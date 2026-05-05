@@ -1,3 +1,18 @@
+---
+gsd_state_version: 1.0
+milestone: v1.1
+milestone_name: Hosted Web App Foundation
+status: planning
+last_updated: "2026-05-05T20:57:06.297Z"
+last_activity: 2026-05-05
+progress:
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
+---
+
 # State — Matrice Commerciale
 
 ## Project Reference
@@ -47,3 +62,10 @@ This is the recommended gate before distributing v10 to Leasétic channel partne
 ---
 
 *Last updated: 2026-04-30 after v1.0 milestone close.*
+
+## Current Position
+
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-05 — Milestone v1.1 started

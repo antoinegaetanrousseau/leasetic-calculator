@@ -27,7 +27,27 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 - On-load self-checks (`assertCalc` 6/6, `assertEscape` 8/8, `assertValidity` 6/6) — every page load logs green or surfaces a regression immediately
 - Backward-compatible: existing partners' v9 localStorage data (coefficients, commission, max threshold, partner name) survives the v9→v10 upgrade with zero reconfiguration
 
-**Pending action before partner distribution:** `FINAL-TEST-v11.md` master ship-gate runbook (10 sections, ~75-105 min in Chrome + Edge) has not yet been executed by Antoine.
+**v10 status:** v10 is a *prepared but undistributed* prototype. The `FINAL-TEST-v11.md` master ship-gate runbook was never executed and the v10 HTML was never sent to partners. v10 is superseded by v1.1 (see below) and will be retired at v1.1 launch — no partner ever runs v10 in production.
+
+## Current Milestone: v1.1 — Hosted Web App Foundation
+
+**Goal:** Migrate Leasétic Matrice from a single-file standalone HTML to a Vercel-hosted multi-page web application with admin-invited authentication, per-partner persistent PDF proposals, and admin-only global financial parameters — designed for future portability to Leasétic's OVH infrastructure.
+
+**Target features:**
+
+- Vercel-hosted Next.js (App Router) web app, Postgres + Blob storage, NextAuth credentials — separate Vercel project under the Memento team, designed portably for future OVH migration (no Vercel-only primitives)
+- Multi-page shell: auth → home (new / browse recent) → proposal flow (data entry → result → review → export). v10 calc engine, FR/EN i18n, and dark mode preserved.
+- Admin-invited authentication (email + password). No self-signup, no SSO. Leasétic admin creates partner accounts in backend; partner receives credentials directly.
+- Persistent PDF proposals stored as immutable binary blobs per partner account. Old proposals never affected by future coefficient changes (non-negotiable invariant).
+- Admin-only coefficients page at hidden URL, role-gated within the same auth system. Edits **global** coefficients, commission rate, and max threshold (single set applies to all partners' new proposals — v10's per-partner customization is removed).
+- Hard cutover: v10 standalone HTML retired at v1.1 launch. Clean-slate partner onboarding (no v10 localStorage migration).
+
+**Out of scope for v1.1** (deferred to v1.2+):
+
+- OVH production deployment (v1.1 deploys to Vercel only; OVH happens once Leasétic IT approves)
+- Mobile-optimized layout
+- Excel export, webhook notifications, automated browser tests
+- Multi-language beyond FR + EN
 
 ## Core value
 
@@ -57,34 +77,50 @@ If that doesn't work, nothing else matters. v10 preserves this core via on-load 
 - ✓ Dark mode with no-flash restore — v1.0
 - ✓ Retractable sidebar with hover tooltips — v1.0
 
-### Active (next milestone candidates)
+### Active (in v1.1)
 
-(Define when starting v1.1 via `/gsd-new-milestone`. Likely candidates from v1.0 deferred list:)
+REQ-IDs assigned in `REQUIREMENTS.md`. High-level scope:
 
-- [ ] Hosted web app (Netlify / Vercel) — eliminates per-partner edit + resend
-- [ ] Partner authentication / SSO — required for hosted version
-- [ ] Centralized LC reference dashboard — backend-required
-- [ ] Excel export of proposal portfolio for portfolio-wide tracking
+- [ ] Vercel-hosted Next.js web app (separate Leasétic project under Memento team)
+- [ ] Portable stack: Next.js + Postgres + Blob storage + NextAuth (no Vercel-only primitives → OVH migration path preserved)
+- [ ] Email + password authentication, admin-invited (no self-signup)
+- [ ] Multi-page shell: auth → home (new / browse recent) → proposal flow (data entry → result → review → export)
+- [ ] Persistent PDF proposals — immutable binary blobs, per-account, never affected by future coefficient changes
+- [ ] Admin-only coefficients page at hidden URL, role-gated, editing **global** coefficients / commission / max threshold
+- [ ] Hard cutover from v10 standalone (clean slate, no localStorage migration)
+
+### Deferred to v1.2+
+
+- [ ] OVH production deployment (Vercel-only in v1.1)
+- [ ] Centralized LC reference dashboard
+- [ ] Excel export of proposal portfolio
 - [ ] Webhook notifications to Leasétic on each proposal generation
-- [ ] Mobile-optimized layout (currently degrades gracefully but not optimized)
+- [ ] Mobile-optimized layout
 - [ ] Multi-language beyond FR + EN
 - [ ] Automated browser tests (Playwright or similar)
 
 ### Out of scope (continuing constraints)
 
-- **Multi-file architecture / build tooling** — explicit constraint of the standalone-HTML distribution model. Any move to a hosted version triggers a re-evaluation, but the standalone v1.0 line stays single-file.
 - **Changing the calculation formula or tranche boundaries** — frozen, partner expectations + business rules. Any change requires explicit business approval.
 - **Removing the "commission invisible" rule** — non-negotiable business rule.
+- **Mutating already-saved PDFs** — once a proposal is stored, its PDF is immutable. Future coefficient changes apply only to new proposals.
 
-## Constraints (still in force)
+## Constraints
 
-- **Single HTML file** for the standalone v10 line. Inline `<style>` + `<script>`. Only external dep: Google Fonts (Plus Jakarta Sans).
-- **Desktop browsers** are the target. Chrome and Edge are required; Firefox and Safari best-effort.
-- **Client-side only** — no server, no network calls beyond Google Fonts CDN.
-- **localStorage keys locked:** `lt_pw`, `lt_coeffs`, `lt_comm`, `lt_max`, `lt_qtr`, `lt_validity`, `lt_lang`, `lt_theme`, `lt_sidebar_collapsed`. Partner data must survive upgrades.
+### Lifted in v1.1 (applied to v1.0 only)
+
+- ~~Single HTML file, inline `<style>` + `<script>`~~ → v1.1 introduces a Next.js build chain (npm + Vite-style toolchain).
+- ~~Client-side only, no server~~ → v1.1 adds Postgres + Blob storage + NextAuth.
+- ~~`window.print()` + `@media print`~~ → v1.1 generates PDFs (server-side or client-capture, decided in planning).
+- ~~v10 localStorage keys (`lt_pw`, `lt_coeffs`, ...)~~ → v1.1 stores per-account state in Postgres; localStorage retained only for ephemeral UI prefs (theme, sidebar, language).
+
+### Still in force
+
 - **Calculation formula frozen.** `loyer = montantHT × (1 + commission/100) × coefficient / 100`.
 - **Commission invisibility:** commission apporteur must never appear in UI or generated proposal.
-- **No server-side PDF.** Print output is `window.print()` + `@media print` CSS.
+- **Desktop browsers** are the primary target. Chrome and Edge are required; Firefox and Safari best-effort. Mobile is out of scope until a future milestone.
+- **PDF immutability** (new in v1.1): once a proposal is stored, neither its inputs nor its rendered PDF may be retroactively changed by anything — including coefficient updates.
+- **Portability constraint** (new in v1.1): the v1.1 stack must be deployable to OVH (generic Node + Postgres + S3-compatible blob) without rewrite. No Vercel-only primitives.
 
 ## Context
 
@@ -126,15 +162,23 @@ If that doesn't work, nothing else matters. v10 preserves this core via on-load 
 - French (product-facing) + English (planning docs)
 - Phase summaries are the durable record; commit log is secondary
 
-## Next milestone
+## Evolution
 
-When ready to start v1.1, run:
-```
-/gsd-new-milestone
-```
+This document evolves at phase transitions and milestone boundaries.
 
-This walks through questioning → optional research → requirements → roadmap for the next milestone cycle.
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
 
 ---
 
-*Last updated: 2026-04-30 after v1.0 milestone close.*
+*Last updated: 2026-05-05 — milestone v1.1 started.*
