@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-06T11:47:00.000Z"
-last_activity: 2026-05-06 -- 05-03 complete: lib/storage adapter (StorageAdapter + VercelBlobStorage + S3Storage + 13 Vitest tests)
+last_updated: "2026-05-06T14:00:00.000Z"
+last_activity: 2026-05-06 -- 05-04 complete: lib/db Drizzle adapter (Neon/postgres-js driver selection + baseline migration SQL committed)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
-  completed_plans: 3
-  percent: 14
+  completed_plans: 4
+  percent: 19
 ---
 
 # State — Matrice Commerciale
@@ -28,16 +28,16 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 5 (bootstrap-deploy) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Executing Phase 5
-Last activity: 2026-05-06 -- 05-03 complete: lib/storage adapter spine (StorageAdapter interface + VercelBlobStorage + S3Storage + Vitest)
+Last activity: 2026-05-06 -- 05-04 complete: lib/db Drizzle 0.45.2 adapter (Neon HTTP + postgres-js driver selection, schema_meta baseline migration committed)
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
 v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases complete
-       └─ Phase 5: Bootstrap & Deploy        ▶ executing (3/7 plans done)
+       └─ Phase 5: Bootstrap & Deploy        ▶ executing (4/7 plans done)
        └─ Phase 6: Auth & Shell              ◯ blocked on P5
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
@@ -104,6 +104,8 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 | display: swap for next/font/local (avoids invisible text on slow networks) | deliberate adjustment from plan note | 05-02 |
 | Static ESM imports in lib/storage/index.ts instead of require() — Vitest ESM context rejects dynamic require() for adjacent .ts modules | Vitest compatibility requirement | 05-03 |
 | Vercel Blob proxy architecture (access:'public' + cacheControlMaxAge:0 + proxy route) — @vercel/blob 0.27.3 has no stable access:'private' option | PITFALLS §5.2 mitigation per plan spec | 05-03 |
+| Drizzle DB adapter mirrors storage adapter pattern (memoized singleton + factory + __resetForTests) — architectural consistency | plan 05-04 design decision | 05-04 |
+| parseDatabaseUrl error message uses 'invalid URL' to match test regex — auto-fixed mismatch between plan spec wording and implementation | Rule 1 auto-fix | 05-04 |
 
 ## Session Notes
 
@@ -111,6 +113,7 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 - **2026-05-06:** 05-01 executed — Next.js 16.2.4 scaffold committed (24a9bae). All pinned versions matched registry exactly. Standalone build artifact confirmed.
 - **2026-05-06:** 05-02 executed — Tailwind v4.2.4 token spine, Plus Jakarta Sans (5 weights) self-hosted, no-flash script, FR/EN i18n helpers, layout shell placeholder. 3 task commits: c2e884e, fce0f98, 0775ffa.
 - **2026-05-06:** 05-03 executed — lib/storage adapter spine: StorageAdapter interface (5 methods), VercelBlobStorage + S3Storage full implementations, STORAGE_DRIVER selector factory, 13 Vitest tests passing. Vitest 2.1.8 installed. OVH portability seam locked. 2 task commits: 2b5af73, c134955.
+- **2026-05-06:** 05-04 executed — lib/db Drizzle adapter spine: drizzle-orm@0.45.2 + @neondatabase/serverless@0.10.4 + postgres@3.4.5 + drizzle-kit@0.30.1 installed (exact pins). DB adapter with Neon HTTP / postgres-js driver selection by DATABASE_URL host. schema_meta baseline migration SQL committed to git. 9 db tests + 13 storage tests all passing. generate-only discipline locked. 3 task commits: 1b9fc8c, c9ab5e6, a4ddfe9.
 
 ## Open Blockers
 
@@ -122,4 +125,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-06 — 05-03 complete: lib/storage adapter spine (StorageAdapter + VercelBlobStorage + S3Storage + 13 Vitest tests).*
+*Last updated: 2026-05-06 — 05-04 complete: lib/db Drizzle adapter (Neon HTTP + postgres-js driver selection, schema_meta baseline migration committed).*

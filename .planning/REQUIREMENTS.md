@@ -18,7 +18,7 @@
 - [ ] **BOOT-06**: ESLint + CI grep enforce the no-Vercel-only-primitives rule on every PR
 - [ ] **BOOT-07**: `next.config.ts` configured with `output: 'standalone'` from the first commit
 - [x] **BOOT-08**: Tailwind CSS v4 configured with dark-mode `selector` strategy using `[data-theme='dark']` on `<html>` (matches v10 carry-over and ARCHITECTURE.md §7 for SSR cookie compatibility — no class mutation, no `next-themes`)
-- [ ] **BOOT-09**: Drizzle ORM 0.45.x + drizzle-kit configured; schema lives in `src/db/schema.ts`; migrations are versioned SQL files committed to git
+- [x] **BOOT-09**: Drizzle ORM 0.45.x + drizzle-kit configured; schema lives in `src/db/schema.ts`; migrations are versioned SQL files committed to git
 - [ ] **BOOT-10**: Migrations are applied only via an explicit GitHub Action against production — never auto-run on Vercel deploy
 - [ ] **BOOT-11**: Vitest configured for unit tests; CI runs the suite on every PR
 - [ ] **BOOT-12**: First deployable artifact: a `/healthz` route that exercises a DB read + blob round-trip and returns `{ db: ok, blob: ok }`
