@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: Hosted Web App Foundation
-status: planning
-last_updated: "2026-05-05T21:30:00.000Z"
-last_activity: 2026-05-05
+milestone_name: — Hosted Web App Foundation
+status: executing
+last_updated: "2026-05-06T11:25:24.679Z"
+last_activity: 2026-05-06 -- Phase 5 execution started
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 7
   completed_plans: 0
   percent: 0
 ---
@@ -23,21 +23,21 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 5 (Bootstrap & Deploy) — ready to plan.
+**Current focus:** Phase 5 — bootstrap-deploy
 
 ## Current Position
 
-Phase: **Phase 5 — Bootstrap & Deploy** (not started, ready to plan)
-Plan: —
-Status: Roadmap approved; awaiting `/gsd-plan-phase 5`
-Last activity: 2026-05-05 — Roadmap created (Phases 5-10), 108/108 requirements mapped
+Phase: 5 (bootstrap-deploy) — EXECUTING
+Plan: 2 of 7
+Status: Executing Phase 5
+Last activity: 2026-05-06 -- 05-01 complete: Next.js 16.2.4 App Router scaffold with standalone output
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
 v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases complete
-       └─ Phase 5: Bootstrap & Deploy        ◯ ready to plan
+       └─ Phase 5: Bootstrap & Deploy        ▶ executing (1/7 plans done)
        └─ Phase 6: Auth & Shell              ◯ blocked on P5
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
@@ -48,6 +48,7 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 ## v1.0 Closure Status
 
 ✅ **v1.0 complete** — shipped 2026-04-30
+
 - 4 phases, 11 plans, 69/69 requirements complete
 - Detailed archives in `.planning/milestones/v1.0-*.md`
 - Living log in `.planning/MILESTONES.md`
@@ -92,9 +93,17 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 - Phase summaries proved the most durable artifact during v1.0's git-corruption incident (see Session Notes). Same discipline applies to v1.1: durable summaries first, commit log second.
 - v1.0 phase directories are still in place under `.planning/phases/`. Use `/gsd-cleanup` to archive them later if the working directory feels cluttered.
 
+## Decisions Log
+
+| Decision | Source | Added |
+|---|---|---|
+| Exact version pins without carets (all direct deps in package.json) | Open Q4 resolution | 05-01 |
+| tsconfig jsx: preserve → react-jsx (Next.js 16 mandates it; accepted as expected) | Next.js build auto-update | 05-01 |
+
 ## Session Notes
 
 - **Git history was lost during a directory move on 2026-04-30** (cloud-sync corruption). Working tree intact; planning artifacts preserved. Fresh git history initialized at v1.0 close, tagged `v1.0`. The corrupted `.git.corrupted-backup/` directory remains in the project root (gitignored).
+- **2026-05-06:** 05-01 executed — Next.js 16.2.4 scaffold committed (24a9bae). All pinned versions matched registry exactly. Standalone build artifact confirmed.
 
 ## Open Blockers
 
