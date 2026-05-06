@@ -13,8 +13,8 @@
 - [ ] **BOOT-01**: Repo initialized as a Next.js (App Router) TypeScript project under a Vercel-deployable structure
 - [ ] **BOOT-02**: Project deployed to a new Vercel project (separate from Memento Hub) under the existing Memento Vercel team
 - [ ] **BOOT-03**: Postgres database provisioned via Neon (Vercel Marketplace integration) with separate dev / preview / prod databases
-- [ ] **BOOT-04**: Blob storage provisioned (Vercel Blob) with private-access default
-- [ ] **BOOT-05**: All hosting-provider primitives (blob, DB) accessed exclusively through `lib/storage` and `lib/db` adapter interfaces — no direct `@vercel/*` imports outside those modules
+- [x] **BOOT-04**: Blob storage provisioned (Vercel Blob) with private-access default
+- [x] **BOOT-05**: All hosting-provider primitives (blob, DB) accessed exclusively through `lib/storage` and `lib/db` adapter interfaces — no direct `@vercel/*` imports outside those modules
 - [ ] **BOOT-06**: ESLint + CI grep enforce the no-Vercel-only-primitives rule on every PR
 - [ ] **BOOT-07**: `next.config.ts` configured with `output: 'standalone'` from the first commit
 - [x] **BOOT-08**: Tailwind CSS v4 configured with dark-mode `selector` strategy using `[data-theme='dark']` on `<html>` (matches v10 carry-over and ARCHITECTURE.md §7 for SSR cookie compatibility — no class mutation, no `next-themes`)
