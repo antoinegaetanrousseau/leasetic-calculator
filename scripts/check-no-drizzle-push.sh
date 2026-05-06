@@ -15,7 +15,7 @@ matches=$(
     --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
     --include='*.md' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.mjs' --include='*.cjs' \
     --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=drizzle --exclude-dir=.planning \
-    --exclude='check-no-drizzle-push.sh' --exclude='drizzle.config.ts' \
+    --exclude='check-no-drizzle-push.sh' --exclude='drizzle.config.ts' --exclude='migrate.ts' \
     "drizzle-kit push" . 2>/dev/null \
   || true
 )
