@@ -38,7 +38,15 @@
   3. Opening a PR that imports `@vercel/blob` outside `lib/storage/` (or any other forbidden Vercel-only primitive) fails CI
   4. `npm test` runs the Vitest suite locally and on every PR via CI
   5. Drizzle migrations are version-controlled SQL files and apply only via the explicit production GitHub Action (never auto-run on Vercel deploy)
-**Plans**: TBD
+**Plans:** 7 plans
+Plans:
+- [ ] 05-01-PLAN.md — Repo scaffolding + Next.js init with output: standalone (BOOT-01, BOOT-07)
+- [ ] 05-02-PLAN.md — Tailwind v4 + UI-SPEC token spine + Plus Jakarta Sans + cookie theme/locale bootstrap + layout shell (BOOT-08)
+- [ ] 05-03-PLAN.md — lib/storage adapter (StorageAdapter interface + VercelBlobStorage + S3Storage drivers + Vitest selector tests) (BOOT-04, BOOT-05)
+- [ ] 05-04-PLAN.md — lib/db Drizzle 0.45 adapter + driver-by-URL selection + drizzle-kit generate baseline migration (BOOT-09)
+- [ ] 05-05-PLAN.md — ESLint flat config + CI grep gates (no @vercel/*, no drizzle-kit push) + Vitest CI workflow (BOOT-06, BOOT-11)
+- [ ] 05-06-PLAN.md — Production migration GitHub Action (workflow_dispatch + environment approval + scripts/migrate.ts via postgres-js) (BOOT-10)
+- [ ] 05-07-PLAN.md — Vercel/Neon/Blob provisioning + /healthz route exercising DB + blob round-trip via adapters (BOOT-02, BOOT-03, BOOT-04, BOOT-12)
 
 ### Phase 6: Auth & Shell
 **Goal**: A real user can log in with email/password, see a bilingual themed app shell, and reach exactly the routes their role permits — with the admin URL hidden behind an env-driven segment that 404s on tampering.
@@ -112,7 +120,7 @@
 | 2. Security Hardening | v1.0 | 2/2 | Complete | 2026-04-30 |
 | 3. UX Polish & i18n | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
-| 5. Bootstrap & Deploy | v1.1 | 0/0 | Not started | - |
+| 5. Bootstrap & Deploy | v1.1 | 0/7 | Not started | - |
 | 6. Auth & Shell | v1.1 | 0/0 | Not started | - |
 | 7. Calc Engine Port + Proposal Form | v1.1 | 0/0 | Not started | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
