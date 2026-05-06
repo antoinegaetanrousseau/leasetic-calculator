@@ -1,0 +1,95 @@
+name: DB Migrate (Production)
+
+# MANUAL TRIGGER ONLY. No on:push, no on:pull_request, no on:schedule.
+# Per BOOT-10 + STATE.md: migrations apply to production only via this gated, human-approved path.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "MIGRATE PROD" exactly to confirm you intend to apply migrations to production'
+        required: true
+        type: string
+
+# Cancel concurrent runs against the same environment to avoid double-apply races.
+concurrency:
+  group: db-migrate-prod
+  cancel-in-progress: false  # Do NOT cancel a running migration; let it finish
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: Dry run — list pending migrations
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    # Note: dry-run does NOT use the production environment because it doesn't connect to the DB.
+    # It just lists files from drizzle/ directory.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Verify confirmation phrase
+        # Use env var to avoid direct interpolation of user input into shell (command injection safety)
+        env:
+          CONFIRM_INPUT: ${{ github.event.inputs.confirm }}
+        run: |
+          if [ "$CONFIRM_INPUT" != "MIGRATE PROD" ]; then
+            echo "ERROR: confirm input must be exactly 'MIGRATE PROD' (got: '$CONFIRM_INPUT')"
+            exit 1
+          fi
+          echo "Confirmation OK."
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: List pending migrations (dry-run)
+        # The dry-run uses a placeholder DATABASE_URL because it never connects.
+        env:
+          DATABASE_URL: 'postgres://dryrun@localhost:5432/dryrun'
+        run: npm run db:migrate:dry-run
+
+  apply:
+    name: Apply migrations to production
+    needs: dry-run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # The 'production' environment provides the human approval gate.
+    # Antoine must configure this environment in GitHub Settings → Environments
+    # with required-reviewers protection (one-time setup, see docs/operations/migrations.md).
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply migrations
+        # DATABASE_URL_PROD is a SECRET on the 'production' environment.
+        # Setting it as DATABASE_URL because scripts/migrate.ts reads that var.
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "ERROR: DATABASE_URL_PROD secret is not set on the 'production' environment."
+            echo "Set it in GitHub Settings → Environments → production → Environment secrets."
+            exit 2
+          fi
+          npm run db:migrate
