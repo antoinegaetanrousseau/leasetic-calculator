@@ -194,3 +194,20 @@ Files verified present:
 Commits verified:
 - 595ceeb: Task 1 (feat — migration runner + tsx + db:migrate scripts)
 - 930d3c0: Task 2 (feat — db-migrate.yml workflow + runbook)
+
+---
+
+## Checkpoint Resolution (2026-05-06, post-provisioning)
+
+GitHub Environment `production` created and configured (limited by free-plan):
+- ✅ Environment exists, scoped to `main` branch (DATABASE_URL_PROD secret routes correctly)
+- ✅ `DATABASE_URL_PROD` secret added with the Neon main-branch pooled URL
+- ⚠ **Required-reviewer protection rule NOT enforceable on free-plan + private repo.** Filed as Phase 5 follow-up: either upgrade GitHub plan ($4/user/mo Pro) or make repo public. Until then, the workflow's `MIGRATE PROD` typed-confirmation in the dry-run job is the meaningful gate.
+
+Migration workflow run #25464278518 (2026-05-06):
+- Dry-run job: ✅ listed `0000_striped_metal_master.sql` (167 bytes), exit 0
+- Apply job: ✅ ran `drizzle-orm/postgres-js/migrator` against `DATABASE_URL_PROD`, applied baseline migration successfully
+- Total duration: ~50s
+- Verified post-apply: `/healthz` from the deploy now returns `db: ok` (the `schema_meta` table created by the migration is what `checkDatabaseHealth` queries)
+
+**Plan 05-06: COMPLETE.** BOOT-10 satisfied with the documented free-plan caveat.

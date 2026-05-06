@@ -181,3 +181,31 @@ Phase 6 (Auth) can begin once the human checkpoint is confirmed. The auth infras
 ---
 *Phase: 05-bootstrap-deploy*
 *Completed (partial): 2026-05-06 — Task 3 human-action checkpoint pending*
+
+---
+
+## Checkpoint Resolution (2026-05-06, post-provisioning + verification)
+
+All 8 user-setup tasks complete:
+1. ✅ GitHub repo created at `antoinegaetanrousseau/leasetic-calculator` (private), `main` pushed (35 commits at first push, plus the post-fix commit `51db390`)
+2. ✅ Vercel project `leasetic-matrice` created (id `prj_Th9bJEtzUvmtov2eTtnKas9g6Xxf`); deployed at canonical URL `https://leasetic-matrice.vercel.app` (BOOT-02 partial: lives in personal scope `antoinerousseau-5272s-projects`, transfer-to-Memento-team is a follow-up)
+3. ⚠ Neon Postgres provisioned (project `calm-wave-22626395`, EU central). **Single `main` branch shared across all 3 Vercel scopes.** The 3-branch split (`preview`, `development` off `main`) is a Phase 5 follow-up — non-blocking for /healthz, but required before Phase 8 PDF persistence ships real partner data.
+4. ✅ Vercel Blob store provisioned with **private access** (BOOT-04 satisfied properly — see SDK upgrade note below)
+5. ✅ Env vars set across all 3 scopes: `STORAGE_DRIVER=vercel`, `AUTH_SECRET` (separate values per scope for trust isolation), `ADMIN_URL_SEGMENT`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`. ADMIN_URL_SEGMENT for production saved to `/tmp/leasetic-admin-segment.txt` for Phase 6 access.
+6. ✅ GitHub Environment `production` + `DATABASE_URL_PROD` secret (see 05-06 SUMMARY for protection-rule limitation note)
+7. ✅ Baseline migration applied via workflow run #25464278518
+8. ✅ **Production `/healthz` returns HTTP 200 with `{ db: "ok", blob: "ok" }` — BOOT-12 success criterion met.**
+
+### SDK upgrade detour (commit `51db390`)
+
+During /healthz verification, blob round-trip failed with: "Vercel Blob: Cannot use public access on a private store." The original driver in `src/lib/storage/vercel-blob.ts` was authored against `@vercel/blob` 0.27.x which only supported `access: 'public'` (a workaround when private stores weren't yet shipped). The provisioned store is private (correct architecture), but the v0.27 SDK couldn't address it.
+
+Fix: upgraded `@vercel/blob` 0.27.3 → 2.3.3, rewrote the driver to use the v2 API:
+- All operations call with `access: 'private'`
+- `get()` switched to v2's stream-based response (Web ReadableStream → Buffer via Response wrapper)
+- `head/del` call with pathname directly (no more list-prefix workaround)
+- Typed `BlobError` subclasses (`BlobNotFoundError`, `BlobAccessError`) mapped to our `Storage*Error` types
+
+This is a quiet architectural improvement — Phase 5 originally planned to use `access: 'public'` as a workaround per the driver's own code comment. We finished with `access: 'private'` properly, and Phase 8's PDF storage inherits the more secure default.
+
+**Plan 05-07: COMPLETE.** BOOT-02 (caveat: personal scope), BOOT-03 (caveat: 1 branch), BOOT-04, BOOT-12 all satisfied.

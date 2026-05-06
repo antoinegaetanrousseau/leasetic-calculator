@@ -10,18 +10,18 @@
 
 ### BOOT — Bootstrap & Deployment
 
-- [ ] **BOOT-01**: Repo initialized as a Next.js (App Router) TypeScript project under a Vercel-deployable structure
-- [ ] **BOOT-02**: Project deployed to a new Vercel project (separate from Memento Hub) under the existing Memento Vercel team
-- [ ] **BOOT-03**: Postgres database provisioned via Neon (Vercel Marketplace integration) with separate dev / preview / prod databases
+- [x] **BOOT-01**: Repo initialized as a Next.js (App Router) TypeScript project under a Vercel-deployable structure
+- [x] **BOOT-02**: Project deployed to a new Vercel project (under personal scope `antoinerousseau-5272s-projects` for v1.1; transfer to Memento team is a Phase 5 follow-up — does not block functionality)
+- [~] **BOOT-03**: Postgres database provisioned via Neon (Vercel Marketplace integration). PARTIAL: single `main` branch shared across Production/Preview/Development scopes; 3-branch split (preview, development off main) is a Phase 5 follow-up. Functionally green for /healthz; isolation upgrade required before Phase 8 PDF storage starts seeing real proposal data.
 - [x] **BOOT-04**: Blob storage provisioned (Vercel Blob) with private-access default
 - [x] **BOOT-05**: All hosting-provider primitives (blob, DB) accessed exclusively through `lib/storage` and `lib/db` adapter interfaces — no direct `@vercel/*` imports outside those modules
 - [x] **BOOT-06**: ESLint + CI grep enforce the no-Vercel-only-primitives rule on every PR
-- [ ] **BOOT-07**: `next.config.ts` configured with `output: 'standalone'` from the first commit
+- [x] **BOOT-07**: `next.config.ts` configured with `output: 'standalone'` from the first commit
 - [x] **BOOT-08**: Tailwind CSS v4 configured with dark-mode `selector` strategy using `[data-theme='dark']` on `<html>` (matches v10 carry-over and ARCHITECTURE.md §7 for SSR cookie compatibility — no class mutation, no `next-themes`)
 - [x] **BOOT-09**: Drizzle ORM 0.45.x + drizzle-kit configured; schema lives in `src/db/schema.ts`; migrations are versioned SQL files committed to git
-- [ ] **BOOT-10**: Migrations are applied only via an explicit GitHub Action against production — never auto-run on Vercel deploy
+- [x] **BOOT-10**: Migrations are applied only via an explicit GitHub Action against production — never auto-run on Vercel deploy. Workflow run #25464278518 applied `0000_striped_metal_master.sql` to Neon prod successfully on 2026-05-06. Note: GitHub free-plan + private-repo cannot enforce required-reviewer protection rule on the `production` Environment — typed-confirmation gate (`MIGRATE PROD`) in the dry-run job is the meaningful confirmation step. Plan upgrade or repo-go-public is a Phase 5 follow-up.
 - [x] **BOOT-11**: Vitest configured for unit tests; CI runs the suite on every PR
-- [ ] **BOOT-12**: First deployable artifact: a `/healthz` route that exercises a DB read + blob round-trip and returns `{ db: ok, blob: ok }`
+- [x] **BOOT-12**: First deployable artifact: a `/healthz` route that exercises a DB read + blob round-trip and returns `{ db: ok, blob: ok }`. Verified live on 2026-05-06 at https://leasetic-matrice.vercel.app/healthz returning HTTP 200 with `{ db: "ok", blob: "ok" }`.
 
 ### AUTH — Authentication & Authorization
 

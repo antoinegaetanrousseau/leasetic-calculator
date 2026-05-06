@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: executing
-last_updated: "2026-05-06T13:05:00.000Z"
-last_activity: 2026-05-06 -- 05-07 tasks 1+2 complete: /healthz route + health.ts helpers + tests (BOOT-12 code); task 3 checkpoint awaiting Vercel/Neon/Blob provisioning + production /healthz verification
+status: phase-complete
+last_updated: "2026-05-06T22:35:00.000Z"
+last_activity: 2026-05-06 -- Phase 5 complete; /healthz live at https://leasetic-matrice.vercel.app returning { db:ok, blob:ok }; @vercel/blob upgraded 0.27→2.3 with private-store driver rewrite (commit 51db390)
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 7
-  completed_plans: 5
-  percent: 24
-  note: "05-06 tasks 1+2 complete; plan not yet marked done (checkpoint pending)"
+  completed_plans: 7
+  percent: 17
 ---
 
 # State — Matrice Commerciale
@@ -24,27 +23,34 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 5 — bootstrap-deploy
+**Current focus:** Phase 5 — bootstrap-deploy ✅ **COMPLETE**. Ready to plan Phase 6.
 
 ## Current Position
 
-Phase: 5 (bootstrap-deploy) — EXECUTING
-Plan: 7 of 7 (checkpoint pending)
-Status: Executing Phase 5 — checkpoint:human-action at 05-07 Task 3
-Last activity: 2026-05-06 -- 05-07 tasks 1+2 complete: /healthz route + health.ts helpers + tests (BOOT-12 code); Task 3 checkpoint awaiting Vercel project creation + Neon provisioning + Blob provisioning + baseline migration + production /healthz verification
+Phase: 5 (bootstrap-deploy) — ✅ COMPLETE
+Plan: 7 of 7 done
+Status: Phase 5 complete — /healthz live at https://leasetic-matrice.vercel.app returning HTTP 200 `{ db: "ok", blob: "ok" }`
+Next: `/gsd-plan-phase 6` (Auth & Shell)
+Last activity: 2026-05-06 -- Phase 5 complete; @vercel/blob upgraded to v2.3.3 + driver rewritten for private stores (commit 51db390)
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
-v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases complete
-       └─ Phase 5: Bootstrap & Deploy        ▶ executing (6/7 plans done, 1 pending checkpoint)
-       └─ Phase 6: Auth & Shell              ◯ blocked on P5
+v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases complete
+       └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
+       └─ Phase 6: Auth & Shell              ◯ READY — unblocked
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
        └─ Phase 9: Admin Surface             ◯ blocked on P8
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
 ```
+
+## Phase 5 follow-ups (non-blocking, deferred)
+
+1. **Neon branch split**: currently 1 shared `main` branch across 3 Vercel scopes. Create `preview` and `development` branches off `main`, scope `DATABASE_URL` per env. Required before Phase 8 PDF persistence ships real partner data.
+2. **GitHub Environment protection rules**: free-plan + private-repo can't enforce required-reviewer or branch policy on the `production` Environment. Either upgrade to Pro ($4/user/mo) or make repo public. The workflow's typed-confirmation gate (`MIGRATE PROD`) is the meaningful confirmation today.
+3. **Vercel project ownership**: project lives in personal scope `antoinerousseau-5272s-projects`. Transfer to `memento` team for v1.1 launch (no code change required, just dashboard transfer).
 
 ## v1.0 Closure Status
 
