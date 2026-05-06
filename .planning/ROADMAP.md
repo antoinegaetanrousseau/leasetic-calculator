@@ -41,7 +41,7 @@
 **Plans:** 7 plans
 Plans:
 - [x] 05-01-PLAN.md — Repo scaffolding + Next.js init with output: standalone (BOOT-01, BOOT-07)
-- [ ] 05-02-PLAN.md — Tailwind v4 + UI-SPEC token spine + Plus Jakarta Sans + cookie theme/locale bootstrap + layout shell (BOOT-08)
+- [x] 05-02-PLAN.md — Tailwind v4 + UI-SPEC token spine + Plus Jakarta Sans + cookie theme/locale bootstrap + layout shell (BOOT-08)
 - [ ] 05-03-PLAN.md — lib/storage adapter (StorageAdapter interface + VercelBlobStorage + S3Storage drivers + Vitest selector tests) (BOOT-04, BOOT-05)
 - [ ] 05-04-PLAN.md — lib/db Drizzle 0.45 adapter + driver-by-URL selection + drizzle-kit generate baseline migration (BOOT-09)
 - [ ] 05-05-PLAN.md — ESLint flat config + CI grep gates (no @vercel/*, no drizzle-kit push) + Vitest CI workflow (BOOT-06, BOOT-11)
@@ -120,7 +120,7 @@ Plans:
 | 2. Security Hardening | v1.0 | 2/2 | Complete | 2026-04-30 |
 | 3. UX Polish & i18n | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
-| 5. Bootstrap & Deploy | v1.1 | 1/7 | In progress | - |
+| 5. Bootstrap & Deploy | v1.1 | 2/7 | In progress | - |
 | 6. Auth & Shell | v1.1 | 0/0 | Not started | - |
 | 7. Calc Engine Port + Proposal Form | v1.1 | 0/0 | Not started | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
@@ -129,5 +129,5 @@ Plans:
 
 ---
 
-*Last updated: 2026-05-06 — 05-01 complete: Next.js 16.2.4 scaffold with standalone output.*
+*Last updated: 2026-05-06 — 05-02 complete: Tailwind v4 token spine + Plus Jakarta Sans + no-flash + layout shell.*
 *Detailed v1.0 archives in `.planning/milestones/`.*

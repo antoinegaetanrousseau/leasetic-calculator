@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-06T11:25:24.679Z"
-last_activity: 2026-05-06 -- Phase 5 execution started
+last_updated: "2026-05-06T11:35:00.000Z"
+last_activity: 2026-05-06 -- 05-02 complete: Tailwind v4 token spine + Plus Jakarta Sans + no-flash + layout shell
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 7
 ---
 
 # State — Matrice Commerciale
@@ -28,16 +28,16 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 5 (bootstrap-deploy) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Executing Phase 5
-Last activity: 2026-05-06 -- 05-01 complete: Next.js 16.2.4 App Router scaffold with standalone output
+Last activity: 2026-05-06 -- 05-02 complete: Tailwind v4 + token spine + Plus Jakarta Sans + no-flash + FR/EN + layout shell
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
 v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases complete
-       └─ Phase 5: Bootstrap & Deploy        ▶ executing (1/7 plans done)
+       └─ Phase 5: Bootstrap & Deploy        ▶ executing (2/7 plans done)
        └─ Phase 6: Auth & Shell              ◯ blocked on P5
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
@@ -99,11 +99,15 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 |---|---|---|
 | Exact version pins without carets (all direct deps in package.json) | Open Q4 resolution | 05-01 |
 | tsconfig jsx: preserve → react-jsx (Next.js 16 mandates it; accepted as expected) | Next.js build auto-update | 05-01 |
+| Tailwind v4 at 4.2.4 (not 4.0.0) — @tailwindcss/postcss@4.0.0 sub-depends on tailwindcss@4.2.4; coherent 4.2.4 set required | Build-time version mismatch (ScannerOptions.sources) | 05-02 |
+| @custom-variant dark uses :where() selector to match [data-theme=dark] and descendants | UI-SPEC + Tailwind v4 docs | 05-02 |
+| display: swap for next/font/local (avoids invisible text on slow networks) | deliberate adjustment from plan note | 05-02 |
 
 ## Session Notes
 
 - **Git history was lost during a directory move on 2026-04-30** (cloud-sync corruption). Working tree intact; planning artifacts preserved. Fresh git history initialized at v1.0 close, tagged `v1.0`. The corrupted `.git.corrupted-backup/` directory remains in the project root (gitignored).
 - **2026-05-06:** 05-01 executed — Next.js 16.2.4 scaffold committed (24a9bae). All pinned versions matched registry exactly. Standalone build artifact confirmed.
+- **2026-05-06:** 05-02 executed — Tailwind v4.2.4 token spine, Plus Jakarta Sans (5 weights) self-hosted, no-flash script, FR/EN i18n helpers, layout shell placeholder. 3 task commits: c2e884e, fce0f98, 0775ffa.
 
 ## Open Blockers
 
@@ -115,4 +119,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-05 — v1.1 roadmap approved, ready to plan Phase 5.*
+*Last updated: 2026-05-06 — 05-02 complete: design system token spine, font bootstrap, layout shell.*
