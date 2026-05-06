@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { getStorage, __resetStorageForTests, StorageError, StorageNotFoundError, StorageAuthError } from './index';
+import { getStorage, __resetStorageForTests, StorageError, StorageNotFoundError, StorageAuthError, VercelBlobStorage, S3Storage } from './index';
 
 describe('storage driver selection', () => {
   const originalEnv = { ...process.env };
@@ -8,6 +8,12 @@ describe('storage driver selection', () => {
     __resetStorageForTests();
     // Strip the env vars we care about so tests are deterministic
     delete process.env.STORAGE_DRIVER;
+    delete process.env.BLOB_READ_WRITE_TOKEN;
+    delete process.env.S3_ENDPOINT;
+    delete process.env.S3_REGION;
+    delete process.env.S3_BUCKET;
+    delete process.env.S3_ACCESS_KEY_ID;
+    delete process.env.S3_SECRET_ACCESS_KEY;
   });
 
   afterEach(() => {
@@ -26,21 +32,19 @@ describe('storage driver selection', () => {
     expect(() => getStorage()).toThrow(/Unknown STORAGE_DRIVER/);
   });
 
-  it('returns a VercelBlobStorage instance when STORAGE_DRIVER=vercel', async () => {
+  it('returns a VercelBlobStorage instance when STORAGE_DRIVER=vercel', () => {
     process.env.STORAGE_DRIVER = 'vercel';
     process.env.BLOB_READ_WRITE_TOKEN = 'test-token-not-used-here';
-    const { VercelBlobStorage } = await import('./vercel-blob');
     expect(getStorage()).toBeInstanceOf(VercelBlobStorage);
   });
 
-  it('returns an S3Storage instance when STORAGE_DRIVER=s3', async () => {
+  it('returns an S3Storage instance when STORAGE_DRIVER=s3', () => {
     process.env.STORAGE_DRIVER = 's3';
     process.env.S3_ENDPOINT = 'https://test.example.com';
     process.env.S3_REGION = 'eu-west-3';
     process.env.S3_BUCKET = 'test-bucket';
     process.env.S3_ACCESS_KEY_ID = 'test-key';
     process.env.S3_SECRET_ACCESS_KEY = 'test-secret';
-    const { S3Storage } = await import('./s3');
     expect(getStorage()).toBeInstanceOf(S3Storage);
   });
 });

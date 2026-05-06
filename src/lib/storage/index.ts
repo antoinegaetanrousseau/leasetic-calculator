@@ -1,12 +1,21 @@
 import type { StorageAdapter } from './adapter';
 import { StorageError } from './errors';
+import { VercelBlobStorage } from './vercel-blob';
+import { S3Storage } from './s3';
 
 export type { StorageAdapter, StorageObject, PutOptions } from './adapter';
 export { StorageError, StorageNotFoundError, StorageAuthError } from './errors';
+export { VercelBlobStorage } from './vercel-blob';
+export { S3Storage } from './s3';
 
 /**
  * Build a fresh StorageAdapter based on the STORAGE_DRIVER env var.
  * Exposed for tests; production code uses the memoized `storage` singleton below.
+ *
+ * Note: both drivers are imported at module load time (standard ESM). The bundle
+ * split between Vercel/S3 SDKs is handled at the process level by STORAGE_DRIVER —
+ * whichever driver is not in use will simply not be instantiated. Next.js build-time
+ * tree-shaking handles further optimisation for the browser bundle.
  */
 export function getStorage(): StorageAdapter {
   const driver = process.env.STORAGE_DRIVER;
@@ -16,14 +25,9 @@ export function getStorage(): StorageAdapter {
     );
   }
   if (driver === 'vercel') {
-    // Lazy-import to avoid pulling @vercel/blob into the bundle when STORAGE_DRIVER=s3 (and vice versa).
-    // eslint-disable-next-line @typescript-eslint/no-require-imports -- intentional dynamic require for driver isolation
-    const { VercelBlobStorage } = require('./vercel-blob') as typeof import('./vercel-blob');
     return new VercelBlobStorage();
   }
   if (driver === 's3') {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { S3Storage } = require('./s3') as typeof import('./s3');
     return new S3Storage();
   }
   throw new StorageError(
@@ -32,7 +36,7 @@ export function getStorage(): StorageAdapter {
 }
 
 /**
- * Memoized singleton. First read instantiates the driver; subsequent reads return it.
+ * Memoized singleton. First call instantiates the driver; subsequent calls return it.
  * Reset by calling `__resetStorageForTests()` (test-only).
  */
 let _storage: StorageAdapter | null = null;
