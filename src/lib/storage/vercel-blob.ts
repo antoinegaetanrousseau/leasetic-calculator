@@ -1,25 +1,38 @@
-import { put, head, del, list } from '@vercel/blob';
+import {
+  put,
+  head,
+  del,
+  get,
+  BlobNotFoundError,
+  BlobAccessError,
+  BlobError,
+} from '@vercel/blob';
 import type { StorageAdapter, StorageObject, PutOptions } from './adapter';
 import { MAX_SIGNED_URL_TTL_SECONDS } from './adapter';
 import { StorageError, StorageNotFoundError, StorageAuthError } from './errors';
 
 /**
- * Vercel Blob driver. Implements StorageAdapter against @vercel/blob.
+ * Vercel Blob driver. Implements StorageAdapter against @vercel/blob v2.x.
  *
- * IMPORTANT (PITFALLS §5.2): Vercel Blob URLs returned by put() are PUBLIC by default
- * (unguessable, but anyone with the URL can fetch). For Phase 8 PDF storage, this is
- * NOT sufficient. We therefore:
- *   1. Use unguessable keys (uuid in path) with access: 'public' on put()
- *   2. NEVER expose the put() URL outside the storage layer
- *   3. The application proxies all PDF reads through /api/proposals/{id}/pdf which
- *      reads via this driver's get() method (server-to-server) and re-streams with
- *      auth + ownership checks (see PITFALLS §5.3)
+ * Architecture (PITFALLS §5.2, BOOT-04):
+ *   The Vercel Blob *store* is provisioned with private access. Every SDK call
+ *   here passes `access: 'private'` — operations against a public store would
+ *   fail at the SDK validation layer.
  *
- * As of @vercel/blob 0.27.x, `access: 'private'` is not yet a stable option.
- * The contract above (proxy through authenticated route) is the v1.1 mitigation.
- * If/when Vercel Blob ships true private access, switch the access option here
- * and adjust the proxy route accordingly.
+ *   With private stores:
+ *   - put() returns a URL on the *.private.blob.vercel-storage.com host
+ *   - Direct unauthed fetch of that URL returns 403 (server-enforced)
+ *   - Reads MUST go through this driver's get() (uses the SDK's get() with the
+ *     BLOB_READ_WRITE_TOKEN under the hood)
+ *   - Application proxies all PDF reads through /api/proposals/{id}/pdf with
+ *     auth + ownership checks (PITFALLS §5.3)
+ *
+ * SDK migration note: previously @vercel/blob 0.27.x used `access: 'public'` as
+ * a workaround when private stores weren't yet shipped. v2.x makes private the
+ * first-class option; this driver is the v2 rewrite.
  */
+const ACCESS = 'private' as const;
+
 export class VercelBlobStorage implements StorageAdapter {
   private readonly token: string;
 
@@ -33,79 +46,92 @@ export class VercelBlobStorage implements StorageAdapter {
     this.token = token;
   }
 
+  /** Map a thrown BlobError subclass (or anything else) to one of our StorageError types. */
+  private wrap(e: unknown, op: string, key: string): StorageError {
+    if (e instanceof StorageError) return e;
+    if (e instanceof BlobNotFoundError) return new StorageNotFoundError(key);
+    if (e instanceof BlobAccessError) {
+      return new StorageAuthError(`Vercel Blob auth failed during ${op} for key=${key}`);
+    }
+    if (e instanceof BlobError) {
+      return new StorageError(`Vercel Blob ${op} failed for key=${key}: ${e.message}`, e);
+    }
+    return new StorageError(`Vercel Blob ${op} failed for key=${key}`, e);
+  }
+
   async put(key: string, body: Buffer | Uint8Array, opts: PutOptions): Promise<StorageObject> {
     try {
-      // addRandomSuffix: false because we already include uuid in the key (proposals/{userId}/{proposalId}.pdf)
-      // Vercel Blob's PutBody type accepts Buffer | File | ArrayBuffer but not plain Uint8Array.
       // Buffer.from() on a Buffer returns the same buffer (no copy); on Uint8Array it wraps.
       const bodyBuf: Buffer = Buffer.isBuffer(body) ? body : Buffer.from(body);
       const result = await put(key, bodyBuf, {
-        access: 'public',
+        access: ACCESS,
         contentType: opts.contentType,
-        cacheControlMaxAge: 0, // never cache; PITFALLS §5.4
+        cacheControlMaxAge: 0, // PITFALLS §5.4
         addRandomSuffix: false,
         token: this.token,
       });
-      // Vercel Blob's put() returns { url, downloadUrl, pathname, contentType, contentDisposition }.
-      // We do a head() to get full metadata for the StorageObject envelope.
-      const headInfo = await head(result.url, { token: this.token });
+      // put() returns { url, downloadUrl, pathname } only. head() round-trips the
+      // canonical metadata (size, etag, uploadedAt). One extra request, but ensures
+      // StorageObject is fully populated with server values.
+      const meta = await head(result.pathname, { token: this.token });
       return {
-        key,
-        size: headInfo.size,
-        // Vercel Blob doesn't expose a stable etag; use the URL as the immutable identity
-        etag: headInfo.url,
-        contentType: headInfo.contentType ?? opts.contentType,
-        uploadedAt: headInfo.uploadedAt,
+        key: meta.pathname,
+        size: meta.size,
+        etag: meta.etag,
+        contentType: meta.contentType ?? opts.contentType,
+        uploadedAt: meta.uploadedAt,
       };
     } catch (e) {
-      if (e instanceof StorageError) throw e;
-      throw new StorageError(`Vercel Blob put failed for key=${key}`, e);
+      throw this.wrap(e, 'put', key);
     }
   }
 
   async get(key: string): Promise<{ body: Buffer; contentType: string; size: number }> {
-    // Vercel Blob: find by pathname via head(), then fetch.
-    const found = await this.head(key);
-    if (found === null) throw new StorageNotFoundError(key);
-    const res = await fetch(found.etag /* the URL */, {
-      headers: { Authorization: `Bearer ${this.token}` },
-    });
-    if (res.status === 404) throw new StorageNotFoundError(key);
-    if (res.status === 401 || res.status === 403) {
-      throw new StorageAuthError(`Vercel Blob auth failed reading ${key}`);
+    try {
+      const res = await get(key, { token: this.token, access: ACCESS });
+      // v2 SDK get() returns null on missing blob (does NOT throw BlobNotFoundError here).
+      if (res === null) {
+        throw new StorageNotFoundError(key);
+      }
+      // res = { statusCode, stream: ReadableStream, headers, blob: { ...metadata } }
+      // Convert the Web ReadableStream to a Buffer via the Response trick.
+      const body = Buffer.from(await new Response(res.stream).arrayBuffer());
+      const meta = res.blob;
+      return {
+        body,
+        contentType: meta.contentType ?? 'application/octet-stream',
+        size: meta.size ?? body.length,
+      };
+    } catch (e) {
+      throw this.wrap(e, 'get', key);
     }
-    if (!res.ok) throw new StorageError(`Vercel Blob get failed status=${res.status}`);
-    const arr = new Uint8Array(await res.arrayBuffer());
-    return {
-      body: Buffer.from(arr),
-      contentType: found.contentType,
-      size: found.size,
-    };
   }
 
   async head(key: string): Promise<StorageObject | null> {
-    // Use list() with prefix and filter to an exact pathname match.
-    const listResult = await list({ prefix: key, limit: 10, token: this.token });
-    const exact = listResult.blobs.find((b) => b.pathname === key);
-    if (!exact) return null;
-    return {
-      key,
-      size: exact.size,
-      etag: exact.url,
-      // list() doesn't return contentType; would need head() for accurate value.
-      // Use 'application/octet-stream' as the safe fallback.
-      contentType: 'application/octet-stream',
-      uploadedAt: exact.uploadedAt,
-    };
+    try {
+      const meta = await head(key, { token: this.token });
+      return {
+        key: meta.pathname,
+        size: meta.size,
+        etag: meta.etag,
+        contentType: meta.contentType ?? 'application/octet-stream',
+        uploadedAt: meta.uploadedAt,
+      };
+    } catch (e) {
+      // Per StorageAdapter contract, head() returns null on missing — never throws on 404.
+      if (e instanceof BlobNotFoundError) return null;
+      throw this.wrap(e, 'head', key);
+    }
   }
 
   async delete(key: string): Promise<void> {
-    const found = await this.head(key);
-    if (!found) return; // idempotent
     try {
-      await del(found.etag /* URL */, { token: this.token });
+      await del(key, { token: this.token });
+      // del() is idempotent in v2 — succeeds even if the blob doesn't exist
     } catch (e) {
-      throw new StorageError(`Vercel Blob delete failed for key=${key}`, e);
+      // Defense in depth: if SDK semantics change, treat NotFound as success
+      if (e instanceof BlobNotFoundError) return;
+      throw this.wrap(e, 'delete', key);
     }
   }
 
@@ -115,12 +141,17 @@ export class VercelBlobStorage implements StorageAdapter {
         `signedUrl expiresInSeconds=${expiresInSeconds} exceeds max=${MAX_SIGNED_URL_TTL_SECONDS}`
       );
     }
-    // Vercel Blob URLs are unguessable but not signed in the AWS sense.
-    // For the v1.1 architecture, signed URLs are issued by the application proxy,
-    // not by the blob layer. Return the head URL; the proxy is responsible for
-    // wrapping it in an authenticated short-lived token (see PITFALLS §5.2).
-    const found = await this.head(key);
-    if (!found) throw new StorageNotFoundError(key);
-    return found.etag;
+    // Private blob URLs are unguessable but do not embed an expiring signature.
+    // For v1.1, signed-URL semantics are implemented at the application proxy layer
+    // (Phase 8: /api/proposals/{id}/pdf with auth + ownership checks). This method
+    // returns the canonical blob URL; the proxy is responsible for wrapping it in
+    // an authenticated short-lived token.
+    try {
+      const meta = await head(key, { token: this.token });
+      return meta.url;
+    } catch (e) {
+      if (e instanceof BlobNotFoundError) throw new StorageNotFoundError(key);
+      throw this.wrap(e, 'signedUrl', key);
+    }
   }
 }
