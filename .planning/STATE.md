@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-06T14:00:00.000Z"
-last_activity: 2026-05-06 -- 05-04 complete: lib/db Drizzle adapter (Neon/postgres-js driver selection + baseline migration SQL committed)
+last_updated: "2026-05-06T14:15:00.000Z"
+last_activity: 2026-05-06 -- 05-05 complete: ESLint flat config + grep scripts (BOOT-06) + CI pipeline (BOOT-11)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
-  completed_plans: 4
-  percent: 19
+  completed_plans: 5
+  percent: 24
 ---
 
 # State — Matrice Commerciale
@@ -28,16 +28,16 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 5 (bootstrap-deploy) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Executing Phase 5
-Last activity: 2026-05-06 -- 05-04 complete: lib/db Drizzle 0.45.2 adapter (Neon HTTP + postgres-js driver selection, schema_meta baseline migration committed)
+Last activity: 2026-05-06 -- 05-05 complete: ESLint flat config + grep scripts (BOOT-06) + .github/workflows/ci.yml (BOOT-11)
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
 v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases complete
-       └─ Phase 5: Bootstrap & Deploy        ▶ executing (4/7 plans done)
+       └─ Phase 5: Bootstrap & Deploy        ▶ executing (5/7 plans done)
        └─ Phase 6: Auth & Shell              ◯ blocked on P5
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
@@ -106,6 +106,9 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 | Vercel Blob proxy architecture (access:'public' + cacheControlMaxAge:0 + proxy route) — @vercel/blob 0.27.3 has no stable access:'private' option | PITFALLS §5.2 mitigation per plan spec | 05-03 |
 | Drizzle DB adapter mirrors storage adapter pattern (memoized singleton + factory + __resetForTests) — architectural consistency | plan 05-04 design decision | 05-04 |
 | parseDatabaseUrl error message uses 'invalid URL' to match test regex — auto-fixed mismatch between plan spec wording and implementation | Rule 1 auto-fix | 05-04 |
+| eslint-config-next 16.x exports flat config arrays natively — FlatCompat NOT needed (causes circular JSON errors) | ESLint 9 flat config investigation | 05-05 |
+| lint script changed from next lint (removed in Next.js 16) to eslint . | Next.js 16 CLI change | 05-05 |
+| check-no-drizzle-push.sh excludes .planning/ and drizzle.config.ts to avoid self-tripping on documentation comments | grep script self-trip fix | 05-05 |
 
 ## Session Notes
 
@@ -114,6 +117,7 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 - **2026-05-06:** 05-02 executed — Tailwind v4.2.4 token spine, Plus Jakarta Sans (5 weights) self-hosted, no-flash script, FR/EN i18n helpers, layout shell placeholder. 3 task commits: c2e884e, fce0f98, 0775ffa.
 - **2026-05-06:** 05-03 executed — lib/storage adapter spine: StorageAdapter interface (5 methods), VercelBlobStorage + S3Storage full implementations, STORAGE_DRIVER selector factory, 13 Vitest tests passing. Vitest 2.1.8 installed. OVH portability seam locked. 2 task commits: 2b5af73, c134955.
 - **2026-05-06:** 05-04 executed — lib/db Drizzle adapter spine: drizzle-orm@0.45.2 + @neondatabase/serverless@0.10.4 + postgres@3.4.5 + drizzle-kit@0.30.1 installed (exact pins). DB adapter with Neon HTTP / postgres-js driver selection by DATABASE_URL host. schema_meta baseline migration SQL committed to git. 9 db tests + 13 storage tests all passing. generate-only discipline locked. 3 task commits: 1b9fc8c, c9ab5e6, a4ddfe9.
+- **2026-05-06:** 05-05 executed — ESLint flat config (eslint.config.mjs) with no-restricted-imports blocking 7 forbidden packages outside lib/ adapters. Two grep scripts for defense-in-depth (check-no-vercel-only-imports.sh + check-no-drizzle-push.sh). .github/workflows/ci.yml: typecheck + lint + grep + vitest + build on every PR. All 22 tests pass. Negative test confirmed both layers fire. 2 task commits: 61b43e0, 54ffa4d.
 
 ## Open Blockers
 
@@ -125,4 +129,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-06 — 05-04 complete: lib/db Drizzle adapter (Neon HTTP + postgres-js driver selection, schema_meta baseline migration committed).*
+*Last updated: 2026-05-06 — 05-05 complete: ESLint flat config + grep scripts (BOOT-06) + .github/workflows/ci.yml (BOOT-11).*
