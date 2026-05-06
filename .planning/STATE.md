@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-06T12:17:30.000Z"
-last_activity: 2026-05-06 -- 05-06 tasks 1+2 complete: migration runner + db-migrate.yml + runbook (BOOT-10); checkpoint pending GitHub Environment setup
+last_updated: "2026-05-06T13:05:00.000Z"
+last_activity: 2026-05-06 -- 05-07 tasks 1+2 complete: /healthz route + health.ts helpers + tests (BOOT-12 code); task 3 checkpoint awaiting Vercel/Neon/Blob provisioning + production /healthz verification
 progress:
   total_phases: 6
   completed_phases: 0
@@ -29,16 +29,16 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 5 (bootstrap-deploy) — EXECUTING
-Plan: 6 of 7 (checkpoint pending)
-Status: Executing Phase 5 — checkpoint:human-action at 05-06 Task 3
-Last activity: 2026-05-06 -- 05-06 tasks 1+2 complete: migration runner + db-migrate.yml + runbook (BOOT-10); Task 3 checkpoint awaiting GitHub Environment 'production' + DATABASE_URL_PROD secret configuration
+Plan: 7 of 7 (checkpoint pending)
+Status: Executing Phase 5 — checkpoint:human-action at 05-07 Task 3
+Last activity: 2026-05-06 -- 05-07 tasks 1+2 complete: /healthz route + health.ts helpers + tests (BOOT-12 code); Task 3 checkpoint awaiting Vercel project creation + Neon provisioning + Blob provisioning + baseline migration + production /healthz verification
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
 v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases complete
-       └─ Phase 5: Bootstrap & Deploy        ▶ executing (5/7 plans done)
+       └─ Phase 5: Bootstrap & Deploy        ▶ executing (6/7 plans done, 1 pending checkpoint)
        └─ Phase 6: Auth & Shell              ◯ blocked on P5
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
@@ -111,6 +111,9 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 | lint script changed from next lint (removed in Next.js 16) to eslint . | Next.js 16 CLI change | 05-05 |
 | check-no-drizzle-push.sh excludes .planning/ and drizzle.config.ts to avoid self-tripping on documentation comments | grep script self-trip fix | 05-05 |
 | Exclude scripts/migrate.ts from check-no-drizzle-push.sh — file documents the prohibition in a comment (same rationale as drizzle.config.ts exclusion) | Rule 1 auto-fix | 05-06 |
+| Route placed at app/healthz/route.ts (URL: /healthz) — plan artifact listed app/api/healthz/route.ts (URL: /api/healthz); must_haves URL spec overrides | Rule 1 auto-fix (plan inconsistency) | 05-07 |
+| runtime: nodejs on /healthz — aws-sdk/client-s3 requires Node APIs; consistent with Phase 8 PDF rendering | Plan spec + PITFALLS §6.1 | 05-07 |
+| classifyError() maps ALL exceptions to bounded 4-string set; raw error.message server-side only | PITFALLS §9.4 security discipline | 05-07 |
 | Wrap workflow_dispatch input in CONFIRM_INPUT env var instead of direct shell interpolation — GitHub Actions injection safety best practice | Rule 2 security fix | 05-06 |
 
 ## Session Notes
@@ -122,6 +125,7 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 - **2026-05-06:** 05-04 executed — lib/db Drizzle adapter spine: drizzle-orm@0.45.2 + @neondatabase/serverless@0.10.4 + postgres@3.4.5 + drizzle-kit@0.30.1 installed (exact pins). DB adapter with Neon HTTP / postgres-js driver selection by DATABASE_URL host. schema_meta baseline migration SQL committed to git. 9 db tests + 13 storage tests all passing. generate-only discipline locked. 3 task commits: 1b9fc8c, c9ab5e6, a4ddfe9.
 - **2026-05-06:** 05-05 executed — ESLint flat config (eslint.config.mjs) with no-restricted-imports blocking 7 forbidden packages outside lib/ adapters. Two grep scripts for defense-in-depth (check-no-vercel-only-imports.sh + check-no-drizzle-push.sh). .github/workflows/ci.yml: typecheck + lint + grep + vitest + build on every PR. All 22 tests pass. Negative test confirmed both layers fire. 2 task commits: 61b43e0, 54ffa4d.
 - **2026-05-06:** 05-06 tasks 1+2 executed — tsx@4.19.2 installed; scripts/migrate.ts migration runner (postgres-js, --dry-run flag, URL hostname masking, max=1+prepare=false); .github/workflows/db-migrate.yml (workflow_dispatch-only, 2-job pipeline: dry-run→apply, production environment gate, concurrency guard); docs/operations/migrations.md (91-line operator runbook). BOOT-10 satisfied. Task 3 checkpoint pending Antoine's GitHub Settings configuration. 2 task commits: 595ceeb, 930d3c0.
+- **2026-05-06:** 05-07 tasks 1+2 executed — src/lib/health.ts (checkDatabaseHealth + checkBlobHealth + buildHealthResponse, classifyError() redaction); src/lib/health.test.ts (6 tests including error-redaction assertions); app/healthz/route.ts (Node-runtime, force-dynamic, unauthenticated GET /healthz); .env.example updated with Vercel+Neon wiring docs. 28/28 tests pass. Smoke: HTTP 503 valid JSON. Task 3 human-action checkpoint: Vercel/Neon/Blob provisioning + production /healthz verify. 2 task commits: 512461f, 1e1ccec.
 
 ## Open Blockers
 
@@ -133,4 +137,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-06 — 05-06 tasks 1+2 complete: migration runner + db-migrate.yml + runbook (BOOT-10). Checkpoint pending: GitHub Environment 'production' + DATABASE_URL_PROD secret setup.*
+*Last updated: 2026-05-06 — 05-07 tasks 1+2 complete: /healthz route + health helpers + tests (BOOT-12 code ready). Checkpoint pending: Vercel project + Neon DB + Blob provisioning + baseline migration apply + production /healthz verification. ALSO still pending: 05-06 Task 3 (GitHub Environment 'production' + DATABASE_URL_PROD secret).*
