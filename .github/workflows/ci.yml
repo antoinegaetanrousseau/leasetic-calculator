@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel in-progress runs for the same PR/branch when a new commit is pushed
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    name: typecheck / lint / grep / test / build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # No fetch-depth needed for non-history operations; default 1 is fastest.
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies (clean install from lockfile)
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint (ESLint flat config -- enforces no-Vercel-only-imports rule)
+        run: npm run lint:check
+
+      - name: Defense-in-depth grep -- no-Vercel-only-imports
+        run: npm run check:no-vercel-imports
+
+      - name: Defense-in-depth grep -- no-drizzle-push invocations
+        run: npm run check:no-drizzle-push
+
+      - name: Vitest unit tests
+        run: npm test
+
+      - name: Production build
+        # Run with placeholder env vars so build-time imports don't fail.
+        # The build itself doesn't actually connect to DB or blob.
+        env:
+          STORAGE_DRIVER: vercel
+          BLOB_READ_WRITE_TOKEN: placeholder-not-used-in-build
+          DATABASE_URL: postgres://placeholder@localhost:5432/placeholder
+        run: npm run build
+
+      - name: Verify standalone artifact present (BOOT-07 sanity)
+        run: test -f .next/standalone/server.js
