@@ -203,10 +203,144 @@
 
 ---
 
-## Traceability (filled by roadmapper)
+## Traceability
 
-*Empty — populated when ROADMAP.md is created.*
+**Phase mapping (108/108 requirements covered, no orphans, no double-mapping).**
+
+| Phase | Title | Requirement count | REQ-IDs |
+|---|---|---|---|
+| 5 | Bootstrap & Deploy | 12 | BOOT-01..12 |
+| 6 | Auth & Shell | 32 | AUTH-01..18, SHELL-01..14 |
+| 7 | Calc Engine Port + Proposal Form | 14 | CALC-01..08, PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25 |
+| 8 | Persistence + PDF Pipeline | 32 | DATA-01..12, PROP-02, PROP-03, PROP-04, PROP-05, PROP-09, PROP-10, PROP-11, PROP-12, PROP-13, PROP-14, PROP-15, PROP-16, PROP-17, PROP-18, PROP-19, PROP-20, PROP-21, PROP-22, PROP-23, PROP-26 |
+| 9 | Admin Surface | 9 | ADMIN-01..09 |
+| 10 | Cutover & Polish | 9 | CUT-01..09 |
+| **Total** | | **108** | |
+
+### Per-requirement table
+
+| Requirement | Phase | Status |
+|---|---|---|
+| BOOT-01 | Phase 5 | Pending |
+| BOOT-02 | Phase 5 | Pending |
+| BOOT-03 | Phase 5 | Pending |
+| BOOT-04 | Phase 5 | Pending |
+| BOOT-05 | Phase 5 | Pending |
+| BOOT-06 | Phase 5 | Pending |
+| BOOT-07 | Phase 5 | Pending |
+| BOOT-08 | Phase 5 | Pending |
+| BOOT-09 | Phase 5 | Pending |
+| BOOT-10 | Phase 5 | Pending |
+| BOOT-11 | Phase 5 | Pending |
+| BOOT-12 | Phase 5 | Pending |
+| AUTH-01 | Phase 6 | Pending |
+| AUTH-02 | Phase 6 | Pending |
+| AUTH-03 | Phase 6 | Pending |
+| AUTH-04 | Phase 6 | Pending |
+| AUTH-05 | Phase 6 | Pending |
+| AUTH-06 | Phase 6 | Pending |
+| AUTH-07 | Phase 6 | Pending |
+| AUTH-08 | Phase 6 | Pending |
+| AUTH-09 | Phase 6 | Pending |
+| AUTH-10 | Phase 6 | Pending |
+| AUTH-11 | Phase 6 | Pending |
+| AUTH-12 | Phase 6 | Pending |
+| AUTH-13 | Phase 6 | Pending |
+| AUTH-14 | Phase 6 | Pending |
+| AUTH-15 | Phase 6 | Pending |
+| AUTH-16 | Phase 6 | Pending |
+| AUTH-17 | Phase 6 | Pending |
+| AUTH-18 | Phase 6 | Pending |
+| SHELL-01 | Phase 6 | Pending |
+| SHELL-02 | Phase 6 | Pending |
+| SHELL-03 | Phase 6 | Pending |
+| SHELL-04 | Phase 6 | Pending |
+| SHELL-05 | Phase 6 | Pending |
+| SHELL-06 | Phase 6 | Pending |
+| SHELL-07 | Phase 6 | Pending |
+| SHELL-08 | Phase 6 | Pending |
+| SHELL-09 | Phase 6 | Pending |
+| SHELL-10 | Phase 6 | Pending |
+| SHELL-11 | Phase 6 | Pending |
+| SHELL-12 | Phase 6 | Pending |
+| SHELL-13 | Phase 6 | Pending |
+| SHELL-14 | Phase 6 | Pending |
+| CALC-01 | Phase 7 | Pending |
+| CALC-02 | Phase 7 | Pending |
+| CALC-03 | Phase 7 | Pending |
+| CALC-04 | Phase 7 | Pending |
+| CALC-05 | Phase 7 | Pending |
+| CALC-06 | Phase 7 | Pending |
+| CALC-07 | Phase 7 | Pending |
+| CALC-08 | Phase 7 | Pending |
+| PROP-01 | Phase 7 | Pending |
+| PROP-02 | Phase 8 | Pending |
+| PROP-03 | Phase 8 | Pending |
+| PROP-04 | Phase 8 | Pending |
+| PROP-05 | Phase 8 | Pending |
+| PROP-06 | Phase 7 | Pending |
+| PROP-07 | Phase 7 | Pending |
+| PROP-08 | Phase 7 | Pending |
+| PROP-09 | Phase 8 | Pending |
+| PROP-10 | Phase 8 | Pending |
+| PROP-11 | Phase 8 | Pending |
+| PROP-12 | Phase 8 | Pending |
+| PROP-13 | Phase 8 | Pending |
+| PROP-14 | Phase 8 | Pending |
+| PROP-15 | Phase 8 | Pending |
+| PROP-16 | Phase 8 | Pending |
+| PROP-17 | Phase 8 | Pending |
+| PROP-18 | Phase 8 | Pending |
+| PROP-19 | Phase 8 | Pending |
+| PROP-20 | Phase 8 | Pending |
+| PROP-21 | Phase 8 | Pending |
+| PROP-22 | Phase 8 | Pending |
+| PROP-23 | Phase 8 | Pending |
+| PROP-24 | Phase 7 | Pending |
+| PROP-25 | Phase 7 | Pending |
+| PROP-26 | Phase 8 | Pending |
+| DATA-01 | Phase 8 | Pending |
+| DATA-02 | Phase 8 | Pending |
+| DATA-03 | Phase 8 | Pending |
+| DATA-04 | Phase 8 | Pending |
+| DATA-05 | Phase 8 | Pending |
+| DATA-06 | Phase 8 | Pending |
+| DATA-07 | Phase 8 | Pending |
+| DATA-08 | Phase 8 | Pending |
+| DATA-09 | Phase 8 | Pending |
+| DATA-10 | Phase 8 | Pending |
+| DATA-11 | Phase 8 | Pending |
+| DATA-12 | Phase 8 | Pending |
+| ADMIN-01 | Phase 9 | Pending |
+| ADMIN-02 | Phase 9 | Pending |
+| ADMIN-03 | Phase 9 | Pending |
+| ADMIN-04 | Phase 9 | Pending |
+| ADMIN-05 | Phase 9 | Pending |
+| ADMIN-06 | Phase 9 | Pending |
+| ADMIN-07 | Phase 9 | Pending |
+| ADMIN-08 | Phase 9 | Pending |
+| ADMIN-09 | Phase 9 | Pending |
+| CUT-01 | Phase 10 | Pending |
+| CUT-02 | Phase 10 | Pending |
+| CUT-03 | Phase 10 | Pending |
+| CUT-04 | Phase 10 | Pending |
+| CUT-05 | Phase 10 | Pending |
+| CUT-06 | Phase 10 | Pending |
+| CUT-07 | Phase 10 | Pending |
+| CUT-08 | Phase 10 | Pending |
+| CUT-09 | Phase 10 | Pending |
+
+### Mapping rationale (where the boundaries got drawn)
+
+- **PROP-15 (single-page PDF) lives in Phase 8** because that's where PDF rendering begins. Phase 7 has no PDF.
+- **PROP-01 (home page CTA) lives in Phase 7**, not Phase 8, because the home page exists from Phase 7 onward as the landing for authenticated partners; Phase 8 then *populates* it (PROP-02..05). The empty CTA satisfies PROP-01; the populated list satisfies PROP-02..05.
+- **PROP-06/07/08 (form / live preview / blur validation) live in Phase 7** because they're the user-visible surface of the calc engine; the form exists end-to-end in Phase 7 minus the submit-handler-that-saves which is added in Phase 8 (PROP-09).
+- **PROP-24/25 (copy-LC, validity options) live in Phase 7** because they're form-local UI, not persistence concerns.
+- **All 12 DATA reqs live in Phase 8** including DATA-12 (coefficient seed migration). The seed migration is *file-authored* in Phase 8 and *verified in production* in Phase 10 (CUT-06); the requirement itself is satisfied when the migration file exists and applies idempotently.
+- **AUTH-07..11 (admin partner-management flows) live in Phase 6** alongside the rest of AUTH because they're auth-system features, not "admin surface" features. Phase 9's admin surface focuses on coefficients/audit/listings; the *invitation* and *reset* primitives are part of the auth library wiring done in Phase 6. Phase 9 then surfaces ADMIN-05/06 (list & disable) as UI affordances over those primitives.
+- **ADMIN-09 (commission invisibility)** is a Phase 9 requirement but is also a *cross-cutting constraint* every phase must respect. Listed once in Phase 9 because that's where the explicit "explain calculation" debug tool ships and where the redacting logger is introduced, but PR review in every phase should enforce it.
 
 ---
 
-*Generated: 2026-05-06*
+*Generated: 2026-05-06.*
+*Traceability filled: 2026-05-05 by roadmapper.*

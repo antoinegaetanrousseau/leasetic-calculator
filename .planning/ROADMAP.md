@@ -3,24 +3,106 @@
 ## Milestones
 
 - ✅ **v1.0 — v10 Refactor** — Phases 1-4 (shipped 2026-04-30) — see `milestones/v1.0-ROADMAP.md`
-- 📋 **v1.1+** — Not yet planned — run `/gsd-new-milestone` to start the next cycle
+- 🚧 **v1.1 — Hosted Web App Foundation** — Phases 5-10 (in progress) — see below
 
 ## Phases
 
 <details>
 <summary>✅ v1.0 — v10 Refactor (Phases 1-4) — SHIPPED 2026-04-30</summary>
 
-- [x] **Phase 1: Parity Refactor** (3/3 plans) — v10 behaves identically to v9 on ES6+ code; backward-compatible v9 localStorage reads; 22-row PARITY-AUDIT
-- [x] **Phase 2: Security Hardening** (2/2 plans) — SHA-256 password hashing via Web Crypto, transparent plaintext migration, current-pw confirmation, escapeHtml + assertEscape (8 fixtures), SEC-TEST.md
-- [x] **Phase 3: UX Polish & i18n** (3/3 plans) — toasts, validation, keyboard shortcuts, FR/EN dictionary (~138 keys × 2), copy-LC, validity override, FINAL-TEST.md
-- [x] **Phase 4: Sidebar Shell + Design System v2** (3/3 plans) — grid shell (sidebar + topbar + footer), pill buttons, shadow cards, rounded inputs, retractable sidebar, dark mode, leasetic.fr-aligned design tokens, FINAL-TEST-v11.md
-- *(post-roadmap polish: bug fix `</script>` escape, font swap to Plus Jakarta Sans, brand logo + dark-mode wordmark inversion, feather icon sprite, retractable sidebar, dark mode with no-flash restore)*
+- [x] **Phase 1: Parity Refactor** (3/3 plans) — v10 behaves identically to v9 on ES6+ code; 22-row PARITY-AUDIT
+- [x] **Phase 2: Security Hardening** (2/2 plans) — SHA-256 password hashing, escapeHtml + assertEscape (8 fixtures), SEC-TEST.md
+- [x] **Phase 3: UX Polish & i18n** (3/3 plans) — toasts, validation, FR/EN dictionary (~138 keys × 2), copy-LC, validity override
+- [x] **Phase 4: Sidebar Shell + Design System v2** (3/3 plans) — grid shell, retractable sidebar, dark mode, FINAL-TEST-v11.md
 
 </details>
 
-### 🚧 v1.1 — Not yet planned
+### 🚧 v1.1 — Hosted Web App Foundation (Phases 5-10)
 
-(Use `/gsd-new-milestone` to start the next cycle. Likely candidates from v1.0 Out-of-Scope: hosted version, partner auth, centralized LC dashboard, Excel export, mobile-optimized layout, automated browser tests.)
+- [ ] **Phase 5: Bootstrap & Deploy** — Deployable empty Next.js shell on Vercel + Neon Postgres + Vercel Blob, all hosting primitives behind portable adapters; CI gates the no-Vercel-only-import rule
+- [ ] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode
+- [ ] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet)
+- [ ] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete
+- [ ] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown
+- [ ] **Phase 10: Cutover & Polish** — v10 retirement + redirect, OVH portability smoke deploy, runbooks, legal/privacy hookup, soft-delete purge job
+
+## Phase Details
+
+### Phase 5: Bootstrap & Deploy
+**Goal**: A deployable empty Next.js shell exists on Vercel that exercises Postgres + Blob round-trips through adapter interfaces, with CI enforcing the no-Vercel-only-primitives rule from the very first commit.
+**Depends on**: Nothing (first phase of v1.1; v1.0 is complete and independent)
+**Requirements**: BOOT-01, BOOT-02, BOOT-03, BOOT-04, BOOT-05, BOOT-06, BOOT-07, BOOT-08, BOOT-09, BOOT-10, BOOT-11, BOOT-12
+**Success Criteria** (what must be TRUE):
+  1. Visiting the production Vercel URL serves a Next.js page rendered from the new repo
+  2. Hitting `/healthz` on production returns `{ db: ok, blob: ok }` proving DB read + blob round-trip works through the adapter interfaces
+  3. Opening a PR that imports `@vercel/blob` outside `lib/storage/` (or any other forbidden Vercel-only primitive) fails CI
+  4. `npm test` runs the Vitest suite locally and on every PR via CI
+  5. Drizzle migrations are version-controlled SQL files and apply only via the explicit production GitHub Action (never auto-run on Vercel deploy)
+**Plans**: TBD
+
+### Phase 6: Auth & Shell
+**Goal**: A real user can log in with email/password, see a bilingual themed app shell, and reach exactly the routes their role permits — with the admin URL hidden behind an env-driven segment that 404s on tampering.
+**Depends on**: Phase 5 (needs deployable shell, DB, adapter interfaces, root layout, theme bootstrap)
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, AUTH-07, AUTH-08, AUTH-09, AUTH-10, AUTH-11, AUTH-12, AUTH-13, AUTH-14, AUTH-15, AUTH-16, AUTH-17, AUTH-18, SHELL-01, SHELL-02, SHELL-03, SHELL-04, SHELL-05, SHELL-06, SHELL-07, SHELL-08, SHELL-09, SHELL-10, SHELL-11, SHELL-12, SHELL-13, SHELL-14
+**Success Criteria** (what must be TRUE):
+  1. A partner provided an invitation URL by the admin can set their initial password and log in to reach `/`, while admin role is granted only via the production CLI script (never via app UI)
+  2. An unauthenticated visitor accessing any `(authed)` or `(admin)` route is redirected to `/login`; an already-authenticated visitor on `/login` is redirected to `/`
+  3. An admin reaches the admin tree only at the env-driven hidden segment; visiting any other segment value returns 404 (not 403), and a partner who guesses the correct segment still gets 404 because each layout and API handler independently calls `requireAdmin()`
+  4. When admin disables a partner account, that partner's existing session is invalidated within 5 minutes via the `session_version` JWT bump, and re-login is rejected with the generic "incorrect email or password" message
+  5. A logged-in user can toggle FR/EN and light/dark/system themes from the topbar, the choice survives logout/login (cookie + DB), and initial paint shows the correct theme without flash
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 7: Calc Engine Port + Proposal Form
+**Goal**: A pure-TS calculation engine matches every v10 self-check fixture and ≥30 golden cases in CI, and an authenticated partner can fill out the proposal entry form and watch the loyer compute live — without any data being saved yet.
+**Depends on**: Phase 6 (needs `(authed)` shell, i18n dictionaries, form/validation libraries, theme system)
+**Requirements**: CALC-01, CALC-02, CALC-03, CALC-04, CALC-05, CALC-06, CALC-07, CALC-08, PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25
+**Success Criteria** (what must be TRUE):
+  1. CI fails on any drift in `lib/calc.ts` against the ≥30 v10 golden test cases and the ported `assertCalc` / `assertEscape` / `assertValidity` Vitest suites
+  2. A partner sees a "Create new proposal" CTA on the home page, opens the entry form, fills in client name + amount HT + duration (and v10 fields), and the computed loyer updates live as they type — without any DB write occurring
+  3. Form fields validate on blur with v10's red-ring focus pattern, and the same Zod schema imported on the client also runs on the server boundary
+  4. The "Copier la référence" LC clipboard button and the configurable validity (15 / 30 / 60 days) selector work as in v10, with bilingual labels driven by the i18n `t()` helper
+  5. Manual parity comparison of the live-preview output against v10 across ≥5 representative scenarios shows zero divergence in computed loyer
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 8: Persistence + PDF Pipeline
+**Goal**: Submitting the proposal form persists an immutable, snapshotted row to Postgres, generates a byte-deterministic single-page PDF stored privately in blob, and the partner can browse, search, duplicate, download, and soft-delete their proposals from the home page — with the PDF immutability invariant enforced by `params_snapshot` and gated in CI.
+**Depends on**: Phase 7 (needs calc engine, proposal form, validation schemas)
+**Requirements**: DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, DATA-07, DATA-08, DATA-09, DATA-10, DATA-11, DATA-12, PROP-02, PROP-03, PROP-04, PROP-05, PROP-09, PROP-10, PROP-11, PROP-12, PROP-13, PROP-14, PROP-15, PROP-16, PROP-17, PROP-18, PROP-19, PROP-20, PROP-21, PROP-22, PROP-23, PROP-26
+**Success Criteria** (what must be TRUE):
+  1. A partner submits the form and lands on `/proposals/{id}` (post-redirect-get) where they see the read-only inputs, validity status, an embedded PDF preview, and Download / Duplicate / Delete buttons
+  2. The home page lists the partner's last 20 proposals (descending by date, with client name + LC ref + montant HT + creation date + validity status), supports load-more pagination, search by client name or LC reference, an empty state for new partners, and never shows another partner's data
+  3. A fixture proposal rendered through `lib/pdf` produces a SHA-256 matching a committed expected hash; CI fails the build on any drift, the PDF is single-page, uses Plus Jakarta Sans self-hosted woff2 with `document.fonts.ready`, and uses explicit `Intl` locales (never system defaults)
+  4. Once a proposal is saved, neither its inputs, computed values, nor PDF can be retroactively changed — verified by reading `params_snapshot` + `inputs` + `computed` + `schema_version` straight off the row, with the audit log capturing every admin mutation and partner soft-delete
+  5. PDFs stream through `/api/proposals/{id}/pdf` after auth + ownership checks (never via raw blob URL), are stored at `proposals/{userId}/{proposalId}.pdf` with private access, and soft-deleted proposals are hidden from the default list while their blob remains available for the 30-day recovery window
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 9: Admin Surface
+**Goal**: The admin can edit global coefficients / commission / max threshold (creating a new append-only row each time), manage partner accounts, and review the audit log — while commission values stay invisible everywhere except the explicit debug tool, and existing proposals remain provably unchanged by any param edit.
+**Depends on**: Phase 8 (needs `global_params`, `proposals.params_snapshot`, `audit_log`, partner data)
+**Requirements**: ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04, ADMIN-05, ADMIN-06, ADMIN-07, ADMIN-08, ADMIN-09
+**Success Criteria** (what must be TRUE):
+  1. An admin opens the hidden coefficients page, edits a coefficient or commission rate or max threshold, confirms the "affects new proposals only" modal, and a new `global_params` row appears with the actor / timestamp / fields-changed / optional note visible in the on-page history table
+  2. After the admin's edit, a partner creating a brand-new proposal sees the new values applied, while every previously-saved proposal continues to render with its own snapshotted params (PDF and HTML view both unchanged)
+  3. An admin can list all partners (email, display name, status, last login, created date), disable / re-enable any account, and trigger a one-time admin-mediated reset URL for any partner
+  4. Every admin mutation (params update, account create, partner disable, proposal delete, role grant) writes a row to `audit_log` with actor + action + target + payload + timestamp
+  5. Commission values are nowhere visible to the admin (not in lists, not in proposal views, not in logs, not in traces) except inside the explicit "explain calculation" debug tool that runs entirely in the admin's browser with no DB write
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 10: Cutover & Polish
+**Goal**: v10 standalone is retired, the v1.1 deployment is operationally ready (purge job, error pages, runbook, legal hookup), and OVH portability is *proven* by an actual smoke deploy of the same code against Node + Postgres + S3-compatible — with only env-var changes.
+**Depends on**: Phase 9 (whole feature surface complete; this phase ships nothing new product-side, only operational and portability proofs)
+**Requirements**: CUT-01, CUT-02, CUT-03, CUT-04, CUT-05, CUT-06, CUT-07, CUT-08, CUT-09
+**Success Criteria** (what must be TRUE):
+  1. After launch date, no partner can use v10; v10's hosted URL (if any) returns the bilingual "Leasétic Matrice has moved" notice that links to the v1.1 login page, and no localStorage migration path exists (all partners are onboarded clean-slate by the admin)
+  2. The same git ref that runs on Vercel deploys successfully against a Node + Postgres + S3-compatible test environment with only env-var changes; a smoke run creates a proposal, generates a PDF, and the SHA-256 matches the Vercel-rendered fixture
+  3. Production database contains zero `is_test=true` rows, the admin has used the first-login "Vérifier les coefficients" diff tool to confirm seed values match the v10 baseline, and the login page links to Leasétic's existing privacy notice in FR + EN with legal counsel confirmation that PDF storage is covered
+  4. The README + `docs/deploy-ovh.md` runbook walks an operator through env vars, build, migration application, and smoke tests; platform logs (Vercel) cover all server errors with no Sentry/APM yet
+  5. The 30-day soft-delete purge job runs successfully against a soft-deleted fixture proposal — deleting the blob, deleting the row, writing the audit-log entry — while PDFs flagged for the 10-year commercial-document retention remain untouched even after partner deactivation
+**Plans**: TBD
 
 ## Progress
 
@@ -30,8 +112,14 @@
 | 2. Security Hardening | v1.0 | 2/2 | Complete | 2026-04-30 |
 | 3. UX Polish & i18n | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
+| 5. Bootstrap & Deploy | v1.1 | 0/0 | Not started | - |
+| 6. Auth & Shell | v1.1 | 0/0 | Not started | - |
+| 7. Calc Engine Port + Proposal Form | v1.1 | 0/0 | Not started | - |
+| 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
+| 9. Admin Surface | v1.1 | 0/0 | Not started | - |
+| 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
 
 ---
 
-*Last updated: 2026-04-30 after v1.0 milestone close.*
-*Detailed archives in `.planning/milestones/`.*
+*Last updated: 2026-05-05 — v1.1 roadmap created (Phases 5-10).*
+*Detailed v1.0 archives in `.planning/milestones/`.*
