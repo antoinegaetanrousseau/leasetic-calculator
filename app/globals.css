@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+
+/* === Tailwind v4 dark variant — maps to data-theme=dark per UI-SPEC === */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* === Light mode: extracted verbatim from UI-SPEC §CSS Custom Properties — Light mode === */
+:root {
+  /* Brand palette — never change without design review */
+  --navy:      #112c3b;
+  --navy-dark: #0a1e2a;
+  --green:     #81c088;
+  --gd:        #129657;
+  --gl:        #c8e2c8;
+  --teal:      #2d7a8c;
+  --paper:     #f5f7fc;
+  --white:     #ffffff;
+  --ink:       #41423d;
+  --muted:     #6e7191;
+  --border:    #d9dbe9;
+  --gold:      #e08530;
+  --danger:    #dc2626;
+
+  /* Layout shell tokens */
+  --shell-sidebar-w: 260px;
+  --topbar-h:        64px;
+  --footer-h:        48px;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgba(17,44,59,0.04), 0 4px 12px rgba(17,44,59,0.05);
+
+  /* Themeable surfaces */
+  --surface:        #ffffff;
+  --hover-overlay:  rgba(17,44,59,0.04);
+  --active-pill:    rgba(18,150,87,0.12);
+
+  color-scheme: light;
+}
+
+/* === Dark mode: extracted verbatim from UI-SPEC §CSS Custom Properties — Dark mode === */
+html[data-theme="dark"] {
+  --paper:    #0c121c;
+  --surface:  #161e2d;
+  --ink:      #e6e9ef;
+  --muted:    #8b93a8;
+  --border:   #242c3e;
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.25);
+  --hover-overlay: rgba(255,255,255,0.05);
+  --active-pill:   rgba(18,150,87,0.22);
+  color-scheme: dark;
+}
+/* Brand palette --navy/--green/--gd/--gl/--teal/--gold/--danger preserved across themes */
+
+/* === @theme: expose CSS variables to Tailwind utility classes (e.g., bg-paper, text-ink) === */
+@theme {
+  --color-paper:     var(--paper);
+  --color-surface:   var(--surface);
+  --color-navy:      var(--navy);
+  --color-gd:        var(--gd);
+  --color-teal:      var(--teal);
+  --color-danger:    var(--danger);
+  --color-ink:       var(--ink);
+  --color-muted:     var(--muted);
+  --color-border:    var(--border);
+  --color-green:     var(--green);
+  --color-gl:        var(--gl);
+  --color-gold:      var(--gold);
+  --color-navy-dark: var(--navy-dark);
+
+  /* Font family registered by next/font/local (set in layout.tsx) */
+  --font-sans: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* Border radius scale from UI-SPEC §Border Radius Scale */
+  --radius-md:  6px;
+  --radius-lg:  8px;
+  --radius-xl:  12px;
+  --radius-2xl: 16px;
+  /* rounded-full (9999px) is Tailwind v4 default */
+}
+
+/* === Body base styles (UI-SPEC §Typography: 14.5px / 400 / 1.55) === */
+body {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === Print / PDF invariants (UI-SPEC §Print/PDF CSS Invariants) — established Phase 5, enforced Phase 8 === */
+@media print {
+  @page { size: A4; margin: 0; }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body { display: block !important; }
+}
+
+/* PDF/print surface stays white in dark mode (data attribute marker for Phase 8) */
+html[data-theme="dark"] [data-pdf-surface] {
+  background: #fff !important;
+  color: #1a2832 !important;
+}
