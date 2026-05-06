@@ -120,7 +120,7 @@ Plans:
 | 2. Security Hardening | v1.0 | 2/2 | Complete | 2026-04-30 |
 | 3. UX Polish & i18n | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
-| 5. Bootstrap & Deploy | v1.1 | 5/7 | In progress | - |
+| 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
 | 6. Auth & Shell | v1.1 | 0/0 | Not started | - |
 | 7. Calc Engine Port + Proposal Form | v1.1 | 0/0 | Not started | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
@@ -129,5 +129,5 @@ Plans:
 
 ---
 
-*Last updated: 2026-05-06 — 05-05 complete: ESLint flat config + grep scripts (BOOT-06) + .github/workflows/ci.yml (BOOT-11).*
+*Last updated: 2026-05-06 — 05-06 tasks 1+2 complete: migration runner + db-migrate.yml + runbook (BOOT-10); Task 3 checkpoint pending GitHub Environment setup.*
 *Detailed v1.0 archives in `.planning/milestones/`.*

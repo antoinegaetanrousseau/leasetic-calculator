@@ -3,14 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-06T14:15:00.000Z"
-last_activity: 2026-05-06 -- 05-05 complete: ESLint flat config + grep scripts (BOOT-06) + CI pipeline (BOOT-11)
+last_updated: "2026-05-06T12:17:30.000Z"
+last_activity: 2026-05-06 -- 05-06 tasks 1+2 complete: migration runner + db-migrate.yml + runbook (BOOT-10); checkpoint pending GitHub Environment setup
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
   completed_plans: 5
   percent: 24
+  note: "05-06 tasks 1+2 complete; plan not yet marked done (checkpoint pending)"
 ---
 
 # State — Matrice Commerciale
@@ -28,9 +29,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 5 (bootstrap-deploy) — EXECUTING
-Plan: 6 of 7
-Status: Executing Phase 5
-Last activity: 2026-05-06 -- 05-05 complete: ESLint flat config + grep scripts (BOOT-06) + .github/workflows/ci.yml (BOOT-11)
+Plan: 6 of 7 (checkpoint pending)
+Status: Executing Phase 5 — checkpoint:human-action at 05-06 Task 3
+Last activity: 2026-05-06 -- 05-06 tasks 1+2 complete: migration runner + db-migrate.yml + runbook (BOOT-10); Task 3 checkpoint awaiting GitHub Environment 'production' + DATABASE_URL_PROD secret configuration
 
 ## Progress
 
@@ -109,6 +110,8 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 | eslint-config-next 16.x exports flat config arrays natively — FlatCompat NOT needed (causes circular JSON errors) | ESLint 9 flat config investigation | 05-05 |
 | lint script changed from next lint (removed in Next.js 16) to eslint . | Next.js 16 CLI change | 05-05 |
 | check-no-drizzle-push.sh excludes .planning/ and drizzle.config.ts to avoid self-tripping on documentation comments | grep script self-trip fix | 05-05 |
+| Exclude scripts/migrate.ts from check-no-drizzle-push.sh — file documents the prohibition in a comment (same rationale as drizzle.config.ts exclusion) | Rule 1 auto-fix | 05-06 |
+| Wrap workflow_dispatch input in CONFIRM_INPUT env var instead of direct shell interpolation — GitHub Actions injection safety best practice | Rule 2 security fix | 05-06 |
 
 ## Session Notes
 
@@ -118,6 +121,7 @@ v1.1 ░░░░░░░░░░░░░░░░░░░░ 0/6 phases com
 - **2026-05-06:** 05-03 executed — lib/storage adapter spine: StorageAdapter interface (5 methods), VercelBlobStorage + S3Storage full implementations, STORAGE_DRIVER selector factory, 13 Vitest tests passing. Vitest 2.1.8 installed. OVH portability seam locked. 2 task commits: 2b5af73, c134955.
 - **2026-05-06:** 05-04 executed — lib/db Drizzle adapter spine: drizzle-orm@0.45.2 + @neondatabase/serverless@0.10.4 + postgres@3.4.5 + drizzle-kit@0.30.1 installed (exact pins). DB adapter with Neon HTTP / postgres-js driver selection by DATABASE_URL host. schema_meta baseline migration SQL committed to git. 9 db tests + 13 storage tests all passing. generate-only discipline locked. 3 task commits: 1b9fc8c, c9ab5e6, a4ddfe9.
 - **2026-05-06:** 05-05 executed — ESLint flat config (eslint.config.mjs) with no-restricted-imports blocking 7 forbidden packages outside lib/ adapters. Two grep scripts for defense-in-depth (check-no-vercel-only-imports.sh + check-no-drizzle-push.sh). .github/workflows/ci.yml: typecheck + lint + grep + vitest + build on every PR. All 22 tests pass. Negative test confirmed both layers fire. 2 task commits: 61b43e0, 54ffa4d.
+- **2026-05-06:** 05-06 tasks 1+2 executed — tsx@4.19.2 installed; scripts/migrate.ts migration runner (postgres-js, --dry-run flag, URL hostname masking, max=1+prepare=false); .github/workflows/db-migrate.yml (workflow_dispatch-only, 2-job pipeline: dry-run→apply, production environment gate, concurrency guard); docs/operations/migrations.md (91-line operator runbook). BOOT-10 satisfied. Task 3 checkpoint pending Antoine's GitHub Settings configuration. 2 task commits: 595ceeb, 930d3c0.
 
 ## Open Blockers
 
@@ -129,4 +133,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-06 — 05-05 complete: ESLint flat config + grep scripts (BOOT-06) + .github/workflows/ci.yml (BOOT-11).*
+*Last updated: 2026-05-06 — 05-06 tasks 1+2 complete: migration runner + db-migrate.yml + runbook (BOOT-10). Checkpoint pending: GitHub Environment 'production' + DATABASE_URL_PROD secret setup.*
