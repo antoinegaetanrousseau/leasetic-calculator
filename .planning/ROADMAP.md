@@ -58,7 +58,17 @@ Plans:
   3. An admin reaches the admin tree only at the env-driven hidden segment; visiting any other segment value returns 404 (not 403), and a partner who guesses the correct segment still gets 404 because each layout and API handler independently calls `requireAdmin()`
   4. When admin disables a partner account, that partner's existing session is invalidated within 5 minutes via the `session_version` JWT bump, and re-login is rejected with the generic "incorrect email or password" message
   5. A logged-in user can toggle FR/EN and light/dark/system themes from the topbar, the choice survives logout/login (cookie + DB), and initial paint shows the correct theme without flash
-**Plans**: TBD
+**Plans:** 9 plans
+Plans:
+- [ ] 06-01-PLAN.md — Foundation: install deps + drizzle-kit upgrade + env vars + Drizzle schema (users, sessions, accounts, verifications, password_resets) + 0001 migration (AUTH-13, AUTH-17)
+- [ ] 06-02-PLAN.md — i18n full v10 dictionary port (225 keys × 2 langs) + format.ts (explicit fr-FR / en-GB) + ESLint hardcoded-JSX rule (SHELL-04..06, SHELL-09)
+- [ ] 06-03-PLAN.md — Better Auth instance + Drizzle adapter + argon2id + tokens.ts + schemas.ts + auth catch-all route (AUTH-01, AUTH-02, AUTH-13, AUTH-17, AUTH-18, SHELL-11)
+- [ ] 06-04-PLAN.md — requireUser/requireAdmin helpers + admin server actions (disable/reEnable/createInvitation/createPasswordReset) + proxy.ts auth gate (AUTH-05, AUTH-06, AUTH-11, AUTH-14, AUTH-15, AUTH-16)
+- [ ] 06-05-PLAN.md — Public auth tree: (public)/layout + login + invite/[token] + reset/[token] + LoginForm + SetPasswordForm + redeem.ts (AUTH-01, AUTH-04, AUTH-08..10, AUTH-18, SHELL-03, SHELL-10, SHELL-11, SHELL-14)
+- [ ] 06-06-PLAN.md — (authed) shell + Topbar + UserMenu + theme/locale DB persistence; replace app/page.tsx (AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14)
+- [ ] 06-07-PLAN.md — (admin)/[adminSegment] layout (env-segment + requireAdmin two-layer gate) + InviteUrlModal primitive (AUTH-07, AUTH-08, AUTH-10, AUTH-14, AUTH-15)
+- [ ] 06-08-PLAN.md — Error boundary (app/error.tsx) + 404 page (app/not-found.tsx) localized FR + EN (SHELL-12, SHELL-13)
+- [ ] 06-09-PLAN.md — scripts/grant-admin.ts CLI for AUTH-12 admin role assignment (Antoine + Emmanuel seed at v1.1 launch)
 **UI hint**: yes
 
 ### Phase 7: Calc Engine Port + Proposal Form
