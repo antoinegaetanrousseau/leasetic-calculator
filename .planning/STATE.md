@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: phase-complete
-last_updated: "2026-05-06T22:35:00.000Z"
-last_activity: 2026-05-06 -- Phase 5 complete; /healthz live at https://leasetic-matrice.vercel.app returning { db:ok, blob:ok }; @vercel/blob upgraded 0.27→2.3 with private-store driver rewrite (commit 51db390)
+status: phase-context-gathered
+last_updated: "2026-05-07T00:00:00.000Z"
+last_activity: 2026-05-07 -- Phase 6 context gathered; user accepted all soft-locks as final without discussion ("keep going with the build"). 06-CONTEXT.md + 06-DISCUSSION-LOG.md written. Ready for /gsd-ui-phase 6 then /gsd-plan-phase 6 --research.
 progress:
   total_phases: 6
   completed_phases: 1
@@ -23,15 +23,15 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 5 — bootstrap-deploy ✅ **COMPLETE**. Ready to plan Phase 6.
+**Current focus:** Phase 6 — Auth & Shell. Context gathered 2026-05-07; ready for UI design contract + planning.
 
 ## Current Position
 
-Phase: 5 (bootstrap-deploy) — ✅ COMPLETE
-Plan: 7 of 7 done
-Status: Phase 5 complete — /healthz live at https://leasetic-matrice.vercel.app returning HTTP 200 `{ db: "ok", blob: "ok" }`
-Next: `/gsd-plan-phase 6` (Auth & Shell)
-Last activity: 2026-05-06 -- Phase 5 complete; @vercel/blob upgraded to v2.3.3 + driver rewritten for private stores (commit 51db390)
+Phase: 6 (auth-shell) — ◯ Context gathered, awaiting UI-SPEC + plan
+Plan: 0 of TBD
+Status: 06-CONTEXT.md committed; user accepted all soft-locks as final without discussion. Better Auth 1.6.x is no longer "soft-locked unless flipped" — it is fully locked. Schema scope, invitation/reset UX, and CLI grant-admin script have sensible defaults captured in CONTEXT.md.
+Next: `/gsd-ui-phase 6` then `/gsd-plan-phase 6 --research`
+Last activity: 2026-05-07 -- Phase 6 context gathered; 06-CONTEXT.md + 06-DISCUSSION-LOG.md written under .planning/phases/06-auth-shell/
 
 ## Progress
 
@@ -39,7 +39,7 @@ Last activity: 2026-05-06 -- Phase 5 complete; @vercel/blob upgraded to v2.3.3 +
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
 v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases complete
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
-       └─ Phase 6: Auth & Shell              ◯ READY — unblocked
+       └─ Phase 6: Auth & Shell              ◐ context gathered (06-CONTEXT.md), needs UI-SPEC + plan
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
        └─ Phase 9: Admin Surface             ◯ blocked on P8
@@ -71,7 +71,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 | Stack: Next.js (App Router) + Postgres (Neon) + Vercel Blob + Drizzle + Tailwind v4 | research/SUMMARY.md | Locked |
 | ORM: Drizzle 0.45.x over Prisma | research/SUMMARY.md | Locked |
 | Migrations: versioned SQL, GitHub Action on prod, never auto on Vercel deploy | BOOT-09/10 | Locked |
-| Auth library: Better Auth 1.6.x (over NextAuth v5) | research/SUMMARY.md | Locked unless Phase 6 verification flips it |
+| Auth library: Better Auth 1.6.x (over NextAuth v5) | research/SUMMARY.md + user 2026-05-07 accept | Locked (verification deferred to Phase 6 research) |
 | PDF library: `@react-pdf/renderer` (over Puppeteer) | research/SUMMARY.md + REQ PROP-16 | Locked — chosen for byte-determinism, OVH portability, smaller bundle |
 | Hidden admin URL: env-driven dynamic segment, layout 404s on mismatch | architecture §2.3, AUTH-14/15 | Locked |
 | PDF immutability: `params_snapshot` + `inputs` + `computed` + `schema_version` jsonb on the proposals row (Stripe pattern, Option A) | architecture §2.5, DATA-01..04 | Locked |
@@ -84,6 +84,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 | Commission invisibility extends to logs / traces / admin views | research PITFALLS, ADMIN-09 | Locked |
 | 10-year PDF retention; partner deactivation never deletes PDFs | DATA-11 | Locked (pending legal counsel confirmation per Open Q3) |
 | Hard cutover from v10 — no localStorage migration | CUT-03 | Locked |
+| Admin roles at v1.1 launch: **Antoine + Emmanuel** seeded via AUTH-12 CLI script (resolves Open Q6) | user decision 2026-05-07 | Locked |
 
 ### Open questions (to resolve before relevant phase)
 
@@ -92,7 +93,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 3. **Legal counsel sign-off** on 10-year retention (DATA-11). Resolve before Phase 10.
 4. **Auth library version pinning matrix** — exact Better Auth + Drizzle adapter + Next.js + React versions. Pin no-carets at Phase 5 bootstrap.
 5. **OVH side stack** — managed Postgres provider, S3-compatible blob endpoint. Confirm with Leasétic IT before Phase 10 smoke deploy.
-6. **Admin role provisioning** — Antoine + Thomas at launch, or Antoine first? Affects AUTH-12 CLI script payload.
+6. ~~**Admin role provisioning** — Antoine + Thomas at launch, or Antoine first? Affects AUTH-12 CLI script payload.~~ ✓ Resolved 2026-05-07: **Antoine + Emmanuel** at launch (see Decisions Log).
 
 ## Carry-Forward Notes (from v1.0)
 
@@ -104,6 +105,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 
 | Decision | Source | Added |
 |---|---|---|
+| Admin roles at v1.1 launch: **Antoine + Emmanuel** (AUTH-12 CLI script seeds both rows) | Open Q6 resolution (user 2026-05-07) | pre-06 |
 | Exact version pins without carets (all direct deps in package.json) | Open Q4 resolution | 05-01 |
 | tsconfig jsx: preserve → react-jsx (Next.js 16 mandates it; accepted as expected) | Next.js build auto-update | 05-01 |
 | Tailwind v4 at 4.2.4 (not 4.0.0) — @tailwindcss/postcss@4.0.0 sub-depends on tailwindcss@4.2.4; coherent 4.2.4 set required | Build-time version mismatch (ScannerOptions.sources) | 05-02 |
@@ -132,6 +134,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 - **2026-05-06:** 05-05 executed — ESLint flat config (eslint.config.mjs) with no-restricted-imports blocking 7 forbidden packages outside lib/ adapters. Two grep scripts for defense-in-depth (check-no-vercel-only-imports.sh + check-no-drizzle-push.sh). .github/workflows/ci.yml: typecheck + lint + grep + vitest + build on every PR. All 22 tests pass. Negative test confirmed both layers fire. 2 task commits: 61b43e0, 54ffa4d.
 - **2026-05-06:** 05-06 tasks 1+2 executed — tsx@4.19.2 installed; scripts/migrate.ts migration runner (postgres-js, --dry-run flag, URL hostname masking, max=1+prepare=false); .github/workflows/db-migrate.yml (workflow_dispatch-only, 2-job pipeline: dry-run→apply, production environment gate, concurrency guard); docs/operations/migrations.md (91-line operator runbook). BOOT-10 satisfied. Task 3 checkpoint pending Antoine's GitHub Settings configuration. 2 task commits: 595ceeb, 930d3c0.
 - **2026-05-06:** 05-07 tasks 1+2 executed — src/lib/health.ts (checkDatabaseHealth + checkBlobHealth + buildHealthResponse, classifyError() redaction); src/lib/health.test.ts (6 tests including error-redaction assertions); app/healthz/route.ts (Node-runtime, force-dynamic, unauthenticated GET /healthz); .env.example updated with Vercel+Neon wiring docs. 28/28 tests pass. Smoke: HTTP 503 valid JSON. Task 3 human-action checkpoint: Vercel/Neon/Blob provisioning + production /healthz verify. 2 task commits: 512461f, 1e1ccec.
+- **2026-05-07:** Phase 6 context-gathering session — analyzed 32 requirements (AUTH-01..18 + SHELL-01..14) against PROJECT.md, REQUIREMENTS.md, STATE.md locked decisions, ARCHITECTURE.md, PITFALLS.md, STACK.md, and Phase 5 UI-SPEC. Surfaced 4 gray areas (auth library re-verification, schema scope, invitation/reset UX, CLI admin-grant script). User responded "none, I want to keep going with the build and commit to these changes" — accepted all soft-locks as final. CONTEXT.md captures: Better Auth 1.6.x final-locked, schema scope tight to users + password_resets only, 24h token TTL with admin-side modal + copy button + "won't be shown again" warning, scripts/grant-admin.ts mirrors scripts/migrate.ts typed-confirmation pattern (idempotent, can upgrade existing or create + emit invitation URL). 06-CONTEXT.md + 06-DISCUSSION-LOG.md written.
 
 ## Open Blockers
 
