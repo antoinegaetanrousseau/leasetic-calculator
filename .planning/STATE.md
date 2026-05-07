@@ -46,11 +46,11 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
 ```
 
-## Phase 5 follow-ups (non-blocking, deferred)
+## Phase 5 follow-ups
 
-1. **Neon branch split**: currently 1 shared `main` branch across 3 Vercel scopes. Create `preview` and `development` branches off `main`, scope `DATABASE_URL` per env. Required before Phase 8 PDF persistence ships real partner data.
-2. **GitHub Environment protection rules**: free-plan + private-repo can't enforce required-reviewer or branch policy on the `production` Environment. Either upgrade to Pro ($4/user/mo) or make repo public. The workflow's typed-confirmation gate (`MIGRATE PROD`) is the meaningful confirmation today.
-3. **Vercel project ownership**: project lives in personal scope `antoinerousseau-5272s-projects`. Transfer to `memento` team for v1.1 launch (no code change required, just dashboard transfer).
+1. **Neon branch split** — ⚠ PARTIAL (2026-05-07): Neon branches `main` (default), `preview`, `development` created in Neon console. Vercel `DATABASE_URL` per-scope routing still pending — all 3 Vercel scopes currently point at the `main` branch pooled endpoint `ep-icy-boat-alx5o1tz-pooler...`. Required before Phase 8 PDF persistence ships real partner data.
+2. **GitHub Environment protection rules** — ✅ RESOLVED (2026-05-07): repo set to public; `production` environment now has required reviewer (`antoinegaetanrousseau`) + custom branch policy restricted to `main`. Migration workflow runs now gate on both typed-confirmation `MIGRATE PROD` AND GitHub UI "Approve" click.
+3. **Vercel project ownership** — ✅ RESOLVED: project was always in the `memento` team (team slug `antoinerousseau-5272s-projects`, display name "memento"); local `.vercel/project.json` orgId `team_b22P56dgh6tYIkM8mgRASgN2` matches.
 
 ## v1.0 Closure Status
 
