@@ -1,14 +1,32 @@
+import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, getCurrentTheme, t } from '@/lib/i18n';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { LocaleToggle } from '@/components/LocaleToggle';
+import { Topbar } from '@/components/Topbar';
 
-// Force dynamic so cookies are re-read on every request (PITFALLS §1.6).
+// PITFALLS §1.6 — every cookie/session-reading layout opts out of static rendering.
 export const dynamic = 'force-dynamic';
 
-export default async function HomePage() {
+export default async function AuthedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Defence in depth: requireUser() is the primary auth gate. It redirects
+  // unauthenticated visitors to /login before any content is rendered.
+  // The middleware (proxy.ts) handles the coarse gate; this is the per-layout
+  // secondary check (ARCHITECTURE.md §2.2 "auth & role enforcement layers").
+  const { session, role } = await requireUser();
   const lang = await getCurrentLang();
-  const themeCookie = await getCurrentTheme();
-  const themeForToggle = themeCookie; // 'light' | 'dark' | 'system' as stored
+  const theme = await getCurrentTheme();
+
+  // Better Auth session.user additionalFields shape (Plan 06-03):
+  // id, email, name, displayName, language, theme, role, sessionVersion, ...
+  // Use displayName when present, fall back to name, then email.
+  const u = session.user as {
+    email: string;
+    displayName?: string | null;
+    name?: string | null;
+  };
+  const displayName = u.displayName ?? u.name ?? u.email;
 
   return (
     <div
@@ -32,32 +50,21 @@ export default async function HomePage() {
           height: '100vh',
         }}
       >
-        <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '16.5px' }}>
+        <div
+          style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '22px' }}
+        >
           {t('sidebar.brand', lang)}
         </div>
       </aside>
 
       {/* Topbar (row 1, col 2) */}
-      <header
-        style={{
-          gridRow: '1',
-          gridColumn: '2',
-          background: 'var(--surface)',
-          borderBottom: '1px solid var(--border)',
-          height: 'var(--topbar-h)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          padding: '0 1.5rem',
-          gap: '0.75rem',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-        }}
-      >
-        <LocaleToggle current={lang} />
-        <ThemeToggle current={themeForToggle} />
-      </header>
+      <Topbar
+        displayName={displayName}
+        email={u.email}
+        lang={lang}
+        theme={theme}
+        isAdmin={role === 'admin'}
+      />
 
       {/* Main content (row 2, col 2) */}
       <main
@@ -71,12 +78,7 @@ export default async function HomePage() {
           margin: '0 auto',
         }}
       >
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '0.5rem' }}>
-          {t('welcomeHeading', lang)}
-        </h1>
-        <p style={{ color: 'var(--muted)', fontSize: '14.5px' }}>
-          {t('welcomeSubtext', lang)}
-        </p>
+        {children}
       </main>
 
       {/* Footer (row 3, col 2) */}
