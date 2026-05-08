@@ -20,7 +20,7 @@
 ### 🚧 v1.1 — Hosted Web App Foundation (Phases 5-10)
 
 - [x] **Phase 5: Bootstrap & Deploy** — Deployable empty Next.js shell on Vercel + Neon Postgres + Vercel Blob, all hosting primitives behind portable adapters; CI gates the no-Vercel-only-import rule. ✅ Complete 2026-05-06: /healthz live at https://leasetic-matrice.vercel.app returning `{ db: ok, blob: ok }`. Follow-ups: 3-branch Neon split, GH plan upgrade for Environment protection, project transfer to memento team.
-- [ ] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode (3/9 plans complete)
+- [ ] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode (4/9 plans complete)
 - [ ] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet)
 - [ ] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete
 - [ ] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown
@@ -67,7 +67,7 @@ Plans:
 - [ ] 06-05-PLAN.md — Public auth tree: (public)/layout + login + invite/[token] + reset/[token] + LoginForm + SetPasswordForm + redeem.ts (AUTH-01, AUTH-04, AUTH-08..10, AUTH-18, SHELL-03, SHELL-10, SHELL-11, SHELL-14)
 - [ ] 06-06-PLAN.md — (authed) shell + Topbar + UserMenu + theme/locale DB persistence; replace app/page.tsx (AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14)
 - [ ] 06-07-PLAN.md — (admin)/[adminSegment] layout (env-segment + requireAdmin two-layer gate) + InviteUrlModal primitive (AUTH-07, AUTH-08, AUTH-10, AUTH-14, AUTH-15)
-- [ ] 06-08-PLAN.md — Error boundary (app/error.tsx) + 404 page (app/not-found.tsx) localized FR + EN (SHELL-12, SHELL-13)
+- [x] 06-08-PLAN.md — Error boundary (app/error.tsx) + 404 page (app/not-found.tsx) localized FR + EN (SHELL-12, SHELL-13) ✅ Complete 2026-05-08
 - [ ] 06-09-PLAN.md — scripts/grant-admin.ts CLI for AUTH-12 admin role assignment (Antoine + Emmanuel seed at v1.1 launch)
 **UI hint**: yes
 

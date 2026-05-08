@@ -57,8 +57,8 @@
 - [x] **SHELL-09**: Number and date formatting uses explicit locale (`fr-FR` or `en-GB`) — never the system default
 - [ ] **SHELL-10**: Toast notifications use Sonner; success / info / error variants
 - [x] **SHELL-11**: Form validation uses react-hook-form + Zod; the same Zod schema is imported on client (validation) and server (action input parsing)
-- [ ] **SHELL-12**: Error boundary catches unhandled errors; partners see a generic error page in their language
-- [ ] **SHELL-13**: 404 page in FR + EN
+- [x] **SHELL-12**: Error boundary catches unhandled errors; partners see a generic error page in their language
+- [x] **SHELL-13**: 404 page in FR + EN
 - [ ] **SHELL-14**: Mobile layout degrades gracefully (desktop-first per v1.0 constraint; mobile optimization deferred to v1.2)
 
 ### CALC — Calculation Engine Port
@@ -262,8 +262,8 @@
 | SHELL-09 | Phase 6 | Complete (06-02) |
 | SHELL-10 | Phase 6 | Pending |
 | SHELL-11 | Phase 6 | Pending |
-| SHELL-12 | Phase 6 | Pending |
-| SHELL-13 | Phase 6 | Pending |
+| SHELL-12 | Phase 6 | Complete (06-08) |
+| SHELL-13 | Phase 6 | Complete (06-08) |
 | SHELL-14 | Phase 6 | Pending |
 | CALC-01 | Phase 7 | Pending |
 | CALC-02 | Phase 7 | Pending |
