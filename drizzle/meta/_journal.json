@@ -8,6 +8,13 @@
       "when": 1778068452229,
       "tag": "0000_striped_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778256563816,
+      "tag": "0001_kind_doctor_faustus",
+      "breakpoints": true
     }
   ]
 }
