@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-08T16:48:27Z"
-last_activity: 2026-05-08 -- Phase 6 Plan 09 complete (scripts/grant-admin.ts CLI for AUTH-12 admin role assignment)
+last_updated: "2026-05-08T17:06:40Z"
+last_activity: 2026-05-08 -- Phase 6 Plan 05 complete (public auth screens: login + invite + reset + LoginForm + SetPasswordForm + redeemToken)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 16
-  completed_plans: 13
-  percent: 75
+  completed_plans: 14
+  percent: 81
 ---
 
 # State — Matrice Commerciale
@@ -28,10 +28,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 6 (auth-shell) — EXECUTING
-Plan: 7 of 9
-Status: Executing Phase 6 (06-09 complete)
-Next: Execute plan 06-05
-Last activity: 2026-05-08 -- Phase 6 Plan 09 complete (scripts/grant-admin.ts CLI for AUTH-12 admin role assignment)
+Plan: 8 of 9
+Status: Executing Phase 6 (06-05 complete)
+Next: Execute plan 06-06 (authed shell layout + Topbar + UserMenu)
+Last activity: 2026-05-08 -- Phase 6 Plan 05 complete (public auth screens: login + invite + reset + LoginForm + SetPasswordForm + redeemToken)
 
 ## Progress
 
@@ -39,7 +39,7 @@ Last activity: 2026-05-08 -- Phase 6 Plan 09 complete (scripts/grant-admin.ts CL
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
 v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases complete
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
-       └─ Phase 6: Auth & Shell              ◐ 6/9 plans complete (auth guards + proxy.ts + admin actions + grant-admin CLI live)
+       └─ Phase 6: Auth & Shell              ◐ 7/9 plans complete (auth guards + proxy.ts + admin actions + grant-admin CLI + public auth screens live)
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
        └─ Phase 9: Admin Surface             ◯ blocked on P8
@@ -139,6 +139,9 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 | Better Auth admin plugin added to auth() config: revokeUserSessions (for another user's sessions) is ONLY in the admin plugin, not core auth.api — Plan 06-03 SUMMARY flagged this; Plan 06-04 adds admin() to plugins array | 06-04 type inspection | 06-04 |
 | proxy.ts exports named export `proxy` (not `middleware`) and no runtime declaration — Next.js 16 convention per RESEARCH §1; build confirms ƒ Proxy (Middleware) entry | 06-04 execution | 06-04 |
 | Vitest mocks server-only as no-op: vi.mock('server-only', () => ({})) in test files — standard pattern for server-only modules outside Next.js bundler | 06-04 execution | 06-04 |
+| t() moved from i18n/index.ts to i18n/dictionaries.ts: client components cannot import next/headers — index.ts was bundled into LoginForm/SetPasswordForm causing build failure (Rule 3 auto-fix) | 06-05 execution | 06-05 |
+| useWatch over watch() for strength meter: React Compiler lint rule flags watch() as incompatible-library; useWatch is the recommended alternative (Rule 1 auto-fix) | 06-05 execution | 06-05 |
+| sidebar.brand dictionary key for logo in public layout: ESLint no-hardcoded-jsx fires on 'Leasétic' in JSXText; t('sidebar.brand') resolves same in FR+EN (Rule 1 auto-fix) | 06-05 execution | 06-05 |
 
 ## Session Notes
 
@@ -155,6 +158,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 - **2026-05-08:** 06-02 executed — i18n foundation: dictionaries.ts extended from 5 to 231 keys × 2 langs (5 legacy + 166 v10 + 60 Phase 6); compile-time EN parity proof via _EnHasAllFrKeys type; 6 parity/spot-check tests. format.ts created with formatCurrency/formatNumber/formatDate using explicit fr-FR/en-GB locales (SHELL-09); 8 tests. ESLint no-restricted-syntax rule blocking hardcoded JSXText (SHELL-06) and Intl no-arg calls (SHELL-09 belt); app/page.tsx refactored (Rule 1 auto-fix: 2 hardcoded literals replaced with t()). 42/42 tests pass. typecheck + lint + build all 0. 3 task commits: 85ed3d0, a31a692, 51cf372.
 - **2026-05-08:** 06-03 executed — Better Auth engine wiring: tokens.ts (generateToken + hashToken, 32-byte SHA-256 token crypto) + schemas.ts (loginSchema + setPasswordSchema Zod, shared client+server) with 13 tests (TDD: RED 381e02d → GREEN 3e448f7). auth() lazy memoized singleton (Rule 1 auto-fix: `export const auth = betterAuth(...)` caused DATABASE_URL error at next build static analysis). authClient 'use client' singleton. catch-all /api/auth route registered (visible in build route list). 55/55 tests pass. typecheck + lint + no-vercel-imports + build all 0. Identified: revokeUserSessions requires admin plugin (critical for Plan 06-04). 3 task commits: 381e02d, 3e448f7, 0df495f.
 - **2026-05-08:** 06-08 executed — error boundary + 404 page: app/error.tsx (Client Component, 'use client', bilingual STR cookie-read via lazy useState initialisers, D-30 redaction, AlertTriangle icon, retry reset()) + app/not-found.tsx (Server Component, getCurrentLang() + t(), force-dynamic, 4 error.404.* keys, .btn-green Link to /). 1 Rule 1 auto-fix: useState lazy init instead of useEffect setState (react-hooks/set-state-in-effect). 55/55 tests pass. typecheck + lint + build all 0. SHELL-12 + SHELL-13 satisfied. 2 task commits: 0ead79e, e3f5011.
+- **2026-05-08:** 06-05 executed — Public auth screens: redeem.ts (atomic server action, 7 TDD tests); LoginForm (RHF+Zod, authClient.signIn.email, AUTH-04/D-22 generic error, ?next= open-redirect guard, mount-time toasts); SetPasswordForm (RHF+Zod, useWatch, 4-segment strength meter, eye-toggle, redeemToken call); app/(public)/layout.tsx (SHELL-03 minimal, LocaleToggle+ThemeToggle, footer); login/page.tsx (D-21 server-side redirect); invite/[token] + reset/[token] pages (4-condition token lookup, expired-token card). 3 Rule auto-fixes: t() extracted to dictionaries.ts (Rule 3 blocking), useWatch over watch() (Rule 1 lint), sidebar.brand key for logo (Rule 1 lint). 83/83 tests. typecheck+lint+build all 0. AUTH-01, AUTH-04, AUTH-08, AUTH-09, AUTH-10, AUTH-18, SHELL-03, SHELL-10, SHELL-11, SHELL-14 grounded. 4 commits: e095d08, 6cb2568, 08fe0e4, 8d2268a.
 - **2026-05-08:** 06-04 executed — Auth authorization layer: require.ts (requireUser + requireAdmin with AUTH-16 secondary deletedAt check, D-18 notFound not 403, server-only import), actions.ts (4 admin server actions: disableUser/reEnableUser/createInvitation/createPasswordReset, all guarded by requireAdmin() first, AUTH-15), proxy.ts at project root (Next.js 16 proxy convention, getSessionCookie cookie-only check, ?next= redirect, ƒ Proxy (Middleware) in build). 2 Rule fixes: server-only installed (Rule 3), admin plugin added to auth() for revokeUserSessions (Rule 2). 76/76 tests. typecheck + lint + build all 0. AUTH-05, AUTH-06, AUTH-11, AUTH-14, AUTH-15, AUTH-16 grounded. 5 task commits: 86aaf61, 25ef355, 472d744, 45b5ab4, 71ed8ea.
 - **2026-05-08:** 06-09 executed — grant-admin CLI: scripts/grant-admin.ts (idempotent 4-branch decision tree: active-admin no-op / active-partner upgrade / disabled re-enable + invite / new user create + invite; D-16 typed-confirmation gate CONFIRM=GRANT-ADMIN-<email>; DATABASE_URL hostname masking; postgres-js max=1+prepare=false; generateToken() from tokens.ts for 24h invitation URLs; randomBytes(16).base64url.slice(0,21) for Better Auth-compatible user IDs). package.json: grant:admin npm script added. Smoke tests: no-CONFIRM exits 2; no-DATABASE_URL exits 2. typecheck + lint + no-drizzle-push all 0. AUTH-12 + AUTH-07 (launch-day seeding) grounded. Commit: b058463.
 - **2026-05-07:** Phase 6 UI-SPEC session — gsd-ui-researcher produced 06-UI-SPEC.md (56KB, 762 insertions, commit ec363d6) inheriting Phase 5 token spine unchanged and adding 7 screen-specific design contracts (login, /invite/{token}, /reset/{token}, expired-token landing, app shell topbar/sidebar/footer, error boundary, 404), 6 sonner toast variants, 1 modal primitive for invitation/reset URL display, and 225-key i18n dictionary scope per language (165 v10 keys + 60 new Phase-6 keys). gsd-ui-checker verified 6 dimensions: 5 PASS + 1 FLAG on inherited typography weights (4 weights vs checker's strict 2-weight rule — non-blocking because v10-source-locked + Phase-5-approved). Researcher made 9 sensible-default decisions within UI discretion (no Radix, login card 420px max-width, 4-segment password strength meter without zxcvbn, logout no-confirmation, etc.). 0 user questions asked — CONTEXT.md was complete. Cross-checks all pass: no Phase 5 token redefinition, SHELL-03 minimal login layout, D-22 anti-enumeration, D-18 404-not-403, D-10 single-display modal, no /settings page, full v10 dictionary scoped, FR copy reads natural.

@@ -28,13 +28,13 @@
 - [x] **AUTH-01**: User can log in with email + password via the `/login` page
 - [x] **AUTH-02**: User session persists across page reloads (8-hour sliding lifetime; refresh on activity)
 - [ ] **AUTH-03**: User can log out from the topbar; session cookie cleared
-- [ ] **AUTH-04**: Login error message is generic ("incorrect email or password") and does not leak whether the email exists (anti-enumeration)
+- [x] **AUTH-04**: Login error message is generic ("incorrect email or password") and does not leak whether the email exists (anti-enumeration)
 - [x] **AUTH-05**: User on a `(authed)` or `(admin)` route while not logged in is redirected to `/login`
 - [x] **AUTH-06**: User on `/login` while already logged in is redirected to `/`
 - [ ] **AUTH-07**: Admin can create a new partner account (email + display name + language) from the admin accounts page
-- [ ] **AUTH-08**: When admin creates a partner, the system generates a one-time invitation URL containing a signed token; admin shares it with the partner out-of-band
-- [ ] **AUTH-09**: Partner can use the invitation URL once to set their initial password; subsequent uses fail
-- [ ] **AUTH-10**: Admin can trigger a password reset for any partner; this generates a one-time reset URL the admin shares out-of-band
+- [x] **AUTH-08**: When admin creates a partner, the system generates a one-time invitation URL containing a signed token; admin shares it with the partner out-of-band
+- [x] **AUTH-09**: Partner can use the invitation URL once to set their initial password; subsequent uses fail
+- [x] **AUTH-10**: Admin can trigger a password reset for any partner; this generates a one-time reset URL the admin shares out-of-band
 - [x] **AUTH-11**: Admin can disable a partner account; disabled users cannot log in but their data is preserved
 - [x] **AUTH-12**: Admin role is granted only via a CLI script run on the production DB by Antoine — never via the app UI
 - [x] **AUTH-13**: Database CHECK constraint enforces `role IN ('partner', 'admin')`
@@ -48,18 +48,18 @@
 
 - [ ] **SHELL-01**: App has a top-level shell with topbar (logo + user menu + language toggle + theme toggle) and main content area
 - [ ] **SHELL-02**: Authenticated users see their display name in the topbar
-- [ ] **SHELL-03**: Login page is public and uses a minimal layout (no app shell)
+- [x] **SHELL-03**: Login page is public and uses a minimal layout (no app shell)
 - [ ] **SHELL-04**: User can toggle between FR and EN; selection persists across sessions via cookie + DB
 - [x] **SHELL-05**: i18n dictionary covers all v10 keys (~138 keys × 2 languages, full parity with v10)
 - [x] **SHELL-06**: All user-facing strings go through the `t()` helper; ESLint rule flags hardcoded literals in JSX
 - [ ] **SHELL-07**: User can toggle between light, dark, and system themes; selection persists across sessions via cookie + DB
 - [ ] **SHELL-08**: Initial paint reflects the user's theme without a flash of incorrect theme (cookie-driven server render + inline `<head>` script)
 - [x] **SHELL-09**: Number and date formatting uses explicit locale (`fr-FR` or `en-GB`) — never the system default
-- [ ] **SHELL-10**: Toast notifications use Sonner; success / info / error variants
+- [x] **SHELL-10**: Toast notifications use Sonner; success / info / error variants
 - [x] **SHELL-11**: Form validation uses react-hook-form + Zod; the same Zod schema is imported on client (validation) and server (action input parsing)
 - [x] **SHELL-12**: Error boundary catches unhandled errors; partners see a generic error page in their language
 - [x] **SHELL-13**: 404 page in FR + EN
-- [ ] **SHELL-14**: Mobile layout degrades gracefully (desktop-first per v1.0 constraint; mobile optimization deferred to v1.2)
+- [x] **SHELL-14**: Mobile layout degrades gracefully (desktop-first per v1.0 constraint; mobile optimization deferred to v1.2)
 
 ### CALC — Calculation Engine Port
 
@@ -233,16 +233,16 @@
 | BOOT-10 | Phase 5 | Pending |
 | BOOT-11 | Phase 5 | Complete (05-05) |
 | BOOT-12 | Phase 5 | Pending |
-| AUTH-01 | Phase 6 | Pending |
+| AUTH-01 | Phase 6 | Complete (06-05) |
 | AUTH-02 | Phase 6 | Pending |
 | AUTH-03 | Phase 6 | Pending |
-| AUTH-04 | Phase 6 | Pending |
+| AUTH-04 | Phase 6 | Complete (06-05) |
 | AUTH-05 | Phase 6 | Pending |
 | AUTH-06 | Phase 6 | Pending |
 | AUTH-07 | Phase 6 | Pending |
-| AUTH-08 | Phase 6 | Pending |
-| AUTH-09 | Phase 6 | Pending |
-| AUTH-10 | Phase 6 | Pending |
+| AUTH-08 | Phase 6 | Complete (06-05) |
+| AUTH-09 | Phase 6 | Complete (06-05) |
+| AUTH-10 | Phase 6 | Complete (06-05) |
 | AUTH-11 | Phase 6 | Pending |
 | AUTH-12 | Phase 6 | Pending |
 | AUTH-13 | Phase 6 | Pending |
@@ -250,21 +250,21 @@
 | AUTH-15 | Phase 6 | Pending |
 | AUTH-16 | Phase 6 | Pending |
 | AUTH-17 | Phase 6 | Pending |
-| AUTH-18 | Phase 6 | Pending |
+| AUTH-18 | Phase 6 | Complete (06-05) |
 | SHELL-01 | Phase 6 | Pending |
 | SHELL-02 | Phase 6 | Pending |
-| SHELL-03 | Phase 6 | Pending |
+| SHELL-03 | Phase 6 | Complete (06-05) |
 | SHELL-04 | Phase 6 | Pending |
 | SHELL-05 | Phase 6 | Complete (06-02) |
 | SHELL-06 | Phase 6 | Complete (06-02) |
 | SHELL-07 | Phase 6 | Pending |
 | SHELL-08 | Phase 6 | Pending |
 | SHELL-09 | Phase 6 | Complete (06-02) |
-| SHELL-10 | Phase 6 | Pending |
-| SHELL-11 | Phase 6 | Pending |
+| SHELL-10 | Phase 6 | Complete (06-05) |
+| SHELL-11 | Phase 6 | Complete (06-05) |
 | SHELL-12 | Phase 6 | Complete (06-08) |
 | SHELL-13 | Phase 6 | Complete (06-08) |
-| SHELL-14 | Phase 6 | Pending |
+| SHELL-14 | Phase 6 | Complete (06-05) |
 | CALC-01 | Phase 7 | Pending |
 | CALC-02 | Phase 7 | Pending |
 | CALC-03 | Phase 7 | Pending |

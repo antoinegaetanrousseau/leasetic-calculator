@@ -64,7 +64,7 @@ Plans:
 - [x] 06-02-PLAN.md — i18n full v10 dictionary port (231 keys × 2 langs) + format.ts (explicit fr-FR / en-GB) + ESLint hardcoded-JSX rule (SHELL-04..06, SHELL-09) ✅ Complete 2026-05-08
 - [x] 06-03-PLAN.md — Better Auth instance + Drizzle adapter + argon2id + tokens.ts + schemas.ts + auth catch-all route (AUTH-01, AUTH-02, AUTH-13, AUTH-17, AUTH-18, SHELL-11) ✅ Complete 2026-05-08
 - [x] 06-04-PLAN.md — requireUser/requireAdmin helpers + admin server actions (disable/reEnable/createInvitation/createPasswordReset) + proxy.ts auth gate (AUTH-05, AUTH-06, AUTH-11, AUTH-14, AUTH-15, AUTH-16) ✅ Complete 2026-05-08
-- [ ] 06-05-PLAN.md — Public auth tree: (public)/layout + login + invite/[token] + reset/[token] + LoginForm + SetPasswordForm + redeem.ts (AUTH-01, AUTH-04, AUTH-08..10, AUTH-18, SHELL-03, SHELL-10, SHELL-11, SHELL-14)
+- [x] 06-05-PLAN.md — Public auth tree: (public)/layout + login + invite/[token] + reset/[token] + LoginForm + SetPasswordForm + redeem.ts (AUTH-01, AUTH-04, AUTH-08..10, AUTH-18, SHELL-03, SHELL-10, SHELL-11, SHELL-14) ✅ Complete 2026-05-08
 - [ ] 06-06-PLAN.md — (authed) shell + Topbar + UserMenu + theme/locale DB persistence; replace app/page.tsx (AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14)
 - [ ] 06-07-PLAN.md — (admin)/[adminSegment] layout (env-segment + requireAdmin two-layer gate) + InviteUrlModal primitive (AUTH-07, AUTH-08, AUTH-10, AUTH-14, AUTH-15)
 - [x] 06-08-PLAN.md — Error boundary (app/error.tsx) + 404 page (app/not-found.tsx) localized FR + EN (SHELL-12, SHELL-13) ✅ Complete 2026-05-08
@@ -131,7 +131,7 @@ Plans:
 | 3. UX Polish & i18n | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
-| 6. Auth & Shell | v1.1 | 6/9 | In progress | - |
+| 6. Auth & Shell | v1.1 | 7/9 | In progress | - |
 | 7. Calc Engine Port + Proposal Form | v1.1 | 0/0 | Not started | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
@@ -139,5 +139,5 @@ Plans:
 
 ---
 
-*Last updated: 2026-05-08 — 06-09 complete: scripts/grant-admin.ts CLI (AUTH-12 admin role assignment, idempotent 4-branch decision tree, D-16 typed-confirmation gate, 24h invitation URL). AUTH-12 grounded.*
+*Last updated: 2026-05-08 — 06-05 complete: public auth screens (login + invite + reset + LoginForm + SetPasswordForm + redeemToken). AUTH-01, AUTH-04, AUTH-08, AUTH-09, AUTH-10, AUTH-18, SHELL-03, SHELL-10, SHELL-11, SHELL-14 grounded.*
 *Detailed v1.0 archives in `.planning/milestones/`.*
