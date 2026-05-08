@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// server-only throws in non-Next.js (Vitest) context — mock it to a no-op
+vi.mock('server-only', () => ({}));
+
 vi.mock('next/headers', () => ({
   headers: () => Promise.resolve(new Headers()),
 }));
