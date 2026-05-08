@@ -7,7 +7,9 @@ import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authClient } from '@/lib/auth/client';
 import { loginSchema, type LoginInput } from '@/lib/auth/schemas';
-import { t, type Lang } from '@/lib/i18n';
+// Import t + Lang from dictionaries (not index.ts) — index.ts imports next/headers
+// which is Server-Component-only and cannot be bundled into a Client Component.
+import { t, type Lang } from '@/lib/i18n/dictionaries';
 
 interface LoginFormProps {
   lang: Lang;

@@ -540,6 +540,18 @@ export type Lang = keyof typeof dictionaries;
 export type DictKey = keyof typeof dictionaries.fr;
 
 /**
+ * Pure translation helper. No I/O, no framework imports — safe to import from
+ * both Server Components and Client Components.
+ *
+ * Falls back to French if the key is (somehow) missing in EN. TypeScript's
+ * strict union type makes a missing key a compile-time error, so the fallback
+ * is only a runtime safety net.
+ */
+export function t(key: DictKey, lang: Lang): string {
+  return dictionaries[lang][key] ?? dictionaries.fr[key];
+}
+
+/**
  * Compile-time parity check: TypeScript fails to compile if any FR key is
  * missing from EN. This catches drift the moment a developer adds a FR-only key.
  */

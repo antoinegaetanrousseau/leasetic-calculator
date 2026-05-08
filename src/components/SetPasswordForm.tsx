@@ -8,7 +8,9 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { setPasswordSchema, type SetPasswordInput } from '@/lib/auth/schemas';
 import { redeemToken, type RedeemKind } from '@/lib/auth/redeem';
-import { t, type Lang, type DictKey } from '@/lib/i18n';
+// Import t + Lang + DictKey from dictionaries (not index.ts) — index.ts imports
+// next/headers which is Server-Component-only and cannot be bundled for client.
+import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
 
 interface SetPasswordFormProps {
   token: string;

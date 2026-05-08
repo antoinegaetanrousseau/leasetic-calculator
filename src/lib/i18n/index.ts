@@ -1,13 +1,15 @@
 import { cookies } from 'next/headers';
-import { dictionaries, type Lang, type DictKey } from './dictionaries';
+import { dictionaries, type Lang, type DictKey, t } from './dictionaries';
 
-export { dictionaries };
+/**
+ * Re-export the pure `t()` helper and types so server components can import
+ * everything from '@/lib/i18n' (one-stop import).
+ *
+ * Client components MUST import `t` and `Lang` directly from
+ * '@/lib/i18n/dictionaries' to avoid pulling in `next/headers`.
+ */
+export { dictionaries, t };
 export type { Lang, DictKey };
-
-/** Pure helper. Falls back to FR if a key is missing in EN (TS makes that impossible at type level). */
-export function t(key: DictKey, lang: Lang): string {
-  return dictionaries[lang][key] ?? dictionaries.fr[key];
-}
 
 /**
  * Server-side cookie reader. ONLY call from server components / route handlers.
