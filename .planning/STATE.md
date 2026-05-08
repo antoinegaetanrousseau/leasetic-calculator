@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: phase-complete
-last_updated: "2026-05-08T18:30:00Z"
-last_activity: 2026-05-08 -- Phase 6 SHIPPED. Migration 0001 applied to prod. Both admins (antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com) seeded via direct-DB launch script and verified to log in end-to-end (HTTP 200 + valid session cookie + role=admin payload). Login fix for canonical-host trustedOrigins: APP_URL + NEXT_PUBLIC_APP_URL added to Vercel env (all 3 scopes), production redeployed. Ready for Phase 7.
+status: executing
+last_updated: "2026-05-08T20:38:47.019Z"
+last_activity: 2026-05-08 -- Phase 7 planning complete
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 16
+  total_plans: 22
   completed_plans: 16
-  milestone_percent: 33
+  percent: 73
 ---
 
 # State — Matrice Commerciale
@@ -29,9 +29,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: **6 (auth-shell) — ✅ COMPLETE & DEPLOYED**
 Plan: 9 of 9 done; migration applied to prod; admins seeded; login verified end-to-end
-Status: Production app at https://leasetic-matrice.vercel.app is fully functional. Both admins can log in with the launch-day shared password (rotation pending — see Phase 6 follow-ups).
+Status: Ready to execute
 Next: `/clear` then `/gsd-plan-phase 7` (Calc Engine Port + Proposal Form)
-Last activity: 2026-05-08 -- Login fix landed. APP_URL + NEXT_PUBLIC_APP_URL env vars added to all 3 Vercel scopes; redeployed; browser-issued login verified HTTP 200 with correct Origin header. Phase 6 fully shipped.
+Last activity: 2026-05-08 -- Phase 7 planning complete
 
 ## Progress
 

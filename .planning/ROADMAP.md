@@ -81,7 +81,21 @@ Plans:
   3. Form fields validate on blur with v10's red-ring focus pattern, and the same Zod schema imported on the client also runs on the server boundary
   4. The "Copier la référence" LC clipboard button and the configurable validity (15 / 30 / 60 days) selector work as in v10, with bilingual labels driven by the i18n `t()` helper
   5. Manual parity comparison of the live-preview output against v10 across ≥5 representative scenarios shows zero divergence in computed loyer
-**Plans**: TBD
+**Plans:** 6 plans
+Plans:
+**Wave 1**
+- [ ] 07-01-PLAN.md — Calc engine core (pure-TS module; computeLoyer / lookupCoefficient / tKey / tLabel / isOnDemand / generateLcRef + Zod schemas; string-typed boundary; seed-params constant) — CALC-01..04, CALC-08
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 07-02-PLAN.md — Calc golden corpus (≥30 golden cases + assertCalc 6/6 + assertValidity 6/6 ports; assertEscape documented-not-ported) — CALC-05, CALC-06
+- [ ] 07-06-PLAN.md — i18n copy table: 26 NEW Phase-7 keys × 2 langs + 4 tranche-label keys + parametric parity tests — cross-cutting (PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 07-03-PLAN.md — Home page CTA + v10 base CSS classes added to globals.css (.card / .ctitle / .fld / input.invalid / .ieu / .dg / .db / .yn-btn / .btn-* / .tbadge) — PROP-01
+- [ ] 07-04-PLAN.md — Proposal form scaffold (RHF + zodResolver, 4 cards, 14 inputs, blur validation, native confirm reset, no-DB-write submit) + DurationSegmented + YesNoToggle + NumberInputAmount + PhoneInput + SirenInput components — PROP-06, PROP-08
+
+**Wave 4** *(blocked on Wave 3 completion)*
+- [ ] 07-05-PLAN.md — Live preview composition (300ms-debounced sticky preview card, 5-state machine, formatCurrency fr-FR/en-GB, LC ref + Copy button, Validity selector, FormProvider restructure) — PROP-07, PROP-24, PROP-25, CALC-07
 **UI hint**: yes
 
 ### Phase 8: Persistence + PDF Pipeline
@@ -132,7 +146,7 @@ Plans:
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
 | 6. Auth & Shell | v1.1 | 9/9 | Complete | 2026-05-08 |
-| 7. Calc Engine Port + Proposal Form | v1.1 | 0/0 | Not started | - |
+| 7. Calc Engine Port + Proposal Form | v1.1 | 0/6 | Planned | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
 | 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
