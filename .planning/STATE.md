@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: phase-ui-spec-approved
-last_updated: "2026-05-07T16:10:00.000Z"
-last_activity: 2026-05-07 -- Phase 6 UI-SPEC approved by gsd-ui-checker (5 PASS + 1 FLAG on inherited typography weights — non-blocking). 06-UI-SPEC.md committed (ec363d6). Ready for /gsd-plan-phase 6 --research.
+status: executing
+last_updated: "2026-05-08T18:12:00.000Z"
+last_activity: 2026-05-08 -- Phase 6 Plan 01 complete (auth deps + schema + migration)
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 7
-  completed_plans: 7
-  percent: 17
+  total_plans: 16
+  completed_plans: 8
+  percent: 50
 ---
 
 # State — Matrice Commerciale
@@ -23,15 +23,15 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 6 — Auth & Shell. CONTEXT + UI-SPEC both approved 2026-05-07; ready for planning.
+**Current focus:** Phase 6 — auth-shell
 
 ## Current Position
 
-Phase: 6 (auth-shell) — ◐ CONTEXT.md + UI-SPEC.md ready, awaiting plan
-Plan: 0 of TBD
-Status: 06-UI-SPEC.md verified by gsd-ui-checker — 5 dimensions PASS + 1 FLAG on inherited typography weights (non-blocking; locked at Phase 5 token-spine level from v10 source). Pre-planning artifacts complete: CONTEXT (32 decisions D-01..D-32), UI-SPEC (7 screens + 6 toast variants + modal primitive + 165-key v10 dictionary scoped + 60 new Phase-6 keys = 225 keys × 2 langs = 450 entries).
-Next: `/gsd-plan-phase 6 --research`
-Last activity: 2026-05-07 -- Phase 6 UI-SPEC approved; 06-UI-SPEC.md committed (ec363d6, 762 insertions)
+Phase: 6 (auth-shell) — EXECUTING
+Plan: 2 of 9
+Status: Executing Phase 6 (06-01 complete)
+Next: Execute plan 06-02
+Last activity: 2026-05-08 -- Phase 6 Plan 01 complete (auth deps + schema + migration)
 
 ## Progress
 
@@ -123,6 +123,8 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 | runtime: nodejs on /healthz — aws-sdk/client-s3 requires Node APIs; consistent with Phase 8 PDF rendering | Plan spec + PITFALLS §6.1 | 05-07 |
 | classifyError() maps ALL exceptions to bounded 4-string set; raw error.message server-side only | PITFALLS §9.4 security discipline | 05-07 |
 | Wrap workflow_dispatch input in CONFIRM_INPUT env var instead of direct shell interpolation — GitHub Actions injection safety best practice | Rule 2 security fix | 05-06 |
+| --legacy-peer-deps used to install better-auth@1.6.9: optional @tanstack/react-start peerDep pulls vite@>=7, conflicting with vitest@2.1.8's vite@5; all conflicting peerDeps optional | Rule 3 auto-fix (blocking install conflict) | 06-01 |
+| Migration file named drizzle/0001_kind_doctor_faustus.sql (drizzle-kit auto-names; ordinal 0001_ ensures correct migration order after 0000_) | drizzle-kit generate output | 06-01 |
 
 ## Session Notes
 
@@ -135,6 +137,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 - **2026-05-06:** 05-06 tasks 1+2 executed — tsx@4.19.2 installed; scripts/migrate.ts migration runner (postgres-js, --dry-run flag, URL hostname masking, max=1+prepare=false); .github/workflows/db-migrate.yml (workflow_dispatch-only, 2-job pipeline: dry-run→apply, production environment gate, concurrency guard); docs/operations/migrations.md (91-line operator runbook). BOOT-10 satisfied. Task 3 checkpoint pending Antoine's GitHub Settings configuration. 2 task commits: 595ceeb, 930d3c0.
 - **2026-05-06:** 05-07 tasks 1+2 executed — src/lib/health.ts (checkDatabaseHealth + checkBlobHealth + buildHealthResponse, classifyError() redaction); src/lib/health.test.ts (6 tests including error-redaction assertions); app/healthz/route.ts (Node-runtime, force-dynamic, unauthenticated GET /healthz); .env.example updated with Vercel+Neon wiring docs. 28/28 tests pass. Smoke: HTTP 503 valid JSON. Task 3 human-action checkpoint: Vercel/Neon/Blob provisioning + production /healthz verify. 2 task commits: 512461f, 1e1ccec.
 - **2026-05-07:** Phase 6 context-gathering session — analyzed 32 requirements (AUTH-01..18 + SHELL-01..14) against PROJECT.md, REQUIREMENTS.md, STATE.md locked decisions, ARCHITECTURE.md, PITFALLS.md, STACK.md, and Phase 5 UI-SPEC. Surfaced 4 gray areas (auth library re-verification, schema scope, invitation/reset UX, CLI admin-grant script). User responded "none, I want to keep going with the build and commit to these changes" — accepted all soft-locks as final. CONTEXT.md captures: Better Auth 1.6.x final-locked, schema scope tight to users + password_resets only, 24h token TTL with admin-side modal + copy button + "won't be shown again" warning, scripts/grant-admin.ts mirrors scripts/migrate.ts typed-confirmation pattern (idempotent, can upgrade existing or create + emit invitation URL). 06-CONTEXT.md + 06-DISCUSSION-LOG.md written.
+- **2026-05-08:** 06-01 executed — Phase 6 auth foundation: better-auth@1.6.9 + @node-rs/argon2@2.0.2 + react-hook-form@7.75.0 + zod@4.4.3 + @hookform/resolvers@5.2.2 installed (exact pins). drizzle-kit upgraded 0.30.1→0.31.10. .env.example Phase 6 block added (AUTH_SECRET, APP_URL, NEXT_PUBLIC_APP_URL, ADMIN_URL_SEGMENT). schema.ts extended with 5 auth tables: users (text id, role CHECK), sessions, accounts (password col), verifications, passwordResets (uuid id, kind CHECK). Migration drizzle/0001_kind_doctor_faustus.sql generated via db:generate. 28/28 tests pass. typecheck+lint+push-guard all 0. AUTH-13 schema-layer done. 2 task commits: 8d36edc, 0d176fb.
 - **2026-05-07:** Phase 6 UI-SPEC session — gsd-ui-researcher produced 06-UI-SPEC.md (56KB, 762 insertions, commit ec363d6) inheriting Phase 5 token spine unchanged and adding 7 screen-specific design contracts (login, /invite/{token}, /reset/{token}, expired-token landing, app shell topbar/sidebar/footer, error boundary, 404), 6 sonner toast variants, 1 modal primitive for invitation/reset URL display, and 225-key i18n dictionary scope per language (165 v10 keys + 60 new Phase-6 keys). gsd-ui-checker verified 6 dimensions: 5 PASS + 1 FLAG on inherited typography weights (4 weights vs checker's strict 2-weight rule — non-blocking because v10-source-locked + Phase-5-approved). Researcher made 9 sensible-default decisions within UI discretion (no Radix, login card 420px max-width, 4-segment password strength meter without zxcvbn, logout no-confirmation, etc.). 0 user questions asked — CONTEXT.md was complete. Cross-checks all pass: no Phase 5 token redefinition, SHELL-03 minimal login layout, D-22 anti-enumeration, D-18 404-not-403, D-10 single-display modal, no /settings page, full v10 dictionary scoped, FR copy reads natural.
 
 ## Open Blockers
