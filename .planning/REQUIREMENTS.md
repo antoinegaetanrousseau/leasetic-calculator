@@ -27,7 +27,7 @@
 
 - [x] **AUTH-01**: User can log in with email + password via the `/login` page
 - [x] **AUTH-02**: User session persists across page reloads (8-hour sliding lifetime; refresh on activity)
-- [ ] **AUTH-03**: User can log out from the topbar; session cookie cleared
+- [x] **AUTH-03**: User can log out from the topbar; session cookie cleared
 - [x] **AUTH-04**: Login error message is generic ("incorrect email or password") and does not leak whether the email exists (anti-enumeration)
 - [x] **AUTH-05**: User on a `(authed)` or `(admin)` route while not logged in is redirected to `/login`
 - [x] **AUTH-06**: User on `/login` while already logged in is redirected to `/`
@@ -46,14 +46,14 @@
 
 ### SHELL — Multi-page Shell & UX
 
-- [ ] **SHELL-01**: App has a top-level shell with topbar (logo + user menu + language toggle + theme toggle) and main content area
-- [ ] **SHELL-02**: Authenticated users see their display name in the topbar
+- [x] **SHELL-01**: App has a top-level shell with topbar (logo + user menu + language toggle + theme toggle) and main content area
+- [x] **SHELL-02**: Authenticated users see their display name in the topbar
 - [x] **SHELL-03**: Login page is public and uses a minimal layout (no app shell)
-- [ ] **SHELL-04**: User can toggle between FR and EN; selection persists across sessions via cookie + DB
+- [x] **SHELL-04**: User can toggle between FR and EN; selection persists across sessions via cookie + DB
 - [x] **SHELL-05**: i18n dictionary covers all v10 keys (~138 keys × 2 languages, full parity with v10)
 - [x] **SHELL-06**: All user-facing strings go through the `t()` helper; ESLint rule flags hardcoded literals in JSX
-- [ ] **SHELL-07**: User can toggle between light, dark, and system themes; selection persists across sessions via cookie + DB
-- [ ] **SHELL-08**: Initial paint reflects the user's theme without a flash of incorrect theme (cookie-driven server render + inline `<head>` script)
+- [x] **SHELL-07**: User can toggle between light, dark, and system themes; selection persists across sessions via cookie + DB
+- [x] **SHELL-08**: Initial paint reflects the user's theme without a flash of incorrect theme (cookie-driven server render + inline `<head>` script)
 - [x] **SHELL-09**: Number and date formatting uses explicit locale (`fr-FR` or `en-GB`) — never the system default
 - [x] **SHELL-10**: Toast notifications use Sonner; success / info / error variants
 - [x] **SHELL-11**: Form validation uses react-hook-form + Zod; the same Zod schema is imported on client (validation) and server (action input parsing)
@@ -235,7 +235,7 @@
 | BOOT-12 | Phase 5 | Pending |
 | AUTH-01 | Phase 6 | Complete (06-05) |
 | AUTH-02 | Phase 6 | Pending |
-| AUTH-03 | Phase 6 | Pending |
+| AUTH-03 | Phase 6 | Complete (06-06) |
 | AUTH-04 | Phase 6 | Complete (06-05) |
 | AUTH-05 | Phase 6 | Pending |
 | AUTH-06 | Phase 6 | Pending |
@@ -251,14 +251,14 @@
 | AUTH-16 | Phase 6 | Pending |
 | AUTH-17 | Phase 6 | Pending |
 | AUTH-18 | Phase 6 | Complete (06-05) |
-| SHELL-01 | Phase 6 | Pending |
-| SHELL-02 | Phase 6 | Pending |
+| SHELL-01 | Phase 6 | Complete (06-06) |
+| SHELL-02 | Phase 6 | Complete (06-06) |
 | SHELL-03 | Phase 6 | Complete (06-05) |
-| SHELL-04 | Phase 6 | Pending |
+| SHELL-04 | Phase 6 | Complete (06-06) |
 | SHELL-05 | Phase 6 | Complete (06-02) |
 | SHELL-06 | Phase 6 | Complete (06-02) |
-| SHELL-07 | Phase 6 | Pending |
-| SHELL-08 | Phase 6 | Pending |
+| SHELL-07 | Phase 6 | Complete (06-06) |
+| SHELL-08 | Phase 6 | Complete (06-06) |
 | SHELL-09 | Phase 6 | Complete (06-02) |
 | SHELL-10 | Phase 6 | Complete (06-05) |
 | SHELL-11 | Phase 6 | Complete (06-05) |

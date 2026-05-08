@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-08T17:06:40Z"
-last_activity: 2026-05-08 -- Phase 6 Plan 05 complete (public auth screens: login + invite + reset + LoginForm + SetPasswordForm + redeemToken)
+last_updated: "2026-05-08T17:20:00Z"
+last_activity: 2026-05-08 -- Phase 6 Plan 06 complete (authed shell: Topbar + UserMenu + DB theme/locale persistence + (authed) layout + page + delete app/page.tsx)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 16
-  completed_plans: 14
-  percent: 81
+  completed_plans: 15
+  percent: 87
 ---
 
 # State — Matrice Commerciale
@@ -28,10 +28,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 6 (auth-shell) — EXECUTING
-Plan: 8 of 9
-Status: Executing Phase 6 (06-05 complete)
-Next: Execute plan 06-06 (authed shell layout + Topbar + UserMenu)
-Last activity: 2026-05-08 -- Phase 6 Plan 05 complete (public auth screens: login + invite + reset + LoginForm + SetPasswordForm + redeemToken)
+Plan: 9 of 9
+Status: Executing Phase 6 (06-06 complete)
+Next: Execute plan 06-07 (admin shell layout + InviteUrlModal primitive)
+Last activity: 2026-05-08 -- Phase 6 Plan 06 complete (authed shell: Topbar + UserMenu + DB theme/locale persistence + (authed) layout + page + delete app/page.tsx)
 
 ## Progress
 
@@ -39,7 +39,7 @@ Last activity: 2026-05-08 -- Phase 6 Plan 05 complete (public auth screens: logi
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
 v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases complete
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
-       └─ Phase 6: Auth & Shell              ◐ 7/9 plans complete (auth guards + proxy.ts + admin actions + grant-admin CLI + public auth screens live)
+       └─ Phase 6: Auth & Shell              ◐ 8/9 plans complete (auth guards + proxy.ts + admin actions + grant-admin CLI + public auth screens + authed shell live)
        └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
        └─ Phase 9: Admin Surface             ◯ blocked on P8
@@ -142,6 +142,8 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 | t() moved from i18n/index.ts to i18n/dictionaries.ts: client components cannot import next/headers — index.ts was bundled into LoginForm/SetPasswordForm causing build failure (Rule 3 auto-fix) | 06-05 execution | 06-05 |
 | useWatch over watch() for strength meter: React Compiler lint rule flags watch() as incompatible-library; useWatch is the recommended alternative (Rule 1 auto-fix) | 06-05 execution | 06-05 |
 | sidebar.brand dictionary key for logo in public layout: ESLint no-hardcoded-jsx fires on 'Leasétic' in JSXText; t('sidebar.brand') resolves same in FR+EN (Rule 1 auto-fix) | 06-05 execution | 06-05 |
+| auth() is a lazy singleton function (not a named object); all callers use auth().api.getSession() — matched require.ts pattern; plan snippets used auth.api.getSession() as shorthand | 06-06 execution | 06-06 |
+| displayName fallback chain: session.user.displayName ?? session.user.name ?? session.user.email — covers all user states (displayName is optional additionalField) | 06-06 execution | 06-06 |
 
 ## Session Notes
 
@@ -161,6 +163,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 - **2026-05-08:** 06-05 executed — Public auth screens: redeem.ts (atomic server action, 7 TDD tests); LoginForm (RHF+Zod, authClient.signIn.email, AUTH-04/D-22 generic error, ?next= open-redirect guard, mount-time toasts); SetPasswordForm (RHF+Zod, useWatch, 4-segment strength meter, eye-toggle, redeemToken call); app/(public)/layout.tsx (SHELL-03 minimal, LocaleToggle+ThemeToggle, footer); login/page.tsx (D-21 server-side redirect); invite/[token] + reset/[token] pages (4-condition token lookup, expired-token card). 3 Rule auto-fixes: t() extracted to dictionaries.ts (Rule 3 blocking), useWatch over watch() (Rule 1 lint), sidebar.brand key for logo (Rule 1 lint). 83/83 tests. typecheck+lint+build all 0. AUTH-01, AUTH-04, AUTH-08, AUTH-09, AUTH-10, AUTH-18, SHELL-03, SHELL-10, SHELL-11, SHELL-14 grounded. 4 commits: e095d08, 6cb2568, 08fe0e4, 8d2268a.
 - **2026-05-08:** 06-04 executed — Auth authorization layer: require.ts (requireUser + requireAdmin with AUTH-16 secondary deletedAt check, D-18 notFound not 403, server-only import), actions.ts (4 admin server actions: disableUser/reEnableUser/createInvitation/createPasswordReset, all guarded by requireAdmin() first, AUTH-15), proxy.ts at project root (Next.js 16 proxy convention, getSessionCookie cookie-only check, ?next= redirect, ƒ Proxy (Middleware) in build). 2 Rule fixes: server-only installed (Rule 3), admin plugin added to auth() for revokeUserSessions (Rule 2). 76/76 tests. typecheck + lint + build all 0. AUTH-05, AUTH-06, AUTH-11, AUTH-14, AUTH-15, AUTH-16 grounded. 5 task commits: 86aaf61, 25ef355, 472d744, 45b5ab4, 71ed8ea.
 - **2026-05-08:** 06-09 executed — grant-admin CLI: scripts/grant-admin.ts (idempotent 4-branch decision tree: active-admin no-op / active-partner upgrade / disabled re-enable + invite / new user create + invite; D-16 typed-confirmation gate CONFIRM=GRANT-ADMIN-<email>; DATABASE_URL hostname masking; postgres-js max=1+prepare=false; generateToken() from tokens.ts for 24h invitation URLs; randomBytes(16).base64url.slice(0,21) for Better Auth-compatible user IDs). package.json: grant:admin npm script added. Smoke tests: no-CONFIRM exits 2; no-DATABASE_URL exits 2. typecheck + lint + no-drizzle-push all 0. AUTH-12 + AUTH-07 (launch-day seeding) grounded. Commit: b058463.
+- **2026-05-08:** 06-06 executed — Authed app shell: Topbar.tsx (server component, page-title slot, ADMIN badge via isAdmin prop, D-25 order: title/badge/spacer/LocaleToggle/ThemeToggle/UserMenu) + UserMenu.tsx (client component, initials avatar 28px/--gd, display name 160px truncated, ChevronDown, dropdown with email header + Logout item, authClient.signOut AUTH-18/D-24, Escape+outside-click close); setTheme/setLang extended (cookie preserved + auth().api.getSession DB write wrapped try/catch, D-27); app/(authed)/layout.tsx (requireUser() first, displayName fallback chain, 3-col×3-row grid, Topbar with isAdmin={role==='admin'}, force-dynamic); app/(authed)/page.tsx (welcomeHeading + welcomeSubtext keys, Phase 7 stub); app/page.tsx deleted (route cleanly resolves to (authed) group). 83/83 tests pass. typecheck + lint + build all 0. AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14 grounded. 3 task commits: a951b16, b848302, 125d91a.
 - **2026-05-07:** Phase 6 UI-SPEC session — gsd-ui-researcher produced 06-UI-SPEC.md (56KB, 762 insertions, commit ec363d6) inheriting Phase 5 token spine unchanged and adding 7 screen-specific design contracts (login, /invite/{token}, /reset/{token}, expired-token landing, app shell topbar/sidebar/footer, error boundary, 404), 6 sonner toast variants, 1 modal primitive for invitation/reset URL display, and 225-key i18n dictionary scope per language (165 v10 keys + 60 new Phase-6 keys). gsd-ui-checker verified 6 dimensions: 5 PASS + 1 FLAG on inherited typography weights (4 weights vs checker's strict 2-weight rule — non-blocking because v10-source-locked + Phase-5-approved). Researcher made 9 sensible-default decisions within UI discretion (no Radix, login card 420px max-width, 4-segment password strength meter without zxcvbn, logout no-confirmation, etc.). 0 user questions asked — CONTEXT.md was complete. Cross-checks all pass: no Phase 5 token redefinition, SHELL-03 minimal login layout, D-22 anti-enumeration, D-18 404-not-403, D-10 single-display modal, no /settings page, full v10 dictionary scoped, FR copy reads natural.
 
 ## Open Blockers
@@ -173,4 +176,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-07 — Phase 6 UI-SPEC approved (5 PASS + 1 FLAG on inherited typography). Pre-planning artifacts complete (CONTEXT + UI-SPEC). Next: /gsd-plan-phase 6 --research.*
+*Last updated: 2026-05-08 — 06-06 complete: authed app shell live (Topbar + UserMenu + (authed)/layout.tsx + (authed)/page.tsx + DB theme/locale persistence). AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14 grounded.*
