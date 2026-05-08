@@ -103,3 +103,240 @@ html[data-theme="dark"] [data-pdf-surface] {
   background: #fff !important;
   color: #1a2832 !important;
 }
+
+/* === v10 base classes — added in Plan 07-03 for Plans 07-04/05 to consume === */
+/* Source: 07-UI-SPEC.md §3.2.2 (card chrome), §3.2.4 (input chrome),
+   §3.2.5 (composite controls), §3.2.6 (action row), §5.1 (blur validation).
+   v10 reference: Matrice_2026_THE_Leasetic-v10.html lines 170-260.
+   Tokens (--surface, --gd, --teal, --danger, etc.) are defined above; this
+   block uses var(--*) exclusively — NO new token declarations introduced. */
+
+/* Card chrome — UI-SPEC §3.2.2 */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+}
+
+/* Section title row — UI-SPEC §3.2.2 */
+.ctitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  font-size: 11.8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.ctitle .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--gd);
+  flex-shrink: 0;
+}
+
+/* Field row (.fld + .fld label + .fld input wrapper) — UI-SPEC §3.2.3 */
+.fld {
+  margin-bottom: 12px;
+}
+.fld + .fld { margin-top: 12px; }
+.fld > label {
+  display: block;
+  font-size: 11.2px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.fld .req { color: var(--danger); margin-left: 2px; }
+.fld .error-msg {
+  font-size: 11.2px;
+  font-weight: 500;
+  color: var(--danger);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+/* Input chrome — UI-SPEC §3.2.4 */
+.fld input[type="text"],
+.fld input[type="email"],
+.fld input[type="tel"],
+.fld input[type="number"] {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.65rem 0.9rem;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.fld input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.12);
+}
+input.invalid,
+input[aria-invalid="true"] {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+}
+
+/* Currency-input addon ("75 000 [€ HT]") — UI-SPEC §3.2.5 */
+.ieu {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.ieu:focus-within {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.12);
+}
+.ieu.invalid,
+.ieu[aria-invalid="true"] {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+}
+.ieu input {
+  flex: 1;
+  border: none !important;
+  border-radius: 0 !important;
+  padding-right: 1rem;
+  background: transparent;
+  outline: none;
+}
+.ieu input:focus {
+  box-shadow: none !important;          /* parent .ieu:focus-within owns the ring */
+}
+.ieu .suffix {
+  padding: 0.65rem 0.9rem;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+/* Tranche badge (auto-shown below amount) — UI-SPEC §3.2.5 */
+.tbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(45, 122, 140, 0.08);
+  color: var(--teal);
+  font-size: 11.2px;
+  font-weight: 600;
+}
+
+/* Duration / Validity segmented (.dg .db / .db.on) — UI-SPEC §3.2.5 */
+.dg {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.dg.invalid,
+.dg[aria-invalid="true"] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+.dg .db {
+  padding: 0.65rem 0.5rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: none;
+  border-right: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms;
+}
+.dg .db:last-child { border-right: none; }
+.dg .db:hover { background: var(--hover-overlay); }
+.dg .db.on {
+  background: var(--gd);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Yes/No toggle (.yn-btn / .yn-btn.on) — UI-SPEC §5 */
+.yn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.yn-btn {
+  padding: 0.65rem 0.5rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: none;
+  border-right: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms;
+}
+.yn-btn:last-child { border-right: none; }
+.yn-btn:hover { background: var(--hover-overlay); }
+.yn-btn.on {
+  background: var(--gd);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Buttons — Phase 5 tokens; concrete classes added here for Plans 07-03/04/05 */
+.btn-green,
+.btn-navy,
+.btn-out {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.6rem 1.5rem;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 150ms, color 150ms, box-shadow 150ms;
+}
+.btn-green       { background: var(--gd);  color: #ffffff; }
+.btn-green:hover { background: #0d7d49; }
+.btn-navy        { background: var(--navy); color: #ffffff; }
+.btn-navy:hover  { background: var(--navy-dark); }
+.btn-out         { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+.btn-out:hover   { background: var(--hover-overlay); }
+.btn-green:focus-visible,
+.btn-navy:focus-visible,
+.btn-out:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+}
+.btn-green:disabled,
+.btn-navy:disabled,
+.btn-out:disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
