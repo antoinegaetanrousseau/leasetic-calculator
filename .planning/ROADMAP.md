@@ -20,7 +20,7 @@
 ### 🚧 v1.1 — Hosted Web App Foundation (Phases 5-10)
 
 - [x] **Phase 5: Bootstrap & Deploy** — Deployable empty Next.js shell on Vercel + Neon Postgres + Vercel Blob, all hosting primitives behind portable adapters; CI gates the no-Vercel-only-import rule. ✅ Complete 2026-05-06: /healthz live at https://leasetic-matrice.vercel.app returning `{ db: ok, blob: ok }`. Follow-ups: 3-branch Neon split, GH plan upgrade for Environment protection, project transfer to memento team.
-- [ ] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode (2/9 plans complete)
+- [ ] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode (3/9 plans complete)
 - [ ] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet)
 - [ ] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete
 - [ ] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown
@@ -62,7 +62,7 @@ Plans:
 Plans:
 - [x] 06-01-PLAN.md — Foundation: install deps + drizzle-kit upgrade + env vars + Drizzle schema (users, sessions, accounts, verifications, password_resets) + 0001 migration (AUTH-13, AUTH-17)
 - [x] 06-02-PLAN.md — i18n full v10 dictionary port (231 keys × 2 langs) + format.ts (explicit fr-FR / en-GB) + ESLint hardcoded-JSX rule (SHELL-04..06, SHELL-09) ✅ Complete 2026-05-08
-- [ ] 06-03-PLAN.md — Better Auth instance + Drizzle adapter + argon2id + tokens.ts + schemas.ts + auth catch-all route (AUTH-01, AUTH-02, AUTH-13, AUTH-17, AUTH-18, SHELL-11)
+- [x] 06-03-PLAN.md — Better Auth instance + Drizzle adapter + argon2id + tokens.ts + schemas.ts + auth catch-all route (AUTH-01, AUTH-02, AUTH-13, AUTH-17, AUTH-18, SHELL-11) ✅ Complete 2026-05-08
 - [ ] 06-04-PLAN.md — requireUser/requireAdmin helpers + admin server actions (disable/reEnable/createInvitation/createPasswordReset) + proxy.ts auth gate (AUTH-05, AUTH-06, AUTH-11, AUTH-14, AUTH-15, AUTH-16)
 - [ ] 06-05-PLAN.md — Public auth tree: (public)/layout + login + invite/[token] + reset/[token] + LoginForm + SetPasswordForm + redeem.ts (AUTH-01, AUTH-04, AUTH-08..10, AUTH-18, SHELL-03, SHELL-10, SHELL-11, SHELL-14)
 - [ ] 06-06-PLAN.md — (authed) shell + Topbar + UserMenu + theme/locale DB persistence; replace app/page.tsx (AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14)
@@ -139,5 +139,5 @@ Plans:
 
 ---
 
-*Last updated: 2026-05-06 — 05-06 tasks 1+2 complete: migration runner + db-migrate.yml + runbook (BOOT-10); Task 3 checkpoint pending GitHub Environment setup.*
+*Last updated: 2026-05-08 — 06-03 complete: Better Auth engine wired (auth() lazy singleton + tokens.ts + schemas.ts + /api/auth route). AUTH-01, AUTH-02, AUTH-17, AUTH-18, SHELL-11 grounded.*
 *Detailed v1.0 archives in `.planning/milestones/`.*

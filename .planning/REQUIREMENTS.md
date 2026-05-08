@@ -25,8 +25,8 @@
 
 ### AUTH — Authentication & Authorization
 
-- [ ] **AUTH-01**: User can log in with email + password via the `/login` page
-- [ ] **AUTH-02**: User session persists across page reloads (8-hour sliding lifetime; refresh on activity)
+- [x] **AUTH-01**: User can log in with email + password via the `/login` page
+- [x] **AUTH-02**: User session persists across page reloads (8-hour sliding lifetime; refresh on activity)
 - [ ] **AUTH-03**: User can log out from the topbar; session cookie cleared
 - [ ] **AUTH-04**: Login error message is generic ("incorrect email or password") and does not leak whether the email exists (anti-enumeration)
 - [ ] **AUTH-05**: User on a `(authed)` or `(admin)` route while not logged in is redirected to `/login`
@@ -37,12 +37,12 @@
 - [ ] **AUTH-10**: Admin can trigger a password reset for any partner; this generates a one-time reset URL the admin shares out-of-band
 - [ ] **AUTH-11**: Admin can disable a partner account; disabled users cannot log in but their data is preserved
 - [ ] **AUTH-12**: Admin role is granted only via a CLI script run on the production DB by Antoine — never via the app UI
-- [ ] **AUTH-13**: Database CHECK constraint enforces `role IN ('partner', 'admin')`
+- [x] **AUTH-13**: Database CHECK constraint enforces `role IN ('partner', 'admin')`
 - [ ] **AUTH-14**: Admin route segment `/[adminSegment]/...` is gated by `process.env.ADMIN_URL_SEGMENT`; mismatched segments return 404 (not 403) to preserve URL obscurity
 - [ ] **AUTH-15**: Every admin route, layout, and API handler independently calls `requireAdmin()` server-side — defence in depth
 - [ ] **AUTH-16**: Forced session revocation works: when admin disables a partner, that partner's existing JWT is invalidated within 5 minutes (via `session_version` field bump checked in JWT callback)
-- [ ] **AUTH-17**: Passwords stored as argon2id hashes
-- [ ] **AUTH-18**: All authentication flows use the auth library's official client functions (no custom POST to internal endpoints, preserving CSRF protection)
+- [x] **AUTH-17**: Passwords stored as argon2id hashes
+- [x] **AUTH-18**: All authentication flows use the auth library's official client functions (no custom POST to internal endpoints, preserving CSRF protection)
 
 ### SHELL — Multi-page Shell & UX
 
@@ -56,7 +56,7 @@
 - [ ] **SHELL-08**: Initial paint reflects the user's theme without a flash of incorrect theme (cookie-driven server render + inline `<head>` script)
 - [x] **SHELL-09**: Number and date formatting uses explicit locale (`fr-FR` or `en-GB`) — never the system default
 - [ ] **SHELL-10**: Toast notifications use Sonner; success / info / error variants
-- [ ] **SHELL-11**: Form validation uses react-hook-form + Zod; the same Zod schema is imported on client (validation) and server (action input parsing)
+- [x] **SHELL-11**: Form validation uses react-hook-form + Zod; the same Zod schema is imported on client (validation) and server (action input parsing)
 - [ ] **SHELL-12**: Error boundary catches unhandled errors; partners see a generic error page in their language
 - [ ] **SHELL-13**: 404 page in FR + EN
 - [ ] **SHELL-14**: Mobile layout degrades gracefully (desktop-first per v1.0 constraint; mobile optimization deferred to v1.2)
