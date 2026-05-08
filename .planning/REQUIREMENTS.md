@@ -246,8 +246,8 @@
 | AUTH-11 | Phase 6 | Pending |
 | AUTH-12 | Phase 6 | Pending |
 | AUTH-13 | Phase 6 | Pending |
-| AUTH-14 | Phase 6 | Pending |
-| AUTH-15 | Phase 6 | Pending |
+| AUTH-14 | Phase 6 | Complete (06-07) |
+| AUTH-15 | Phase 6 | Complete (06-07) |
 | AUTH-16 | Phase 6 | Pending |
 | AUTH-17 | Phase 6 | Pending |
 | AUTH-18 | Phase 6 | Complete (06-05) |

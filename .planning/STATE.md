@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-08T17:20:00Z"
-last_activity: 2026-05-08 -- Phase 6 Plan 06 complete (authed shell: Topbar + UserMenu + DB theme/locale persistence + (authed) layout + page + delete app/page.tsx)
+last_updated: "2026-05-08T18:05:00Z"
+last_activity: 2026-05-08 -- Phase 6 Plan 07 complete (admin shell: dual-layer URL gate + InviteUrlModal primitive. Phase 6 ALL 9 plans complete.)
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 16
-  completed_plans: 15
-  percent: 87
+  completed_plans: 16
+  percent: 93
 ---
 
 # State — Matrice Commerciale
@@ -27,20 +27,20 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 6 (auth-shell) — EXECUTING
-Plan: 9 of 9
-Status: Executing Phase 6 (06-06 complete)
-Next: Execute plan 06-07 (admin shell layout + InviteUrlModal primitive)
-Last activity: 2026-05-08 -- Phase 6 Plan 06 complete (authed shell: Topbar + UserMenu + DB theme/locale persistence + (authed) layout + page + delete app/page.tsx)
+Phase: 6 (auth-shell) — COMPLETE
+Plan: 9 of 9 (ALL COMPLETE)
+Status: Phase 6 complete — all 9 plans done; advancing to Phase 7
+Next: Execute Phase 7 — Calc Engine Port + Proposal Form
+Last activity: 2026-05-08 -- Phase 6 Plan 07 complete (admin shell: dual-layer URL gate + InviteUrlModal primitive. Phase 6 ALL 9 plans complete.)
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
-v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases complete
+v1.1 ████░░░░░░░░░░░░░░░░ 2/6 phases complete
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
-       └─ Phase 6: Auth & Shell              ◐ 8/9 plans complete (auth guards + proxy.ts + admin actions + grant-admin CLI + public auth screens + authed shell live)
-       └─ Phase 7: Calc Engine + Form        ◯ blocked on P6
+       └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
+       └─ Phase 7: Calc Engine + Form        ◯ ready to start
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
        └─ Phase 9: Admin Surface             ◯ blocked on P8
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
@@ -144,6 +144,9 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 | sidebar.brand dictionary key for logo in public layout: ESLint no-hardcoded-jsx fires on 'Leasétic' in JSXText; t('sidebar.brand') resolves same in FR+EN (Rule 1 auto-fix) | 06-05 execution | 06-05 |
 | auth() is a lazy singleton function (not a named object); all callers use auth().api.getSession() — matched require.ts pattern; plan snippets used auth.api.getSession() as shorthand | 06-06 execution | 06-06 |
 | displayName fallback chain: session.user.displayName ?? session.user.name ?? session.user.email — covers all user states (displayName is optional additionalField) | 06-06 execution | 06-06 |
+| Layer order in AdminLayout: segment check (notFound) first, requireAdmin() second — URL obscurity fires before any role reveal per D-18 | 06-07 execution | 06-07 |
+| ADMIN_URL_SEGMENT unset → notFound() (fail-closed) — safe operational failure, no admin reach possible (T-06-07-04 accepted) | 06-07 execution | 06-07 |
+| InviteUrlModal uses inline backdrop + panel siblings at z-index 200/201 (no ReactDOM.createPortal) — adequate for Phase 6; no stacking-context-creating ancestors exist | 06-07 execution | 06-07 |
 
 ## Session Notes
 
@@ -166,9 +169,11 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 - **2026-05-08:** 06-06 executed — Authed app shell: Topbar.tsx (server component, page-title slot, ADMIN badge via isAdmin prop, D-25 order: title/badge/spacer/LocaleToggle/ThemeToggle/UserMenu) + UserMenu.tsx (client component, initials avatar 28px/--gd, display name 160px truncated, ChevronDown, dropdown with email header + Logout item, authClient.signOut AUTH-18/D-24, Escape+outside-click close); setTheme/setLang extended (cookie preserved + auth().api.getSession DB write wrapped try/catch, D-27); app/(authed)/layout.tsx (requireUser() first, displayName fallback chain, 3-col×3-row grid, Topbar with isAdmin={role==='admin'}, force-dynamic); app/(authed)/page.tsx (welcomeHeading + welcomeSubtext keys, Phase 7 stub); app/page.tsx deleted (route cleanly resolves to (authed) group). 83/83 tests pass. typecheck + lint + build all 0. AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14 grounded. 3 task commits: a951b16, b848302, 125d91a.
 - **2026-05-07:** Phase 6 UI-SPEC session — gsd-ui-researcher produced 06-UI-SPEC.md (56KB, 762 insertions, commit ec363d6) inheriting Phase 5 token spine unchanged and adding 7 screen-specific design contracts (login, /invite/{token}, /reset/{token}, expired-token landing, app shell topbar/sidebar/footer, error boundary, 404), 6 sonner toast variants, 1 modal primitive for invitation/reset URL display, and 225-key i18n dictionary scope per language (165 v10 keys + 60 new Phase-6 keys). gsd-ui-checker verified 6 dimensions: 5 PASS + 1 FLAG on inherited typography weights (4 weights vs checker's strict 2-weight rule — non-blocking because v10-source-locked + Phase-5-approved). Researcher made 9 sensible-default decisions within UI discretion (no Radix, login card 420px max-width, 4-segment password strength meter without zxcvbn, logout no-confirmation, etc.). 0 user questions asked — CONTEXT.md was complete. Cross-checks all pass: no Phase 5 token redefinition, SHELL-03 minimal login layout, D-22 anti-enumeration, D-18 404-not-403, D-10 single-display modal, no /settings page, full v10 dictionary scoped, FR copy reads natural.
 
+- **2026-05-08:** 06-07 executed — Admin route group + InviteUrlModal: app/(admin)/[adminSegment]/layout.tsx (dual-layer gate: Layer 1 env-segment notFound, Layer 2 requireAdmin() notFound, isAdmin={true} to Topbar), app/(admin)/[adminSegment]/page.tsx (admin home placeholder, independent requireAdmin() AUTH-15), src/components/InviteUrlModal.tsx ('use client', backdrop+panel z-index 200/201, role=dialog aria-modal=true, focus-trap+Escape+outside-click, navigator.clipboard.writeText with 2s confirmation + Sonner toast, clipboard failure handled, warning banner, all strings via t()). Phase 6 ALL 9/9 plans complete. typecheck + lint + build all 0. AUTH-07, AUTH-08, AUTH-10, AUTH-14, AUTH-15 grounded. 2 task commits: 0f0dda5, c82eb6a.
+
 ## Open Blockers
 
-(none — Phase 6 is ready to plan)
+(none)
 
 ## Deferred Items
 
@@ -176,4 +181,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-08 — 06-06 complete: authed app shell live (Topbar + UserMenu + (authed)/layout.tsx + (authed)/page.tsx + DB theme/locale persistence). AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14 grounded.*
+*Last updated: 2026-05-08 — Phase 6 COMPLETE: all 9/9 plans done. AUTH-01..18 + SHELL-01..14 all satisfied. Phase 7 (Calc Engine + Form) ready to start.*
