@@ -21,7 +21,7 @@
 
 - [x] **Phase 5: Bootstrap & Deploy** — Deployable empty Next.js shell on Vercel + Neon Postgres + Vercel Blob, all hosting primitives behind portable adapters; CI gates the no-Vercel-only-import rule. ✅ Complete 2026-05-06: /healthz live at https://leasetic-matrice.vercel.app returning `{ db: ok, blob: ok }`. Follow-ups: 3-branch Neon split, GH plan upgrade for Environment protection, project transfer to memento team.
 - [x] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode. ✅ Complete 2026-05-08: all 9/9 plans done, 32/32 AUTH+SHELL requirements satisfied, migration 0001 applied to prod, both admins (antoine + emmanuel @leasetic.com) seeded and verified to log in end-to-end. Follow-ups: admin password rotation (shared launch password → individual strong), Better Auth trustedOrigins behavior investigation, Origin-gate documentation, APP_URL/NEXT_PUBLIC_APP_URL env requirement made explicit.
-- [ ] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet)
+- [x] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet). ✅ Complete 2026-05-09: 6/6 plans done, 14/14 requirements satisfied (CALC-01..08, PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25). Live preview ships at /proposals/new — partner types into form + 300ms-debounced sticky right-column card shows formatted loyer (fr-FR/en-GB explicit locale), generated LC ref + Copy button, validity selector. Calc engine + 30 golden tests preserve v10 formula parity (±0.01 €). 227/227 tests passing.
 - [ ] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete
 - [ ] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown
 - [ ] **Phase 10: Cutover & Polish** — v10 retirement + redirect, OVH portability smoke deploy, runbooks, legal/privacy hookup, soft-delete purge job
@@ -95,7 +95,7 @@ Plans:
 - [x] 07-04-PLAN.md — Proposal form scaffold (RHF + zodResolver, 4 cards, 14 inputs, blur validation, native confirm reset, no-DB-write submit) + DurationSegmented + YesNoToggle + NumberInputAmount + PhoneInput + SirenInput components — PROP-06, PROP-08 ✅ Complete 2026-05-09
 
 **Wave 4** *(blocked on Wave 3 completion)*
-- [ ] 07-05-PLAN.md — Live preview composition (300ms-debounced sticky preview card, 5-state machine, formatCurrency fr-FR/en-GB, LC ref + Copy button, Validity selector, FormProvider restructure) — PROP-07, PROP-24, PROP-25, CALC-07
+- [x] 07-05-PLAN.md — Live preview composition (300ms-debounced sticky preview card, 5-state machine, formatCurrency fr-FR/en-GB, LC ref + Copy button, Validity selector, FormProvider restructure) — PROP-07, PROP-24, PROP-25, CALC-07 ✅ Complete 2026-05-09
 **UI hint**: yes
 
 ### Phase 8: Persistence + PDF Pipeline
@@ -146,12 +146,12 @@ Plans:
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
 | 6. Auth & Shell | v1.1 | 9/9 | Complete | 2026-05-08 |
-| 7. Calc Engine Port + Proposal Form | v1.1 | 5/6 | In progress | - |
+| 7. Calc Engine Port + Proposal Form | v1.1 | 6/6 | Complete | 2026-05-09 |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
 | 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
 
 ---
 
-*Last updated: 2026-05-09 — Phase 7 Wave 3 fully shipped: Plan 07-04 (proposal form scaffold) closes Wave 3. 7 source files (1005 lines total): 5 shared field components under `src/components/proposal/` (DurationSegmented, YesNoToggle, NumberInputAmount with U+202F formatter and tranche badge, PhoneInput XX XX XX XX XX, SirenInput XXX XXX XXX) + ProposalForm (519 lines, RHF + zodResolver, FormProvider, 4 cards × 14 inputs, native confirm() reset per D-7-08, no-op-toast submit per D-7-07) + `app/(authed)/proposals/new/page.tsx` (Server Component, requireUser() defence-in-depth, 2-column grid 640+360+24 with sticky preview placeholder for Plan 07-05). Build verified: route `ƒ /proposals/new` in route map. typecheck/lint/test/build all 0; 227/227 tests preserved. PROP-06 + PROP-08 grounded. Phase 7 progress: 5/6 plans complete. Wave 4 (07-05 live preview composition) is the only remainder — closes Phase 7.*
+*Last updated: 2026-05-09 — **Phase 7 complete: 6/6 plans done.** Wave 4 closed by Plan 07-05 (live preview composition; capstone). 4 new components (550 lines): LiveLoyerPreview (398 lines, 5-state machine + useDebouncedValue + useMemo computeLoyer + LC ref lifecycle via store-info-from-previous-render + aria-live polite + coefficientsExpired D-7-12 stub) + CopyRefButton (82 lines, navigator.clipboard + sonner + 2s Check label + Range/Selection fallback) + ValiditySegmented (46 lines, DurationSegmented<15|30|60> wrapper per D-7-16) + useDebouncedValue (24 lines, generic 300ms hook). ProposalForm hoisted to ProposalFormProvider (Path A); page wraps form + preview as siblings under one RHF context. typecheck/lint/test/build all 0; 227/227 tests preserved. PROP-07 + PROP-24 + PROP-25 + CALC-07 grounded. ROADMAP success criteria #2 (live preview), #4 (Copy LC + Validity), #5 (manual v10 parity, via Plan 07-02's 30-case golden corpus running on every PR) all satisfied. Phase 8 (Persistence + PDF Pipeline) unblocked.*
 *Detailed v1.0 archives in `.planning/milestones/`.*

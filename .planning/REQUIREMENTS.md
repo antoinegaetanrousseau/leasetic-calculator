@@ -69,7 +69,7 @@
 - [x] **CALC-04**: Inputs validated with Zod schemas at the calc-engine boundary (proposalInputSchema + coefficientsSchema + amount/duration/validity schemas)
 - [x] **CALC-05**: All v10 self-check fixtures (`assertCalc 6/6`, `assertEscape 8/8`, `assertValidity 6/6`) pass as Vitest tests — CALC-05 satisfied for the two suites that map to v1.1 reality (assertCalc + assertValidity). assertEscape (8/8) is documented-not-ported because v10's `escapeHtml()` exists for innerHTML template-string DOM construction; v1.1 builds DOM via React JSX which escapes children automatically. The non-port comment block at `src/lib/calc/formula.test.ts:13-29` cites v10 lines 2002-2020 + the React-JSX-escapes invariant. Re-evaluate only if a future phase introduces unsafe HTML insertion patterns.
 - [x] **CALC-06**: ≥30 representative golden test cases extracted from v10 (input → expected output pairs); CI fails on any drift — 30 cases land in `src/lib/calc/calc.golden.test.ts` (12 happy-path × 4 tranches × 3 durations + 8 boundaries + 4 on-demand + 6 edges); fixture coefficients embedded as local const (D-1 fixture/seed separation); ±0.01 € tolerance; static lexical gate `grep -c "  it(" ≥ 30` defends against silent case removal.
-- [ ] **CALC-07**: Calc engine runs server-side on save; client-side calculations are for live preview only and are never trusted
+- [~] **CALC-07**: Calc engine runs server-side on save; client-side calculations are for live preview only and are never trusted. PARTIAL (07-05): client-side preview seam grounded — `<LiveLoyerPreview>` calls `computeLoyer(...)` from `@/lib/calc` for live display only; no DB write, no persisted value (D-7-07: Phase-7 onSubmit is a no-op + info toast). Server-side recompute on save is Phase 8 territory (server route will call `proposalInputSchema.parse(req.body)` then `computeLoyer({...})` then write the resulting `params_snapshot + inputs + computed` jsonb to the proposals row — never trusting the client's display value).
 - [x] **CALC-08**: Monetary values stored as `numeric(14, 4)` in Postgres; coefficients as `numeric(10, 8)`; conversion handled in a single boundary helper (string-typed boundary discipline per D-4 — parseNumeric/formatNumeric helpers in formula.ts; signature DB-numeric-compatible from day one)
 
 ### PROP — Proposal Lifecycle
@@ -80,7 +80,7 @@
 - [ ] **PROP-04**: Empty state on home page for new partners ("No proposals yet — create your first one") in FR + EN
 - [ ] **PROP-05**: Partner can paginate / "load more" past the first 20
 - [x] **PROP-06**: Proposal entry form captures all v10 inputs plus a required `client_name` field for the home-page list — grounded by Plan 07-04: D-7-06 satisfies this by tightening v10's existing `clientCo` (Société cliente) field to required-by-Zod via `proposalInputSchema.clientCo: z.string().min(1, { message: 'error.field.client.co.required' })` (no new field added). The form renders the inline error message via `t(error.field.client.co.required, lang)` on blur.
-- [ ] **PROP-07**: Form provides live preview of the computed loyer as the partner types
+- [x] **PROP-07**: Form provides live preview of the computed loyer as the partner types — grounded by Plan 07-05: `<LiveLoyerPreview/>` sticky right-column card subscribes to RHF via `useFormContext<ProposalInput>() + useWatch({name: ['amountHT', 'durationMonths', 'validityDays']})`, debounces through `useDebouncedValue(...,300)` (D-7-02), calls `useMemo`-cached `computeLoyer({...})`, renders the formatted loyer via `formatCurrency(Number(loyerHT), lang)` (Phase 6 D-28 explicit fr-FR / en-GB) plus the v10 coefficient suffix `"{N} mois · coeff. {C}%"`. State machine mirrors v10 lines 1425-1454 (idle / expired / missing / on-demand / computed); aria-live="polite" on the computed-state container (UI-SPEC §13).
 - [x] **PROP-08**: Form validates on blur (red-ring focus state per v10 pattern) — grounded by Plan 07-04: `useForm({ mode: 'onBlur', shouldFocusError: true })` + `className={errors.field ? 'invalid' : ''}` on each input + `.invalid` red-ring CSS contract from Plan 07-03's globals.css. All required fields show inline error message via `<p role="alert" className="error-msg">` on blur.
 - [ ] **PROP-09**: On submit, the system: validates inputs, computes server-side, snapshots current global params + inputs into a new `proposals` row, generates the PDF, uploads to blob, returns the proposal ID
 - [ ] **PROP-10**: After save, partner is redirected to `/proposals/{id}` (post-redirect-get pattern)
@@ -97,8 +97,8 @@
 - [ ] **PROP-21**: Partner can duplicate a proposal: button on detail page → routes to `/proposals/new` with form values pre-filled from the source proposal; on save, the new proposal snapshots **current** global params (not the source's)
 - [ ] **PROP-22**: Partner can soft-delete a proposal (sets `deleted_at`); soft-deleted proposals are hidden from default list but PDF remains in blob storage
 - [ ] **PROP-23**: Once a proposal is saved, neither its inputs, computed values, nor PDF can be retroactively modified — even by future coefficient changes (PDF immutability invariant)
-- [ ] **PROP-24**: "Copier la référence" (LC clipboard button) preserved from v10
-- [ ] **PROP-25**: Configurable proposal validity (15 / 30 / 60 days) preserved from v10
+- [x] **PROP-24**: "Copier la référence" (LC clipboard button) preserved from v10 — grounded by Plan 07-05: `<CopyRefButton lcRef={lcRef} lang={lang}/>` calls `navigator.clipboard.writeText(lcRef)` from a user-gesture button click; on success switches the label/icon to "Référence copiée" + lucide Check for 2 seconds then auto-reverts (`useEffect` setTimeout cleanup), AND fires sonner success toast `proposal.toast.copy.success`; on failure (insecure context, browser denies) fires sonner error toast `proposal.toast.copy.error` plus a Range/Selection-API fallback selecting the LC ref text node so the user can Cmd+C manually. LC reference itself generated via `generateLcRef()` (port of v10 line 1741: `'LC-' + Math.floor(Math.random() * 90000 + 10000)`); lifecycle owned by `<LiveLoyerPreview>` (generated once on idle→non-idle transition; held until form reset; regenerated on next non-idle).
+- [x] **PROP-25**: Configurable proposal validity (15 / 30 / 60 days) preserved from v10 — grounded by Plan 07-05: `<ValiditySegmented lang={lang} value={validityDays} onChange={...}/>` lives inside `<LiveLoyerPreview/>` (D-7-04 places it in the preview card, not the form column); thin wrapper around Plan 07-04's `DurationSegmented<15|30|60>` (D-7-16 — one shared component, two configurations); writes back to RHF's `validityDays` field via `setValue('validityDays', v, { shouldDirty: true })`. Default 30 (D-7-05 — applied at the schema level via `validityDaysSchema.default(30)` and the form's defaultValues). The "Valable {N} jours" caption renders only in the `'computed'` state per UI-SPEC §3.2.10.
 - [ ] **PROP-26**: Validity expiry indicator on proposal detail page (e.g., "Valid until DD/MM/YYYY" or "Expired")
 
 ### DATA — Data Model & PDF Immutability
@@ -271,7 +271,7 @@
 | CALC-04 | Phase 7 | Complete (07-01) |
 | CALC-05 | Phase 7 | Complete (07-02) |
 | CALC-06 | Phase 7 | Complete (07-02) |
-| CALC-07 | Phase 7 | Pending |
+| CALC-07 | Phase 7 | Partial (07-05 — client preview seam shipped; server recompute is Phase 8) |
 | CALC-08 | Phase 7 | Complete (07-01) |
 | PROP-01 | Phase 7 | Partial (07-03 — empty-state shell shipped; populated rows block on Phase 8) |
 | PROP-02 | Phase 8 | Pending |
@@ -279,7 +279,7 @@
 | PROP-04 | Phase 8 | Pending |
 | PROP-05 | Phase 8 | Pending |
 | PROP-06 | Phase 7 | Pending |
-| PROP-07 | Phase 7 | Pending |
+| PROP-07 | Phase 7 | Complete (07-05) |
 | PROP-08 | Phase 7 | Pending |
 | PROP-09 | Phase 8 | Pending |
 | PROP-10 | Phase 8 | Pending |
@@ -296,8 +296,8 @@
 | PROP-21 | Phase 8 | Pending |
 | PROP-22 | Phase 8 | Pending |
 | PROP-23 | Phase 8 | Pending |
-| PROP-24 | Phase 7 | Pending |
-| PROP-25 | Phase 7 | Pending |
+| PROP-24 | Phase 7 | Complete (07-05) |
+| PROP-25 | Phase 7 | Complete (07-05) |
 | PROP-26 | Phase 8 | Pending |
 | DATA-01 | Phase 8 | Pending |
 | DATA-02 | Phase 8 | Pending |
