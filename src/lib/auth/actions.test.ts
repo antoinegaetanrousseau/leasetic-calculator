@@ -71,52 +71,46 @@ vi.mock('@/lib/db', () => ({
 }));
 
 import { disableUser, reEnableUser, createInvitation, createPasswordReset } from './actions';
-import { requireAdmin } from './require';
-
-// Track requireAdmin invocation order relative to DB operations
-let requireAdminCallOrder = 0;
-let dbOpCallOrder = 0;
 
 beforeEach(() => {
   vi.clearAllMocks();
   dbCallOrder.length = 0;
   mockFindFirst.mockReset();
-  requireAdminCallOrder = 0;
-  dbOpCallOrder = 0;
   // Restore default requireAdmin resolution
   mockRequireAdmin.mockResolvedValue({ session: { user: { id: 'admin-1' } } });
 });
 
-// Helper to track strict ordering of requireAdmin vs first DB op
-function trackCallOrder() {
-  let counter = 0;
-  const orderMap: Record<string, number> = {};
-  mockRequireAdmin.mockImplementation(async () => {
-    orderMap['requireAdmin'] = ++counter;
-    return { session: { user: { id: 'admin-1' } } };
-  });
-  return orderMap;
-}
-
 describe('disableUser', () => {
   it('calls requireAdmin() before any DB writes', async () => {
-    const order = trackCallOrder();
-    const dbWriteOrders: number[] = [];
-    let counter = 0;
-    // Wrap fakeDb.update to track order
+    // Track call sequence using a shared array
+    const callSequence: string[] = [];
+    mockRequireAdmin.mockImplementation(async () => {
+      callSequence.push('requireAdmin');
+      return { session: { user: { id: 'admin-1' } } };
+    });
+    // Wrap fakeDb.update to append to shared sequence
     const origUpdate = fakeDb.update.bind(fakeDb);
     vi.spyOn(fakeDb, 'update').mockImplementation((t) => {
-      dbWriteOrders.push(++counter);
-      return origUpdate(t);
+      const result = origUpdate(t);
+      // patch where() to record the call
+      return {
+        set: (s: unknown) => ({
+          where: (w: unknown) => {
+            callSequence.push('dbUpdate');
+            return result.set(s).where(w);
+          },
+        }),
+      };
     });
     await disableUser('user-123');
-    expect(order['requireAdmin']).toBeDefined();
-    expect(order['requireAdmin']).toBeLessThan(dbWriteOrders[0]);
+    expect(callSequence[0]).toBe('requireAdmin');
+    expect(callSequence.indexOf('requireAdmin')).toBeLessThan(callSequence.indexOf('dbUpdate'));
   });
 
   it('updates users SET deleted_at + session_version + 1', async () => {
     await disableUser('user-123');
     expect(dbCallOrder).toContain('update');
+    expect(mockRequireAdmin).toHaveBeenCalled();
   });
 
   it('calls the Better Auth revoke-sessions API with { body: { userId } }', async () => {
@@ -130,7 +124,7 @@ describe('reEnableUser', () => {
   it('updates users SET deleted_at = null', async () => {
     await reEnableUser('user-789');
     expect(dbCallOrder).toContain('update');
-    expect(requireAdmin).toHaveBeenCalled();
+    expect(mockRequireAdmin).toHaveBeenCalled();
   });
 
   it('does NOT call revoke API (re-enable should not log out the user)', async () => {
@@ -170,24 +164,32 @@ describe('createInvitation', () => {
     mockFindFirst.mockResolvedValue(undefined);
     await createInvitation('partner@example.com', 'Alice');
     expect(dbCallOrder).toContain('insert');
+    expect(mockRequireAdmin).toHaveBeenCalled();
   });
 
-  it('calls requireAdmin() before any data access', async () => {
-    const order = trackCallOrder();
-    const dbWriteOrders: number[] = [];
-    let counter = 0;
+  it('calls requireAdmin() before any DB mutations', async () => {
+    // Track call sequence using a shared array
+    const callSequence: string[] = [];
+    mockRequireAdmin.mockImplementation(async () => {
+      callSequence.push('requireAdmin');
+      return { session: { user: { id: 'admin-1' } } };
+    });
     const origInsert = fakeDb.insert.bind(fakeDb);
     vi.spyOn(fakeDb, 'insert').mockImplementation((t) => {
-      dbWriteOrders.push(++counter);
-      return origInsert(t);
+      const result = origInsert(t);
+      return {
+        values: (v: unknown) => {
+          callSequence.push('dbInsert');
+          return result.values(v);
+        },
+      };
     });
     mockFindFirst.mockResolvedValue(undefined);
     await createInvitation('partner@example.com', 'Alice');
-    expect(order['requireAdmin']).toBeDefined();
-    // requireAdmin must be called before any DB inserts
-    if (dbWriteOrders.length > 0) {
-      expect(order['requireAdmin']).toBeLessThan(dbWriteOrders[0]);
-    }
+    expect(callSequence[0]).toBe('requireAdmin');
+    const reqIdx = callSequence.indexOf('requireAdmin');
+    const insertIdx = callSequence.indexOf('dbInsert');
+    expect(insertIdx).toBeGreaterThan(reqIdx);
   });
 });
 
@@ -208,6 +210,6 @@ describe('createPasswordReset', () => {
   it('inserts a passwordResets row with kind=reset', async () => {
     await createPasswordReset('user-123');
     expect(dbCallOrder).toContain('insert');
-    expect(requireAdmin).toHaveBeenCalled();
+    expect(mockRequireAdmin).toHaveBeenCalled();
   });
 });

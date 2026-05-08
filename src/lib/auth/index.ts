@@ -24,6 +24,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
+import { admin } from 'better-auth/plugins/admin';
 import { db, schema } from '@/lib/db';
 
 function resolveBaseUrl(): string {
@@ -120,6 +121,9 @@ function createAuth() {
       // Required for Better Auth to set Set-Cookie headers from Next.js Server
       // Actions and Route Handlers.
       nextCookies(),
+      // Admin plugin: adds auth().api.revokeUserSessions({ body: { userId } })
+      // used by disableUser() in src/lib/auth/actions.ts (Plan 06-04).
+      admin(),
     ],
 
     trustedOrigins: [resolveBaseUrl(), 'http://localhost:3000'].filter(Boolean),
