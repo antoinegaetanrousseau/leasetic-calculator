@@ -29,18 +29,18 @@
 - [x] **AUTH-02**: User session persists across page reloads (8-hour sliding lifetime; refresh on activity)
 - [ ] **AUTH-03**: User can log out from the topbar; session cookie cleared
 - [ ] **AUTH-04**: Login error message is generic ("incorrect email or password") and does not leak whether the email exists (anti-enumeration)
-- [ ] **AUTH-05**: User on a `(authed)` or `(admin)` route while not logged in is redirected to `/login`
-- [ ] **AUTH-06**: User on `/login` while already logged in is redirected to `/`
+- [x] **AUTH-05**: User on a `(authed)` or `(admin)` route while not logged in is redirected to `/login`
+- [x] **AUTH-06**: User on `/login` while already logged in is redirected to `/`
 - [ ] **AUTH-07**: Admin can create a new partner account (email + display name + language) from the admin accounts page
 - [ ] **AUTH-08**: When admin creates a partner, the system generates a one-time invitation URL containing a signed token; admin shares it with the partner out-of-band
 - [ ] **AUTH-09**: Partner can use the invitation URL once to set their initial password; subsequent uses fail
 - [ ] **AUTH-10**: Admin can trigger a password reset for any partner; this generates a one-time reset URL the admin shares out-of-band
-- [ ] **AUTH-11**: Admin can disable a partner account; disabled users cannot log in but their data is preserved
+- [x] **AUTH-11**: Admin can disable a partner account; disabled users cannot log in but their data is preserved
 - [ ] **AUTH-12**: Admin role is granted only via a CLI script run on the production DB by Antoine — never via the app UI
 - [x] **AUTH-13**: Database CHECK constraint enforces `role IN ('partner', 'admin')`
-- [ ] **AUTH-14**: Admin route segment `/[adminSegment]/...` is gated by `process.env.ADMIN_URL_SEGMENT`; mismatched segments return 404 (not 403) to preserve URL obscurity
-- [ ] **AUTH-15**: Every admin route, layout, and API handler independently calls `requireAdmin()` server-side — defence in depth
-- [ ] **AUTH-16**: Forced session revocation works: when admin disables a partner, that partner's existing JWT is invalidated within 5 minutes (via `session_version` field bump checked in JWT callback)
+- [x] **AUTH-14**: Admin route segment `/[adminSegment]/...` is gated by `process.env.ADMIN_URL_SEGMENT`; mismatched segments return 404 (not 403) to preserve URL obscurity
+- [x] **AUTH-15**: Every admin route, layout, and API handler independently calls `requireAdmin()` server-side — defence in depth
+- [x] **AUTH-16**: Forced session revocation works: when admin disables a partner, that partner's existing JWT is invalidated within 5 minutes (via `session_version` field bump checked in JWT callback)
 - [x] **AUTH-17**: Passwords stored as argon2id hashes
 - [x] **AUTH-18**: All authentication flows use the auth library's official client functions (no custom POST to internal endpoints, preserving CSRF protection)
 
