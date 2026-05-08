@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: phase-complete
-last_updated: "2026-05-08T18:10:00Z"
-last_activity: 2026-05-08 -- Phase 6 COMPLETE. Migration 0001 applied to prod (workflow #25569691806). Production smoke test passed (/healthz green, /login renders FR+EN, unauth → /login?next= redirect via proxy.ts). 32/32 AUTH+SHELL requirements marked [x]. Admin seeding (Antoine + Emmanuel) deferred to launch day per user choice — non-blocking.
+last_updated: "2026-05-08T18:30:00Z"
+last_activity: 2026-05-08 -- Phase 6 SHIPPED. Migration 0001 applied to prod. Both admins (antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com) seeded via direct-DB launch script and verified to log in end-to-end (HTTP 200 + valid session cookie + role=admin payload). Login fix for canonical-host trustedOrigins: APP_URL + NEXT_PUBLIC_APP_URL added to Vercel env (all 3 scopes), production redeployed. Ready for Phase 7.
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 16
   completed_plans: 16
-  percent: 93
+  milestone_percent: 33
 ---
 
 # State — Matrice Commerciale
@@ -23,15 +23,15 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 6 — auth-shell
+**Current focus:** Phase 7 — Calc Engine Port + Proposal Form. Phase 6 shipped 2026-05-08; production fully functional with admin login verified.
 
 ## Current Position
 
-Phase: 6 (auth-shell) — COMPLETE
-Plan: 9 of 9 (ALL COMPLETE)
-Status: Phase 6 complete — all 9 plans done; advancing to Phase 7
-Next: Execute Phase 7 — Calc Engine Port + Proposal Form
-Last activity: 2026-05-08 -- Phase 6 Plan 07 complete (admin shell: dual-layer URL gate + InviteUrlModal primitive. Phase 6 ALL 9 plans complete.)
+Phase: **6 (auth-shell) — ✅ COMPLETE & DEPLOYED**
+Plan: 9 of 9 done; migration applied to prod; admins seeded; login verified end-to-end
+Status: Production app at https://leasetic-matrice.vercel.app is fully functional. Both admins can log in with the launch-day shared password (rotation pending — see Phase 6 follow-ups).
+Next: `/clear` then `/gsd-plan-phase 7` (Calc Engine Port + Proposal Form)
+Last activity: 2026-05-08 -- Login fix landed. APP_URL + NEXT_PUBLIC_APP_URL env vars added to all 3 Vercel scopes; redeployed; browser-issued login verified HTTP 200 with correct Origin header. Phase 6 fully shipped.
 
 ## Progress
 
@@ -51,6 +51,13 @@ v1.1 ████░░░░░░░░░░░░░░░░ 2/6 phases com
 1. **Neon branch split** — ⚠ PARTIAL (2026-05-07): Neon branches `main` (default), `preview`, `development` created in Neon console. Vercel `DATABASE_URL` per-scope routing still pending — all 3 Vercel scopes currently point at the `main` branch pooled endpoint `ep-icy-boat-alx5o1tz-pooler...`. Required before Phase 8 PDF persistence ships real partner data.
 2. **GitHub Environment protection rules** — ✅ RESOLVED (2026-05-07): repo set to public; `production` environment now has required reviewer (`antoinegaetanrousseau`) + custom branch policy restricted to `main`. Migration workflow runs now gate on both typed-confirmation `MIGRATE PROD` AND GitHub UI "Approve" click.
 3. **Vercel project ownership** — ✅ RESOLVED: project was always in the `memento` team (team slug `antoinerousseau-5272s-projects`, display name "memento"); local `.vercel/project.json` orgId `team_b22P56dgh6tYIkM8mgRASgN2` matches.
+
+## Phase 6 follow-ups (recorded 2026-05-08)
+
+1. **Admin password rotation** — both admins were seeded with a shared "for now" password (`leasetic2026`) via `scripts/seed-admins-launch.ts` to enable immediate launch-day login. Per Decisions Log, both admins MUST rotate to individual strong passwords before the first real partner is onboarded. Mechanism: one admin triggers a password reset for the other via the admin accounts page (admin↔admin pattern), or use the existing `grant-admin` flow with a new email→reset cycle. Target: before Phase 9 admin-surface work or earlier.
+2. **Better Auth `trustedOrigins` behavior investigation** — when probing prod with `Origin: https://evil.example.com`, the API still returned HTTP 200 with a valid session. Better Auth's `trustedOrigins` apparently doesn't hard-block based on Origin alone; the actual CSRF defense in this stack is `SameSite=Lax` + `__Secure-` cookies. Confirm whether we want stricter Origin gating (e.g., explicit middleware-level Origin check on `/api/auth/sign-in/*` mutations) or whether SameSite is judged sufficient. Read upstream Better Auth issue tracker before deciding. Phase 9 hardening candidate.
+3. **Origin gate documentation** — the Phase 6 launch surfaced that `APP_URL` AND `NEXT_PUBLIC_APP_URL` are BOTH required in Vercel env for Better Auth to work end-to-end (server uses APP_URL for `trustedOrigins`/`baseURL`; client uses `NEXT_PUBLIC_APP_URL` for authClient baseURL). This wasn't called out in Phase 6 plans — add to README + `.env.example` comment block + Phase 7 plans for visibility.
+4. **Admin seeding bypass documented** — `scripts/seed-admins-launch.ts` does direct-DB INSERT into users + accounts tables, bypassing Better Auth's `signUpEmail` (locked off architecturally) AND the admin plugin's `createUser` (requires authenticated admin caller, chicken-and-egg at bootstrap). The script has a typed-confirmation gate + `INITIAL_PASSWORD` env-var (literal not in source). For ALL future admin grants, use `scripts/grant-admin.ts` (the architecturally-locked invitation flow). The launch script should NOT be re-used for ongoing admin operations.
 
 ## v1.0 Closure Status
 
@@ -91,7 +98,7 @@ v1.1 ████░░░░░░░░░░░░░░░░ 2/6 phases com
 1. **Cutover ownership** — Antoine vs Thomas for partner comms. Decide before Phase 10.
 2. **Existing v10 form schema** — does it capture a structured "client name" field? Verify by reading v10 HTML at start of Phase 7.
 3. **Legal counsel sign-off** on 10-year retention (DATA-11). Resolve before Phase 10.
-4. **Auth library version pinning matrix** — exact Better Auth + Drizzle adapter + Next.js + React versions. Pin no-carets at Phase 5 bootstrap.
+4. ~~**Auth library version pinning matrix** — exact Better Auth + Drizzle adapter + Next.js + React versions. Pin no-carets at Phase 5 bootstrap.~~ ✓ Resolved 2026-05-08 (Phase 6 plan 06-01): `better-auth@1.6.9`, `@node-rs/argon2@2.0.2`, `react-hook-form@7.75.0`, `zod@4.4.3`, `@hookform/resolvers@5.2.2`, `drizzle-kit@0.31.10`, `drizzle-orm@0.45.2`, `next@16.2.4`, `react@19.0.0`. All exact pins, no carets. Drizzle adapter is bundled inside `better-auth/adapters/drizzle` — no separate package.
 5. **OVH side stack** — managed Postgres provider, S3-compatible blob endpoint. Confirm with Leasétic IT before Phase 10 smoke deploy.
 6. ~~**Admin role provisioning** — Antoine + Thomas at launch, or Antoine first? Affects AUTH-12 CLI script payload.~~ ✓ Resolved 2026-05-07: **Antoine + Emmanuel** at launch (see Decisions Log).
 
@@ -147,6 +154,11 @@ v1.1 ████░░░░░░░░░░░░░░░░ 2/6 phases com
 | Layer order in AdminLayout: segment check (notFound) first, requireAdmin() second — URL obscurity fires before any role reveal per D-18 | 06-07 execution | 06-07 |
 | ADMIN_URL_SEGMENT unset → notFound() (fail-closed) — safe operational failure, no admin reach possible (T-06-07-04 accepted) | 06-07 execution | 06-07 |
 | InviteUrlModal uses inline backdrop + panel siblings at z-index 200/201 (no ReactDOM.createPortal) — adequate for Phase 6; no stacking-context-creating ancestors exist | 06-07 execution | 06-07 |
+| Admin email domain: `@leasetic.com` (NOT `@memento.eco` as CLAUDE.md notes) — antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com seeded as admins. CLAUDE.md still references @memento.eco for unrelated-project context (Memento Hub); for THIS project (Leasétic Matrice) use @leasetic.com. | user 2026-05-08 launch | 06-launch |
+| Launch-day admin seeding via `scripts/seed-admins-launch.ts` (direct-DB INSERT into users + accounts) — bypasses Better Auth `signUpEmail` (architecturally disabled) AND admin plugin `createUser` (chicken-and-egg at bootstrap, no admin yet). One-off script with typed-confirmation gate + INITIAL_PASSWORD env var (literal not in source). For ongoing grants: use `grant-admin` (invitation flow). | 2026-05-08 launch decision | 06-launch |
+| Both admins seeded with shared "for now" password `leasetic2026` (not in source/git; in chat transcript only). Architecturally diverges from AUTH-08/09 invitation-flow lock; documented as launch-day exception. Rotation to individual strong passwords pending — see Phase 6 follow-ups. | user 2026-05-08 launch | 06-launch |
+| `APP_URL` + `NEXT_PUBLIC_APP_URL` env vars BOTH required for Better Auth to work end-to-end on Vercel — server uses APP_URL for resolveBaseUrl()/trustedOrigins; client uses NEXT_PUBLIC_APP_URL for authClient baseURL. Default fallbacks (VERCEL_URL deployment-specific hash, empty string) cause silent login failures with the same INVALID_EMAIL_OR_PASSWORD message browsers see for actual bad creds (anti-enumeration discipline collapses all failures). Set both to canonical alias in production+preview Vercel scopes; localhost:3000 in development. | 2026-05-08 launch debug | 06-launch |
+| Better Auth admin plugin's `createUser` requires authenticated admin caller — cannot be used at bootstrap when no admin exists. signUpEmail is locked off (project policy: admin-invited only). Direct-DB write to users + accounts tables with argon2id hash matching the auth() config (timeCost:2, memoryCost:19456, parallelism:1, algorithm:2) is the correct chicken-and-egg-break. Hash is verifiable by Better Auth's verify() — confirmed via HTTP 200 from /api/auth/sign-in/email post-seed. | 2026-05-08 launch debug | 06-launch |
 
 ## Session Notes
 
@@ -170,6 +182,7 @@ v1.1 ████░░░░░░░░░░░░░░░░ 2/6 phases com
 - **2026-05-07:** Phase 6 UI-SPEC session — gsd-ui-researcher produced 06-UI-SPEC.md (56KB, 762 insertions, commit ec363d6) inheriting Phase 5 token spine unchanged and adding 7 screen-specific design contracts (login, /invite/{token}, /reset/{token}, expired-token landing, app shell topbar/sidebar/footer, error boundary, 404), 6 sonner toast variants, 1 modal primitive for invitation/reset URL display, and 225-key i18n dictionary scope per language (165 v10 keys + 60 new Phase-6 keys). gsd-ui-checker verified 6 dimensions: 5 PASS + 1 FLAG on inherited typography weights (4 weights vs checker's strict 2-weight rule — non-blocking because v10-source-locked + Phase-5-approved). Researcher made 9 sensible-default decisions within UI discretion (no Radix, login card 420px max-width, 4-segment password strength meter without zxcvbn, logout no-confirmation, etc.). 0 user questions asked — CONTEXT.md was complete. Cross-checks all pass: no Phase 5 token redefinition, SHELL-03 minimal login layout, D-22 anti-enumeration, D-18 404-not-403, D-10 single-display modal, no /settings page, full v10 dictionary scoped, FR copy reads natural.
 
 - **2026-05-08:** 06-07 executed — Admin route group + InviteUrlModal: app/(admin)/[adminSegment]/layout.tsx (dual-layer gate: Layer 1 env-segment notFound, Layer 2 requireAdmin() notFound, isAdmin={true} to Topbar), app/(admin)/[adminSegment]/page.tsx (admin home placeholder, independent requireAdmin() AUTH-15), src/components/InviteUrlModal.tsx ('use client', backdrop+panel z-index 200/201, role=dialog aria-modal=true, focus-trap+Escape+outside-click, navigator.clipboard.writeText with 2s confirmation + Sonner toast, clipboard failure handled, warning banner, all strings via t()). Phase 6 ALL 9/9 plans complete. typecheck + lint + build all 0. AUTH-07, AUTH-08, AUTH-10, AUTH-14, AUTH-15 grounded. 2 task commits: 0f0dda5, c82eb6a.
+- **2026-05-08:** Phase 6 launch day — migration applied, admins seeded, login fixed end-to-end. (1) Pushed all 34 Phase 6 commits to origin/main. (2) Triggered `db-migrate.yml` workflow (#25569691806); approved at GitHub Environment gate; both jobs (dry-run + apply) succeeded; migration `0001_kind_doctor_faustus.sql` applied to prod Neon. (3) Initial smoke test: /healthz green, /login renders FR+EN, unauth → /login?next= via proxy.ts. (4) Decided to seed both admins immediately for fast launch (deferred individual password discipline to Phase 9). (5) Wrote `scripts/seed-admins-launch.ts` (direct-DB workaround for the chicken-and-egg: signUpEmail disabled architecturally + admin plugin createUser requires admin caller); seeded antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com with shared "for now" password via INITIAL_PASSWORD env var (not in source). (6) Verified API login HTTP 200 + valid session cookie + role=admin payload. (7) **User reported browser login failing despite working API.** Root-caused to APP_URL + NEXT_PUBLIC_APP_URL both unset in Vercel — `resolveBaseUrl()` was falling through to VERCEL_URL (deployment-hash host), so `trustedOrigins` didn't include the canonical alias. (8) Fixed by setting both env vars to `https://leasetic-matrice.vercel.app` in production+preview scopes (development: localhost:3000) via Vercel REST API; redeployed; verified browser-style login (with Origin + Referer headers matching canonical) HTTP 200. (9) Phase 6 fully shipped end-to-end. Commits this day: e853434 (push of all plans), workflow run #25569691806, d5a8a54 (seed-admins-launch.ts), 58d448e (Phase 6 finalize), env vars added (no commit), redeploy.
 
 ## Open Blockers
 
@@ -181,4 +194,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-08 — Phase 6 COMPLETE: all 9/9 plans done. AUTH-01..18 + SHELL-01..14 all satisfied. Phase 7 (Calc Engine + Form) ready to start.*
+*Last updated: 2026-05-08 — Phase 6 SHIPPED. Production at https://leasetic-matrice.vercel.app fully functional (login verified end-to-end with both admin accounts). 32/32 AUTH+SHELL requirements satisfied. 4 follow-ups recorded (admin password rotation, trustedOrigins behavior investigation, Origin gate documentation, admin seeding bypass discipline). **Phase 7 (Calc Engine Port + Proposal Form) is unblocked and ready — recommend `/clear` then `/gsd-plan-phase 7` for fresh-context start.***
