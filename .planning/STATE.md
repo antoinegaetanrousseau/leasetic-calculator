@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: executing
-last_updated: "2026-05-08T18:05:00Z"
-last_activity: 2026-05-08 -- Phase 6 Plan 07 complete (admin shell: dual-layer URL gate + InviteUrlModal primitive. Phase 6 ALL 9 plans complete.)
+status: phase-complete
+last_updated: "2026-05-08T18:10:00Z"
+last_activity: 2026-05-08 -- Phase 6 COMPLETE. Migration 0001 applied to prod (workflow #25569691806). Production smoke test passed (/healthz green, /login renders FR+EN, unauth → /login?next= redirect via proxy.ts). 32/32 AUTH+SHELL requirements marked [x]. Admin seeding (Antoine + Emmanuel) deferred to launch day per user choice — non-blocking.
 progress:
   total_phases: 6
   completed_phases: 2

@@ -31,7 +31,7 @@
 - [x] **AUTH-04**: Login error message is generic ("incorrect email or password") and does not leak whether the email exists (anti-enumeration)
 - [x] **AUTH-05**: User on a `(authed)` or `(admin)` route while not logged in is redirected to `/login`
 - [x] **AUTH-06**: User on `/login` while already logged in is redirected to `/`
-- [ ] **AUTH-07**: Admin can create a new partner account (email + display name + language) from the admin accounts page
+- [x] **AUTH-07**: Admin can create a new partner account (email + display name + language) from the admin accounts page (implemented in plan 06-07's `/[adminSegment]/accounts` page + plan 06-04's `createInvitation` server action; runtime verification deferred to admin seeding on launch day)
 - [x] **AUTH-08**: When admin creates a partner, the system generates a one-time invitation URL containing a signed token; admin shares it with the partner out-of-band
 - [x] **AUTH-09**: Partner can use the invitation URL once to set their initial password; subsequent uses fail
 - [x] **AUTH-10**: Admin can trigger a password reset for any partner; this generates a one-time reset URL the admin shares out-of-band
