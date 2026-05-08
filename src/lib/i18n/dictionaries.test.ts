@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dictionaries } from './dictionaries';
+import { dictionaries, t, type DictKey } from './dictionaries';
 
 describe('i18n dictionary parity', () => {
   const frKeys = Object.keys(dictionaries.fr);
@@ -54,5 +54,77 @@ describe('i18n dictionary parity', () => {
     expect(hasPrefix('error.')).toBe(true);
     // Spot-check 'error.required.fields' is present (per UI-SPEC §i18n category note)
     expect(typeof fr['error.required.fields']).toBe('string');
+  });
+});
+
+describe('Phase 7 i18n keys (UI-SPEC §8 + §9)', () => {
+  const phase7Keys: DictKey[] = [
+    // Home page (07-03)
+    'dashboard.greeting',
+    'dashboard.subtext',
+    'dashboard.cta.new.proposal',
+    'dashboard.recent.title',
+    'dashboard.empty.title',
+    'dashboard.empty.body',
+    'header.proposals.new',
+    // Live preview (07-05)
+    'proposal.section.preview',
+    'proposal.validity.label',
+    'proposal.validity.suffix',
+    'proposal.validity.computed.label',
+    // Toasts (07-04 / 07-05)
+    'proposal.toast.copy.success',
+    'proposal.toast.copy.error',
+    'proposal.toast.validation.errors',
+    'proposal.toast.phase8.placeholder',
+    'proposal.confirm.reset',
+    // Copy button (07-05) — button.copy.ref already covered by v10 dict tests
+    'button.copy.ref',
+    'button.copy.ref.copied',
+    // Inline errors (07-04 RHF resolver messages)
+    'error.field.required',
+    'error.field.client.co.required',
+    'error.field.amount.required',
+    'error.field.amount.too.small',
+    'error.field.amount.too.large',
+    'error.field.duration.required',
+    'error.field.email.invalid',
+    'error.field.phone.invalid',
+    'error.field.siren.invalid',
+    // Tranche labels (Plan 07-01 tLabel contract)
+    'form.tranche.t1',
+    'form.tranche.t2',
+    'form.tranche.t3',
+    'form.tranche.t4',
+  ];
+
+  for (const key of phase7Keys) {
+    it(`fr / ${key} resolves to a non-empty string`, () => {
+      const v = t(key, 'fr');
+      expect(typeof v).toBe('string');
+      expect(v.length).toBeGreaterThan(0);
+    });
+    it(`en / ${key} resolves to a non-empty string`, () => {
+      const v = t(key, 'en');
+      expect(typeof v).toBe('string');
+      expect(v.length).toBeGreaterThan(0);
+    });
+  }
+
+  it('dashboard.greeting (fr/en) supports {0} interpolation contract — caller .replace() pattern', () => {
+    // Phase 6 t() does NOT auto-interpolate; verify the placeholder is present
+    // so the consumer's .replace('{0}', name) works.
+    expect(t('dashboard.greeting', 'fr')).toContain('{0}');
+    expect(t('dashboard.greeting', 'en')).toContain('{0}');
+  });
+
+  it('proposal.validity.computed.label has {0} placeholder (Plan 07-05 consumer)', () => {
+    expect(t('proposal.validity.computed.label', 'fr')).toContain('{0}');
+    expect(t('proposal.validity.computed.label', 'en')).toContain('{0}');
+  });
+
+  it('error.field.amount.too.small references the 25 000 € floor (matches v10 line 1196)', () => {
+    expect(t('error.field.amount.too.small', 'fr')).toMatch(/25/);
+    expect(t('error.field.amount.too.small', 'en')).toMatch(/25,?0?00/);
   });
 });
