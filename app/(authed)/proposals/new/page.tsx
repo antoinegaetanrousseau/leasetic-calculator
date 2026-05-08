@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
-import { ProposalForm } from '@/components/proposal/ProposalForm';
+import {
+  ProposalForm,
+  ProposalFormProvider,
+} from '@/components/proposal/ProposalForm';
+import { LiveLoyerPreview } from '@/components/proposal/LiveLoyerPreview';
 
 // PITFALLS §1.6 — every cookie/session-reading page opts out of static rendering.
 export const dynamic = 'force-dynamic';
@@ -13,8 +17,10 @@ export const metadata: Metadata = {
 /**
  * Phase 7 — proposal entry route. Mounts inside the (authed) shell.
  *
- * Plan 07-04 ships the form column (left); Plan 07-05 plugs the live-preview
- * card into the right column at the <aside> placeholder slot below.
+ * Plan 07-05 Path A: page stays a Server Component (requireUser + prefill);
+ * <ProposalFormProvider> ('use client') hosts useForm + FormProvider so
+ * <ProposalForm> and <LiveLoyerPreview> are siblings sharing a single RHF
+ * context. Each child consumes via useFormContext() / useWatch().
  *
  * D-7-13 partner-name pre-fill: heuristic chain
  *   session.user.displayName ?? session.user.name ?? '' (NOT email — we don't
@@ -40,8 +46,8 @@ export default async function NewProposalPage() {
     <div>
       {/* Page title — Topbar's pageTitle slot is not currently passed by the
           (authed) layout, so we render the page title in-content like the
-          home page (Plan 07-03) does. Plan 07-05 may consolidate this into
-          the Topbar slot if desired. */}
+          home page (Plan 07-03) does. A later cleanup may consolidate this
+          into the Topbar slot if desired. */}
       <h1
         style={{
           fontSize: '20px',
@@ -56,45 +62,25 @@ export default async function NewProposalPage() {
       {/* 2-column desktop grid (D-7-01 / D-7-14):
           640px form column + 360px sticky preview column + 24px gap = 1024px,
           fits within the (authed) layout's 1100px main-content max-width.
-          Plan 07-05 replaces the <aside> placeholder with <LiveLoyerPreview>. */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 640px) minmax(0, 360px)',
-          gap: 24,
-          alignItems: 'start',
-        }}
-      >
-        {/* form-column — left */}
-        <ProposalForm lang={lang} prefill={{ partnerName }} />
-
-        {/* preview-column — right. Plan 07-05 will replace this placeholder
-            wholesale with <LiveLoyerPreview>. The result.inline.placeholder
-            key is a v10-ported dictionary entry from Phase 6 06-02. */}
-        <aside
+          Both children share a single RHF FormProvider hoisted by
+          <ProposalFormProvider> (Plan 07-05 Path A). */}
+      <ProposalFormProvider prefill={{ partnerName }}>
+        <div
           style={{
-            position: 'sticky',
-            top: 'calc(var(--topbar-h) + 24px)',
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 640px) minmax(0, 360px)',
+            gap: 24,
+            alignItems: 'start',
           }}
-          aria-label={t('proposal.section.preview', lang)}
         >
-          <div className="card" style={{ minHeight: 260 }}>
-            <div className="ctitle">
-              <span>{t('proposal.section.preview', lang)}</span>
-            </div>
-            <p
-              style={{
-                fontSize: '14.5px',
-                color: 'var(--muted)',
-                textAlign: 'center',
-                marginTop: 32,
-              }}
-            >
-              {t('result.inline.placeholder', lang)}
-            </p>
-          </div>
-        </aside>
-      </div>
+          {/* form-column — left */}
+          <ProposalForm lang={lang} />
+          {/* preview-column — right. coefficientsExpired hardcoded false
+              (D-7-12 stub — Phase 8 will wire from a global_params freshness
+              probe). */}
+          <LiveLoyerPreview lang={lang} coefficientsExpired={false} />
+        </div>
+      </ProposalFormProvider>
     </div>
   );
 }

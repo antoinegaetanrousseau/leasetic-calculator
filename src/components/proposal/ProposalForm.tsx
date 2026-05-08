@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef, type ReactNode } from 'react';
 import {
   Controller,
   FormProvider,
   useForm,
-  type Control,
-  type UseFormWatch,
+  useFormContext,
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -14,6 +13,11 @@ import { RotateCcw, ArrowRight } from 'lucide-react';
 import type { z } from 'zod';
 import { proposalInputSchema, type ProposalInput } from '@/lib/calc';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
+import { DurationSegmented } from './DurationSegmented';
+import { YesNoToggle } from './YesNoToggle';
+import { NumberInputAmount } from './NumberInputAmount';
+import { PhoneInput } from './PhoneInput';
+import { SirenInput } from './SirenInput';
 
 /**
  * RHF input type — the schema's INPUT side (validityDays optional because
@@ -22,54 +26,30 @@ import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
  * is required). useForm gets <TFieldValues=Input, TContext, TTransformed=Output>
  * so handleSubmit's data is typed to ProposalInput while defaultValues stays
  * lenient about validityDays.
+ *
+ * Pattern locked in Plan 07-04 (STATE.md Decisions Log) — sibling components
+ * that consume the context (LiveLoyerPreview) use useFormContext<ProposalInput>
+ * (the OUTPUT side, since validityDays.default(30) means the parsed/runtime
+ * value is always defined).
  */
 type ProposalFormValues = z.input<typeof proposalInputSchema>;
-import { DurationSegmented } from './DurationSegmented';
-import { YesNoToggle } from './YesNoToggle';
-import { NumberInputAmount } from './NumberInputAmount';
-import { PhoneInput } from './PhoneInput';
-import { SirenInput } from './SirenInput';
 
-export interface ProposalFormProps {
-  lang: Lang;
+export interface ProposalFormProviderProps {
   /** Pre-fill values from session (D-7-13). */
   prefill?: Partial<ProposalInput>;
-  /**
-   * Plan 07-05 hook: receives the form's `watch` + `control` so the sibling
-   * <LiveLoyerPreview> can subscribe via useWatch without ProposalForm and
-   * the preview having to share a parent FormProvider. Plan 07-05 may also
-   * choose to hoist the FormProvider one level up; in that case this callback
-   * becomes a no-op.
-   */
-  onWatchableState?: (state: {
-    watch: UseFormWatch<ProposalFormValues>;
-    control: Control<ProposalFormValues>;
-  }) => void;
+  children: ReactNode;
 }
 
-const DURATION_OPTIONS = [
-  { value: 36 as const, labelKey: 'form.duration.36' as const },
-  { value: 48 as const, labelKey: 'form.duration.48' as const },
-  { value: 60 as const, labelKey: 'form.duration.60' as const },
-];
-
 /**
- * Phase 7 proposal entry form (PROP-06 + PROP-08).
- *
- * Renders ONLY the form column (left side of the 2-column grid established
- * by app/(authed)/proposals/new/page.tsx). Plan 07-05's <LiveLoyerPreview>
- * mounts in the right column and consumes RHF state via the
- * `onWatchableState` callback, OR by hoisting the FormProvider one level up
- * — either path works because this component wraps its children in
- * <FormProvider>.
- *
- * Validation: blur-time .invalid red-ring (PROP-08) via mode: 'onBlur' +
- * shouldFocusError. Submit is a no-op + info toast (D-7-07: Phase 8 wires
- * persistence). Reset uses native window.confirm() (D-7-08, v10 line 2146).
+ * Hoists the RHF setup one level up so <ProposalForm> + <LiveLoyerPreview>
+ * are siblings sharing a single FormProvider context (Plan 07-05 Path A).
+ * The page Server Component wraps both children in this provider; each
+ * child consumes the context via useFormContext().
  */
-export function ProposalForm({ lang, prefill, onWatchableState }: ProposalFormProps) {
-  const firstFieldRef = useRef<HTMLInputElement | null>(null);
-
+export function ProposalFormProvider({
+  prefill,
+  children,
+}: ProposalFormProviderProps) {
   const form = useForm<ProposalFormValues, unknown, ProposalInput>({
     resolver: zodResolver(proposalInputSchema),
     mode: 'onBlur', // PROP-08: blur validation
@@ -94,27 +74,59 @@ export function ProposalForm({ lang, prefill, onWatchableState }: ProposalFormPr
       validityDays: 30, // D-7-05 default
     },
   });
+  return <FormProvider {...form}>{children}</FormProvider>;
+}
+
+export interface ProposalFormProps {
+  lang: Lang;
+}
+
+const DURATION_OPTIONS = [
+  { value: 36 as const, labelKey: 'form.duration.36' as const },
+  { value: 48 as const, labelKey: 'form.duration.48' as const },
+  { value: 60 as const, labelKey: 'form.duration.60' as const },
+];
+
+/**
+ * Phase 7 proposal entry form (PROP-06 + PROP-08).
+ *
+ * Renders ONLY the form column (left side of the 2-column grid established
+ * by app/(authed)/proposals/new/page.tsx). The parent (page Server Component)
+ * wraps both <ProposalForm> and <LiveLoyerPreview> in a <ProposalFormProvider>
+ * so they share a single FormProvider context (Plan 07-05 Path A). This
+ * component consumes the context via useFormContext().
+ *
+ * Validation: blur-time .invalid red-ring (PROP-08) via mode: 'onBlur' +
+ * shouldFocusError (configured by ProposalFormProvider). Submit is a no-op +
+ * info toast (D-7-07: Phase 8 wires persistence). Reset uses native
+ * window.confirm() (D-7-08, v10 line 2146).
+ */
+export function ProposalForm({ lang }: ProposalFormProps) {
+  const firstFieldRef = useRef<HTMLInputElement | null>(null);
+
+  // Consume the parent <ProposalFormProvider>'s RHF context. Three-generic
+  // form mirrors useForm's input/output split; useFormContext is parametrized
+  // by the OUTPUT type (the parsed shape Phase 8's server route will see).
+  const form = useFormContext<ProposalFormValues>();
   const {
     register,
     handleSubmit,
     control,
-    watch,
     setValue,
     reset,
     formState: { errors, isSubmitting },
   } = form;
 
-  // Hand the watch + control to the parent (Plan 07-05 wires the live preview).
-  useEffect(() => {
-    if (onWatchableState) onWatchableState({ watch, control });
-  }, [onWatchableState, watch, control]);
-
-  const onSubmit = (_data: ProposalInput): void => {
+  const onSubmit = (_data: ProposalFormValues): void => {
     /**
      * D-7-07: Phase 7 submit is a no-op + info toast (NO DB write — that's
      * PROP-09 / Phase 8). Live-preview already shows the loyer; the toast
      * confirms validation passed. The parsed `_data` will be consumed by
-     * Phase 8's server route.
+     * Phase 8's server route via proposalInputSchema.parse(req.body) — that
+     * parse call is the authoritative ProposalInput-typed data; Phase 7's
+     * onSubmit only sees the input-side shape (validityDays: optional)
+     * since useFormContext is parametrized with the input type to bridge
+     * the schema's input/output split (.default(30) on validityDays).
      */
     void _data;
     toast.info(t('proposal.toast.phase8.placeholder', lang));
@@ -142,8 +154,7 @@ export function ProposalForm({ lang, prefill, onWatchableState }: ProposalFormPr
   const partnerCoReg = register('partnerCo');
 
   return (
-    <FormProvider {...form}>
-      <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
+    <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
         {/* ── Card 1: Partenaire ─────────────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
           <div className="ctitle">
@@ -513,7 +524,6 @@ export function ProposalForm({ lang, prefill, onWatchableState }: ProposalFormPr
             <ArrowRight size={17} strokeWidth={1.6} aria-hidden="true" />
           </button>
         </div>
-      </form>
-    </FormProvider>
+    </form>
   );
 }
