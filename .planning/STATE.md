@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-08T21:07:18Z"
-last_activity: 2026-05-08 -- Plan 07-02 complete (calc golden corpus — 30 cases + assertCalc/assertValidity ports; 162/162 tests passing)
+last_updated: "2026-05-08T23:30:00Z"
+last_activity: 2026-05-08 -- Plan 07-06 complete (Phase-7 i18n keys: +30 keys × 2 langs; fr/en 233→263; 227/227 tests passing)
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 22
-  completed_plans: 18
-  percent: 82
+  completed_plans: 19
+  percent: 86
 ---
 
 # State — Matrice Commerciale
@@ -28,10 +28,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: **7 (calc-engine-port-proposal-form) — IN PROGRESS**
-Plan: 2 of 6 done (07-01 calc engine core ✅, 07-02 golden corpus ✅); next is Wave 2 — 07-06 (i18n keys)
+Plan: 3 of 6 done (07-01 calc engine core ✅, 07-02 golden corpus ✅, 07-06 i18n keys ✅); Wave 2 complete; next is Wave 3 — 07-03 (home page CTA) + 07-04 (proposal form scaffold)
 Status: Ready to execute
-Next: `/gsd-execute-phase 7` for Plan 07-06 (i18n keys)
-Last activity: 2026-05-08 -- Plan 07-02 complete (calc golden corpus — 30 cases + assertCalc/assertValidity ports; 162/162 tests passing)
+Next: `/gsd-execute-phase 7` for Plan 07-03 (home page CTA) — Wave 3
+Last activity: 2026-05-08 -- Plan 07-06 complete (Phase-7 i18n keys; +30 keys × 2 langs; 227/227 tests passing)
 
 ## Progress
 
@@ -40,7 +40,7 @@ v1.0 ████████████████████ 4/4 phases com
 v1.1 █████░░░░░░░░░░░░░░░ 2/6 phases complete (Phase 7 in progress)
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
        └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
-       └─ Phase 7: Calc Engine + Form        🚧 in progress (2/6 plans — 07-01 calc engine core ✅, 07-02 golden corpus ✅)
+       └─ Phase 7: Calc Engine + Form        🚧 in progress (3/6 plans — 07-01 calc engine core ✅, 07-02 golden corpus ✅, 07-06 i18n keys ✅)
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
        └─ Phase 9: Admin Surface             ◯ blocked on P8
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
@@ -187,6 +187,7 @@ v1.1 █████░░░░░░░░░░░░░░░ 2/6 phases com
 - **2026-05-08:** Phase 6 launch day — migration applied, admins seeded, login fixed end-to-end. (1) Pushed all 34 Phase 6 commits to origin/main. (2) Triggered `db-migrate.yml` workflow (#25569691806); approved at GitHub Environment gate; both jobs (dry-run + apply) succeeded; migration `0001_kind_doctor_faustus.sql` applied to prod Neon. (3) Initial smoke test: /healthz green, /login renders FR+EN, unauth → /login?next= via proxy.ts. (4) Decided to seed both admins immediately for fast launch (deferred individual password discipline to Phase 9). (5) Wrote `scripts/seed-admins-launch.ts` (direct-DB workaround for the chicken-and-egg: signUpEmail disabled architecturally + admin plugin createUser requires admin caller); seeded antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com with shared "for now" password via INITIAL_PASSWORD env var (not in source). (6) Verified API login HTTP 200 + valid session cookie + role=admin payload. (7) **User reported browser login failing despite working API.** Root-caused to APP_URL + NEXT_PUBLIC_APP_URL both unset in Vercel — `resolveBaseUrl()` was falling through to VERCEL_URL (deployment-hash host), so `trustedOrigins` didn't include the canonical alias. (8) Fixed by setting both env vars to `https://leasetic-matrice.vercel.app` in production+preview scopes (development: localhost:3000) via Vercel REST API; redeployed; verified browser-style login (with Origin + Referer headers matching canonical) HTTP 200. (9) Phase 6 fully shipped end-to-end. Commits this day: e853434 (push of all plans), workflow run #25569691806, d5a8a54 (seed-admins-launch.ts), 58d448e (Phase 6 finalize), env vars added (no commit), redeploy.
 - **2026-05-08:** 07-01 executed — Calc engine core: 6 pure-TS files under `src/lib/calc/` (481 lines total). seed-params.ts (typed `SeedParams` constant; D-2 placeholders from v10 fixture lines 1922-1929 with TODO marker; commissionPct=5; maxAmount=500_000; getMaxAmount() Phase-8 swap seam). tranche.ts (tKey port of v10 lines 1195-1211; tLabel returns i18n key literal types). coefficients.ts (Coefficients type; lookupCoefficient returns null for missing cell). formula.ts (FROZEN v10 invariant `loyer = amount × (1 + commission/100) × coeff / 100`; computeLoyer 4-state machine idle/on-demand/missing/computed; isOnDemand; parseNumeric/formatNumeric D-4 helpers; generateLcRef v10 line-1741 port). schema.ts (proposalInputSchema 15 fields per UI-SPEC §4 + D-7-06 clientCo required; validityDaysSchema 15/30/60 default 30; durationMonthsSchema 36/48/60; amountHTSchema digits-only > 25_000; coefficientsSchema). index.ts (barrel: 16 named exports + 9 type exports). typecheck 0; lint 0 errors; 83/83 existing tests pass; @/lib/calc resolves cleanly. Zero deviations. Pre-existing scripts/seed-admins-launch.ts:42 lint warning logged to deferred-items.md (out-of-scope). CALC-01..04 + CALC-08 grounded. 2 task commits: 5191a39 (data + lookups), 5715997 (kernel + Zod + barrel).
 - **2026-05-08:** 07-02 executed — Calc golden corpus + v10 self-check ports: 3 Vitest files under `src/lib/calc/`. formula.test.ts (184 lines, 23 tests): v10 assertCalc 6/6 fixtures port (HTML lines 1922-1965) + applyFormula/parseNumeric/formatNumeric/isOnDemand/generateLcRef unit tests + assertEscape non-port comment block citing lines 2002-2020 + React-JSX-escapes-by-default invariant. schema.test.ts (201 lines, 26 tests): v10 assertValidity 6/6 fixtures port (lines 2027-2053: null→30, 15→15, 30→30, 60→60, 999→reject, 'abc'→reject) + amountHTSchema/durationMonthsSchema/proposalInputSchema/coefficientsSchema tests including PROP-06 clientCo required + email/phone/SIREN tolerance. calc.golden.test.ts (256 lines, 30 tests): CALC-06 ≥30 corpus — happy-path 4 tranches × 3 durations + 8 boundaries (25k floor, 25k001, 50k, 50k001, 100k, 100k001, 250k, 250k001) + 4 on-demand + 6 edges (0/empty/NaN/negative/fractional/very-large); fixture coefficients embedded as local const (D-1 fixture/seed separation); math-derived expected values via `expectedLoyer()` helper; ±0.01 € tolerance. Vitest count: 83 → 162 (+79). typecheck 0; lint 0 errors; only the same pre-existing scripts/seed-admins-launch.ts:42 warning persists. 1 deviation (Rule 1 auto-fix): refactored happy-path matrix from for-loop to individual it() invocations because the plan's literal `grep -c "  it(" ≥ 30` static gate is incompatible with for-loop generation (12 runtime tests from 4 lexical it() lines); individual it() lines satisfy both gates. Static lexical count: 32 (≥30 floor); runtime count: 30. CALC-05 (2/3 ported, 1/3 documented-not-ported) + CALC-06 grounded. 3 task commits: 647f2ad (formula.test.ts), 7638ebb (schema.test.ts), dbee032 (calc.golden.test.ts).
+- **2026-05-08:** 07-06 executed — Phase-7 i18n copy table: 30 new keys × 2 languages added to `src/lib/i18n/dictionaries.ts` (fr 233→263, en 233→263). Breakdown by consumer plan: home page (07-03) 7 keys [dashboard.greeting/.subtext/.cta.new.proposal/.recent.title/.empty.title/.empty.body, header.proposals.new], live preview (07-05) 4 keys [proposal.section.preview, proposal.validity.label/.suffix/.computed.label], toasts (07-04/05) 5 keys [proposal.toast.copy.success/.error, .validation.errors, .phase8.placeholder, proposal.confirm.reset], copy button (07-05) 1 key [button.copy.ref.copied — pairs with existing v10 `button.copy.ref` reused without dup], inline RHF errors (07-04) 9 keys [error.field.required + .client.co.required + .amount.required/.too.small/.too.large + .duration.required + .email.invalid/.phone.invalid/.siren.invalid], tranche labels (Plan 07-01 tLabel contract) 4 keys [form.tranche.t1..t4 with FR non-breaking space + → arrow / EN comma-grouping]. dictionaries.test.ts extended with parametric `phase7Keys: DictKey[]` for-loop yielding 60 fr+en non-empty assertions + 4 standalone assertions (3 `{0}` interpolation-contract + 1 `25` floor reference). Test count 162→227 (+65). typecheck 0 (`_EnHasAllFrKeys` parity proof intact); lint 0 errors (same pre-existing seed-admins-launch.ts:42 warning persists, out-of-scope). Zero deviations beyond two minor cosmetic decisions documented in SUMMARY (button.copy.ref reuse — flagged by plan; FR tranche-label whitespace U+00A0 over U+202F — cosmetic). Plans 07-03/04/05 unblocked from JSXText lint failures. 2 task commits: 489c629 (feat: dictionaries.ts +60 entries), 9d970e6 (test: parametric spot-check + parity assertions).
 
 ## Open Blockers
 
@@ -198,4 +199,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-08 — Plan 07-02 (calc golden corpus + v10 self-check ports) shipped. CALC-05 (2/3 suites ported, 1/3 documented-not-ported) + CALC-06 grounded; ≥30 golden cases asserted to ±0.01 € in CI. Vitest count 83 → 162 (+79). Phase 7 progress: 2/6 plans complete. Wave 2 still has 07-06 (i18n keys) outstanding before Wave 3 (07-03/07-04) unblocks.*
+*Last updated: 2026-05-08 — Plan 07-06 (Phase-7 i18n copy table) shipped. 30 new keys × 2 languages added; fr/en dictionaries 233→263; `_EnHasAllFrKeys` parity proof intact; Vitest count 162→227 (+65). Phase 7 progress: 3/6 plans complete; Wave 2 done; Wave 3 (07-03 home page CTA + 07-04 proposal form scaffold) unblocked.*

@@ -88,7 +88,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 07-02-PLAN.md — Calc golden corpus (≥30 golden cases + assertCalc 6/6 + assertValidity 6/6 ports; assertEscape documented-not-ported) — CALC-05, CALC-06 ✅ Complete 2026-05-08
-- [ ] 07-06-PLAN.md — i18n copy table: 26 NEW Phase-7 keys × 2 langs + 4 tranche-label keys + parametric parity tests — cross-cutting (PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25)
+- [x] 07-06-PLAN.md — i18n copy table: 26 NEW Phase-7 keys × 2 langs + 4 tranche-label keys + parametric parity tests — cross-cutting (PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25) ✅ Complete 2026-05-08
 
 **Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 07-03-PLAN.md — Home page CTA + v10 base CSS classes added to globals.css (.card / .ctitle / .fld / input.invalid / .ieu / .dg / .db / .yn-btn / .btn-* / .tbadge) — PROP-01
@@ -153,5 +153,5 @@ Plans:
 
 ---
 
-*Last updated: 2026-05-08 — Phase 7 Wave 2 partial: Plan 07-02 (calc golden corpus + v10 self-check ports) shipped. CALC-05 + CALC-06 grounded; Vitest count 83 → 162 (+79 tests). Wave 2 still has 07-06 (i18n keys) outstanding; Wave 3 (07-03/07-04) blocks on Wave 2 completion.*
+*Last updated: 2026-05-08 — Phase 7 Wave 2 complete: Plan 07-06 (Phase-7 i18n copy table) shipped. 30 new keys × 2 languages added; fr/en dictionaries 233→263; `_EnHasAllFrKeys` parity proof intact; Vitest count 162→227 (+65 tests). Phase 7 progress: 3/6 plans complete. Wave 3 (07-03 home page CTA + 07-04 proposal form scaffold) unblocked.*
 *Detailed v1.0 archives in `.planning/milestones/`.*
