@@ -79,9 +79,9 @@
 - [ ] **PROP-03**: Each list row shows: client name, LC reference, montant HT, creation date, validity status (active vs expired)
 - [ ] **PROP-04**: Empty state on home page for new partners ("No proposals yet — create your first one") in FR + EN
 - [ ] **PROP-05**: Partner can paginate / "load more" past the first 20
-- [ ] **PROP-06**: Proposal entry form captures all v10 inputs plus a required `client_name` field for the home-page list
+- [x] **PROP-06**: Proposal entry form captures all v10 inputs plus a required `client_name` field for the home-page list — grounded by Plan 07-04: D-7-06 satisfies this by tightening v10's existing `clientCo` (Société cliente) field to required-by-Zod via `proposalInputSchema.clientCo: z.string().min(1, { message: 'error.field.client.co.required' })` (no new field added). The form renders the inline error message via `t(error.field.client.co.required, lang)` on blur.
 - [ ] **PROP-07**: Form provides live preview of the computed loyer as the partner types
-- [ ] **PROP-08**: Form validates on blur (red-ring focus state per v10 pattern)
+- [x] **PROP-08**: Form validates on blur (red-ring focus state per v10 pattern) — grounded by Plan 07-04: `useForm({ mode: 'onBlur', shouldFocusError: true })` + `className={errors.field ? 'invalid' : ''}` on each input + `.invalid` red-ring CSS contract from Plan 07-03's globals.css. All required fields show inline error message via `<p role="alert" className="error-msg">` on blur.
 - [ ] **PROP-09**: On submit, the system: validates inputs, computes server-side, snapshots current global params + inputs into a new `proposals` row, generates the PDF, uploads to blob, returns the proposal ID
 - [ ] **PROP-10**: After save, partner is redirected to `/proposals/{id}` (post-redirect-get pattern)
 - [ ] **PROP-11**: Proposal detail page shows: read-only inputs, computed values, validity status, LC reference, language, creation date, "Download PDF" button, "Duplicate" button, "Delete" button
