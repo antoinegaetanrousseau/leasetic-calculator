@@ -63,14 +63,14 @@
 
 ### CALC — Calculation Engine Port
 
-- [ ] **CALC-01**: v10 calculation formula ported as a pure TypeScript module at `src/lib/calc.ts` with no React, no I/O, no side effects
-- [ ] **CALC-02**: Module exports `computeLoyer({ montantHT, commissionPct, coefficient }) → { loyer }` matching v10 formula exactly
-- [ ] **CALC-03**: Module exports `lookupCoefficient(coefficients, qtr) → number`
-- [ ] **CALC-04**: Inputs validated with Zod schemas at the calc-engine boundary
+- [x] **CALC-01**: v10 calculation formula ported as a pure TypeScript module at `src/lib/calc/` with no React, no I/O, no side effects
+- [x] **CALC-02**: Module exports `computeLoyer({ amountHT, durationMonths, validityDays, ... }) → { computed: { loyerHT, coeff, ... } }` matching v10 formula exactly (string-typed boundary per D-4)
+- [x] **CALC-03**: Module exports `lookupCoefficient(coefficients, trancheKey, durationMonths) → string | null`
+- [x] **CALC-04**: Inputs validated with Zod schemas at the calc-engine boundary (proposalInputSchema + coefficientsSchema + amount/duration/validity schemas)
 - [ ] **CALC-05**: All v10 self-check fixtures (`assertCalc 6/6`, `assertEscape 8/8`, `assertValidity 6/6`) pass as Vitest tests
 - [ ] **CALC-06**: ≥30 representative golden test cases extracted from v10 (input → expected output pairs); CI fails on any drift
 - [ ] **CALC-07**: Calc engine runs server-side on save; client-side calculations are for live preview only and are never trusted
-- [ ] **CALC-08**: Monetary values stored as `numeric(14, 4)` in Postgres; coefficients as `numeric(10, 8)`; conversion handled in a single boundary helper
+- [x] **CALC-08**: Monetary values stored as `numeric(14, 4)` in Postgres; coefficients as `numeric(10, 8)`; conversion handled in a single boundary helper (string-typed boundary discipline per D-4 — parseNumeric/formatNumeric helpers in formula.ts; signature DB-numeric-compatible from day one)
 
 ### PROP — Proposal Lifecycle
 
@@ -265,14 +265,14 @@
 | SHELL-12 | Phase 6 | Complete (06-08) |
 | SHELL-13 | Phase 6 | Complete (06-08) |
 | SHELL-14 | Phase 6 | Complete (06-05) |
-| CALC-01 | Phase 7 | Pending |
-| CALC-02 | Phase 7 | Pending |
-| CALC-03 | Phase 7 | Pending |
-| CALC-04 | Phase 7 | Pending |
+| CALC-01 | Phase 7 | Complete (07-01) |
+| CALC-02 | Phase 7 | Complete (07-01) |
+| CALC-03 | Phase 7 | Complete (07-01) |
+| CALC-04 | Phase 7 | Complete (07-01) |
 | CALC-05 | Phase 7 | Pending |
 | CALC-06 | Phase 7 | Pending |
 | CALC-07 | Phase 7 | Pending |
-| CALC-08 | Phase 7 | Pending |
+| CALC-08 | Phase 7 | Complete (07-01) |
 | PROP-01 | Phase 7 | Pending |
 | PROP-02 | Phase 8 | Pending |
 | PROP-03 | Phase 8 | Pending |

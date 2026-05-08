@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-08T20:38:47.019Z"
-last_activity: 2026-05-08 -- Phase 7 planning complete
+last_updated: "2026-05-08T22:55:00Z"
+last_activity: 2026-05-08 -- Plan 07-01 complete (calc engine core)
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 22
-  completed_plans: 16
-  percent: 73
+  completed_plans: 17
+  percent: 77
 ---
 
 # State — Matrice Commerciale
@@ -27,20 +27,20 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: **6 (auth-shell) — ✅ COMPLETE & DEPLOYED**
-Plan: 9 of 9 done; migration applied to prod; admins seeded; login verified end-to-end
+Phase: **7 (calc-engine-port-proposal-form) — IN PROGRESS**
+Plan: 1 of 6 done (07-01 calc engine core ✅); next is Wave 2 — 07-02 (golden corpus) + 07-06 (i18n keys)
 Status: Ready to execute
-Next: `/clear` then `/gsd-plan-phase 7` (Calc Engine Port + Proposal Form)
-Last activity: 2026-05-08 -- Phase 7 planning complete
+Next: `/gsd-execute-phase 7` for Plan 07-02 (golden corpus)
+Last activity: 2026-05-08 -- Plan 07-01 complete (calc engine core)
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
-v1.1 ████░░░░░░░░░░░░░░░░ 2/6 phases complete
+v1.1 █████░░░░░░░░░░░░░░░ 2/6 phases complete (Phase 7 in progress)
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
        └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
-       └─ Phase 7: Calc Engine + Form        ◯ ready to start
+       └─ Phase 7: Calc Engine + Form        🚧 in progress (1/6 plans — 07-01 calc engine core ✅)
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
        └─ Phase 9: Admin Surface             ◯ blocked on P8
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
@@ -183,6 +183,7 @@ v1.1 ████░░░░░░░░░░░░░░░░ 2/6 phases com
 
 - **2026-05-08:** 06-07 executed — Admin route group + InviteUrlModal: app/(admin)/[adminSegment]/layout.tsx (dual-layer gate: Layer 1 env-segment notFound, Layer 2 requireAdmin() notFound, isAdmin={true} to Topbar), app/(admin)/[adminSegment]/page.tsx (admin home placeholder, independent requireAdmin() AUTH-15), src/components/InviteUrlModal.tsx ('use client', backdrop+panel z-index 200/201, role=dialog aria-modal=true, focus-trap+Escape+outside-click, navigator.clipboard.writeText with 2s confirmation + Sonner toast, clipboard failure handled, warning banner, all strings via t()). Phase 6 ALL 9/9 plans complete. typecheck + lint + build all 0. AUTH-07, AUTH-08, AUTH-10, AUTH-14, AUTH-15 grounded. 2 task commits: 0f0dda5, c82eb6a.
 - **2026-05-08:** Phase 6 launch day — migration applied, admins seeded, login fixed end-to-end. (1) Pushed all 34 Phase 6 commits to origin/main. (2) Triggered `db-migrate.yml` workflow (#25569691806); approved at GitHub Environment gate; both jobs (dry-run + apply) succeeded; migration `0001_kind_doctor_faustus.sql` applied to prod Neon. (3) Initial smoke test: /healthz green, /login renders FR+EN, unauth → /login?next= via proxy.ts. (4) Decided to seed both admins immediately for fast launch (deferred individual password discipline to Phase 9). (5) Wrote `scripts/seed-admins-launch.ts` (direct-DB workaround for the chicken-and-egg: signUpEmail disabled architecturally + admin plugin createUser requires admin caller); seeded antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com with shared "for now" password via INITIAL_PASSWORD env var (not in source). (6) Verified API login HTTP 200 + valid session cookie + role=admin payload. (7) **User reported browser login failing despite working API.** Root-caused to APP_URL + NEXT_PUBLIC_APP_URL both unset in Vercel — `resolveBaseUrl()` was falling through to VERCEL_URL (deployment-hash host), so `trustedOrigins` didn't include the canonical alias. (8) Fixed by setting both env vars to `https://leasetic-matrice.vercel.app` in production+preview scopes (development: localhost:3000) via Vercel REST API; redeployed; verified browser-style login (with Origin + Referer headers matching canonical) HTTP 200. (9) Phase 6 fully shipped end-to-end. Commits this day: e853434 (push of all plans), workflow run #25569691806, d5a8a54 (seed-admins-launch.ts), 58d448e (Phase 6 finalize), env vars added (no commit), redeploy.
+- **2026-05-08:** 07-01 executed — Calc engine core: 6 pure-TS files under `src/lib/calc/` (481 lines total). seed-params.ts (typed `SeedParams` constant; D-2 placeholders from v10 fixture lines 1922-1929 with TODO marker; commissionPct=5; maxAmount=500_000; getMaxAmount() Phase-8 swap seam). tranche.ts (tKey port of v10 lines 1195-1211; tLabel returns i18n key literal types). coefficients.ts (Coefficients type; lookupCoefficient returns null for missing cell). formula.ts (FROZEN v10 invariant `loyer = amount × (1 + commission/100) × coeff / 100`; computeLoyer 4-state machine idle/on-demand/missing/computed; isOnDemand; parseNumeric/formatNumeric D-4 helpers; generateLcRef v10 line-1741 port). schema.ts (proposalInputSchema 15 fields per UI-SPEC §4 + D-7-06 clientCo required; validityDaysSchema 15/30/60 default 30; durationMonthsSchema 36/48/60; amountHTSchema digits-only > 25_000; coefficientsSchema). index.ts (barrel: 16 named exports + 9 type exports). typecheck 0; lint 0 errors; 83/83 existing tests pass; @/lib/calc resolves cleanly. Zero deviations. Pre-existing scripts/seed-admins-launch.ts:42 lint warning logged to deferred-items.md (out-of-scope). CALC-01..04 + CALC-08 grounded. 2 task commits: 5191a39 (data + lookups), 5715997 (kernel + Zod + barrel).
 
 ## Open Blockers
 
@@ -194,4 +195,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-08 — Phase 6 SHIPPED. Production at https://leasetic-matrice.vercel.app fully functional (login verified end-to-end with both admin accounts). 32/32 AUTH+SHELL requirements satisfied. 4 follow-ups recorded (admin password rotation, trustedOrigins behavior investigation, Origin gate documentation, admin seeding bypass discipline). **Phase 7 (Calc Engine Port + Proposal Form) is unblocked and ready — recommend `/clear` then `/gsd-plan-phase 7` for fresh-context start.***
+*Last updated: 2026-05-08 — Plan 07-01 (calc engine core) shipped. CALC-01/02/03/04/08 grounded; pure-TS module @/lib/calc with 16 exports + 9 types ready for Plans 07-02 (golden corpus), 07-04 (form), 07-05 (preview). Phase 7 progress: 1/6 plans complete.*

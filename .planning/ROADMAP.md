@@ -84,7 +84,7 @@ Plans:
 **Plans:** 6 plans
 Plans:
 **Wave 1**
-- [ ] 07-01-PLAN.md — Calc engine core (pure-TS module; computeLoyer / lookupCoefficient / tKey / tLabel / isOnDemand / generateLcRef + Zod schemas; string-typed boundary; seed-params constant) — CALC-01..04, CALC-08
+- [x] 07-01-PLAN.md — Calc engine core (pure-TS module; computeLoyer / lookupCoefficient / tKey / tLabel / isOnDemand / generateLcRef + Zod schemas; string-typed boundary; seed-params constant) — CALC-01..04, CALC-08 ✅ Complete 2026-05-08
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 07-02-PLAN.md — Calc golden corpus (≥30 golden cases + assertCalc 6/6 + assertValidity 6/6 ports; assertEscape documented-not-ported) — CALC-05, CALC-06
@@ -146,12 +146,12 @@ Plans:
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
 | 6. Auth & Shell | v1.1 | 9/9 | Complete | 2026-05-08 |
-| 7. Calc Engine Port + Proposal Form | v1.1 | 0/6 | Planned | - |
+| 7. Calc Engine Port + Proposal Form | v1.1 | 1/6 | In progress | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
 | 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
 
 ---
 
-*Last updated: 2026-05-08 — Phase 6 COMPLETE (9/9 plans). AUTH-01..18 + SHELL-01..14 all satisfied. Phase 7 (Calc Engine + Form) is the next target.*
+*Last updated: 2026-05-08 — Phase 7 Wave 1 (Plan 07-01 calc engine core) shipped. CALC-01..04 + CALC-08 grounded. Wave 2 (Plans 07-02 golden corpus + 07-06 i18n keys) is unblocked.*
 *Detailed v1.0 archives in `.planning/milestones/`.*
