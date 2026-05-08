@@ -91,7 +91,7 @@ Plans:
 - [x] 07-06-PLAN.md — i18n copy table: 26 NEW Phase-7 keys × 2 langs + 4 tranche-label keys + parametric parity tests — cross-cutting (PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25) ✅ Complete 2026-05-08
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 07-03-PLAN.md — Home page CTA + v10 base CSS classes added to globals.css (.card / .ctitle / .fld / input.invalid / .ieu / .dg / .db / .yn-btn / .btn-* / .tbadge) — PROP-01
+- [x] 07-03-PLAN.md — Home page CTA + v10 base CSS classes added to globals.css (.card / .ctitle / .fld / input.invalid / .ieu / .dg / .db / .yn-btn / .btn-* / .tbadge) — PROP-01 ✅ Complete 2026-05-08
 - [ ] 07-04-PLAN.md — Proposal form scaffold (RHF + zodResolver, 4 cards, 14 inputs, blur validation, native confirm reset, no-DB-write submit) + DurationSegmented + YesNoToggle + NumberInputAmount + PhoneInput + SirenInput components — PROP-06, PROP-08
 
 **Wave 4** *(blocked on Wave 3 completion)*
@@ -146,12 +146,12 @@ Plans:
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
 | 6. Auth & Shell | v1.1 | 9/9 | Complete | 2026-05-08 |
-| 7. Calc Engine Port + Proposal Form | v1.1 | 2/6 | In progress | - |
+| 7. Calc Engine Port + Proposal Form | v1.1 | 4/6 | In progress | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
 | 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
 
 ---
 
-*Last updated: 2026-05-08 — Phase 7 Wave 2 complete: Plan 07-06 (Phase-7 i18n copy table) shipped. 30 new keys × 2 languages added; fr/en dictionaries 233→263; `_EnHasAllFrKeys` parity proof intact; Vitest count 162→227 (+65 tests). Phase 7 progress: 3/6 plans complete. Wave 3 (07-03 home page CTA + 07-04 proposal form scaffold) unblocked.*
+*Last updated: 2026-05-08 — Phase 7 Wave 3 partial: Plan 07-03 (home page CTA + v10 base CSS classes) shipped. `app/(authed)/page.tsx` rewritten as Phase-7 home shell (Server Component, greeting + .btn-green Link to /proposals/new + .card empty-state with FileText icon); `app/globals.css` extended with 13 v10 base classes (.card, .ctitle, .fld + input chrome, .ieu, .tbadge, .dg/.db/.db.on, .yn-group/.yn-btn/.yn-btn.on, .btn-green/.btn-navy/.btn-out) — class-based contract for Plans 07-04/05. Zero new --token: declarations. typecheck/lint/test/build all 0; 227/227 tests preserved. PROP-01 grounded (empty-state shell). Phase 7 progress: 4/6 plans complete. Wave 3 remainder: 07-04 (proposal form scaffold). Wave 4 (07-05 live preview) follows.*
 *Detailed v1.0 archives in `.planning/milestones/`.*

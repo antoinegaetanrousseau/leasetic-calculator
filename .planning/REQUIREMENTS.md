@@ -74,7 +74,7 @@
 
 ### PROP — Proposal Lifecycle
 
-- [ ] **PROP-01**: Authenticated partner sees a home page with a prominent "Create new proposal" CTA
+- [~] **PROP-01**: Authenticated partner sees a home page with a prominent "Create new proposal" CTA. PARTIAL (07-03): empty-state shell grounded (greeting + CTA Link + .card recent-proposals empty-state with FileText icon at `app/(authed)/page.tsx`). Full requirement (with populated row data) blocks on Phase 8 PROP-02..05.
 - [ ] **PROP-02**: Home page lists the partner's recent proposals (last 20 by default), sorted by creation date descending
 - [ ] **PROP-03**: Each list row shows: client name, LC reference, montant HT, creation date, validity status (active vs expired)
 - [ ] **PROP-04**: Empty state on home page for new partners ("No proposals yet — create your first one") in FR + EN
@@ -273,7 +273,7 @@
 | CALC-06 | Phase 7 | Complete (07-02) |
 | CALC-07 | Phase 7 | Pending |
 | CALC-08 | Phase 7 | Complete (07-01) |
-| PROP-01 | Phase 7 | Pending |
+| PROP-01 | Phase 7 | Partial (07-03 — empty-state shell shipped; populated rows block on Phase 8) |
 | PROP-02 | Phase 8 | Pending |
 | PROP-03 | Phase 8 | Pending |
 | PROP-04 | Phase 8 | Pending |
