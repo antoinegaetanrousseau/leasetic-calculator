@@ -36,7 +36,7 @@
 - [ ] **AUTH-09**: Partner can use the invitation URL once to set their initial password; subsequent uses fail
 - [ ] **AUTH-10**: Admin can trigger a password reset for any partner; this generates a one-time reset URL the admin shares out-of-band
 - [x] **AUTH-11**: Admin can disable a partner account; disabled users cannot log in but their data is preserved
-- [ ] **AUTH-12**: Admin role is granted only via a CLI script run on the production DB by Antoine — never via the app UI
+- [x] **AUTH-12**: Admin role is granted only via a CLI script run on the production DB by Antoine — never via the app UI
 - [x] **AUTH-13**: Database CHECK constraint enforces `role IN ('partner', 'admin')`
 - [x] **AUTH-14**: Admin route segment `/[adminSegment]/...` is gated by `process.env.ADMIN_URL_SEGMENT`; mismatched segments return 404 (not 403) to preserve URL obscurity
 - [x] **AUTH-15**: Every admin route, layout, and API handler independently calls `requireAdmin()` server-side — defence in depth

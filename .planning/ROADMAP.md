@@ -20,7 +20,7 @@
 ### 🚧 v1.1 — Hosted Web App Foundation (Phases 5-10)
 
 - [x] **Phase 5: Bootstrap & Deploy** — Deployable empty Next.js shell on Vercel + Neon Postgres + Vercel Blob, all hosting primitives behind portable adapters; CI gates the no-Vercel-only-import rule. ✅ Complete 2026-05-06: /healthz live at https://leasetic-matrice.vercel.app returning `{ db: ok, blob: ok }`. Follow-ups: 3-branch Neon split, GH plan upgrade for Environment protection, project transfer to memento team.
-- [ ] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode (4/9 plans complete)
+- [ ] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode (6/9 plans complete)
 - [ ] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet)
 - [ ] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete
 - [ ] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown
@@ -68,7 +68,7 @@ Plans:
 - [ ] 06-06-PLAN.md — (authed) shell + Topbar + UserMenu + theme/locale DB persistence; replace app/page.tsx (AUTH-03, AUTH-06, SHELL-01, SHELL-02, SHELL-04, SHELL-07, SHELL-08, SHELL-10, SHELL-14)
 - [ ] 06-07-PLAN.md — (admin)/[adminSegment] layout (env-segment + requireAdmin two-layer gate) + InviteUrlModal primitive (AUTH-07, AUTH-08, AUTH-10, AUTH-14, AUTH-15)
 - [x] 06-08-PLAN.md — Error boundary (app/error.tsx) + 404 page (app/not-found.tsx) localized FR + EN (SHELL-12, SHELL-13) ✅ Complete 2026-05-08
-- [ ] 06-09-PLAN.md — scripts/grant-admin.ts CLI for AUTH-12 admin role assignment (Antoine + Emmanuel seed at v1.1 launch)
+- [x] 06-09-PLAN.md — scripts/grant-admin.ts CLI for AUTH-12 admin role assignment (Antoine + Emmanuel seed at v1.1 launch) ✅ Complete 2026-05-08
 **UI hint**: yes
 
 ### Phase 7: Calc Engine Port + Proposal Form
@@ -131,7 +131,7 @@ Plans:
 | 3. UX Polish & i18n | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
-| 6. Auth & Shell | v1.1 | 5/9 | In progress | - |
+| 6. Auth & Shell | v1.1 | 6/9 | In progress | - |
 | 7. Calc Engine Port + Proposal Form | v1.1 | 0/0 | Not started | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
@@ -139,5 +139,5 @@ Plans:
 
 ---
 
-*Last updated: 2026-05-08 — 06-04 complete: requireUser/requireAdmin + 4 admin server actions + proxy.ts (Next.js 16 coarse gate). AUTH-05, AUTH-06, AUTH-11, AUTH-14, AUTH-15, AUTH-16 grounded.*
+*Last updated: 2026-05-08 — 06-09 complete: scripts/grant-admin.ts CLI (AUTH-12 admin role assignment, idempotent 4-branch decision tree, D-16 typed-confirmation gate, 24h invitation URL). AUTH-12 grounded.*
 *Detailed v1.0 archives in `.planning/milestones/`.*
