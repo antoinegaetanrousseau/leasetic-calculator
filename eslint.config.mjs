@@ -86,6 +86,39 @@ const config = [
       ],
     },
   },
+  {
+    // SHELL-06 / D-26: hardcoded JSX text literals must go through t().
+    // The selector matches JSXText nodes whose value contains 2+ consecutive
+    // letters (Unicode-aware: covers French accents). It does NOT match:
+    //  - text inside expressions ({t('key', lang)}) because those are JSXExpressionContainer
+    //  - whitespace-only JSX (e.g. line breaks, indentation)
+    //  - 1-character punctuation runs (·, ©, ▾, etc.)
+    // Test files and config files are exempt.
+    files: ['**/*.{tsx,jsx}'],
+    ignores: [
+      '**/*.test.{ts,tsx}',
+      '**/*.spec.{ts,tsx}',
+      'app/error.tsx', // error.tsx must work without server-side i18n; bilingual fallback is hardcoded by design (D-30 / 06-RESEARCH.md §16)
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'JSXText[value=/[a-zA-ZÀ-ÿ]{2,}/]',
+          message:
+            'Hardcoded text in JSX is forbidden (SHELL-06 / D-26). Wrap user-facing strings in t(key, lang) — see src/lib/i18n/dictionaries.ts.',
+        },
+        {
+          // SHELL-09 belt-and-suspenders: forbid Intl.NumberFormat()/Intl.DateTimeFormat()
+          // with zero arguments (which silently uses the runtime locale).
+          selector:
+            'NewExpression[callee.object.name="Intl"][callee.property.name=/^(NumberFormat|DateTimeFormat)$/][arguments.length=0]',
+          message:
+            'Intl.NumberFormat / Intl.DateTimeFormat require an explicit locale (SHELL-09). Use formatCurrency / formatNumber / formatDate from @/lib/i18n/format.',
+        },
+      ],
+    },
+  },
 ];
 
 export default config;

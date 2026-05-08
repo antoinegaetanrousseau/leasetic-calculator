@@ -33,7 +33,7 @@ export default async function HomePage() {
         }}
       >
         <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '16.5px' }}>
-          Leas&#233;tic
+          {t('sidebar.brand', lang)}
         </div>
       </aside>
 
@@ -94,7 +94,7 @@ export default async function HomePage() {
           color: 'var(--muted)',
         }}
       >
-        Phase 5 — Bootstrap &amp; Deploy
+        {t('shell.footer.copyright', lang)}
       </footer>
     </div>
   );
