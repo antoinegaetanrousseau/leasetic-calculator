@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-08T22:55:00Z"
-last_activity: 2026-05-08 -- Plan 07-01 complete (calc engine core)
+last_updated: "2026-05-08T21:07:18Z"
+last_activity: 2026-05-08 -- Plan 07-02 complete (calc golden corpus — 30 cases + assertCalc/assertValidity ports; 162/162 tests passing)
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 22
-  completed_plans: 17
-  percent: 77
+  completed_plans: 18
+  percent: 82
 ---
 
 # State — Matrice Commerciale
@@ -28,10 +28,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: **7 (calc-engine-port-proposal-form) — IN PROGRESS**
-Plan: 1 of 6 done (07-01 calc engine core ✅); next is Wave 2 — 07-02 (golden corpus) + 07-06 (i18n keys)
+Plan: 2 of 6 done (07-01 calc engine core ✅, 07-02 golden corpus ✅); next is Wave 2 — 07-06 (i18n keys)
 Status: Ready to execute
-Next: `/gsd-execute-phase 7` for Plan 07-02 (golden corpus)
-Last activity: 2026-05-08 -- Plan 07-01 complete (calc engine core)
+Next: `/gsd-execute-phase 7` for Plan 07-06 (i18n keys)
+Last activity: 2026-05-08 -- Plan 07-02 complete (calc golden corpus — 30 cases + assertCalc/assertValidity ports; 162/162 tests passing)
 
 ## Progress
 
@@ -40,7 +40,7 @@ v1.0 ████████████████████ 4/4 phases com
 v1.1 █████░░░░░░░░░░░░░░░ 2/6 phases complete (Phase 7 in progress)
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
        └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
-       └─ Phase 7: Calc Engine + Form        🚧 in progress (1/6 plans — 07-01 calc engine core ✅)
+       └─ Phase 7: Calc Engine + Form        🚧 in progress (2/6 plans — 07-01 calc engine core ✅, 07-02 golden corpus ✅)
        └─ Phase 8: Persistence + PDF         ◯ blocked on P7
        └─ Phase 9: Admin Surface             ◯ blocked on P8
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
@@ -159,6 +159,8 @@ v1.1 █████░░░░░░░░░░░░░░░ 2/6 phases com
 | Both admins seeded with shared "for now" password `leasetic2026` (not in source/git; in chat transcript only). Architecturally diverges from AUTH-08/09 invitation-flow lock; documented as launch-day exception. Rotation to individual strong passwords pending — see Phase 6 follow-ups. | user 2026-05-08 launch | 06-launch |
 | `APP_URL` + `NEXT_PUBLIC_APP_URL` env vars BOTH required for Better Auth to work end-to-end on Vercel — server uses APP_URL for resolveBaseUrl()/trustedOrigins; client uses NEXT_PUBLIC_APP_URL for authClient baseURL. Default fallbacks (VERCEL_URL deployment-specific hash, empty string) cause silent login failures with the same INVALID_EMAIL_OR_PASSWORD message browsers see for actual bad creds (anti-enumeration discipline collapses all failures). Set both to canonical alias in production+preview Vercel scopes; localhost:3000 in development. | 2026-05-08 launch debug | 06-launch |
 | Better Auth admin plugin's `createUser` requires authenticated admin caller — cannot be used at bootstrap when no admin exists. signUpEmail is locked off (project policy: admin-invited only). Direct-DB write to users + accounts tables with argon2id hash matching the auth() config (timeCost:2, memoryCost:19456, parallelism:1, algorithm:2) is the correct chicken-and-egg-break. Hash is verifiable by Better Auth's verify() — confirmed via HTTP 200 from /api/auth/sign-in/email post-seed. | 2026-05-08 launch debug | 06-launch |
+| Golden corpus happy-path matrix uses individual `it()` invocations (12 lexical lines) instead of for-loop parametric generation (4 lexical lines × 3 runtime tests each) — the plan's literal `grep -c "  it(" ≥ 30` static lexical gate is incompatible with for-loop generation. Individual it() satisfies both the static gate (32 lines) and the runtime gate (30 tests). T-07-02-01 mitigation strengthened. | Rule 1 auto-fix (plan example vs plan verify-gate inconsistency) | 07-02 |
+| T-07-02-02 audit grep `grep -c "import.*seed-params"` is a known false-positive heuristic in calc.golden.test.ts: the docstring asserts the negation with the words "imported from seed-params". Actual imports are only `'vitest'` and `'./index'`. Future audit upgrade: `grep -E "^import" file \| grep seed-params` for zero false positives. | 07-02 audit observation | 07-02 |
 
 ## Session Notes
 
@@ -184,6 +186,7 @@ v1.1 █████░░░░░░░░░░░░░░░ 2/6 phases com
 - **2026-05-08:** 06-07 executed — Admin route group + InviteUrlModal: app/(admin)/[adminSegment]/layout.tsx (dual-layer gate: Layer 1 env-segment notFound, Layer 2 requireAdmin() notFound, isAdmin={true} to Topbar), app/(admin)/[adminSegment]/page.tsx (admin home placeholder, independent requireAdmin() AUTH-15), src/components/InviteUrlModal.tsx ('use client', backdrop+panel z-index 200/201, role=dialog aria-modal=true, focus-trap+Escape+outside-click, navigator.clipboard.writeText with 2s confirmation + Sonner toast, clipboard failure handled, warning banner, all strings via t()). Phase 6 ALL 9/9 plans complete. typecheck + lint + build all 0. AUTH-07, AUTH-08, AUTH-10, AUTH-14, AUTH-15 grounded. 2 task commits: 0f0dda5, c82eb6a.
 - **2026-05-08:** Phase 6 launch day — migration applied, admins seeded, login fixed end-to-end. (1) Pushed all 34 Phase 6 commits to origin/main. (2) Triggered `db-migrate.yml` workflow (#25569691806); approved at GitHub Environment gate; both jobs (dry-run + apply) succeeded; migration `0001_kind_doctor_faustus.sql` applied to prod Neon. (3) Initial smoke test: /healthz green, /login renders FR+EN, unauth → /login?next= via proxy.ts. (4) Decided to seed both admins immediately for fast launch (deferred individual password discipline to Phase 9). (5) Wrote `scripts/seed-admins-launch.ts` (direct-DB workaround for the chicken-and-egg: signUpEmail disabled architecturally + admin plugin createUser requires admin caller); seeded antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com with shared "for now" password via INITIAL_PASSWORD env var (not in source). (6) Verified API login HTTP 200 + valid session cookie + role=admin payload. (7) **User reported browser login failing despite working API.** Root-caused to APP_URL + NEXT_PUBLIC_APP_URL both unset in Vercel — `resolveBaseUrl()` was falling through to VERCEL_URL (deployment-hash host), so `trustedOrigins` didn't include the canonical alias. (8) Fixed by setting both env vars to `https://leasetic-matrice.vercel.app` in production+preview scopes (development: localhost:3000) via Vercel REST API; redeployed; verified browser-style login (with Origin + Referer headers matching canonical) HTTP 200. (9) Phase 6 fully shipped end-to-end. Commits this day: e853434 (push of all plans), workflow run #25569691806, d5a8a54 (seed-admins-launch.ts), 58d448e (Phase 6 finalize), env vars added (no commit), redeploy.
 - **2026-05-08:** 07-01 executed — Calc engine core: 6 pure-TS files under `src/lib/calc/` (481 lines total). seed-params.ts (typed `SeedParams` constant; D-2 placeholders from v10 fixture lines 1922-1929 with TODO marker; commissionPct=5; maxAmount=500_000; getMaxAmount() Phase-8 swap seam). tranche.ts (tKey port of v10 lines 1195-1211; tLabel returns i18n key literal types). coefficients.ts (Coefficients type; lookupCoefficient returns null for missing cell). formula.ts (FROZEN v10 invariant `loyer = amount × (1 + commission/100) × coeff / 100`; computeLoyer 4-state machine idle/on-demand/missing/computed; isOnDemand; parseNumeric/formatNumeric D-4 helpers; generateLcRef v10 line-1741 port). schema.ts (proposalInputSchema 15 fields per UI-SPEC §4 + D-7-06 clientCo required; validityDaysSchema 15/30/60 default 30; durationMonthsSchema 36/48/60; amountHTSchema digits-only > 25_000; coefficientsSchema). index.ts (barrel: 16 named exports + 9 type exports). typecheck 0; lint 0 errors; 83/83 existing tests pass; @/lib/calc resolves cleanly. Zero deviations. Pre-existing scripts/seed-admins-launch.ts:42 lint warning logged to deferred-items.md (out-of-scope). CALC-01..04 + CALC-08 grounded. 2 task commits: 5191a39 (data + lookups), 5715997 (kernel + Zod + barrel).
+- **2026-05-08:** 07-02 executed — Calc golden corpus + v10 self-check ports: 3 Vitest files under `src/lib/calc/`. formula.test.ts (184 lines, 23 tests): v10 assertCalc 6/6 fixtures port (HTML lines 1922-1965) + applyFormula/parseNumeric/formatNumeric/isOnDemand/generateLcRef unit tests + assertEscape non-port comment block citing lines 2002-2020 + React-JSX-escapes-by-default invariant. schema.test.ts (201 lines, 26 tests): v10 assertValidity 6/6 fixtures port (lines 2027-2053: null→30, 15→15, 30→30, 60→60, 999→reject, 'abc'→reject) + amountHTSchema/durationMonthsSchema/proposalInputSchema/coefficientsSchema tests including PROP-06 clientCo required + email/phone/SIREN tolerance. calc.golden.test.ts (256 lines, 30 tests): CALC-06 ≥30 corpus — happy-path 4 tranches × 3 durations + 8 boundaries (25k floor, 25k001, 50k, 50k001, 100k, 100k001, 250k, 250k001) + 4 on-demand + 6 edges (0/empty/NaN/negative/fractional/very-large); fixture coefficients embedded as local const (D-1 fixture/seed separation); math-derived expected values via `expectedLoyer()` helper; ±0.01 € tolerance. Vitest count: 83 → 162 (+79). typecheck 0; lint 0 errors; only the same pre-existing scripts/seed-admins-launch.ts:42 warning persists. 1 deviation (Rule 1 auto-fix): refactored happy-path matrix from for-loop to individual it() invocations because the plan's literal `grep -c "  it(" ≥ 30` static gate is incompatible with for-loop generation (12 runtime tests from 4 lexical it() lines); individual it() lines satisfy both gates. Static lexical count: 32 (≥30 floor); runtime count: 30. CALC-05 (2/3 ported, 1/3 documented-not-ported) + CALC-06 grounded. 3 task commits: 647f2ad (formula.test.ts), 7638ebb (schema.test.ts), dbee032 (calc.golden.test.ts).
 
 ## Open Blockers
 
@@ -195,4 +198,4 @@ None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREME
 
 ---
 
-*Last updated: 2026-05-08 — Plan 07-01 (calc engine core) shipped. CALC-01/02/03/04/08 grounded; pure-TS module @/lib/calc with 16 exports + 9 types ready for Plans 07-02 (golden corpus), 07-04 (form), 07-05 (preview). Phase 7 progress: 1/6 plans complete.*
+*Last updated: 2026-05-08 — Plan 07-02 (calc golden corpus + v10 self-check ports) shipped. CALC-05 (2/3 suites ported, 1/3 documented-not-ported) + CALC-06 grounded; ≥30 golden cases asserted to ±0.01 € in CI. Vitest count 83 → 162 (+79). Phase 7 progress: 2/6 plans complete. Wave 2 still has 07-06 (i18n keys) outstanding before Wave 3 (07-03/07-04) unblocks.*

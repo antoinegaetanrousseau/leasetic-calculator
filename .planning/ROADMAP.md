@@ -87,7 +87,7 @@ Plans:
 - [x] 07-01-PLAN.md — Calc engine core (pure-TS module; computeLoyer / lookupCoefficient / tKey / tLabel / isOnDemand / generateLcRef + Zod schemas; string-typed boundary; seed-params constant) — CALC-01..04, CALC-08 ✅ Complete 2026-05-08
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 07-02-PLAN.md — Calc golden corpus (≥30 golden cases + assertCalc 6/6 + assertValidity 6/6 ports; assertEscape documented-not-ported) — CALC-05, CALC-06
+- [x] 07-02-PLAN.md — Calc golden corpus (≥30 golden cases + assertCalc 6/6 + assertValidity 6/6 ports; assertEscape documented-not-ported) — CALC-05, CALC-06 ✅ Complete 2026-05-08
 - [ ] 07-06-PLAN.md — i18n copy table: 26 NEW Phase-7 keys × 2 langs + 4 tranche-label keys + parametric parity tests — cross-cutting (PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25)
 
 **Wave 3** *(blocked on Wave 2 completion)*
@@ -146,12 +146,12 @@ Plans:
 | 4. Sidebar Shell + Design System v2 | v1.0 | 3/3 | Complete | 2026-04-30 |
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
 | 6. Auth & Shell | v1.1 | 9/9 | Complete | 2026-05-08 |
-| 7. Calc Engine Port + Proposal Form | v1.1 | 1/6 | In progress | - |
+| 7. Calc Engine Port + Proposal Form | v1.1 | 2/6 | In progress | - |
 | 8. Persistence + PDF Pipeline | v1.1 | 0/0 | Not started | - |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
 | 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
 
 ---
 
-*Last updated: 2026-05-08 — Phase 7 Wave 1 (Plan 07-01 calc engine core) shipped. CALC-01..04 + CALC-08 grounded. Wave 2 (Plans 07-02 golden corpus + 07-06 i18n keys) is unblocked.*
+*Last updated: 2026-05-08 — Phase 7 Wave 2 partial: Plan 07-02 (calc golden corpus + v10 self-check ports) shipped. CALC-05 + CALC-06 grounded; Vitest count 83 → 162 (+79 tests). Wave 2 still has 07-06 (i18n keys) outstanding; Wave 3 (07-03/07-04) blocks on Wave 2 completion.*
 *Detailed v1.0 archives in `.planning/milestones/`.*
