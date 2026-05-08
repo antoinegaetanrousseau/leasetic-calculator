@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-08T18:12:00.000Z"
-last_activity: 2026-05-08 -- Phase 6 Plan 01 complete (auth deps + schema + migration)
+last_updated: "2026-05-08T16:19:08Z"
+last_activity: 2026-05-08 -- Phase 6 Plan 02 complete (i18n dictionary 231 keys + format.ts + ESLint JSXText rule)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 16
-  completed_plans: 8
-  percent: 50
+  completed_plans: 9
+  percent: 56
 ---
 
 # State — Matrice Commerciale
@@ -28,10 +28,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 6 (auth-shell) — EXECUTING
-Plan: 2 of 9
-Status: Executing Phase 6 (06-01 complete)
-Next: Execute plan 06-02
-Last activity: 2026-05-08 -- Phase 6 Plan 01 complete (auth deps + schema + migration)
+Plan: 3 of 9
+Status: Executing Phase 6 (06-02 complete)
+Next: Execute plan 06-03
+Last activity: 2026-05-08 -- Phase 6 Plan 02 complete (i18n dictionary 231 keys + format.ts + ESLint JSXText rule)
 
 ## Progress
 
@@ -125,6 +125,9 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 | Wrap workflow_dispatch input in CONFIRM_INPUT env var instead of direct shell interpolation — GitHub Actions injection safety best practice | Rule 2 security fix | 05-06 |
 | --legacy-peer-deps used to install better-auth@1.6.9: optional @tanstack/react-start peerDep pulls vite@>=7, conflicting with vitest@2.1.8's vite@5; all conflicting peerDeps optional | Rule 3 auto-fix (blocking install conflict) | 06-01 |
 | Migration file named drizzle/0001_kind_doctor_faustus.sql (drizzle-kit auto-names; ordinal 0001_ ensures correct migration order after 0000_) | drizzle-kit generate output | 06-01 |
+| v10 I18N dict has 166 keys (RESEARCH.md §11 estimated 165; actual Python regex extraction = 166 — within ±5 tolerance) | 06-02 extraction | 06-02 |
+| app/page.tsx had 2 hardcoded JSX literals (sidebar brand + footer placeholder); replaced with t() calls when ESLint rule fired | Rule 1 auto-fix | 06-02 |
+| ESLint no-restricted-syntax rule exempts app/error.tsx (D-30: bilingual hardcoded fallback by design) | 06-CONTEXT.md D-30 | 06-02 |
 
 ## Session Notes
 
@@ -138,6 +141,7 @@ v1.1 ███░░░░░░░░░░░░░░░░░ 1/6 phases com
 - **2026-05-06:** 05-07 tasks 1+2 executed — src/lib/health.ts (checkDatabaseHealth + checkBlobHealth + buildHealthResponse, classifyError() redaction); src/lib/health.test.ts (6 tests including error-redaction assertions); app/healthz/route.ts (Node-runtime, force-dynamic, unauthenticated GET /healthz); .env.example updated with Vercel+Neon wiring docs. 28/28 tests pass. Smoke: HTTP 503 valid JSON. Task 3 human-action checkpoint: Vercel/Neon/Blob provisioning + production /healthz verify. 2 task commits: 512461f, 1e1ccec.
 - **2026-05-07:** Phase 6 context-gathering session — analyzed 32 requirements (AUTH-01..18 + SHELL-01..14) against PROJECT.md, REQUIREMENTS.md, STATE.md locked decisions, ARCHITECTURE.md, PITFALLS.md, STACK.md, and Phase 5 UI-SPEC. Surfaced 4 gray areas (auth library re-verification, schema scope, invitation/reset UX, CLI admin-grant script). User responded "none, I want to keep going with the build and commit to these changes" — accepted all soft-locks as final. CONTEXT.md captures: Better Auth 1.6.x final-locked, schema scope tight to users + password_resets only, 24h token TTL with admin-side modal + copy button + "won't be shown again" warning, scripts/grant-admin.ts mirrors scripts/migrate.ts typed-confirmation pattern (idempotent, can upgrade existing or create + emit invitation URL). 06-CONTEXT.md + 06-DISCUSSION-LOG.md written.
 - **2026-05-08:** 06-01 executed — Phase 6 auth foundation: better-auth@1.6.9 + @node-rs/argon2@2.0.2 + react-hook-form@7.75.0 + zod@4.4.3 + @hookform/resolvers@5.2.2 installed (exact pins). drizzle-kit upgraded 0.30.1→0.31.10. .env.example Phase 6 block added (AUTH_SECRET, APP_URL, NEXT_PUBLIC_APP_URL, ADMIN_URL_SEGMENT). schema.ts extended with 5 auth tables: users (text id, role CHECK), sessions, accounts (password col), verifications, passwordResets (uuid id, kind CHECK). Migration drizzle/0001_kind_doctor_faustus.sql generated via db:generate. 28/28 tests pass. typecheck+lint+push-guard all 0. AUTH-13 schema-layer done. 2 task commits: 8d36edc, 0d176fb.
+- **2026-05-08:** 06-02 executed — i18n foundation: dictionaries.ts extended from 5 to 231 keys × 2 langs (5 legacy + 166 v10 + 60 Phase 6); compile-time EN parity proof via _EnHasAllFrKeys type; 6 parity/spot-check tests. format.ts created with formatCurrency/formatNumber/formatDate using explicit fr-FR/en-GB locales (SHELL-09); 8 tests. ESLint no-restricted-syntax rule blocking hardcoded JSXText (SHELL-06) and Intl no-arg calls (SHELL-09 belt); app/page.tsx refactored (Rule 1 auto-fix: 2 hardcoded literals replaced with t()). 42/42 tests pass. typecheck + lint + build all 0. 3 task commits: 85ed3d0, a31a692, 51cf372.
 - **2026-05-07:** Phase 6 UI-SPEC session — gsd-ui-researcher produced 06-UI-SPEC.md (56KB, 762 insertions, commit ec363d6) inheriting Phase 5 token spine unchanged and adding 7 screen-specific design contracts (login, /invite/{token}, /reset/{token}, expired-token landing, app shell topbar/sidebar/footer, error boundary, 404), 6 sonner toast variants, 1 modal primitive for invitation/reset URL display, and 225-key i18n dictionary scope per language (165 v10 keys + 60 new Phase-6 keys). gsd-ui-checker verified 6 dimensions: 5 PASS + 1 FLAG on inherited typography weights (4 weights vs checker's strict 2-weight rule — non-blocking because v10-source-locked + Phase-5-approved). Researcher made 9 sensible-default decisions within UI discretion (no Radix, login card 420px max-width, 4-segment password strength meter without zxcvbn, logout no-confirmation, etc.). 0 user questions asked — CONTEXT.md was complete. Cross-checks all pass: no Phase 5 token redefinition, SHELL-03 minimal login layout, D-22 anti-enumeration, D-18 404-not-403, D-10 single-display modal, no /settings page, full v10 dictionary scoped, FR copy reads natural.
 
 ## Open Blockers

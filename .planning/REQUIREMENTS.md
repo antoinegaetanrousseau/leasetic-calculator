@@ -50,11 +50,11 @@
 - [ ] **SHELL-02**: Authenticated users see their display name in the topbar
 - [ ] **SHELL-03**: Login page is public and uses a minimal layout (no app shell)
 - [ ] **SHELL-04**: User can toggle between FR and EN; selection persists across sessions via cookie + DB
-- [ ] **SHELL-05**: i18n dictionary covers all v10 keys (~138 keys × 2 languages, full parity with v10)
-- [ ] **SHELL-06**: All user-facing strings go through the `t()` helper; ESLint rule flags hardcoded literals in JSX
+- [x] **SHELL-05**: i18n dictionary covers all v10 keys (~138 keys × 2 languages, full parity with v10)
+- [x] **SHELL-06**: All user-facing strings go through the `t()` helper; ESLint rule flags hardcoded literals in JSX
 - [ ] **SHELL-07**: User can toggle between light, dark, and system themes; selection persists across sessions via cookie + DB
 - [ ] **SHELL-08**: Initial paint reflects the user's theme without a flash of incorrect theme (cookie-driven server render + inline `<head>` script)
-- [ ] **SHELL-09**: Number and date formatting uses explicit locale (`fr-FR` or `en-GB`) — never the system default
+- [x] **SHELL-09**: Number and date formatting uses explicit locale (`fr-FR` or `en-GB`) — never the system default
 - [ ] **SHELL-10**: Toast notifications use Sonner; success / info / error variants
 - [ ] **SHELL-11**: Form validation uses react-hook-form + Zod; the same Zod schema is imported on client (validation) and server (action input parsing)
 - [ ] **SHELL-12**: Error boundary catches unhandled errors; partners see a generic error page in their language
@@ -255,11 +255,11 @@
 | SHELL-02 | Phase 6 | Pending |
 | SHELL-03 | Phase 6 | Pending |
 | SHELL-04 | Phase 6 | Pending |
-| SHELL-05 | Phase 6 | Pending |
-| SHELL-06 | Phase 6 | Pending |
+| SHELL-05 | Phase 6 | Complete (06-02) |
+| SHELL-06 | Phase 6 | Complete (06-02) |
 | SHELL-07 | Phase 6 | Pending |
 | SHELL-08 | Phase 6 | Pending |
-| SHELL-09 | Phase 6 | Pending |
+| SHELL-09 | Phase 6 | Complete (06-02) |
 | SHELL-10 | Phase 6 | Pending |
 | SHELL-11 | Phase 6 | Pending |
 | SHELL-12 | Phase 6 | Pending |
