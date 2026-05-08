@@ -277,6 +277,45 @@ export const dictionaries = {
     'error.404.body': "La page que vous cherchez n'existe pas ou a été déplacée.",
     'error.404.button.home': "Retour à l'accueil",
     'header.home': 'Accueil',
+
+    // ── Phase 7 keys (UI-SPEC §8) ──────────────────────────────────────────
+    // Home page (07-03)
+    'dashboard.greeting': 'Bonjour, {0} 👋',
+    'dashboard.subtext': 'Créez une nouvelle proposition ou consultez vos propositions récentes.',
+    'dashboard.cta.new.proposal': 'Nouvelle proposition',
+    'dashboard.recent.title': 'Propositions récentes',
+    'dashboard.empty.title': 'Aucune proposition pour le moment',
+    'dashboard.empty.body': 'Cliquez sur « Nouvelle proposition » pour créer votre première proposition.',
+    'header.proposals.new': 'Nouvelle proposition',
+    // Live preview (07-05)
+    'proposal.section.preview': 'Aperçu',
+    'proposal.validity.label': 'Validité de la proposition',
+    'proposal.validity.suffix': 'jours',
+    'proposal.validity.computed.label': 'Valable {0} jours',
+    // Toasts (07-04 / 07-05)
+    'proposal.toast.copy.success': 'Référence copiée.',
+    'proposal.toast.copy.error': 'Impossible de copier. Sélectionnez et copiez manuellement.',
+    'proposal.toast.validation.errors': 'Vérifiez les champs requis.',
+    'proposal.toast.phase8.placeholder': "Validation OK — Phase 8 ajoutera l'enregistrement et le PDF.",
+    'proposal.confirm.reset': 'Réinitialiser tous les champs ? Cette action est irréversible.',
+    // Copy button (07-05) — note: 'button.copy.ref' is REUSED from existing v10 dict (line 115)
+    'button.copy.ref.copied': 'Référence copiée',
+    // Inline errors (07-04 RHF resolver messages)
+    'error.field.required': 'Ce champ est requis.',
+    'error.field.client.co.required': 'La société cliente est requise.',
+    'error.field.amount.required': 'Le montant est requis.',
+    'error.field.amount.too.small': 'Le montant doit être supérieur à 25 000 €.',
+    'error.field.amount.too.large': 'Le montant dépasse le seuil configuré.',
+    'error.field.duration.required': 'Sélectionnez une durée.',
+    'error.field.email.invalid': "Format d'email invalide.",
+    'error.field.phone.invalid': 'Numéro de téléphone invalide.',
+    'error.field.siren.invalid': 'SIREN invalide (9 chiffres requis).',
+    // Tranche labels (Plan 07-01 tLabel contract — values from v10 lines 1205-1208;
+    // U+202F narrow no-break space + U+2192 rightward arrow preserved)
+    'form.tranche.t1': '25 001 € → 50 000 €',
+    'form.tranche.t2': '50 001 € → 100 000 €',
+    'form.tranche.t3': '100 001 € → 250 000 €',
+    'form.tranche.t4': '250 001 € et plus',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -533,6 +572,44 @@ export const dictionaries = {
     'error.404.body': "The page you're looking for doesn't exist or has moved.",
     'error.404.button.home': 'Back to home',
     'header.home': 'Home',
+
+    // ── Phase 7 keys (UI-SPEC §8) ──────────────────────────────────────────
+    // Home page (07-03)
+    'dashboard.greeting': 'Hello, {0} 👋',
+    'dashboard.subtext': 'Create a new proposal or view your recent proposals.',
+    'dashboard.cta.new.proposal': 'New proposal',
+    'dashboard.recent.title': 'Recent proposals',
+    'dashboard.empty.title': 'No proposals yet',
+    'dashboard.empty.body': 'Click "New proposal" to create your first one.',
+    'header.proposals.new': 'New proposal',
+    // Live preview (07-05)
+    'proposal.section.preview': 'Preview',
+    'proposal.validity.label': 'Proposal validity',
+    'proposal.validity.suffix': 'days',
+    'proposal.validity.computed.label': 'Valid {0} days',
+    // Toasts (07-04 / 07-05)
+    'proposal.toast.copy.success': 'Reference copied.',
+    'proposal.toast.copy.error': 'Could not copy. Please select and copy manually.',
+    'proposal.toast.validation.errors': 'Please check required fields.',
+    'proposal.toast.phase8.placeholder': 'Validation OK — Phase 8 will add saving and PDF.',
+    'proposal.confirm.reset': 'Reset all fields? This action cannot be undone.',
+    // Copy button (07-05) — 'button.copy.ref' is REUSED from existing v10 dict (line 371)
+    'button.copy.ref.copied': 'Reference copied',
+    // Inline errors (07-04 RHF resolver messages)
+    'error.field.required': 'This field is required.',
+    'error.field.client.co.required': 'Client company is required.',
+    'error.field.amount.required': 'Amount is required.',
+    'error.field.amount.too.small': 'Amount must be greater than €25,000.',
+    'error.field.amount.too.large': 'Amount exceeds configured threshold.',
+    'error.field.duration.required': 'Select a duration.',
+    'error.field.email.invalid': 'Invalid email format.',
+    'error.field.phone.invalid': 'Invalid phone number.',
+    'error.field.siren.invalid': 'Invalid SIREN (9 digits required).',
+    // Tranche labels (Plan 07-01 tLabel contract — values from v10 lines 1205-1208 EN-localized)
+    'form.tranche.t1': '25,001 € → 50,000 €',
+    'form.tranche.t2': '50,001 € → 100,000 €',
+    'form.tranche.t3': '100,001 € → 250,000 €',
+    'form.tranche.t4': '250,001 € and above',
   },
 } as const;
 
