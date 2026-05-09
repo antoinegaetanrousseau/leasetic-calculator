@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import type { ListResponse } from '@/lib/api/proposals/list';
 
@@ -34,6 +35,8 @@ export function LoadMoreButton({
       if (res.ok) {
         const json = (await res.json()) as ListResponse;
         onAppend(json);
+      } else {
+        toast.error(t('proposal.list.load.more.error', lang));
       }
     } finally {
       setLoading(false);

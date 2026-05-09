@@ -333,6 +333,7 @@ export const dictionaries = {
     'proposal.list.toggle.deleted': 'Supprimées',
     'proposal.list.load.more': 'Charger plus',
     'proposal.list.load.more.loading': 'Chargement...',
+    'proposal.list.load.more.error': 'Impossible de charger plus. Réessayez.',
     'proposal.deleted.empty.title': 'Aucune proposition supprimée récemment',
     'proposal.deleted.empty.body': 'Les propositions supprimées apparaissent ici pendant 30 jours.',
 
@@ -703,6 +704,7 @@ export const dictionaries = {
     'proposal.list.toggle.deleted': 'Deleted',
     'proposal.list.load.more': 'Load more',
     'proposal.list.load.more.loading': 'Loading...',
+    'proposal.list.load.more.error': 'Could not load more. Please try again.',
     'proposal.deleted.empty.title': 'No recently deleted proposals',
     'proposal.deleted.empty.body': 'Deleted proposals appear here for 30 days.',
 
