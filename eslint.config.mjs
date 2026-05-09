@@ -127,9 +127,15 @@ const config = [
   {
     // Allow @react-pdf/renderer imports only inside the PDF rendering module.
     // All other app code must go through renderProposalPdf() from '@/lib/pdf'.
+    //
+    // no-restricted-syntax is also disabled here: the short bilingual inline
+    // strings in ProposalDocument (e.g., 'Société'/'Company') are intentional
+    // PDF-only literals. They are not app UI strings — they don't go through
+    // the runtime t() path. Per plan 08-05 planner discretion D-A3 / T-08-05-07.
     files: ['src/lib/pdf/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': 'off',
+      'no-restricted-syntax': 'off',
     },
   },
 ];
