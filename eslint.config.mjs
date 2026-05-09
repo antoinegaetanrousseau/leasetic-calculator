@@ -74,6 +74,11 @@ const config = [
               message:
                 'Direct postgres (postgres-js) import is forbidden outside src/lib/db/. Use `import { db } from "@/lib/db"`.',
             },
+            {
+              name: '@react-pdf/renderer',
+              message:
+                '`@react-pdf/renderer` may only be imported from src/lib/pdf/. PDF rendering goes through src/lib/pdf/render.ts (renderProposalPdf).',
+            },
           ],
           patterns: [
             {
@@ -117,6 +122,14 @@ const config = [
             'Intl.NumberFormat / Intl.DateTimeFormat require an explicit locale (SHELL-09). Use formatCurrency / formatNumber / formatDate from @/lib/i18n/format.',
         },
       ],
+    },
+  },
+  {
+    // Allow @react-pdf/renderer imports only inside the PDF rendering module.
+    // All other app code must go through renderProposalPdf() from '@/lib/pdf'.
+    files: ['src/lib/pdf/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': 'off',
     },
   },
 ];
