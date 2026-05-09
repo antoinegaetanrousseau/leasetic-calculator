@@ -22,7 +22,7 @@
 - [x] **Phase 5: Bootstrap & Deploy** — Deployable empty Next.js shell on Vercel + Neon Postgres + Vercel Blob, all hosting primitives behind portable adapters; CI gates the no-Vercel-only-import rule. ✅ Complete 2026-05-06: /healthz live at https://leasetic-matrice.vercel.app returning `{ db: ok, blob: ok }`. Follow-ups: 3-branch Neon split, GH plan upgrade for Environment protection, project transfer to memento team.
 - [x] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode. ✅ Complete 2026-05-08: all 9/9 plans done, 32/32 AUTH+SHELL requirements satisfied, migration 0001 applied to prod, both admins (antoine + emmanuel @leasetic.com) seeded and verified to log in end-to-end. Follow-ups: admin password rotation (shared launch password → individual strong), Better Auth trustedOrigins behavior investigation, Origin-gate documentation, APP_URL/NEXT_PUBLIC_APP_URL env requirement made explicit.
 - [x] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet). ✅ Complete 2026-05-09: 6/6 plans done, 14/14 requirements satisfied (CALC-01..08, PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25). Live preview ships at /proposals/new — partner types into form + 300ms-debounced sticky right-column card shows formatted loyer (fr-FR/en-GB explicit locale), generated LC ref + Copy button, validity selector. Calc engine + 30 golden tests preserve v10 formula parity (±0.01 €). 227/227 tests passing.
-- [ ] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete
+- [x] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete (completed 2026-05-09)
 - [ ] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown
 - [ ] **Phase 10: Cutover & Polish** — v10 retirement + redirect, OVH portability smoke deploy, runbooks, legal/privacy hookup, soft-delete purge job
 
@@ -147,7 +147,7 @@ Plans:
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
 | 6. Auth & Shell | v1.1 | 9/9 | Complete | 2026-05-08 |
 | 7. Calc Engine Port + Proposal Form | v1.1 | 6/6 | Complete | 2026-05-09 |
-| 8. Persistence + PDF Pipeline | v1.1 | 13/14 | In Progress|  |
+| 8. Persistence + PDF Pipeline | v1.1 | 14/14 | Complete    | 2026-05-09 |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
 | 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
 

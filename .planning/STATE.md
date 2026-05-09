@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: verifying
+status: ready_to_plan
 last_updated: "2026-05-09T19:50:03.966Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 36
   completed_plans: 36
-  percent: 100
+  percent: 83
 ---
 
 # State — Matrice Commerciale
@@ -27,9 +27,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 08 (persistence-pdf-pipeline) — COMPLETE
-Plan: 14 of 14 (all plans executed)
-Status: Phase complete — ready for post-phase verification gates
+Phase: 9
+Plan: Not started
+Status: Ready to plan
 Next: Post-phase finalization (code review, regression, schema drift, verifier, phase.complete)
 Last activity: 2026-05-09
 

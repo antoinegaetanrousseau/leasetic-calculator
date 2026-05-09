@@ -113,7 +113,7 @@
 - [x] **DATA-08**: `proposals` index on `(user_id, created_at desc)` for the home-page query
 - [x] **DATA-09**: `proposals.pdf_sha256` stored at generation time and never recomputed
 - [x] **DATA-10**: Soft-deleted proposals retained for 30 days, then hard-purged by a scheduled job (sets blob delete + row delete + audit log entry)
-- [ ] **DATA-11**: PDFs themselves are retained for 10 years minimum (French commercial-document retention) regardless of partner deactivation; partner deactivation never deletes PDFs
+- [x] **DATA-11**: PDFs themselves are retained for 10 years minimum (French commercial-document retention) regardless of partner deactivation; partner deactivation never deletes PDFs
 - [x] **DATA-12**: Coefficient seed migration inserts v10 baseline values; idempotent (`ON CONFLICT DO NOTHING`); runs in dev / preview / prod identically
 
 ### ADMIN — Admin Surface
@@ -309,7 +309,7 @@
 | DATA-08 | Phase 8 | Complete |
 | DATA-09 | Phase 8 | Complete |
 | DATA-10 | Phase 8 | Complete |
-| DATA-11 | Phase 8 | Pending |
+| DATA-11 | Phase 8 | Complete |
 | DATA-12 | Phase 8 | Complete |
 | ADMIN-01 | Phase 9 | Pending |
 | ADMIN-02 | Phase 9 | Pending |
