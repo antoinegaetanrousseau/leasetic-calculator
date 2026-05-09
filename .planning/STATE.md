@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-09T14:51:23.470Z"
+last_updated: "2026-05-09T15:15:51.392Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 36
-  completed_plans: 24
-  percent: 67
+  completed_plans: 25
+  percent: 69
 ---
 
 # State — Matrice Commerciale
@@ -28,8 +28,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 08 (persistence-pdf-pipeline) — EXECUTING
-Plan: 3 of 14
-Status: Executing Phase 08 (08-02 complete — 56 new i18n keys × 2 langs; 355 tests)
+Plan: 4 of 14
+Status: Executing Phase 08 (08-03 complete — query helpers + 21 tests; 376 tests total)
 Next: `/gsd-execute-phase 8`
 Last activity: 2026-05-09
 
@@ -176,6 +176,9 @@ v1.1 ██████████░░░░░░░░░░ 3/6 phases com
 | `duplicated_from_id` self-FK hand-appended to `0002_phase8_persistence.sql` after drizzle-kit generation — Drizzle cannot declare self-referential FK within same pgTable block (forward-reference limitation); column exists as plain uuid in schema.ts without `.references()`; FK constraint lives only in migration SQL | 08-01 schema decision | 08-01 |
 | 5 v10 keys NOT redeclared for Phase 8 PDF + detail consumers per UI-SPEC §7.9 reuse table: proposal.duree.label / .duree.months / .interests.slb / .interests.eval / .montant.label — Plans 08-05 + 08-10 reference these directly (same FR+EN values for Phase 8 use cases) | 08-02 reuse decision | 08-02 |
 | FR typography in Phase 8 i18n keys: U+2019 curly apostrophe in jusqu'au/d'origine/l'accord/D'INTÉRÊT; U+202F narrow-no-break-space before colon in pdf.section.interests + pdf.project.ref.prefix. EN uses straight quotes/apostrophes per English convention. | 08-02 typography | 08-02 |
+| Cursor encoding: base64url JSON tuple {createdAt: ISO8601, id: uuid} — URL-safe, decodable without schema change; never appears in user-visible URLs per D-C1 spec | 08-03 query-layer design | 08-03 |
+| `.returning()` no-arg on update chains — Drizzle 0.45.2 type constraint: PgUpdateBase after `.set().where()` only exposes no-arg `returning()` at type level; partial-fields overload not reachable from that chain state (TS2554) | Rule 1 auto-fix | 08-03 |
+| `findByIdempotencyKey` includes soft-deleted rows — D-B1 tombstones must block duplicate INSERTs even after deletion; Plan 08-07 surfaces the row's `deleted_at` state to the client | 08-03 design call | 08-03 |
 
 ## Session Notes
 
@@ -208,6 +211,8 @@ v1.1 ██████████░░░░░░░░░░ 3/6 phases com
 - **2026-05-09:** 08-01 executed — Phase 8 schema + migration: `src/db/schema.ts` extended with 3 new tables (globalParams/proposals/auditLog, 160 lines added). 2 CHECK constraints on proposals (language whitelist D-A2, semver shape D-D3). 7 indexes total (2 unique + 5 btree — idempotency/lcRef unique D-B2, cursor D-C1, partial deleted_at, globalParams effective_from, audit_log actor+target). `drizzle-kit generate` emitted `0002_new_black_crow.sql`; renamed to `0002_phase8_persistence.sql`; `_journal.json` idx=2 tag updated. Hand-appended `duplicated_from_id` self-FK ALTER TABLE (Drizzle cannot auto-generate self-referential FK). `drizzle-kit check` passes. 227/227 tests preserved; typecheck/lint-baseline/vercel-imports/drizzle-push guards all 0; build 0. DATA-01..10 schema-grounded. 2 task commits: 0e9524d (schema.ts), 7f2df06 (migration files).
 - **2026-05-09:** 08-02 executed — Phase 8 i18n delta: 56 new keys × 2 languages added to `src/lib/i18n/dictionaries.ts` (319 keys per lang, up from 263). Key groups: list-view (11), validity chips (6), detail header+sections (7), action buttons (4), PDF preview UI (3), deleted-banner+confirm (2), toasts (9), PDF document copy (14). 5 v10 keys NOT redeclared per UI-SPEC §7.9 reuse table (proposal.duree.label/.months, .interests.slb/.eval, .montant.label — consumed by 08-05/08-10 directly). FR typography preserved: curly apostrophe U+2019, U+202F narrow-no-break before colons in IDENTIFIÉS: and partenaire:. Test count 227 → 355 (+128): 112 non-empty assertions + 8 single-arg interpolation + 3 two-arg interpolation + 5 reuse-table integrity. typecheck/lint/tests all 0. Zero deviations — plan executed exactly as written. PROP-02..04 + PROP-11..13 + PROP-15..16 + PROP-18 + PROP-20 + PROP-22 + PROP-26 copy-grounded. 2 task commits: bc9dbed (feat: dictionaries.ts +56 keys × 2 langs), b43316b (test: Phase 8 spot-check + interpolation contract).
 - **2026-05-09:** 07-04 executed — Proposal form scaffold + /proposals/new route: 7 source files created (1005 lines total). 5 shared field components under `src/components/proposal/` (Task 1: 28b01d3): DurationSegmented (100 lines, generic `<V extends number>` 3-button radiogroup with arrow-key keyboard nav, role=radio + aria-checked, reused by Plan 07-05 as ValiditySegmented), YesNoToggle (56 lines, 2-button radiogroup with .yn-btn/.yn-btn.on, returns boolean), NumberInputAmount (98 lines, type=text + inputMode=numeric per D-7-09, U+202F NARROW NO-BREAK SPACE thousand separators per v10 line 2181, tranche badge auto-shown when amount > 25000 && tKey(amount) !== null per D-7-10, two-step form.tranche.label + tLabel(key) interpolation), PhoneInput + formatPhone (66 lines, "XX XX XX XX XX" formatter per v10 lines 2092-2100), SirenInput + formatSiren (66 lines, "XXX XXX XXX" formatter per v10 lines 2103-2111). ProposalForm (Task 2: 9fa6187, 519 lines): 'use client' Client Component using `useForm<z.input<schema>, unknown, ProposalInput>` three-generic form (Rule 1 fix bridging zodResolver input/output split — validityDays.default(30) makes input optional but output required), zodResolver(proposalInputSchema), mode:'onBlur' + shouldFocusError for PROP-08, FormProvider wrap, 4 cards × 14 inputs (Partenaire 2 fields with partner-name pre-fill from D-7-13; Client 6 fields including required clientCo per D-7-06 PROP-06 with clientTel/clientSiren via Controller-wrapped PhoneInput/SirenInput; Intérêts 2 YesNoToggles via Controller; Paramètres 4 controls including amountHT NumberInputAmount + durationMonths DurationSegmented<36|48|60> via Controller). Submit (D-7-07): no DB write, just toast.info(proposal.toast.phase8.placeholder); Reset (D-7-08): native window.confirm(proposal.confirm.reset) + reset() + refocus first field; Invalid: toast.error(proposal.toast.validation.errors). All 5 custom inputs wired via `<Controller>` (Rule 1 fix — the plan's literal `register(name).onBlur({...} as never)` cast pattern would bypass RHF's real blur tracking AND emit a TS error). `app/(authed)/proposals/new/page.tsx` (Task 3: 4ea48b1, 100 lines): Server Component (no 'use client'), requireUser() defence-in-depth + getCurrentLang(), partner-name pre-fill heuristic (displayName ?? name ?? '' — never email-local-part), 2-column desktop grid (D-7-01/D-7-14: minmax(0,640px) + minmax(0,360px) + 24px gap = 1024px within authed shell's 1100px max-width), <ProposalForm/> in left column, sticky <aside> placeholder card in right column showing result.inline.placeholder (Plan 07-05 replaces wholesale with <LiveLoyerPreview/>). In-content <h1> page title (header.proposals.new) consistent with Plan 07-03 home page (Topbar.pageTitle prop is not currently passed by the (authed) layout). Build verified: route `ƒ /proposals/new` confirmed in route map (server-rendered on demand). typecheck 0; npm run lint 0 errors (only pre-existing seed-admins-launch.ts:42 warning persists, out-of-scope); strict `npx eslint --max-warnings=0` passes for this plan's files independently; build 0; 227/227 tests preserved (no regression — no new tests added per Phase 7 CONTEXT deferred component-test policy). 3 deviations (all Rule 1 auto-fixes): (1) Controller for custom inputs over register+cast hack, (2) three-generic useForm to bridge zodResolver input/output split, (3) `void _data;` for unused submit param (eslint-config-next preset doesn't honor argsIgnorePattern). PROP-06 + PROP-08 grounded end-to-end. 3 task commits: 28b01d3 (5 components), 9fa6187 (ProposalForm), 4ea48b1 (route page).
+
+- **2026-05-09:** 08-03 executed — DB query helpers: 4 source files created under `src/lib/db/queries/` (420 lines total). proposals.ts: 11 functions (encodeCursor/decodeCursor, createProposal, finalizePdfBlobOnProposal, findByIdempotencyKey, getProposalById, listProposalsByUser, searchProposals, softDeleteProposal, restoreProposal, hardPurgeProposal, listPurgeCandidates). global-params.ts: getLatestGlobalParams + insertGlobalParams (append-only). audit-log.ts: writeAuditLog with AuditAction + AuditTargetType types. index.ts: barrel re-exporting all symbols + types. 2 test files (261 lines total): 18 tests in proposals.test.ts (cursor encode/decode, listProposalsByUser limit math, searchProposals ILIKE, createProposal insert args, soft-delete/restore/purge shapes), 3 tests in global-params.test.ts. All modules import 'server-only'. 2 deviations: (1) `.returning()` no-arg (Drizzle 0.45.2 type constraint — Rule 1), (2) `as any` cast for jsonb paramsSnapshot (vs `as never` per plan — cleaner bridge). typecheck/no-vercel-imports/build all 0; 376/376 tests pass (+21 from 355 baseline). Plans 08-07/08/10/11/12/13/14 unblocked at the data-access layer. DATA-06/07/08 + PROP-02/05/09/20/21/22 grounded. 2 task commits: 89d478d (feat), 9ce8120 (test).
 
 ## Open Blockers
 
