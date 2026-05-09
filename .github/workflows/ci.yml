@@ -47,6 +47,9 @@ jobs:
       - name: Defense-in-depth grep -- no-drizzle-push invocations
         run: npm run check:no-drizzle-push
 
+      - name: Defense-in-depth -- seed SQL in sync with seedParams (D-D1)
+        run: npm run check:seed-sql
+
       - name: Vitest unit tests
         run: npm test
 
