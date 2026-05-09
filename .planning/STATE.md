@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-10T00:52:00.000Z"
+last_updated: "2026-05-10T00:57:16.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 40
-  completed_plans: 38
-  percent: 95
+  completed_plans: 39
+  percent: 97
 ---
 
 # State — Matrice Commerciale
@@ -28,9 +28,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 9 (admin-surface) — EXECUTING
-Plan: 3 of 4
-Status: Ready to execute
-Next: Plan 09-03 (accounts page) → Plan 09-04 (admin home + verifier)
+Plan: 4 of 4
+Status: Plan 09-03 complete — accounts page delivered
+Next: Plan 09-04 (admin home + verifier)
 Last activity: 2026-05-10
 
 ## Progress

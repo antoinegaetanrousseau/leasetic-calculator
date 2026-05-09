@@ -128,7 +128,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 09-02-PLAN.md — Coefficients page: editor (RHF + Zod, 4×3 table, note) + SaveConfirmModal (computed diff) + HistoryTable (cursor pagination + per-row diff) + ExplainTool (pure-client formula trail — sole non-editor commission surface) (ADMIN-01..04, ADMIN-09)
-- [ ] 09-03-PLAN.md — Accounts page: partners list (6 cols + status chip + last-login relative + proposalsCount) + per-row Disable/Re-enable confirm-toast + Re-issue/Reset URL via InviteUrlModal + CreatePartnerModal (ADMIN-05, ADMIN-06, ADMIN-08, ADMIN-09)
+- [x] 09-03-PLAN.md — Accounts page: partners list (6 cols + status chip + last-login relative + proposalsCount) + per-row Disable/Re-enable confirm-toast + Re-issue/Reset URL via InviteUrlModal + CreatePartnerModal (ADMIN-05, ADMIN-06, ADMIN-08, ADMIN-09)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 09-04-PLAN.md — Admin home (two-card nav grid) + getDefaultValidityDays() swap-in seam wiring proposal-new page (ADMIN-07)
