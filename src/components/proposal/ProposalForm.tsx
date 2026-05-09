@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, type ReactNode } from 'react';
+import { useState, useRef, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Controller,
   FormProvider,
@@ -103,6 +104,12 @@ const DURATION_OPTIONS = [
  */
 export function ProposalForm({ lang }: ProposalFormProps) {
   const firstFieldRef = useRef<HTMLInputElement | null>(null);
+  const router = useRouter();
+
+  // D-B2: client-generated UUIDv4 idempotency key. Persists across
+  // re-renders + back-button-then-resubmit within this form session.
+  // Regenerated only on form unmount (which clears the proposal session).
+  const [idempotencyKey] = useState<string>(() => crypto.randomUUID());
 
   // Consume the parent <ProposalFormProvider>'s RHF context. Three-generic
   // form mirrors useForm's input/output split; useFormContext is parametrized
@@ -117,19 +124,51 @@ export function ProposalForm({ lang }: ProposalFormProps) {
     formState: { errors, isSubmitting },
   } = form;
 
-  const onSubmit = (_data: ProposalFormValues): void => {
-    /**
-     * D-7-07: Phase 7 submit is a no-op + info toast (NO DB write — that's
-     * PROP-09 / Phase 8). Live-preview already shows the loyer; the toast
-     * confirms validation passed. The parsed `_data` will be consumed by
-     * Phase 8's server route via proposalInputSchema.parse(req.body) — that
-     * parse call is the authoritative ProposalInput-typed data; Phase 7's
-     * onSubmit only sees the input-side shape (validityDays: optional)
-     * since useFormContext is parametrized with the input type to bridge
-     * the schema's input/output split (.default(30) on validityDays).
-     */
-    void _data;
-    toast.info(t('proposal.toast.phase8.placeholder', lang));
+  /**
+   * D-B1 + D-B2: server validates again, computes again, snapshots params,
+   * INSERTs row, renders PDF, uploads blob, returns { id, pdfUrl }. Idempotency
+   * key persists across re-renders so double-click / browser-back-then-resubmit
+   * collapse to the same proposal id.
+   */
+  const onSubmit = (data: ProposalFormValues): void => {
+    // D-B3: sonner.promise pattern (loading → success / error).
+    const promise = (async () => {
+      const response = await fetch('/api/proposals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': idempotencyKey,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        // Bounded error code from Plan 08-07's SubmitErrorCode union.
+        let code = 'unknown_error';
+        try {
+          const json = (await response.json()) as { error?: unknown };
+          if (typeof json?.error === 'string') code = json.error;
+        } catch {
+          // ignore — fall back to unknown_error
+        }
+        throw new Error(code);
+      }
+
+      const json = (await response.json()) as { id: string; pdfUrl: string };
+      return json;
+    })();
+
+    toast.promise(promise, {
+      loading: t('proposal.toast.submit.loading', lang),
+      success: (result) => {
+        // PROP-10: post-redirect-get. Trigger redirect during the promise
+        // resolution; the success toast briefly displays during the route
+        // change.
+        router.push(`/proposals/${result.id}`);
+        return t('proposal.toast.submit.success', lang);
+      },
+      error: () => t('proposal.toast.submit.error', lang),
+    });
   };
 
   const onInvalid = () => {
