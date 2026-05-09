@@ -50,9 +50,18 @@ export function encodeCursor(c: Cursor): string {
 }
 
 export function decodeCursor(encoded: string): Cursor | null {
+  const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   try {
     const parsed = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'));
-    if (typeof parsed?.createdAt === 'string' && typeof parsed?.id === 'string') return parsed;
+    if (
+      typeof parsed?.createdAt === 'string' &&
+      typeof parsed?.id === 'string' &&
+      ISO_RE.test(parsed.createdAt) &&
+      UUID_RE.test(parsed.id)
+    ) {
+      return parsed;
+    }
     return null;
   } catch {
     return null;
