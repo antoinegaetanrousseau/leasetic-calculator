@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-09T15:15:51.392Z"
+last_updated: "2026-05-09T15:23:58.621Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 36
-  completed_plans: 25
-  percent: 69
+  completed_plans: 26
+  percent: 72
 ---
 
 # State — Matrice Commerciale
@@ -28,8 +28,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 08 (persistence-pdf-pipeline) — EXECUTING
-Plan: 4 of 14
-Status: Executing Phase 08 (08-03 complete — query helpers + 21 tests; 376 tests total)
+Plan: 5 of 14
+Status: Executing Phase 08 (08-04 complete — seed migration DATA-12; 376 tests total)
 Next: `/gsd-execute-phase 8`
 Last activity: 2026-05-09
 
