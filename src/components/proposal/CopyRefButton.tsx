@@ -9,6 +9,12 @@ export interface CopyRefButtonProps {
   /** The LC reference string to copy, e.g. "LC-12345". */
   lcRef: string;
   lang: Lang;
+  /**
+   * 'default' (pill button with label) — used in LiveLoyerPreview.
+   * 'inline'  (28px square ghost icon-only) — used on the detail page header.
+   * Defaults to 'default'.
+   */
+  variant?: 'default' | 'inline';
 }
 
 /**
@@ -27,7 +33,7 @@ export interface CopyRefButtonProps {
  * Phase-6 InviteUrlModal uses the same try/catch shape. The 2s auto-revert
  * is a useEffect with setTimeout cleanup (no leaked timers across renders).
  */
-export function CopyRefButton({ lcRef, lang }: CopyRefButtonProps) {
+export function CopyRefButton({ lcRef, lang, variant = 'default' }: CopyRefButtonProps) {
   const [copied, setCopied] = useState(false);
   const labelRef = useRef<HTMLSpanElement | null>(null);
 
@@ -56,6 +62,36 @@ export function CopyRefButton({ lcRef, lang }: CopyRefButtonProps) {
       }
     }
   };
+
+  if (variant === 'inline') {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        title={t('button.copy.ref', lang)}
+        aria-label={t('button.copy.ref', lang) + ' ' + lcRef}
+        style={{
+          width: 28,
+          height: 28,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 9999,
+          cursor: 'pointer',
+          color: 'var(--muted)',
+          flexShrink: 0,
+        }}
+      >
+        {copied ? (
+          <Check size={17} strokeWidth={1.6} aria-hidden="true" />
+        ) : (
+          <Copy size={17} strokeWidth={1.6} aria-hidden="true" />
+        )}
+      </button>
+    );
+  }
 
   return (
     <button
