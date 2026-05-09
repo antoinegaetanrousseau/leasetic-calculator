@@ -1,6 +1,9 @@
 'use client';
-// Plan 08-10 stub. Plan 08-12 implements the server action call + sonner toast.
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Undo2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
 export interface RestoreButtonClientProps {
@@ -8,18 +11,40 @@ export interface RestoreButtonClientProps {
   lang: Lang;
 }
 
-/**
- * Restore button stub — shown when proposal.deletedAt IS NOT NULL.
- * Plan 08-12 replaces the body with the real server action wiring.
- */
 export function RestoreButtonClient({ proposalId, lang }: RestoreButtonClientProps) {
-  // TODO 08-12: wire onClick to server action (restoreProposal + sonner toast)
-  void proposalId;
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+
+  const onClick = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/proposals/${proposalId}/restore`, { method: 'POST' });
+      if (!res.ok) {
+        toast.error(t('proposal.toast.restore.error', lang));
+        return;
+      }
+      toast.success(t('proposal.toast.restore.success', lang));
+      router.push(`/proposals/${proposalId}`);
+      router.refresh();    // server-component re-fetch so the page state shows non-deleted
+    } catch {
+      toast.error(t('proposal.toast.restore.error', lang));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <button
       type="button"
-      className="btn-out"
-      style={{ width: '100%', justifyContent: 'center' }}
+      className="btn-green"
+      onClick={onClick}
+      disabled={busy}
+      style={{
+        width: '100%', justifyContent: 'center',
+        opacity: busy ? 0.6 : 1,
+      }}
+      aria-label={t('proposal.detail.action.restore', lang)}
     >
       <Undo2 size={17} />
       {t('proposal.detail.action.restore', lang)}
