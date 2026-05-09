@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-09T12:15:00Z"
-last_activity: 2026-05-09 -- Phase 8 UI-SPEC approved (08-UI-SPEC.md, 1502 lines, 14 sections, 23 D-8-* decisions, 11 component primitives, 5 sonner variants, 61 i18n keys × 2 langs). 6/6 quality dimensions PASS after revision 1 (spacing-scale fixes on .toggle-pill, .list-row, .chip + Path A typography trim to 5 PDF sizes 8/9/10/22/32pt). Ready for /gsd-plan-phase 8.
+last_updated: "2026-05-09T13:00:00Z"
+last_activity: 2026-05-09 -- Phase 8 plans produced. 14 PLAN.md files across 6 waves; 31/32 reqs fully grounded (DATA-11 schema-grounded; 10-yr enforcement deferred to Phase 10 per CONTEXT). 08-PLAN-INDEX.md committed. Two within-wave file overlaps surfaced + patched via explicit depends_on (08-08→08-07; 08-11→08-10). Ready for /gsd-execute-phase 8.
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 22
+  total_plans: 36
   completed_plans: 22
-  percent: 100
+  percent: 61
 ---
 
 # State — Matrice Commerciale
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: **8 (persistence-pdf-pipeline) — UI-SPEC approved**
-Plan: 0 of TBD (Phase 8 plans not yet produced; ~8-12 plans expected per CONTEXT scope)
-Status: Ready for `/gsd-plan-phase 8` to produce executable plans
-Next: `/gsd-plan-phase 8`
+Phase: **8 (persistence-pdf-pipeline) — plans produced**
+Plan: 0 of 14 done (14 plans across 6 waves: schema+migration→queries+seed→lib/pdf→PDF CI gate+POST+stream/list→form swap+detail+list→delete/restore+duplicate+purge CLI)
+Status: Ready for `/gsd-execute-phase 8` to ship the plans wave-by-wave
+Next: `/gsd-execute-phase 8`
 Last activity: 2026-05-09 -- Phase 8 UI-SPEC approved 6/6 dimensions PASS after 1 revision (commits f5f4f1b initial + 7c5ffac revision-1 spacing fixes). UI-SPEC documents: home list (5-column ProposalRow + cursor 'Load more' + debounced search + 'Recently Deleted' 2-button pill toggle + Restore action), detail page (read-only inputs as `<dt>/<dd>` flat list, two-column layout 640+360 with sticky `<embed>` PDF preview right column 480px height, Download/Duplicate/Delete vertical action stack), PDF document (single page, 5-size scale 8/9/10/22/32pt, professional layout, header LEASÉTIC wordmark + LC ref + creation date, client info block, computation breakdown KeyValueRows, loyer climax card 32pt navy on green-tint bg, minimal footer LC ref + page number). 61 new i18n keys, 11 new component primitives, 5 new sonner variants, zero modal primitives (native confirm() for delete).
 
 ## Progress
@@ -41,7 +41,7 @@ v1.1 ██████████░░░░░░░░░░ 3/6 phases com
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
        └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
        └─ Phase 7: Calc Engine + Form        ✅ complete (6/6 plans — calc engine ✅, 30-case golden corpus ✅, 30-key i18n ✅, home shell ✅, 14-input form ✅, live preview ✅; CALC-01..08 + PROP-01/06/07/08/24/25 satisfied)
-       └─ Phase 8: Persistence + PDF         ⏳ context + UI-SPEC approved (12 + 23 decisions locked); planning next
+       └─ Phase 8: Persistence + PDF         ⏳ planned (14 plans / 6 waves; 31/32 reqs grounded); execution next
        └─ Phase 9: Admin Surface             ◯ blocked on P8
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
 ```
