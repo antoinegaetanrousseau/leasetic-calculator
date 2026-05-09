@@ -16,7 +16,10 @@
  * IMPORTANT: NEVER drop or rename this table without a migration. Phase 5 healthz
  * SELECTs from it.
  */
-import { pgTable, serial, text, integer, timestamp, uuid, check } from 'drizzle-orm/pg-core';
+import {
+  pgTable, serial, text, integer, timestamp, uuid, check,
+  jsonb, numeric, uniqueIndex, index,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const schemaMeta = pgTable('schema_meta', {
@@ -125,3 +128,159 @@ export type VerificationRow = typeof verifications.$inferSelect;
 export type NewVerificationRow = typeof verifications.$inferInsert;
 export type PasswordResetRow = typeof passwordResets.$inferSelect;
 export type NewPasswordResetRow = typeof passwordResets.$inferInsert;
+
+// ── Phase 8 application tables ───────────────────────────────────────────────
+// Schema source-of-truth for the proposals + global_params + audit_log triple
+// per ARCHITECTURE §2.4 + 08-CONTEXT D-A1..D3, D-B1..B3, D-C1..C3, D-D1..D3.
+
+/**
+ * Append-only history of admin-edited global financial parameters.
+ *
+ * DATA-05 — every admin save creates a new row; never UPDATE.
+ * DATA-06 — at proposal-creation time, server reads the most recent row
+ *           (ORDER BY effective_from DESC LIMIT 1) and inlines it as
+ *           proposals.params_snapshot.
+ *
+ * Phase 8 only WRITES the seed row (Plan 08-04, DATA-12). Admin UI ships
+ * in Phase 9 (ADMIN-01..04).
+ */
+export const globalParams = pgTable('global_params', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  effectiveFrom: timestamp('effective_from', { withTimezone: true }).notNull().defaultNow(),
+  createdBy: text('created_by').references(() => users.id, { onDelete: 'set null' }),
+  commissionPct: numeric('commission_pct', { precision: 7, scale: 4 }).notNull(),
+  maxAmount: numeric('max_amount', { precision: 12, scale: 2 }).notNull(),
+  validityDays: integer('validity_days').notNull(),
+  coefficients: jsonb('coefficients').$type<{
+    t1: { 36: string; 48: string; 60: string };
+    t2: { 36: string; 48: string; 60: string };
+    t3: { 36: string; 48: string; 60: string };
+    t4: { 36: string; 48: string; 60: string };
+  }>().notNull(),
+  note: text('note'),
+}, (table) => [
+  // "current" lookup — server reads most-recent by effective_from desc.
+  index('global_params_effective_from_idx').on(sql`${table.effectiveFrom} DESC`),
+]);
+
+/**
+ * Persistent partner proposals (DATA-01..09).
+ *
+ * Snapshot pattern (ARCHITECTURE §2.5 Option A, locked):
+ *   inputs / params_snapshot / computed / schema_version are all written
+ *   at INSERT time and NEVER updated. PDF blob key + sha256 + size +
+ *   generated_at are filled in by the same request after upload.
+ *
+ * Failure mode (D-B1 sync fail-loud): if PDF render or upload fails after
+ * the row is INSERTed, the server sets deleted_at on this row + writes an
+ * audit_log entry, then returns HTTP 500. Partner retries with the same
+ * idempotency_key — D-B2 lookup returns the existing (now-tombstoned) row
+ * is forbidden by the partial unique index on idempotency_key WHERE
+ * deleted_at IS NULL (so the retry creates a fresh row).
+ *
+ * Soft-delete (D-C3): deleted_at = now() hides from default list; restored
+ * via UPDATE ... SET deleted_at = NULL. Hard purge (manual CLI in Phase 8 +
+ * scheduled cron in Phase 10) deletes the row + blob after 30 days.
+ */
+export const proposals = pgTable('proposals', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'restrict' }),
+
+  // D-A2: language committed at gen time, immutable.
+  language: text('language').notNull(),
+
+  // Display reference (PROP-24 via Phase 7 generateLcRef). UNIQUE per user.
+  lcRef: text('lc_ref').notNull(),
+
+  // D-B2: client-generated UUIDv4. UNIQUE per user — unique index below.
+  idempotencyKey: text('idempotency_key').notNull(),
+
+  // DATA-04 (D-D3): semver, default '1.0.0', CHECK ^\d+\.\d+\.\d+$.
+  schemaVersion: text('schema_version').notNull().default('1.0.0'),
+
+  // DATA-02/01/03: jsonb snapshot triple — written once, read forever.
+  inputs: jsonb('inputs').$type<Record<string, unknown>>().notNull(),
+  paramsSnapshot: jsonb('params_snapshot').$type<{
+    commissionPct: string;
+    maxAmount: string;
+    validityDays: number;
+    coefficients: {
+      t1: { 36: string; 48: string; 60: string };
+      t2: { 36: string; 48: string; 60: string };
+      t3: { 36: string; 48: string; 60: string };
+      t4: { 36: string; 48: string; 60: string };
+    };
+  }>().notNull(),
+  computed: jsonb('computed').$type<Record<string, unknown>>().notNull(),
+
+  // PDF artifact slots (filled after row INSERT — D-B1 step 7).
+  pdfBlobKey: text('pdf_blob_key'),
+  pdfSha256: text('pdf_sha256'),
+  pdfSizeBytes: integer('pdf_size_bytes'),
+  pdfGeneratedAt: timestamp('pdf_generated_at', { withTimezone: true }),
+
+  // Soft-delete window (DATA-10) + duplicate audit (PROP-21 implicit).
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  duplicatedFromId: uuid('duplicated_from_id'),
+
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  // D-A2: language whitelist enforced at the DB.
+  check('proposals_language_check', sql`${table.language} IN ('fr', 'en')`),
+  // D-D3: semver shape enforced at the DB.
+  check('proposals_schema_version_check', sql`${table.schemaVersion} ~ '^[0-9]+\\.[0-9]+\\.[0-9]+$'`),
+
+  // D-B2: idempotency uniqueness (user_id, idempotency_key).
+  uniqueIndex('proposals_user_id_idempotency_key_uq').on(table.userId, table.idempotencyKey),
+  // Within-user LC ref stability.
+  uniqueIndex('proposals_user_id_lc_ref_uq').on(table.userId, table.lcRef),
+
+  // D-C1 cursor query: (user_id, created_at desc, id desc).
+  index('proposals_user_id_created_at_id_idx')
+    .on(table.userId, sql`${table.createdAt} DESC`, sql`${table.id} DESC`),
+  // Partial index for the Recently Deleted view + purge job.
+  index('proposals_deleted_at_idx')
+    .on(table.deletedAt)
+    .where(sql`${table.deletedAt} IS NOT NULL`),
+]);
+
+/**
+ * Audit log (DATA-07).
+ *
+ * Phase 8 writes:
+ *   - 'proposal.create'        (every successful save)
+ *   - 'proposal.create_failed' (D-B1 fail-loud sets deleted_at AND writes here)
+ *   - 'proposal.delete'        (soft-delete by partner)
+ *   - 'proposal.restore'       (un-soft-delete)
+ *   - 'proposal.purge'         (manual CLI hard-purge, Plan 08-13)
+ *
+ * Phase 9 adds:
+ *   - 'global_params.update'  (admin coefficients save)
+ *   - 'user.create' / 'user.disable' / 'user.re_enable'
+ *   - 'role.grant' (CLI grant-admin already writes when run with --audit)
+ *
+ * Phase 9 ADMIN-07 reads from this table for the admin viewer; Phase 8
+ * only writes.
+ */
+export const auditLog = pgTable('audit_log', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  actorId: text('actor_id').references(() => users.id, { onDelete: 'set null' }),
+  action: text('action').notNull(),
+  targetType: text('target_type').notNull(),
+  targetId: uuid('target_id'),
+  payload: jsonb('payload').$type<Record<string, unknown>>(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('audit_log_actor_id_created_at_idx')
+    .on(table.actorId, sql`${table.createdAt} DESC`),
+  index('audit_log_target_type_target_id_created_at_idx')
+    .on(table.targetType, table.targetId, sql`${table.createdAt} DESC`),
+]);
+
+// Type exports for Phase 8 tables.
+export type GlobalParamsRow = typeof globalParams.$inferSelect;
+export type NewGlobalParamsRow = typeof globalParams.$inferInsert;
+export type ProposalRow = typeof proposals.$inferSelect;
+export type NewProposalRow = typeof proposals.$inferInsert;
+export type AuditLogRow = typeof auditLog.$inferSelect;
+export type NewAuditLogRow = typeof auditLog.$inferInsert;
