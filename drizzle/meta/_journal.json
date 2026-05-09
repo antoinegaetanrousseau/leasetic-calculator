@@ -15,6 +15,13 @@
       "when": 1778256563816,
       "tag": "0001_kind_doctor_faustus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778335492046,
+      "tag": "0002_phase8_persistence",
+      "breakpoints": true
     }
   ]
 }
