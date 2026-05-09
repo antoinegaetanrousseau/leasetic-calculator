@@ -271,13 +271,15 @@ function buildPdfComputed(
 
 /** Extract optional duplicatedFromId from raw body (informational only per T-08-07-05). */
 function extractDuplicatedFromId(body: unknown): string | null {
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (
     body !== null &&
     typeof body === 'object' &&
     'duplicatedFromId' in body &&
     typeof (body as { duplicatedFromId?: unknown }).duplicatedFromId === 'string'
   ) {
-    return (body as { duplicatedFromId: string }).duplicatedFromId;
+    const id = (body as { duplicatedFromId: string }).duplicatedFromId;
+    return UUID_RE.test(id) ? id : null;  // silently drop malformed IDs — avoids Postgres uuid cast error
   }
   return null;
 }
