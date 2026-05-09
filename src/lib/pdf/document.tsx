@@ -19,13 +19,25 @@ import { KeyValueRow } from './components/key-value-row';
 
 const FONT_DIR = path.join(process.cwd(), 'public', 'fonts');
 
+// PROP-19 / determinism (T-08-05-04): Plus Jakarta Sans self-hosted.
+//
+// Font format: TTF (converted from the Phase 5 woff2 set via wawoff2 decompressor).
+// Reason: @react-pdf/renderer uses PDFKit/fontkit for font subsetting. fontkit's
+// TTFSubset correctly handles multi-weight subsetting with TTF; the woff2 brotli
+// path fails with DataView bounds errors when multiple weights share the same
+// Brotli decompression buffer (fontkit upstream issue). The TTF files are derived
+// from the same woff2 source and committed alongside them in public/fonts/.
+// Determinism is preserved: same font binary bytes on every machine.
+//
+// Note: Plus Jakarta Sans has no separate italic cut. fontStyle: 'italic' is
+// not used in the document (validity caption is regular weight only).
 Font.register({
   family: 'PlusJakartaSans',
   fonts: [
-    { src: path.join(FONT_DIR, 'PlusJakartaSans-400.woff2'), fontWeight: 400 },
-    { src: path.join(FONT_DIR, 'PlusJakartaSans-500.woff2'), fontWeight: 500 },
-    { src: path.join(FONT_DIR, 'PlusJakartaSans-600.woff2'), fontWeight: 600 },
-    { src: path.join(FONT_DIR, 'PlusJakartaSans-700.woff2'), fontWeight: 700 },
+    { src: path.join(FONT_DIR, 'PlusJakartaSans-400.ttf'), fontWeight: 400 },
+    { src: path.join(FONT_DIR, 'PlusJakartaSans-500.ttf'), fontWeight: 500 },
+    { src: path.join(FONT_DIR, 'PlusJakartaSans-600.ttf'), fontWeight: 600 },
+    { src: path.join(FONT_DIR, 'PlusJakartaSans-700.ttf'), fontWeight: 700 },
   ],
 });
 
@@ -308,7 +320,6 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
         <Text style={{
           fontSize: pdfFontSizes.body,
           fontWeight: pdfFontWeights.regular,
-          fontStyle: 'italic',
           color: pdfColors.muted,
           marginBottom: 24,
           lineHeight: 1.5,
