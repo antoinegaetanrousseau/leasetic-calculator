@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Save } from 'lucide-react';
@@ -53,10 +53,35 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
 
   const [pending, setPending] = useState<CoeffEditorValues | null>(null);
 
+  // WR-02: reset RHF baseline when latestParams.id changes (router.refresh() after save
+  // re-renders the server component with a new latestParams row).
+  useEffect(() => {
+    form.reset({
+      commissionPct: String(latestParams.commissionPct),
+      maxAmount: String(latestParams.maxAmount),
+      validityDays: latestParams.validityDays,
+      coefficients: latestParams.coefficients,
+      note: '',
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestParams.id]);
+
   const onOpenConfirm = (data: CoeffEditorValues) => {
     setPending(data);
   };
   const onCloseModal = () => setPending(null);
+
+  // WR-02: called by SaveConfirmModal on success — reset RHF baseline to saved values
+  // so isDirty becomes false immediately (before router.refresh() delivers new props).
+  const onResetForm = (saved: CoeffEditorValues) => {
+    form.reset({
+      commissionPct: saved.commissionPct,
+      maxAmount: saved.maxAmount,
+      validityDays: saved.validityDays,
+      coefficients: saved.coefficients,
+      note: '',
+    });
+  };
 
   return (
     <>
@@ -344,6 +369,7 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
           pending={pending}
           onClose={onCloseModal}
           onConfirmed={onCloseModal}
+          onResetForm={onResetForm}
         />
       )}
     </>

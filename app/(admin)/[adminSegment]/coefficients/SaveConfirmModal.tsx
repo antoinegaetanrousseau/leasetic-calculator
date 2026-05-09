@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle, Info, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { adminUpdateGlobalParams } from '@/lib/admin';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -16,6 +16,8 @@ export interface SaveConfirmModalProps {
   pending: CoeffEditorValues;
   onClose: () => void;
   onConfirmed: () => void;
+  /** Called with the saved values so CoefficientsEditor can reset RHF baseline (WR-02). */
+  onResetForm?: (saved: CoeffEditorValues) => void;
 }
 
 export function SaveConfirmModal({
@@ -24,10 +26,13 @@ export function SaveConfirmModal({
   pending,
   onClose,
   onConfirmed,
+  onResetForm,
 }: SaveConfirmModalProps) {
   const router = useRouter();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  // CR-01: guard against double-submit while promise is in flight.
+  const [isSaving, setIsSaving] = useState(false);
 
   // Compute diff at modal-open time (D-09-01) — pure client comparison, no DB read.
   const pairs = computeDiffPairs(latestParams, {
@@ -69,6 +74,9 @@ export function SaveConfirmModal({
   }, [onClose]);
 
   const onConfirm = () => {
+    // CR-01: prevent double-submit — guard is checked before and cleared only on error.
+    if (isSaving) return;
+    setIsSaving(true);
     const promise = adminUpdateGlobalParams({
       commissionPct: pending.commissionPct,
       maxAmount: pending.maxAmount,
@@ -80,11 +88,17 @@ export function SaveConfirmModal({
     toast.promise(promise, {
       loading: t('admin.coefficients.save.loading', lang),
       success: () => {
+        // WR-02: reset RHF baseline to the just-saved values so isDirty resets correctly.
+        onResetForm?.(pending);
         onConfirmed();
         router.refresh(); // re-runs the page server component → fresh latestParams + history
         return t('admin.coefficients.toast.save.success', lang);
       },
-      error: () => t('admin.coefficients.toast.save.error', lang),
+      error: () => {
+        // CR-01: re-enable on error so admin can retry without reopening modal.
+        setIsSaving(false);
+        return t('admin.coefficients.toast.save.error', lang);
+      },
     });
   };
 
@@ -214,9 +228,23 @@ export function SaveConfirmModal({
             type="button"
             className="btn-green"
             onClick={onConfirm}
-            disabled={pairs.length === 0}
-            aria-disabled={pairs.length === 0 || undefined}
+            disabled={pairs.length === 0 || isSaving}
+            aria-disabled={pairs.length === 0 || isSaving || undefined}
+            aria-busy={isSaving || undefined}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              opacity: isSaving ? 0.7 : undefined,
+            }}
           >
+            {isSaving && (
+              <Loader2
+                size={16}
+                style={{ animation: 'spin 1s linear infinite' }}
+                aria-hidden="true"
+              />
+            )}
             {t('admin.coefficients.modal.confirm', lang)}
           </button>
         </div>
