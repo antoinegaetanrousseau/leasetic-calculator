@@ -58,21 +58,22 @@ export function ProposalFormProvider({
     defaultValues: {
       partnerCo: prefill?.partnerCo ?? '',
       partnerName: prefill?.partnerName ?? '',
-      clientCo: '',
-      clientName: '',
-      clientRole: '',
-      clientTel: '',
-      clientEmail: '',
-      clientSiren: '',
-      slb: undefined,
-      evalParc: undefined,
-      amountHT: '',
+      clientCo: prefill?.clientCo ?? '',
+      clientName: prefill?.clientName ?? '',
+      clientRole: prefill?.clientRole ?? '',
+      clientTel: prefill?.clientTel ?? '',
+      clientEmail: prefill?.clientEmail ?? '',
+      clientSiren: prefill?.clientSiren ?? '',
+      slb: prefill?.slb ?? undefined,
+      evalParc: prefill?.evalParc ?? undefined,
+      amountHT: prefill?.amountHT ?? '',
       // 36/48/60 — left undefined so the segmented control starts in
       // "no selection" state; Zod will reject submit until the user picks one.
-      durationMonths: undefined as unknown as 36 | 48 | 60,
-      projectDesc: '',
-      partnerRef: '',
-      validityDays: 30, // D-7-05 default
+      // PROP-21: if duplicating, pre-select the source's duration.
+      durationMonths: prefill?.durationMonths ?? (undefined as unknown as 36 | 48 | 60),
+      projectDesc: prefill?.projectDesc ?? '',
+      partnerRef: prefill?.partnerRef ?? '',
+      validityDays: prefill?.validityDays ?? 30, // D-7-05 default
     },
   });
   return <FormProvider {...form}>{children}</FormProvider>;
@@ -111,6 +112,14 @@ export function ProposalForm({ lang }: ProposalFormProps) {
   // Regenerated only on form unmount (which clears the proposal session).
   const [idempotencyKey] = useState<string>(() => crypto.randomUUID());
 
+  // PROP-21: capture ?duplicate=<id> at mount-time via window.location.search.
+  // Using lazy useState init (not useSearchParams) so the value persists even
+  // after DuplicatePrefillToast strips the URL flag on first render.
+  const [duplicatedFromId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return new URLSearchParams(window.location.search).get('duplicate');
+  });
+
   // Consume the parent <ProposalFormProvider>'s RHF context. Three-generic
   // form mirrors useForm's input/output split; useFormContext is parametrized
   // by the OUTPUT type (the parsed shape Phase 8's server route will see).
@@ -133,13 +142,18 @@ export function ProposalForm({ lang }: ProposalFormProps) {
   const onSubmit = (data: ProposalFormValues): void => {
     // D-B3: sonner.promise pattern (loading → success / error).
     const promise = (async () => {
+      const requestBody = {
+        ...data,
+        // PROP-21: include source id for audit trail (server plumbs to duplicated_from_id).
+        ...(duplicatedFromId ? { duplicatedFromId } : {}),
+      };
       const response = await fetch('/api/proposals', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Idempotency-Key': idempotencyKey,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
