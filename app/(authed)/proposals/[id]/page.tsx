@@ -258,7 +258,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
                 k={t('proposal.duree.label', lang)}
                 v={`${String(inputs.durationMonths)} ${t('proposal.duree.months', lang)}`}
               />
-              {isComputed && typeof computed.coeff === 'number' && (
+              {isComputed && typeof computed.coeff === 'string' && computed.coeff && (
                 <Row
                   k={t('pdf.computed.coefficient.label', lang)}
                   v={`${formatNumber(Number(computed.coeff), lang, {
@@ -302,7 +302,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  {isComputed && typeof computed.loyerHT === 'number'
+                  {isComputed && typeof computed.loyerHT === 'string' && computed.loyerHT
                     ? formatCurrency(Number(computed.loyerHT), lang)
                     : t('pdf.loyer.on.demand', lang)}
                 </span>
