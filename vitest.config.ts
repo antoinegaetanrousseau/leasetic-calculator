@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: false,
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx', '__pdf-fixtures__/**/*.test.ts'],
   },
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
