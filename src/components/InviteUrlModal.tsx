@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Copy, Check, X, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { t, type Lang } from '@/lib/i18n';
+import { t, type Lang } from '@/lib/i18n/dictionaries';
 import type { RedeemKind } from '@/lib/auth/redeem';
 
 export interface InviteUrlModalProps {
