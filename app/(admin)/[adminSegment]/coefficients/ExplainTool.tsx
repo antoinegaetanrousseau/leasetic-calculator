@@ -236,7 +236,7 @@ function FormulaTrail({
     >
       <div style={labelStyle}>{t('admin.coefficients.explain.formula.label', lang)}</div>
       <div style={{ color: 'var(--muted)', marginBottom: 12 }}>
-        {'loyer = montantHT × (1 + commission/100) × coefficient / 100'}
+        {t('admin.coefficients.explain.formula.symbolic', lang)}
       </div>
 
       <div style={labelStyle}>{t('admin.coefficients.explain.substitution.label', lang)}</div>
@@ -255,7 +255,7 @@ function FormulaTrail({
           color: 'var(--gd)',
         }}
       >
-        {'= '}{formattedLoyer}{' / mois'}
+        {'= '}{formattedLoyer}{' '}{t('admin.coefficients.explain.result.per_month', lang)}
       </div>
 
       <div
@@ -266,7 +266,9 @@ function FormulaTrail({
           fontFamily: 'var(--font-sans)',
         }}
       >
-        {durationMonths}{' mois · '}{validityDays}{' jours'}
+        {t('admin.coefficients.explain.result.duration_validity', lang)
+          .replace('{0}', String(durationMonths))
+          .replace('{1}', String(validityDays))}
       </div>
     </div>
   );
