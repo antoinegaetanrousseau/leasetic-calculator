@@ -192,7 +192,7 @@ A 2-button pill switch placed right-aligned in the card header row.
 
 - Wrapper: `display: inline-flex; border: 1px solid var(--border); border-radius: 9999px; padding: 2px; background: var(--paper); gap: 0;`
 - Each button (`.toggle-pill`):
-  - `padding: 6px 14px; border-radius: 9999px; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 500; border: none; cursor: pointer; transition: background 150ms, color 150ms;`
+  - `padding: 4px 12px; border-radius: 9999px; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 500; border: none; cursor: pointer; transition: background 150ms, color 150ms;`
   - Hover (when not active): `background: var(--hover-overlay); color: var(--ink);`
 - Active button (`.toggle-pill.on`):
   - `background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(17,44,59,0.06);`
@@ -254,7 +254,7 @@ display: grid;
 grid-template-columns: 1fr 100px 130px 100px 92px;
 align-items: center;
 gap: 16px;
-padding: 14px 16px;
+padding: 16px 16px;
 border-radius: 8px;
 text-decoration: none;
 color: inherit;
@@ -678,13 +678,13 @@ PROP-19: `document.fonts.ready` is the BROWSER's font-load gate; for `@react-pdf
 ```tsx
 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
   <View>
-    <Text style={{ fontSize: 18, fontWeight: 700, color: '#112c3b' }}>LEASÉTIC</Text>
+    <Text style={{ fontSize: 22, fontWeight: 700, color: '#112c3b' }}>LEASÉTIC</Text>
     <Text style={{ fontSize: 9, fontWeight: 400, color: '#6e7191', marginTop: 2 }}>
       {t('pdf.tagline', lang)}
     </Text>
   </View>
   <View style={{ alignItems: 'flex-end' }}>
-    <Text style={{ fontSize: 11, fontWeight: 600, color: '#112c3b' }}>
+    <Text style={{ fontSize: 10, fontWeight: 600, color: '#112c3b' }}>
       {t('pdf.ref.label', lang)} {lc_ref}
     </Text>
     <Text style={{ fontSize: 9, fontWeight: 400, color: '#6e7191', marginTop: 2 }}>
@@ -696,8 +696,8 @@ PROP-19: `document.fonts.ready` is the BROWSER's font-load gate; for `@react-pdf
 ```
 
 **Header content:**
-- Left: "LEASÉTIC" wordmark, 18pt weight 700 navy, with tagline below ("IT financial leasing" en / "Location financière IT" fr) at 9pt weight 400 muted
-- Right: "N° LC-12345" at 11pt weight 600 navy, with creation date below at 9pt weight 400 muted
+- Left: "LEASÉTIC" wordmark, 22pt weight 700 navy, with tagline below ("IT financial leasing" en / "Location financière IT" fr) at 9pt weight 400 muted
+- Right: "N° LC-12345" at 10pt weight 600 navy, with creation date below at 9pt weight 400 muted
 - Below: 1pt horizontal rule in `--border` (`#d9dbe9`), margin 16pt above and below
 
 **Decision (D-8-12): NO logo image in the header for v1.1.** v10 has no actual brand image asset; the wordmark is text-rendered. Phase 8 keeps text-rendered "LEASÉTIC" — guarantees byte-determinism (no image embedding variability), avoids asset-pipeline coupling. v1.2 candidate to add an SVG/PNG logo if Leasétic's brand team supplies one.
@@ -705,12 +705,12 @@ PROP-19: `document.fonts.ready` is the BROWSER's font-load gate; for `@react-pdf
 #### 3.3.5 Title row
 
 ```tsx
-<Text style={{ fontSize: 16, fontWeight: 700, color: '#112c3b', marginBottom: 24, textAlign: 'left' }}>
+<Text style={{ fontSize: 22, fontWeight: 700, color: '#112c3b', marginBottom: 24, textAlign: 'left' }}>
   {t('pdf.title', lang)}
 </Text>
 ```
 
-Copy: `pdf.title` "Proposition de location financière" / "Financial lease proposal" (reuses existing v10 dict key `proposal.title` value verbatim). 16pt weight 700 navy. Left-aligned. Margin-bottom 24pt to next section.
+Copy: `pdf.title` "Proposition de location financière" / "Financial lease proposal" (reuses existing v10 dict key `proposal.title` value verbatim). 22pt weight 700 navy. Left-aligned. Margin-bottom 24pt to next section.
 
 #### 3.3.6 Destinataire (Recipient) section
 
@@ -783,7 +783,7 @@ A second bordered View, this time WITH a tinted background to create visual emph
   borderWidth: 1,
   borderColor: '#129657',          // --gd green
   borderRadius: 8,
-  padding: 20,
+  padding: 24,
   marginBottom: 24,
   backgroundColor: '#f0f9f4',      // 5% --gd tint (computed: rgba(18,150,87,0.05) flattened on white)
 }}>
@@ -948,7 +948,7 @@ type ValidityChipProps = { variant: 'active' | 'expired'; expiresAt?: Date; lang
 ```
 
 - Wrapper (`.chip`):
-  - `display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 9999px; font-size: 11.2px; font-weight: 600; line-height: 1.4;`
+  - `display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 9999px; font-size: 11.2px; font-weight: 600; line-height: 1.4;`
 - `chip-active` variant:
   - `background: rgba(18,150,87,0.12); color: var(--gd);`
   - Icon: Lucide `CircleDot` 12px filled (`fill="currentColor"`)
@@ -1445,7 +1445,7 @@ No new component-library scaffolding introduced in Phase 8. Phase 5–7 rational
 - [ ] Dimension 1 Copywriting: PASS (FR + EN tables for every new user-facing string in §7; PDF copy in §3.3 + §7.8)
 - [ ] Dimension 2 Visuals: PASS (every screen has layout diagram + state inventory; PDF has ASCII layout + per-element tsx style specs)
 - [ ] Dimension 3 Color: PASS (60/30/10 inherited from Phase 5; PDF color palette §3.3.13 inlined as hex literals matching tokens; chip variants enumerated; no new tokens introduced)
-- [ ] Dimension 4 Typography: PASS (in-app: 4 sizes max per screen, 4 weights total — inherited; PDF: 4 sizes 8/9/10/32pt + 4 weights 400/500/600/700 — declared in §3.3)
+- [ ] Dimension 4 Typography: PASS (in-app: 4 sizes max per screen, 4 weights total — inherited; PDF: 5 sizes 8/9/10/22/32pt + 4 weights 400/500/600/700 — declared in §3.3. Path A trim applied in revision 1: dropped 11pt LC ref → 10pt; dropped 16pt title → 22pt; dropped 18pt wordmark → 22pt; 22pt now serves as the unified "feature size" for wordmark + title + on-demand badge.)
 - [ ] Dimension 5 Spacing: PASS (in-app: multiples of 4 only — inherited; PDF: 8pt grid via 8/16/24pt margins + 4pt key-value row gaps)
 - [ ] Dimension 6 Registry Safety: PASS (no shadcn, no third-party blocks)
 
@@ -1453,7 +1453,7 @@ No new component-library scaffolding introduced in Phase 8. Phase 5–7 rational
 
 ---
 
-*Phase 8 UI-SPEC — three-surface contract on top of Phase 5 token spine + Phase 6 shell + Phase 7 base CSS classes. Inherits unchanged: color palette, typography, spacing, focus ring, button variants, sonner variants, lucide defaults, layout shell dimensions, font loading, no-flash script, .card/.ctitle/.fld/.btn-*/.ieu/.tbadge/.dg/.db/.yn-btn classes. Adds: home-page proposals list (5-column rows + search + cursor pagination + Recently Deleted toggle), proposal detail page (read-only inputs + computed card + embedded PDF preview + Download/Duplicate/Delete action row), single-page A4 PDF document layout (header + title + recipient block + project block + computation card + loyer feature card + interests + validity caption + minimal footer), 4 new CSS classes (.chip / .list-row / .search-bar / .toggle-pill), 5 new sonner variants (submit-pipeline loading→success/error promise + delete success/error + restore success/error + duplicate-prefilled info), ~56-61 new i18n keys × 2 langs, native confirm() for soft-delete (no new modal primitive), 23 D-8-* decisions logged.*
+*Phase 8 UI-SPEC (revision 1, 2026-05-09 — spacing-scale fixes: .toggle-pill 4×12, .list-row 16×16, .chip 4×8, PDF loyer card padding 24; Path A typography trim: PDF reduced from 6 sizes to 5 sizes 8/9/10/22/32pt) — three-surface contract on top of Phase 5 token spine + Phase 6 shell + Phase 7 base CSS classes. Inherits unchanged: color palette, typography, spacing, focus ring, button variants, sonner variants, lucide defaults, layout shell dimensions, font loading, no-flash script, .card/.ctitle/.fld/.btn-*/.ieu/.tbadge/.dg/.db/.yn-btn classes. Adds: home-page proposals list (5-column rows + search + cursor pagination + Recently Deleted toggle), proposal detail page (read-only inputs + computed card + embedded PDF preview + Download/Duplicate/Delete action row), single-page A4 PDF document layout (header + title + recipient block + project block + computation card + loyer feature card + interests + validity caption + minimal footer), 4 new CSS classes (.chip / .list-row / .search-bar / .toggle-pill), 5 new sonner variants (submit-pipeline loading→success/error promise + delete success/error + restore success/error + duplicate-prefilled info), ~56-61 new i18n keys × 2 langs, native confirm() for soft-delete (no new modal primitive), 23 D-8-* decisions logged.*
 
 ---
 
@@ -1464,7 +1464,7 @@ No new component-library scaffolding introduced in Phase 8. Phase 5–7 rational
 
 ### Contract Summary
 - Spacing: inherited (xs=4, sm=8, md=16, lg=24, xl=28, 2xl=32, 3xl=48, 4xl=64); PDF uses 4/8/16/24/32pt scale
-- Typography: in-app inherited 4 sizes + 4 weights; PDF declares 8/9/10/16/22/32pt + 400/500/600/700 weights; loyer big-number 32pt
+- Typography: in-app inherited 4 sizes + 4 weights; PDF declares 5 sizes 8/9/10/22/32pt + 400/500/600/700 weights; loyer big-number 32pt; 22pt unified for wordmark + title + on-demand badge
 - Color: inherited 60/30/10 (`--paper`/`--surface`/`--gd`); chip variants tinted (active=--gd, expired=--gold, deleted=--danger, language=--teal); PDF inlines hex literals matching tokens
 - Copywriting: ~56-61 new FR/EN keys across list/detail/PDF/toasts; D-A3 PDF footer minimal locked
 - Registry: no shadcn (declined Phase 5–7); no third-party blocks
