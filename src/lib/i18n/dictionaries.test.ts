@@ -128,3 +128,144 @@ describe('Phase 7 i18n keys (UI-SPEC §8 + §9)', () => {
     expect(t('error.field.amount.too.small', 'en')).toMatch(/25,?0?00/);
   });
 });
+
+// ── Phase 8 — Persistence + PDF Pipeline (Plan 08-02) ────────────────────────
+
+// Every Phase 8 key MUST resolve non-empty in BOTH languages. Catches drift
+// where someone adds a FR-only key (compile-time _EnHasAllFrKeys catches the
+// missing-EN case; this runtime check catches empty-string regressions in
+// either language).
+const phase8Keys: DictKey[] = [
+  // 7.1 List view (11)
+  'proposal.search.placeholder',
+  'proposal.search.aria',
+  'proposal.search.clear',
+  'proposal.search.empty.title',
+  'proposal.search.empty.body',
+  'proposal.list.toggle.active',
+  'proposal.list.toggle.deleted',
+  'proposal.list.load.more',
+  'proposal.list.load.more.loading',
+  'proposal.deleted.empty.title',
+  'proposal.deleted.empty.body',
+  // 7.2 Chips (6)
+  'proposal.chip.active',
+  'proposal.chip.expired',
+  'proposal.chip.deleted',
+  'proposal.chip.language.tooltip',
+  'proposal.chip.tooltip.expires',
+  'proposal.chip.tooltip.expired',
+  // 7.3 Detail header + sections (7)
+  'proposal.detail.title',
+  'proposal.detail.created.line',
+  'proposal.detail.section.inputs',
+  'proposal.detail.section.computed',
+  'proposal.detail.computed.expires.label',
+  'proposal.detail.computed.expired.label',
+  'proposal.detail.computed.loyer.suffix',
+  // 7.4 Action buttons (4)
+  'proposal.detail.action.download',
+  'proposal.detail.action.duplicate',
+  'proposal.detail.action.delete',
+  'proposal.detail.action.restore',
+  // 7.5 PDF preview UI (3)
+  'proposal.detail.pdf.preview.title',
+  'proposal.detail.pdf.preview.aria',
+  'proposal.detail.pdf.fallback.link',
+  // 7.6 Deleted-view banner + confirm (2)
+  'proposal.detail.deleted.banner',
+  'proposal.confirm.delete',
+  // 7.7 Toasts (9)
+  'proposal.toast.submit.loading',
+  'proposal.toast.submit.success',
+  'proposal.toast.submit.error',
+  'proposal.toast.delete.success',
+  'proposal.toast.delete.action.view.deleted',
+  'proposal.toast.delete.error',
+  'proposal.toast.restore.success',
+  'proposal.toast.restore.error',
+  'proposal.toast.duplicate.prefilled',
+  // 7.8 PDF document copy (14)
+  'pdf.tagline',
+  'pdf.title',
+  'pdf.ref.label',
+  'pdf.section.recipient',
+  'pdf.section.project',
+  'pdf.section.interests',
+  'pdf.project.placeholder',
+  'pdf.project.ref.prefix',
+  'pdf.computed.coefficient.label',
+  'pdf.loyer.label',
+  'pdf.loyer.subtext',
+  'pdf.loyer.on.demand',
+  'pdf.validity.caption',
+  'pdf.footer.left',
+];
+
+describe('Phase 8 i18n delta', () => {
+  for (const key of phase8Keys) {
+    it(`fr.${key} resolves non-empty`, () => {
+      expect(t(key, 'fr')).not.toBe('');
+      expect(t(key, 'fr').length).toBeGreaterThan(0);
+    });
+    it(`en.${key} resolves non-empty`, () => {
+      expect(t(key, 'en')).not.toBe('');
+      expect(t(key, 'en').length).toBeGreaterThan(0);
+    });
+  }
+
+  // Interpolation contract: keys with {0} / {1} placeholders for caller-side
+  // .replace() interpolation. The dictionary value MUST contain the placeholder
+  // literal so consumers can substitute it. Catches accidental rewrites that
+  // drop the placeholder.
+  describe('interpolation contract', () => {
+    const singleArgKeys: DictKey[] = [
+      'proposal.chip.deleted',
+      'proposal.chip.tooltip.expires',
+      'proposal.chip.tooltip.expired',
+      'proposal.detail.title',
+      'proposal.detail.computed.expires.label',
+      'proposal.detail.computed.expired.label',
+      'proposal.detail.deleted.banner',
+      'pdf.loyer.subtext',
+    ];
+    const twoArgKeys: DictKey[] = [
+      'proposal.detail.created.line',
+      'pdf.validity.caption',
+      'pdf.footer.left',
+    ];
+
+    for (const key of singleArgKeys) {
+      it(`${key} contains {0} in fr + en`, () => {
+        expect(t(key, 'fr')).toContain('{0}');
+        expect(t(key, 'en')).toContain('{0}');
+      });
+    }
+    for (const key of twoArgKeys) {
+      it(`${key} contains {0} and {1} in fr + en`, () => {
+        expect(t(key, 'fr')).toContain('{0}');
+        expect(t(key, 'fr')).toContain('{1}');
+        expect(t(key, 'en')).toContain('{0}');
+        expect(t(key, 'en')).toContain('{1}');
+      });
+    }
+  });
+
+  // Sanity: the Phase 8 reuse table — these v10 keys must still exist.
+  // Plan 08-05 + 08-10 reference them in place of new Phase 8 aliases.
+  describe('reuse table integrity (UI-SPEC §7.9)', () => {
+    const reusedKeys: DictKey[] = [
+      'proposal.duree.label',
+      'proposal.duree.months',
+      'proposal.interests.slb',
+      'proposal.interests.eval',
+      'proposal.montant.label',
+    ];
+    for (const key of reusedKeys) {
+      it(`${key} (v10 reused for Phase 8) still resolves`, () => {
+        expect(t(key, 'fr')).not.toBe('');
+        expect(t(key, 'en')).not.toBe('');
+      });
+    }
+  });
+});
