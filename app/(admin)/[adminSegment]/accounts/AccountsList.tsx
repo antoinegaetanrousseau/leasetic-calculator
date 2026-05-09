@@ -40,7 +40,9 @@ interface InviteUrlPayload {
 
 export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps) {
   const router = useRouter();
-  const [partners] = useState<PartnerWithCount[]>(initialPartners);
+  // WR-06: do NOT cache initialPartners in useState — React does not re-initialize state
+  // from changed props. router.refresh() causes a server-component re-render that delivers
+  // fresh initialPartners; reading the prop directly ensures the list reflects that update.
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [inviteUrl, setInviteUrl] = useState<InviteUrlPayload | null>(null);
@@ -50,14 +52,14 @@ export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps
   const createBtnRef = useRef<HTMLButtonElement>(null);
 
   const filtered = useMemo(() => {
-    if (!searchTerm.trim()) return partners;
+    if (!searchTerm.trim()) return initialPartners;
     const q = searchTerm.trim().toLowerCase();
-    return partners.filter(
+    return initialPartners.filter(
       (p) =>
         p.email.toLowerCase().includes(q) ||
         (p.displayName ?? p.name ?? '').toLowerCase().includes(q),
     );
-  }, [partners, searchTerm]);
+  }, [initialPartners, searchTerm]);
 
   const refreshAfterAction = () => {
     // Defer to router.refresh — re-runs page server component for fresh partners list.
@@ -164,7 +166,7 @@ export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps
   };
 
   /* ── Empty states ─────────────────────────────────────────────────────── */
-  if (partners.length === 0) {
+  if (initialPartners.length === 0) {
     return (
       <>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
