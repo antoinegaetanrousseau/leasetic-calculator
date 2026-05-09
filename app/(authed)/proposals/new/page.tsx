@@ -6,6 +6,7 @@ import {
   ProposalFormProvider,
 } from '@/components/proposal/ProposalForm';
 import { LiveLoyerPreview } from '@/components/proposal/LiveLoyerPreview';
+import { getLatestGlobalParams } from '@/lib/db/queries';
 
 // PITFALLS §1.6 — every cookie/session-reading page opts out of static rendering.
 export const dynamic = 'force-dynamic';
@@ -42,6 +43,13 @@ export default async function NewProposalPage() {
   };
   const partnerName = u.displayName ?? u.name ?? '';
 
+  // D-7-12 → Phase 8 wiring: coefficients are "expired" when the seed has not
+  // yet been applied. Phase 9 admin-edit will introduce a richer freshness
+  // semantic (e.g., effective_from > 90 days ago = stale); Phase 8 keeps it
+  // binary because the seed-or-not is the only meaningful state until then.
+  const params = await getLatestGlobalParams();
+  const coefficientsExpired = params === null;
+
   return (
     <div>
       {/* Page title — Topbar's pageTitle slot is not currently passed by the
@@ -75,10 +83,10 @@ export default async function NewProposalPage() {
         >
           {/* form-column — left */}
           <ProposalForm lang={lang} />
-          {/* preview-column — right. coefficientsExpired hardcoded false
-              (D-7-12 stub — Phase 8 will wire from a global_params freshness
-              probe). */}
-          <LiveLoyerPreview lang={lang} coefficientsExpired={false} />
+          {/* preview-column — right. coefficientsExpired is server-driven from
+              getLatestGlobalParams: true when no seed row exists (D-7-12 probe
+              wired in Phase 8; Phase 9 will add richer freshness semantics). */}
+          <LiveLoyerPreview lang={lang} coefficientsExpired={coefficientsExpired} />
         </div>
       </ProposalFormProvider>
     </div>
