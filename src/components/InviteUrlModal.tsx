@@ -284,7 +284,7 @@ export function InviteUrlModal({
           <button
             type="button"
             onClick={handleClose}
-            className="btn-ghost"
+            className="btn-out"
           >
             {t('auth.modal.button.close', lang)}
           </button>
