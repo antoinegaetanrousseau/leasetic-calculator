@@ -147,7 +147,7 @@ Plans:
 | 5. Bootstrap & Deploy | v1.1 | 5/7 (06 checkpoint) | In progress | - |
 | 6. Auth & Shell | v1.1 | 9/9 | Complete | 2026-05-08 |
 | 7. Calc Engine Port + Proposal Form | v1.1 | 6/6 | Complete | 2026-05-09 |
-| 8. Persistence + PDF Pipeline | v1.1 | 10/14 | In Progress|  |
+| 8. Persistence + PDF Pipeline | v1.1 | 11/14 | In Progress|  |
 | 9. Admin Surface | v1.1 | 0/0 | Not started | - |
 | 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
 
