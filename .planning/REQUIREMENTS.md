@@ -75,31 +75,31 @@
 ### PROP — Proposal Lifecycle
 
 - [~] **PROP-01**: Authenticated partner sees a home page with a prominent "Create new proposal" CTA. PARTIAL (07-03): empty-state shell grounded (greeting + CTA Link + .card recent-proposals empty-state with FileText icon at `app/(authed)/page.tsx`). Full requirement (with populated row data) blocks on Phase 8 PROP-02..05.
-- [ ] **PROP-02**: Home page lists the partner's recent proposals (last 20 by default), sorted by creation date descending
-- [ ] **PROP-03**: Each list row shows: client name, LC reference, montant HT, creation date, validity status (active vs expired)
-- [ ] **PROP-04**: Empty state on home page for new partners ("No proposals yet — create your first one") in FR + EN
+- [x] **PROP-02**: Home page lists the partner's recent proposals (last 20 by default), sorted by creation date descending
+- [x] **PROP-03**: Each list row shows: client name, LC reference, montant HT, creation date, validity status (active vs expired)
+- [x] **PROP-04**: Empty state on home page for new partners ("No proposals yet — create your first one") in FR + EN
 - [ ] **PROP-05**: Partner can paginate / "load more" past the first 20
 - [x] **PROP-06**: Proposal entry form captures all v10 inputs plus a required `client_name` field for the home-page list — grounded by Plan 07-04: D-7-06 satisfies this by tightening v10's existing `clientCo` (Société cliente) field to required-by-Zod via `proposalInputSchema.clientCo: z.string().min(1, { message: 'error.field.client.co.required' })` (no new field added). The form renders the inline error message via `t(error.field.client.co.required, lang)` on blur.
 - [x] **PROP-07**: Form provides live preview of the computed loyer as the partner types — grounded by Plan 07-05: `<LiveLoyerPreview/>` sticky right-column card subscribes to RHF via `useFormContext<ProposalInput>() + useWatch({name: ['amountHT', 'durationMonths', 'validityDays']})`, debounces through `useDebouncedValue(...,300)` (D-7-02), calls `useMemo`-cached `computeLoyer({...})`, renders the formatted loyer via `formatCurrency(Number(loyerHT), lang)` (Phase 6 D-28 explicit fr-FR / en-GB) plus the v10 coefficient suffix `"{N} mois · coeff. {C}%"`. State machine mirrors v10 lines 1425-1454 (idle / expired / missing / on-demand / computed); aria-live="polite" on the computed-state container (UI-SPEC §13).
 - [x] **PROP-08**: Form validates on blur (red-ring focus state per v10 pattern) — grounded by Plan 07-04: `useForm({ mode: 'onBlur', shouldFocusError: true })` + `className={errors.field ? 'invalid' : ''}` on each input + `.invalid` red-ring CSS contract from Plan 07-03's globals.css. All required fields show inline error message via `<p role="alert" className="error-msg">` on blur.
 - [ ] **PROP-09**: On submit, the system: validates inputs, computes server-side, snapshots current global params + inputs into a new `proposals` row, generates the PDF, uploads to blob, returns the proposal ID
 - [ ] **PROP-10**: After save, partner is redirected to `/proposals/{id}` (post-redirect-get pattern)
-- [ ] **PROP-11**: Proposal detail page shows: read-only inputs, computed values, validity status, LC reference, language, creation date, "Download PDF" button, "Duplicate" button, "Delete" button
-- [ ] **PROP-12**: Proposal detail page embeds a PDF preview (`<embed>` or PDF.js)
-- [ ] **PROP-13**: PDF download streams through `/api/proposals/{id}/pdf` (auth + ownership check, signed URL or direct stream — never raw blob URL)
+- [x] **PROP-11**: Proposal detail page shows: read-only inputs, computed values, validity status, LC reference, language, creation date, "Download PDF" button, "Duplicate" button, "Delete" button
+- [x] **PROP-12**: Proposal detail page embeds a PDF preview (`<embed>` or PDF.js)
+- [x] **PROP-13**: PDF download streams through `/api/proposals/{id}/pdf` (auth + ownership check, signed URL or direct stream — never raw blob URL)
 - [ ] **PROP-14**: PDF stored in blob at key `proposals/{userId}/{proposalId}.pdf` with `private` access
-- [ ] **PROP-15**: PDF is **a single page** (financial offer only); v10's RSE second page is removed in v1.1
-- [ ] **PROP-16**: PDF rendered with `@react-pdf/renderer` using a deterministic configuration (pinned font files, fixed metadata, no `Date.now()` calls in the render tree)
+- [x] **PROP-15**: PDF is **a single page** (financial offer only); v10's RSE second page is removed in v1.1
+- [x] **PROP-16**: PDF rendered with `@react-pdf/renderer` using a deterministic configuration (pinned font files, fixed metadata, no `Date.now()` calls in the render tree)
 - [ ] **PROP-17**: PDF byte-determinism gated by CI: a fixture proposal renders to a SHA-256 matching a committed expected hash
-- [ ] **PROP-18**: PDF generation uses `Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })` and `Intl.DateTimeFormat('fr-FR' | 'en-GB')` explicitly — never system defaults
+- [x] **PROP-18**: PDF generation uses `Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })` and `Intl.DateTimeFormat('fr-FR' | 'en-GB')` explicitly — never system defaults
 - [ ] **PROP-19**: Plus Jakarta Sans woff2 files self-hosted under `public/fonts/`; PDF generation waits for `document.fonts.ready` before render
-- [ ] **PROP-20**: Partner can search their proposals by client name or LC reference (ILIKE, case-insensitive)
+- [x] **PROP-20**: Partner can search their proposals by client name or LC reference (ILIKE, case-insensitive)
 - [ ] **PROP-21**: Partner can duplicate a proposal: button on detail page → routes to `/proposals/new` with form values pre-filled from the source proposal; on save, the new proposal snapshots **current** global params (not the source's)
-- [ ] **PROP-22**: Partner can soft-delete a proposal (sets `deleted_at`); soft-deleted proposals are hidden from default list but PDF remains in blob storage
+- [x] **PROP-22**: Partner can soft-delete a proposal (sets `deleted_at`); soft-deleted proposals are hidden from default list but PDF remains in blob storage
 - [ ] **PROP-23**: Once a proposal is saved, neither its inputs, computed values, nor PDF can be retroactively modified — even by future coefficient changes (PDF immutability invariant)
 - [x] **PROP-24**: "Copier la référence" (LC clipboard button) preserved from v10 — grounded by Plan 07-05: `<CopyRefButton lcRef={lcRef} lang={lang}/>` calls `navigator.clipboard.writeText(lcRef)` from a user-gesture button click; on success switches the label/icon to "Référence copiée" + lucide Check for 2 seconds then auto-reverts (`useEffect` setTimeout cleanup), AND fires sonner success toast `proposal.toast.copy.success`; on failure (insecure context, browser denies) fires sonner error toast `proposal.toast.copy.error` plus a Range/Selection-API fallback selecting the LC ref text node so the user can Cmd+C manually. LC reference itself generated via `generateLcRef()` (port of v10 line 1741: `'LC-' + Math.floor(Math.random() * 90000 + 10000)`); lifecycle owned by `<LiveLoyerPreview>` (generated once on idle→non-idle transition; held until form reset; regenerated on next non-idle).
 - [x] **PROP-25**: Configurable proposal validity (15 / 30 / 60 days) preserved from v10 — grounded by Plan 07-05: `<ValiditySegmented lang={lang} value={validityDays} onChange={...}/>` lives inside `<LiveLoyerPreview/>` (D-7-04 places it in the preview card, not the form column); thin wrapper around Plan 07-04's `DurationSegmented<15|30|60>` (D-7-16 — one shared component, two configurations); writes back to RHF's `validityDays` field via `setValue('validityDays', v, { shouldDirty: true })`. Default 30 (D-7-05 — applied at the schema level via `validityDaysSchema.default(30)` and the form's defaultValues). The "Valable {N} jours" caption renders only in the `'computed'` state per UI-SPEC §3.2.10.
-- [ ] **PROP-26**: Validity expiry indicator on proposal detail page (e.g., "Valid until DD/MM/YYYY" or "Expired")
+- [x] **PROP-26**: Validity expiry indicator on proposal detail page (e.g., "Valid until DD/MM/YYYY" or "Expired")
 
 ### DATA — Data Model & PDF Immutability
 
@@ -274,31 +274,31 @@
 | CALC-07 | Phase 7 | Partial (07-05 — client preview seam shipped; server recompute is Phase 8) |
 | CALC-08 | Phase 7 | Complete (07-01) |
 | PROP-01 | Phase 7 | Partial (07-03 — empty-state shell shipped; populated rows block on Phase 8) |
-| PROP-02 | Phase 8 | Pending |
-| PROP-03 | Phase 8 | Pending |
-| PROP-04 | Phase 8 | Pending |
+| PROP-02 | Phase 8 | Complete |
+| PROP-03 | Phase 8 | Complete |
+| PROP-04 | Phase 8 | Complete |
 | PROP-05 | Phase 8 | Pending |
 | PROP-06 | Phase 7 | Pending |
 | PROP-07 | Phase 7 | Complete (07-05) |
 | PROP-08 | Phase 7 | Pending |
 | PROP-09 | Phase 8 | Pending |
 | PROP-10 | Phase 8 | Pending |
-| PROP-11 | Phase 8 | Pending |
-| PROP-12 | Phase 8 | Pending |
-| PROP-13 | Phase 8 | Pending |
+| PROP-11 | Phase 8 | Complete |
+| PROP-12 | Phase 8 | Complete |
+| PROP-13 | Phase 8 | Complete |
 | PROP-14 | Phase 8 | Pending |
-| PROP-15 | Phase 8 | Pending |
-| PROP-16 | Phase 8 | Pending |
+| PROP-15 | Phase 8 | Complete |
+| PROP-16 | Phase 8 | Complete |
 | PROP-17 | Phase 8 | Pending |
-| PROP-18 | Phase 8 | Pending |
+| PROP-18 | Phase 8 | Complete |
 | PROP-19 | Phase 8 | Pending |
-| PROP-20 | Phase 8 | Pending |
+| PROP-20 | Phase 8 | Complete |
 | PROP-21 | Phase 8 | Pending |
-| PROP-22 | Phase 8 | Pending |
+| PROP-22 | Phase 8 | Complete |
 | PROP-23 | Phase 8 | Pending |
 | PROP-24 | Phase 7 | Complete (07-05) |
 | PROP-25 | Phase 7 | Complete (07-05) |
-| PROP-26 | Phase 8 | Pending |
+| PROP-26 | Phase 8 | Complete |
 | DATA-01 | Phase 8 | Complete |
 | DATA-02 | Phase 8 | Complete |
 | DATA-03 | Phase 8 | Complete |
