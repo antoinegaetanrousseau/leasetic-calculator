@@ -103,16 +103,16 @@
 
 ### DATA — Data Model & PDF Immutability
 
-- [ ] **DATA-01**: `proposals` table stores a deep-copy `params_snapshot` jsonb of the global params in force at creation time
-- [ ] **DATA-02**: `proposals` table stores `inputs` jsonb with all form values
-- [ ] **DATA-03**: `proposals` table stores `computed` jsonb with all derived values used by the PDF
-- [ ] **DATA-04**: `proposals.schema_version` field present from day one; bumped whenever the calc formula or PDF layout changes; old proposals routed to old renderers based on this field
-- [ ] **DATA-05**: `global_params` table is append-only (history of admin edits); each row has `effective_from`, `created_by`, the actual values, and an optional admin note
-- [ ] **DATA-06**: New proposals read the most-recent `global_params` row at creation time (single read, then inlined into snapshot)
-- [ ] **DATA-07**: `audit_log` table records all admin mutations (params updates, account creates, proposal deletes, role grants)
-- [ ] **DATA-08**: `proposals` index on `(user_id, created_at desc)` for the home-page query
-- [ ] **DATA-09**: `proposals.pdf_sha256` stored at generation time and never recomputed
-- [ ] **DATA-10**: Soft-deleted proposals retained for 30 days, then hard-purged by a scheduled job (sets blob delete + row delete + audit log entry)
+- [x] **DATA-01**: `proposals` table stores a deep-copy `params_snapshot` jsonb of the global params in force at creation time
+- [x] **DATA-02**: `proposals` table stores `inputs` jsonb with all form values
+- [x] **DATA-03**: `proposals` table stores `computed` jsonb with all derived values used by the PDF
+- [x] **DATA-04**: `proposals.schema_version` field present from day one; bumped whenever the calc formula or PDF layout changes; old proposals routed to old renderers based on this field
+- [x] **DATA-05**: `global_params` table is append-only (history of admin edits); each row has `effective_from`, `created_by`, the actual values, and an optional admin note
+- [x] **DATA-06**: New proposals read the most-recent `global_params` row at creation time (single read, then inlined into snapshot)
+- [x] **DATA-07**: `audit_log` table records all admin mutations (params updates, account creates, proposal deletes, role grants)
+- [x] **DATA-08**: `proposals` index on `(user_id, created_at desc)` for the home-page query
+- [x] **DATA-09**: `proposals.pdf_sha256` stored at generation time and never recomputed
+- [x] **DATA-10**: Soft-deleted proposals retained for 30 days, then hard-purged by a scheduled job (sets blob delete + row delete + audit log entry)
 - [ ] **DATA-11**: PDFs themselves are retained for 10 years minimum (French commercial-document retention) regardless of partner deactivation; partner deactivation never deletes PDFs
 - [ ] **DATA-12**: Coefficient seed migration inserts v10 baseline values; idempotent (`ON CONFLICT DO NOTHING`); runs in dev / preview / prod identically
 
@@ -299,16 +299,16 @@
 | PROP-24 | Phase 7 | Complete (07-05) |
 | PROP-25 | Phase 7 | Complete (07-05) |
 | PROP-26 | Phase 8 | Pending |
-| DATA-01 | Phase 8 | Pending |
-| DATA-02 | Phase 8 | Pending |
-| DATA-03 | Phase 8 | Pending |
-| DATA-04 | Phase 8 | Pending |
-| DATA-05 | Phase 8 | Pending |
-| DATA-06 | Phase 8 | Pending |
-| DATA-07 | Phase 8 | Pending |
-| DATA-08 | Phase 8 | Pending |
-| DATA-09 | Phase 8 | Pending |
-| DATA-10 | Phase 8 | Pending |
+| DATA-01 | Phase 8 | Complete |
+| DATA-02 | Phase 8 | Complete |
+| DATA-03 | Phase 8 | Complete |
+| DATA-04 | Phase 8 | Complete |
+| DATA-05 | Phase 8 | Complete |
+| DATA-06 | Phase 8 | Complete |
+| DATA-07 | Phase 8 | Complete |
+| DATA-08 | Phase 8 | Complete |
+| DATA-09 | Phase 8 | Complete |
+| DATA-10 | Phase 8 | Complete |
 | DATA-11 | Phase 8 | Pending |
 | DATA-12 | Phase 8 | Pending |
 | ADMIN-01 | Phase 9 | Pending |
