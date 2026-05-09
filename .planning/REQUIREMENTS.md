@@ -92,7 +92,7 @@
 - [x] **PROP-16**: PDF rendered with `@react-pdf/renderer` using a deterministic configuration (pinned font files, fixed metadata, no `Date.now()` calls in the render tree)
 - [ ] **PROP-17**: PDF byte-determinism gated by CI: a fixture proposal renders to a SHA-256 matching a committed expected hash
 - [x] **PROP-18**: PDF generation uses `Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })` and `Intl.DateTimeFormat('fr-FR' | 'en-GB')` explicitly — never system defaults
-- [ ] **PROP-19**: Plus Jakarta Sans woff2 files self-hosted under `public/fonts/`; PDF generation waits for `document.fonts.ready` before render
+- [x] **PROP-19**: Plus Jakarta Sans woff2 files self-hosted under `public/fonts/`; PDF generation waits for `document.fonts.ready` before render
 - [x] **PROP-20**: Partner can search their proposals by client name or LC reference (ILIKE, case-insensitive)
 - [x] **PROP-21**: Partner can duplicate a proposal: button on detail page → routes to `/proposals/new` with form values pre-filled from the source proposal; on save, the new proposal snapshots **current** global params (not the source's)
 - [x] **PROP-22**: Partner can soft-delete a proposal (sets `deleted_at`); soft-deleted proposals are hidden from default list but PDF remains in blob storage
@@ -291,7 +291,7 @@
 | PROP-16 | Phase 8 | Complete |
 | PROP-17 | Phase 8 | Pending |
 | PROP-18 | Phase 8 | Complete |
-| PROP-19 | Phase 8 | Pending |
+| PROP-19 | Phase 8 | Complete |
 | PROP-20 | Phase 8 | Complete |
 | PROP-21 | Phase 8 | Complete |
 | PROP-22 | Phase 8 | Complete |
