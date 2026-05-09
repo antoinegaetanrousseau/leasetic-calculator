@@ -121,10 +121,10 @@ Plans:
   3. An admin can list all partners (email, display name, status, last login, created date), disable / re-enable any account, and trigger a one-time admin-mediated reset URL for any partner
   4. Every admin mutation (params update, account create, partner disable, proposal delete, role grant) writes a row to `audit_log` with actor + action + target + payload + timestamp
   5. Commission values are nowhere visible to the admin (not in lists, not in proposal views, not in logs, not in traces) except inside the explicit "explain calculation" debug tool that runs entirely in the admin's browser with no DB write
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 Plans:
 **Wave 1**
-- [ ] 09-01-PLAN.md — Foundation: extend audit_log union + new admin-action wrappers (requireAdmin → primitive → writeAuditLog) + listPartnersWithCounts + listGlobalParamsHistory + ~49 i18n keys × 2 langs + 4 CSS classes (ADMIN-02, ADMIN-05, ADMIN-06, ADMIN-08, ADMIN-09)
+- [x] 09-01-PLAN.md — Foundation: extend audit_log union + new admin-action wrappers (requireAdmin → primitive → writeAuditLog) + listPartnersWithCounts + listGlobalParamsHistory + ~49 i18n keys × 2 langs + 4 CSS classes (ADMIN-02, ADMIN-05, ADMIN-06, ADMIN-08, ADMIN-09)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 09-02-PLAN.md — Coefficients page: editor (RHF + Zod, 4×3 table, note) + SaveConfirmModal (computed diff) + HistoryTable (cursor pagination + per-row diff) + ExplainTool (pure-client formula trail — sole non-editor commission surface) (ADMIN-01..04, ADMIN-09)
@@ -158,7 +158,7 @@ Plans:
 | 6. Auth & Shell | v1.1 | 9/9 | Complete | 2026-05-08 |
 | 7. Calc Engine Port + Proposal Form | v1.1 | 6/6 | Complete | 2026-05-09 |
 | 8. Persistence + PDF Pipeline | v1.1 | 14/14 | Complete    | 2026-05-09 |
-| 9. Admin Surface | v1.1 | 0/4 | Planned | - |
+| 9. Admin Surface | v1.1 | 1/4 | In Progress|  |
 | 10. Cutover & Polish | v1.1 | 0/0 | Not started | - |
 
 ---
