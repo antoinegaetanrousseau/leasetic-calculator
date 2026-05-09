@@ -5,14 +5,13 @@ import { Plus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
 import { formatDate } from '@/lib/i18n/format';
-import type { GlobalParamsRow } from '@/db/schema';
-import type { GlobalParamsCursor } from '@/lib/db/queries/global-params';
+import type { GlobalParamsCursor, GlobalParamsHistoryRow } from '@/lib/db/queries/global-params';
 import { HistoryDiff, computeDiffPairs } from './HistoryDiff';
 import { loadMoreHistory } from './history-load-more.action';
 
 export interface HistoryTableProps {
   lang: Lang;
-  initialRows: GlobalParamsRow[];
+  initialRows: GlobalParamsHistoryRow[];
   initialHasMore: boolean;
   initialNextCursor: GlobalParamsCursor | null;
 }
@@ -26,7 +25,7 @@ export function HistoryTable({
   initialHasMore,
   initialNextCursor,
 }: HistoryTableProps) {
-  const [rows, setRows] = useState<GlobalParamsRow[]>(initialRows);
+  const [rows, setRows] = useState<GlobalParamsHistoryRow[]>(initialRows);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [cursor, setCursor] = useState<GlobalParamsCursor | null>(
     initialNextCursor,
@@ -124,10 +123,8 @@ export function HistoryTable({
                       })}
                     </td>
                     <td style={{ padding: '14px 12px', fontSize: 13, color: 'var(--ink)' }}>
-                      {/* D-09-02: display admin displayName. For now render the raw createdBy id with
-                          a '—' fallback — full displayName JOIN is a Plan 03 follow-up
-                          (row.createdBy stores user.id; UI-SPEC §3.1.3.2 requests displayName ?? email). */}
-                      {row.createdBy ?? '—'}
+                      {/* WR-05: render displayName ?? email from the LEFT JOIN in listGlobalParamsHistory. */}
+                      {row.createdByDisplay ?? '—'}
                     </td>
                     <td style={{ padding: '14px 12px' }}>
                       <HistoryDiff

@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, desc, sql } from 'drizzle-orm';
+import { and, desc, sql, eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import type { GlobalParamsRow, NewGlobalParamsRow } from '@/db/schema';
 
@@ -44,8 +44,13 @@ export interface ListGlobalParamsHistoryArgs {
   limit?: number;   // default 20
 }
 
+/** WR-05: history rows augmented with the admin's display name (displayName ?? email). */
+export interface GlobalParamsHistoryRow extends GlobalParamsRow {
+  createdByDisplay: string | null;
+}
+
 export interface GlobalParamsHistoryResult {
-  rows: GlobalParamsRow[];
+  rows: GlobalParamsHistoryRow[];
   hasMore: boolean;
   nextCursor: GlobalParamsCursor | null;
 }
@@ -97,15 +102,30 @@ export async function listGlobalParamsHistory(
     ? sql`(${schema.globalParams.effectiveFrom}, ${schema.globalParams.id}) < (${cursor.effectiveFrom}::timestamptz, ${cursor.id}::uuid)`
     : undefined;
 
-  const rows = await dbi
-    .select()
+  // WR-05: LEFT JOIN users to surface displayName ?? email in the history table.
+  // global_params.created_by is a text FK to users.id (Better Auth nanoid).
+  const rawRows = await dbi
+    .select({
+      // All global_params columns
+      id: schema.globalParams.id,
+      commissionPct: schema.globalParams.commissionPct,
+      maxAmount: schema.globalParams.maxAmount,
+      validityDays: schema.globalParams.validityDays,
+      coefficients: schema.globalParams.coefficients,
+      note: schema.globalParams.note,
+      effectiveFrom: schema.globalParams.effectiveFrom,
+      createdBy: schema.globalParams.createdBy,
+      // Joined admin display name
+      createdByDisplay: sql<string | null>`COALESCE(${schema.users.displayName}, ${schema.users.email})`,
+    })
     .from(schema.globalParams)
+    .leftJoin(schema.users, eq(schema.users.id, schema.globalParams.createdBy))
     .where(cursorPredicate ? and(cursorPredicate) : undefined)
     .orderBy(desc(schema.globalParams.effectiveFrom), desc(schema.globalParams.id))
     .limit(fetchCount);
 
-  const hasMore = rows.length > limit;
-  const sliced = hasMore ? rows.slice(0, limit) : rows;
+  const hasMore = rawRows.length > limit;
+  const sliced = hasMore ? rawRows.slice(0, limit) : rawRows;
   const last = sliced[sliced.length - 1];
   const nextCursor: GlobalParamsCursor | null =
     hasMore && last

@@ -39,6 +39,7 @@ export type {
   GlobalParamsCursor,
   ListGlobalParamsHistoryArgs,
   GlobalParamsHistoryResult,
+  GlobalParamsHistoryRow,
 } from './global-params';
 
 export { listPartnersWithCounts } from './users';
