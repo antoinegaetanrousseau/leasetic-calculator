@@ -3,6 +3,7 @@ import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang } from '@/lib/i18n';
 import { submitProposal } from '@/lib/api/proposals/submit';
 import { SubmitError, errorHttpStatus, type SubmitErrorCode } from '@/lib/api/proposals/errors';
+import { buildListResponse } from '@/lib/api/proposals/list';
 
 // PROP-09 + PITFALLS §1.3: route handler, NOT server action.
 // Node runtime — @react-pdf/renderer + storage adapter both need Node APIs.
@@ -60,4 +61,34 @@ function jsonError(code: SubmitErrorCode, statusOverride?: number) {
     { error: code },
     { status: statusOverride ?? errorHttpStatus[code] },
   );
+}
+
+// ── GET /api/proposals — JSON list (PROP-05, PROP-20) ─────────────────────────
+// Powers the home list's Load More button (D-C1) + search-as-you-type (D-C2).
+// Cursor decoded by buildListResponse; malformed cursor → treated as no cursor.
+
+export async function GET(req: NextRequest) {
+  let userId: string;
+  try {
+    const { session } = await requireUser();
+    userId = session.user.id;
+  } catch {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
+  const url = req.nextUrl;
+  const q = url.searchParams.get('q') ?? undefined;
+  const cursor = url.searchParams.get('cursor');
+  const deleted = url.searchParams.get('deleted') === '1';
+  const limitParam = url.searchParams.get('limit');
+  const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 20, 1), 50) : 20;
+
+  const response = await buildListResponse({
+    userId, q, cursorEncoded: cursor, deleted, limit,
+  });
+
+  return NextResponse.json(response, {
+    status: 200,
+    headers: { 'Cache-Control': 'private, max-age=0, no-store' },
+  });
 }
