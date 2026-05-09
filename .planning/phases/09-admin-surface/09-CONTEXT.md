@@ -68,7 +68,7 @@ Build the admin operating surface on top of Phase 6's hidden `/[adminSegment]` g
         = 50 000 × 1.05 × 2.3000 / 100
         = 1 207.50 €/mois
   ```
-  Each step labeled in i18n. `commission_pct` appears as a named term — this is the SOLE admin surface where it is visible (alongside the coefficients editor). Use `formatCurrency` / `formatNumber` from Phase 6 `src/lib/format.ts` for all numeric rendering (explicit fr-FR / en-GB locale per SHELL-09).
+  Each step labeled in i18n. `commission_pct` appears as a named term — this is the SOLE admin surface where it is visible (alongside the coefficients editor). Use `formatCurrency` / `formatNumber` from Phase 6 `src/lib/i18n/format.ts` for all numeric rendering (explicit fr-FR / en-GB locale per SHELL-09).
 - **D-09-08 (Compute location):** Pure client. The page server-component reads the latest `global_params` row (the editor needs it anyway), passes it as props to a `'use client'` `<ExplainTool>` component. The component imports `computeLoyer` from `src/lib/calc` (already client-safe per Phase 7 — pure-TS module, no React, no I/O). Compute runs in the admin's browser. Zero network, zero DB write, zero audit_log entry. ADMIN-09 enforcement: trivially auditable — the route handler is read-only on `global_params`, the client-component performs no mutations.
 
 ### Validity options scope (gathered 2026-05-09)
@@ -142,7 +142,7 @@ Build the admin operating surface on top of Phase 6's hidden `/[adminSegment]` g
 - `src/lib/auth/actions.ts` — `disableUser`, `reEnableUser`, `createInvitation`, `createPasswordReset` — Phase 9 WRAPS these (D-09-09), does NOT edit
 - `src/lib/auth/redeem.ts` — invitation/reset redemption flow; Phase 9 reads to determine the "invitation unredeemed" predicate for D-09-11(b)
 - `src/lib/i18n/dictionaries.ts` — 263+ keys; Phase 9 ADDS ~40-50 new keys × 2 langs (D-09 implicit decision)
-- `src/lib/format.ts` — `formatCurrency`, `formatNumber`, `formatDate` (explicit fr-FR / en-GB locale per SHELL-09); Phase 9 reuses everywhere numbers/dates render
+- `src/lib/i18n/format.ts` — `formatCurrency`, `formatNumber`, `formatDate` (explicit fr-FR / en-GB locale per SHELL-09); Phase 9 reuses everywhere numbers/dates render
 - `app/(admin)/[adminSegment]/layout.tsx` — 2-layer admin gate (env-segment notFound → requireAdmin); Phase 9 adds children, no layout edits
 - `app/(admin)/[adminSegment]/page.tsx` — placeholder admin home; Phase 9 replaces body with two card-style links to `/coefficients` and `/accounts`
 - Phase 6 plan 06-07 SUMMARY — `InviteUrlModal` primitive details (one-time URL display, copy button, "won't be shown again" warning); Phase 9 reuses for new-partner + reset + re-issue invitation flows
@@ -173,7 +173,7 @@ Build the admin operating surface on top of Phase 6's hidden `/[adminSegment]` g
 - **`writeAuditLog()`** (`src/lib/db/queries/audit-log.ts`): Phase 9 EXTENDS the `AuditAction` union (D-09-09a) and calls from wrapped admin actions.
 - **`getLatestGlobalParams()`** + **`insertGlobalParams()`** (`src/lib/db/queries/global-params.ts`): Phase 9 reads via the former (editor + history), writes via the latter (wrapped in admin action with audit log).
 - **`computeLoyer`, `tKey`, `validityDaysSchema`** (`src/lib/calc/index.ts`): Phase 9 explain tool imports `computeLoyer` client-side; tranche auto-derived via `tKey()`.
-- **`formatCurrency`, `formatNumber`, `formatDate`** (`src/lib/format.ts`): explicit fr-FR / en-GB locale; reused everywhere Phase 9 renders numbers/dates.
+- **`formatCurrency`, `formatNumber`, `formatDate`** (`src/lib/i18n/format.ts`): explicit fr-FR / en-GB locale; reused everywhere Phase 9 renders numbers/dates.
 - **CSS chrome** (`app/globals.css` from Phases 4–7): `.card`, `.ctitle`, `.fld`, `.invalid`, `.btn-green`, `.btn-out`, `.btn-navy`, `.tbadge`, `.dg/.db/.db.on`, `.yn-btn`, `.chip` (Phase 8). Phase 9 reuses for editor cards, accounts table rows, status chips. May add: `.tabs` if planner picks tab UI for explain tool, `.history-row .diff` for the rendered-diff cell styling.
 - **Sonner toasts**: success/info/error/loading patterns from Phase 6/7/8.
 - **RHF + Zod, same schema client+server** (SHELL-11 pattern).
