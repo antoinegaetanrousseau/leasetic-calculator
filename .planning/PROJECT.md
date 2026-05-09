@@ -85,7 +85,7 @@ REQ-IDs assigned in `REQUIREMENTS.md`. High-level scope:
 - [ ] Portable stack: Next.js + Postgres + Blob storage + NextAuth (no Vercel-only primitives → OVH migration path preserved)
 - [ ] Email + password authentication, admin-invited (no self-signup)
 - [ ] Multi-page shell: auth → home (new / browse recent) → proposal flow (data entry → result → review → export)
-- [ ] Persistent PDF proposals — immutable binary blobs, per-account, never affected by future coefficient changes
+- [x] Persistent PDF proposals — immutable binary blobs, per-account, never affected by future coefficient changes — Phase 8 (2026-05-09)
 - [ ] Admin-only coefficients page at hidden URL, role-gated, editing **global** coefficients / commission / max threshold
 - [ ] Hard cutover from v10 standalone (clean slate, no localStorage migration)
 
@@ -181,4 +181,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-05 — milestone v1.1 started.*
+*Last updated: 2026-05-09 — Phase 8 (Persistence + PDF Pipeline) complete.*
