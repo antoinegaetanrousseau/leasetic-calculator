@@ -116,7 +116,10 @@ export async function adminUpdateGlobalParams(
     });
     return newRow;
   } catch (e) {
-    console.error('[adminUpdateGlobalParams] failed:', e);   // PITFALLS §9.4
+    // CR-03 / ADMIN-09 §9.4: do NOT log `e` directly — DB errors (postgres.js / Drizzle)
+    // may embed commission_pct in the query-parameter dump. Log message only.
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[adminUpdateGlobalParams] failed:', msg);
     throw new Error('admin.coefficients.error.save');
   }
 }
