@@ -351,7 +351,9 @@ export const dictionaries = {
     'proposal.detail.section.inputs': 'Saisie',
     'proposal.detail.section.computed': 'Calcul',
     'proposal.detail.computed.expires.label': "Valable jusqu\u2019au {0}",
+    'proposal.detail.computed.expires.key': "Valable jusqu\u2019au",
     'proposal.detail.computed.expired.label': 'Expirée le {0}',
+    'proposal.detail.computed.expired.key': 'Expirée le',
     'proposal.detail.computed.loyer.suffix': '/ mois',
 
     // 7.4 Action buttons (4 keys)
@@ -722,7 +724,9 @@ export const dictionaries = {
     'proposal.detail.section.inputs': 'Input',
     'proposal.detail.section.computed': 'Computed',
     'proposal.detail.computed.expires.label': 'Valid until {0}',
+    'proposal.detail.computed.expires.key': 'Valid until',
     'proposal.detail.computed.expired.label': 'Expired on {0}',
+    'proposal.detail.computed.expired.key': 'Expired on',
     'proposal.detail.computed.loyer.suffix': '/ month',
 
     // 7.4 Action buttons (4 keys)

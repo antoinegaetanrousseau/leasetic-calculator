@@ -428,9 +428,9 @@ function ValidityFooter({
   const expiresAt = new Date(createdAt.getTime() + validityDays * 86_400_000);
   const isExpired = nowMs >= expiresAt.getTime();
   const labelKey = isExpired
-    ? 'proposal.detail.computed.expired.label'
-    : 'proposal.detail.computed.expires.label';
-  const expiresLabel = t(labelKey, lang).split(' {')[0];
+    ? 'proposal.detail.computed.expired.key'
+    : 'proposal.detail.computed.expires.key';
+  const expiresLabel = t(labelKey, lang);
 
   return (
     <dl
