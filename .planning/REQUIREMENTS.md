@@ -124,7 +124,7 @@
 - [x] **ADMIN-04**: Coefficient change history is visible on the admin page as a table (timestamp, admin, fields changed, optional note)
 - [x] **ADMIN-05**: Admin can list all partners (email, display name, status active/disabled, last login, created date)
 - [x] **ADMIN-06**: Admin can disable / re-enable a partner account
-- [ ] **ADMIN-07**: Admin's hidden URL segment is set via `ADMIN_URL_SEGMENT` env var; rotatable without code changes
+- [x] **ADMIN-07**: Admin's hidden URL segment is set via `ADMIN_URL_SEGMENT` env var; rotatable without code changes
 - [x] **ADMIN-08**: Admin actions log to the `audit_log` table (actor, action type, target, payload, timestamp)
 - [x] **ADMIN-09**: Commission values do not appear anywhere admin-visible except in the deliberate "explain calculation" debug tool (which runs in admin's browser only, no DB write)
 
@@ -317,7 +317,7 @@
 | ADMIN-04 | Phase 9 | Complete |
 | ADMIN-05 | Phase 9 | Complete |
 | ADMIN-06 | Phase 9 | Complete |
-| ADMIN-07 | Phase 9 | Pending |
+| ADMIN-07 | Phase 9 | Complete |
 | ADMIN-08 | Phase 9 | Complete |
 | ADMIN-09 | Phase 9 | Complete |
 | CUT-01 | Phase 10 | Pending |

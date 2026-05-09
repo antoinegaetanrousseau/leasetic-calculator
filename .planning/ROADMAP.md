@@ -23,7 +23,7 @@
 - [x] **Phase 6: Auth & Shell** — Login, session, role-gating with hidden admin URL; bilingual app shell with FR/EN i18n + dark mode. ✅ Complete 2026-05-08: all 9/9 plans done, 32/32 AUTH+SHELL requirements satisfied, migration 0001 applied to prod, both admins (antoine + emmanuel @leasetic.com) seeded and verified to log in end-to-end. Follow-ups: admin password rotation (shared launch password → individual strong), Better Auth trustedOrigins behavior investigation, Origin-gate documentation, APP_URL/NEXT_PUBLIC_APP_URL env requirement made explicit.
 - [x] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet). ✅ Complete 2026-05-09: 6/6 plans done, 14/14 requirements satisfied (CALC-01..08, PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25). Live preview ships at /proposals/new — partner types into form + 300ms-debounced sticky right-column card shows formatted loyer (fr-FR/en-GB explicit locale), generated LC ref + Copy button, validity selector. Calc engine + 30 golden tests preserve v10 formula parity (±0.01 €). 227/227 tests passing.
 - [x] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete (completed 2026-05-09)
-- [ ] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown
+- [x] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown. ✅ Complete 2026-05-10: 4/4 plans done, ADMIN-01..09 satisfied. Admin home nav hub, validity seam wired to global_params.
 - [ ] **Phase 10: Cutover & Polish** — v10 retirement + redirect, OVH portability smoke deploy, runbooks, legal/privacy hookup, soft-delete purge job
 
 ## Phase Details
@@ -121,7 +121,7 @@ Plans:
   3. An admin can list all partners (email, display name, status, last login, created date), disable / re-enable any account, and trigger a one-time admin-mediated reset URL for any partner
   4. Every admin mutation (params update, account create, partner disable, proposal delete, role grant) writes a row to `audit_log` with actor + action + target + payload + timestamp
   5. Commission values are nowhere visible to the admin (not in lists, not in proposal views, not in logs, not in traces) except inside the explicit "explain calculation" debug tool that runs entirely in the admin's browser with no DB write
-**Plans:** 1/4 plans executed
+**Plans:** 4/4 plans executed ✅ Complete 2026-05-10
 Plans:
 **Wave 1**
 - [x] 09-01-PLAN.md — Foundation: extend audit_log union + new admin-action wrappers (requireAdmin → primitive → writeAuditLog) + listPartnersWithCounts + listGlobalParamsHistory + ~49 i18n keys × 2 langs + 4 CSS classes (ADMIN-02, ADMIN-05, ADMIN-06, ADMIN-08, ADMIN-09)
@@ -131,7 +131,7 @@ Plans:
 - [x] 09-03-PLAN.md — Accounts page: partners list (6 cols + status chip + last-login relative + proposalsCount) + per-row Disable/Re-enable confirm-toast + Re-issue/Reset URL via InviteUrlModal + CreatePartnerModal (ADMIN-05, ADMIN-06, ADMIN-08, ADMIN-09)
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 09-04-PLAN.md — Admin home (two-card nav grid) + getDefaultValidityDays() swap-in seam wiring proposal-new page (ADMIN-07)
+- [x] 09-04-PLAN.md — Admin home (two-card nav grid) + getDefaultValidityDays() swap-in seam wiring proposal-new page (ADMIN-07)
 **UI hint**: yes
 
 ### Phase 10: Cutover & Polish

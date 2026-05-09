@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: executing
-last_updated: "2026-05-10T00:57:16.000Z"
-last_activity: 2026-05-10
+status: verifying
+last_updated: "2026-05-09T23:06:47.706Z"
+last_activity: 2026-05-09
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 40
-  completed_plans: 39
-  percent: 97
+  completed_plans: 40
+  percent: 100
 ---
 
 # State — Matrice Commerciale
@@ -27,22 +27,22 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 9 (admin-surface) — EXECUTING
-Plan: 4 of 4
-Status: Plan 09-03 complete — accounts page delivered
-Next: Plan 09-04 (admin home + verifier)
+Phase: 9 (admin-surface) — COMPLETE
+Plan: 4 of 4 (all plans shipped)
+Status: Phase 9 complete — 4/4 plans done, ADMIN-01..09 satisfied
+Next: Phase 10 (cutover & polish)
 Last activity: 2026-05-10
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
-v1.1 ██████████░░░░░░░░░░ 3/6 phases complete (Phase 8 next)
+v1.1 █████████████████░░░ 5/6 phases complete (Phase 10 next)
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
        └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
        └─ Phase 7: Calc Engine + Form        ✅ complete (6/6 plans — calc engine ✅, 30-case golden corpus ✅, 30-key i18n ✅, home shell ✅, 14-input form ✅, live preview ✅; CALC-01..08 + PROP-01/06/07/08/24/25 satisfied)
        └─ Phase 8: Persistence + PDF         ✅ complete (14/14 plans; PROP-02..25 + DATA-01..10 + PDF-01..06 grounded)
-       └─ Phase 9: Admin Surface             ◯ blocked on P8
+       └─ Phase 9: Admin Surface             ✅ complete (4/4 plans; ADMIN-01..09 satisfied)
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
 ```
 
