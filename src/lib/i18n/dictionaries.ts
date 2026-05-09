@@ -316,6 +316,86 @@ export const dictionaries = {
     'form.tranche.t2': '50 001 € → 100 000 €',
     'form.tranche.t3': '100 001 € → 250 000 €',
     'form.tranche.t4': '250 001 € et plus',
+
+    // ── Phase 8 — Persistence + PDF Pipeline (Plan 08-02) ──────────────────────
+    // 56 new keys × 2 langs per UI-SPEC §7. Reuse v10 keys for 5 PDF labels
+    // (see UI-SPEC §7.9 reuse table): proposal.duree.label, proposal.duree.months,
+    // proposal.interests.slb, proposal.interests.eval, proposal.montant.label.
+    // Plan 08-05 (PDF) + Plan 08-10 (detail) consume those existing keys directly.
+
+    // 7.1 List view (11 keys)
+    'proposal.search.placeholder': 'Rechercher par client ou référence...',
+    'proposal.search.aria': 'Rechercher dans vos propositions',
+    'proposal.search.clear': 'Effacer la recherche',
+    'proposal.search.empty.title': 'Aucune proposition trouvée',
+    'proposal.search.empty.body': 'Essayez un autre nom de client ou référence.',
+    'proposal.list.toggle.active': 'Actives',
+    'proposal.list.toggle.deleted': 'Supprimées',
+    'proposal.list.load.more': 'Charger plus',
+    'proposal.list.load.more.loading': 'Chargement...',
+    'proposal.deleted.empty.title': 'Aucune proposition supprimée récemment',
+    'proposal.deleted.empty.body': 'Les propositions supprimées apparaissent ici pendant 30 jours.',
+
+    // 7.2 Validity / chips (6 keys)
+    'proposal.chip.active': 'Active',
+    'proposal.chip.expired': 'Expirée',
+    'proposal.chip.deleted': 'Supprimée le {0}',
+    'proposal.chip.language.tooltip': 'Document généré en français.',
+    'proposal.chip.tooltip.expires': "Valable jusqu\u2019au {0}",
+    'proposal.chip.tooltip.expired': 'Expirée le {0}',
+
+    // 7.3 Detail page header + sections (7 keys)
+    'proposal.detail.title': 'Proposition {0}',
+    'proposal.detail.created.line': 'Créée le {0} à {1}',
+    'proposal.detail.section.inputs': 'Saisie',
+    'proposal.detail.section.computed': 'Calcul',
+    'proposal.detail.computed.expires.label': "Valable jusqu\u2019au {0}",
+    'proposal.detail.computed.expired.label': 'Expirée le {0}',
+    'proposal.detail.computed.loyer.suffix': '/ mois',
+
+    // 7.4 Action buttons (4 keys)
+    'proposal.detail.action.download': 'Télécharger le PDF',
+    'proposal.detail.action.duplicate': 'Dupliquer',
+    'proposal.detail.action.delete': 'Supprimer',
+    'proposal.detail.action.restore': 'Restaurer',
+
+    // 7.5 PDF preview + fallback (3 keys)
+    'proposal.detail.pdf.preview.title': 'APERÇU PDF',
+    'proposal.detail.pdf.preview.aria': 'Aperçu du document PDF de la proposition',
+    'proposal.detail.pdf.fallback.link': 'Voir le PDF dans un nouvel onglet',
+
+    // 7.6 Deleted-view banner + confirm (2 keys)
+    'proposal.detail.deleted.banner': 'Cette proposition est supprimée. Restaurez-la dans les {0} jours restants.',
+    'proposal.confirm.delete': "Supprimer cette proposition\u00a0? Vous pourrez la restaurer dans les 30 jours depuis \u00ab\u202fVoir supprimées\u202f\u00bb.",
+
+    // 7.7 Toasts (9 keys — submit pipeline + delete/restore/duplicate)
+    'proposal.toast.submit.loading': 'Génération du PDF en cours...',
+    'proposal.toast.submit.success': 'Proposition créée.',
+    'proposal.toast.submit.error': 'Erreur lors de la génération — veuillez réessayer.',
+    'proposal.toast.delete.success': 'Proposition supprimée.',
+    'proposal.toast.delete.action.view.deleted': 'Voir',
+    'proposal.toast.delete.error': 'Erreur lors de la suppression. Réessayez.',
+    'proposal.toast.restore.success': 'Proposition restaurée.',
+    'proposal.toast.restore.error': 'Erreur lors de la restauration. Réessayez.',
+    'proposal.toast.duplicate.prefilled': "Champs pré-remplis depuis la proposition d\u2019origine. Modifiez si nécessaire.",
+
+    // 7.8 PDF document copy (14 keys — used by @react-pdf/renderer only;
+    //     5 v10 keys reused per §7.9 — pdf.computed.duration.* + pdf.interests.* + pdf.computed.amount.label
+    //     are NOT redeclared; consumers reference proposal.duree.* / proposal.interests.* / proposal.montant.label.)
+    'pdf.tagline': 'Location financière IT',
+    'pdf.title': 'Proposition de location financière',
+    'pdf.ref.label': 'N°',
+    'pdf.section.recipient': 'DESTINATAIRE',
+    'pdf.section.project': 'PROJET',
+    'pdf.section.interests': "POINTS D\u2019INTÉRÊT IDENTIFIÉS\u202f:",
+    'pdf.project.placeholder': 'Projet non précisé',
+    'pdf.project.ref.prefix': 'Réf. partenaire\u202f:',
+    'pdf.computed.coefficient.label': 'Coefficient appliqué',
+    'pdf.loyer.label': 'LOYER MENSUEL HT',
+    'pdf.loyer.subtext': 'sur {0} mois',
+    'pdf.loyer.on.demand': 'Sur demande',
+    'pdf.validity.caption': "Proposition valable jusqu\u2019au {0} ({1} jours), sous réserve de l\u2019accord du comité des engagements de Leasétic. Document non contractuel.",
+    'pdf.footer.left': 'N° {0} · Créée le {1}',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -610,6 +690,81 @@ export const dictionaries = {
     'form.tranche.t2': '50,001 € → 100,000 €',
     'form.tranche.t3': '100,001 € → 250,000 €',
     'form.tranche.t4': '250,001 € and above',
+
+    // ── Phase 8 — Persistence + PDF Pipeline (Plan 08-02) ──────────────────────
+
+    // 7.1 List view (11 keys)
+    'proposal.search.placeholder': 'Search by client or reference...',
+    'proposal.search.aria': 'Search your proposals',
+    'proposal.search.clear': 'Clear search',
+    'proposal.search.empty.title': 'No proposals found',
+    'proposal.search.empty.body': 'Try a different client name or reference.',
+    'proposal.list.toggle.active': 'Active',
+    'proposal.list.toggle.deleted': 'Deleted',
+    'proposal.list.load.more': 'Load more',
+    'proposal.list.load.more.loading': 'Loading...',
+    'proposal.deleted.empty.title': 'No recently deleted proposals',
+    'proposal.deleted.empty.body': 'Deleted proposals appear here for 30 days.',
+
+    // 7.2 Validity / chips (6 keys)
+    'proposal.chip.active': 'Active',
+    'proposal.chip.expired': 'Expired',
+    'proposal.chip.deleted': 'Deleted on {0}',
+    'proposal.chip.language.tooltip': 'Document generated in English.',
+    'proposal.chip.tooltip.expires': 'Valid until {0}',
+    'proposal.chip.tooltip.expired': 'Expired on {0}',
+
+    // 7.3 Detail page header + sections (7 keys)
+    'proposal.detail.title': 'Proposal {0}',
+    'proposal.detail.created.line': 'Created on {0} at {1}',
+    'proposal.detail.section.inputs': 'Input',
+    'proposal.detail.section.computed': 'Computed',
+    'proposal.detail.computed.expires.label': 'Valid until {0}',
+    'proposal.detail.computed.expired.label': 'Expired on {0}',
+    'proposal.detail.computed.loyer.suffix': '/ month',
+
+    // 7.4 Action buttons (4 keys)
+    'proposal.detail.action.download': 'Download PDF',
+    'proposal.detail.action.duplicate': 'Duplicate',
+    'proposal.detail.action.delete': 'Delete',
+    'proposal.detail.action.restore': 'Restore',
+
+    // 7.5 PDF preview + fallback (3 keys)
+    'proposal.detail.pdf.preview.title': 'PDF PREVIEW',
+    'proposal.detail.pdf.preview.aria': 'PDF preview of the proposal document',
+    'proposal.detail.pdf.fallback.link': 'Open PDF in a new tab',
+
+    // 7.6 Deleted-view banner + confirm (2 keys)
+    'proposal.detail.deleted.banner': 'This proposal is deleted. Restore it within the next {0} days.',
+    'proposal.confirm.delete': "Delete this proposal? You can restore it within 30 days from 'Show deleted'.",
+
+    // 7.7 Toasts (9 keys — submit pipeline + delete/restore/duplicate)
+    'proposal.toast.submit.loading': 'Generating PDF...',
+    'proposal.toast.submit.success': 'Proposal created.',
+    'proposal.toast.submit.error': 'Error during generation \u2014 please try again.',
+    'proposal.toast.delete.success': 'Proposal deleted.',
+    'proposal.toast.delete.action.view.deleted': 'View',
+    'proposal.toast.delete.error': 'Could not delete. Please try again.',
+    'proposal.toast.restore.success': 'Proposal restored.',
+    'proposal.toast.restore.error': 'Could not restore. Please try again.',
+    'proposal.toast.duplicate.prefilled': 'Fields pre-filled from source proposal. Edit if needed.',
+
+    // 7.8 PDF document copy (14 keys — used by @react-pdf/renderer only;
+    //     5 v10 keys reused per §7.9)
+    'pdf.tagline': 'IT financial leasing',
+    'pdf.title': 'Financial lease proposal',
+    'pdf.ref.label': 'No.',
+    'pdf.section.recipient': 'RECIPIENT',
+    'pdf.section.project': 'PROJECT',
+    'pdf.section.interests': 'POINTS OF INTEREST IDENTIFIED:',
+    'pdf.project.placeholder': 'Project not specified',
+    'pdf.project.ref.prefix': 'Partner ref.:',
+    'pdf.computed.coefficient.label': 'Applied coefficient',
+    'pdf.loyer.label': 'MONTHLY RENT (EX-VAT)',
+    'pdf.loyer.subtext': 'over {0} months',
+    'pdf.loyer.on.demand': 'On request',
+    'pdf.validity.caption': "Proposal valid until {0} ({1} days), subject to approval by Leas\u00e9tic's credit committee. Non-contractual document.",
+    'pdf.footer.left': 'No. {0} \u00b7 Created on {1}',
   },
 } as const;
 
