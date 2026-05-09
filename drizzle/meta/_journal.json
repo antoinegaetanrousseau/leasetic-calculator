@@ -22,6 +22,13 @@
       "when": 1778335492046,
       "tag": "0002_phase8_persistence",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778419200000,
+      "tag": "0003_seed_global_params",
+      "breakpoints": true
     }
   ]
 }

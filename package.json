@@ -13,6 +13,8 @@
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:check": "drizzle-kit check",
+    "build:seed-sql": "tsx scripts/build-seed-sql.ts",
+    "check:seed-sql": "tsx scripts/build-seed-sql.ts --check",
     "check:no-vercel-imports": "bash scripts/check-no-vercel-only-imports.sh",
     "check:no-drizzle-push": "bash scripts/check-no-drizzle-push.sh",
     "db:migrate": "tsx scripts/migrate.ts",
