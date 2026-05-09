@@ -39,7 +39,7 @@
  *   - If user does not exist → create user + accounts row
  */
 import 'dotenv/config';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';
 
 // Hardcoded launch-day admin pair. Per CONTEXT.md decision (Open Q6 resolution
