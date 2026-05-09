@@ -1,27 +1,43 @@
+import type { Metadata } from 'next';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Plus, FileText } from 'lucide-react';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
+import { buildListResponse } from '@/lib/api/proposals/list';
+import { ProposalsList } from '@/components/proposals/ProposalsList';
+import { SearchBar } from '@/components/proposals/SearchBar';
+import { RecentlyDeletedToggle } from '@/components/proposals/RecentlyDeletedToggle';
 
 // PITFALLS §1.6: cookie-reading layout opts out of static rendering.
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Accueil — Leasétic Matrice' };
 
 /**
- * Authenticated home page (PROP-01 — Phase 7).
+ * Module-level async helper so Date.now() is not called inside a React
+ * component function — satisfies react-hooks/purity (same pattern as
+ * Plan 08-10's getNowMs in the detail page).
+ */
+async function getNowMs(): Promise<number> {
+  return Date.now();
+}
+
+interface PageParams {
+  searchParams: Promise<{ q?: string; deleted?: string; cursor?: string }>;
+}
+
+/**
+ * Authenticated home page — Phase 8 (PROP-02..05, PROP-20).
  *
- * Replaces Phase 6's minimal placeholder body. Phase 8 will populate the
- * recent-proposals card with real DB rows. The shell (sidebar + topbar +
- * footer) is owned by app/(authed)/layout.tsx and stays unchanged.
+ * Server Component does the initial list fetch (SSR first paint) and passes
+ * { rows, hasMore, nextCursor } to the <ProposalsList> client orchestrator.
  *
  * Defence in depth: requireUser() runs again here even though the parent
- * layout already gated the route — same pattern as Plan 06-07's admin tree
- * (see require.ts comment block on PITFALLS §7.3 ordering).
+ * layout already gated the route (PITFALLS §7.3 ordering).
  */
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: PageParams) {
   const { session } = await requireUser();
   const lang = await getCurrentLang();
 
-  // Same fallback chain Phase 6 layout uses for the topbar's UserMenu.
   const u = session.user as {
     email: string;
     displayName?: string | null;
@@ -29,14 +45,33 @@ export default async function HomePage() {
   };
   const displayName = u.displayName ?? u.name ?? u.email;
 
-  // dashboard.greeting = "Bonjour, {0} 👋" / "Hello, {0} 👋" — manual interpolation
-  // because Phase 6's t() helper does not auto-interpolate. The greeting goes
-  // through JSXText so React's child-escape covers any HTML chars in displayName.
-  const greeting = t('dashboard.greeting', lang).replace('{0}', displayName);
+  const sp = await searchParams;
+  const q = sp.q ?? '';
+  const deleted = sp.deleted === '1';
+  const cursor = sp.cursor ?? null;
+
+  // SSR initial fetch — called directly (no HTTP round-trip on the SSR pass).
+  const initial = await buildListResponse({
+    userId: session.user.id,
+    q,
+    cursorEncoded: cursor,
+    deleted,
+    limit: 20,
+  });
+
+  // nowMs passed as prop so ValidityChip stays a pure render function
+  // (react-hooks/purity pattern from Plan 08-10 getNowMs helper).
+  const nowMs = await getNowMs();
+
+  // SSR re-mount key: forces ProposalsList to reset rows when URL params change.
+  // Back/forward navigation re-renders the server component, which propagates
+  // fresh initial props — the key change re-mounts ProposalsList so stale
+  // client-side rows are discarded.
+  const remountKey = `${q}|${deleted ? '1' : '0'}|${cursor ?? ''}`;
 
   return (
     <div>
-      {/* Greeting section — UI-SPEC §3.1.2 (no card chrome; sits on --paper) */}
+      {/* Greeting section — UI-SPEC §3.1.1 */}
       <section style={{ marginBottom: 32 }}>
         <h1
           style={{
@@ -46,7 +81,7 @@ export default async function HomePage() {
             marginBottom: 8,
           }}
         >
-          {greeting}
+          {t('dashboard.greeting', lang).replace('{0}', displayName)}
         </h1>
         <p
           style={{
@@ -59,7 +94,7 @@ export default async function HomePage() {
           {t('dashboard.subtext', lang)}
         </p>
 
-        {/* Primary CTA — UI-SPEC §3.1.2 */}
+        {/* Primary CTA — UI-SPEC §3.1.1 */}
         <Link
           href="/proposals/new"
           className="btn-green"
@@ -75,62 +110,30 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      {/* Recent-proposals card — Phase 7 ships the SHELL ONLY (PROP-01). */}
-      {/* Phase 8 will populate with real rows + search + pagination. */}
-      <section className="card">
-        <div className="ctitle">
-          {/* No dot for this section title — purely informational header. */}
-          <span>{t('dashboard.recent.title', lang)}</span>
-        </div>
-        {/* Separator — UI-SPEC §3.1.3 */}
+      {/* Recent-proposals card — UI-SPEC §3.1.1 */}
+      <section className="card" style={{ marginTop: 0 }}>
+        {/* Card header: title left + toggle right */}
         <div
           style={{
-            height: 1,
-            background: 'var(--border)',
-            margin: '12px 0 16px',
-          }}
-        />
-
-        {/* Empty-state body — UI-SPEC §3.1.3 */}
-        <div
-          style={{
-            minHeight: 240,
             display: 'flex',
-            flexDirection: 'column',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
+            gap: 16,
           }}
         >
-          <FileText
-            size={38}
-            strokeWidth={1.3}
-            color="var(--muted)"
-            style={{ opacity: 0.4 }}
-            aria-hidden="true"
-          />
-          <h2
-            style={{
-              fontSize: '16.5px',
-              fontWeight: 600,
-              color: 'var(--ink)',
-              marginTop: 16,
-              marginBottom: 8,
-            }}
-          >
-            {t('dashboard.empty.title', lang)}
-          </h2>
-          <p
-            style={{
-              fontSize: '14.5px',
-              fontWeight: 400,
-              color: 'var(--muted)',
-              maxWidth: 480,
-            }}
-          >
-            {t('dashboard.empty.body', lang)}
-          </p>
+          <div className="ctitle">
+            <span>{t('dashboard.recent.title', lang)}</span>
+          </div>
+          <RecentlyDeletedToggle lang={lang} />
         </div>
+
+        {/* Search bar — full width inside card */}
+        <div style={{ marginTop: 16, marginBottom: 16 }}>
+          <SearchBar lang={lang} />
+        </div>
+
+        {/* List orchestrator — re-mounts on every q/deleted/cursor change */}
+        <ProposalsList key={remountKey} lang={lang} initial={initial} nowMs={nowMs} />
       </section>
     </div>
   );
