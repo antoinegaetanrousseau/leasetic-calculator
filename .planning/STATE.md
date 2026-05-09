@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-09T22:34:43.169Z"
-last_activity: 2026-05-09
+last_updated: "2026-05-10T00:52:00.000Z"
+last_activity: 2026-05-10
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 40
-  completed_plans: 37
-  percent: 93
+  completed_plans: 38
+  percent: 95
 ---
 
 # State — Matrice Commerciale
@@ -28,10 +28,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 9 (admin-surface) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
-Next: Post-phase finalization (code review, regression, schema drift, verifier, phase.complete)
-Last activity: 2026-05-09
+Next: Plan 09-03 (accounts page) → Plan 09-04 (admin home + verifier)
+Last activity: 2026-05-10
 
 ## Progress
 
@@ -92,6 +92,8 @@ v1.1 ██████████░░░░░░░░░░ 3/6 phases com
 | 10-year PDF retention; partner deactivation never deletes PDFs | DATA-11 | Locked (pending legal counsel confirmation per Open Q3) |
 | Hard cutover from v10 — no localStorage migration | CUT-03 | Locked |
 | Admin roles at v1.1 launch: **Antoine + Emmanuel** seeded via AUTH-12 CLI script (resolves Open Q6) | user decision 2026-05-07 | Locked |
+| RHF useForm<z.input,unknown,z.infer> split for z.coerce fields — z.input for TFieldValues, output for TTransformed | 09-02 CoefficientsEditor | Locked pattern |
+| row.createdBy in HistoryTable renders raw user.id (displayName JOIN deferred to Plan 03) | 09-02-SUMMARY Known Stubs | Plan 03 follow-up |
 
 ### Open questions (to resolve before relevant phase)
 

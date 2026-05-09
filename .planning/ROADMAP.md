@@ -127,7 +127,7 @@ Plans:
 - [x] 09-01-PLAN.md — Foundation: extend audit_log union + new admin-action wrappers (requireAdmin → primitive → writeAuditLog) + listPartnersWithCounts + listGlobalParamsHistory + ~49 i18n keys × 2 langs + 4 CSS classes (ADMIN-02, ADMIN-05, ADMIN-06, ADMIN-08, ADMIN-09)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 09-02-PLAN.md — Coefficients page: editor (RHF + Zod, 4×3 table, note) + SaveConfirmModal (computed diff) + HistoryTable (cursor pagination + per-row diff) + ExplainTool (pure-client formula trail — sole non-editor commission surface) (ADMIN-01..04, ADMIN-09)
+- [x] 09-02-PLAN.md — Coefficients page: editor (RHF + Zod, 4×3 table, note) + SaveConfirmModal (computed diff) + HistoryTable (cursor pagination + per-row diff) + ExplainTool (pure-client formula trail — sole non-editor commission surface) (ADMIN-01..04, ADMIN-09)
 - [ ] 09-03-PLAN.md — Accounts page: partners list (6 cols + status chip + last-login relative + proposalsCount) + per-row Disable/Re-enable confirm-toast + Re-issue/Reset URL via InviteUrlModal + CreatePartnerModal (ADMIN-05, ADMIN-06, ADMIN-08, ADMIN-09)
 
 **Wave 3** *(blocked on Wave 2 completion)*

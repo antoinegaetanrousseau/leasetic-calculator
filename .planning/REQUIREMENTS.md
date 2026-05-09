@@ -118,10 +118,10 @@
 
 ### ADMIN — Admin Surface
 
-- [ ] **ADMIN-01**: Admin can view current global coefficients, commission rate, max threshold, and validity options on the admin coefficients page
+- [x] **ADMIN-01**: Admin can view current global coefficients, commission rate, max threshold, and validity options on the admin coefficients page
 - [x] **ADMIN-02**: Admin can edit any of the above; saving creates a new `global_params` row (append-only history)
-- [ ] **ADMIN-03**: Save action shows a confirmation modal: "This affects all NEW proposals from now on. Existing proposals are unchanged. Confirm?"
-- [ ] **ADMIN-04**: Coefficient change history is visible on the admin page as a table (timestamp, admin, fields changed, optional note)
+- [x] **ADMIN-03**: Save action shows a confirmation modal: "This affects all NEW proposals from now on. Existing proposals are unchanged. Confirm?"
+- [x] **ADMIN-04**: Coefficient change history is visible on the admin page as a table (timestamp, admin, fields changed, optional note)
 - [x] **ADMIN-05**: Admin can list all partners (email, display name, status active/disabled, last login, created date)
 - [x] **ADMIN-06**: Admin can disable / re-enable a partner account
 - [ ] **ADMIN-07**: Admin's hidden URL segment is set via `ADMIN_URL_SEGMENT` env var; rotatable without code changes
@@ -311,10 +311,10 @@
 | DATA-10 | Phase 8 | Complete |
 | DATA-11 | Phase 8 | Complete |
 | DATA-12 | Phase 8 | Complete |
-| ADMIN-01 | Phase 9 | Pending |
+| ADMIN-01 | Phase 9 | Complete |
 | ADMIN-02 | Phase 9 | Complete |
-| ADMIN-03 | Phase 9 | Pending |
-| ADMIN-04 | Phase 9 | Pending |
+| ADMIN-03 | Phase 9 | Complete |
+| ADMIN-04 | Phase 9 | Complete |
 | ADMIN-05 | Phase 9 | Complete |
 | ADMIN-06 | Phase 9 | Complete |
 | ADMIN-07 | Phase 9 | Pending |
