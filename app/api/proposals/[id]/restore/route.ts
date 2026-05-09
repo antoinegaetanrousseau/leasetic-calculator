@@ -25,13 +25,19 @@ export async function POST(_req: NextRequest, ctx: RouteParams) {
     return NextResponse.json({ error: 'not_found_or_expired' }, { status: 404 });
   }
 
-  await writeAuditLog({
-    actorId: userId,
-    action: 'proposal.restore',
-    targetType: 'proposal',
-    targetId: id,
-    payload: { source: 'partner-detail-page' },
-  });
+  try {
+    await writeAuditLog({
+      actorId: userId,
+      action: 'proposal.restore',
+      targetType: 'proposal',
+      targetId: id,
+      payload: { source: 'partner-detail-page' },
+    });
+  } catch (err) {
+    // Audit write failure must not surface to the client — the mutation already
+    // succeeded. Log server-side for ops visibility.
+    console.error('[POST /api/proposals/[id]/restore] audit log write failed', err);
+  }
 
   return NextResponse.json({ ok: true }, { status: 200 });
 }
