@@ -7,6 +7,7 @@ import { buildListResponse } from '@/lib/api/proposals/list';
 import { ProposalsList } from '@/components/proposals/ProposalsList';
 import { SearchBar } from '@/components/proposals/SearchBar';
 import { RecentlyDeletedToggle } from '@/components/proposals/RecentlyDeletedToggle';
+import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
 
 // PITFALLS §1.6: cookie-reading layout opts out of static rendering.
 export const dynamic = 'force-dynamic';
@@ -71,6 +72,9 @@ export default async function HomePage({ searchParams }: PageParams) {
 
   return (
     <div>
+      {/* D-8-09: fires delete-success toast when ?deleted_just=1 is in URL, then strips it */}
+      <DeleteJustToast lang={lang} />
+
       {/* Greeting section — UI-SPEC §3.1.1 */}
       <section style={{ marginBottom: 32 }}>
         <h1
