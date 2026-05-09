@@ -90,7 +90,7 @@
 - [ ] **PROP-14**: PDF stored in blob at key `proposals/{userId}/{proposalId}.pdf` with `private` access
 - [x] **PROP-15**: PDF is **a single page** (financial offer only); v10's RSE second page is removed in v1.1
 - [x] **PROP-16**: PDF rendered with `@react-pdf/renderer` using a deterministic configuration (pinned font files, fixed metadata, no `Date.now()` calls in the render tree)
-- [ ] **PROP-17**: PDF byte-determinism gated by CI: a fixture proposal renders to a SHA-256 matching a committed expected hash
+- [x] **PROP-17**: PDF byte-determinism gated by CI: a fixture proposal renders to a SHA-256 matching a committed expected hash
 - [x] **PROP-18**: PDF generation uses `Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })` and `Intl.DateTimeFormat('fr-FR' | 'en-GB')` explicitly — never system defaults
 - [x] **PROP-19**: Plus Jakarta Sans woff2 files self-hosted under `public/fonts/`; PDF generation waits for `document.fonts.ready` before render
 - [x] **PROP-20**: Partner can search their proposals by client name or LC reference (ILIKE, case-insensitive)
@@ -289,7 +289,7 @@
 | PROP-14 | Phase 8 | Pending |
 | PROP-15 | Phase 8 | Complete |
 | PROP-16 | Phase 8 | Complete |
-| PROP-17 | Phase 8 | Pending |
+| PROP-17 | Phase 8 | Complete |
 | PROP-18 | Phase 8 | Complete |
 | PROP-19 | Phase 8 | Complete |
 | PROP-20 | Phase 8 | Complete |

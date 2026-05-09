@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-09T15:55:43.679Z"
+last_updated: "2026-05-09T16:48:50.193Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 36
-  completed_plans: 27
-  percent: 75
+  completed_plans: 28
+  percent: 78
 ---
 
 # State — Matrice Commerciale
@@ -28,8 +28,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 08 (persistence-pdf-pipeline) — EXECUTING
-Plan: 6 of 14
-Status: Executing Phase 08 (08-05 complete — PDF render module + @react-pdf/renderer 4.5.1; 381 tests total)
+Plan: 7 of 14
+Status: Executing Phase 08 (08-06 complete — PDF byte-determinism CI gate PROP-17; 384 tests total)
 Next: `/gsd-execute-phase 8`
 Last activity: 2026-05-09
 
