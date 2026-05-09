@@ -1,5 +1,5 @@
 import 'server-only';
-import { desc } from 'drizzle-orm';
+import { and, desc, sql } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import type { GlobalParamsRow, NewGlobalParamsRow } from '@/db/schema';
 
@@ -33,4 +33,84 @@ export async function insertGlobalParams(args: NewGlobalParamsRow): Promise<Glob
   const dbi = db();
   const [row] = await dbi.insert(schema.globalParams).values(args).returning();
   return row;
+}
+
+// ── Phase 9 — Admin Surface: history pagination (D-09-04) ────────────────────
+
+export type GlobalParamsCursor = { effectiveFrom: string; id: string };
+
+export interface ListGlobalParamsHistoryArgs {
+  cursor?: GlobalParamsCursor | null;
+  limit?: number;   // default 20
+}
+
+export interface GlobalParamsHistoryResult {
+  rows: GlobalParamsRow[];
+  hasMore: boolean;
+  nextCursor: GlobalParamsCursor | null;
+}
+
+export function encodeGlobalParamsCursor(c: GlobalParamsCursor): string {
+  return Buffer.from(JSON.stringify(c), 'utf8').toString('base64url');
+}
+
+export function decodeGlobalParamsCursor(encoded: string): GlobalParamsCursor | null {
+  const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  try {
+    const parsed = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'));
+    if (
+      typeof parsed?.effectiveFrom === 'string' &&
+      typeof parsed?.id === 'string' &&
+      ISO_RE.test(parsed.effectiveFrom) &&
+      UUID_RE.test(parsed.id)
+    ) {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+const DEFAULT_HISTORY_LIMIT = 20;
+
+/**
+ * D-09-04. Cursor-paginated history of global_params rows, newest-first.
+ * Cursor is (effectiveFrom, id) desc — mirrors proposals.ts listProposalsByUser pattern.
+ * Caller passes the encoded cursor string from the previous page's nextCursor.
+ *
+ * T-09-01-08 DoS mitigation: limit defaults to 20 with no way for caller to exceed
+ * it without explicitly passing a higher value (caller-trusted; admin-only surface).
+ */
+export async function listGlobalParamsHistory(
+  args: ListGlobalParamsHistoryArgs = {},
+): Promise<GlobalParamsHistoryResult> {
+  const dbi = db();
+  const limit = args.limit ?? DEFAULT_HISTORY_LIMIT;
+  const fetchCount = limit + 1;
+  const cursor = args.cursor ?? null;
+
+  // Tuple-compare predicate (same shape as proposals.ts listProposalsByUser cursor):
+  //   (effective_from, id) < (cursor.effectiveFrom::timestamptz, cursor.id::uuid)
+  const cursorPredicate = cursor
+    ? sql`(${schema.globalParams.effectiveFrom}, ${schema.globalParams.id}) < (${cursor.effectiveFrom}::timestamptz, ${cursor.id}::uuid)`
+    : undefined;
+
+  const rows = await dbi
+    .select()
+    .from(schema.globalParams)
+    .where(cursorPredicate ? and(cursorPredicate) : undefined)
+    .orderBy(desc(schema.globalParams.effectiveFrom), desc(schema.globalParams.id))
+    .limit(fetchCount);
+
+  const hasMore = rows.length > limit;
+  const sliced = hasMore ? rows.slice(0, limit) : rows;
+  const last = sliced[sliced.length - 1];
+  const nextCursor: GlobalParamsCursor | null =
+    hasMore && last
+      ? { effectiveFrom: last.effectiveFrom.toISOString(), id: last.id }
+      : null;
+
+  return { rows: sliced, hasMore, nextCursor };
 }

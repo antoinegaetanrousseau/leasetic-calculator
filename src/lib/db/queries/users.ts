@@ -1,0 +1,82 @@
+import 'server-only';
+import { and, desc, eq, gt, inArray, isNull, sql } from 'drizzle-orm';
+import { db, schema } from '@/lib/db';
+
+export interface PartnerWithCount {
+  id: string;
+  email: string;
+  displayName: string | null;
+  name: string;
+  role: string;
+  deletedAt: Date | null;
+  lastLoginAt: Date | null;
+  createdAt: Date;
+  language: string;
+  proposalsCount: number;
+  /** D-09-11(b): true when partner has at least one unused unexpired 'invite' token (controls re-issue button visibility). */
+  hasUnredeemedInvite: boolean;
+}
+
+/**
+ * D-09-10. Returns one row per role='partner' user with proposalsCount = number
+ * of non-soft-deleted proposals owned by that user. Default sort: created_at DESC.
+ *
+ * ADMIN-09: this query MUST NOT select commission_pct (which lives on
+ * global_params, not users — defense in depth). No commission field appears anywhere
+ * in this query or its return type.
+ */
+export async function listPartnersWithCounts(): Promise<PartnerWithCount[]> {
+  const dbi = db();
+
+  // Aggregate proposals count per user using a correlated subquery for the deletedAt IS NULL filter.
+  // This avoids LEFT JOIN + GROUP BY complications when using Drizzle's .select() builder.
+  const rows = await dbi
+    .select({
+      id: schema.users.id,
+      email: schema.users.email,
+      displayName: schema.users.displayName,
+      name: schema.users.name,
+      role: schema.users.role,
+      deletedAt: schema.users.deletedAt,
+      lastLoginAt: schema.users.lastLoginAt,
+      createdAt: schema.users.createdAt,
+      language: schema.users.language,
+      // Correlated subquery: count non-soft-deleted proposals per user.
+      proposalsCount: sql<number>`(
+        SELECT COUNT(*)::int
+        FROM proposals
+        WHERE proposals.user_id = ${schema.users.id}
+          AND proposals.deleted_at IS NULL
+      )`.as('proposals_count'),
+    })
+    .from(schema.users)
+    .where(eq(schema.users.role, 'partner'))
+    .orderBy(desc(schema.users.createdAt));
+
+  // Derive hasUnredeemedInvite per user via a follow-up SELECT using inArray.
+  // Small partner counts make this acceptable over N+1 for-loop.
+  const userIds = rows.map((r) => r.id);
+  if (userIds.length === 0) {
+    return [];
+  }
+
+  // D-09-11(b): predicate — kind='invite' AND usedAt IS NULL AND expiresAt > now()
+  // The schema column is `usedAt` (NOT redeemedAt — verified against schema.ts line 115).
+  const inviteRows = await dbi
+    .select({ userId: schema.passwordResets.userId })
+    .from(schema.passwordResets)
+    .where(
+      and(
+        eq(schema.passwordResets.kind, 'invite'),
+        isNull(schema.passwordResets.usedAt),
+        gt(schema.passwordResets.expiresAt, sql`now()`),
+        inArray(schema.passwordResets.userId, userIds),
+      ),
+    );
+  const unredeemedSet = new Set(inviteRows.map((r) => r.userId));
+
+  return rows.map((r) => ({
+    ...r,
+    hasUnredeemedInvite: unredeemedSet.has(r.id),
+  }));
+}

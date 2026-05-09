@@ -28,7 +28,21 @@ export type {
   ListResult,
 } from './proposals';
 
-export { getLatestGlobalParams, insertGlobalParams } from './global-params';
+export {
+  getLatestGlobalParams,
+  insertGlobalParams,
+  listGlobalParamsHistory,
+  encodeGlobalParamsCursor,
+  decodeGlobalParamsCursor,
+} from './global-params';
+export type {
+  GlobalParamsCursor,
+  ListGlobalParamsHistoryArgs,
+  GlobalParamsHistoryResult,
+} from './global-params';
+
+export { listPartnersWithCounts } from './users';
+export type { PartnerWithCount } from './users';
 
 export { writeAuditLog } from './audit-log';
 export type { AuditAction, AuditTargetType, WriteAuditLogArgs } from './audit-log';
