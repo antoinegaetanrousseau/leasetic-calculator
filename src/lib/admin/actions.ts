@@ -319,6 +319,15 @@ export async function adminReissueInvitation(
         .update(schema.users)
         .set({ deletedAt: new Date() })
         .where(eq(schema.users.id, userRow.id));
+      // WR-01: audit the temporary disable so the audit trail is not misleading.
+      await writeAuditLog({
+        actorId: session.user.id,
+        action: 'user.disable',
+        targetType: 'user',
+        targetId: null,
+        payload: { userId: userRow.id, note: 'temporary-disable for re-issue workaround' },
+        // D-09-09b: ADMIN-09 redaction — this payload intentionally excludes financial rate fields.
+      });
     }
 
     let result: InviteResult;
@@ -331,6 +340,15 @@ export async function adminReissueInvitation(
           .update(schema.users)
           .set({ deletedAt: null })
           .where(eq(schema.users.id, userRow.id));
+        // WR-01: audit the restore so the trail is complete even on failure path.
+        await writeAuditLog({
+          actorId: session.user.id,
+          action: 'user.re_enable',
+          targetType: 'user',
+          targetId: null,
+          payload: { userId: userRow.id, note: 're-enabled by re-issue workaround (createInvitation failed)' },
+          // D-09-09b: ADMIN-09 redaction — this payload intentionally excludes financial rate fields.
+        });
       }
       throw e;
     }
@@ -340,6 +358,18 @@ export async function adminReissueInvitation(
       .update(schema.users)
       .set({ language: args.language })
       .where(eq(schema.users.id, userRow.id));
+
+    // WR-01: audit the re-enable that createInvitation performed implicitly.
+    if (wasActive) {
+      await writeAuditLog({
+        actorId: session.user.id,
+        action: 'user.re_enable',
+        targetType: 'user',
+        targetId: null,
+        payload: { userId: userRow.id, note: 're-enabled by re-issue workaround' },
+        // D-09-09b: ADMIN-09 redaction — this payload intentionally excludes financial rate fields.
+      });
+    }
 
     // Write invitation.create audit (no user.create — partner already exists).
     await writeAuditLog({
