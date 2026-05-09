@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-09T00:39:40Z"
-last_activity: 2026-05-09 -- Plan 07-05 complete (live preview composition; PROP-07/24/25 + CALC-07 grounded; LiveLoyerPreview + CopyRefButton + ValiditySegmented + useDebouncedValue shipped; ProposalForm hoisted to ProposalFormProvider Path A; Phase 7 complete 6/6 plans; 227/227 tests passing)
+last_updated: "2026-05-09T11:30:00Z"
+last_activity: 2026-05-09 -- Phase 8 context gathered (08-CONTEXT.md + 08-DISCUSSION-LOG.md committed). 12 implementation decisions locked (D-A1..A3 PDF, D-B1..B3 submit flow, D-C1..C3 list/search/soft-delete, D-D1..D3 schema/ops). Ready for /gsd-ui-phase 8.
 progress:
   total_phases: 6
   completed_phases: 3
@@ -23,15 +23,15 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 7 — Calc Engine Port + Proposal Form. Phase 6 shipped 2026-05-08; production fully functional with admin login verified.
+**Current focus:** Phase 8 — Persistence + PDF Pipeline. Phase 7 shipped + deployed to prod 2026-05-09 (canonical alias smoke green; /proposals/new in route map; redirect-to-login wiring confirmed). Phase 8 context gathered same day; ready for UI spec.
 
 ## Current Position
 
-Phase: **7 (calc-engine-port-proposal-form) — COMPLETE** ✅
-Plan: 6 of 6 done (07-01 calc engine core ✅, 07-02 golden corpus ✅, 07-06 i18n keys ✅, 07-03 home page CTA ✅, 07-04 proposal form scaffold ✅, 07-05 live preview composition ✅). Wave 4 closed. Phase 7 complete.
-Status: Ready for Phase 8 (Persistence + PDF Pipeline) spec / context / planning
-Next: `/gsd-context 8` to gather Phase 8 context, then `/gsd-plan 8` to produce phase plans
-Last activity: 2026-05-09 -- Plan 07-05 complete (live preview composition; capstone of Phase 7). 4 new components shipped (LiveLoyerPreview 398 lines + CopyRefButton 82 + ValiditySegmented 46 + useDebouncedValue 24); ProposalForm hoisted to ProposalFormProvider (Path A); /proposals/new now wraps form + preview as RHF-context siblings. 5-state machine wired (idle/expired/missing/on-demand/computed); LC ref lifecycle via store-info-from-previous-render pattern; 300ms debounce; formatCurrency explicit fr-FR/en-GB. PROP-07 + PROP-24 + PROP-25 + CALC-07 grounded. typecheck/lint/test/build all 0; 227/227 tests preserved.
+Phase: **8 (persistence-pdf-pipeline) — context gathered**
+Plan: 0 of TBD (Phase 8 plans not yet produced; ~8-12 plans expected per CONTEXT.md scope)
+Status: Ready for `/gsd-ui-phase 8` (design contract for proposal detail page + list view + PDF visual layout), then `/gsd-plan-phase 8`
+Next: `/gsd-ui-phase 8` to produce 08-UI-SPEC.md
+Last activity: 2026-05-09 -- Phase 8 context gathered. 12 decisions locked (D-A1..D3): professional PDF layout (not v10-equivalent), session-language PDFs, minimal footer; synchronous fail-loud submit with client UUIDv4 idempotency key; cursor-based load-more, debounced search, 'Recently Deleted' filter toggle UI; seed migration uses Phase 7 placeholder coefficients; Neon branch-split = separate ops task; semver schema_version. 16 prior decisions carried forward from PROJECT.md / ARCHITECTURE.md / PITFALLS.md / Phase 6+7 CONTEXT. 3 open questions flagged for parallel resolution (legal counsel 10-yr retention, OVH stack, cutover ownership).
 
 ## Progress
 
@@ -41,7 +41,7 @@ v1.1 ██████████░░░░░░░░░░ 3/6 phases com
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
        └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
        └─ Phase 7: Calc Engine + Form        ✅ complete (6/6 plans — calc engine ✅, 30-case golden corpus ✅, 30-key i18n ✅, home shell ✅, 14-input form ✅, live preview ✅; CALC-01..08 + PROP-01/06/07/08/24/25 satisfied)
-       └─ Phase 8: Persistence + PDF         ⏭ next (blocked on P7 — now unblocked)
+       └─ Phase 8: Persistence + PDF         ⏳ context gathered (12 decisions locked); UI spec next
        └─ Phase 9: Admin Surface             ◯ blocked on P8
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
 ```
