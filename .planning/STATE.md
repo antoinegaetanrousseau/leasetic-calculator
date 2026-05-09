@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: executing
-last_updated: "2026-05-09T19:21:48.068Z"
+status: verifying
+last_updated: "2026-05-09T19:50:03.966Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 36
-  completed_plans: 35
-  percent: 97
+  completed_plans: 36
+  percent: 100
 ---
 
 # State — Matrice Commerciale
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 08 (persistence-pdf-pipeline) — EXECUTING
-Plan: 14 of 14
-Status: Ready to execute
-Next: `/gsd-execute-phase 8`
+Phase: 08 (persistence-pdf-pipeline) — COMPLETE
+Plan: 14 of 14 (all plans executed)
+Status: Phase complete — ready for post-phase verification gates
+Next: Post-phase finalization (code review, regression, schema drift, verifier, phase.complete)
 Last activity: 2026-05-09
 
 ## Progress
@@ -41,7 +41,7 @@ v1.1 ██████████░░░░░░░░░░ 3/6 phases com
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
        └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
        └─ Phase 7: Calc Engine + Form        ✅ complete (6/6 plans — calc engine ✅, 30-case golden corpus ✅, 30-key i18n ✅, home shell ✅, 14-input form ✅, live preview ✅; CALC-01..08 + PROP-01/06/07/08/24/25 satisfied)
-       └─ Phase 8: Persistence + PDF         ⏳ planned (14 plans / 6 waves; 31/32 reqs grounded); execution next
+       └─ Phase 8: Persistence + PDF         ✅ complete (14/14 plans; PROP-02..25 + DATA-01..10 + PDF-01..06 grounded)
        └─ Phase 9: Admin Surface             ◯ blocked on P8
        └─ Phase 10: Cutover & Polish         ◯ blocked on P9
 ```
