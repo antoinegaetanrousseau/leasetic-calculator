@@ -29,7 +29,7 @@ export type {
   ValidityDays,
 } from './formula';
 
-export { seedParams, getMaxAmount } from './seed-params';
+export { seedParams, getMaxAmount, getDefaultValidityDays } from './seed-params';
 export type { SeedParams } from './seed-params';
 
 export {

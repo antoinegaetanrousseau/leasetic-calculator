@@ -8,7 +8,7 @@ import {
 import { LiveLoyerPreview } from '@/components/proposal/LiveLoyerPreview';
 import { getLatestGlobalParams, getProposalById } from '@/lib/db/queries';
 import { DuplicatePrefillToast } from '@/components/proposals/DuplicatePrefillToast';
-import type { ProposalInput } from '@/lib/calc';
+import { getDefaultValidityDays, type ProposalInput } from '@/lib/calc';
 
 // PITFALLS §1.6 — every cookie/session-reading page opts out of static rendering.
 export const dynamic = 'force-dynamic';
@@ -57,8 +57,23 @@ export default async function NewProposalPage({ searchParams }: PageProps) {
   const params = await getLatestGlobalParams();
   const coefficientsExpired = params === null;
 
+  // D-09-13 (Phase 9): read the admin's latest validity_days default from
+  // global_params and pre-select it in the form's validity segmented control.
+  //
+  // D-09-14 invariant: validityDaysSchema keeps {15,30,60} hardcoded at the
+  // calc-engine layer. If the admin stores a value outside the whitelist, we
+  // silently fall back to 30 here — the calc-engine schema is NOT modified.
+  const ALLOWED_VALIDITY = [15, 30, 60] as const;
+  type AllowedValidity = (typeof ALLOWED_VALIDITY)[number];
+  const rawValidityDays = params?.validityDays ?? getDefaultValidityDays();
+  const defaultValidityNarrowed: AllowedValidity =
+    ALLOWED_VALIDITY.find((v) => v === rawValidityDays) ?? 30;
+
   // D-7-13 baseline: partner name from session. Extended by PROP-21 below.
-  let prefill: Partial<ProposalInput> = { partnerName };
+  let prefill: Partial<ProposalInput> = {
+    partnerName,
+    validityDays: defaultValidityNarrowed,
+  };
 
   // PROP-21: ?duplicate=<id> — pre-populate all 14 fields from the source's inputs.
   // Ownership-checked server-side; silent fallback to default prefill on any miss.
