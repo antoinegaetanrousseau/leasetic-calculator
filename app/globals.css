@@ -451,3 +451,61 @@ input[aria-invalid="true"] {
 }
 
 /* === end Phase 8 home list === */
+
+/* === Phase 9 (09-01) admin surface primitives === */
+
+.admin-nav-card {
+  cursor: pointer;
+  text-decoration: none;
+  transition: box-shadow 150ms, border-color 150ms;
+  display: block;
+}
+.admin-nav-card:hover {
+  border-color: var(--teal);
+  box-shadow: 0 2px 8px rgba(45, 122, 140, 0.12);
+}
+.admin-nav-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+}
+
+.history-diff-item {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink);
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  margin-bottom: 2px;
+}
+.history-diff-item code {
+  font-size: 11.5px;
+  color: var(--teal);
+  background: rgba(45, 122, 140, 0.07);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+.history-diff-item .old-val {
+  color: var(--danger);
+  text-decoration: line-through;
+}
+.history-diff-item .new-val {
+  color: var(--gd);
+  font-weight: 600;
+}
+
+.chip-disabled {
+  background: rgba(220, 38, 38, 0.08);
+  color: var(--danger);
+}
+
+.accounts-row td {
+  padding: 14px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.accounts-row:last-child td { border-bottom: none; }
+.accounts-row:hover td { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); }
+
+/* === end Phase 9 admin surface === */
