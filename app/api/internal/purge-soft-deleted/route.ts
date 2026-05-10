@@ -10,8 +10,8 @@ export const dynamic = 'force-dynamic';
 
 /**
  * D-10-05/07/08 — Dual-auth purge endpoint:
- *   Gate A: Authorization: Bearer ${PURGE_CRON_SECRET}  (Vercel Cron / cron-style invocation)
- *   Gate B: Admin session                               (manual ad-hoc invocation)
+ *   Gate A: Authorization: Bearer ${CRON_SECRET}  (Vercel Cron — uses Vercel's reserved env var name)
+ *   Gate B: Admin session                          (manual ad-hoc invocation)
  *
  * Either gate alone is sufficient. The cron secret is compared via timingSafeEqual
  * to defeat timing-side-channel attacks. The secret is never logged.
@@ -26,7 +26,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   // ── Gate A: cron secret bearer token ──────────────────────────────────────
   const authHeader = req.headers.get('authorization') ?? '';
-  const cronSecret = process.env.PURGE_CRON_SECRET ?? '';
+  const cronSecret = process.env.CRON_SECRET ?? ''; // Vercel's reserved name — auto-injected by Vercel Cron
   let hasCronSecret = false;
   if (cronSecret.length > 0 && authHeader.startsWith('Bearer ')) {
     const presented = authHeader.slice('Bearer '.length);
