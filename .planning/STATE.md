@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: executing
-last_updated: "2026-05-10T19:45:00.000Z"
+status: verifying
+last_updated: "2026-05-10T17:35:23.939Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 46
   completed_plans: 46
   percent: 100
@@ -29,10 +29,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 10 (cutover-polish) — COMPLETE
 Plan: 6 of 6 (all plans executed)
-Status: Complete
+Status: Phase complete — ready for verification
 Next: v1.1 launch (all planning complete)
 Last activity: 2026-05-10
-Last session: 2026-05-10 — Completed 10-05-PLAN.md (smoke-ovh.ts — OVH portability smoke test, CUT-09)
+Last session: 2026-05-10 — Completed 10-06-PLAN.md (operational docs + CI grep gate + launch artifacts — Phase 10 fully shipped)
 
 ## Progress
 
@@ -44,7 +44,7 @@ v1.1 ████████████████████ 6/6 phases com
        └─ Phase 7: Calc Engine + Form        ✅ complete (6/6 plans — calc engine ✅, 30-case golden corpus ✅, 30-key i18n ✅, home shell ✅, 14-input form ✅, live preview ✅; CALC-01..08 + PROP-01/06/07/08/24/25 satisfied)
        └─ Phase 8: Persistence + PDF         ✅ complete (14/14 plans; PROP-02..25 + DATA-01..10 + PDF-01..06 grounded)
        └─ Phase 9: Admin Surface             ✅ complete (4/4 plans; ADMIN-01..09 satisfied)
-       └─ Phase 10: Cutover & Polish         ◯ blocked on P9
+       └─ Phase 10: Cutover & Polish         ✅ complete (6/6 plans; CUT-01..09 satisfied; Phase 10 fully shipped 2026-05-10)
 ```
 
 ## Phase 5 follow-ups

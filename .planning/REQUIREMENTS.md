@@ -130,13 +130,13 @@
 
 ### CUT — Cutover & Polish
 
-- [ ] **CUT-01**: v10 standalone HTML retired at v1.1 launch; partners cannot use v10 in production after launch
-- [ ] **CUT-02**: v10's hosting URL (if any) redirects to v1.1 login page with a "Leasétic Matrice has moved" notice in FR + EN
-- [ ] **CUT-03**: No automated migration of v10 localStorage data; partners onboarded clean-slate by Leasétic admin
+- [x] **CUT-01**: v10 standalone HTML retired at v1.1 launch; partners cannot use v10 in production after launch — communicated via partner comms (steps 6+9 in launch-checklist.md); no technical kill-switch (D-10-15/21)
+- [x] **CUT-02**: v10's hosting URL (if any) redirects to v1.1 login page — **resolved vacuously**: v10 was never hosted at a URL (emailed HTML file only); CUT-02's redirect requirement is moot. Documented in PROJECT.md + launch-checklist.md (D-10-15)
+- [x] **CUT-03**: No automated migration of v10 localStorage data; partners onboarded clean-slate by Leasétic admin — enforced by CI grep gate (`scripts/check-no-v10-localstorage.sh`, Phase 10 plan 10-06 / D-10-16)
 - [x] **CUT-04**: All test partner accounts deleted from production DB before launch (rows with `is_test=true` are purged in a pre-launch checklist step)
 - [x] **CUT-05**: Login page links to Leasétic's existing privacy notice (FR + EN URLs); legal counsel confirms the new processing activity (PDF storage) is covered by the existing policy
 - [x] **CUT-06**: Coefficient seed migration verified in production before partners get access (admin first-login checklist: "Vérifier les coefficients" with a diff tool against v10 baseline)
-- [ ] **CUT-07**: Production observability: platform logs (Vercel) cover all server errors; Sentry/APM deferred to v1.2
+- [x] **CUT-07**: Production observability: platform logs (Vercel) cover all server errors; Sentry/APM deferred to v1.2 — Vercel logs + dual-auth audit log cover the v1.1 observability baseline; Sentry explicitly deferred (D-10-07 best-effort + log)
 - [x] **CUT-08**: README + `docs/deploy-ovh.md` runbook covers env vars, build steps, migration application, smoke tests
 - [x] **CUT-09**: OVH portability proven via smoke deploy: same code deploys on a Node + Postgres + S3-compatible test environment with only env-var changes (no code changes). Capability shipped: scripts/smoke-ovh.ts (10-05). September execution proves it in practice (D-10-01).
 
@@ -320,13 +320,13 @@
 | ADMIN-07 | Phase 9 | Complete |
 | ADMIN-08 | Phase 9 | Complete |
 | ADMIN-09 | Phase 9 | Complete |
-| CUT-01 | Phase 10 | Pending |
-| CUT-02 | Phase 10 | Pending |
-| CUT-03 | Phase 10 | Pending |
+| CUT-01 | Phase 10 | Complete |
+| CUT-02 | Phase 10 | Complete |
+| CUT-03 | Phase 10 | Complete |
 | CUT-04 | Phase 10 | Complete |
 | CUT-05 | Phase 10 | Complete |
 | CUT-06 | Phase 10 | Complete |
-| CUT-07 | Phase 10 | Pending |
+| CUT-07 | Phase 10 | Complete |
 | CUT-08 | Phase 10 | Complete |
 | CUT-09 | Phase 10 | Complete |
 
