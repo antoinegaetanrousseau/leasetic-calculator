@@ -129,6 +129,10 @@ async function main() {
   let totalBlobsDeleted = 0;
 
   for (const u of candidates) {
+    // Declared outside try so audit-log block (below) can reference them.
+    let purgedProposalCount = 0;
+    let purgedBlobCount = 0;
+
     try {
       // ── 1. Find user's proposals (need the blob keys before we delete the rows) ──
       const userProposals = await db()
@@ -137,12 +141,11 @@ async function main() {
         .where(eq(proposals.userId, u.id));
 
       // ── 2. Delete each proposal's PDF blob (idempotent — 404 = no-op) ──
-      let blobsDeleted = 0;
       for (const p of userProposals) {
         if (p.pdfBlobKey) {
           try {
             await storage().delete(p.pdfBlobKey);
-            blobsDeleted += 1;
+            purgedBlobCount += 1;
           } catch (blobErr) {
             // Best-effort: log and continue; the row delete still proceeds.
             console.error(
@@ -154,6 +157,7 @@ async function main() {
 
       // ── 3. Hard-delete proposals rows ──
       const proposalIds = userProposals.map((p) => p.id);
+      purgedProposalCount = proposalIds.length;
       if (proposalIds.length > 0) {
         await db().delete(proposals).where(inArray(proposals.id, proposalIds));
       }
@@ -174,7 +178,24 @@ async function main() {
       // SET NULL so historical actor references survive the user purge.
       await db().delete(users).where(eq(users.id, u.id));
 
-      // ── 8. Audit log entry ──
+      // Count the purge BEFORE the audit write — the row is gone regardless of audit outcome.
+      console.log(
+        `  [ok]   id=${u.id} email=${u.email} (${purgedProposalCount} proposals, ${purgedBlobCount} blobs)`,
+      );
+      usersPurged += 1;
+      totalProposalsPurged += purgedProposalCount;
+      totalBlobsDeleted += purgedBlobCount;
+    } catch (err) {
+      console.error(
+        `  [fail] id=${u.id} email=${u.email}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+      usersFailed += 1;
+      // best-effort: continue with next user
+      continue;
+    }
+
+    // ── 8. Audit log entry — best-effort, does NOT undo the purge. ──
+    try {
       await writeAuditLog({
         actorId: null,
         action: 'user.purge',
@@ -183,23 +204,15 @@ async function main() {
         payload: {
           email: u.email,
           reason: 'pre_launch_test_data_cleanup',
-          proposalsPurged: proposalIds.length,
-          blobsDeleted,
+          proposalsPurged: purgedProposalCount,
+          blobsDeleted: purgedBlobCount,
         },
       });
-
-      console.log(
-        `  [ok]   id=${u.id} email=${u.email} (${proposalIds.length} proposals, ${blobsDeleted} blobs)`,
-      );
-      usersPurged += 1;
-      totalProposalsPurged += proposalIds.length;
-      totalBlobsDeleted += blobsDeleted;
-    } catch (err) {
+    } catch (auditErr) {
       console.error(
-        `  [fail] id=${u.id} email=${u.email}: ${err instanceof Error ? err.message : String(err)}`,
+        `  [warn] audit log write failed for user ${u.id}:`,
+        auditErr instanceof Error ? auditErr.message : String(auditErr),
       );
-      usersFailed += 1;
-      // best-effort: continue with next user
     }
   }
 

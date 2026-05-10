@@ -42,7 +42,19 @@ export async function purgeSoftDeleted(opts?: {
         // Race condition: another concurrent run already purged this row.
         continue;
       }
-      // Step 3: audit log entry (DATA-07 / DATA-10)
+      // Count the purge BEFORE the audit write — the row is gone regardless of audit outcome.
+      purged += 1;
+    } catch (err) {
+      errors.push({
+        id: row.id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      // best-effort: continue with next row
+      continue;
+    }
+
+    // Step 3: audit log entry (DATA-07 / DATA-10) — best-effort, does NOT undo the purge.
+    try {
       await writeAuditLog({
         actorId,
         action: 'proposal.purge',
@@ -54,13 +66,11 @@ export async function purgeSoftDeleted(opts?: {
           blobKey: row.pdfBlobKey ?? null,
         },
       });
-      purged += 1;
-    } catch (err) {
-      errors.push({
-        id: row.id,
-        error: err instanceof Error ? err.message : String(err),
-      });
-      // best-effort: continue with next row
+    } catch (auditErr) {
+      console.error(
+        `[purgeSoftDeleted] audit log write failed for proposal ${row.id}:`,
+        auditErr instanceof Error ? auditErr.message : String(auditErr),
+      );
     }
   }
 
