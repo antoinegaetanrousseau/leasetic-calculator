@@ -37,8 +37,11 @@ export interface SeedParams {
 }
 
 export const seedParams: SeedParams = {
-  // TODO: confirm against v10 baseline before CUT-06 — values lifted from v10
-  // assertCalc fixture coefficients (Matrice_2026_THE_Leasetic-v10.html lines 1922-1929).
+  // D-10-14: seed-vs-customized verification is realized by the SeedBanner on
+  // /[adminSegment]/coefficients (yellow banner visible when latestParams.coefficients
+  // JSON-equals seedParams.coefficients). Resolved by data — admin saves any edit and
+  // the banner disappears. No code-side confirmation step needed.
+  // (Values lifted from v10 assertCalc fixture coefficients, Matrice_2026_THE_Leasetic-v10.html lines 1922-1929.)
   coefficients: {
     t1: { 36: '3.0000', 48: '2.3000', 60: '1.8765' },
     t2: { 36: '2.9000', 48: '2.2500', 60: '1.8500' },
