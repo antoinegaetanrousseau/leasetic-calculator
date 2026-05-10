@@ -30,10 +30,8 @@
 import 'dotenv/config';
 import {
   listPurgeCandidates,
-  hardPurgeProposal,
-  writeAuditLog,
 } from '../src/lib/db/queries';
-import { storage } from '../src/lib/storage';
+import { purgeSoftDeleted } from '../src/lib/admin/purge';
 
 function maskUrl(raw: string | undefined): string {
   if (!raw) return '<unset>';
@@ -100,62 +98,23 @@ async function main() {
     return;
   }
 
-  // Apply mode: blob FIRST, then row, then audit log.
-  // Order matters: blob delete BEFORE row delete so a crash mid-purge leaves
-  // the row + blob in place for retry. If we deleted the row first, a failure
-  // between would orphan the blob with no recovery path.
-  let ok = 0;
-  let failed = 0;
+  // Apply mode: delegate to shared pure function (D-10-07 — same code as cron HTTP route).
+  console.log('Applying hard purge via shared purgeSoftDeleted()...');
+  console.log('');
+  const { purged, errors } = await purgeSoftDeleted({ actorId: null });
 
-  for (const row of candidates) {
-    try {
-      // Step 1: delete the blob (idempotent — 404 is a no-op in both Vercel Blob + S3)
-      if (row.pdfBlobKey) {
-        await storage().delete(row.pdfBlobKey);
-      }
-
-      // Step 2: hard-delete the row (WHERE clause re-checks the 30-day window)
-      const deleted = await hardPurgeProposal(row.id);
-      if (!deleted) {
-        // Race condition: row was already purged by a concurrent run, or the
-        // 30-day window flipped between listPurgeCandidates and now. Skip gracefully.
-        console.log(`  [skip] id=${row.id} (no row affected — possible race condition)`);
-        continue;
-      }
-
-      // Step 3: write audit log entry (DATA-07 / DATA-10)
-      await writeAuditLog({
-        actorId: null, // system-initiated (manual CLI counts as system)
-        action: 'proposal.purge',
-        targetType: 'proposal',
-        targetId: row.id,
-        payload: {
-          lcRef: row.lcRef,
-          deletedAt: row.deletedAt?.toISOString() ?? null,
-          blobKey: row.pdfBlobKey ?? null,
-        },
-      });
-
-      console.log(`  [ok]   id=${row.id} lc_ref=${row.lcRef}`);
-      ok += 1;
-    } catch (err) {
-      console.error(
-        `  [fail] id=${row.id}: ${err instanceof Error ? err.message : String(err)}`,
-      );
-      failed += 1;
-      // best-effort: continue with next row
-    }
+  for (const e of errors) {
+    console.error(`  [fail] id=${e.id}: ${e.error}`);
   }
-
   console.log('');
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`  Done. ${ok} purged, ${failed} failed.`);
-  if (failed > 0) {
+  console.log(`  Done. ${purged} purged, ${errors.length} failed.`);
+  if (errors.length > 0) {
     console.log(`  Re-run to retry failed rows (they remain as purge candidates).`);
   }
   console.log('═══════════════════════════════════════════════════════════════');
 
-  if (failed > 0) {
+  if (errors.length > 0) {
     process.exit(1);
   }
 }
