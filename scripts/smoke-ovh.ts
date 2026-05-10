@@ -161,19 +161,26 @@ async function main() {
   // ── Read expected SHA-256 from disk (single source of truth) ──────────────
   // Fixture: __pdf-fixtures__/expected.sha256.txt
   // Format: name:sha256hex per line (e.g. "happy-path-fr:6189c125...")
+  //
+  // WR-04 fix: accept either the fr or en fixture hash. The admin account's
+  // `language` column determines which language the PDF is generated in — we
+  // cannot guarantee 'fr' on all environments. Passing if either matches avoids
+  // misleading SHA-256 mismatch errors caused by a language mismatch rather than
+  // real byte-determinism regressions.
   const fixtureRoot = resolve(__dirname, '../__pdf-fixtures__');
-  let expectedSha256: string;
+  let expectedSha256Fr: string | null = null;
+  let expectedSha256En: string | null = null;
   try {
     const raw = await readFile(`${fixtureRoot}/expected.sha256.txt`, 'utf8');
-    // Extract the happy-path-fr hash (the lang used by the API when the admin
-    // session is established — Better Auth defaults to 'fr' for this deployment).
     const lines = raw.trim().split('\n');
     const frLine = lines.find((l) => l.startsWith('happy-path-fr:'));
-    if (!frLine) {
-      console.error('ERROR: expected.sha256.txt does not contain a happy-path-fr entry.');
+    const enLine = lines.find((l) => l.startsWith('happy-path-en:'));
+    if (frLine) expectedSha256Fr = frLine.split(':')[1].trim().toLowerCase();
+    if (enLine) expectedSha256En = enLine.split(':')[1].trim().toLowerCase();
+    if (!expectedSha256Fr && !expectedSha256En) {
+      console.error('ERROR: expected.sha256.txt contains neither happy-path-fr nor happy-path-en.');
       process.exit(2);
     }
-    expectedSha256 = frLine.split(':')[1].trim().toLowerCase();
   } catch (err) {
     console.error('ERROR: failed to read __pdf-fixtures__/expected.sha256.txt.');
     console.error(`  Looked under: ${fixtureRoot}`);
@@ -187,7 +194,10 @@ async function main() {
     console.log(`  1. GET  ${APP_URL}/healthz                        → expect { db: ok, blob: ok }`);
     console.log(`  2. POST ${APP_URL}/api/auth/sign-in/email         → expect 200 + Set-Cookie`);
     console.log(`  3. POST ${APP_URL}/api/proposals                  → expect { id, pdfUrl, idempotent }`);
-    console.log(`  4. GET  ${APP_URL}/api/proposals/<id>/pdf         → assert X-Content-SHA256 === ${expectedSha256.slice(0, 16)}...`);
+    const hashDisplay = expectedSha256Fr
+      ? `happy-path-fr: ${expectedSha256Fr.slice(0, 16)}... (or happy-path-en if admin lang=en)`
+      : `happy-path-en: ${expectedSha256En!.slice(0, 16)}...`;
+    console.log(`  4. GET  ${APP_URL}/api/proposals/<id>/pdf         → assert X-Content-SHA256 matches ${hashDisplay}`);
     console.log(`  5. POST ${APP_URL}/api/proposals/<id>/delete      → expect { ok: true }`);
     console.log(`  6. POST ${APP_URL}/api/proposals/<id>/restore     → expect { ok: true }`);
     console.log(`  7. POST ${APP_URL}/api/proposals/<id>/delete      → expect { ok: true }  (cleanup)`);
@@ -278,15 +288,20 @@ async function main() {
     const pdfBytes = await pdfRes.arrayBuffer();
     actualSha256 = createHash('sha256').update(Buffer.from(pdfBytes)).digest('hex');
   }
-  if (actualSha256 !== expectedSha256) {
+  const sha256Matches =
+    (expectedSha256Fr !== null && actualSha256 === expectedSha256Fr) ||
+    (expectedSha256En !== null && actualSha256 === expectedSha256En);
+  if (!sha256Matches) {
     fail(
       4,
       `PDF SHA-256 drift detected (PROP-17)!\n` +
-      `  expected: ${expectedSha256}\n` +
-      `  got:      ${actualSha256}\n` +
-      `  If global_params coefficients have been customised, rotate the fixture:\n` +
-      `    npm run pdf:update-fixture -- --confirm UPDATE-FIXTURE\n` +
-      `  Then re-commit expected.sha256.txt. Investigate before September cutover.`,
+      `  expected (fr): ${expectedSha256Fr ?? '<not in fixture>'}\n` +
+      `  expected (en): ${expectedSha256En ?? '<not in fixture>'}\n` +
+      `  got:           ${actualSha256}\n` +
+      `  If the admin account language differs from the fixture, ensure the fixture\n` +
+      `  covers both languages (run: npm run pdf:update-fixture -- --confirm UPDATE-FIXTURE).\n` +
+      `  If global_params coefficients have been customised, rotate the fixture and\n` +
+      `  re-commit expected.sha256.txt. Investigate before September cutover.`,
     );
   }
   console.log('  [ok] byte-deterministic match');
