@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/internal/purge-soft-deleted",
+      "schedule": "0 3 1,15 * *"
+    }
+  ]
+}
