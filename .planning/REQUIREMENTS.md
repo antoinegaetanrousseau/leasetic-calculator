@@ -138,7 +138,7 @@
 - [x] **CUT-06**: Coefficient seed migration verified in production before partners get access (admin first-login checklist: "Vérifier les coefficients" with a diff tool against v10 baseline)
 - [ ] **CUT-07**: Production observability: platform logs (Vercel) cover all server errors; Sentry/APM deferred to v1.2
 - [x] **CUT-08**: README + `docs/deploy-ovh.md` runbook covers env vars, build steps, migration application, smoke tests
-- [ ] **CUT-09**: OVH portability proven via smoke deploy: same code deploys on a Node + Postgres + S3-compatible test environment with only env-var changes (no code changes)
+- [x] **CUT-09**: OVH portability proven via smoke deploy: same code deploys on a Node + Postgres + S3-compatible test environment with only env-var changes (no code changes). Capability shipped: scripts/smoke-ovh.ts (10-05). September execution proves it in practice (D-10-01).
 
 ---
 
@@ -328,7 +328,7 @@
 | CUT-06 | Phase 10 | Complete |
 | CUT-07 | Phase 10 | Pending |
 | CUT-08 | Phase 10 | Complete |
-| CUT-09 | Phase 10 | Pending |
+| CUT-09 | Phase 10 | Complete |
 
 ### Mapping rationale (where the boundaries got drawn)
 

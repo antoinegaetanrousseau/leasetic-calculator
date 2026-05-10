@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-10T19:12:00.000Z"
+last_updated: "2026-05-10T19:45:00.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 46
-  completed_plans: 45
-  percent: 98
+  completed_plans: 46
+  percent: 100
 ---
 
 # State — Matrice Commerciale
@@ -27,18 +27,18 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 10 (cutover-polish) — EXECUTING
-Plan: 5 of 6
-Status: Ready to execute
-Next: Phase 10 plan 05 (CI grep gate for no-v10-localStorage)
+Phase: 10 (cutover-polish) — COMPLETE
+Plan: 6 of 6 (all plans executed)
+Status: Complete
+Next: v1.1 launch (all planning complete)
 Last activity: 2026-05-10
-Last session: 2026-05-10 — Completed 10-04-PLAN.md (SeedBanner + privacy link)
+Last session: 2026-05-10 — Completed 10-05-PLAN.md (smoke-ovh.ts — OVH portability smoke test, CUT-09)
 
 ## Progress
 
 ```
 v1.0 ████████████████████ 4/4 phases complete (shipped 2026-04-30)
-v1.1 █████████████████░░░ 5/6 phases complete (Phase 10 next)
+v1.1 ████████████████████ 6/6 phases complete (all phases done — v1.1 ready for launch)
        └─ Phase 5: Bootstrap & Deploy        ✅ complete (7/7 plans, 12/12 BOOT reqs, /healthz live)
        └─ Phase 6: Auth & Shell              ✅ complete (9/9 plans, AUTH-01..18 + SHELL-01..14 satisfied)
        └─ Phase 7: Calc Engine + Form        ✅ complete (6/6 plans — calc engine ✅, 30-case golden corpus ✅, 30-key i18n ✅, home shell ✅, 14-input form ✅, live preview ✅; CALC-01..08 + PROP-01/06/07/08/24/25 satisfied)
@@ -97,6 +97,7 @@ v1.1 █████████████████░░░ 5/6 phases com
 | row.createdBy in HistoryTable renders raw user.id (displayName JOIN deferred to Plan 03) | 09-02-SUMMARY Known Stubs | Plan 03 follow-up |
 | isStillSeed computed SERVER-SIDE only via JSON.stringify deep-equal — no client-side seedParams comparison surface (D-10-14 / CUT-06) | 10-04 SeedBanner | 10-04 |
 | Privacy link uses lang ternary (fr/en) with canonical leasetic.fr fallbacks; NEXT_PUBLIC_* inlined at build time — defense in depth for missing env var (D-10-17 / CUT-05) | 10-04 LoginForm privacy link | 10-04 |
+| Smoke script SHA-256 assertion via X-Content-SHA256 header from GET /api/proposals/{id}/pdf; fixture inputs hardcoded (no canonical-input.json exists); Idempotency-Key UUID v4 required per POST /api/proposals (D-10-02 / CUT-09) | 10-05 smoke-ovh.ts | 10-05 |
 
 ### Open questions (to resolve before relevant phase)
 

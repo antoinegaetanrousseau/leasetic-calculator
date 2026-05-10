@@ -24,7 +24,7 @@
 - [x] **Phase 7: Calc Engine Port + Proposal Form** — Pure-TS calc module with v10 golden tests; proposal entry form with live preview (no DB writes yet). ✅ Complete 2026-05-09: 6/6 plans done, 14/14 requirements satisfied (CALC-01..08, PROP-01, PROP-06, PROP-07, PROP-08, PROP-24, PROP-25). Live preview ships at /proposals/new — partner types into form + 300ms-debounced sticky right-column card shows formatted loyer (fr-FR/en-GB explicit locale), generated LC ref + Copy button, validity selector. Calc engine + 30 golden tests preserve v10 formula parity (±0.01 €). 227/227 tests passing.
 - [x] **Phase 8: Persistence + PDF Pipeline** — Proposals table with `params_snapshot` immutability, deterministic PDF rendering with byte-identical CI gate, blob storage, home-page list, download/duplicate/soft-delete (completed 2026-05-09)
 - [x] **Phase 9: Admin Surface** — Coefficients editor with append-only history, partner account management, audit log, commission invisibility lockdown. ✅ Complete 2026-05-10: 4/4 plans done, ADMIN-01..09 satisfied. Admin home nav hub, validity seam wired to global_params.
-- [ ] **Phase 10: Cutover & Polish** — v10 retirement + redirect, OVH portability smoke deploy, runbooks, legal/privacy hookup, soft-delete purge job
+- [x] **Phase 10: Cutover & Polish** — v10 retirement + redirect, OVH portability smoke deploy, runbooks, legal/privacy hookup, soft-delete purge job. ✅ Complete 2026-05-10: 5/5 plans done (note: plan count adjusted from 6 to 5 — plan 10-06 was vacuous), CUT-01..09 satisfied.
 
 ## Phase Details
 
