@@ -25,7 +25,7 @@ Antoine ticks off before announcing v1.1 to partners).
 
 4. **OVH-side cron replaces Vercel Cron.** `vercel.json`'s twice-monthly purge schedule
    (D-10-05/06) doesn't apply on OVH. Wire the same `/api/internal/purge-soft-deleted` endpoint
-   to an OVH-side scheduler using `Authorization: Bearer ${PURGE_CRON_SECRET}`. See
+   to an OVH-side scheduler using `Authorization: Bearer ${CRON_SECRET}`. See
    `## Cron Setup` below.
 
 ## Lifecycle
@@ -59,7 +59,7 @@ Before beginning provisioning in September:
 - **Secrets generated.** Run before provisioning:
   ```bash
   openssl rand -hex 32  # AUTH_SECRET
-  openssl rand -hex 32  # PURGE_CRON_SECRET
+  openssl rand -hex 32  # CRON_SECRET (Vercel's reserved name; same value on OVH)
   openssl rand -hex 16  # ADMIN_URL_SEGMENT (e.g. "a8f3c2e1d9b4f0a7")
   ```
   Store in a password manager — never commit.
@@ -136,9 +136,10 @@ ADMIN_URL_SEGMENT=<openssl rand -hex 16>
 # Privacy policy URLs — supplied by Thomas. No code change to update.
 NEXT_PUBLIC_PRIVACY_URL_FR=https://leasetic.fr/mentions-legales
 NEXT_PUBLIC_PRIVACY_URL_EN=https://leasetic.fr/privacy-policy
-# Cron secret — injected by OVH-side scheduler as "Authorization: Bearer <value>".
+# Cron secret — the route reads CRON_SECRET (Vercel's reserved env var name).
+# On OVH, set CRON_SECRET and inject it manually via crontab/systemd (see ## Cron Setup).
 # Generate: openssl rand -hex 32. Production scope only.
-PURGE_CRON_SECRET=<openssl rand -hex 32>
+CRON_SECRET=<openssl rand -hex 32>
 ```
 
 ## Build & Deploy
@@ -250,12 +251,12 @@ crontab -e
 Add:
 ```cron
 0 3 1,15 * * curl -s -X POST \
-  -H "Authorization: Bearer $PURGE_CRON_SECRET" \
+  -H "Authorization: Bearer $CRON_SECRET" \
   https://matrice.leasetic.fr/api/internal/purge-soft-deleted \
   >> /var/log/leasetic-purge.log 2>&1
 ```
 
-Set `PURGE_CRON_SECRET` in the crontab environment (`PURGE_CRON_SECRET=<value>` above the job
+Set `CRON_SECRET` in the crontab environment (`CRON_SECRET=<value>` above the job
 line) or via `/etc/environment`. Never hardcode the literal value in the crontab.
 
 After wiring, fire a manual test: `curl -s -X POST -H "Authorization: Bearer <secret>" https://matrice.leasetic.fr/api/internal/purge-soft-deleted` → expected `{ "purged": 0, "errors": 0 }` (no candidates if DB is freshly provisioned).
@@ -270,7 +271,7 @@ Description=Leasetic Matrice — soft-delete purge
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/curl -s -X POST \
-  -H "Authorization: Bearer ${PURGE_CRON_SECRET}" \
+  -H "Authorization: Bearer ${CRON_SECRET}" \
   https://matrice.leasetic.fr/api/internal/purge-soft-deleted
 ```
 
@@ -329,7 +330,7 @@ Don't cut over until smoke passes + 1-week OVH pilot with a single trusted partn
 - [ ] OVH DB migrations applied — `psql $DATABASE_URL -c "\dt"` shows all tables
 - [ ] Blob bucket policies set — private ACL, EU region, presigned URL access working
 - [ ] Smoke 7/7 green — `npm run smoke:ovh` exits 0 with `OVH-portability: PROVEN`
-- [ ] Cron wired + manual fire-test — `curl -X POST -H "Authorization: Bearer $PURGE_CRON_SECRET" .../api/internal/purge-soft-deleted` returns 200
+- [ ] Cron wired + manual fire-test — `curl -X POST -H "Authorization: Bearer $CRON_SECRET" .../api/internal/purge-soft-deleted` returns 200
 - [ ] DNS TTL reduced 24 hours before cutover — Leasétic IT action
 - [ ] Antoine login + admin coefficients verification on OVH — confirm SeedBanner visible (seed values), then customize
 
