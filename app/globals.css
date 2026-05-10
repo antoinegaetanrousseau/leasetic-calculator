@@ -508,4 +508,21 @@ input[aria-invalid="true"] {
 .accounts-row:last-child td { border-bottom: none; }
 .accounts-row:hover td { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); }
 
+/* Seed-banner — Phase 10 CUT-06 (D-10-13/14) */
+/* Yellow informational banner on coefficients page when latest global_params row is byte-equal to seedParams.coefficients (admin still on placeholder values). */
+.seed-banner {
+  background: var(--gold);
+  color: var(--navy);
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+html[data-theme="dark"] .seed-banner {
+  background: rgba(224, 133, 48, 0.18);
+  color: var(--ink);
+}
+
 /* === end Phase 9 admin surface === */
