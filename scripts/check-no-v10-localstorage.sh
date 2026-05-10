@@ -39,8 +39,11 @@ SEARCH_PATHS=("src" "app")
 fail=0
 
 for p in "${PATTERNS[@]}"; do
+  # -F (fixed strings): all five v10 key patterns are literals, not regexes.
+  # -E (extended regex) was previously combined here but is mutually exclusive
+  # with -F and caused platform-dependent behavior (GNU grep vs BSD grep).
   matches=$(
-    grep -rEnF \
+    grep -rnF \
       --include='*.ts' --include='*.tsx' --include='*.js' --include='*.mjs' --include='*.cjs' \
       --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=drizzle --exclude-dir=dist \
       "$p" "${SEARCH_PATHS[@]}" 2>/dev/null \
