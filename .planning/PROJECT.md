@@ -29,6 +29,8 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 
 **v10 status:** v10 is a *prepared but undistributed* prototype. The `FINAL-TEST-v11.md` master ship-gate runbook was never executed and the v10 HTML was never sent to partners. v10 is superseded by v1.1 (see below) and will be retired at v1.1 launch — no partner ever runs v10 in production.
 
+**CUT-02 / D-10-15 (cutover note):** v10 was never hosted at a URL — there is no v10 hosted URL to redirect from. CUT-02's "redirect" requirement is satisfied vacuously; documented in `docs/operations/launch-checklist.md`.
+
 ## Current Milestone: v1.1 — Hosted Web App Foundation
 
 **Goal:** Migrate Leasétic Matrice from a single-file standalone HTML to a Vercel-hosted multi-page web application with admin-invited authentication, per-partner persistent PDF proposals, and admin-only global financial parameters — designed for future portability to Leasétic's OVH infrastructure.
