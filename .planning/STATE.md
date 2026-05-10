@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-10T17:06:46.561Z"
+last_updated: "2026-05-10T19:12:00.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 46
-  completed_plans: 43
-  percent: 93
+  completed_plans: 45
+  percent: 98
 ---
 
 # State — Matrice Commerciale
@@ -28,10 +28,11 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 10 (cutover-polish) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
-Next: Phase 10 (cutover & polish)
+Next: Phase 10 plan 05 (CI grep gate for no-v10-localStorage)
 Last activity: 2026-05-10
+Last session: 2026-05-10 — Completed 10-04-PLAN.md (SeedBanner + privacy link)
 
 ## Progress
 
@@ -94,6 +95,8 @@ v1.1 █████████████████░░░ 5/6 phases com
 | Admin roles at v1.1 launch: **Antoine + Emmanuel** seeded via AUTH-12 CLI script (resolves Open Q6) | user decision 2026-05-07 | Locked |
 | RHF useForm<z.input,unknown,z.infer> split for z.coerce fields — z.input for TFieldValues, output for TTransformed | 09-02 CoefficientsEditor | Locked pattern |
 | row.createdBy in HistoryTable renders raw user.id (displayName JOIN deferred to Plan 03) | 09-02-SUMMARY Known Stubs | Plan 03 follow-up |
+| isStillSeed computed SERVER-SIDE only via JSON.stringify deep-equal — no client-side seedParams comparison surface (D-10-14 / CUT-06) | 10-04 SeedBanner | 10-04 |
+| Privacy link uses lang ternary (fr/en) with canonical leasetic.fr fallbacks; NEXT_PUBLIC_* inlined at build time — defense in depth for missing env var (D-10-17 / CUT-05) | 10-04 LoginForm privacy link | 10-04 |
 
 ### Open questions (to resolve before relevant phase)
 

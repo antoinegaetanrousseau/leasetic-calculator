@@ -159,7 +159,7 @@ Plans:
 | 7. Calc Engine Port + Proposal Form | v1.1 | 6/6 | Complete | 2026-05-09 |
 | 8. Persistence + PDF Pipeline | v1.1 | 14/14 | Complete    | 2026-05-09 |
 | 9. Admin Surface | v1.1 | 1/4 | In Progress|  |
-| 10. Cutover & Polish | v1.1 | 3/6 | In Progress|  |
+| 10. Cutover & Polish | v1.1 | 4/6 | In Progress|  |
 
 ---
 
