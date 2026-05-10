@@ -520,6 +520,11 @@ export const dictionaries = {
     'admin.accounts.error.enable': 'Erreur lors de la réactivation.',
     'admin.accounts.error.create': 'Erreur lors de la création du compte.',
     'admin.accounts.error.reset': 'Erreur lors de la réinitialisation.',
+
+    // ── Phase 10 — Cutover & Polish (D-10-13, D-10-17) ──────────────────────────
+    // 2 new keys × 2 langs: SeedBanner message + login privacy link label.
+    'admin.seed_banner.message': "Les coefficients sont actuellement les valeurs par défaut. Vérifiez et confirmez avant d’inviter des partenaires.",
+    'login.privacy.label': 'Politique de confidentialité',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -1009,6 +1014,10 @@ export const dictionaries = {
     'admin.accounts.error.enable': 'Error while re-enabling.',
     'admin.accounts.error.create': 'Error creating the account.',
     'admin.accounts.error.reset': 'Error during reset.',
+
+    // ── Phase 10 — Cutover & Polish (D-10-13, D-10-17) ──────────────────────────
+    'admin.seed_banner.message': 'Coefficients are currently default values. Verify and confirm before inviting partners.',
+    'login.privacy.label': 'Privacy policy',
   },
 } as const;
 

@@ -19,7 +19,9 @@ export type AuditAction =
   | 'user.re_enable'
   | 'invitation.create'
   | 'password_reset.create'
-  | 'role.grant';   // reserved — scripts/grant-admin.ts does NOT yet write to audit_log; future hook only.
+  | 'role.grant'   // reserved — scripts/grant-admin.ts does NOT yet write to audit_log; future hook only.
+  // ── Phase 10 — Cutover & Polish (D-10-11) ──────────────────────────────────
+  | 'user.purge';   // pre-launch hard-delete of test accounts (@test.leasetic.com)
 
 export type AuditTargetType = 'proposal' | 'user' | 'global_params';
 
@@ -46,6 +48,9 @@ export interface WriteAuditLogArgs {
  *   - adminReEnableUser             → 'user.re_enable'
  *   - adminCreateInvitation         → 'user.create' + 'invitation.create'
  *   - adminCreatePasswordReset      → 'password_reset.create'
+ *
+ * Phase 10 (scripts/purge-test-data.ts) also calls this for:
+ *   - scripts/purge-test-data.ts                       → 'user.purge' (Phase 10 D-10-11)
  */
 export async function writeAuditLog(args: WriteAuditLogArgs): Promise<AuditLogRow> {
   const dbi = db();
