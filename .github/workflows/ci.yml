@@ -50,6 +50,9 @@ jobs:
       - name: Defense-in-depth -- seed SQL in sync with seedParams (D-D1)
         run: npm run check:seed-sql
 
+      - name: Defense-in-depth grep -- no v10 localStorage keys (CUT-03)
+        run: npm run check:no-v10-localstorage
+
       - name: Vitest unit tests
         run: npm test
 
