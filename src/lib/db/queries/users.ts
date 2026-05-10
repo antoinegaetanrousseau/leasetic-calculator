@@ -42,10 +42,13 @@ export async function listPartnersWithCounts(): Promise<PartnerWithCount[]> {
       createdAt: schema.users.createdAt,
       language: schema.users.language,
       // Correlated subquery: count non-soft-deleted proposals per user.
+      // NOTE: ${schema.users.id} interpolation emits unqualified `"id"`, which
+      // Postgres binds to `proposals.id` (uuid) — not the outer `users.id` (text).
+      // Result is `text = uuid` type mismatch (42883). Fix: qualify explicitly.
       proposalsCount: sql<number>`(
         SELECT COUNT(*)::int
         FROM proposals
-        WHERE proposals.user_id = ${schema.users.id}
+        WHERE proposals.user_id = users.id
           AND proposals.deleted_at IS NULL
       )`.as('proposals_count'),
     })
