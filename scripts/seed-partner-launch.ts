@@ -8,8 +8,9 @@
  *
  * Production partners MUST come through the invitation flow
  * (`src/lib/auth/actions.ts createInvitation` → /invite/<token> redemption).
- * Use this script ONLY for internal test accounts (e.g. delphine.specht@leasetic.com
- * during Phase 8 verification).
+ * Use this script ONLY for internal test accounts under the
+ * `@test.leasetic.com` domain (D-10-09 / D-10-10 — domain reservation).
+ * Example: delphine.specht@test.leasetic.com.
  *
  * The argon2id hash uses the same parameters Better Auth's hash function uses
  * (per `src/lib/auth/index.ts`: timeCost: 2, memoryCost: 19456, parallelism: 1,
@@ -86,6 +87,22 @@ function parseArgs(argv: string[]): { email: string; displayName?: string } {
 async function main(): Promise<void> {
   const { email: rawEmail, displayName: nameArg } = parseArgs(process.argv);
   const email = rawEmail.trim().toLowerCase();
+
+  // Gate 0: D-10-10 — seed-partner-launch.ts is for TEST partners ONLY.
+  // The @test.leasetic.com domain is reserved for test accounts (D-10-09);
+  // production partners come through the /invite/<token> invitation flow
+  // (src/lib/auth/actions.ts createInvitation) — never via this script.
+  // This guard runs BEFORE the typed-confirmation gate so a wrong-domain
+  // invocation fails-fast without the operator needing to figure out the
+  // CONFIRM token first.
+  const TEST_EMAIL_RE = /^.+@test\.leasetic\.com$/;
+  if (!TEST_EMAIL_RE.test(email)) {
+    console.error('[seed-partner] REFUSE: email does not match @test.leasetic.com pattern.');
+    console.error('[seed-partner] Production partners must come through the /invite/<token> flow.');
+    console.error(`[seed-partner] Got: ${email}`);
+    process.exit(2);
+  }
+
   const expectedConfirm = `${REQUIRED_CONFIRM_PREFIX}${email}`;
 
   // Gate 1: typed confirmation (email-scoped — typo'd CLI arg fails the gate)
