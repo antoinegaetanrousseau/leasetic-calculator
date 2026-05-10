@@ -22,7 +22,7 @@
     "grant:admin": "tsx scripts/grant-admin.ts",
     "pdf:update-fixture": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/update-pdf-fixture.ts",
     "purge:soft-deleted": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/purge-soft-deleted.ts",
-    "purge:soft-deleted:dry": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/purge-soft-deleted.ts",
+    "purge:soft-deleted:dry": "CONFIRM= tsx -r ./scripts/_preload-mock-server-only.cjs scripts/purge-soft-deleted.ts",
     "purge:test-data": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/purge-test-data.ts",
     "smoke:ovh": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/smoke-ovh.ts",
     "check:no-v10-localstorage": "bash scripts/check-no-v10-localstorage.sh"
