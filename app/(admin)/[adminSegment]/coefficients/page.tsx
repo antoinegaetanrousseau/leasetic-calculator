@@ -7,6 +7,18 @@ import { ExplainTool } from './ExplainTool';
 import { HistoryTable } from './HistoryTable';
 import { SeedBanner } from './SeedBanner';
 import { seedParams } from '@/lib/calc/seed-params';
+import type { Coefficients } from '@/lib/calc/coefficients';
+
+/**
+ * D-10-14: leaf-value deep equality for coefficient tables — immune to JSONB
+ * key-order variation. JSON.stringify comparison would break if JSONB normalizes
+ * key order differently from the in-memory object insertion order.
+ */
+function coefficientsEqual(a: Coefficients, b: Coefficients): boolean {
+  const tranches = ['t1', 't2', 't3', 't4'] as const;
+  const durations = [36, 48, 60] as const;
+  return tranches.every((t) => durations.every((d) => a[t]?.[d] === b[t]?.[d]));
+}
 
 // PITFALLS §1.6 — every cookie/session-reading page opts out of static rendering.
 export const dynamic = 'force-dynamic';
@@ -41,12 +53,12 @@ export default async function CoefficientsPage({ params }: PageProps) {
   const initialHistory = await listGlobalParamsHistory({ limit: 20 });
 
   // D-10-14: server-side deep-equal of latest coefficients vs seedParams.coefficients.
-  // JSON.stringify is sufficient because seedParams.coefficients is a flat
-  // {tranche: {duration: stringDecimal}} object with deterministic key insertion
-  // order (coefficientsSchema enforces shape). When admin saves any edit, the new
-  // global_params row's coefficients differ in at least one numeric value → flips false.
-  const isStillSeed =
-    JSON.stringify(latestParams.coefficients) === JSON.stringify(seedParams.coefficients);
+  // Uses leaf-value comparison (coefficientsEqual) to avoid JSONB key-order assumptions —
+  // see WR-01 fix. When admin saves any edit, at least one cell differs → flips false.
+  const isStillSeed = coefficientsEqual(
+    latestParams.coefficients as Coefficients,
+    seedParams.coefficients,
+  );
 
   return (
     <div>
