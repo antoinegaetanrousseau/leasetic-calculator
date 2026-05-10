@@ -226,6 +226,25 @@ export function LoginForm({ lang }: LoginFormProps) {
       <div style={{ fontSize: '10.5px', color: 'var(--muted)', lineHeight: 1.5, marginTop: 8 }}>
         {t('auth.hint.forgot.password', lang)}
       </div>
+
+      {/* Privacy-policy link — D-10-17 / CUT-05. NEXT_PUBLIC_* inlined at build
+          time. Fallback URLs are the canonical Leasétic privacy pages — keep
+          a working link even if env var unset (defense in depth: a missing
+          env var must not produce a broken link). */}
+      <div style={{ fontSize: '10.5px', color: 'var(--muted)', lineHeight: 1.5, marginTop: 4 }}>
+        <a
+          href={
+            lang === 'en'
+              ? (process.env.NEXT_PUBLIC_PRIVACY_URL_EN ?? 'https://leasetic.fr/privacy-policy')
+              : (process.env.NEXT_PUBLIC_PRIVACY_URL_FR ?? 'https://leasetic.fr/mentions-legales')
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--muted)', textDecoration: 'underline' }}
+        >
+          {t('login.privacy.label', lang)}
+        </a>
+      </div>
     </form>
   );
 }
