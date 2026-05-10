@@ -133,9 +133,9 @@
 - [ ] **CUT-01**: v10 standalone HTML retired at v1.1 launch; partners cannot use v10 in production after launch
 - [ ] **CUT-02**: v10's hosting URL (if any) redirects to v1.1 login page with a "Leasétic Matrice has moved" notice in FR + EN
 - [ ] **CUT-03**: No automated migration of v10 localStorage data; partners onboarded clean-slate by Leasétic admin
-- [ ] **CUT-04**: All test partner accounts deleted from production DB before launch (rows with `is_test=true` are purged in a pre-launch checklist step)
-- [ ] **CUT-05**: Login page links to Leasétic's existing privacy notice (FR + EN URLs); legal counsel confirms the new processing activity (PDF storage) is covered by the existing policy
-- [ ] **CUT-06**: Coefficient seed migration verified in production before partners get access (admin first-login checklist: "Vérifier les coefficients" with a diff tool against v10 baseline)
+- [x] **CUT-04**: All test partner accounts deleted from production DB before launch (rows with `is_test=true` are purged in a pre-launch checklist step)
+- [x] **CUT-05**: Login page links to Leasétic's existing privacy notice (FR + EN URLs); legal counsel confirms the new processing activity (PDF storage) is covered by the existing policy
+- [x] **CUT-06**: Coefficient seed migration verified in production before partners get access (admin first-login checklist: "Vérifier les coefficients" with a diff tool against v10 baseline)
 - [ ] **CUT-07**: Production observability: platform logs (Vercel) cover all server errors; Sentry/APM deferred to v1.2
 - [ ] **CUT-08**: README + `docs/deploy-ovh.md` runbook covers env vars, build steps, migration application, smoke tests
 - [ ] **CUT-09**: OVH portability proven via smoke deploy: same code deploys on a Node + Postgres + S3-compatible test environment with only env-var changes (no code changes)
@@ -323,9 +323,9 @@
 | CUT-01 | Phase 10 | Pending |
 | CUT-02 | Phase 10 | Pending |
 | CUT-03 | Phase 10 | Pending |
-| CUT-04 | Phase 10 | Pending |
-| CUT-05 | Phase 10 | Pending |
-| CUT-06 | Phase 10 | Pending |
+| CUT-04 | Phase 10 | Complete |
+| CUT-05 | Phase 10 | Complete |
+| CUT-06 | Phase 10 | Complete |
 | CUT-07 | Phase 10 | Pending |
 | CUT-08 | Phase 10 | Pending |
 | CUT-09 | Phase 10 | Pending |

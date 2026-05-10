@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
 status: executing
-last_updated: "2026-05-10T16:40:58.306Z"
-last_activity: 2026-05-10 -- Phase 10 planning complete
+last_updated: "2026-05-10T16:52:11.742Z"
+last_activity: 2026-05-10
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 46
-  completed_plans: 40
-  percent: 87
+  completed_plans: 41
+  percent: 89
 ---
 
 # State — Matrice Commerciale
@@ -23,15 +23,15 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 9 — admin-surface
+**Current focus:** Phase 10 — cutover-polish
 
 ## Current Position
 
-Phase: 9 (admin-surface) — COMPLETE
-Plan: 4 of 4 (all plans shipped)
+Phase: 10 (cutover-polish) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
 Next: Phase 10 (cutover & polish)
-Last activity: 2026-05-10 -- Phase 10 planning complete
+Last activity: 2026-05-10
 
 ## Progress
 
