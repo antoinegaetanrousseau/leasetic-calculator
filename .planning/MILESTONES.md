@@ -1,5 +1,64 @@
 # Milestones — Matrice Commerciale
 
+## v1.1 — Hosted Web App Foundation
+
+**Shipped:** 2026-05-11
+**Phases:** 6 | **Plans:** 46 | **Plan↔Summary parity:** 46/46
+**Requirements:** 108/108 (105 ✅ complete + 3 partial — see audit)
+**Timeline:** 2026-05-05 → 2026-05-11 (6 days from Phase 5 scaffold to Phase 10 audit pass)
+**Deliverable:** `https://leasetic-matrice.vercel.app` — Vercel-hosted Next.js 16 + Neon Postgres + Vercel Blob + Better Auth, OVH-portable architecture
+**Git range:** `24a9bae..5df081a` (236 commits, 300 files changed, 16,139 LOC across `src/` + `app/`)
+**Known deferred items:** 7 (see `STATE.md` Deferred Items section and `milestones/v1.1-MILESTONE-AUDIT.md`)
+
+### What shipped
+
+Migration of the Leasétic Matrice from a single-file standalone HTML quote tool to a **hosted multi-page web application** with admin-invited authentication, persistent PDF proposals stored as immutable blobs per partner, admin-only global financial parameters (commission / max / validity / coefficients), and a coefficient-snapshot pattern that makes existing PDFs immune to future parameter edits. The full v10 calculation formula was ported as a pure-TS module with a 30-case golden corpus asserting ±0.01 € parity in CI. The architecture is deliberately OVH-portable: a `lib/storage` + `lib/db` adapter spine plus ESLint + CI grep gates prevent Vercel-only imports outside those modules, so the September 2026 OVH cutover can swap drivers via env-var changes only.
+
+### Key accomplishments
+
+- **Vercel-hosted Next.js 16 + Neon Postgres + Vercel Blob deployment** with `/healthz` live exercising DB read + blob round-trip via portable adapters; `output: 'standalone'` from first commit; CI enforces no-Vercel-only-imports rule on every PR (Phase 5: BOOT-01..12)
+- **Admin-invited authentication** with Better Auth 1.6.9 + argon2id hashing + 8h sliding sessions; hidden `/[adminSegment]` admin tree with 2-layer gate (env-segment `notFound()` → `requireAdmin()`); no SMTP — invitations and resets are admin-mediated one-time URLs via the `InviteUrlModal` primitive; 231-key FR/EN i18n dictionary with compile-time `_EnHasAllFrKeys` parity proof; light/dark mode with no-flash cookie-driven SSR (Phase 6: AUTH-01..18, SHELL-01..14)
+- **Pure-TS calculation engine** at `src/lib/calc/` with the frozen v10 formula `loyer = amountHT × (1 + commission/100) × coefficient / 100`; 30-case golden corpus in CI with ±0.01 € tolerance; live preview (300ms debounce) on the proposal entry form with full 5-state machine (idle / expired / missing / on-demand / computed) and LC reference + Copy button + 15/30/60-day validity selector (Phase 7: CALC-01..08, PROP-01/06/07/08/24/25)
+- **Persistent PDF proposals with `params_snapshot` immutability** — single `POST /api/proposals` handler with client-generated `Idempotency-Key`, server-side `computeLoyer()` recompute (never trusts client), deep-copy snapshot of `global_params` into the row, deterministic `@react-pdf/renderer` PDF (CI-gated SHA-256 byte-equality on a fixture proposal), blob upload at `proposals/{userId}/{proposalId}.pdf` with private access; cursor-paginated home list + ILIKE search + soft-delete (30-day window) + duplicate flow (snapshots *current* params, not source's) (Phase 8: DATA-01..12, PROP-02..05/09..23/26)
+- **Admin operating surface** at `/[adminSegment]/coefficients` (editor + computed-diff confirmation modal + cursor-paginated history with per-row diff + pure-client "Explain calculation" debug tool — the SOLE non-editor surface allowed to display `commission_pct` per ADMIN-09) and `/[adminSegment]/accounts` (6-column partners list with proposal counts, per-row disable/re-enable via sonner confirm-toast, re-issue invitation, send password reset, create-new-partner modal); 42 STRIDE threats verified closed (ASVS L1); cross-cutting commission redaction discipline enforced across server logs, audit_log payloads, and partner-facing surfaces (Phase 9: ADMIN-01..09)
+- **Cutover & polish operational layer** — `docs/operations/deploy-ovh.md` runbook + `scripts/smoke-ovh.ts` 7-step full-lifecycle smoke (deferred OVH execution to September 2026; capability ships now); twice-monthly Vercel Cron at `0 3 1,15 * * UTC` → dual-auth `/api/internal/purge-soft-deleted` route → shared `src/lib/admin/purge.ts` pure function called by both CLI and cron; email-pattern test-data discriminator (`@test.leasetic.com`) with `scripts/purge-test-data.ts` pre-launch scrub; `<SeedBanner>` first-login confirmation surface; CI grep gate blocking v10 localStorage key resurrection; 55 STRIDE threats verified closed (Phase 10: CUT-01..09)
+
+### Verification artifacts
+
+- `milestones/v1.1-ROADMAP.md` — full phase + plan archive
+- `milestones/v1.1-REQUIREMENTS.md` — 108-row traceability with final outcomes
+- `milestones/v1.1-MILESTONE-AUDIT.md` — integration check + cross-cutting invariants + Drizzle correlated-subquery latent-bug audit (commit `5df081a`)
+- Per-phase artifacts under `.planning/phases/{05..10}-*/` — SUMMARY.md per plan (46 files), REVIEW.md + REVIEW-FIX.md for Phases 8/9/10, SECURITY.md for Phases 9/10 (97 threats verified closed across the two)
+- 399/399 Vitest tests passing as of milestone close; typecheck + lint + build all clean
+- Code review surfaced and fixed 21 findings across Phases 8/9/10 (5 critical + 11 warning + 5 info-deferred); zero open critical issues
+
+### Key decisions (v1.1)
+
+- **Vercel + Neon + Better Auth** chosen over NextAuth alternatives for adapter ergonomics, EU-hosting compliance, and OVH portability; locked at Phase 5 with all dep versions pinned exact-no-carets
+- **OVH portability is a CI claim, not a runtime claim** in v1.1 — the smoke script + runbook ship now; actual OVH deploy is September 2026 (v1.2 follow-up)
+- **PDF immutability via `params_snapshot` jsonb** (Stripe pattern, Option A in ARCHITECTURE §2.5) — old PDFs render byte-identically forever even after admin coefficient edits
+- **Commission invisibility extended to logs / traces / audit payloads** (ADMIN-09 cross-cutting), with the explicit "Explain calculation" debug tool as the sole authorized exception
+- **Hard cutover from v10 — no localStorage migration path**; v10 was never hosted (delivered as emailed HTML file), so CUT-02 collapses vacuously
+- **Phased pilot launch** (2-3 trusted partners → 1-2 weeks observation → batch onboard); Antoine owns partner comms directly (not delegated to Thomas)
+
+### Known gaps at close (acknowledged, not blocking)
+
+- BOOT-03 partial: Neon 3-branch split deferred — all Vercel scopes currently route to the `main` Neon branch (functionally green; documented Phase 5 follow-up)
+- ADMIN-05 operational gap: `users.last_login_at` is read by the admin accounts page but never *written* anywhere in the auth code — every partner row will show `'—'`
+- DATA-11 legal counsel sign-off on 10-year PDF retention deferred (Thomas reply pending; stub committed at `docs/legal/privacy-coverage-confirmation.md`)
+- CUT-09 live OVH smoke deploy deferred to September 2026 (capability shipped: `scripts/smoke-ovh.ts` + `docs/operations/deploy-ovh.md`)
+- Admin password rotation (`leasetic2026` → individual strong) — Phase 6 follow-up #1, must complete *before* first real partner is onboarded
+- Better Auth `trustedOrigins` hardening deferred to v1.2 (SameSite=Lax + `__Secure-` cookies are the actual CSRF defense)
+- 2 stale `[~]` markers in v1.1 REQUIREMENTS.md (CALC-07, PROP-01) — functionally satisfied by Phase 8 work; cosmetic only
+
+### Surprises captured
+
+- **Drizzle correlated-subquery name-resolution footgun** (commit `4879831`) — `${schema.users.id}` interpolation inside a `sql\`...\`` template emits unqualified `"id"`, which Postgres binds to the wrong inner-table column. Caught in production via Vercel runtime logs after the partners page 500'd; fixed by inlining `users.id` as raw SQL. The milestone audit confirmed no other latent instances of this pattern exist in the codebase
+- **Vercel Cron auth env-var reserved name** (commit `df6fdae`) — Vercel auto-injects `Authorization: Bearer ${CRON_SECRET}` using the literal env-var name `CRON_SECRET`. The Phase 10 plan originally named it `PURGE_CRON_SECRET`; CR-01 fix renamed to match Vercel's reserved name. Would have caused the soft-delete purge cron to silently 401 forever without alerting (CUT-07 alerting is deferred to v1.2)
+- **Token-scope friction on push** — the local `gh` token initially lacked the `workflow` scope needed to push commits modifying `.github/workflows/`; resolved with `gh auth refresh -s workflow`. Worth flagging for any future contributor
+
+---
+
 Living log of shipped versions. Each entry summarizes what shipped, when, and where the detailed archives live.
 
 ---

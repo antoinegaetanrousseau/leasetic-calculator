@@ -6,9 +6,21 @@ The internal sales-quote tool for **Leasétic**, distributed as a self-contained
 
 Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-file standalone, no build chain).
 
-## Current state — post-v1.0
+## Current state — post-v1.1 (shipped 2026-05-11)
 
-**Shipped 2026-04-30:** v10 refactor of the original v9 standalone tool. 4 phases, 11 plans, 69 requirements all complete. See `MILESTONES.md` for details.
+**v1.1 — Hosted Web App Foundation** shipped 2026-05-11. 6 phases, 46 plans, 108 requirements (105 ✅ + 3 documented partials), 236 commits over 6 days. Production deployment live at `https://leasetic-matrice.vercel.app` (Vercel + Neon Postgres + Vercel Blob + Better Auth). See `MILESTONES.md` for the full v1.1 entry and `milestones/v1.1-*.md` for archived ROADMAP / REQUIREMENTS / AUDIT.
+
+**What v1.1 has that v1.0 didn't:**
+- Hosted multi-page web app instead of single-file HTML (Next.js 16 App Router + TypeScript)
+- Admin-invited authentication (Better Auth 1.6.9 + argon2id, 8h sessions, hidden `/[adminSegment]` admin tree)
+- Persistent PDF proposals with `params_snapshot` immutability invariant — once saved, never changed by future coefficient edits
+- Server-side calc engine with 30-case CI golden corpus (±0.01 € parity vs v1.0)
+- Admin coefficient editor with append-only history + "Vérifier les coefficients" first-login banner + sole-allowed commission-visibility "Explain calculation" tool
+- Soft-delete + scheduled purge cron (twice-monthly 1st + 15th); 30-day window; audit_log on every mutation
+- OVH-portable adapter discipline (`lib/storage` + `lib/db`) with ESLint + CI grep gates enforcing no-Vercel-only-primitives outside adapters
+- 97 STRIDE threats verified closed across Phases 9 + 10 (ASVS L1); 21 code review findings caught + fixed across Phases 8/9/10
+
+**v1.0 status:** `Matrice_2026_THE_Leasetic-v10.html` was a prepared-but-undistributed prototype. It was never sent to partners. v1.1 is the first version partners actually use; v10 is now retired in name only (no localStorage migration path, no hosted URL to redirect from per CUT-02/D-10-15).
 
 **What v10 has that v9 didn't:**
 - Modern ES6+ codebase (`const`/`let`, arrow functions, template literals, labeled CSS + JS sections)
@@ -31,25 +43,36 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 
 **CUT-02 / D-10-15 (cutover note):** v10 was never hosted at a URL — there is no v10 hosted URL to redirect from. CUT-02's "redirect" requirement is satisfied vacuously; documented in `docs/operations/launch-checklist.md`.
 
-## Current Milestone: v1.1 — Hosted Web App Foundation
+## Current Milestone: v1.2 — UX Polish + Proposal Wizard
 
-**Goal:** Migrate Leasétic Matrice from a single-file standalone HTML to a Vercel-hosted multi-page web application with admin-invited authentication, per-partner persistent PDF proposals, and admin-only global financial parameters — designed for future portability to Leasétic's OVH infrastructure.
+**Started:** 2026-05-11 (post-v1.1 close, Figma design session same day)
+**Source of truth:** `.planning/MILESTONE-CONTEXT.md` (Figma design contract `vwOzirhL0vyxDWq4m6t4gC`)
 
-**Target features:**
+**Goal:** Apply the visual + interaction design contract sketched in Figma to the v1.1 surface — adding a 3-step proposal wizard (Paramètres → Calcul → Vérification), a retractable sidebar with brand logo, draft-state proposal persistence, dedicated partner-create route, coefficient change history surface, and brand-logo treatment across login / invite / reset public pages.
 
-- Vercel-hosted Next.js (App Router) web app, Postgres + Blob storage, NextAuth credentials — separate Vercel project under the Memento team, designed portably for future OVH migration (no Vercel-only primitives)
-- Multi-page shell: auth → home (new / browse recent) → proposal flow (data entry → result → review → export). v10 calc engine, FR/EN i18n, and dark mode preserved.
-- Admin-invited authentication (email + password). No self-signup, no SSO. Leasétic admin creates partner accounts in backend; partner receives credentials directly.
-- Persistent PDF proposals stored as immutable binary blobs per partner account. Old proposals never affected by future coefficient changes (non-negotiable invariant).
-- Admin-only coefficients page at hidden URL, role-gated within the same auth system. Edits **global** coefficients, commission rate, and max threshold (single set applies to all partners' new proposals — v10's per-partner customization is removed).
-- Hard cutover: v10 standalone HTML retired at v1.1 launch. Clean-slate partner onboarding (no v10 localStorage migration).
+**Target features (full requirements in `MILESTONE-CONTEXT.md`):**
 
-**Out of scope for v1.1** (deferred to v1.2+):
+- **Database:** add `draft` proposal status (enum: `draft | active | expired | deleted`), `invited` partner account status, coefficient change history table powering a new History sidebar
+- **Routing:** split `/proposals/new` into 3 wizard steps with server-side draft persistence between steps; dedicated `/[adminSegment]/partners/new` route replacing v1.1's modal-based partner creation
+- **Components:** new reusable Stepper (3 states per step: active/pending/done), Retractable sidebar (260px ↔ 72px with localStorage preference), Home metric tile (3 variants), Admin nav cards, Status chip variants (active/draft/expired/disabled)
+- **Brand assets:** add Leasétic logo files (`#6DC388` mark, `#112C3B` wordmark) with light/dark mode SVG variants
+- **Public surfaces:** apply brand logo + paper background to login, invite/[token], reset/[token]
 
-- OVH production deployment (v1.1 deploys to Vercel only; OVH happens once Leasétic IT approves)
+**Carried-over follow-ups from v1.1 (close before partner onboarding):**
+
+- Rotate shared admin password (`leasetic2026` → individual strong) — Phase 6 follow-up #1
+- Ask Thomas to confirm privacy-policy coverage of (a) Vercel/Neon EU hosting and (b) 10-year PDF retention (D-10-18)
+- Wire `users.last_login_at` write at login time (ADMIN-05 operational gap; WR-AUDIT-01)
+
+**Out of scope for v1.2** (deferred to v1.3+):
+
+- OVH production deployment + smoke deploy execution (September 2026 target; capability shipped in v1.1)
 - Mobile-optimized layout
 - Excel export, webhook notifications, automated browser tests
 - Multi-language beyond FR + EN
+- SMTP-driven self-service password reset (admin-mediated only continues)
+- Sentry / APM observability (Vercel logs continue as production observability)
+- Better Auth `trustedOrigins` hardening (SameSite=Lax + `__Secure-` cookies stay the CSRF defense)
 
 ## Core value
 
@@ -79,27 +102,47 @@ If that doesn't work, nothing else matters. v10 preserves this core via on-load 
 - ✓ Dark mode with no-flash restore — v1.0
 - ✓ Retractable sidebar with hover tooltips — v1.0
 
-### Active (in v1.1)
+### Validated (shipped in v1.1)
 
-REQ-IDs assigned in `REQUIREMENTS.md`. High-level scope:
+- ✓ Vercel-hosted Next.js 16 web app on Memento team scope — v1.1 (Phase 5)
+- ✓ Portable stack — Next.js + Neon Postgres + Vercel Blob + Better Auth via `lib/storage` + `lib/db` adapters; ESLint + CI grep gates block Vercel-only imports outside adapters — v1.1 (Phase 5)
+- ✓ Email + password authentication via Better Auth 1.6.9 + argon2id; admin-invited only (no self-signup); hidden `/[adminSegment]` 2-layer gate — v1.1 (Phase 6)
+- ✓ Multi-page shell with FR/EN i18n (231 keys × 2 langs, compile-time parity proof); cookie-driven theme with no flash; sonner toasts; SHELL-12 error boundary + localized 404 — v1.1 (Phase 6)
+- ✓ Pure-TS v10 calculation engine with 30-case CI golden corpus (±0.01 € parity); live preview (300ms debounce); 5-state machine on the proposal entry form — v1.1 (Phase 7)
+- ✓ Persistent PDF proposals — immutable binary blobs per account; `params_snapshot` jsonb makes old PDFs immune to future coefficient changes; byte-deterministic CI gate on SHA-256 — v1.1 (Phase 8)
+- ✓ Admin coefficients editor at hidden URL with append-only history + computed-diff modal + first-login "Vérifier les coefficients" banner + sole-allowed commission-visibility "Explain calculation" tool — v1.1 (Phase 9)
+- ✓ Admin partners page with 6-column list (including proposals_count), per-row disable/re-enable/reset/re-issue actions, create-partner modal with one-time-URL InviteUrlModal — v1.1 (Phase 9)
+- ✓ Cross-cutting commission invisibility (ADMIN-09) across server logs, audit_log payloads, and partner-facing surfaces — v1.1 (Phase 9)
+- ✓ Scheduled soft-delete purge cron (Vercel Cron at 03:00 UTC on 1st + 15th of each month) — v1.1 (Phase 10)
+- ✓ Hard cutover from v10 standalone — v10 was never hosted (CUT-02 vacuous); clean-slate partner onboarding; CI grep gate blocks v10 localStorage key resurrection — v1.1 (Phase 10)
+- ✓ OVH portability runbook + scripted full-lifecycle smoke (`scripts/smoke-ovh.ts` + `docs/operations/deploy-ovh.md`); execution deferred to September 2026 — v1.1 (Phase 10)
+- ✓ 97 STRIDE threats verified closed across Phases 9 + 10 (ASVS L1) — v1.1
+- ⚠ Partial v1.1: Neon 3-branch split (BOOT-03 — all Vercel scopes route to `main` Neon branch; deferred to ops follow-up)
 
-- [ ] Vercel-hosted Next.js web app (separate Leasétic project under Memento team)
-- [ ] Portable stack: Next.js + Postgres + Blob storage + NextAuth (no Vercel-only primitives → OVH migration path preserved)
-- [ ] Email + password authentication, admin-invited (no self-signup)
-- [ ] Multi-page shell: auth → home (new / browse recent) → proposal flow (data entry → result → review → export)
-- [x] Persistent PDF proposals — immutable binary blobs, per-account, never affected by future coefficient changes — Phase 8 (2026-05-09)
-- [ ] Admin-only coefficients page at hidden URL, role-gated, editing **global** coefficients / commission / max threshold
-- [ ] Hard cutover from v10 standalone (clean slate, no localStorage migration)
+### Active (in v1.2 — UX Polish + Proposal Wizard)
 
-### Deferred to v1.2+
+Full requirements in `.planning/MILESTONE-CONTEXT.md` (carried into a fresh `.planning/REQUIREMENTS.md` at `/gsd-new-milestone`):
 
-- [ ] OVH production deployment (Vercel-only in v1.1)
+- [ ] **Database extensions:** add `draft` proposal status, `invited` partner account status, coefficient change history table
+- [ ] **Routing:** 3-step proposal wizard (Paramètres → Calcul → Vérification) with server-side draft persistence between steps; dedicated `/[adminSegment]/partners/new` route replacing modal flow
+- [ ] **Reusable components:** Stepper, retractable sidebar (260px ↔ 72px with localStorage preference), home metric tile (3 variants), admin nav cards, status chip variants
+- [ ] **Brand assets:** add Leasétic logo SVGs (mark `#6DC388`, wordmark `#112C3B`) with light/dark variants; apply to login + invite + reset public pages and authed sidebar
+- [ ] **Public surface polish:** paper background + centered logo + card pattern across all 3 `(public)` routes
+
+### Deferred to v1.3+
+
+- [ ] OVH production deployment + smoke-deploy execution (September 2026 target; capability shipped in v1.1)
 - [ ] Centralized LC reference dashboard
 - [ ] Excel export of proposal portfolio
 - [ ] Webhook notifications to Leasétic on each proposal generation
 - [ ] Mobile-optimized layout
 - [ ] Multi-language beyond FR + EN
 - [ ] Automated browser tests (Playwright or similar)
+- [ ] SMTP-driven self-service password reset
+- [ ] Sentry / APM observability beyond Vercel logs
+- [ ] Better Auth `trustedOrigins` hardening (currently relying on SameSite=Lax + `__Secure-` cookies)
+- [ ] Generic audit-log viewer beyond coefficient history
+- [ ] Admin cross-partner proposal read view
 
 ### Out of scope (continuing constraints)
 
@@ -126,13 +169,13 @@ REQ-IDs assigned in `REQUIREMENTS.md`. High-level scope:
 
 ## Context
 
-- **Codebase:** 2,296 lines of HTML + inline CSS + inline JS (`Matrice_2026_THE_Leasetic-v10.html`)
-- **Tech stack:** Vanilla HTML5 / CSS3 / JS ES6+, Plus Jakarta Sans (Google Fonts CDN), Web Crypto API for SHA-256
-- **No npm, no bundler, no framework, no build tools** — by design
-- **Distribution:** "send the file" — the v10 HTML is emailed/shared with each partner
-- **Per-partner customization:** coefficients, commission rate, max threshold are configured per partner and stored in their own localStorage
-- **v9 retained as `Matrice_2026_THE_Leasetic-v9.html`** for rollback if ever needed (currently outside the working tree but documented in MILESTONES.md)
-- **Test strategy:** manual checklists in Chrome + Edge (`PARITY-AUDIT.md`, `SEC-TEST.md`, `FINAL-TEST-v11.md`), plus the on-load self-check triad (`assertCalc` / `assertEscape` / `assertValidity`)
+- **Codebase (post-v1.1):** 16,139 LOC of TypeScript across `src/` + `app/` (.ts + .tsx); 4 Drizzle migrations; 4 deployed routes + 1 internal cron route; 263+ i18n keys × 2 languages
+- **Tech stack:** Next.js 16 (App Router) + TypeScript + Drizzle ORM 0.45.2 + Neon Postgres + Vercel Blob + Better Auth 1.6.9 + argon2id + @react-pdf/renderer 4.5.1 + Tailwind v4 (custom CSS classes, no framework UI primitives) + Sonner + react-hook-form + Zod + Plus Jakarta Sans (self-hosted)
+- **Distribution:** hosted at `https://leasetic-matrice.vercel.app` — partners receive a one-time invitation URL via Antoine; admin-invited only (no self-signup, no SMTP)
+- **Global financial parameters:** single set of coefficients / commission_pct / max_amount / validity_days lives in the `global_params` append-only history table; admin-only edits via `/[adminSegment]/coefficients` create new rows (existing PDFs unchanged via `proposals.params_snapshot`)
+- **v10 retained as `Matrice_2026_THE_Leasetic-v10.html`** in repo root for reference (never distributed in production; CUT-01 / CUT-02 satisfied)
+- **Test strategy:** 399 Vitest tests in CI on every PR (typecheck + lint + grep gates + unit tests + build); manual smoke verification on Vercel after migration applies; `scripts/smoke-ovh.ts` ready for September 2026 OVH execution
+- **Verification policy:** `verifier_enabled: false` in `.planning/config.json` — per-phase formal VERIFICATION.md is skipped by design. Verification rigor comes from SUMMARY.md (per plan), REVIEW.md (Phases 8/9/10), REVIEW-FIX.md (Phases 9/10), SECURITY.md (Phases 9/10), and milestone-level audit (every milestone close)
 
 ## Key decisions (running log)
 
@@ -150,6 +193,24 @@ REQ-IDs assigned in `REQUIREMENTS.md`. High-level scope:
 | `--surface` token introduced for dark mode | Semantic separation from `--white` (used for text on green CTAs) | ✓ Held |
 | Proposal page stays white in dark mode | Print parity over visual unity | ✓ Held |
 | No-flash inline `<head>` script for theme restore | Prevents flash of light content on dark-mode reload | ✓ Held |
+| **v1.1** — Better Auth 1.6.9 over NextAuth v5 | Drizzle adapter ergonomics + admin-invitation flow primitives + smaller bundle | ✓ Validated v1.1 (Phase 6) |
+| **v1.1** — Drizzle 0.45.2 over Prisma | OVH portability (no proprietary engine) + smaller cold-start; generate-only discipline | ✓ Validated v1.1 (Phase 5) |
+| **v1.1** — `@react-pdf/renderer` over Puppeteer | Byte-determinism + OVH portability + no Chromium dependency | ✓ Validated v1.1 (Phase 8) |
+| **v1.1** — Hidden admin URL via env-driven segment | URL obscurity is defense-in-depth on top of `requireAdmin()`; layout 404s on mismatch | ✓ Validated v1.1 (Phase 6) |
+| **v1.1** — `params_snapshot` jsonb for PDF immutability (Stripe Option A) | Data-shape enforcement instead of code-path enforcement; old PDFs trivially immune to coefficient edits | ✓ Validated v1.1 (Phase 8) |
+| **v1.1** — `lib/storage` + `lib/db` adapter spine with ESLint + CI grep gates | OVH portability claim is mechanically enforced from day 1, not retrofitted | ✓ Validated v1.1 (Phase 5) |
+| **v1.1** — Append-only `global_params` history (DATA-05) | Audit trail by data shape; admin edits trivially produce a new row, never overwrite | ✓ Validated v1.1 (Phase 8) |
+| **v1.1** — Hand-rolled FR/EN i18n dict over `next-intl` | No framework needed for 263 strings × 2 langs; compile-time parity proof catches drift | ✓ Validated v1.1 (Phase 6) |
+| **v1.1** — Cookie-based dark mode (no flash, SSR-rendered) over `next-themes` | Phase-4 v10 pattern preserved; explicit and small | ✓ Validated v1.1 (Phase 6) |
+| **v1.1** — Single typed-confirmation prod migration via GitHub Actions | Never auto-run on Vercel deploy; explicit human approval; safe by construction | ✓ Validated v1.1 (Phase 5) |
+| **v1.1** — Commission invisibility extended to logs / traces / audit payloads (ADMIN-09) | Cross-cutting privacy invariant; debug tool is the sole authorized exception | ✓ Validated v1.1 (Phase 9, CR-03 review fix) |
+| **v1.1** — Twice-monthly purge cron (1st + 15th) over daily | Less ops noise; DATA-10 "after 30 days" reads as minimum threshold; worst-case persistence ~46 days | ✓ Held v1.1 (Phase 10) |
+| **v1.1** — Email-pattern test-data discriminator (`@test.leasetic.com`) over `is_test` schema column | No schema artifact post-launch; cleaner production schema | ✓ Held v1.1 (Phase 10) |
+| **v1.1** — Antoine owns partner cutover comms directly (not Thomas) | Technical voice during the change; runbook written assuming Antoine-context | ✓ Held v1.1 (Phase 10) |
+| **v1.1** — OVH execution deferred to September 2026 | Ship runbook + script now (capability); execute when Leasétic IT engagement is ready | ✓ Held v1.1 (Phase 10) |
+| **v1.1** — `verifier_enabled: false` project policy | Per-phase VERIFICATION.md not needed when SUMMARY + REVIEW + SECURITY + milestone audit cover the same ground | ✓ Held v1.1 (validated by milestone audit) |
+| **v1.1** — Code review caught Drizzle correlated-subquery SQL bug post-deploy | Generator self-evaluation blind spot: unit tests passed (fixtures), build passed (types), only real Postgres exposed it. Found via Vercel runtime logs. | ⚠ Revisit — add a post-deploy DB-smoke step to CI in v1.2 or v1.3 |
+| **v1.1** — Vercel Cron uses reserved env-var name `CRON_SECRET` | Phase 10 originally named it `PURGE_CRON_SECRET`; CR-01 review fix renamed to match Vercel's auto-injection contract | ✓ Caught by code review |
 
 ## Team
 
@@ -183,4 +244,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-09 — Phase 8 (Persistence + PDF Pipeline) complete.*
+*Last updated: 2026-05-11 — after v1.1 milestone close. v1.1 shipped (hosted web app foundation); v1.2 milestone (UX Polish + Proposal Wizard) is the active focus, context pre-staged in `.planning/MILESTONE-CONTEXT.md` from the 2026-05-11 Figma design session.*

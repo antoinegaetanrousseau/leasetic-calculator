@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Hosted Web App Foundation
-status: verifying
-last_updated: "2026-05-10T17:35:23.939Z"
-last_activity: 2026-05-10
+status: Awaiting next milestone
+last_updated: "2026-05-11T18:38:57.518Z"
+last_activity: 2026-05-11 — Milestone v1.1 completed and archived
 progress:
   total_phases: 6
   completed_phases: 6
@@ -27,12 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 10 (cutover-polish) — COMPLETE
-Plan: 6 of 6 (all plans executed)
-Status: Phase complete — ready for verification
-Next: v1.1 launch (all planning complete)
-Last activity: 2026-05-10
-Last session: 2026-05-10 — Completed 10-06-PLAN.md (operational docs + CI grep gate + launch artifacts — Phase 10 fully shipped)
+Phase: Milestone v1.1 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-11 — Milestone v1.1 completed and archived
 
 ## Progress
 
@@ -232,8 +230,39 @@ None — Plan 08-05 complete. Plans 08-06 (CI byte-determinism gate) and 08-07 (
 
 ## Deferred Items
 
-None at v1.1 planning start. v1.2+ candidates documented in `.planning/REQUIREMENTS.md` "Future Requirements" section (SMTP-driven self-service password reset, OVH production cutover, mobile layout, Excel export, automated browser tests, etc.).
+Items acknowledged and deferred at v1.1 milestone close on 2026-05-11.
+
+### Stale `Open Questions` markers in archived CONTEXT.md files
+
+These are documentation hygiene gaps — the listed questions were resolved or formally deferred elsewhere (decisions log, audit `deferred_acknowledged`, Phase 10 D-10-21) but the `<open_questions>` text in old CONTEXT.md files was not updated. No outstanding milestone work.
+
+| Phase | CONTEXT marker | Real status |
+|---|---|---|
+| 06 | Q4 auth library version pinning | RESOLVED 2026-05-08 (Better Auth 1.6.9 pinned) — see Decisions Log |
+| 07 | Q2 v10 client_name field | RESOLVED 2026-05-08 (07-UI-SPEC §1.4 / D-7-06) |
+| 07 | D-2 seed coefficients canonical values | DEFERRED — CUT-06 banner on first admin edit (Phase 10) |
+| 08 | Q1 cutover ownership | RESOLVED — Phase 10 D-10-21: Antoine owns partner comms |
+| 08 | Q3 legal counsel sign-off (DATA-11 10-year retention) | DEFERRED — pending Thomas reply; documented in v1.1-MILESTONE-AUDIT.md `deferred_acknowledged` |
+| 08 | Q5 OVH side stack provider | DEFERRED — September 2026 (CUT-09 capability shipped) |
+
+### Other deferred items from v1.1 milestone audit
+
+| Item | Source | Notes |
+|---|---|---|
+| BOOT-03 Neon 3-branch split | Phase 5 follow-up | All Vercel scopes currently on `main` Neon branch; functionally green |
+| Phase 6: admin password rotation (`leasetic2026` → individual strong) | Phase 6 follow-up #1 | Must complete before first real partner is onboarded |
+| Phase 6: Better Auth `trustedOrigins` hardening | Phase 6 follow-up #2 | SameSite=Lax + `__Secure-` cookies are the actual CSRF defense; deferred to v1.2 |
+| ADMIN-05: `users.last_login_at` never written at login | This audit (WR-AUDIT-01) | Column always shows `'—'`; nullable; not a security issue |
+| `scripts/seed-partner-launch.ts` missing npm script entry | This audit (WR-AUDIT-02 / Phase 10 IN-01) | One-time launch tooling friction |
+| CUT-09 OVH live smoke deploy execution | D-10-01 explicit | September 2026; capability is shipped |
+| Stale `[~]` markers in REQUIREMENTS.md (CALC-07, PROP-01) | This audit | Both functionally satisfied; cosmetic checkbox update optional before archive |
+
+Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requirements" section (SMTP self-service reset, OVH production cutover, mobile layout, Excel export, automated browser tests, etc.) — to be carried into `.planning/REQUIREMENTS.md` (rewritten) at `/gsd-new-milestone` for v1.2.
 
 ---
 
 *Last updated: 2026-05-09 — Plan 08-05 (lib-pdf) shipped. @react-pdf/renderer 4.5.1 exact-pin. src/lib/pdf/ module: ProposalDocument A4, renderProposalPdf({data})→{buffer,sha256,sizeBytes}. Plus Jakarta Sans TTF (4 weights) via Font.register. 5 smoke tests pass. Test count 376 → 381 (+5). Plans 08-06 + 08-07 now unblocked.*
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
