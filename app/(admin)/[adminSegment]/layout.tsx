@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/require';
-import { getCurrentLang, getCurrentTheme, t } from '@/lib/i18n';
-import { Topbar } from '@/components/Topbar';
+import { getCurrentLang, getCurrentTheme } from '@/lib/i18n';
+import { Shell } from '@/components/ui/Shell';
 
 // PITFALLS §1.6 — every cookie/session-reading layout opts out of static rendering.
 export const dynamic = 'force-dynamic';
@@ -60,75 +60,16 @@ export default async function AdminLayout({ params, children }: AdminLayoutProps
   const displayName = u.displayName ?? u.name ?? u.email;
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'var(--shell-sidebar-w) 1fr',
-        gridTemplateRows: 'var(--topbar-h) 1fr var(--footer-h)',
-        minHeight: '100vh',
-      }}
+    <Shell
+      isAdmin={true}
+      lang={lang}
+      theme={theme}
+      displayName={displayName}
+      email={u.email}
+      activeNav="admin-home"
+      adminSegment={adminSegment}
     >
-      {/* Sidebar (rows 1-3, col 1) — same as (authed) layout */}
-      <aside
-        style={{
-          gridRow: '1 / 4',
-          gridColumn: '1',
-          background: 'var(--surface)',
-          borderRight: '1px solid var(--border)',
-          padding: '1.5rem 1rem',
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-        }}
-      >
-        <div
-          style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '22px' }}
-        >
-          {t('sidebar.brand', lang)}
-        </div>
-      </aside>
-
-      {/* Topbar (row 1, col 2) — isAdmin={true} activates the ADMIN badge (D-25 / D-19) */}
-      <Topbar
-        displayName={displayName}
-        email={u.email}
-        lang={lang}
-        theme={theme}
-        isAdmin={true}
-      />
-
-      {/* Main content (row 2, col 2) */}
-      <main
-        style={{
-          gridRow: '2',
-          gridColumn: '2',
-          background: 'var(--paper)',
-          padding: '1.5rem 1.5rem 2rem',
-          maxWidth: '1100px',
-          width: '100%',
-          margin: '0 auto',
-        }}
-      >
-        {children}
-      </main>
-
-      {/* Footer (row 3, col 2) */}
-      <footer
-        style={{
-          gridRow: '3',
-          gridColumn: '2',
-          background: 'var(--paper)',
-          borderTop: '1px solid var(--border)',
-          height: 'var(--footer-h)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '10.5px',
-          color: 'var(--muted)',
-        }}
-      >
-        {t('shell.footer.copyright', lang)}
-      </footer>
-    </div>
+      {children}
+    </Shell>
   );
 }

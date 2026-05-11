@@ -1,13 +1,17 @@
-import { LocaleToggle } from './LocaleToggle';
-import { ThemeToggle } from './ThemeToggle';
 import { UserMenu } from './UserMenu';
 import { t, type Lang } from '@/lib/i18n';
 
+/**
+ * Topbar — page title + ADMIN pill + UserMenu (UI-SPEC §6.7, Plan 11-05 D-06).
+ *
+ * Plan 11-05 refactor: `<LocaleToggle />` + `<ThemeToggle />` relocated to the
+ * bottom of `<RetractableSidebar />` (Plan 11-04). The `theme` prop is removed —
+ * Topbar no longer renders any theme-aware controls.
+ */
 export interface TopbarProps {
   displayName: string;
   email: string;
   lang: Lang;
-  theme: 'light' | 'dark' | 'system';
   isAdmin?: boolean;
   pageTitle?: string;
 }
@@ -16,7 +20,6 @@ export function Topbar({
   displayName,
   email,
   lang,
-  theme,
   isAdmin = false,
   pageTitle,
 }: TopbarProps) {
@@ -70,8 +73,6 @@ export function Topbar({
         </span>
       )}
       <div style={{ flex: 1 }} />
-      <LocaleToggle current={lang} />
-      <ThemeToggle current={theme} />
       <UserMenu displayName={displayName} email={email} lang={lang} />
     </header>
   );
