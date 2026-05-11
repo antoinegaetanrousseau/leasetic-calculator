@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: UX Polish + Proposal Wizard
-status: planning
-last_updated: "2026-05-11T19:30:00.000Z"
-last_activity: 2026-05-11
+status: Defining requirements
+last_updated: "2026-05-11T19:16:01.687Z"
+last_activity: 2026-05-11 — Milestone v1.2 started
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
 ---
 
 # State — Matrice Commerciale
