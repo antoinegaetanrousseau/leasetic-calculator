@@ -19,9 +19,12 @@
   --border:    #d9dbe9;
   --gold:      #e08530;
   --danger:    #dc2626;
+  --brand-mark: #6DC388;
 
   /* Layout shell tokens */
   --shell-sidebar-w: 260px;
+  --shell-sidebar-w-collapsed: 72px;
+  --shell-sidebar-current-w: 260px;
   --topbar-h:        64px;
   --footer-h:        48px;
 
@@ -65,6 +68,7 @@ html[data-theme="dark"] {
   --color-gl:        var(--gl);
   --color-gold:      var(--gold);
   --color-navy-dark: var(--navy-dark);
+  --color-brand-mark: var(--brand-mark);
 
   /* Font family registered by next/font/local (set in layout.tsx) */
   --font-sans: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -360,6 +364,11 @@ input[aria-invalid="true"] {
 }
 
 .chip-expired {
+  background: rgba(110, 113, 145, 0.12);
+  color: var(--muted);
+}
+
+.chip-draft {
   background: rgba(224, 133, 48, 0.12);
   color: var(--gold);
 }
@@ -526,3 +535,6 @@ html[data-theme="dark"] .seed-banner {
 }
 
 /* === end Phase 9 admin surface === */
+/* === Phase 11 brand-logo theme picker (UI-SPEC §6.1, D-09) === */
+html[data-theme="light"] .brand-logo-dark  { display: none; }
+html[data-theme="dark"]  .brand-logo-light { display: none; }
