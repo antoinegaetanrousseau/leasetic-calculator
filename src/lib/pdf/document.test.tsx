@@ -1,3 +1,7 @@
+// @vitest-environment node
+// Phase 11-01 — PDF rendering uses @react-pdf/renderer's own pipeline and depends on
+// native node globals (Buffer, fs, crypto). Pinned to node alongside the byte-determinism
+// gate at __pdf-fixtures__/render-fixtures.test.ts to keep PDF output stable across runs.
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));

@@ -1,3 +1,8 @@
+// @vitest-environment node
+// Phase 11-01 — PDF byte-determinism (PROP-17/PDF-04) requires native node globals.
+// jsdom polyfills (URL, Blob, crypto) shift @react-pdf/renderer output bytes by ~1KB
+// per fixture, breaking the SHA-256 gate. Pin this file to node; component tests
+// (Plans 11-02..11-04) run under jsdom per the global vitest.config.ts setting.
 import { describe, it, expect, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';

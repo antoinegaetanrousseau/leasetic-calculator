@@ -3,8 +3,9 @@ import path from 'node:path';
 
 export default defineConfig({
   test: {
-    environment: 'node',
+    environment: 'jsdom',
     globals: false,
+    setupFiles: ['./__tests__/setup-dom.ts'],
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'app/**/*.test.ts', 'app/**/*.test.tsx', '__pdf-fixtures__/**/*.test.ts'],
   },
   resolve: {
