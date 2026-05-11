@@ -56,7 +56,12 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   3. `StatusChip` renders 4 distinct visual variants (`active` green, `draft` gold, `expired` gray-muted, `disabled` red-danger) using existing `.chip-*` class extensions in `app/globals.css`
   4. `public/logo-light.svg` and `public/logo-dark.svg` exist on disk with mark color `#6DC388` (new `--brand-mark` CSS custom property) and theme-correct wordmark inks; a manual smoke confirms the right asset shows under `[data-theme=light]` vs `[data-theme=dark]`
   5. Vitest typecheck + lint + build all 0; no Vercel-only imports introduced outside `lib/storage` and `lib/db` adapters
-**Plans**: TBD
+**Plans**: 5 plans
+  - [ ] 11-01-PLAN.md — Foundation: globals.css token extensions + 13 sidebar.* i18n keys + Vitest jsdom infra
+  - [ ] 11-02-PLAN.md — Brand assets: 3 SVG files (light/dark/mark) + <BrandLogo /> server component (ASSET-01, ASSET-02)
+  - [ ] 11-03-PLAN.md — Static primitives: StatusChip + MetricTile + AdminNavCard (COMP-03, COMP-04, COMP-05)
+  - [ ] 11-04-PLAN.md — Interactive primitives: Stepper + RetractableSidebar + LocaleToggle/ThemeToggle fullWidth prop (COMP-01, COMP-02)
+  - [ ] 11-05-PLAN.md — Integration: <Shell> wrapper + Topbar refactor + layout migration + dev smoke route + chip-expired regression verify
 **UI hint**: yes
 
 ### Phase 12: Schema Extensions for Drafts + History
@@ -124,7 +129,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 8. Persistence + PDF | v1.1 | 14/14 | Complete | 2026-05-09 |
 | 9. Admin Surface | v1.1 | 4/4 | Complete | 2026-05-10 |
 | 10. Cutover & Polish | v1.1 | 6/6 | Complete | 2026-05-11 |
-| 11. Design System Foundation + Brand Assets | v1.2 | 0/0 | Not started | — |
+| 11. Design System Foundation + Brand Assets | v1.2 | 0/5 | Planned | — |
 | 12. Schema Extensions for Drafts + History | v1.2 | 0/0 | Not started | — |
 | 13. 3-Step Proposal Wizard | v1.2 | 0/0 | Not started | — |
 | 14. Admin Polish — Partners + History + Home | v1.2 | 0/0 | Not started | — |
