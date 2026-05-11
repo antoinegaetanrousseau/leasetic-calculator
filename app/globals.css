@@ -538,3 +538,9 @@ html[data-theme="dark"] .seed-banner {
 /* === Phase 11 brand-logo theme picker (UI-SPEC §6.1, D-09) === */
 html[data-theme="light"] .brand-logo-dark  { display: none; }
 html[data-theme="dark"]  .brand-logo-light { display: none; }
+
+/* === Phase 11 Stepper focus ring (UI-SPEC §6.2 — matches .btn-green:focus-visible pattern) === */
+.stepper-circle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+}
