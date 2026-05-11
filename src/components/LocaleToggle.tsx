@@ -4,12 +4,20 @@ import { setLang } from '@/lib/i18n/actions';
 import { startTransition } from 'react';
 import type { Lang } from '@/lib/i18n/dictionaries';
 
-export function LocaleToggle({ current }: { current: Lang }) {
+export function LocaleToggle({ current, fullWidth = false }: { current: Lang; fullWidth?: boolean }) {
   const options: Lang[] = ['fr', 'en'];
   return (
     <div
-      className="inline-flex items-center rounded-full border p-1"
-      style={{ background: 'var(--paper)', borderColor: 'var(--border)' }}
+      className={
+        fullWidth
+          ? "flex items-center rounded-full border p-1"
+          : "inline-flex items-center rounded-full border p-1"
+      }
+      style={{
+        background: 'var(--paper)',
+        borderColor: 'var(--border)',
+        ...(fullWidth ? { width: '100%' } : {}),
+      }}
       role="radiogroup"
       aria-label="Language"
     >
@@ -29,6 +37,7 @@ export function LocaleToggle({ current }: { current: Lang }) {
               fontSize: '11.5px',
               fontWeight: 600,
               letterSpacing: '0.04em',
+              ...(fullWidth ? { flex: 1, textAlign: 'center' as const } : {}),
             }}
           >
             {value}

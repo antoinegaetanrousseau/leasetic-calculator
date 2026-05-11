@@ -6,7 +6,7 @@ import { startTransition } from 'react';
 
 type ThemeOption = 'light' | 'system' | 'dark';
 
-export function ThemeToggle({ current }: { current: ThemeOption }) {
+export function ThemeToggle({ current, fullWidth = false }: { current: ThemeOption; fullWidth?: boolean }) {
   const options: { value: ThemeOption; icon: React.ComponentType<{ size: number; strokeWidth: number }>; label: string }[] = [
     { value: 'light',  icon: Sun,     label: 'Light' },
     { value: 'system', icon: Monitor, label: 'System' },
@@ -15,8 +15,16 @@ export function ThemeToggle({ current }: { current: ThemeOption }) {
 
   return (
     <div
-      className="inline-flex items-center rounded-full border p-1"
-      style={{ background: 'var(--paper)', borderColor: 'var(--border)' }}
+      className={
+        fullWidth
+          ? "flex items-center rounded-full border p-1"
+          : "inline-flex items-center rounded-full border p-1"
+      }
+      style={{
+        background: 'var(--paper)',
+        borderColor: 'var(--border)',
+        ...(fullWidth ? { width: '100%' } : {}),
+      }}
       role="radiogroup"
       aria-label="Theme"
     >
@@ -34,6 +42,7 @@ export function ThemeToggle({ current }: { current: ThemeOption }) {
             style={{
               background: active ? 'var(--gd)' : 'transparent',
               color: active ? '#ffffff' : 'var(--muted)',
+              ...(fullWidth ? { flex: 1, justifyContent: 'center' as const, display: 'inline-flex' as const } : {}),
             }}
           >
             <Icon size={17} strokeWidth={1.6} />
