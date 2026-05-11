@@ -46,7 +46,7 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 ## Current Milestone: v1.2 — UX Polish + Proposal Wizard
 
 **Started:** 2026-05-11 (post-v1.1 close, Figma design session same day)
-**Source of truth:** `.planning/MILESTONE-CONTEXT.md` (Figma design contract `vwOzirhL0vyxDWq4m6t4gC`)
+**Source of truth:** `.planning/REQUIREMENTS.md` (14 REQ-IDs) + `.planning/milestones/v1.2-CONTEXT.md` (Figma design contract `vwOzirhL0vyxDWq4m6t4gC`, 3-layer fill rules, design system tokens)
 
 **Goal:** Apply the visual + interaction design contract sketched in Figma to the v1.1 surface — adding a 3-step proposal wizard (Paramètres → Calcul → Vérification), a retractable sidebar with brand logo, draft-state proposal persistence, dedicated partner-create route, coefficient change history surface, and brand-logo treatment across login / invite / reset public pages.
 
@@ -121,7 +121,7 @@ If that doesn't work, nothing else matters. v10 preserves this core via on-load 
 
 ### Active (in v1.2 — UX Polish + Proposal Wizard)
 
-Full requirements in `.planning/MILESTONE-CONTEXT.md` (carried into a fresh `.planning/REQUIREMENTS.md` at `/gsd-new-milestone`):
+Full requirements in `.planning/REQUIREMENTS.md` (14 REQ-IDs); design contract detail in `.planning/milestones/v1.2-CONTEXT.md`:
 
 - [ ] **Database extensions:** add `draft` proposal status, `invited` partner account status, coefficient change history table
 - [ ] **Routing:** 3-step proposal wizard (Paramètres → Calcul → Vérification) with server-side draft persistence between steps; dedicated `/[adminSegment]/partners/new` route replacing modal flow
