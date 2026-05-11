@@ -104,6 +104,7 @@ const config = [
       '**/*.test.{ts,tsx}',
       '**/*.spec.{ts,tsx}',
       'app/error.tsx', // error.tsx must work without server-side i18n; bilingual fallback is hardcoded by design (D-30 / 06-RESEARCH.md §16)
+      'app/dev/**', // dev-only diagnostic routes — never reachable in production (NODE_ENV gate, Plan 11-05 D-11)
     ],
     rules: {
       'no-restricted-syntax': [
