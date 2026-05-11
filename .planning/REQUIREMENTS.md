@@ -80,28 +80,35 @@ Which phase covers which requirement. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01 | TBD | Pending |
-| DB-02 | TBD | Pending |
-| DB-03 | TBD | Pending |
-| ROUTE-01 | TBD | Pending |
-| ROUTE-02 | TBD | Pending |
-| COMP-01 | TBD | Pending |
-| COMP-02 | TBD | Pending |
-| COMP-03 | TBD | Pending |
-| COMP-04 | TBD | Pending |
-| COMP-05 | TBD | Pending |
-| ASSET-01 | TBD | Pending |
-| ASSET-02 | TBD | Pending |
-| PUB-01 | TBD | Pending |
-| PUB-02 | TBD | Pending |
+| DB-01 | Phase 12 | Pending |
+| DB-02 | Phase 12 | Pending |
+| DB-03 | Phase 12 | Pending |
+| ROUTE-01 | Phase 13 | Pending |
+| ROUTE-02 | Phase 14 | Pending |
+| COMP-01 | Phase 11 | Pending |
+| COMP-02 | Phase 11 | Pending |
+| COMP-03 | Phase 11 | Pending |
+| COMP-04 | Phase 11 | Pending |
+| COMP-05 | Phase 11 | Pending |
+| ASSET-01 | Phase 11 | Pending |
+| ASSET-02 | Phase 11 | Pending |
+| PUB-01 | Phase 15 | Pending |
+| PUB-02 | Phase 15 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 14 total
-- Mapped to phases: 0 ⚠️ (pending roadmap)
-- Unmapped: 14
+- Mapped to phases: 14 ✅
+- Unmapped: 0
+
+**Per-phase counts:**
+- Phase 11 (Design System Foundation + Brand Assets): 7 requirements (COMP-01..05, ASSET-01, ASSET-02)
+- Phase 12 (Schema Extensions): 3 requirements (DB-01, DB-02, DB-03)
+- Phase 13 (3-Step Proposal Wizard): 1 requirement (ROUTE-01)
+- Phase 14 (Admin Polish): 1 requirement (ROUTE-02)
+- Phase 15 (Public Surface Brand Polish): 2 requirements (PUB-01, PUB-02)
 
 ---
 
 *Requirements defined: 2026-05-11*
 *Source: `.planning/milestones/v1.2-CONTEXT.md` (Figma design session)*
-*Last updated: 2026-05-11 after initial definition*
+*Last updated: 2026-05-11 — Traceability populated by `/gsd-new-milestone` roadmapper (Phases 11-15).*

@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 — v10 Refactor** — Phases 1-4 (shipped 2026-04-30) — see `milestones/v1.0-ROADMAP.md`
 - ✅ **v1.1 — Hosted Web App Foundation** — Phases 5-10 (shipped 2026-05-11) — see `milestones/v1.1-ROADMAP.md`
-- 🚧 **v1.2 — UX Polish + Proposal Wizard** — context pre-staged in `.planning/MILESTONE-CONTEXT.md` (Figma design contract `vwOzirhL0vyxDWq4m6t4gC`); phases TBD via `/gsd-new-milestone`
+- 🚧 **v1.2 — UX Polish + Proposal Wizard** — Phases 11-15 (started 2026-05-11; Figma design contract `vwOzirhL0vyxDWq4m6t4gC`)
 
 ## Phases
 
@@ -36,21 +36,79 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 </details>
 
-### 🚧 v1.2 — UX Polish + Proposal Wizard (planning)
+### 🚧 v1.2 — UX Polish + Proposal Wizard (Phases 11-15)
 
-Context pre-staged 2026-05-11 in `.planning/MILESTONE-CONTEXT.md` from a Figma design session (file key `vwOzirhL0vyxDWq4m6t4gC`). Run `/gsd-new-milestone` to lock in requirements + phases.
+- [ ] **Phase 11: Design System Foundation + Brand Assets** — Stepper, RetractableSidebar, MetricTile, AdminNavCard, StatusChip + light/dark Leasétic logo SVGs land as a reusable foundation
+- [ ] **Phase 12: Schema Extensions for Drafts + History** — `draft` proposal status, `invited` partner status, `coefficient_history` append-only table
+- [ ] **Phase 13: 3-Step Proposal Wizard** — `/proposals/new/{parametres,calcul,verification}` with server-side draft persistence and Stepper-gated forward nav
+- [ ] **Phase 14: Admin Polish — Partners + History + Home** — Dedicated `/partners/new` route, status chips across admin lists, coefficient history sidebar, admin nav cards on admin home
+- [ ] **Phase 15: Public Surface Brand Polish** — Login + invite + reset pages adopt centered-logo + paper-background `(public)` shell
 
-**High-level scope** (full requirements in MILESTONE-CONTEXT.md):
-- 3-step proposal wizard (Paramètres → Calcul → Vérification) with server-side draft persistence
-- Retractable sidebar with brand logo (light/dark variants), home metric tiles, admin nav cards, status chip variants
-- Database extensions: `draft` proposal status, `invited` partner account status, coefficient change history table
-- Dedicated `/[adminSegment]/partners/new` route (replaces v1.1 modal)
-- Brand-logo treatment on `/login`, `/invite/[token]`, `/reset/[token]`
+## Phase Details
 
-**Carried-over from v1.1** (close before partner onboarding):
-- Admin password rotation (`leasetic2026` → individual strong)
-- `users.last_login_at` write at login (ADMIN-05 gap)
-- Ask Thomas to confirm privacy-policy coverage (D-10-18)
+### Phase 11: Design System Foundation + Brand Assets
+**Goal**: Ship the v1.2 reusable component library and Leasétic brand-logo assets that all downstream UI phases will consume
+**Depends on**: Nothing (first v1.2 phase; builds on v1.1 Tailwind v4 token spine)
+**Requirements**: COMP-01, COMP-02, COMP-03, COMP-04, COMP-05, ASSET-01, ASSET-02
+**Success Criteria** (what must be TRUE):
+  1. `Stepper`, `RetractableSidebar`, `MetricTile`, `AdminNavCard`, `StatusChip` all export from a shared component path and render in isolation tests (or visual smoke pages) with all documented prop states
+  2. `RetractableSidebar` toggles between 260px expanded and 72px collapsed states, persists the user's choice in `localStorage` under a stable key, and survives a full-page reload
+  3. `StatusChip` renders 4 distinct visual variants (`active` green, `draft` gold, `expired` gray-muted, `disabled` red-danger) using existing `.chip-*` class extensions in `app/globals.css`
+  4. `public/logo-light.svg` and `public/logo-dark.svg` exist on disk with mark color `#6DC388` (new `--brand-mark` CSS custom property) and theme-correct wordmark inks; a manual smoke confirms the right asset shows under `[data-theme=light]` vs `[data-theme=dark]`
+  5. Vitest typecheck + lint + build all 0; no Vercel-only imports introduced outside `lib/storage` and `lib/db` adapters
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 12: Schema Extensions for Drafts + History
+**Goal**: Ship database migrations and query helpers that unlock draft proposals, invited partners, and coefficient-history surfaces for downstream phases
+**Depends on**: Phase 11 (StatusChip variants are consumed by surfaces that read these new statuses)
+**Requirements**: DB-01, DB-02, DB-03
+**Success Criteria** (what must be TRUE):
+  1. `proposals.status` enum now accepts `draft | active | expired | deleted` (was `active | expired | deleted`); existing rows are unaffected and a new row defaulting to `draft` can be inserted via Drizzle
+  2. Partner account status surface exposes a third value `invited` (alongside `actif | désactivé`); an account created via the existing invitation flow but never logged-in returns `invited` from the partner-status read query
+  3. `coefficient_history` table exists with the spec'd columns (`id`, `changed_at`, `changed_by_user_id` FK, `before_json`, `after_json`, `summary`); a DB-level rule rejects `UPDATE` and `DELETE` statements against the table (CHECK constraint, RULE, or migration-level GRANT-revoke)
+  4. The Drizzle migration runs cleanly through `scripts/migrate.ts --dry-run` against the prod Neon `main` branch (typed-confirmation gate executes, no schema drift errors)
+  5. Vitest unit tests cover the new query helpers (`listInvitedPartners`, `createCoefficientHistoryEntry`, `listCoefficientHistory`) and pass with mocked DB; typecheck + lint + build all 0
+**Plans**: TBD
+
+### Phase 13: 3-Step Proposal Wizard
+**Goal**: Partners create proposals through a guided 3-step wizard with server-side draft persistence between steps, replacing v1.1's single-page form
+**Depends on**: Phase 11 (Stepper + RetractableSidebar), Phase 12 (DB-01 draft status)
+**Requirements**: ROUTE-01
+**Success Criteria** (what must be TRUE):
+  1. Three routes `/proposals/new/parametres`, `/proposals/new/calcul`, `/proposals/new/verification` each render with the `Stepper` at the top showing the correct active/done/pending state per step
+  2. Partner can fill step 1 (Paramètres), navigate to step 2 (Calcul), close the browser, return to `/proposals/new/parametres` and find their entered data still present — backed by a `draft` proposal row in the DB (DB-01)
+  3. Partner can click back to any *completed* step via the Stepper, but clicking a pending (future) step does nothing — verified by browser smoke and by the `Stepper` component refusing to render a `<Link>` for pending steps
+  4. Submitting step 3 (Vérification) transitions the draft row to `status=active`, generates the PDF via the existing v1.1 pipeline, and the proposal appears in the partner home list with an `active` `StatusChip`; the draft row is no longer visible in any draft surface
+  5. Drafts are only visible to their creator — querying `/proposals/new/parametres` as a different partner shows an empty form, not the other partner's draft data
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 14: Admin Polish — Partners + History + Home
+**Goal**: Apply v1.2 design contract to all admin surfaces — replace partner-creation modal with a dedicated page, surface coefficient history, add status chips, and rebuild the admin home with nav cards
+**Depends on**: Phase 11 (AdminNavCard + StatusChip + MetricTile + RetractableSidebar), Phase 12 (DB-02 invited status + DB-03 coefficient_history)
+**Requirements**: ROUTE-02
+**Success Criteria** (what must be TRUE):
+  1. `/[adminSegment]/partners/new` route exists, renders a 3-section form (personal info / company info / customizable invitation message), and successfully issues a one-time invitation URL on submit using the same `InviteUrlModal` primitive as v1.1's modal flow
+  2. v1.1's modal-based partner creation is removed from the admin accounts page; the "Créer un partenaire" CTA now navigates to `/[adminSegment]/partners/new` instead of opening a modal
+  3. Admin home page (`/[adminSegment]`) renders 3 `AdminNavCard`s (Coefficients / Partenaires / Historique) and each navigates to its target page on click; the partner home renders 3 `MetricTile`s (Ce mois-ci / Total / Brouillons) with the correct green/navy/gold color variants powered by aggregate SQL queries over the partner's proposals
+  4. Liste des partenaires renders the `invited` status as a distinct gold `StatusChip` (separate from `active` green and `disabled` red); proposal list rows also use the appropriate `StatusChip` variant per row status
+  5. Coefficients page surfaces a History sidebar populated from `coefficient_history` (DB-03) showing the past 5 edits with diff summaries; each row links to a full diff modal
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 15: Public Surface Brand Polish
+**Goal**: Apply Leasétic brand logo + paper-background `(public)` shell pattern uniformly across login, invitation landing, and password reset pages
+**Depends on**: Phase 11 (ASSET-01 + ASSET-02 logos must exist on disk)
+**Requirements**: PUB-01, PUB-02
+**Success Criteria** (what must be TRUE):
+  1. `/login` replaces its v1.1 plain-text "Leasétic" header with the official `logo-light.svg` / `logo-dark.svg` lockup centered above the existing form card; form structure unchanged
+  2. Body background on `/login`, `/invite/[token]`, and `/reset/[token]` is `--paper`; the centered form card remains `--surface` — verified visually in Chrome + Edge under both light and dark themes
+  3. Language and theme toggles remain in the top-right of all 3 public routes (different from authed/admin where they moved into the `RetractableSidebar`)
+  4. All 3 public routes share a single reusable `(public)` layout component — verified by grep: the logo + paper-bg pattern is not duplicated across 3 files
+  5. Manual smoke: opening each of the 3 routes under both `[data-theme=light]` and `[data-theme=dark]` shows the correct logo variant (mark `#6DC388`, theme-correct wordmark ink); no flash of unstyled content on reload
+**Plans**: TBD
+**UI hint**: yes
 
 ## Progress
 
@@ -66,8 +124,12 @@ Context pre-staged 2026-05-11 in `.planning/MILESTONE-CONTEXT.md` from a Figma d
 | 8. Persistence + PDF | v1.1 | 14/14 | Complete | 2026-05-09 |
 | 9. Admin Surface | v1.1 | 4/4 | Complete | 2026-05-10 |
 | 10. Cutover & Polish | v1.1 | 6/6 | Complete | 2026-05-11 |
-| v1.2 phases | v1.2 | 0/0 | Not started | — |
+| 11. Design System Foundation + Brand Assets | v1.2 | 0/0 | Not started | — |
+| 12. Schema Extensions for Drafts + History | v1.2 | 0/0 | Not started | — |
+| 13. 3-Step Proposal Wizard | v1.2 | 0/0 | Not started | — |
+| 14. Admin Polish — Partners + History + Home | v1.2 | 0/0 | Not started | — |
+| 15. Public Surface Brand Polish | v1.2 | 0/0 | Not started | — |
 
 ---
 
-*Last updated: 2026-05-11 after v1.1 milestone close. v1.2 context pre-staged in `MILESTONE-CONTEXT.md`. v1.0 + v1.1 details archived in `milestones/`.*
+*Last updated: 2026-05-11 after v1.2 roadmap creation. v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
