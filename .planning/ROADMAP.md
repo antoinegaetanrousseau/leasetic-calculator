@@ -74,7 +74,14 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   3. `coefficient_history` table exists with the spec'd columns (`id`, `changed_at`, `changed_by_user_id` FK, `before_json`, `after_json`, `summary`); a DB-level rule rejects `UPDATE` and `DELETE` statements against the table (CHECK constraint, RULE, or migration-level GRANT-revoke)
   4. The Drizzle migration runs cleanly through `scripts/migrate.ts --dry-run` against the prod Neon `main` branch (typed-confirmation gate executes, no schema drift errors)
   5. Vitest unit tests cover the new query helpers (`listInvitedPartners`, `createCoefficientHistoryEntry`, `listCoefficientHistory`) and pass with mocked DB; typecheck + lint + build all 0
-**Plans**: TBD
+**Plans**: 7 plans
+  - [ ] 12-01-PLAN.md — Drizzle migration `0004_phase12_drafts_and_history.sql` + `src/db/schema.ts` updates (proposals status + nullability + partial unique indexes + completeness CHECK + coefficient_history table + 2 triggers) + [BLOCKING] `npm run db:migrate -- --dry-run` gate (DB-01, DB-02, DB-03)
+  - [ ] 12-02-PLAN.md — `src/lib/admin/coefficient-diff.ts` pure `generateDiffSummary(before, after)` FR semicolon-separated diff function + Vitest unit tests (DB-03)
+  - [ ] 12-03-PLAN.md — `src/lib/db/queries/users.ts` extension: `listInvitedPartners()` (role='partner' AND deleted_at IS NULL AND last_login_at IS NULL) + Vitest unit tests with mocked DB (DB-02)
+  - [ ] 12-04-PLAN.md — `src/lib/db/queries/coefficient-history.ts` (new file): `createCoefficientHistoryEntry` (auto-fallback to generateDiffSummary per D-16) + `listCoefficientHistory` (cursor-paginated) + Vitest unit tests (DB-03)
+  - [ ] 12-05-PLAN.md — Extend `src/lib/db/queries/proposals.ts`: `createDraft`, `updateDraft`, `finalizeDraft` (writes audit_log entry), `listDraftsByUser`, `getDraftById`, `deriveDisplayStatus` + modify `softDeleteProposal`/`restoreProposal` for D-08 status/deleted_at lockstep + Vitest unit tests (DB-01)
+  - [ ] 12-06-PLAN.md — `scripts/backfill-coefficient-history.ts` (idempotent, typed-confirmation `BACKFILL_CONFIRM=YES` on Neon prod) + `package.json` script + `docs/operations/launch-checklist.md` step + Vitest integration test verifying append-only TRIGGER raises on UPDATE and DELETE (DB-03)
+  - [ ] 12-07-PLAN.md — Better Auth session.create.after hook writes `users.last_login_at = now()` on every successful login — closes Phase 6 follow-up #3 / WR-AUDIT-01 (prerequisite for DB-02 truthfulness per D-11) + Vitest unit tests (DB-02)
 
 ### Phase 13: 3-Step Proposal Wizard
 **Goal**: Partners create proposals through a guided 3-step wizard with server-side draft persistence between steps, replacing v1.1's single-page form
@@ -130,11 +137,11 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 9. Admin Surface | v1.1 | 4/4 | Complete | 2026-05-10 |
 | 10. Cutover & Polish | v1.1 | 6/6 | Complete | 2026-05-11 |
 | 11. Design System Foundation + Brand Assets | v1.2 | 0/5 | Planned | — |
-| 12. Schema Extensions for Drafts + History | v1.2 | 0/0 | Not started | — |
+| 12. Schema Extensions for Drafts + History | v1.2 | 0/7 | Planned | — |
 | 13. 3-Step Proposal Wizard | v1.2 | 0/0 | Not started | — |
 | 14. Admin Polish — Partners + History + Home | v1.2 | 0/0 | Not started | — |
 | 15. Public Surface Brand Polish | v1.2 | 0/0 | Not started | — |
 
 ---
 
-*Last updated: 2026-05-11 after v1.2 roadmap creation. v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
+*Last updated: 2026-05-12 after Phase 12 plan creation (7 plans, requirements DB-01/02/03 covered). v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
