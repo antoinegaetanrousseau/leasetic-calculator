@@ -83,7 +83,7 @@ Which phase covers which requirement. Updated during roadmap creation.
 | DB-01 | Phase 12 | Pending |
 | DB-02 | Phase 12 | Pending |
 | DB-03 | Phase 12 | Pending |
-| ROUTE-01 | Phase 13 | In Progress (Wave 1 13-01+13-02 + Wave 2 13-03+13-04+13-05 all shipped — 3 wizard routes + server actions + finalize API live; Wave 3 plan 13-06 closes the requirement with integration suite + D-28 STRIDE addendum + golden-PDF byte-determinism gate) |
+| ROUTE-01 | Phase 13 | Structurally Complete (6/6 plans shipped — Wave 1 13-01+13-02 + Wave 2 13-03+13-04+13-05 + Wave 3 13-06; 788 Vitest tests pass including 9 stepperBehavior + 36 no-commission golden corpus + plan-04/05 commission-exactly-once tests; D-28 STRIDE addendum at `docs/security/13-stride-addendum-admin09-step2.md`; manual smoke runbook at `docs/smoke/13-wizard-runbook.md` pending Antoine's Chrome+Edge sign-off to close fully) |
 | ROUTE-02 | Phase 14 | Pending |
 | COMP-01 | Phase 11 | Pending |
 | COMP-02 | Phase 11 | Pending |

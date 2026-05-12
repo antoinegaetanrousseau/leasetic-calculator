@@ -99,7 +99,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   - [x] 13-03-PLAN.md — Step 1 route /proposals/new/parametres (draft mint/hydrate + duplicate flow + 2-section form + accordion)
   - [x] 13-04-PLAN.md — Step 2 route /proposals/new/calcul (server-side compute + hero card + Détail du calcul with D-12 commission relaxation + recap)
   - [x] 13-05-PLAN.md — Step 3 route /proposals/new/verification (2-column review + PdfPreviewMock + FinalizeButton wired to D-16 pipeline)
-  - [ ] 13-06-PLAN.md — Stepper state semantics integration tests + ADMIN-09 no-commission-in-PDF golden corpus test + D-28 STRIDE addendum + manual smoke runbook
+  - [x] 13-06-PLAN.md — Stepper state semantics integration tests + ADMIN-09 no-commission-in-PDF golden corpus test + D-28 STRIDE addendum + manual smoke runbook
 **UI hint**: yes
 
 ### Phase 14: Admin Polish — Partners + History + Home
@@ -144,7 +144,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 10. Cutover & Polish | v1.1 | 6/6 | Complete | 2026-05-11 |
 | 11. Design System Foundation + Brand Assets | v1.2 | 0/5 | Planned | — |
 | 12. Schema Extensions for Drafts + History | v1.2 | 7/7 | Complete | 2026-05-12 |
-| 13. 3-Step Proposal Wizard | v1.2 | 5/6 | In Progress|  |
+| 13. 3-Step Proposal Wizard | v1.2 | 6/6 | Ready for Verification | 2026-05-12 |
 | 14. Admin Polish — Partners + History + Home | v1.2 | 0/0 | Not started | — |
 | 15. Public Surface Brand Polish | v1.2 | 0/0 | Not started | — |
 

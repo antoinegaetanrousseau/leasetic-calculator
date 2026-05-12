@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
-status: executing
-last_updated: "2026-05-12T19:45:00.532Z"
+status: verifying
+last_updated: "2026-05-12T20:07:26.020Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 18
-  completed_plans: 17
-  percent: 94
+  completed_plans: 18
+  percent: 100
 ---
 
 # State — Matrice Commerciale
@@ -27,17 +27,24 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 13 (3-step-proposal-wizard) — EXECUTING
-Plan: 6 of 6 (Plans 1 + 2 + 3 + 4 + 5 SHIPPED 2026-05-12)
+Phase: 13 (3-step-proposal-wizard) — READY FOR VERIFICATION
+Plan: 6 of 6 (all plans SHIPPED 2026-05-12)
 
   - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
   - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
   - Plan 3 — Step-1 Paramètres Route + Form Card (page.tsx + ParametresFormCard + WizardStep1Wiring + 28 Vitest assertions; ADMIN-09 step-1 grep-clean)
   - Plan 4 — Step-2 Calcul Route (page.tsx with server-side computeLoyer + hero card + Détail du calcul + D-12 commission relaxation + Paramètres saisis recap; 15 Vitest assertions; ADMIN-09 commission-appears-exactly-once enforced)
   - Plan 5 — Step-3 Verification Route (page.tsx with 2-column 1040px review + 3 RecapSection cards CLIENT/PROJET/CALCUL + PdfPreviewMock right column + FinalizeButton client adapter wiring Confirmer & Générer le PDF CTA to POST /api/proposals/finalize; D-24 spinner UX + D-12 bounded commission visibility on step-3 review; 23 Vitest assertions across 2 test files; Wave 2 complete)
+  - Plan 6 — Wave 3 Integration Tests + Security Closeout (stepperBehavior.test.ts 9 scenarios D-20/D-21/D-22/D-23; no-commission.test.ts 36 assertions across 30 golden fixtures with 4-layer defense-in-depth including binary PDF inspection; STRIDE addendum D-28 mandatory documenting D-12 envelope + 7 new threats; manual Chrome+Edge smoke runbook all 5 ROUTE-01 criteria + ADMIN-09 envelope + cross-partner isolation across 7 numbered tests; 788 Vitest tests pass total; ZERO new schema migrations)
 
-Status: Ready to execute Plan 6 (Wave 3 — integration tests + D-28 STRIDE addendum + golden-PDF byte-determinism gate)
-Last activity: 2026-05-12 -- Plan 13-05 shipped (23 Vitest assertions, /proposals/new/verification 2-column review + FinalizeButton wiring D-16 8-step pipeline trigger; Wave 2 of Phase 13 complete)
+Status: Phase complete — manual smoke runbook + STRIDE addendum sign-off pending Antoine
+Last activity: 2026-05-12 — Plan 13-06 shipped (9 stepperBehavior + 36 no-commission + STRIDE addendum + smoke runbook; ROUTE-01 structurally satisfied)
+
+## Phase 13 Performance Metrics
+
+| Plan | Duration | Tasks | Files |
+|---|---|---|---|
+| 13-06 | ~25min | 4 | 5 (+ SUMMARY) |
 
 ## Progress
 
