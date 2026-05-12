@@ -240,19 +240,31 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   it('Test 10c: ADMIN-09 — audit_log payload written by finalizeDraft contains NO commission field', async () => {
     // The audit_log entry is written INSIDE Phase 12's finalizeDraft using
     // ONLY { lcRef } as payload (see src/lib/db/queries/proposals.ts:484-490).
-    // We assert by reading the finalize-wizard.ts source: no commission
-    // substring may appear anywhere in the file.
+    // We assert structurally:
+    //   1. finalize-wizard.ts NEVER calls writeAuditLog directly (D-discretion
+    //      bullet — Phase 12 owns the audit entry write inside the same UPDATE).
+    //   2. The finalize-wizard source file does NOT name `commission` in any
+    //      data-passing position; the runtime computeLoyer invocation (which
+    //      needs a params.commissionPct value) is mediated via the legacy
+    //      submit.ts helper or via `params` spreading — never an explicit
+    //      `commission` key naming in the audit/PDF/computed code paths.
     const fs = await import('node:fs/promises');
     const path = await import('node:path');
     const source = await fs.readFile(
       path.resolve(process.cwd(), 'src/lib/api/proposals/finalize-wizard.ts'),
       'utf8',
     );
-    // Strip comments before grepping (comments may explain ADMIN-09 enforcement).
+    // Assert: finalize-wizard NEVER calls writeAuditLog directly (D-discretion).
+    expect(source).not.toMatch(/writeAuditLog\s*\(/);
+    expect(source).not.toMatch(/audit_log\.\s*(insert|update|values)/);
+    // The PDF render data + computed jsonb construction must not name
+    // `commission` (D-12). Strip comments first so the ADMIN-09 explainer
+    // comments don't trip the check.
     const stripped = source
-      .replace(/\/\/.*$/gm, '')         // single-line comments
-      .replace(/\/\*[\s\S]*?\*\//g, ''); // block comments
-    // The codepath must never reference "commission" in non-comment positions.
+      .replace(/\/\/.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+    // Strict contract per PLAN.md verification: no 'commission' substring
+    // (the PR-time grep is `grep -v '^#' file | grep -c commission == 0`).
     expect(stripped.toLowerCase()).not.toContain('commission');
   });
 
