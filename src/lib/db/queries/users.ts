@@ -41,14 +41,21 @@ export async function listPartnersWithCounts(): Promise<PartnerWithCount[]> {
       lastLoginAt: schema.users.lastLoginAt,
       createdAt: schema.users.createdAt,
       language: schema.users.language,
-      // Correlated subquery: count non-soft-deleted proposals per user.
+      // Correlated subquery: count non-soft-deleted, non-draft proposals per user.
       // NOTE: ${schema.users.id} interpolation emits unqualified `"id"`, which
       // Postgres binds to `proposals.id` (uuid) — not the outer `users.id` (text).
       // Result is `text = uuid` type mismatch (42883). Fix: qualify explicitly.
+      //
+      // bug_007 (Phase 12): the `deleted_at IS NULL` predicate alone now matches
+      // drafts (which have `deleted_at` at default NULL and `status='draft'`),
+      // silently inflating the admin "Propositions" column. Adding
+      // `proposals.status = 'active'` aligns this query with the parallel fix
+      // in proposals.ts:listProposalsByUser / searchProposals (D-08).
       proposalsCount: sql<number>`(
         SELECT COUNT(*)::int
         FROM proposals
         WHERE proposals.user_id = users.id
+          AND proposals.status = 'active'
           AND proposals.deleted_at IS NULL
       )`.as('proposals_count'),
     })
