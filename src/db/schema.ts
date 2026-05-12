@@ -186,20 +186,29 @@ export const proposals = pgTable('proposals', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: text('user_id').notNull().references(() => users.id, { onDelete: 'restrict' }),
 
+  // D-01 (12-CONTEXT): lifecycle status. Stored values: 'draft' | 'active' | 'deleted'.
+  // 'expired' is derived at query/render time — never stored (D-07).
+  // DEFAULT 'active' aligns existing Phase 8 rows on migration (D-09).
+  status: text('status').notNull().default('active'),
+
   // D-A2: language committed at gen time, immutable.
   language: text('language').notNull(),
 
   // Display reference (PROP-24 via Phase 7 generateLcRef). UNIQUE per user.
-  lcRef: text('lc_ref').notNull(),
+  // D-03 (12-CONTEXT): nullable — drafts do not have an lc_ref until finalization.
+  lcRef: text('lc_ref'),
 
   // D-B2: client-generated UUIDv4. UNIQUE per user — unique index below.
-  idempotencyKey: text('idempotency_key').notNull(),
+  // D-03 (12-CONTEXT): nullable — drafts do not have an idempotency_key until finalization.
+  idempotencyKey: text('idempotency_key'),
 
   // DATA-04 (D-D3): semver, default '1.0.0', CHECK ^\d+\.\d+\.\d+$.
   schemaVersion: text('schema_version').notNull().default('1.0.0'),
 
-  // DATA-02/01/03: jsonb snapshot triple — written once, read forever.
+  // DATA-02/01/03: jsonb snapshot triple — written once on finalization, read forever.
+  // inputs stays NOT NULL — drafts INSERT with inputs = '{}' then accumulate (D-03).
   inputs: jsonb('inputs').$type<Record<string, unknown>>().notNull(),
+  // D-03 (12-CONTEXT): paramsSnapshot nullable — NULL for drafts; written once by finalizeDraft().
   paramsSnapshot: jsonb('params_snapshot').$type<{
     commissionPct: string;
     maxAmount: string;
@@ -210,8 +219,9 @@ export const proposals = pgTable('proposals', {
       t3: { 36: string; 48: string; 60: string };
       t4: { 36: string; 48: string; 60: string };
     };
-  }>().notNull(),
-  computed: jsonb('computed').$type<Record<string, unknown>>().notNull(),
+  }>(),
+  // D-03 (12-CONTEXT): computed nullable — NULL for drafts; written once by finalizeDraft().
+  computed: jsonb('computed').$type<Record<string, unknown>>(),
 
   // PDF artifact slots (filled after row INSERT — D-B1 step 7).
   pdfBlobKey: text('pdf_blob_key'),
@@ -229,11 +239,21 @@ export const proposals = pgTable('proposals', {
   check('proposals_language_check', sql`${table.language} IN ('fr', 'en')`),
   // D-D3: semver shape enforced at the DB.
   check('proposals_schema_version_check', sql`${table.schemaVersion} ~ '^[0-9]+\\.[0-9]+\\.[0-9]+$'`),
+  // D-01 (12-CONTEXT): stored status whitelist — 3 values only; 'expired' is derived.
+  check('proposals_status_check', sql`${table.status} IN ('draft','active','deleted')`),
+  // D-04 (12-CONTEXT): finalized-row completeness — draft rows exempt; active/deleted must have all 4 fields.
+  check('proposals_finalized_completeness_check', sql`${table.status} = 'draft' OR (${table.lcRef} IS NOT NULL AND ${table.idempotencyKey} IS NOT NULL AND ${table.paramsSnapshot} IS NOT NULL AND ${table.computed} IS NOT NULL)`),
 
   // D-B2: idempotency uniqueness (user_id, idempotency_key).
-  uniqueIndex('proposals_user_id_idempotency_key_uq').on(table.userId, table.idempotencyKey),
+  // D-05 (12-CONTEXT): partial — drafts may have NULL idempotency_key and don't collide.
+  uniqueIndex('proposals_user_id_idempotency_key_uq')
+    .on(table.userId, table.idempotencyKey)
+    .where(sql`${table.idempotencyKey} IS NOT NULL`),
   // Within-user LC ref stability.
-  uniqueIndex('proposals_user_id_lc_ref_uq').on(table.userId, table.lcRef),
+  // D-05 (12-CONTEXT): partial — drafts may have NULL lc_ref and don't collide.
+  uniqueIndex('proposals_user_id_lc_ref_uq')
+    .on(table.userId, table.lcRef)
+    .where(sql`${table.lcRef} IS NOT NULL`),
 
   // D-C1 cursor query: (user_id, created_at desc, id desc).
   index('proposals_user_id_created_at_id_idx')
@@ -277,6 +297,31 @@ export const auditLog = pgTable('audit_log', {
     .on(table.targetType, table.targetId, sql`${table.createdAt} DESC`),
 ]);
 
+/**
+ * Append-only coefficient change history (DB-03 per 12-CONTEXT.md D-12, D-13).
+ *
+ * Append-only at the DB layer via triggers `coefficient_history_no_update` and
+ * `coefficient_history_no_delete` (defined in drizzle/0004_phase12_drafts_and_history.sql).
+ * Any UPDATE or DELETE raises 'coefficient_history is append-only — UPDATE and DELETE forbidden'.
+ *
+ * Backfill from existing global_params rows is performed by
+ * scripts/backfill-coefficient-history.ts (idempotent, see plan 12-06).
+ */
+export const coefficientHistory = pgTable('coefficient_history', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  changedAt: timestamp('changed_at', { withTimezone: true }).notNull().defaultNow(),
+  // Nullable FK: NULL if the acting user was deleted (ON DELETE SET NULL).
+  changedByUserId: text('changed_by_user_id').references(() => users.id, { onDelete: 'set null' }),
+  // NULL for the seed-row first entry (no prior state to diff against).
+  beforeJson: jsonb('before_json').$type<Record<string, unknown>>(),
+  afterJson: jsonb('after_json').$type<Record<string, unknown>>().notNull(),
+  // Human-readable French diff summary (auto-generated by generateDiffSummary or admin-provided).
+  summary: text('summary').notNull(),
+}, (table) => [
+  // Newest-first reads for the History sidebar.
+  index('coefficient_history_changed_at_idx').on(sql`${table.changedAt} DESC`),
+]);
+
 // Type exports for Phase 8 tables.
 export type GlobalParamsRow = typeof globalParams.$inferSelect;
 export type NewGlobalParamsRow = typeof globalParams.$inferInsert;
@@ -284,3 +329,7 @@ export type ProposalRow = typeof proposals.$inferSelect;
 export type NewProposalRow = typeof proposals.$inferInsert;
 export type AuditLogRow = typeof auditLog.$inferSelect;
 export type NewAuditLogRow = typeof auditLog.$inferInsert;
+
+// Type exports for Phase 12 tables.
+export type CoefficientHistoryRow = typeof coefficientHistory.$inferSelect;
+export type NewCoefficientHistoryRow = typeof coefficientHistory.$inferInsert;
