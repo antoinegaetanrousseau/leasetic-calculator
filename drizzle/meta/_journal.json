@@ -29,6 +29,13 @@
       "when": 1778419200000,
       "tag": "0003_seed_global_params",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778619261976,
+      "tag": "0004_phase12_drafts_and_history",
+      "breakpoints": true
     }
   ]
 }
