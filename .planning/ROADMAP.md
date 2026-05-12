@@ -39,7 +39,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 ### 🚧 v1.2 — UX Polish + Proposal Wizard (Phases 11-15)
 
 - [ ] **Phase 11: Design System Foundation + Brand Assets** — Stepper, RetractableSidebar, MetricTile, AdminNavCard, StatusChip + light/dark Leasétic logo SVGs land as a reusable foundation
-- [ ] **Phase 12: Schema Extensions for Drafts + History** — `draft` proposal status, `invited` partner status, `coefficient_history` append-only table
+- [x] **Phase 12: Schema Extensions for Drafts + History** ✅ shipped 2026-05-12 — `draft` proposal status, `invited` partner status, `coefficient_history` append-only table
 - [ ] **Phase 13: 3-Step Proposal Wizard** — `/proposals/new/{parametres,calcul,verification}` with server-side draft persistence and Stepper-gated forward nav
 - [ ] **Phase 14: Admin Polish — Partners + History + Home** — Dedicated `/partners/new` route, status chips across admin lists, coefficient history sidebar, admin nav cards on admin home
 - [ ] **Phase 15: Public Surface Brand Polish** — Login + invite + reset pages adopt centered-logo + paper-background `(public)` shell
@@ -137,11 +137,11 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 9. Admin Surface | v1.1 | 4/4 | Complete | 2026-05-10 |
 | 10. Cutover & Polish | v1.1 | 6/6 | Complete | 2026-05-11 |
 | 11. Design System Foundation + Brand Assets | v1.2 | 0/5 | Planned | — |
-| 12. Schema Extensions for Drafts + History | v1.2 | 0/7 | Planned | — |
+| 12. Schema Extensions for Drafts + History | v1.2 | 7/7 | Complete | 2026-05-12 |
 | 13. 3-Step Proposal Wizard | v1.2 | 0/0 | Not started | — |
 | 14. Admin Polish — Partners + History + Home | v1.2 | 0/0 | Not started | — |
 | 15. Public Surface Brand Polish | v1.2 | 0/0 | Not started | — |
 
 ---
 
-*Last updated: 2026-05-12 after Phase 12 plan creation (7 plans, requirements DB-01/02/03 covered). v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
+*Last updated: 2026-05-12 after Phase 12 execution (7/7 plans complete, DB-01/02/03 satisfied, 492 vitest tests pass, 4 integration tests skipped pending DATABASE_URL_TEST). v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
