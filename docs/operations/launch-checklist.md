@@ -102,4 +102,39 @@ message rather than ticking the box.
 
 ---
 
-*Last updated: 2026-05-10 (Phase 10 plan 10-06). Antoine commits this file in its checked state on launch day.*
+## v1.2 schema rollout (Phase 12)
+
+Run these steps when promoting v1.2 to production. Order matters: migration first, then backfill.
+
+- [ ] **v1.2-1.** Apply migration `0004_phase12_drafts_and_history.sql` to production. Run via the same GitHub Actions workflow as v1.1:
+  ```bash
+  gh workflow run db-migrate.yml --field confirm="MIGRATE PROD"
+  ```
+  Approve the `production` environment gate when prompted. Verify:
+  ```bash
+  psql $DATABASE_URL_PROD -c "\d coefficient_history"
+  psql $DATABASE_URL_PROD -c "SELECT proname FROM pg_proc WHERE proname = 'coefficient_history_no_modify'"
+  ```
+  Expected: `coefficient_history` table exists with `id, changed_at, changed_by_user_id, before_json, after_json, summary` columns, AND the `coefficient_history_no_modify()` plpgsql function exists. Both `coefficient_history_no_update` and `coefficient_history_no_delete` triggers should be present.
+
+- [ ] **v1.2-2.** Backfill `coefficient_history` from existing `global_params` rows:
+  - For local / preview: `npm run db:backfill:coefficient-history`
+  - For production (Neon main): `DATABASE_URL=<prod-url> BACKFILL_CONFIRM=YES npm run db:backfill:coefficient-history`
+  - Idempotent (D-15): safe to re-run. Skips with "Already backfilled — N rows exist" if the table is already non-empty.
+  - Required for the Phase 14 History sidebar to render pre-v1.2 coefficient edits. Without this step, the sidebar shows "no changes yet" until the next admin coefficient edit.
+  - Verify after run:
+    ```bash
+    psql $DATABASE_URL_PROD -c "SELECT COUNT(*), MIN(changed_at), MAX(changed_at) FROM coefficient_history"
+    psql $DATABASE_URL_PROD -c "SELECT summary FROM coefficient_history ORDER BY changed_at LIMIT 1"
+    ```
+    Expected: count matches `SELECT COUNT(*) FROM global_params`; the oldest row's summary is `'Configuration initiale'`.
+
+- [ ] **v1.2-3.** Smoke-test the append-only trigger in production:
+  ```bash
+  psql $DATABASE_URL_PROD -c "UPDATE coefficient_history SET summary = 'x' WHERE id = (SELECT id FROM coefficient_history LIMIT 1)"
+  ```
+  Expected: `ERROR: coefficient_history is append-only — UPDATE and DELETE forbidden`. If this command succeeds, the trigger is missing and the migration did not apply cleanly — STOP, investigate.
+
+---
+
+*Last updated: 2026-05-12 (Phase 12 plan 12-06 — added v1.2 schema rollout section). Antoine commits this file in its checked state on launch day.*
