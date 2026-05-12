@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
 status: executing
-last_updated: "2026-05-12T19:23:37.777Z"
+last_updated: "2026-05-12T19:35:00.000Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 18
-  completed_plans: 15
-  percent: 83
+  completed_plans: 16
+  percent: 89
 ---
 
 # State — Matrice Commerciale
@@ -28,14 +28,15 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 13 (3-step-proposal-wizard) — EXECUTING
-Plan: 4 of 6 (Plans 1 + 2 + 3 SHIPPED 2026-05-12)
+Plan: 5 of 6 (Plans 1 + 2 + 3 + 4 SHIPPED 2026-05-12)
 
   - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
   - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
   - Plan 3 — Step-1 Paramètres Route + Form Card (page.tsx + ParametresFormCard + WizardStep1Wiring + 28 Vitest assertions; ADMIN-09 step-1 grep-clean)
+  - Plan 4 — Step-2 Calcul Route (page.tsx with server-side computeLoyer + hero card + Détail du calcul + D-12 commission relaxation + Paramètres saisis recap; 15 Vitest assertions; ADMIN-09 commission-appears-exactly-once enforced)
 
-Status: Ready to execute Plan 4 (step-2 calcul route — Wave 2 continues)
-Last activity: 2026-05-12 -- Plan 13-03 shipped (28 Vitest assertions, full D-01..D-26 lifecycle on /proposals/new/parametres, ADMIN-09 step-1 surface grep-clean)
+Status: Ready to execute Plan 5 (step-3 verification route — Wave 2 final)
+Last activity: 2026-05-12 -- Plan 13-04 shipped (15 Vitest assertions, server-side computeLoyer pipeline on /proposals/new/calcul, D-12 ADMIN-09 partial relaxation implementation site)
 
 ## Progress
 
@@ -193,6 +194,9 @@ v1.1 ████████████████████ 6/6 phases com
 | fontStyle: 'italic' removed from validity caption — no italic cut in self-hosted Plus Jakarta Sans set (only upright 300/400/500/600/700). Registering the same woff2 as italic + upright causes fontkit double-subsetting DataView corruption. | Rule 1 auto-fix | 08-05 |
 | ESLint override for src/lib/pdf/** disables both no-restricted-imports AND no-restricted-syntax — PDF bilingual inline strings (e.g., 'Société'/'Company') are intentional server-only literals not routed through the runtime i18n t() system (T-08-05-07 accepted) | 08-05 design call | 08-05 |
 | renderToBuffer() is the top-level export of @react-pdf/renderer 4.5.1 — no sub-path import needed; ProposalDocument requires ReactElement<DocumentProps> cast because ProposalDocumentProps wraps the document props in a data field | 08-05 execution | 08-05 |
+| Step 2 onSaveDraft uses an inline `'use server'` arrow as a WizardActionBar prop instead of a step-2 client wiring component — step 2 has no form fields so there's no `useFormContext().getValues()` to read, making the plan-13-03 WizardStep1Wiring idiom over-engineered for this surface. Inline arrow captures draft.id + draft.inputs from server-component scope and forwards verbatim to saveAsDraftAction | 13-04 design call | 13-04 |
+| Commission amount on step 2 derived server-side from `amountHT × commissionPct / 100` (NOT read from computeLoyer.computed — the calc engine does not surface a commission field in its return shape). Same formula computeLoyer uses internally; same global_params snapshot drives both the loyer and the commission. Zero drift risk by construction | 13-04 design call | 13-04 |
+| 'Coefficients manquants pour cette tranche' soft-error fallback rendered at 24px/600/--gd (heading scale) rather than 40px hero scale — per UI-SPEC §5.6 non-blocking recommendation OQ#4 ("long strings overflow at narrow viewports"). 'Sur demande' stays at hero scale (short enough to fit comfortably) | UI-SPEC §5.6 non-blocking recommendation | 13-04 |
 
 ## Session Notes
 
@@ -228,6 +232,7 @@ v1.1 ████████████████████ 6/6 phases com
 
 - **2026-05-09:** 08-05 executed — PDF rendering module: @react-pdf/renderer 4.5.1 exact-pin installed. src/lib/pdf/ module: styles.ts (pdfColors/pdfFontSizes/pdfFontWeights/pdfPageMargins hex-literal tokens), components/section-label.tsx + components/key-value-row.tsx (reusable PDF children), document.tsx (ProposalDocument single-page A4 with header band/title/recipient/project/computation card/loyer card/interests/validity caption/absolute footer; Font.register with 4 TTF weights), render.ts (import 'server-only', renderProposalPdf({data})→{buffer,sha256,sizeBytes} via renderToBuffer + node:crypto sha256), index.ts (barrel). ESLint no-restricted-imports + no-restricted-syntax override for src/lib/pdf/**. document.test.tsx: 5 Vitest smoke tests (Buffer >4KB, sha256 64-hex, %PDF- magic bytes, on-demand variant, EN language). **Key deviation:** woff2 fails fontkit TTFSubset with DataView bounds error for accented chars — fixed by converting self-hosted woff2 → TTF via wawoff2 (committed to public/fonts/). fontStyle:'italic' removed (no italic cut exists). Test count 376 → 381 (+5). typecheck/lint/build/all-guards 0. 5 task commits: 5b95f78, 793f988, 27e0f8c, b746089, 2141ee3. Plans 08-06 + 08-07 unblocked. PROP-15..19 + DATA-09 grounded.
 - **2026-05-09:** 08-03 executed — DB query helpers: 4 source files created under `src/lib/db/queries/` (420 lines total). proposals.ts: 11 functions (encodeCursor/decodeCursor, createProposal, finalizePdfBlobOnProposal, findByIdempotencyKey, getProposalById, listProposalsByUser, searchProposals, softDeleteProposal, restoreProposal, hardPurgeProposal, listPurgeCandidates). global-params.ts: getLatestGlobalParams + insertGlobalParams (append-only). audit-log.ts: writeAuditLog with AuditAction + AuditTargetType types. index.ts: barrel re-exporting all symbols + types. 2 test files (261 lines total): 18 tests in proposals.test.ts (cursor encode/decode, listProposalsByUser limit math, searchProposals ILIKE, createProposal insert args, soft-delete/restore/purge shapes), 3 tests in global-params.test.ts. All modules import 'server-only'. 2 deviations: (1) `.returning()` no-arg (Drizzle 0.45.2 type constraint — Rule 1), (2) `as any` cast for jsonb paramsSnapshot (vs `as never` per plan — cleaner bridge). typecheck/no-vercel-imports/build all 0; 376/376 tests pass (+21 from 355 baseline). Plans 08-07/08/10/11/12/13/14 unblocked at the data-access layer. DATA-06/07/08 + PROP-02/05/09/20/21/22 grounded. 2 task commits: 89d478d (feat), 9ce8120 (test).
+- **2026-05-12:** 13-04 executed — Step-2 calcul route: `app/(authed)/proposals/new/calcul/page.tsx` (506 lines) + colocated `page.test.tsx` (457 lines, 15 Vitest assertions). Server component: requireUser() first; D-03 silent self-heal × 4 redirect paths (no draft_id / null draft / status !== 'draft' / deletedAt); server-side compute via getLatestGlobalParams + proposalInputSchema.safeParse + computeLoyer (same pure-function the v9 v1.1 LiveLoyerPreview consumes); 4-variant hero card (computed / on-demand / missing / inputsIncomplete) with state-driven typography (40px for hero scale on computed and on-demand; 24px heading scale for 'missing' per UI-SPEC §5.6 non-blocking recommendation); 5-row Détail du calcul RecapSection (Montant HT / Commission apporteur / Coefficient appliqué (tranche {N}K€) / Durée / Loyer mensuel calculé with --gd weight 600 emphasis); D-12 ADMIN-09 partial relaxation — commission AMOUNT (amountHT × commissionPct / 100) rendered EXACTLY ONCE at row 2 with `(non visible client)` sub-line via RecapSection rowSublabels[1]; Paramètres saisis recap with ← Modifier link → /parametres + 7 rows (NO commission row); WizardActionBar (← Précédent + Save inline 'use server' arrow + Continuer link / ← Retour à l'étape 1 replacement when blocked). Test 14 + Test 15 enforce the visibility-and-bounded invariant (commission visible once, no leaks). Test 13 enforces ROUTE-01 SC5 (cross-user redirect, no leak). typecheck 0; lint 0 errors (3 pre-existing warnings unrelated); 15/15 plan tests + 720/720 full suite (no regression); all 10 grep contracts pass (commission refs 4 within 2..5 window; 0 console.log; 0 hidden inputs with commission; 3 // D-12 annotations; 4 redirect-to-parametres; 0 interactive inputs — D-11 invariant). 0 deviations beyond PLAN.md `<action>` block clarifications (the example used `result.state` and `result.commission` which don't exist on the real ComputeLoyerResult shape — implementation uses the real `result.computed.state` discriminated union and derives commission from the global_params snapshot). ROUTE-01 step-2 grounded. 2 task commits: 0ff12a7 (test RED), 68a698b (feat GREEN).
 
 ## Open Blockers
 
