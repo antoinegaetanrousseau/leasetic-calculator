@@ -538,6 +538,71 @@ export const dictionaries = {
     // 2 new keys × 2 langs: SeedBanner message + login privacy link label.
     'admin.seed_banner.message': "Les coefficients sont actuellement les valeurs par défaut. Vérifiez et confirmez avant d’inviter des partenaires.",
     'login.privacy.label': 'Politique de confidentialité',
+
+    // ── Phase 13 — 3-Step Proposal Wizard (Plan 13-01, locked in 13-UI-SPEC.md §6) ──
+    // ~45 new keys consumed by the 4 route-private wizard components
+    // (WizardActionBar, PlusDeDetailsAccordion, PdfPreviewMock, RecapSection)
+    // and the 3 wizard step routes (plans 13-03/04/05).
+    // §6.1 Page titles + subtitles
+    'wizard.step1.title': 'Paramètres du projet',
+    'wizard.step1.subtitle': 'Saisissez les informations du client et les détails du projet. Vous pourrez sauvegarder à tout moment et reprendre plus tard.',
+    'wizard.step2.title': 'Résultat du calcul',
+    'wizard.step2.subtitle': 'Voici le loyer mensuel calculé selon les paramètres du projet. Vérifiez avant de continuer.',
+    'wizard.step3.title': 'Vérifier la proposition',
+    'wizard.step3.subtitle': 'Vérifiez tous les éléments puis confirmez pour générer le PDF final.',
+    // §6.2 Section bullet headers
+    'wizard.section.informations.client': 'INFORMATIONS CLIENT',
+    'wizard.section.details.projet': 'DÉTAILS DU PROJET',
+    'wizard.section.parametres.saisis': 'PARAMÈTRES SAISIS',
+    'wizard.section.detail.calcul': 'DÉTAIL DU CALCUL',
+    'wizard.section.client': 'CLIENT',
+    'wizard.section.projet': 'PROJET',
+    'wizard.section.calcul': 'CALCUL',
+    // §6.3 Wizard field-label overrides (D-7-13 carry-over: keep both
+    // wizard.field.* and form.client.co for backward compat per UI-SPEC §6.3)
+    'wizard.field.client.co.label': 'Nom du client',
+    'wizard.field.client.name.label': 'Personne de contact',
+    // §6.4 Accordion trigger
+    'wizard.accordion.trigger': '+ Plus de détails (facultatif)',
+    'wizard.accordion.aria.label.open': 'Afficher les détails supplémentaires',
+    'wizard.accordion.aria.label.close': 'Masquer les détails supplémentaires',
+    // §6.5 Step-2 specific labels
+    'wizard.step2.hero.label': 'LOYER MENSUEL',
+    'wizard.step2.hero.sub': 'par mois pendant {0} mois',
+    'wizard.step2.chip.tranche': 'Tranche {0} · Coefficient {1}%',
+    'wizard.step2.row.amount': 'Montant HT du projet',
+    'wizard.step2.row.commission': 'Commission apporteur',
+    // D-12 partner-facing parenthetical (commission is visible on step 2 only
+    // — never in the PDF, audit_log, or server logs).
+    'wizard.step2.row.commission.sublabel': '(non visible client)',
+    'wizard.step2.row.coefficient': 'Coefficient appliqué (tranche {0}K€)',
+    'wizard.step2.row.duration': 'Durée du contrat',
+    'wizard.step2.row.loyer.calculated': 'Loyer mensuel calculé',
+    'wizard.step2.error.incomplete': "Données du projet incomplètes — retournez à l'étape 1 pour les compléter.",
+    // §6.6 Step-3 specific labels
+    // D-15: ref line MUST use literal `LC-2026-XXX` (never digits, never
+    // timestamps) so it never collides with real allocated numeric lc_refs.
+    'wizard.step3.modifier.link': '← Modifier',
+    'wizard.step3.pdf.title': 'Proposition de financement',
+    'wizard.step3.pdf.ref.line': 'Réf. LC-2026-XXX · {0} jours de validité',
+    'wizard.step3.pdf.preview.aria': 'Aperçu de la proposition à générer',
+    'wizard.step3.pdf.loyer.label': 'LOYER MENSUEL',
+    // §6.7 Action bar button labels
+    'wizard.action.previous': '← Précédent',
+    'wizard.action.previous.aria': 'Étape précédente',
+    'wizard.action.save.draft': 'Enregistrer comme brouillon',
+    'wizard.action.step1.continue': 'Continuer vers le calcul →',
+    'wizard.action.step2.continue': 'Continuer vers la vérification →',
+    'wizard.action.step3.confirm': 'Confirmer & Générer le PDF',
+    'wizard.action.step3.confirm.spinner': 'Génération en cours…',
+    // §6.8 Toast strings (sonner)
+    'wizard.toast.save.draft.success': 'Brouillon enregistré ✓',
+    'wizard.toast.finalize.success': 'Proposition générée ✓',
+    'wizard.toast.finalize.error': 'Erreur lors de la génération. Réessayez.',
+    'wizard.toast.validation.errors': 'Veuillez corriger les erreurs dans le formulaire.',
+    // Extra: save-draft error toast (supports WizardActionBar onSaveDraft
+    // catch branch — Plan 13-01 Task 2).
+    'wizard.toast.draft.error': "Erreur lors de l'enregistrement. Réessayez.",
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -1044,6 +1109,62 @@ export const dictionaries = {
     // ── Phase 10 — Cutover & Polish (D-10-13, D-10-17) ──────────────────────────
     'admin.seed_banner.message': 'Coefficients are currently default values. Verify and confirm before inviting partners.',
     'login.privacy.label': 'Privacy policy',
+
+    // ── Phase 13 — 3-Step Proposal Wizard (Plan 13-01, locked in 13-UI-SPEC.md §6) ──
+    // §6.1 Page titles + subtitles
+    'wizard.step1.title': 'Project parameters',
+    'wizard.step1.subtitle': 'Enter the client information and project details. You can save at any time and resume later.',
+    'wizard.step2.title': 'Calculation result',
+    'wizard.step2.subtitle': 'Here is the monthly rent calculated from the project parameters. Review before continuing.',
+    'wizard.step3.title': 'Review the proposal',
+    'wizard.step3.subtitle': 'Review all elements then confirm to generate the final PDF.',
+    // §6.2 Section bullet headers
+    'wizard.section.informations.client': 'CLIENT INFORMATION',
+    'wizard.section.details.projet': 'PROJECT DETAILS',
+    'wizard.section.parametres.saisis': 'ENTERED PARAMETERS',
+    'wizard.section.detail.calcul': 'CALCULATION DETAIL',
+    'wizard.section.client': 'CLIENT',
+    'wizard.section.projet': 'PROJECT',
+    'wizard.section.calcul': 'CALCULATION',
+    // §6.3 Wizard field-label overrides
+    'wizard.field.client.co.label': 'Client name',
+    'wizard.field.client.name.label': 'Contact person',
+    // §6.4 Accordion trigger
+    'wizard.accordion.trigger': '+ More details (optional)',
+    'wizard.accordion.aria.label.open': 'Show additional details',
+    'wizard.accordion.aria.label.close': 'Hide additional details',
+    // §6.5 Step-2 specific labels
+    'wizard.step2.hero.label': 'MONTHLY RENT',
+    'wizard.step2.hero.sub': 'per month over {0} months',
+    'wizard.step2.chip.tranche': 'Tranche {0} · Coefficient {1}%',
+    'wizard.step2.row.amount': 'Project amount (excl. tax)',
+    'wizard.step2.row.commission': 'Partner commission',
+    'wizard.step2.row.commission.sublabel': '(not visible to client)',
+    'wizard.step2.row.coefficient': 'Applied coefficient (tranche {0}K€)',
+    'wizard.step2.row.duration': 'Contract duration',
+    'wizard.step2.row.loyer.calculated': 'Calculated monthly rent',
+    'wizard.step2.error.incomplete': 'Project data incomplete — return to step 1 to complete it.',
+    // §6.6 Step-3 specific labels (D-15 — literal LC-2026-XXX)
+    'wizard.step3.modifier.link': '← Edit',
+    'wizard.step3.pdf.title': 'Financing proposal',
+    'wizard.step3.pdf.ref.line': 'Ref. LC-2026-XXX · {0}-day validity',
+    'wizard.step3.pdf.preview.aria': 'Preview of the proposal to be generated',
+    'wizard.step3.pdf.loyer.label': 'MONTHLY RENT',
+    // §6.7 Action bar button labels
+    'wizard.action.previous': '← Previous',
+    'wizard.action.previous.aria': 'Previous step',
+    'wizard.action.save.draft': 'Save as draft',
+    'wizard.action.step1.continue': 'Continue to calculation →',
+    'wizard.action.step2.continue': 'Continue to review →',
+    'wizard.action.step3.confirm': 'Confirm & Generate PDF',
+    'wizard.action.step3.confirm.spinner': 'Generating…',
+    // §6.8 Toast strings (sonner)
+    'wizard.toast.save.draft.success': 'Draft saved ✓',
+    'wizard.toast.finalize.success': 'Proposal generated ✓',
+    'wizard.toast.finalize.error': 'Generation failed. Try again.',
+    'wizard.toast.validation.errors': 'Please correct the errors in the form.',
+    // Extra: save-draft error toast.
+    'wizard.toast.draft.error': 'Save failed. Try again.',
   },
 } as const;
 
