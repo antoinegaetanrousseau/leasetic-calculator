@@ -79,26 +79,32 @@ async function main(): Promise<void> {
   }
 
   // Typed-confirmation gate: only fires for Neon production (*.neon.tech).
-  let host: string;
+  //
+  // bug_011: use URL.hostname (bare DNS name) NOT URL.host (which includes
+  // the port). Neon's pgbouncer endpoint is on :6543 and operator-pasted
+  // connection strings often include :5432; `host` for those URLs is
+  // 'db.us-east.neon.tech:5432' which does NOT endsWith('.neon.tech') —
+  // silently bypassing the gate. `hostname` strips the port.
+  let hostname: string;
   try {
-    host = new URL(databaseUrl).host;
+    hostname = new URL(databaseUrl).hostname;
   } catch {
     console.error('[backfill] FATAL: DATABASE_URL is malformed');
     process.exit(2);
   }
-  const isNeonProd = host.endsWith('.neon.tech');
+  const isNeonProd = hostname.endsWith('.neon.tech');
   if (isNeonProd) {
     if (process.env.BACKFILL_CONFIRM !== REQUIRED_CONFIRM_VALUE) {
       console.error(
-        `[backfill] FATAL: Production Neon DB detected (${host}). ` +
+        `[backfill] FATAL: Production Neon DB detected (${hostname}). ` +
           `Re-run with BACKFILL_CONFIRM=YES to confirm.`,
       );
       process.exit(2);
     }
-    console.log(`[backfill] Production Neon (${host}) — gate satisfied.`);
+    console.log(`[backfill] Production Neon (${hostname}) — gate satisfied.`);
   } else {
     console.log(
-      `[backfill] Non-prod DB (${host}) — typed-confirmation gate not enforced.`,
+      `[backfill] Non-prod DB (${hostname}) — typed-confirmation gate not enforced.`,
     );
   }
 
@@ -152,6 +158,13 @@ async function main(): Promise<void> {
       after,
       userId,
       summary: undefined,
+      // bug_003: preserve the original global_params.effective_from as the
+      // history row's changed_at so chronology survives backfill. Without
+      // this, the schema's defaultNow() would cluster every row at backfill
+      // execution time and the Phase 14 History sidebar's ORDER BY changed_at
+      // DESC would render pre-launch history as one simultaneous moment.
+      // The append-only trigger blocks any post-hoc UPDATE fix.
+      changedAt: current.effectiveFrom,
     });
     inserted++;
     console.log(

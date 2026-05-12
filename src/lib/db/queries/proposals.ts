@@ -267,11 +267,18 @@ export async function searchProposals(args: SearchProposalsArgs): Promise<ListRe
 /**
  * Soft delete (PROP-22 / DATA-10). Ownership embedded in WHERE clause as
  * defence-in-depth alongside the route's requireUser ownership check.
- * Returns the affected count (0 = not found / not owned / already deleted).
+ * Returns the affected count (0 = not found / not owned / already deleted / is a draft).
  *
  * D-08 lockstep: writes BOTH `deletedAt: now()` AND `status: 'deleted'` in
  * the same UPDATE. Two columns always move together; downstream code that
  * filters on either predicate sees a consistent state.
+ *
+ * WHERE filters on `status='active'` to exclude drafts. A draft row has all
+ * four of (lc_ref, idempotency_key, params_snapshot, computed) at NULL — if
+ * this helper wrote status='deleted' onto such a row, the
+ * `proposals_finalized_completeness_check` (D-04) would reject the UPDATE
+ * with SQLSTATE 23514. Drafts must be discarded via a different path (e.g.,
+ * Phase 13's discardDraft hard-delete or a draft-aware status transition).
  */
 export async function softDeleteProposal(
   proposalId: string,
@@ -284,6 +291,7 @@ export async function softDeleteProposal(
   }).where(and(
     eq(schema.proposals.id, proposalId),
     eq(schema.proposals.userId, userId),
+    eq(schema.proposals.status, 'active'),
     isNull(schema.proposals.deletedAt),
   )).returning();
   return result.length;
@@ -294,9 +302,12 @@ export async function softDeleteProposal(
  * the row is a candidate for hard purge and restore is forbidden.
  *
  * D-08 lockstep: writes BOTH `deletedAt: null` AND `status: 'active'` in
- * the same UPDATE. A restored row always returns to 'active' (drafts are
- * not soft-deleted through this path; they go through the normal delete
- * lifecycle then the 30-day purge cron).
+ * the same UPDATE. A restored row always returns to 'active'. WHERE filters
+ * on `status='deleted'` for symmetry with softDeleteProposal — drafts are
+ * never put into the `deleted` state by softDelete (its WHERE excludes
+ * them), so this filter is a no-op for drafts in practice but prevents any
+ * future path that might directly write status='deleted' onto a draft from
+ * being reachable via restore.
  */
 export async function restoreProposal(
   proposalId: string,
@@ -309,6 +320,7 @@ export async function restoreProposal(
   }).where(and(
     eq(schema.proposals.id, proposalId),
     eq(schema.proposals.userId, userId),
+    eq(schema.proposals.status, 'deleted'),
     isNotNull(schema.proposals.deletedAt),
     gt(schema.proposals.deletedAt, SOFT_DELETE_WINDOW),
   )).returning();

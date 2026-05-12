@@ -28,6 +28,9 @@ vi.mock('@/lib/db', async () => {
 });
 
 import { listInvitedPartners, type InvitedPartnerRow } from './users';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 beforeEach(() => {
   calls.length = 0;
@@ -73,6 +76,15 @@ describe('listInvitedPartners', () => {
     ];
     fixtureRows = fixture;
     expect(await listInvitedPartners()).toEqual(fixture);
+  });
+
+  // Regression: bug_007 — see source comment on the correlated subquery.
+  // The mocked-DB pattern cannot evaluate raw SQL fragments, so we grep the
+  // source file for the AND clause that excludes drafts from the count.
+  it('source contains the proposals.status = "active" filter in the correlated subquery (bug_007 regression)', () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const src = readFileSync(join(here, 'users.ts'), 'utf8');
+    expect(src).toContain("AND proposals.status = 'active'");
   });
 
   it('does NOT include commission_pct or password fields in the returned shape', async () => {

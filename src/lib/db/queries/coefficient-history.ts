@@ -40,6 +40,20 @@ export interface CreateCoefficientHistoryArgs {
   userId: string | null;
   /** Optional admin-provided label. Falls back to generateDiffSummary when undefined / empty / whitespace-only (D-16). */
   summary?: string;
+  /**
+   * Optional override for the row's `changed_at` timestamp. Default behavior
+   * (when omitted): the column's `defaultNow()` fires at INSERT time, which
+   * is correct for live admin edits.
+   *
+   * Backfill (plan 12-06) passes the original `global_params.effective_from`
+   * so historical rows preserve their original chronology. Without this
+   * override, all backfilled rows would cluster at backfill execution time
+   * and the History sidebar's `ORDER BY changed_at DESC` would render the
+   * pre-launch history as if it happened simultaneously. The append-only
+   * trigger blocks any post-hoc fix (UPDATE forbidden), so this must be
+   * passed at INSERT time. (Caught by /ultrareview as bug_003.)
+   */
+  changedAt?: Date;
 }
 
 /**
@@ -67,6 +81,10 @@ export async function createCoefficientHistoryEntry(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     afterJson: args.after as any,
     summary: resolvedSummary,
+    // bug_003: only include changedAt when explicitly provided. Omitting
+    // it lets Postgres's defaultNow() fire (correct for live admin edits);
+    // including it preserves the original timestamp (correct for backfill).
+    ...(args.changedAt ? { changedAt: args.changedAt } : {}),
   };
 
   const [row] = await dbi

@@ -160,6 +160,32 @@ describe('createCoefficientHistoryEntry — summary fallback (D-16)', () => {
     });
     expect(lastInsertPayload()?.changedByUserId).toBeNull();
   });
+
+  // Regression: bug_003 — backfill must preserve global_params.effective_from
+  // as the coefficient_history.changed_at; without the changedAt override the
+  // schema's defaultNow() fires and historical chronology is destroyed.
+  it('omits changedAt from the insert payload when not provided (defaultNow fires)', async () => {
+    await createCoefficientHistoryEntry({
+      before: null,
+      after: baseSnapshot,
+      userId: null,
+    });
+    const payload = lastInsertPayload();
+    expect(payload).toBeDefined();
+    expect(payload!).not.toHaveProperty('changedAt');
+  });
+
+  it('passes through changedAt when provided (preserves historical timestamps for backfill)', async () => {
+    const historical = new Date('2025-09-01T10:00:00Z');
+    await createCoefficientHistoryEntry({
+      before: null,
+      after: baseSnapshot,
+      userId: null,
+      changedAt: historical,
+    });
+    const payload = lastInsertPayload();
+    expect(payload?.changedAt).toBe(historical);
+  });
 });
 
 describe('listCoefficientHistory — cursor pagination', () => {
