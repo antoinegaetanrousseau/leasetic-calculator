@@ -49,11 +49,17 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
 }));
 vi.mock('@/lib/auth/require', () => ({ requireUser: requireUserMock }));
-vi.mock('@/lib/i18n', () => ({
-  getCurrentLang: getCurrentLangMock,
-  // The page imports `t` indirectly via children — keep the real dictionary
-  // by NOT mocking '@/lib/i18n/dictionaries'.
-}));
+vi.mock('@/lib/i18n', async () => {
+  // Real `t` + dictionaries — only stub the cookie-reading `getCurrentLang`.
+  const real = await vi.importActual<typeof import('@/lib/i18n/dictionaries')>(
+    '@/lib/i18n/dictionaries',
+  );
+  return {
+    t: real.t,
+    dictionaries: real.dictionaries,
+    getCurrentLang: getCurrentLangMock,
+  };
+});
 vi.mock('@/lib/db/queries/proposals', () => ({
   createDraft: (...args: unknown[]) => createDraftMock(...args),
   getDraftById: (...args: unknown[]) => getDraftByIdMock(...args),
@@ -70,23 +76,6 @@ vi.mock('@/(authed)/proposals/new/_actions/persistAccordionOpen.action', () => (
 vi.mock('@/(authed)/proposals/new/_actions/saveAsDraft.action', () => ({
   saveAsDraftAction: (...args: unknown[]) => saveAsDraftMock(...args),
 }));
-
-// Path-relative mock candidate (the page may import via relative path):
-vi.mock(
-  '../_actions/persistAccordionOpen.action',
-  () => ({
-    persistAccordionOpenAction: (...args: unknown[]) =>
-      persistAccordionOpenMock(...args),
-  }),
-  { virtual: true } as never, // tolerate either import shape
-);
-vi.mock(
-  '../_actions/saveAsDraft.action',
-  () => ({
-    saveAsDraftAction: (...args: unknown[]) => saveAsDraftMock(...args),
-  }),
-  { virtual: true } as never,
-);
 
 // Import AFTER all mocks are in place.
 import ParametresStep1Page from './page';
