@@ -152,6 +152,13 @@ async function main(): Promise<void> {
       after,
       userId,
       summary: undefined,
+      // bug_003: preserve the original global_params.effective_from as the
+      // history row's changed_at so chronology survives backfill. Without
+      // this, the schema's defaultNow() would cluster every row at backfill
+      // execution time and the Phase 14 History sidebar's ORDER BY changed_at
+      // DESC would render pre-launch history as one simultaneous moment.
+      // The append-only trigger blocks any post-hoc UPDATE fix.
+      changedAt: current.effectiveFrom,
     });
     inserted++;
     console.log(
