@@ -98,7 +98,7 @@ const COMPLETE_INPUTS = {
   clientCo: 'CompanyX',
   clientName: 'Bob Buyer',
   clientEmail: 'bob@companyx.example',
-  clientTel: '+33 1 23 45 67 89',
+  clientTel: '01 23 45 67 89',
   partnerRef: 'PROJ-2026-01',
   amountHT: '75000',
   durationMonths: 48,
@@ -359,7 +359,7 @@ describe('calcul/page.tsx (D-01 / D-03 / D-11 / D-12 / D-13 / D-22)', () => {
     // Primary CTA must be ← Retour à l'étape 1 (the Continuer link is REPLACED).
     expect(container.textContent).not.toMatch(/Continuer vers la vérification/);
     const retourLink = Array.from(container.querySelectorAll('a')).find((a) =>
-      (a.textContent ?? '').match(/Retour à l['']étape 1/),
+      (a.textContent ?? '').match(/Retour à l['’]étape 1/),
     );
     expect(retourLink).toBeDefined();
     expect(retourLink!.getAttribute('href')).toBe(
@@ -389,7 +389,7 @@ describe('calcul/page.tsx (D-01 / D-03 / D-11 / D-12 / D-13 / D-22)', () => {
     // Continuer link replaced with ← Retour.
     expect(container.textContent).not.toMatch(/Continuer vers la vérification/);
     const retourLink = Array.from(container.querySelectorAll('a')).find((a) =>
-      (a.textContent ?? '').match(/Retour à l['']étape 1/),
+      (a.textContent ?? '').match(/Retour à l['’]étape 1/),
     );
     expect(retourLink).toBeDefined();
   });
