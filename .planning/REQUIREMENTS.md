@@ -83,7 +83,7 @@ Which phase covers which requirement. Updated during roadmap creation.
 | DB-01 | Phase 12 | Pending |
 | DB-02 | Phase 12 | Pending |
 | DB-03 | Phase 12 | Pending |
-| ROUTE-01 | Phase 13 | In Progress (server actions + finalize API shipped by 13-02; route pages ship in Wave 2 plans 13-03/04/05) |
+| ROUTE-01 | Phase 13 | In Progress (Wave 1 13-01+13-02 + Wave 2 13-03+13-04+13-05 all shipped — 3 wizard routes + server actions + finalize API live; Wave 3 plan 13-06 closes the requirement with integration suite + D-28 STRIDE addendum + golden-PDF byte-determinism gate) |
 | ROUTE-02 | Phase 14 | Pending |
 | COMP-01 | Phase 11 | Pending |
 | COMP-02 | Phase 11 | Pending |
