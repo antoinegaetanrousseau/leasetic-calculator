@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
 status: executing
-last_updated: "2026-05-12T17:55:20.429Z"
-last_activity: 2026-05-12 -- Phase 12 execution started
+last_updated: "2026-05-12T18:49:00.404Z"
+last_activity: 2026-05-12
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 12
-  completed_plans: 12
-  percent: 100
+  total_plans: 18
+  completed_plans: 13
+  percent: 72
 ---
 
 # State — Matrice Commerciale
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 12 — schema-extensions-for-drafts-history
+**Current focus:** Phase 13 — 3-step-proposal-wizard
 
 ## Current Position
 
-Phase: 12 (schema-extensions-for-drafts-history) — EXECUTING
-Plan: 1 of 7
-Status: Executing Phase 12
-Last activity: 2026-05-12 -- Phase 12 execution started
+Phase: 13 (3-step-proposal-wizard) — EXECUTING
+Plan: 2 of 6 (Plan 1 — Shared Wizard Primitives + i18n Delta — SHIPPED 2026-05-12)
+Status: Ready to execute Plan 2 (server actions: createOrResumeDraft / saveAsDraftAction / persistAccordionOpenAction / saveAndAdvanceAction)
+Last activity: 2026-05-12 -- Plan 13-01 shipped (4 wizard primitives + 45 wizard.* i18n keys × FR + EN)
 
 ## Progress
 
