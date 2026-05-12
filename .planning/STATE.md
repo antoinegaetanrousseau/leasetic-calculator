@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
 status: executing
-last_updated: "2026-05-12T19:06:46.246Z"
+last_updated: "2026-05-12T19:23:37.777Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 18
-  completed_plans: 14
-  percent: 78
+  completed_plans: 15
+  percent: 83
 ---
 
 # State — Matrice Commerciale
@@ -28,11 +28,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 13 (3-step-proposal-wizard) — EXECUTING
-Plan: 3 of 6 (Plans 1 + 2 SHIPPED 2026-05-12)
+Plan: 4 of 6 (Plans 1 + 2 + 3 SHIPPED 2026-05-12)
+
   - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
   - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
-Status: Ready to execute Plan 3 (step-1 parametres route — Wave 2 begins)
-Last activity: 2026-05-12 -- Plan 13-02 shipped (50 Vitest assertions, all PLAN.md grep contracts satisfied, ADMIN-09 structural barrier via finalize-helpers.ts)
+  - Plan 3 — Step-1 Paramètres Route + Form Card (page.tsx + ParametresFormCard + WizardStep1Wiring + 28 Vitest assertions; ADMIN-09 step-1 grep-clean)
+
+Status: Ready to execute Plan 4 (step-2 calcul route — Wave 2 continues)
+Last activity: 2026-05-12 -- Plan 13-03 shipped (28 Vitest assertions, full D-01..D-26 lifecycle on /proposals/new/parametres, ADMIN-09 step-1 surface grep-clean)
 
 ## Progress
 
