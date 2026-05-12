@@ -269,3 +269,134 @@ describe('Phase 8 i18n delta', () => {
     }
   });
 });
+
+// ── Phase 13 — 3-Step Proposal Wizard (Plan 13-01) ───────────────────────────
+//
+// New `wizard.*` namespace consumed by the 4 route-private wizard components
+// (WizardActionBar, PlusDeDetailsAccordion, PdfPreviewMock, RecapSection) and
+// by the 3 wizard step routes (plans 13-03/04/05). The compile-time
+// `_EnHasAllFrKeys` guard in dictionaries.ts catches FR↔EN drift; this suite
+// adds runtime non-empty + exact-value assertions for the locked copy in
+// 13-UI-SPEC.md §6.1–§6.8.
+
+const phase13WizardKeys: DictKey[] = [
+  // §6.1 Page titles + subtitles (6)
+  'wizard.step1.title',
+  'wizard.step1.subtitle',
+  'wizard.step2.title',
+  'wizard.step2.subtitle',
+  'wizard.step3.title',
+  'wizard.step3.subtitle',
+  // §6.2 Section bullet headers (7)
+  'wizard.section.informations.client',
+  'wizard.section.details.projet',
+  'wizard.section.parametres.saisis',
+  'wizard.section.detail.calcul',
+  'wizard.section.client',
+  'wizard.section.projet',
+  'wizard.section.calcul',
+  // §6.3 Wizard field-label overrides (2)
+  'wizard.field.client.co.label',
+  'wizard.field.client.name.label',
+  // §6.4 Accordion trigger (3)
+  'wizard.accordion.trigger',
+  'wizard.accordion.aria.label.open',
+  'wizard.accordion.aria.label.close',
+  // §6.5 Step-2 labels (10)
+  'wizard.step2.hero.label',
+  'wizard.step2.hero.sub',
+  'wizard.step2.chip.tranche',
+  'wizard.step2.row.amount',
+  'wizard.step2.row.commission',
+  'wizard.step2.row.commission.sublabel',
+  'wizard.step2.row.coefficient',
+  'wizard.step2.row.duration',
+  'wizard.step2.row.loyer.calculated',
+  'wizard.step2.error.incomplete',
+  // §6.6 Step-3 labels (5)
+  'wizard.step3.modifier.link',
+  'wizard.step3.pdf.title',
+  'wizard.step3.pdf.ref.line',
+  'wizard.step3.pdf.preview.aria',
+  'wizard.step3.pdf.loyer.label',
+  // §6.7 Action bar (7)
+  'wizard.action.previous',
+  'wizard.action.previous.aria',
+  'wizard.action.save.draft',
+  'wizard.action.step1.continue',
+  'wizard.action.step2.continue',
+  'wizard.action.step3.confirm',
+  'wizard.action.step3.confirm.spinner',
+  // §6.8 Toast strings (4)
+  'wizard.toast.save.draft.success',
+  'wizard.toast.finalize.success',
+  'wizard.toast.finalize.error',
+  'wizard.toast.validation.errors',
+  // Extra: save-draft error toast (added in Plan 13-01 Task 1 action to
+  // support the WizardActionBar onSaveDraft catch branch in Task 2).
+  'wizard.toast.draft.error',
+];
+
+describe('Phase 13 wizard i18n delta (Plan 13-01)', () => {
+  for (const key of phase13WizardKeys) {
+    it(`fr.${key} resolves non-empty`, () => {
+      expect(t(key, 'fr')).not.toBe('');
+      expect(t(key, 'fr').length).toBeGreaterThan(0);
+    });
+    it(`en.${key} resolves non-empty`, () => {
+      expect(t(key, 'en')).not.toBe('');
+      expect(t(key, 'en').length).toBeGreaterThan(0);
+    });
+  }
+
+  describe('locked exact-copy assertions (13-UI-SPEC.md §6.1–§6.8)', () => {
+    it('wizard.step1.title — FR exact', () => {
+      expect(t('wizard.step1.title', 'fr')).toBe('Paramètres du projet');
+    });
+    it('wizard.step1.title — EN exact', () => {
+      expect(t('wizard.step1.title', 'en')).toBe('Project parameters');
+    });
+    it('wizard.toast.save.draft.success — FR exact', () => {
+      expect(t('wizard.toast.save.draft.success', 'fr')).toBe('Brouillon enregistré ✓');
+    });
+    it('wizard.toast.save.draft.success — EN exact', () => {
+      expect(t('wizard.toast.save.draft.success', 'en')).toBe('Draft saved ✓');
+    });
+    it('wizard.step2.row.commission.sublabel — D-12 partner-facing parenthetical (FR)', () => {
+      expect(t('wizard.step2.row.commission.sublabel', 'fr')).toBe('(non visible client)');
+    });
+    it('wizard.step3.pdf.ref.line — D-15 literal LC-2026-XXX (FR + EN)', () => {
+      // D-15: the mock PDF reference MUST be the literal `LC-2026-XXX` (never
+      // digits, never timestamps) so it never collides with real allocated
+      // numeric lc_refs.
+      expect(t('wizard.step3.pdf.ref.line', 'fr')).toContain('LC-2026-XXX');
+      expect(t('wizard.step3.pdf.ref.line', 'en')).toContain('LC-2026-XXX');
+    });
+  });
+
+  describe('interpolation contract (Phase 13 wizard placeholders)', () => {
+    const phase13SingleArgKeys: DictKey[] = [
+      'wizard.step2.hero.sub',         // {0} = durationMonths
+      'wizard.step2.row.coefficient',  // {0} = tranche K€ band
+      'wizard.step3.pdf.ref.line',     // {0} = validityDays
+    ];
+    const phase13TwoArgKeys: DictKey[] = [
+      'wizard.step2.chip.tranche',     // {0} = tranche, {1} = coefficient%
+    ];
+
+    for (const key of phase13SingleArgKeys) {
+      it(`${key} contains {0} in fr + en`, () => {
+        expect(t(key, 'fr')).toContain('{0}');
+        expect(t(key, 'en')).toContain('{0}');
+      });
+    }
+    for (const key of phase13TwoArgKeys) {
+      it(`${key} contains {0} and {1} in fr + en`, () => {
+        expect(t(key, 'fr')).toContain('{0}');
+        expect(t(key, 'fr')).toContain('{1}');
+        expect(t(key, 'en')).toContain('{0}');
+        expect(t(key, 'en')).toContain('{1}');
+      });
+    }
+  });
+});
