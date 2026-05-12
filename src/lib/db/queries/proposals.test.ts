@@ -390,4 +390,19 @@ describe('softDeleteProposal + restoreProposal — D-08 status/deleted_at lockst
     expect(payload.status).toBe('active');
     expect(payload.deletedAt).toBeNull();
   });
+  // Regression: bug_001 — softDeleteProposal must exclude drafts to avoid
+  // violating proposals_finalized_completeness_check. The mocked DB can't
+  // evaluate the WHERE predicate, but we can assert the helper returns 0
+  // when no row matched (which is what real Postgres would return when the
+  // status='active' filter excludes a draft row).
+  it('softDeleteProposal returns 0 when no row matched (e.g. attempting to soft-delete a draft)', async () => {
+    mockState.returningResult = [];
+    const affected = await softDeleteProposal('draft-id', 'u1');
+    expect(affected).toBe(0);
+  });
+  it('restoreProposal returns 0 when no row matched (e.g. attempting to restore a non-deleted row)', async () => {
+    mockState.returningResult = [];
+    const affected = await restoreProposal('active-id', 'u1');
+    expect(affected).toBe(0);
+  });
 });
