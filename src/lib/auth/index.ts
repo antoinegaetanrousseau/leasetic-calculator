@@ -25,7 +25,38 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { admin } from 'better-auth/plugins/admin';
+import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+
+/**
+ * DB-02 / WR-AUDIT-01 closure (CONTEXT.md D-11). Writes
+ * users.last_login_at = now() for the given userId.
+ *
+ * Best-effort: logs but does NOT throw on DB error — login itself has already
+ * succeeded (Better Auth has set the session cookie) by the time the
+ * session.create.after hook calls this. A sustained pattern of failures
+ * indicates a real DB connectivity issue and will surface in Vercel logs.
+ *
+ * Powers the DB-02 'invited' partner derivation in listInvitedPartners
+ * (src/lib/db/queries/users.ts, plan 12-03): partners with last_login_at
+ * still NULL after this hook ships are the never-logged-in cohort.
+ *
+ * Exported for unit testing; production callers go through the
+ * session.create.after hook in createAuth() below.
+ */
+export async function updateLastLoginAt(userId: string): Promise<void> {
+  try {
+    await db()
+      .update(schema.users)
+      .set({ lastLoginAt: new Date() })
+      .where(eq(schema.users.id, userId));
+  } catch (err) {
+    // Best-effort: a transient DB error is logged but does NOT prevent the
+    // user from completing login. DB-02 derivation tolerates ephemeral lag —
+    // the partner will be re-classified on their next successful login.
+    console.error('[auth] failed to update users.last_login_at:', err);
+  }
+}
 
 function resolveBaseUrl(): string {
   // Prefer explicit APP_URL (works in dev + OVH portability).
@@ -113,6 +144,19 @@ function createAuth() {
           before: async (user) => ({
             data: { ...user, email: user.email.toLowerCase() },
           }),
+        },
+      },
+      // DB-02 / WR-AUDIT-01 closure (CONTEXT.md D-11). Phase 6 left
+      // users.last_login_at registered as an additionalField but never written;
+      // this hook closes that gap by writing on every successful login.
+      // Best-effort: see updateLastLoginAt() above for the failure contract.
+      // Fires on every login (not just the first) — supports future per-login
+      // analytics in addition to the DB-02 IS-NULL derivation.
+      session: {
+        create: {
+          after: async (session) => {
+            await updateLastLoginAt(session.userId);
+          },
         },
       },
     },
