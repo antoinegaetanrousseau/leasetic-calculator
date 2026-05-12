@@ -122,9 +122,9 @@ export default async function ProposalDetailPage({ params }: PageProps) {
               margin: 0,
             }}
           >
-            {t('proposal.detail.title', lang).replace('{0}', proposal.lcRef)}
+            {t('proposal.detail.title', lang).replace('{0}', proposal.lcRef ?? '')}
           </h1>
-          <CopyRefButton lcRef={proposal.lcRef} lang={lang} variant="inline" />
+          <CopyRefButton lcRef={proposal.lcRef ?? ''} lang={lang} variant="inline" />
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           {isDeleted ? (
@@ -347,7 +347,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
             {/* Download — same-origin <a download> (PROP-11, PROP-13) */}
             <a
               href={`/api/proposals/${proposal.id}/pdf`}
-              download={`Leasetic_Proposition_${proposal.lcRef}.pdf`}
+              download={`Leasetic_Proposition_${proposal.lcRef ?? 'proposal'}.pdf`}
               className="btn-green"
               style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
             >

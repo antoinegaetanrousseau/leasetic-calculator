@@ -145,7 +145,7 @@ export async function submitProposal(args: SubmitProposalArgs): Promise<SubmitPr
 
     const { buffer, sha256, sizeBytes } = await renderProposalPdf({
       data: {
-        lcRef: row.lcRef,
+        lcRef: row.lcRef!,
         language: row.language as 'fr' | 'en',
         createdAt: row.createdAt,
         inputs: input,
@@ -170,7 +170,7 @@ export async function submitProposal(args: SubmitProposalArgs): Promise<SubmitPr
       targetType: 'proposal',
       targetId: row.id,
       payload: {
-        lcRef: row.lcRef,
+        lcRef: row.lcRef!,
         language: row.language,
         schemaVersion: row.schemaVersion,
       },

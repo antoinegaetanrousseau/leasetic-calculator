@@ -100,10 +100,11 @@ describe('listInvitedPartners', () => {
       for (const k of Object.keys(row)) {
         expect(allowedKeys.has(k)).toBe(true);
       }
-      expect((row as Record<string, unknown>).commissionPct).toBeUndefined();
-      expect((row as Record<string, unknown>).commission_pct).toBeUndefined();
-      expect((row as Record<string, unknown>).password).toBeUndefined();
-      expect((row as Record<string, unknown>).passwordHash).toBeUndefined();
+      const indexed = row as unknown as Record<string, unknown>;
+      expect(indexed.commissionPct).toBeUndefined();
+      expect(indexed.commission_pct).toBeUndefined();
+      expect(indexed.password).toBeUndefined();
+      expect(indexed.passwordHash).toBeUndefined();
     }
   });
 });
