@@ -61,7 +61,9 @@ export async function buildListResponse(args: BuildListParams): Promise<ListResp
   return {
     rows: result.rows.map((row) => ({
       id: row.id,
-      lcRef: row.lcRef,
+      // Active rows (filtered by status='active' in the helper) always have lcRef
+      // set per proposals_finalized_completeness_check (Phase 12 D-04).
+      lcRef: row.lcRef!,
       clientCo: typeof (row.inputs as { clientCo?: unknown })?.clientCo === 'string'
         ? (row.inputs as { clientCo: string }).clientCo
         : '',

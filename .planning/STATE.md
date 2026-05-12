@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
-status: completed
-last_updated: "2026-05-11T20:54:09.303Z"
-last_activity: 2026-05-11 -- Phase 11 marked complete
+status: executing
+last_updated: "2026-05-12T12:10:02.030Z"
+last_activity: 2026-05-12 -- Phase 12 execution started
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
-  percent: 20
+  completed_phases: 2
+  total_plans: 12
+  completed_plans: 12
+  percent: 100
 ---
 
 # State — Matrice Commerciale
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 11 — design-system-foundation-brand-assets
+**Current focus:** Phase 12 — schema-extensions-for-drafts-history
 
 ## Current Position
 
-Phase: 11 — COMPLETE
-Plan: 5 of 5
-Status: Phase 11 complete
-Last activity: 2026-05-11 -- Phase 11 marked complete
+Phase: 12 (schema-extensions-for-drafts-history) — EXECUTING
+Plan: 1 of 7
+Status: Executing Phase 12
+Last activity: 2026-05-12 -- Phase 12 execution started
 
 ## Progress
 

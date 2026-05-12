@@ -83,3 +83,51 @@ export async function listPartnersWithCounts(): Promise<PartnerWithCount[]> {
     hasUnredeemedInvite: unredeemedSet.has(r.id),
   }));
 }
+
+// ── Phase 12 — DB-02: derived "invited" partner status ──────────────────────
+
+export interface InvitedPartnerRow {
+  id: string;
+  email: string;
+  displayName: string | null;
+  name: string;
+  language: string;
+  createdAt: Date;
+}
+
+/**
+ * DB-02 per 12-CONTEXT.md D-10. `invited` = `role='partner' AND deleted_at
+ * IS NULL AND last_login_at IS NULL` — fully derived from existing columns;
+ * no new schema column on `users`. Closure depends on plan 12-07 writing
+ * `users.last_login_at` on every successful login (WR-AUDIT-01 / Phase 6
+ * follow-up #3); without that, every partner forever appears as `invited`.
+ *
+ * ADMIN-09: this query MUST NOT select commission_pct or any password column.
+ * The returned shape is bounded above to id / email / displayName / name /
+ * language / createdAt — narrower than `PartnerWithCount`.
+ *
+ * No pagination — admin partner list is bounded (revisit only if it grows
+ * past ~200; CONTEXT recommendation).
+ */
+export async function listInvitedPartners(): Promise<InvitedPartnerRow[]> {
+  const dbi = db();
+  const rows = await dbi
+    .select({
+      id: schema.users.id,
+      email: schema.users.email,
+      displayName: schema.users.displayName,
+      name: schema.users.name,
+      language: schema.users.language,
+      createdAt: schema.users.createdAt,
+    })
+    .from(schema.users)
+    .where(
+      and(
+        eq(schema.users.role, 'partner'),
+        isNull(schema.users.deletedAt),
+        isNull(schema.users.lastLoginAt),
+      ),
+    )
+    .orderBy(desc(schema.users.createdAt));
+  return rows;
+}
