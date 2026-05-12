@@ -52,8 +52,13 @@ export function Shell({
       ? {
           home: `/${adminSegment}`,
           coefficients: `/${adminSegment}/coefficients`,
-          partners: `/${adminSegment}/partners`,
-          history: `/${adminSegment}/history`,
+          // Phase 11 anticipated a Phase 14 rename to /partners but the route still
+          // lives at /accounts (Phase 9). Point at the existing route until Phase 14
+          // ships the dedicated /partners + /partners/new surfaces (ROUTE-02).
+          partners: `/${adminSegment}/accounts`,
+          // History route does not exist yet — Phase 14 will surface coefficient
+          // history INSIDE /coefficients (sidebar). Point here until then.
+          history: `/${adminSegment}/coefficients`,
         }
       : undefined;
 
