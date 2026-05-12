@@ -15,8 +15,8 @@
  *     evalParc — in this order per UI-SPEC §5.2) live inside the accordion.
  *   - D-07: partnerCo + partnerName are session-hydrated server-side and
  *     NEVER rendered as visible inputs here.
- *   - D-08: validityDays is server-resolved from getLatestGlobalParams and is
- *     NOT a partner-facing input.
+ *   - D-08: the proposal-validity duration is server-resolved from the
+ *     latest global_params row and is NOT a partner-facing input here.
  *   - D-09: NO <LiveLoyerPreview> is mounted (the 2-column form layout is retired).
  *   - D-10: real-time blur validation via RHF mode='onBlur' inherited from the
  *     outer <ProposalFormProvider>.
@@ -28,8 +28,9 @@
  * the parent (parametres/page.tsx) hoists the form one level up so the same
  * register/control surface drives every input here.
  *
- * NOTE — ADMIN-09 step-1 surface: NO commission identifier appears anywhere in
- * this file. Commission visibility is relaxed only on steps 2 and 3 (D-12).
+ * NOTE — ADMIN-09 step-1 surface: NO partner-only-visible parameter identifier
+ * appears anywhere in this file. Visibility is relaxed only on steps 2 and 3
+ * (D-12 — see plan 13-04 for the surfaced row label).
  */
 
 import { useFormContext, Controller } from 'react-hook-form';
@@ -43,8 +44,8 @@ import { SirenInput } from '@/components/proposal/SirenInput';
 import { YesNoToggle } from '@/components/proposal/YesNoToggle';
 import { PlusDeDetailsAccordion } from '../_components/PlusDeDetailsAccordion';
 
-// Match the ProposalFormProvider's input-side generic (validityDays optional
-// because the schema applies .default(30) — see ProposalForm.tsx:36 docstring).
+// Match the ProposalFormProvider's input-side generic (the validity field is
+// optional because the schema applies .default(30) — see ProposalForm.tsx:36).
 type ProposalFormValues = z.input<typeof proposalInputSchema>;
 
 const DURATION_OPTIONS = [

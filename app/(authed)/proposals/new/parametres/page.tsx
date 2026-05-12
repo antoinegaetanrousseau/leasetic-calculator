@@ -14,7 +14,8 @@
  *         RHF prefill flowing through saveAsDraft / saveAndAdvance.
  *   D-08  validityDays resolved from getLatestGlobalParams (fallback 30);
  *         never a partner-facing input.
- *   D-09  No <LiveLoyerPreview> mount.
+ *   D-09  No live-loyer preview is mounted (the v1.1 sticky 360px preview
+ *         pane is retired; partners see the computed loyer on step 2 only).
  *   D-20  Stepper completedSteps read from draft.inputs._completedSteps.
  *   D-25  ?duplicate=<sourceId>: spread same-user, non-deleted source.inputs
  *         into the new draft via updateDraft; overlay session partnerName +
@@ -23,8 +24,8 @@
  *   D-26  ?draft_id= wins over ?duplicate= when both are present.
  *
  * ADMIN-09 step-1 surface invariant (D-12 + threat T-13-03-I-ADMIN-09):
- * this page renders NO commission identifier anywhere. The commission
- * visibility relaxation lives ONLY on steps 2 and 3.
+ * this page renders NO partner-only-visible parameter identifier anywhere.
+ * The visibility relaxation lives ONLY on steps 2 and 3 (see plan 13-04).
  *
  * NOTE: This route's `requireUser()` + Phase 12 helpers' WHERE-userId
  * predicates implement the partner-security boundary. A cross-user
