@@ -279,7 +279,8 @@ describe('finalizeDraft', () => {
     mockState.returningResult = [{ id: 'p1', userId: 'u1' }];
     await finalizeDraft('p1', 'u1', finalArgs);
     expect(mockWriteAuditLog).toHaveBeenCalledTimes(1);
-    const arg = mockWriteAuditLog.mock.calls[0]?.[0] as Record<string, unknown>;
+    const callArgs = mockWriteAuditLog.mock.calls[0] as unknown as [Record<string, unknown>];
+    const arg = callArgs[0];
     expect(arg.action).toBe('proposal.create');
     expect(arg.actorId).toBe('u1');
     expect(arg.targetType).toBe('proposal');
