@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
 status: executing
-last_updated: "2026-05-12T18:49:00.404Z"
+last_updated: "2026-05-12T19:06:46.246Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 18
-  completed_plans: 13
-  percent: 72
+  completed_plans: 14
+  percent: 78
 ---
 
 # State — Matrice Commerciale
@@ -28,9 +28,11 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 13 (3-step-proposal-wizard) — EXECUTING
-Plan: 2 of 6 (Plan 1 — Shared Wizard Primitives + i18n Delta — SHIPPED 2026-05-12)
-Status: Ready to execute Plan 2 (server actions: createOrResumeDraft / saveAsDraftAction / persistAccordionOpenAction / saveAndAdvanceAction)
-Last activity: 2026-05-12 -- Plan 13-01 shipped (4 wizard primitives + 45 wizard.* i18n keys × FR + EN)
+Plan: 3 of 6 (Plans 1 + 2 SHIPPED 2026-05-12)
+  - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
+  - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
+Status: Ready to execute Plan 3 (step-1 parametres route — Wave 2 begins)
+Last activity: 2026-05-12 -- Plan 13-02 shipped (50 Vitest assertions, all PLAN.md grep contracts satisfied, ADMIN-09 structural barrier via finalize-helpers.ts)
 
 ## Progress
 

@@ -83,7 +83,7 @@ Which phase covers which requirement. Updated during roadmap creation.
 | DB-01 | Phase 12 | Pending |
 | DB-02 | Phase 12 | Pending |
 | DB-03 | Phase 12 | Pending |
-| ROUTE-01 | Phase 13 | Pending |
+| ROUTE-01 | Phase 13 | In Progress (server actions + finalize API shipped by 13-02; route pages ship in Wave 2 plans 13-03/04/05) |
 | ROUTE-02 | Phase 14 | Pending |
 | COMP-01 | Phase 11 | Pending |
 | COMP-02 | Phase 11 | Pending |
