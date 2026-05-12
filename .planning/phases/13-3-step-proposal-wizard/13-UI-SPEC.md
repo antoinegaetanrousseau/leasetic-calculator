@@ -1,10 +1,11 @@
 ---
 phase: 13
 slug: 3-step-proposal-wizard
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-12
+reviewed_at: 2026-05-12
 milestone: v1.2
 figma_file_key: vwOzirhL0vyxDWq4m6t4gC
 figma_url: https://www.figma.com/design/vwOzirhL0vyxDWq4m6t4gC/
