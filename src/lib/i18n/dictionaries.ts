@@ -580,8 +580,10 @@ export const dictionaries = {
     'wizard.step2.row.loyer.calculated': 'Loyer mensuel calculé',
     'wizard.step2.error.incomplete': "Données du projet incomplètes — retournez à l'étape 1 pour les compléter.",
     // §6.6 Step-3 specific labels
-    // D-15: ref line MUST use literal `LC-2026-XXX` (never digits, never
-    // timestamps) so it never collides with real allocated numeric lc_refs.
+    // D-15: the partner-facing mock reference placeholder is baked into
+    // this dictionary string (never digits, never timestamps) so it never
+    // collides with real allocated numeric lc_refs. Do NOT change this
+    // string without revisiting the D-15 / plan-13-06 golden-PDF test.
     'wizard.step3.modifier.link': '← Modifier',
     'wizard.step3.pdf.title': 'Proposition de financement',
     'wizard.step3.pdf.ref.line': 'Réf. LC-2026-XXX · {0} jours de validité',
@@ -1144,7 +1146,7 @@ export const dictionaries = {
     'wizard.step2.row.duration': 'Contract duration',
     'wizard.step2.row.loyer.calculated': 'Calculated monthly rent',
     'wizard.step2.error.incomplete': 'Project data incomplete — return to step 1 to complete it.',
-    // §6.6 Step-3 specific labels (D-15 — literal LC-2026-XXX)
+    // §6.6 Step-3 specific labels (D-15 — see FR block for full rationale)
     'wizard.step3.modifier.link': '← Edit',
     'wizard.step3.pdf.title': 'Financing proposal',
     'wizard.step3.pdf.ref.line': 'Ref. LC-2026-XXX · {0}-day validity',
