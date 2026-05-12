@@ -12,20 +12,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // server-only is mocked because we're running outside Next bundler.
 vi.mock('server-only', () => ({}));
 
-// Mock next/navigation's redirect — never actually navigate during tests.
-const redirectMock = vi.fn((path: string) => {
-  // mimic real redirect() behavior: it throws to halt execution
-  throw new Error(`NEXT_REDIRECT:${path}`);
-});
+// vi.hoisted: vi.mock factories are hoisted to the top of the module; any
+// vars they reference must be hoisted too. Pattern from src/lib/db/queries/proposals.test.ts.
+const { redirectMock, requireUserMock, getDraftByIdMock, updateDraftMock } = vi.hoisted(() => ({
+  redirectMock: vi.fn((path: string) => {
+    // mimic real redirect() behavior: it throws to halt execution
+    throw new Error(`NEXT_REDIRECT:${path}`);
+  }),
+  requireUserMock: vi.fn(),
+  getDraftByIdMock: vi.fn(),
+  updateDraftMock: vi.fn(),
+}));
+
 vi.mock('next/navigation', () => ({ redirect: redirectMock }));
-
-// Mock requireUser — return a synthetic session or throw on unauth.
-const requireUserMock = vi.fn();
 vi.mock('@/lib/auth/require', () => ({ requireUser: requireUserMock }));
-
-// Mock the draft helpers + getDraftById + updateDraft from proposals.ts.
-const getDraftByIdMock = vi.fn();
-const updateDraftMock = vi.fn();
 vi.mock('@/lib/db/queries/proposals', () => ({
   getDraftById: (...args: unknown[]) => getDraftByIdMock(...args),
   updateDraft: (...args: unknown[]) => updateDraftMock(...args),

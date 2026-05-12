@@ -9,15 +9,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-const redirectMock = vi.fn((path: string) => {
-  throw new Error(`NEXT_REDIRECT:${path}`);
-});
+const { redirectMock, requireUserMock, updateDraftMock } = vi.hoisted(() => ({
+  redirectMock: vi.fn((path: string) => {
+    throw new Error(`NEXT_REDIRECT:${path}`);
+  }),
+  requireUserMock: vi.fn(),
+  updateDraftMock: vi.fn(),
+}));
+
 vi.mock('next/navigation', () => ({ redirect: redirectMock }));
-
-const requireUserMock = vi.fn();
 vi.mock('@/lib/auth/require', () => ({ requireUser: requireUserMock }));
-
-const updateDraftMock = vi.fn();
 vi.mock('@/lib/db/queries/proposals', () => ({
   updateDraft: (...args: unknown[]) => updateDraftMock(...args),
 }));
