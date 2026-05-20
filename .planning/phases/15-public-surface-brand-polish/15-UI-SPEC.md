@@ -1,10 +1,11 @@
 ---
 phase: 15
 slug: public-surface-brand-polish
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-21
+reviewed_at: 2026-05-21
 milestone: v1.2
 figma_file_key: vwOzirhL0vyxDWq4m6t4gC
 figma_url: https://www.figma.com/design/vwOzirhL0vyxDWq4m6t4gC/
