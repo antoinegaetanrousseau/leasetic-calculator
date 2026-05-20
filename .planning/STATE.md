@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
-status: verifying
-last_updated: "2026-05-12T20:07:26.020Z"
-last_activity: 2026-05-12
+status: completed
+last_updated: "2026-05-20T17:50:26.588Z"
+last_activity: 2026-05-12 — Plan 13-06 shipped (9 stepperBehavior + 36 no-commission + STRIDE addendum + smoke runbook; ROUTE-01 structurally satisfied)
 progress:
   total_phases: 5
   completed_phases: 3

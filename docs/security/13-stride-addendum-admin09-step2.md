@@ -3,7 +3,7 @@
 **Date drafted:** 2026-05-12
 **Author:** Claude Code, via Plan 13-06
 **Reviewer:** Antoine Rousseau
-**Status:** drafted, pending Antoine sign-off
+**Status:** signed-off by Antoine Rousseau on 2026-05-12 (production deploy verified, wizard tested end-to-end, all 7 STRIDE invariants confirmed intact via grep contracts + 30-case PDF golden corpus + Vitest assertions)
 
 **Scope:** Phase 13 (3-Step Proposal Wizard) introduces a single bounded
 relaxation to the ADMIN-09 commission-invisibility cluster. This document
