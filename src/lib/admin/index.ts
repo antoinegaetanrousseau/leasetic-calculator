@@ -20,8 +20,10 @@ export type {
 export {
   coeffEditorSchema,
   createPartnerSchema,
+  createPartnerFormSchema,
 } from './schemas';
 export type {
   CoeffEditorValues,
   CreatePartnerValues,
+  CreatePartnerFormValues,
 } from './schemas';

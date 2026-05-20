@@ -54,3 +54,41 @@ export const createPartnerSchema = z.object({
 });
 
 export type CreatePartnerValues = z.infer<typeof createPartnerSchema>;
+
+/**
+ * Phase 14 — /partners/new route 7-field form schema (UI-SPEC §5.1).
+ *
+ * Distinct from `createPartnerSchema` above (D-10 keeps CreatePartnerModal.tsx
+ * as shelf code with its legacy 3-field shape). Both schemas coexist; the
+ * server-side adminCreateInvitation accepts the union of both shapes via
+ * optional fields.
+ *
+ * Validation rules (UI-SPEC §5.1):
+ *   - firstName/lastName: required, 1–100 chars
+ *   - email: required, RFC-format
+ *   - companyName: required, 1–200 chars
+ *   - siret: OPTIONAL — empty string OR exactly 14 digits
+ *   - phone: required, 6–20 chars from [0-9 +()-]
+ *   - invitationMessage: OPTIONAL, max 1000 chars
+ */
+export const createPartnerFormSchema = z.object({
+  firstName: z.string().min(1, 'error.field.required').max(100),
+  lastName: z.string().min(1, 'error.field.required').max(100),
+  email: z
+    .string()
+    .min(1, 'error.field.required')
+    .email('error.field.email.invalid'),
+  companyName: z.string().min(1, 'error.field.required').max(200),
+  siret: z
+    .string()
+    .regex(/^\d{14}$/, 'error.field.siret.invalid')
+    .optional()
+    .or(z.literal('')),
+  phone: z
+    .string()
+    .min(1, 'error.field.required')
+    .regex(/^[\d\s+()-]{6,20}$/, 'error.field.phone.invalid'),
+  invitationMessage: z.string().max(1000, 'partners.new.message.tooLong').optional(),
+});
+
+export type CreatePartnerFormValues = z.infer<typeof createPartnerFormSchema>;

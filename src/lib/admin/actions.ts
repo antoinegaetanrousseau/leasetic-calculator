@@ -176,13 +176,48 @@ export async function adminReEnableUser(userId: string): Promise<void> {
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 export interface AdminCreateInvitationArgs {
+  // Existing (still required for backward-compat with CreatePartnerModal — D-10).
   email: string;
   displayName: string;
   language: 'fr' | 'en';
+  // Phase 14 extension (UI-SPEC §5.1) — OPTIONAL so the modal call site keeps working.
+  // Persisted into the audit_log payload under a `profile` sub-key (empty values dropped).
+  // ADMIN-09 (D-09-09b) preserved: none of these are commission/rate fields.
+  firstName?: string;
+  lastName?: string;
+  companyName?: string;
+  siret?: string;
+  phone?: string;
+  invitationMessage?: string;
 }
 
 export interface AdminCreateInvitationResult extends InviteResult {
   userId: string;
+}
+
+/**
+ * Build the Phase 14 `profile` sub-key for audit_log payloads — empty
+ * strings + undefined are dropped (decision: empty = "not provided").
+ */
+function buildProfilePayload(
+  args: AdminCreateInvitationArgs,
+): Record<string, string> {
+  const profile: Record<string, string> = {};
+  const fields: Array<keyof AdminCreateInvitationArgs> = [
+    'firstName',
+    'lastName',
+    'companyName',
+    'siret',
+    'phone',
+    'invitationMessage',
+  ];
+  for (const f of fields) {
+    const v = args[f];
+    if (typeof v === 'string' && v.length > 0) {
+      profile[f] = v;
+    }
+  }
+  return profile;
 }
 
 /**
@@ -214,6 +249,14 @@ export async function adminCreateInvitation(
       .set({ language: args.language })
       .where(eq(schema.users.id, userRow.id));
 
+    // Phase 14: persist the /partners/new extended fields under a `profile`
+    // sub-key (UI-SPEC §5.1). Empty values are dropped (decision: empty =
+    // "not provided"). When the legacy 3-field call site (CreatePartnerModal,
+    // D-10 shelf code) invokes this, `profile` is an empty {} and is
+    // omitted from the payload below — preserving the legacy shape.
+    const profile = buildProfilePayload(args);
+    const profilePart = Object.keys(profile).length > 0 ? { profile } : {};
+
     // Two audit writes — both required by ADMIN-08:
     //   1. user.create (the partner row exists / was re-enabled)
     //   2. invitation.create (the one-time URL was issued)
@@ -222,16 +265,29 @@ export async function adminCreateInvitation(
       action: 'user.create',
       targetType: 'user',
       targetId: null,
-      payload: { userId: userRow.id, email: lowered, displayName: args.displayName, language: args.language },
+      payload: {
+        userId: userRow.id,
+        email: lowered,
+        displayName: args.displayName,
+        language: args.language,
+        ...profilePart,
+      },
       // D-09-09b: ADMIN-09 redaction — this payload intentionally excludes financial rate fields.
+      // Phase 14: the `profile` sub-key contains PII (name/company/phone/SIRET/message), NOT
+      // commission/rate values; the redaction note still holds.
     });
     await writeAuditLog({
       actorId: session.user.id,
       action: 'invitation.create',
       targetType: 'user',
       targetId: null,
-      payload: { userId: userRow.id, email: lowered },
+      payload: {
+        userId: userRow.id,
+        email: lowered,
+        ...profilePart,
+      },
       // D-09-09b: ADMIN-09 redaction — this payload intentionally excludes financial rate fields.
+      // Phase 14: same PII-only `profile` sub-key as above; ADMIN-09 invariant preserved.
     });
     return { ...result, userId: userRow.id };
   } catch (e) {
