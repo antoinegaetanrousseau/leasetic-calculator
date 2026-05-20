@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
-import { getLatestGlobalParams, listGlobalParamsHistory } from '@/lib/db/queries';
+import { getLatestGlobalParams } from '@/lib/db/queries';
 import { CoefficientsEditor } from './CoefficientsEditor';
 import { ExplainTool } from './ExplainTool';
-import { HistoryTable } from './HistoryTable';
+import { CoefficientHistorySidebar } from './CoefficientHistorySidebar';
 import { SeedBanner } from './SeedBanner';
 import { seedParams } from '@/lib/calc/seed-params';
 import type { Coefficients } from '@/lib/calc/coefficients';
@@ -35,7 +35,7 @@ interface PageProps {
 
 export default async function CoefficientsPage({ params }: PageProps) {
   // PITFALL §1.1 — params is async in Next.js 16.
-  await params;
+  const { adminSegment } = await params;
 
   // AUTH-15 — independent requireAdmin call (defense in depth even though layout already gates).
   await requireAdmin();
@@ -50,7 +50,6 @@ export default async function CoefficientsPage({ params }: PageProps) {
       'global_params seed missing — run scripts/build-seed-sql.ts and re-deploy.',
     );
   }
-  const initialHistory = await listGlobalParamsHistory({ limit: 20 });
 
   // D-10-14: server-side deep-equal of latest coefficients vs seedParams.coefficients.
   // Uses leaf-value comparison (coefficientsEqual) to avoid JSONB key-order assumptions —
@@ -60,8 +59,15 @@ export default async function CoefficientsPage({ params }: PageProps) {
     seedParams.coefficients,
   );
 
+  // Plan 14-04 D-17 / UI-SPEC §5.6 — 2-column layout at max-width 1040px:
+  //   - Left column (minmax(0, 1fr)): editor + ExplainTool (Phase 9
+  //     HistoryTable JSX usage REMOVED per UI-SPEC §5.6 ruling — the
+  //     HistoryTable.tsx file stays on disk, only the page-level mount
+  //     is removed).
+  //   - Right column (360px fixed): CoefficientHistorySidebar (5 most-recent
+  //     coefficient_history rows + footer link to /<seg>/history).
   return (
-    <div>
+    <div style={{ maxWidth: 1040, margin: '0 auto' }}>
       <SeedBanner lang={lang} visible={isStillSeed} />
       <h1
         style={{
@@ -83,16 +89,20 @@ export default async function CoefficientsPage({ params }: PageProps) {
         {t('admin.coefficients.page.sub', lang)}
       </p>
 
-      <CoefficientsEditor lang={lang} latestParams={latestParams} />
-
-      <ExplainTool lang={lang} latestParams={latestParams} />
-
-      <HistoryTable
-        lang={lang}
-        initialRows={initialHistory.rows}
-        initialHasMore={initialHistory.hasMore}
-        initialNextCursor={initialHistory.nextCursor}
-      />
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) 360px',
+          gap: 24,
+          alignItems: 'start',
+        }}
+      >
+        <div>
+          <CoefficientsEditor lang={lang} latestParams={latestParams} />
+          <ExplainTool lang={lang} latestParams={latestParams} />
+        </div>
+        <CoefficientHistorySidebar lang={lang} adminSegment={adminSegment} />
+      </div>
     </div>
   );
 }
