@@ -131,7 +131,8 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   3. Language and theme toggles remain in the top-right of all 3 public routes (different from authed/admin where they moved into the `RetractableSidebar`)
   4. All 3 public routes share a single reusable `(public)` layout component — verified by grep: the logo + paper-bg pattern is not duplicated across 3 files
   5. Manual smoke: opening each of the 3 routes under both `[data-theme=light]` and `[data-theme=dark]` shows the correct logo variant (mark `#6DC388`, theme-correct wordmark ink); no flash of unstyled content on reload
-**Plans**: TBD
+**Plans**: 1 plan
+  - [ ] 15-01-PLAN.md — Swap plain-text "Leasétic" header in app/(public)/layout.tsx for `<BrandLogo className="public-page-logo" />` + append `.public-page-logo` CSS (clamp 140px/50vw/200px) to app/globals.css + add 1 Vitest layout test (PUB-01, PUB-02)
 **UI hint**: yes
 
 ## Progress
@@ -152,8 +153,8 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 12. Schema Extensions for Drafts + History | v1.2 | 7/7 | Complete | 2026-05-12 |
 | 13. 3-Step Proposal Wizard | v1.2 | 6/6 | Ready for Verification | 2026-05-12 |
 | 14. Admin Polish — Partners + History + Home | v1.2 | 5/6 | In Progress|  |
-| 15. Public Surface Brand Polish | v1.2 | 0/0 | Not started | — |
+| 15. Public Surface Brand Polish | v1.2 | 0/1 | Planned | — |
 
 ---
 
-*Last updated: 2026-05-20 after Phase 14 planning (6 plans across 3 waves; ROUTE-02 with partner-home tile deferral to v1.3 and scope-inflated /history standalone route per CONTEXT.md). v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
+*Last updated: 2026-05-21 after Phase 15 planning (1 plan, 1 TDD task — RED test + GREEN implementation; lightweight shell-only swap closing PUB-01 + PUB-02). v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
