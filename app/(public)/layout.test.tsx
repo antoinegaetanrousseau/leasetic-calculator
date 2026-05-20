@@ -14,7 +14,7 @@
  *   Future planners adding tests for `(authed)` or `(admin)` async server
  *   layouts can follow this same recipe.
  */
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 
@@ -48,13 +48,12 @@ vi.mock('@/components/LocaleToggle', () => ({
   ),
 }));
 
-// eslint-disable-next-line import/first
 import PublicLayout from './layout';
 
 afterEach(() => cleanup());
 
 async function renderPublicLayout(children: ReactNode = <div data-testid="child" />) {
-  const ui = (await PublicLayout({ children })) as JSX.Element;
+  const ui = (await PublicLayout({ children })) as ReactElement;
   return render(ui);
 }
 

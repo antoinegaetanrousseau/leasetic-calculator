@@ -1,6 +1,7 @@
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LocaleToggle } from '@/components/LocaleToggle';
 import { getCurrentLang, getCurrentTheme, t } from '@/lib/i18n';
+import { BrandLogo } from '@/components/ui/BrandLogo';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,19 +54,13 @@ export default async function PublicLayout({ children }: { children: React.React
         <ThemeToggle current={theme} />
       </div>
 
-      {/* Leasétic logo — displayed above the card, weight 700, 22px, color --navy */}
-      <div
-        style={{
-          fontWeight: 700,
-          color: 'var(--navy)',
-          fontSize: 22,
-          marginBottom: 16,
-          userSelect: 'none',
-        }}
-      >
-        {/* Brand name — from dictionary (sidebar.brand = 'Leasétic', same in FR + EN) */}
-        {t('sidebar.brand', lang)}
-      </div>
+      {/* Phase 15 — Leasétic SVG logo lockup (PUB-01, PUB-02). The CSS class
+          on the JSX below is matched by a rule in globals.css that drives
+          responsive sizing via clamp(140px, 50vw, 200px); the Phase 11
+          brand-logo CSS picker (lines 543-545) hides whichever variant does
+          not match html[data-theme]. Non-interactive brand anchor — NOT
+          wrapped in <Link>, per UI-SPEC §6.1 AC-15-BL-06. */}
+      <BrandLogo className="public-page-logo" alt={t('sidebar.brand', lang)} />
 
       {/* Page content: login form / set-password form / expired-token card */}
       {children}

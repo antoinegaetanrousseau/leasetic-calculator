@@ -549,3 +549,16 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
   outline: none;
   box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
 }
+
+/* === Phase 15 public-page logo sizing (PUB-01, PUB-02 — UI-SPEC §6.3, D-08) === */
+.public-page-logo {
+  width: clamp(140px, 50vw, 200px);
+  height: auto;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.public-page-logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
