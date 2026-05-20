@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
   },
   // Pin generateBuildId to git SHA for OVH parity (per STACK.md §1)
   generateBuildId: async () => process.env.GIT_COMMIT_SHA ?? 'dev-build',
+  async redirects() {
+    return [
+      // D-02: 308 permanent redirect for v1.1 bookmarks
+      {
+        source: '/:adminSegment/accounts/:path*',
+        destination: '/:adminSegment/partners/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
