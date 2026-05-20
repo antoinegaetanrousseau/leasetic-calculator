@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
 status: executing
-last_updated: "2026-05-20T20:32:23.000Z"
-last_activity: 2026-05-20 -- Phase 14 plan 03 complete (admin home redesign: 3 AdminNavCards + 9 i18n keys)
+last_updated: "2026-05-20T22:47:00.000Z"
+last_activity: 2026-05-20 -- Phase 14 plan 04 complete (coefficient history sidebar + shared CoefficientDiffPanel + 2-col /coefficients layout + 10 i18n keys)
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 24
-  completed_plans: 21
-  percent: 88
+  completed_plans: 22
+  percent: 92
 ---
 
 # State — Matrice Commerciale
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 14 (admin-polish-partners-history-home) — EXECUTING
-Plan: 4 of 6 (plans 01-03 complete 2026-05-20)
+Plan: 5 of 6 (plans 01-04 complete 2026-05-20)
 
   - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
   - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
@@ -47,6 +47,7 @@ Last activity: 2026-05-20
 | 14-01 | ~12min | 2 | 9 (4 renames + 5 modified) (+ SUMMARY) |
 | 14-02 | ~28min | 2 | 11 (4 created src + 3 modified src + 4 test files) (+ SUMMARY) |
 | 14-03 | ~17min | 1 (TDD) | 3 (1 created test + 2 modified src) (+ SUMMARY) |
+| 14-04 | ~22min | 2 (TDD) | 7 (5 created src + 2 modified src) (+ SUMMARY) |
 
 ## Phase 13 Performance Metrics
 
@@ -225,6 +226,11 @@ v1.1 ████████████████████ 6/6 phases com
 | Mock-child-by-prop-capture testing pattern for admin server-component pages: mock `<AdminNavCard>` to render a `<div>` with each prop projected as `data-*` attribute. Page test asserts only wiring (variant/href/icon/title), leaves chrome assertions to `AdminNavCard.test.tsx`. Separation of concerns | 14-03 test design | 14-03 |
 | Phase 9 legacy i18n keys (`admin.home.coefficients.*`, `admin.home.accounts.*`) retained as dead-but-harmless after 14-03 replaces the consumer. Removal would force a coordinated FR+EN diff for zero functional gain; `_EnHasAllFrKeys` parity proof still typechecks with them present. Future cleanup at planner discretion | 14-03 i18n cleanup decision | 14-03 |
 | JSDoc prose-only references to JSX literals: a docstring saying "three `<AdminNavCard>` instances" inflates the plan's `grep -c '<AdminNavCard'` verification gate from 3 (correct JSX count) to 4 (JSX + docstring). Replace with prose "three AdminNavCard instances" to keep the grep gate honest while preserving documentation clarity | 14-03 grep-gate maintenance | 14-03 |
+| Shared `<CoefficientDiffPanel>` with `mode: 'condensed' \| 'full'` prop (single source of truth for sidebar inline expansion AND Plan 14-05 standalone `/history`). Avoids two near-identical layouts at the cost of one `mode` branch inside the component. Located under `history/` (not `coefficients/`) — Plan 14-05's primary consumer dictates the home directory | 14-04 component location + API | 14-04 |
+| `computeDiffPairs` reuse vs fresh flatten in CoefficientDiffPanel: chose FRESH flatten. Reason: Phase 9's `computeDiffPairs` returns ONLY changed pairs (it's a diff-by-design that filters before === after); UI-SPEC §5.4 requires ALL 15 rows (3 scalars + 12 coefficient cells) always rendered with an `isChanged` flag per row for the gold-tint. Rewriting `computeDiffPairs` would have broken its existing HistoryTable.tsx consumer (`pairs.length === 0 ⇒ no changes`). The fresh flatten (~30 LOC) is isolated; the Phase 9 helper stays untouched | 14-04 implementation choice | 14-04 |
+| Per-row `useState` expansion in CoefficientHistorySidebarRow (multi-expand per D-20). Differs from Plan 14-05's `/history` route (D-25 single-active) which lifts state to the list parent. Sidebar can afford per-row state because the row count is bounded at 5; `/history` may have 20+ rows so single-active matches the vertical-rhythm needs of UI-SPEC §5.3 | 14-04 D-20 vs D-25 contrast | 14-04 |
+| `stopPropagation` on the expanded CoefficientDiffPanel wrapper inside the parent row's `role="button"` container — clicks/keys inside the panel must NOT bubble to the row's onClick (which would re-toggle the row closed). Keeps the click-toggle semantics intact without lifting state | 14-04 nested-interactive pattern | 14-04 |
+| D-30 admin-only commission exception pinned by test (Test 8 in CoefficientDiffPanel.test.tsx asserts the panel renders `5.00%` + `5.50%`). A future regression that strips commission from the diff panel will fail loudly. Both consumer surfaces (`/coefficients` sidebar + `/history`) are gated by `requireAdmin()` upstream | 14-04 STRIDE T-14-04-02 mitigation | 14-04 |
 
 ## Session Notes
 
