@@ -42,7 +42,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] **Phase 12: Schema Extensions for Drafts + History** ✅ shipped 2026-05-12 — `draft` proposal status, `invited` partner status, `coefficient_history` append-only table
 - [x] **Phase 13: 3-Step Proposal Wizard** ✅ shipped 2026-05-12 — `/proposals/new/{parametres,calcul,verification}` with server-side draft persistence, Stepper-gated forward nav, ADMIN-09 D-12 partner-facing commission relaxation (signed-off STRIDE addendum)
 - [x] **Phase 14: Admin Polish — Partners + History + Home** ✅ shipped 2026-05-20 — Dedicated `/partners/new` route, status chips across admin lists, coefficient history sidebar (in /coefficients) + standalone /history, admin nav cards on admin home, 84 new Vitest tests, ADMIN-09 D-29 grep-contract suite live (9 gates). Color-contrast measurement deferred to v1.3 color refresh.
-- [x] **Phase 15: Public Surface Brand Polish** ✅ implementation shipped 2026-05-21 (manual smoke pending) — Login + invite + reset pages adopt centered-logo + paper-background `(public)` shell via single shared `app/(public)/layout.tsx` BrandLogo swap + new `.public-page-logo` CSS clamp(140px, 50vw, 200px); PUB-01 + PUB-02 closed; 876 Vitest tests pass (+4 net)
+- [x] **Phase 15: Public Surface Brand Polish** ✅ shipped 2026-05-21 (manual smoke signed off by Antoine) — Login + invite + reset pages adopt centered-logo + paper-background `(public)` shell via single shared `app/(public)/layout.tsx` BrandLogo swap + new `.public-page-logo` CSS clamp(140px, 50vw, 200px); PUB-01 + PUB-02 closed; 876 Vitest tests pass (+4 net)
 
 ## Phase Details
 

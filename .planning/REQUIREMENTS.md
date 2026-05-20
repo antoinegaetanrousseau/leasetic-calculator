@@ -38,8 +38,8 @@ Requirements for milestone v1.2. Each maps to one or more roadmap phases.
 
 ### Public surfaces
 
-- [ ] **PUB-01**: Login page (`/login`) replaces its v1.1 plain-text "Leasétic" header with the official lockup SVG (ASSET-01) centered above the existing form card. Body background switches to `--paper`; the form card stays `--surface`. Form field structure is unchanged from v1.1 — only the visual frame is updated. Language and theme toggles remain in the top-right (different from authed/admin where they moved to the sidebar).
-- [ ] **PUB-02**: Invitation landing (`/invite/[token]`) and password reset (`/reset/[token]`) inherit the same `(public)` shell pattern as PUB-01 — centered logo above a centered card, paper background, top-right language/theme toggles. No form changes — purely visual alignment.
+- [x] **PUB-01** ✅ shipped 2026-05-21: Login page (`/login`) replaces its v1.1 plain-text "Leasétic" header with the official lockup SVG (ASSET-01) centered above the existing form card. Body background switches to `--paper`; the form card stays `--surface`. Form field structure is unchanged from v1.1 — only the visual frame is updated. Language and theme toggles remain in the top-right (different from authed/admin where they moved to the sidebar).
+- [x] **PUB-02** ✅ shipped 2026-05-21: Invitation landing (`/invite/[token]`) and password reset (`/reset/[token]`) inherit the same `(public)` shell pattern as PUB-01 — centered logo above a centered card, paper background, top-right language/theme toggles. No form changes — purely visual alignment.
 
 ---
 
@@ -92,8 +92,8 @@ Which phase covers which requirement. Updated during roadmap creation.
 | COMP-05 | Phase 11 | Pending |
 | ASSET-01 | Phase 11 | Pending |
 | ASSET-02 | Phase 11 | Pending |
-| PUB-01 | Phase 15 | Pending |
-| PUB-02 | Phase 15 | Pending |
+| PUB-01 | Phase 15 | ✅ shipped 2026-05-21 |
+| PUB-02 | Phase 15 | ✅ shipped 2026-05-21 |
 
 **Coverage:**
 - v1.2 requirements: 14 total
