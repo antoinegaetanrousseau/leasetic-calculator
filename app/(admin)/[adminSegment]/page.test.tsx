@@ -15,6 +15,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, within } from '@testing-library/react';
+import { Sliders, Users, History } from 'lucide-react';
 
 vi.mock('server-only', () => ({}));
 
@@ -118,17 +119,17 @@ describe('Admin home page (D-13..D-16)', () => {
     );
   });
 
-  it('Test 4: each card has the correct lucide icon (Sliders|Users|History)', async () => {
-    const { container } = await renderPage();
-    expect(
-      within(container).getByTestId('navcard-coefficients').getAttribute('data-icon-name'),
-    ).toBe('Sliders');
-    expect(within(container).getByTestId('navcard-partners').getAttribute('data-icon-name')).toBe(
-      'Users',
-    );
-    expect(within(container).getByTestId('navcard-history').getAttribute('data-icon-name')).toBe(
-      'History',
-    );
+  it('Test 4: each card has the correct lucide icon reference (Sliders|Users|History)', async () => {
+    await renderPage();
+    // Assert by component identity rather than displayName: in newer lucide-react
+    // versions `Sliders` is aliased to `SlidersVertical` (same component), so the
+    // displayName resolves to "SlidersVertical". The page contract is "import
+    // Sliders from lucide-react"; we verify the identity of the import reference.
+    const calls = adminNavCardMock.mock.calls.map(([props]) => props);
+    const byVariant = Object.fromEntries(calls.map((p) => [p.variant, p]));
+    expect(byVariant.coefficients.icon).toBe(Sliders);
+    expect(byVariant.partners.icon).toBe(Users);
+    expect(byVariant.history.icon).toBe(History);
   });
 
   it('Test 5: h1 + subtitle render admin.home.title / admin.home.subtitle (FR)', async () => {

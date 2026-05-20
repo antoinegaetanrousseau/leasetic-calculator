@@ -426,13 +426,22 @@ export const dictionaries = {
     //   trail and as a labeled input in the editor — i18n labels are SAFE (no commission
     //   numeric values are encoded into i18n strings).
 
-    // Admin home page (6 keys)
+    // Admin home page (6 keys — Phase 9 legacy values; Phase 14 D-13..D-16 updates subtitle per UI-SPEC §6.1)
     'admin.home.title': 'Administration',
-    'admin.home.subtitle': "Tableau de bord d'administration Leasétic.",
+    'admin.home.subtitle': 'Gérez les paramètres globaux et les comptes',
     'admin.home.coefficients.title': 'Coefficients & commission',
     'admin.home.coefficients.sub': 'Éditez les paramètres globaux',
     'admin.home.accounts.title': 'Partenaires',
     'admin.home.accounts.sub': 'Gérez les comptes partenaires',
+
+    // Phase 14 — Admin home AdminNavCard wiring (7 keys per UI-SPEC §6.2 + D-13..D-16)
+    'admin.nav.coefficients.title': 'Coefficients & commission',
+    'admin.nav.coefficients.description': 'Éditez les paramètres globaux',
+    'admin.nav.partners.title': 'Partenaires',
+    'admin.nav.partners.description': 'Gérez les comptes partenaires',
+    'admin.nav.history.title': 'Historique',
+    'admin.nav.history.description': 'Historique des coefficients',
+    'admin.nav.open': 'Ouvrir →',
 
     // Coefficients page (UI-SPEC §3.1 + §9.2)
     'admin.coefficients.page.title': 'Coefficients & Commission',
@@ -1040,13 +1049,22 @@ export const dictionaries = {
     // EN counterparts of the 49 FR keys above. _EnHasAllFrKeys compile-time check
     // will fail if any key is missing or misspelled.
 
-    // Admin home page
+    // Admin home page (Phase 9 legacy; Phase 14 updates subtitle per UI-SPEC \u00a76.1)
     'admin.home.title': 'Administration',
-    'admin.home.subtitle': 'Leas\u00e9tic administration dashboard.',
+    'admin.home.subtitle': 'Manage global parameters and accounts',
     'admin.home.coefficients.title': 'Coefficients & commission',
     'admin.home.coefficients.sub': 'Edit global financial parameters',
     'admin.home.accounts.title': 'Partners',
     'admin.home.accounts.sub': 'Manage partner accounts',
+
+    // Phase 14 \u2014 Admin home AdminNavCard wiring (7 keys)
+    'admin.nav.coefficients.title': 'Coefficients & commission',
+    'admin.nav.coefficients.description': 'Edit global parameters',
+    'admin.nav.partners.title': 'Partners',
+    'admin.nav.partners.description': 'Manage partner accounts',
+    'admin.nav.history.title': 'History',
+    'admin.nav.history.description': 'Coefficient history',
+    'admin.nav.open': 'Open \u2192',
 
     // Coefficients page
     'admin.coefficients.page.title': 'Coefficients & Commission',

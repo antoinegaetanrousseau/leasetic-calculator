@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Settings2, Users } from 'lucide-react';
+import { Sliders, Users, History } from 'lucide-react';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
+import { AdminNavCard } from '@/components/ui/AdminNavCard';
 
 // PITFALLS §1.6 — opts out of static rendering (reads session cookie via requireAdmin).
 export const dynamic = 'force-dynamic';
@@ -17,15 +17,20 @@ interface PageProps {
 }
 
 /**
- * Admin home page (UI-SPEC §3.0).
+ * Admin home page — Phase 14 v1.2 design contract (UI-SPEC §5.5, D-13..D-16).
  *
- * Per AUTH-15: every admin route/handler/page calls requireAdmin() independently —
- * defense in depth, do NOT rely on the parent layout alone (PITFALLS §7.1: hidden URL is
- * NOT security; role check is).
+ * Replaces the Phase 9 two-link layout (Settings2 + Users cards via plain Link)
+ * with three AdminNavCard instances rendered in a 3-column grid (max-width 1040px,
+ * 24px gap). Variants: 'coefficients' (Sliders icon), 'partners' (Users icon),
+ * 'history' (History icon) per Figma node 41:46.
  *
- * ADMIN-07 is structurally satisfied by the existing Phase 6 layout (env-segment +
- * 2-layer requireAdmin gate). Phase 9 only updates the BODY of this page to add the
- * two card-style nav links — no gate work.
+ * Per AUTH-15: requireAdmin() is called independently (defense in depth) — do NOT
+ * rely on the parent layout alone (PITFALLS §7.1: hidden URL is NOT security; role
+ * check is).
+ *
+ * ADMIN-09 invariant: the 3 cards render only chrome labels (titles + descriptions);
+ * no commission values are exposed. The literal string "Coefficients & commission"
+ * is a card title, not a value (threat T-14-03-02 mitigated).
  */
 export default async function AdminHomePage({ params }: PageProps) {
   const { adminSegment } = await params; // PITFALL §1.1
@@ -36,19 +41,22 @@ export default async function AdminHomePage({ params }: PageProps) {
     <div>
       <h1
         style={{
-          fontSize: 24,
+          fontSize: 32,
           fontWeight: 700,
+          lineHeight: 1.2,
           color: 'var(--ink)',
-          marginBottom: 8,
+          margin: 0,
         }}
       >
         {t('admin.home.title', lang)}
       </h1>
       <p
         style={{
-          fontSize: 14.5,
+          fontSize: 16,
+          lineHeight: 1.55,
           color: 'var(--muted)',
-          marginBottom: 24,
+          marginTop: 8,
+          marginBottom: 0,
         }}
       >
         {t('admin.home.subtitle', lang)}
@@ -57,48 +65,36 @@ export default async function AdminHomePage({ params }: PageProps) {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: 'repeat(3, 1fr)',
           gap: 24,
-          marginTop: 24,
+          maxWidth: 1040,
+          marginTop: 32,
         }}
       >
-        <Link
+        <AdminNavCard
+          variant="coefficients"
+          title={t('admin.nav.coefficients.title', lang)}
+          description={t('admin.nav.coefficients.description', lang)}
           href={`/${adminSegment}/coefficients`}
-          className="card admin-nav-card"
-          aria-label={t('admin.home.coefficients.title', lang)}
-        >
-          <Settings2
-            size={48}
-            strokeWidth={1.4}
-            color="var(--teal)"
-            aria-hidden="true"
-          />
-          <div style={{ fontWeight: 600, fontSize: 16, color: 'var(--ink)', marginTop: 12 }}>
-            {t('admin.home.coefficients.title', lang)}
-          </div>
-          <div style={{ fontSize: 13.5, color: 'var(--muted)', marginTop: 4 }}>
-            {t('admin.home.coefficients.sub', lang)}
-          </div>
-        </Link>
-
-        <Link
-          href={`/${adminSegment}/accounts`}
-          className="card admin-nav-card"
-          aria-label={t('admin.home.accounts.title', lang)}
-        >
-          <Users
-            size={48}
-            strokeWidth={1.4}
-            color="var(--teal)"
-            aria-hidden="true"
-          />
-          <div style={{ fontWeight: 600, fontSize: 16, color: 'var(--ink)', marginTop: 12 }}>
-            {t('admin.home.accounts.title', lang)}
-          </div>
-          <div style={{ fontSize: 13.5, color: 'var(--muted)', marginTop: 4 }}>
-            {t('admin.home.accounts.sub', lang)}
-          </div>
-        </Link>
+          icon={Sliders}
+          openLabel={t('admin.nav.open', lang)}
+        />
+        <AdminNavCard
+          variant="partners"
+          title={t('admin.nav.partners.title', lang)}
+          description={t('admin.nav.partners.description', lang)}
+          href={`/${adminSegment}/partners`}
+          icon={Users}
+          openLabel={t('admin.nav.open', lang)}
+        />
+        <AdminNavCard
+          variant="history"
+          title={t('admin.nav.history.title', lang)}
+          description={t('admin.nav.history.description', lang)}
+          href={`/${adminSegment}/history`}
+          icon={History}
+          openLabel={t('admin.nav.open', lang)}
+        />
       </div>
     </div>
   );
