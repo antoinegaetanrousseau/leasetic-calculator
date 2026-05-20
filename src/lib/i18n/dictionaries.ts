@@ -669,6 +669,17 @@ export const dictionaries = {
     'history.diff.close.aria': 'Fermer le détail',
     'history.diff.panel.aria.label':
       'Détail du changement de coefficient du {0} par {1}',
+
+    // ── Phase 14 Plan 05 — Standalone /history route (8 keys per UI-SPEC §6.6) ──
+    'history.title': 'Historique des coefficients',
+    'history.subtitle':
+      'Tous les changements de coefficients et commission',
+    'history.row.viewDetail': 'Voir le détail →',
+    'history.row.hideDetail': '↓ Masquer le détail',
+    'history.diff.summary.label': 'Résumé',
+    'history.pagination.next': 'Page suivante →',
+    'history.pagination.previous': '← Page précédente',
+    'history.empty': 'Aucun changement de coefficient pour le moment.',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -1291,6 +1302,16 @@ export const dictionaries = {
     'history.diff.close.aria': 'Close details',
     'history.diff.panel.aria.label':
       'Coefficient change details from {0} by {1}',
+
+    // ── Phase 14 Plan 05 — Standalone /history route (8 keys per UI-SPEC §6.6) ──
+    'history.title': 'Coefficient history',
+    'history.subtitle': 'All coefficient and commission changes',
+    'history.row.viewDetail': 'View details →',
+    'history.row.hideDetail': '↓ Hide details',
+    'history.diff.summary.label': 'Summary',
+    'history.pagination.next': 'Next page →',
+    'history.pagination.previous': '← Previous page',
+    'history.empty': 'No coefficient changes yet.',
   },
 } as const;
 
