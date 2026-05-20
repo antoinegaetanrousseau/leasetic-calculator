@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
 status: executing
-last_updated: "2026-05-20T22:23:00.000Z"
-last_activity: 2026-05-20 -- Phase 14 plan 02 complete (/partners/new route + form + extended adminCreateInvitation)
+last_updated: "2026-05-20T20:32:23.000Z"
+last_activity: 2026-05-20 -- Phase 14 plan 03 complete (admin home redesign: 3 AdminNavCards + 9 i18n keys)
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 24
-  completed_plans: 20
-  percent: 83
+  completed_plans: 21
+  percent: 88
 ---
 
 # State — Matrice Commerciale
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 14 (admin-polish-partners-history-home) — EXECUTING
-Plan: 3 of 6 (plans 01-02 complete 2026-05-20)
+Plan: 4 of 6 (plans 01-03 complete 2026-05-20)
 
   - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
   - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
@@ -46,6 +46,7 @@ Last activity: 2026-05-20
 |---|---|---|---|
 | 14-01 | ~12min | 2 | 9 (4 renames + 5 modified) (+ SUMMARY) |
 | 14-02 | ~28min | 2 | 11 (4 created src + 3 modified src + 4 test files) (+ SUMMARY) |
+| 14-03 | ~17min | 1 (TDD) | 3 (1 created test + 2 modified src) (+ SUMMARY) |
 
 ## Phase 13 Performance Metrics
 
@@ -220,6 +221,10 @@ v1.1 ████████████████████ 6/6 phases com
 | InviteUrlModal `kind` value: `'invite'` (per Phase 6 `RedeemKind = 'invite' \| 'reset'` at src/lib/auth/redeem.ts:9) — NOT `'invitation'` as Plan 14-02's must_haves + interfaces blocks suggested. Plan text vs shipped-contract drift; honored the verbatim Phase 9 contract | 14-02 plan-vs-shipped reconciliation | 14-02 |
 | PhoneInput NOT reused on /partners/new despite UI-SPEC §5.1.3 recommendation — PhoneInput formats to FR 10-digit `XX XX XX XX XX` with maxLength=14; the partners.new schema accepts 6-20 international chars `[0-9 +()-]` to support partners outside FR. Plain `<input type="tel" inputMode="tel">` instead | 14-02 international-partner support | 14-02 |
 | Client component imports from `@/lib/admin/schemas` (sub-module) NOT `@/lib/admin` (barrel) — the barrel re-exports `'use server'` actions which transitively pulls `server-only` into the client bundle. Routing through the schemas sub-module keeps the client bundle server-only-free | 14-02 client-bundle hygiene | 14-02 |
+| Lucide-react identity-based icon assertion in vitest — `Sliders` is aliased to `SlidersVertical` in newer lucide-react versions (same component reference, different displayName). Asserting `props.icon === Sliders` (identity) instead of `displayName === 'Sliders'` (string) is forward-compatible across lucide upgrades. Pattern applies to all icon-prop assertions in page tests | 14-03 TDD observation | 14-03 |
+| Mock-child-by-prop-capture testing pattern for admin server-component pages: mock `<AdminNavCard>` to render a `<div>` with each prop projected as `data-*` attribute. Page test asserts only wiring (variant/href/icon/title), leaves chrome assertions to `AdminNavCard.test.tsx`. Separation of concerns | 14-03 test design | 14-03 |
+| Phase 9 legacy i18n keys (`admin.home.coefficients.*`, `admin.home.accounts.*`) retained as dead-but-harmless after 14-03 replaces the consumer. Removal would force a coordinated FR+EN diff for zero functional gain; `_EnHasAllFrKeys` parity proof still typechecks with them present. Future cleanup at planner discretion | 14-03 i18n cleanup decision | 14-03 |
+| JSDoc prose-only references to JSX literals: a docstring saying "three `<AdminNavCard>` instances" inflates the plan's `grep -c '<AdminNavCard'` verification gate from 3 (correct JSX count) to 4 (JSX + docstring). Replace with prose "three AdminNavCard instances" to keep the grep gate honest while preserving documentation clarity | 14-03 grep-gate maintenance | 14-03 |
 
 ## Session Notes
 
