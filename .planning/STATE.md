@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
 status: executing
-last_updated: "2026-05-20T21:02:04.419Z"
+last_updated: "2026-05-20T23:30:00.000Z"
 last_activity: 2026-05-20
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 24
-  completed_plans: 23
-  percent: 96
+  completed_plans: 24
+  percent: 100
 ---
 
 # State — Matrice Commerciale
@@ -27,8 +27,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 14 (admin-polish-partners-history-home) — EXECUTING
-Plan: 6 of 6 (plans 01-05 complete 2026-05-20)
+Phase: 14 (admin-polish-partners-history-home) — EXECUTING (color-contrast HUMAN-VERIFY checkpoint pending on 14-06 Task 4)
+Plan: 6 of 6 (plans 01-06 code complete 2026-05-20; Task 4 HUMAN-VERIFY pending)
 
   - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
   - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
@@ -49,6 +49,7 @@ Last activity: 2026-05-20
 | 14-03 | ~17min | 1 (TDD) | 3 (1 created test + 2 modified src) (+ SUMMARY) |
 | 14-04 | ~22min | 2 (TDD) | 7 (5 created src + 2 modified src) (+ SUMMARY) |
 | 14-05 | ~5min | 1 (TDD) | 6 (3 created src + 2 created test + 1 modified i18n) (+ SUMMARY) |
+| 14-06 | ~38min | 3 + checkpoint | 13 (4 created test + 9 modified src) (+ SUMMARY) |
 
 ## Phase 13 Performance Metrics
 
@@ -236,6 +237,13 @@ v1.1 ████████████████████ 6/6 phases com
 | Cursor-pagination on admin server routes via Phase 12 encode/decode helpers + Next.js 16 async searchParams: page.tsx awaits searchParams, decodes if present (returns null on malformed → falls through to no-cursor query — T-14-05-02 mitigation), passes `{ cursor: decoded, limit: 20 }` to listCoefficientHistory, encodes `nextCursor` if present. Same shape as Phase 8's `/` proposals list. Pattern reusable for any future paginated admin route | 14-05 cursor-pagination pattern | 14-05 |
 | Previous-page link as bare `/<seg>/history` (page 1) instead of encoded previous-cursor: chosen per planner's explicit recommendation in PLAN.md `<action>` (ii). Trade-off: a user on page 3 who clicks "Page précédente" lands on page 1, not page 2. Acceptable for v1.2 scope (expected <50 history rows); explicit previous-cursor deferred to v1.3+ if multi-page admin browsing becomes common | 14-05 pagination polish | 14-05 |
 | On-expand focus-to-`Fermer ×` button NOT implemented (UI-SPEC §5.3.5 calls for it). Plan 14-04's CoefficientDiffPanel does not auto-focus the close button on mount, and forwarding a ref from the panel would require modifying the Plan 14-04 artifact (out of scope). The collapse-side refocus IS implemented (useRef + useEffect transition detection + requestAnimationFrame) — the more important leg per keyboard-navigation contract | 14-05 a11y trade-off | 14-05 |
+| ProposalRowDto extended with server-derived `displayStatus: DisplayStatus` (NOT with raw `status`/`pdfGeneratedAt`/`paramsSnapshot`). Chosen path keeps deriveDisplayStatus as the single source of truth AND ensures paramsSnapshot (which contains commission_pct) never crosses the server/client boundary — ADMIN-09 defense in depth | 14-06 D-27 DTO design | 14-06 |
+| D-10 shelf-code resolution for CreatePartnerModal: import line retained with `// eslint-disable-next-line @typescript-eslint/no-unused-vars` + explanatory docstring; render block + showCreate useState removed. AccountsList.test.tsx Test 6 (standalone modal mount) verifies the modal file still exports a working component (negative case keeps code warm) | 14-06 D-10 resolution | 14-06 |
+| 5 missing `chip.*` i18n keys added (chip.active / chip.disabled / chip.draft / chip.expired / chip.deleted) — plan claimed they already existed but only chip.invited was wired (Plan 14-01). Existing `proposal.chip.*` keys carry date placeholders and `admin.accounts.status.*` keys are partner-table-specific; neither matches the generic StatusChip's date-less interface. Rule 3 auto-add | 14-06 Rule 3 auto-fix | 14-06 |
+| StatusChip variant union extended with 'deleted' (`.chip-deleted` CSS already shipped in Phase 8 globals.css). The pre-Phase-14 union was `'active' \| 'draft' \| 'expired' \| 'disabled' \| 'invited'` — missing 'deleted' even though DeletedChip.tsx already used the class. Rule 1 typecheck-blocker fix | 14-06 Rule 1 auto-fix | 14-06 |
+| vitest.config.ts include glob extended with `tests/**/*.test.{ts,tsx}` for the top-level grep-contract test file. Pre-Phase-14 globs only covered colocated tests; cross-cutting STRIDE-style grep suites at `tests/` need explicit inclusion | 14-06 Rule 3 auto-fix | 14-06 |
+| ValidityChip tooltip dropped during the StatusChip swap. ValidityChip rendered `title="Valable jusqu'au DD/MM/YYYY"` on the row chip; StatusChip has no tooltip prop. UI-SPEC §5.8 does not mandate parity for v1.2. Expiration date still visible on /proposals/[id] detail-page Computed card ValidityFooter (dt/dd row). v1.3 polish candidate | 14-06 D-27 trade-off | 14-06 |
+| renderToString grep-contract harness uses `React.createElement` (not direct function calls) so client-component hooks (useState/useEffect) fire under React's SSR dispatcher. Calling client components as plain JS functions throws `Cannot read properties of null (reading 'useState')` because the hook dispatcher is uninitialized outside React's render cycle | 14-06 grep-contract harness pattern | 14-06 |
 
 ## Session Notes
 
