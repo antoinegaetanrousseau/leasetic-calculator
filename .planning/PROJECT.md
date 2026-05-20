@@ -43,10 +43,33 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 
 **CUT-02 / D-10-15 (cutover note):** v10 was never hosted at a URL — there is no v10 hosted URL to redirect from. CUT-02's "redirect" requirement is satisfied vacuously; documented in `docs/operations/launch-checklist.md`.
 
-## Current Milestone: v1.2 — UX Polish + Proposal Wizard
+## ✅ v1.2 — UX Polish + Proposal Wizard — SHIPPED 2026-05-21
+
+**Started:** 2026-05-11 · **Shipped:** 2026-05-21 (10 days, 5 phases, 25 plans, 147 commits, +249 tests)
+**Archive:** `.planning/milestones/v1.2-ROADMAP.md` · `.planning/milestones/v1.2-REQUIREMENTS.md`
+**Carry-forwards to v1.3:** `.planning/v1.3-CARRYFORWARD.md`
+
+**Shipped scope:** 3-step proposal wizard with server-side draft persistence (Phases 12+13), dedicated `/partners/new` route + 3 AdminNavCards on admin home + coefficient history sidebar + standalone `/history` route + StatusChip rollout (Phase 14), public page brand-logo treatment via `<BrandLogo>` swap in shared `(public)` layout (Phase 15). ADMIN-09 partner-facing relaxation (Phase 13 D-12, signed-off STRIDE addendum). ADMIN-09 D-29 9-gate grep-contract suite in CI (Phase 14).
+
+**Deferred to v1.3 (see v1.3-CARRYFORWARD.md for full Tier 1-5 inventory):**
+- Partner home dashboard restructure + 3 MetricTiles + /proposals route (ROUTE-02 #3 partial deferral)
+- UI color refresh + diff-panel contrast measurement (deferred together)
+- Admin password rotation, privacy policy confirmation (partner-onboarding gates)
+- Neon 3-branch split, post-deploy DB-smoke CI step (tech debt discovered during v1.2)
+
+## ◯ Next Milestone: v1.3 — TBD
+
+Run `/gsd-new-milestone v1.3` to define scope. The `v1.3-CARRYFORWARD.md` inventory categorizes 20+ candidates into 5 priority tiers; Tier 1 (admin password rotation, privacy policy confirmation) are partner-onboarding gates that should NOT slip past v1.3.
+
+---
+
+<details>
+<summary>📦 v1.2 archived milestone context</summary>
+
+### v1.2 — UX Polish + Proposal Wizard — ARCHIVED 2026-05-21
 
 **Started:** 2026-05-11 (post-v1.1 close, Figma design session same day)
-**Source of truth:** `.planning/REQUIREMENTS.md` (14 REQ-IDs) + `.planning/milestones/v1.2-CONTEXT.md` (Figma design contract `vwOzirhL0vyxDWq4m6t4gC`, 3-layer fill rules, design system tokens)
+**Source of truth (at-ship):** `.planning/milestones/v1.2-REQUIREMENTS.md` (14 REQ-IDs satisfied) + `.planning/milestones/v1.2-CONTEXT.md` (Figma design contract `vwOzirhL0vyxDWq4m6t4gC`, 3-layer fill rules, design system tokens)
 
 **Goal:** Apply the visual + interaction design contract sketched in Figma to the v1.1 surface — adding a 3-step proposal wizard (Paramètres → Calcul → Vérification), a retractable sidebar with brand logo, draft-state proposal persistence, dedicated partner-create route, coefficient change history surface, and brand-logo treatment across login / invite / reset public pages.
 
@@ -73,6 +96,8 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 - SMTP-driven self-service password reset (admin-mediated only continues)
 - Sentry / APM observability (Vercel logs continue as production observability)
 - Better Auth `trustedOrigins` hardening (SameSite=Lax + `__Secure-` cookies stay the CSRF defense)
+
+</details>
 
 ## Core value
 
@@ -119,15 +144,20 @@ If that doesn't work, nothing else matters. v10 preserves this core via on-load 
 - ✓ 97 STRIDE threats verified closed across Phases 9 + 10 (ASVS L1) — v1.1
 - ⚠ Partial v1.1: Neon 3-branch split (BOOT-03 — all Vercel scopes route to `main` Neon branch; deferred to ops follow-up)
 
-### Active (in v1.2 — UX Polish + Proposal Wizard)
+### Validated (shipped in v1.2)
 
-Full requirements in `.planning/REQUIREMENTS.md` (14 REQ-IDs); design contract detail in `.planning/milestones/v1.2-CONTEXT.md`:
+Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; design contract detail in `.planning/milestones/v1.2-CONTEXT.md`:
 
-- [ ] **Database extensions:** add `draft` proposal status, `invited` partner account status, coefficient change history table
-- [ ] **Routing:** 3-step proposal wizard (Paramètres → Calcul → Vérification) with server-side draft persistence between steps; dedicated `/[adminSegment]/partners/new` route replacing modal flow
-- [ ] **Reusable components:** Stepper, retractable sidebar (260px ↔ 72px with localStorage preference), home metric tile (3 variants), admin nav cards, status chip variants
-- [ ] **Brand assets:** add Leasétic logo SVGs (mark `#6DC388`, wordmark `#112C3B`) with light/dark variants; apply to login + invite + reset public pages and authed sidebar
-- [ ] **Public surface polish:** paper background + centered logo + card pattern across all 3 `(public)` routes
+- ✓ **Database extensions:** `draft` proposal status, `invited` partner status, `coefficient_history` append-only table with TRIGGER-enforced no-UPDATE/DELETE — v1.2 (Phase 12, DB-01/02/03)
+- ✓ **3-step proposal wizard:** `/proposals/new/{parametres,calcul,verification}` with server-side draft persistence + Stepper-gated forward nav + ADMIN-09 D-12 partner-facing commission relaxation (signed-off STRIDE addendum) — v1.2 (Phase 13, ROUTE-01)
+- ✓ **Dedicated `/[adminSegment]/partners/new` route** replacing v1.1's modal-based partner creation (modal stays as shelf code; CTA → Link) — v1.2 (Phase 14, ROUTE-02)
+- ✓ **Reusable components:** Stepper, RetractableSidebar, MetricTile, AdminNavCard, StatusChip (5 variants incl. `invited` gold added in Phase 14) — v1.2 (Phase 11 + Phase 14 extension, COMP-01..05)
+- ✓ **Brand assets:** Leasétic logo SVGs (mark `#6DC388`, wordmark `#112C3B`/light-ink) shipped to `public/logo-light.svg` + `public/logo-dark.svg` — v1.2 (Phase 11, ASSET-01/02)
+- ✓ **Admin home redesign:** 3 AdminNavCards (Coefficients / Partenaires / Historique) replacing Phase 9's 2-link layout — v1.2 (Phase 14)
+- ✓ **Coefficient history sidebar + standalone /history route** with cursor pagination + shared `<CoefficientDiffPanel>` (condensed + full modes) + side-by-side Avant/Après diff with `--gold` tint highlight — v1.2 (Phase 14, scope-inflated per D-21..D-25)
+- ✓ **ADMIN-09 D-29 9-gate grep-contract suite** in CI verifying zero commission leakage across all Phase 14 non-exempt admin surfaces — v1.2 (Phase 14)
+- ✓ **Public surface polish:** `<BrandLogo>` swap in shared `app/(public)/layout.tsx` + `.public-page-logo` CSS with `clamp(140px, 50vw, 200px)` responsive sizing — v1.2 (Phase 15, PUB-01/02)
+- ⚠ Deferred to v1.3: partner home dashboard restructure + 3 MetricTiles + /proposals route + UI color refresh + diff-panel contrast measurement (all bundled per CONTEXT.md decisions)
 
 ### Deferred to v1.3+
 

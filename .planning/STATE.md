@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.2
-milestone_name: — UX Polish + Proposal Wizard
-status: executing
-last_updated: "2026-05-21T00:18:30.000Z"
-last_activity: 2026-05-21 -- Phase 15 Plan 01 complete (PUB-01, PUB-02 closed via shell-only BrandLogo swap)
+milestone_name: — UX Polish + Proposal Wizard (SHIPPED 2026-05-21)
+status: shipped
+last_updated: "2026-05-21T01:00:00.000Z"
+last_activity: "2026-05-21 -- v1.2 milestone archived via /gsd-complete-milestone v1.2; ready for /gsd-new-milestone v1.3 (see .planning/v1.3-CARRYFORWARD.md for candidate scope)"
 progress:
-  total_phases: 5
-  completed_phases: 4
-  total_plans: 25
-  completed_plans: 25
+  total_phases: 15
+  completed_phases: 15
+  total_plans: 82
+  completed_plans: 82
   percent: 100
 ---
 
