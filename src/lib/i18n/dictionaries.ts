@@ -323,6 +323,8 @@ export const dictionaries = {
     'error.field.email.invalid': "Format d'email invalide.",
     'error.field.phone.invalid': 'Numéro de téléphone invalide.',
     'error.field.siren.invalid': 'SIREN invalide (9 chiffres requis).',
+    // Phase 14 — SIRET (14 digits) validation key, consumed by createPartnerFormSchema.
+    'error.field.siret.invalid': 'SIRET invalide (14 chiffres requis).',
     // Tranche labels (Plan 07-01 tLabel contract — values from v10 lines 1205-1208;
     // U+202F narrow no-break space + U+2192 rightward arrow preserved)
     'form.tranche.t1': '25 001 € → 50 000 €',
@@ -608,6 +610,41 @@ export const dictionaries = {
     // Extra: save-draft error toast (supports WizardActionBar onSaveDraft
     // catch branch — Plan 13-01 Task 2).
     'wizard.toast.draft.error': "Erreur lors de l'enregistrement. Réessayez.",
+
+    // ── Phase 14 — /partners/new route (UI-SPEC §6.3, ~30 keys) ──────────────
+    'partners.new.title': 'Créer un partenaire',
+    'partners.new.subtitle':
+      "Renseignez les informations du partenaire pour générer un lien d'invitation unique",
+    'partners.new.section.personal': 'INFORMATIONS PERSONNELLES',
+    'partners.new.section.company': 'INFORMATIONS SOCIÉTÉ',
+    'partners.new.section.message': "MESSAGE D'INVITATION",
+    'partners.new.field.firstName': 'Prénom',
+    'partners.new.field.lastName': 'Nom',
+    'partners.new.field.email': 'Email',
+    'partners.new.field.companyName': 'Société',
+    'partners.new.field.siret': 'SIRET (optionnel)',
+    'partners.new.field.phone': 'Téléphone',
+    'partners.new.field.message': "Message d'invitation",
+    'partners.new.field.firstName.placeholder': 'ex: Marie',
+    'partners.new.field.lastName.placeholder': 'ex: Dupont',
+    'partners.new.field.email.placeholder': 'marie.dupont@exemple.fr',
+    'partners.new.field.companyName.placeholder': 'ex: Acme SAS',
+    'partners.new.field.siret.placeholder': '14 chiffres',
+    'partners.new.field.message.placeholder': 'Bonjour Marie, …',
+    'partners.new.message.counter': '{0}/1000',
+    'partners.new.message.tooLong':
+      'Le message ne peut pas dépasser 1000 caractères',
+    'partners.new.cancel': '← Annuler',
+    'partners.new.cancel.aria':
+      'Annuler et retourner à la liste des partenaires',
+    'partners.new.submit': 'Créer le partenaire',
+    'partners.new.submit.spinner': 'Création en cours…',
+    'partners.new.toast.success': 'Partenaire créé ✓',
+    'partners.new.toast.error': 'Erreur lors de la création. Réessayez.',
+    'partners.new.toast.error.duplicate':
+      'Un partenaire avec cet email existe déjà.',
+    'partners.new.toast.validation.errors':
+      'Veuillez corriger les erreurs dans le formulaire.',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -910,6 +947,8 @@ export const dictionaries = {
     'error.field.email.invalid': 'Invalid email format.',
     'error.field.phone.invalid': 'Invalid phone number.',
     'error.field.siren.invalid': 'Invalid SIREN (9 digits required).',
+    // Phase 14 — SIRET (14 digits) validation key, consumed by createPartnerFormSchema.
+    'error.field.siret.invalid': 'Invalid SIRET (14 digits required).',
     // Tranche labels (Plan 07-01 tLabel contract — values from v10 lines 1205-1208 EN-localized)
     'form.tranche.t1': '25,001 € → 50,000 €',
     'form.tranche.t2': '50,001 € → 100,000 €',
@@ -1173,6 +1212,39 @@ export const dictionaries = {
     'wizard.toast.validation.errors': 'Please correct the errors in the form.',
     // Extra: save-draft error toast.
     'wizard.toast.draft.error': 'Save failed. Try again.',
+
+    // ── Phase 14 — /partners/new route (UI-SPEC §6.3, ~30 keys) ──────────────
+    'partners.new.title': 'Create a partner',
+    'partners.new.subtitle':
+      "Enter the partner's information to generate a one-time invitation link",
+    'partners.new.section.personal': 'PERSONAL INFORMATION',
+    'partners.new.section.company': 'COMPANY INFORMATION',
+    'partners.new.section.message': 'INVITATION MESSAGE',
+    'partners.new.field.firstName': 'First name',
+    'partners.new.field.lastName': 'Last name',
+    'partners.new.field.email': 'Email',
+    'partners.new.field.companyName': 'Company',
+    'partners.new.field.siret': 'SIRET (optional)',
+    'partners.new.field.phone': 'Phone',
+    'partners.new.field.message': 'Invitation message',
+    'partners.new.field.firstName.placeholder': 'e.g. Marie',
+    'partners.new.field.lastName.placeholder': 'e.g. Dupont',
+    'partners.new.field.email.placeholder': 'marie.dupont@example.com',
+    'partners.new.field.companyName.placeholder': 'e.g. Acme Inc.',
+    'partners.new.field.siret.placeholder': '14 digits',
+    'partners.new.field.message.placeholder': 'Hi Marie, …',
+    'partners.new.message.counter': '{0}/1000',
+    'partners.new.message.tooLong': 'Message cannot exceed 1000 characters',
+    'partners.new.cancel': '← Cancel',
+    'partners.new.cancel.aria': 'Cancel and return to the partner list',
+    'partners.new.submit': 'Create partner',
+    'partners.new.submit.spinner': 'Creating…',
+    'partners.new.toast.success': 'Partner created ✓',
+    'partners.new.toast.error': 'Creation failed. Try again.',
+    'partners.new.toast.error.duplicate':
+      'A partner with this email already exists.',
+    'partners.new.toast.validation.errors':
+      'Please correct the errors in the form.',
   },
 } as const;
 
