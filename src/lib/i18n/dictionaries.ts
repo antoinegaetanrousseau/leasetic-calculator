@@ -654,6 +654,21 @@ export const dictionaries = {
       'Un partenaire avec cet email existe déjà.',
     'partners.new.toast.validation.errors':
       'Veuillez corriger les erreurs dans le formulaire.',
+
+    // ── Phase 14 Plan 04 — Coefficient history sidebar + shared diff panel
+    // (10 keys per UI-SPEC §6.5 + §6.6 subset + §6.8) ──────────────────────
+    'coefficients.history.title': 'HISTORIQUE',
+    'coefficients.history.aria.label': 'Historique des coefficients',
+    'coefficients.history.viewAll': "Voir tout l'historique →",
+    'coefficients.history.empty':
+      'Aucun changement de coefficient pour le moment.',
+    'history.diff.before': 'AVANT',
+    'history.diff.after': 'APRÈS',
+    'history.diff.before.none': '(aucun)',
+    'history.diff.close': 'Fermer ×',
+    'history.diff.close.aria': 'Fermer le détail',
+    'history.diff.panel.aria.label':
+      'Détail du changement de coefficient du {0} par {1}',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -1263,6 +1278,19 @@ export const dictionaries = {
       'A partner with this email already exists.',
     'partners.new.toast.validation.errors':
       'Please correct the errors in the form.',
+
+    // ── Phase 14 Plan 04 — Coefficient history sidebar + shared diff panel ──
+    'coefficients.history.title': 'HISTORY',
+    'coefficients.history.aria.label': 'Coefficient history',
+    'coefficients.history.viewAll': 'View full history →',
+    'coefficients.history.empty': 'No coefficient changes yet.',
+    'history.diff.before': 'BEFORE',
+    'history.diff.after': 'AFTER',
+    'history.diff.before.none': '(none)',
+    'history.diff.close': 'Close ×',
+    'history.diff.close.aria': 'Close details',
+    'history.diff.panel.aria.label':
+      'Coefficient change details from {0} by {1}',
   },
 } as const;
 
