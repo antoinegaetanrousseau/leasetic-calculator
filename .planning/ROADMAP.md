@@ -113,7 +113,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   4. Liste des partenaires renders the `invited` status as a distinct gold `StatusChip` (separate from `active` green and `disabled` red); proposal list rows also use the appropriate `StatusChip` variant per row status
   5. Coefficients page surfaces a History sidebar populated from `coefficient_history` (DB-03) showing the past 5 edits with diff summaries; each row links to a full diff modal — **scope-inflated per CONTEXT.md D-21..D-25 to include a standalone /history route**
 **Plans**: 6 plans
-  - [ ] 14-01-PLAN.md — Foundation: rename accounts/→partners/, 308 redirect, .chip-invited CSS, StatusChip variant extension, Shell.tsx revert, chip.invited i18n
+  - [x] 14-01-PLAN.md — Foundation: rename accounts/→partners/, 308 redirect, .chip-invited CSS, StatusChip variant extension, Shell.tsx revert, chip.invited i18n
   - [ ] 14-02-PLAN.md — /partners/new route: extended createPartnerFormSchema, adminCreateInvitation extension, server-component page + 3-section RHF form + ~30 partners.new.* i18n keys
   - [ ] 14-03-PLAN.md — Admin home redesign: 3 AdminNavCards (Sliders/Users/History icons) replacing Phase 9 2-link layout + 9 admin.{home,nav}.* i18n keys
   - [ ] 14-04-PLAN.md — Coefficients 2-col layout + CoefficientHistorySidebar (5 most-recent) + shared CoefficientDiffPanel (condensed + full modes) + 10 i18n keys
@@ -151,7 +151,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 11. Design System Foundation + Brand Assets | v1.2 | 0/5 | Planned | — |
 | 12. Schema Extensions for Drafts + History | v1.2 | 7/7 | Complete | 2026-05-12 |
 | 13. 3-Step Proposal Wizard | v1.2 | 6/6 | Ready for Verification | 2026-05-12 |
-| 14. Admin Polish — Partners + History + Home | v1.2 | 0/6 | Planned | — |
+| 14. Admin Polish — Partners + History + Home | v1.2 | 1/6 | In Progress | — |
 | 15. Public Surface Brand Polish | v1.2 | 0/0 | Not started | — |
 
 ---

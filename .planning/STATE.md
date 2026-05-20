@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: — UX Polish + Proposal Wizard
-status: completed
-last_updated: "2026-05-20T17:50:26.588Z"
-last_activity: 2026-05-12 — Plan 13-06 shipped (9 stepperBehavior + 36 no-commission + STRIDE addendum + smoke runbook; ROUTE-01 structurally satisfied)
+status: executing
+last_updated: "2026-05-20T20:05:00.000Z"
+last_activity: 2026-05-20 -- Phase 14 plan 01 complete (foundation rename + StatusChip-invited + Shell revert)
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 18
-  completed_plans: 18
-  percent: 100
+  total_plans: 24
+  completed_plans: 19
+  percent: 79
 ---
 
 # State — Matrice Commerciale
@@ -23,12 +23,12 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 13 — 3-step-proposal-wizard
+**Current focus:** Phase 14 — admin-polish-partners-history-home
 
 ## Current Position
 
-Phase: 13 (3-step-proposal-wizard) — READY FOR VERIFICATION
-Plan: 6 of 6 (all plans SHIPPED 2026-05-12)
+Phase: 14 (admin-polish-partners-history-home) — EXECUTING
+Plan: 2 of 6 (plan 01 complete 2026-05-20)
 
   - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
   - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
@@ -37,8 +37,14 @@ Plan: 6 of 6 (all plans SHIPPED 2026-05-12)
   - Plan 5 — Step-3 Verification Route (page.tsx with 2-column 1040px review + 3 RecapSection cards CLIENT/PROJET/CALCUL + PdfPreviewMock right column + FinalizeButton client adapter wiring Confirmer & Générer le PDF CTA to POST /api/proposals/finalize; D-24 spinner UX + D-12 bounded commission visibility on step-3 review; 23 Vitest assertions across 2 test files; Wave 2 complete)
   - Plan 6 — Wave 3 Integration Tests + Security Closeout (stepperBehavior.test.ts 9 scenarios D-20/D-21/D-22/D-23; no-commission.test.ts 36 assertions across 30 golden fixtures with 4-layer defense-in-depth including binary PDF inspection; STRIDE addendum D-28 mandatory documenting D-12 envelope + 7 new threats; manual Chrome+Edge smoke runbook all 5 ROUTE-01 criteria + ADMIN-09 envelope + cross-partner isolation across 7 numbered tests; 788 Vitest tests pass total; ZERO new schema migrations)
 
-Status: Phase complete — manual smoke runbook + STRIDE addendum sign-off pending Antoine
-Last activity: 2026-05-12 — Plan 13-06 shipped (9 stepperBehavior + 36 no-commission + STRIDE addendum + smoke runbook; ROUTE-01 structurally satisfied)
+Status: Executing Phase 14
+Last activity: 2026-05-20 -- Phase 14 plan 01 complete (foundation rename + StatusChip-invited + Shell revert)
+
+## Phase 14 Performance Metrics
+
+| Plan | Duration | Tasks | Files |
+|---|---|---|---|
+| 14-01 | ~12min | 2 | 9 (4 renames + 5 modified) (+ SUMMARY) |
 
 ## Phase 13 Performance Metrics
 
@@ -205,6 +211,9 @@ v1.1 ████████████████████ 6/6 phases com
 | Step 2 onSaveDraft uses an inline `'use server'` arrow as a WizardActionBar prop instead of a step-2 client wiring component — step 2 has no form fields so there's no `useFormContext().getValues()` to read, making the plan-13-03 WizardStep1Wiring idiom over-engineered for this surface. Inline arrow captures draft.id + draft.inputs from server-component scope and forwards verbatim to saveAsDraftAction | 13-04 design call | 13-04 |
 | Commission amount on step 2 derived server-side from `amountHT × commissionPct / 100` (NOT read from computeLoyer.computed — the calc engine does not surface a commission field in its return shape). Same formula computeLoyer uses internally; same global_params snapshot drives both the loyer and the commission. Zero drift risk by construction | 13-04 design call | 13-04 |
 | 'Coefficients manquants pour cette tranche' soft-error fallback rendered at 24px/600/--gd (heading scale) rather than 40px hero scale — per UI-SPEC §5.6 non-blocking recommendation OQ#4 ("long strings overflow at narrow viewports"). 'Sur demande' stays at hero scale (short enough to fit comfortably) | UI-SPEC §5.6 non-blocking recommendation | 13-04 |
+| Phase 14 redirect approach: picked next.config.ts `redirects()` block (over stub-page app/(admin)/[adminSegment]/accounts/page.tsx) per D-02 — keeps the legacy directory fully deleted on disk; redirects() handles all sub-paths in one rule without a placeholder page.tsx that would need to be hand-maintained | 14-01 design call | 14-01 |
+| TDD RED gate for variant-union extensions is tsc (compile-time), not vitest (runtime). With templated className (`chip chip-${variant}`), runtime accepts the new variant before the union extension — only tsc rejects. Stale `.next/dev/types/validator.ts` artifacts can mask the tsc error; clean `.next/` before relying on `npm run typecheck` for type-union gating | 14-01 TDD observation | 14-01 |
+| i18n key `chip.invited` namespaced under generic `chip.*` (not `partners.chip.invited` or `admin.chip.invited`) per UI-SPEC §6.7 — future StatusChip-invited consumers anywhere in the app can reuse the same key | 14-01 design call | 14-01 |
 
 ## Session Notes
 
