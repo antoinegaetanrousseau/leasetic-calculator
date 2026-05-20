@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
 import { listPartnersWithCounts } from '@/lib/db/queries';
+import { listInvitedPartners } from '@/lib/db/queries/users';
 import { AccountsList } from './AccountsList';
 
 // PITFALLS §1.6 — opts out of static rendering.
@@ -26,10 +27,18 @@ interface PageProps {
 }
 
 export default async function AccountsPage({ params }: PageProps) {
-  await params;
+  const { adminSegment } = await params;
   await requireAdmin(); // AUTH-15 defense in depth
   const lang = await getCurrentLang();
   const partners = await listPartnersWithCounts();
+
+  // Phase 14 D-26 — fetch the invited partner set (role='partner' AND deleted_at IS NULL
+  // AND last_login_at IS NULL per Phase 12 listInvitedPartners contract). Returned IDs
+  // become a Set<string> on the client side for O(1) per-row chip-variant selection.
+  // ADMIN-09: this helper returns no commission fields (verified by listInvitedPartners
+  // type narrowing — id/email/displayName/name/language/createdAt only).
+  const invitedRows = await listInvitedPartners();
+  const invitedUserIds = new Set(invitedRows.map((r) => r.id));
 
   // Stable now-ms for relative-time rendering — passed to client to avoid hydration drift.
   // Called via module-level helper to avoid react-hooks/purity error (Date.now is impure).
@@ -48,7 +57,13 @@ export default async function AccountsPage({ params }: PageProps) {
         {t('admin.accounts.page.sub', lang)}
       </p>
 
-      <AccountsList lang={lang} initialPartners={partners} nowMs={nowMs} />
+      <AccountsList
+        lang={lang}
+        initialPartners={partners}
+        invitedUserIds={invitedUserIds}
+        adminSegment={adminSegment}
+        nowMs={nowMs}
+      />
     </div>
   );
 }

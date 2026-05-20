@@ -360,8 +360,15 @@ export const dictionaries = {
     'proposal.chip.tooltip.expires': "Valable jusqu\u2019au {0}",
     'proposal.chip.tooltip.expired': 'Expirée le {0}',
 
-    // Phase 14 — generic StatusChip variants (consumed by /partners, /history surfaces)
+    // Phase 14 — generic StatusChip variants (consumed by /partners, /proposals surfaces).
+    // Date-less labels: the StatusChip is a pure status indicator; per-row date context
+    // (e.g. "Supprimée le DD/MM/YYYY") lives in adjacent metadata, NOT inside the chip.
     'chip.invited': 'invité.e',
+    'chip.active': 'Actif',
+    'chip.disabled': 'Désactivé',
+    'chip.draft': 'Brouillon',
+    'chip.expired': 'Expirée',
+    'chip.deleted': 'Supprimée',
 
     // 7.3 Detail page header + sections (7 keys)
     'proposal.detail.title': 'Proposition {0}',
@@ -1014,8 +1021,13 @@ export const dictionaries = {
     'proposal.chip.tooltip.expires': 'Valid until {0}',
     'proposal.chip.tooltip.expired': 'Expired on {0}',
 
-    // Phase 14 — generic StatusChip variants (consumed by /partners, /history surfaces)
+    // Phase 14 — generic StatusChip variants (consumed by /partners, /proposals surfaces).
     'chip.invited': 'Invited',
+    'chip.active': 'Active',
+    'chip.disabled': 'Disabled',
+    'chip.draft': 'Draft',
+    'chip.expired': 'Expired',
+    'chip.deleted': 'Deleted',
 
     // 7.3 Detail page header + sections (7 keys)
     'proposal.detail.title': 'Proposal {0}',

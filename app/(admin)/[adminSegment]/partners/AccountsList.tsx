@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState, useTransition } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Users,
@@ -23,13 +24,28 @@ import {
 } from '@/lib/admin';
 import type { PartnerWithCount } from '@/lib/db/queries/users';
 import { InviteUrlModal } from '@/components/InviteUrlModal';
+import { StatusChip } from '@/components/ui/StatusChip';
 import type { RedeemKind } from '@/lib/auth/redeem';
+// D-10: shelf-code — CreatePartnerModal preserved for future UX iterations (quick-create
+// vs full-create patterns). The active CTA in this list points to /partners/new per D-11;
+// the modal is no longer triggered from this component but the file stays on disk and
+// remains independently instantiable for downstream callers / tests.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { CreatePartnerModal } from './CreatePartnerModal';
 import { timeAgo } from './timeAgo';
 
 export interface AccountsListProps {
   lang: Lang;
   initialPartners: PartnerWithCount[];
+  /**
+   * Phase 14 D-26 — set of partner user IDs in the "invited" state
+   * (role='partner' AND deleted_at IS NULL AND last_login_at IS NULL).
+   * Computed server-side in partners/page.tsx via listInvitedPartners();
+   * passed as a Set for O(1) per-row variant selection.
+   */
+  invitedUserIds: Set<string>;
+  /** Active admin segment — used to build the /partners/new CTA href. */
+  adminSegment: string;
   nowMs: number;
 }
 
@@ -38,18 +54,28 @@ interface InviteUrlPayload {
   kind: RedeemKind;
 }
 
-export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps) {
+export function AccountsList({
+  lang,
+  initialPartners,
+  invitedUserIds,
+  adminSegment,
+  nowMs,
+}: AccountsListProps) {
   const router = useRouter();
   // WR-06: do NOT cache initialPartners in useState — React does not re-initialize state
   // from changed props. router.refresh() causes a server-component re-render that delivers
   // fresh initialPartners; reading the prop directly ensures the list reflects that update.
   const [searchTerm, setSearchTerm] = useState('');
-  const [showCreate, setShowCreate] = useState(false);
+  // D-11: showCreate modal-toggle state removed — the CTA is now a <Link> to /partners/new,
+  // not a button that opens a modal. CreatePartnerModal stays imported as shelf-code (D-10)
+  // but no longer rendered from this component.
   const [inviteUrl, setInviteUrl] = useState<InviteUrlPayload | null>(null);
   const [busyRow, setBusyRow] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
-  const createBtnRef = useRef<HTMLButtonElement>(null);
+  // D-11: CTA is now a <Link>, not a button; the ref is kept as an anchor ref so
+  // InviteUrlModal's triggerRef contract (focus-return on close) still works.
+  const createBtnRef = useRef<HTMLAnchorElement>(null);
 
   const filtered = useMemo(() => {
     if (!searchTerm.trim()) return initialPartners;
@@ -170,16 +196,15 @@ export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps
     return (
       <>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-          <button
+          <Link
             ref={createBtnRef}
-            type="button"
+            href={`/${adminSegment}/partners/new`}
             className="btn-green"
-            onClick={() => setShowCreate(true)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >
             <UserPlus size={16} strokeWidth={1.6} aria-hidden="true" />
             {t('admin.accounts.create.btn', lang)}
-          </button>
+          </Link>
         </div>
         <div className="card" style={{ textAlign: 'center', padding: '48px 24px' }}>
           <Users
@@ -210,17 +235,6 @@ export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps
             {t('admin.accounts.empty.body', lang)}
           </p>
         </div>
-        {showCreate && (
-          <CreatePartnerModal
-            lang={lang}
-            onClose={() => setShowCreate(false)}
-            onCreated={(url) => {
-              setShowCreate(false);
-              setInviteUrl({ url, kind: 'invite' });
-              refreshAfterAction();
-            }}
-          />
-        )}
         {inviteUrl && (
           <InviteUrlModal
             url={inviteUrl.url}
@@ -273,11 +287,14 @@ export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps
             }}
           />
         </div>
-        <button
+        {/* D-11 — CTA is a Link to /partners/new (not a button that opens the modal).
+            Same .btn-green chrome; same UserPlus icon; same i18n label. The
+            CreatePartnerModal still exists on disk (D-10 shelf code) but is no
+            longer mounted from this list. */}
+        <Link
           ref={createBtnRef}
-          type="button"
+          href={`/${adminSegment}/partners/new`}
           className="btn-green"
-          onClick={() => setShowCreate(true)}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -287,7 +304,7 @@ export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps
         >
           <UserPlus size={16} strokeWidth={1.6} aria-hidden="true" />
           {t('admin.accounts.create.btn', lang)}
-        </button>
+        </Link>
       </div>
 
       {/* Table */}
@@ -352,22 +369,17 @@ export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps
                       {displayName}
                     </td>
                     <td style={{ textAlign: 'center', padding: '12px 14px' }}>
-                      <span
-                        className={`chip ${isDisabled ? 'chip-disabled' : 'chip-active'}`}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                      >
-                        {isDisabled ? (
-                          <Ban size={12} strokeWidth={1.6} aria-hidden="true" />
-                        ) : (
-                          <CheckCircle2 size={12} strokeWidth={1.6} aria-hidden="true" />
-                        )}
-                        {t(
-                          isDisabled
-                            ? 'admin.accounts.status.disabled'
-                            : 'admin.accounts.status.active',
-                          lang,
-                        )}
-                      </span>
+                      {/* D-26 — 3-variant StatusChip per UI-SPEC §5.7.
+                          Priority: invited > disabled > active. The invited set
+                          is computed server-side (listInvitedPartners) and passed
+                          as a Set<string>; O(1) per-row lookup. */}
+                      {invitedUserIds.has(p.id) ? (
+                        <StatusChip variant="invited" label={t('chip.invited', lang)} />
+                      ) : isDisabled ? (
+                        <StatusChip variant="disabled" label={t('chip.disabled', lang)} />
+                      ) : (
+                        <StatusChip variant="active" label={t('chip.active', lang)} />
+                      )}
                     </td>
                     <td
                       style={{
@@ -492,18 +504,8 @@ export function AccountsList({ lang, initialPartners, nowMs }: AccountsListProps
         )}
       </section>
 
-      {/* Modals */}
-      {showCreate && (
-        <CreatePartnerModal
-          lang={lang}
-          onClose={() => setShowCreate(false)}
-          onCreated={(url) => {
-            setShowCreate(false);
-            setInviteUrl({ url, kind: 'invite' });
-            refreshAfterAction();
-          }}
-        />
-      )}
+      {/* Modals — D-11: CreatePartnerModal render block removed (CTA is now a Link).
+          The InviteUrlModal still mounts on demand for reissue / password-reset flows. */}
       {inviteUrl && (
         <InviteUrlModal
           url={inviteUrl.url}
