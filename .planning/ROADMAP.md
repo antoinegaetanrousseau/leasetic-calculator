@@ -114,7 +114,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   5. Coefficients page surfaces a History sidebar populated from `coefficient_history` (DB-03) showing the past 5 edits with diff summaries; each row links to a full diff modal — **scope-inflated per CONTEXT.md D-21..D-25 to include a standalone /history route**
 **Plans**: 6 plans
   - [x] 14-01-PLAN.md — Foundation: rename accounts/→partners/, 308 redirect, .chip-invited CSS, StatusChip variant extension, Shell.tsx revert, chip.invited i18n
-  - [ ] 14-02-PLAN.md — /partners/new route: extended createPartnerFormSchema, adminCreateInvitation extension, server-component page + 3-section RHF form + ~30 partners.new.* i18n keys
+  - [x] 14-02-PLAN.md — /partners/new route: extended createPartnerFormSchema, adminCreateInvitation extension, server-component page + 3-section RHF form + 28 partners.new.* i18n keys + error.field.siret.invalid (Rule 3 auto-fix)
   - [ ] 14-03-PLAN.md — Admin home redesign: 3 AdminNavCards (Sliders/Users/History icons) replacing Phase 9 2-link layout + 9 admin.{home,nav}.* i18n keys
   - [ ] 14-04-PLAN.md — Coefficients 2-col layout + CoefficientHistorySidebar (5 most-recent) + shared CoefficientDiffPanel (condensed + full modes) + 10 i18n keys
   - [ ] 14-05-PLAN.md — Standalone /history route with cursor pagination + CoefficientHistoryList (single-active expand per D-25) + ~7 history.* i18n keys
