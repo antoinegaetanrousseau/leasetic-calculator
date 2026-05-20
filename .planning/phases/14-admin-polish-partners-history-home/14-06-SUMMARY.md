@@ -77,7 +77,7 @@ metrics:
 | 1 | Partner list — StatusChip invited + Link CTA + D-10 shelf-code | `b83ece3` | `partners/page.tsx`, `partners/AccountsList.tsx`, `partners/AccountsList.test.tsx`, `i18n/dictionaries.ts` |
 | 2 | ProposalRow + detail header — StatusChip via deriveDisplayStatus | `86d1f1e` | `proposals/ProposalRow.tsx`, `proposals/ProposalRow.test.tsx`, `proposals/ProposalsList.tsx`, `ui/StatusChip.tsx`, `lib/api/proposals/list.ts`, `lib/db/queries/index.ts`, `proposals/[id]/page.tsx`, `proposals/[id]/page.test.tsx` |
 | 3 | ADMIN-09 D-29 grep-contract test suite | `9b23fc2` | `tests/admin-09-grep-contracts.test.ts`, `vitest.config.ts` |
-| 4 | Color-contrast measurement (HUMAN VERIFY) | — | (no code; awaiting manual measurement — see Checkpoint section below) |
+| 4 | Color-contrast measurement (HUMAN VERIFY) | — | **DEFERRED to v1.3 color refresh** — measurement skipped because user has signaled an upcoming UI color token update; measuring contrast on tokens that will change is wasted work. Carried forward to v1.3+ as a hard prerequisite for any plan touching `--gold`, `.chip-invited`, or the diff-panel composite. See PROJECT.md decisions log + Phase 14 deferred ideas. |
 
 ## AccountsList — final shape (D-26 + D-11 + D-10)
 

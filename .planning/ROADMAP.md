@@ -41,7 +41,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [ ] **Phase 11: Design System Foundation + Brand Assets** — Stepper, RetractableSidebar, MetricTile, AdminNavCard, StatusChip + light/dark Leasétic logo SVGs land as a reusable foundation
 - [x] **Phase 12: Schema Extensions for Drafts + History** ✅ shipped 2026-05-12 — `draft` proposal status, `invited` partner status, `coefficient_history` append-only table
 - [x] **Phase 13: 3-Step Proposal Wizard** ✅ shipped 2026-05-12 — `/proposals/new/{parametres,calcul,verification}` with server-side draft persistence, Stepper-gated forward nav, ADMIN-09 D-12 partner-facing commission relaxation (signed-off STRIDE addendum)
-- [x] **Phase 14: Admin Polish — Partners + History + Home** — Dedicated `/partners/new` route, status chips across admin lists, coefficient history sidebar, admin nav cards on admin home (color-contrast HUMAN-VERIFY checkpoint pending on 14-06 Task 4)
+- [x] **Phase 14: Admin Polish — Partners + History + Home** ✅ shipped 2026-05-20 — Dedicated `/partners/new` route, status chips across admin lists, coefficient history sidebar (in /coefficients) + standalone /history, admin nav cards on admin home, 84 new Vitest tests, ADMIN-09 D-29 grep-contract suite live (9 gates). Color-contrast measurement deferred to v1.3 color refresh.
 - [ ] **Phase 15: Public Surface Brand Polish** — Login + invite + reset pages adopt centered-logo + paper-background `(public)` shell
 
 ## Phase Details
