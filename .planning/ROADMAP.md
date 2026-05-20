@@ -109,10 +109,16 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Success Criteria** (what must be TRUE):
   1. `/[adminSegment]/partners/new` route exists, renders a 3-section form (personal info / company info / customizable invitation message), and successfully issues a one-time invitation URL on submit using the same `InviteUrlModal` primitive as v1.1's modal flow
   2. v1.1's modal-based partner creation is removed from the admin accounts page; the "Créer un partenaire" CTA now navigates to `/[adminSegment]/partners/new` instead of opening a modal
-  3. Admin home page (`/[adminSegment]`) renders 3 `AdminNavCard`s (Coefficients / Partenaires / Historique) and each navigates to its target page on click; the partner home renders 3 `MetricTile`s (Ce mois-ci / Total / Brouillons) with the correct green/navy/gold color variants powered by aggregate SQL queries over the partner's proposals
+  3. Admin home page (`/[adminSegment]`) renders 3 `AdminNavCard`s (Coefficients / Partenaires / Historique) and each navigates to its target page on click; the partner home renders 3 `MetricTile`s (Ce mois-ci / Total / Brouillons) with the correct green/navy/gold color variants powered by aggregate SQL queries over the partner's proposals — **partner-home tiles DEFERRED to v1.3 per CONTEXT.md (relaxation logged in PROJECT.md)**
   4. Liste des partenaires renders the `invited` status as a distinct gold `StatusChip` (separate from `active` green and `disabled` red); proposal list rows also use the appropriate `StatusChip` variant per row status
-  5. Coefficients page surfaces a History sidebar populated from `coefficient_history` (DB-03) showing the past 5 edits with diff summaries; each row links to a full diff modal
-**Plans**: TBD
+  5. Coefficients page surfaces a History sidebar populated from `coefficient_history` (DB-03) showing the past 5 edits with diff summaries; each row links to a full diff modal — **scope-inflated per CONTEXT.md D-21..D-25 to include a standalone /history route**
+**Plans**: 6 plans
+  - [ ] 14-01-PLAN.md — Foundation: rename accounts/→partners/, 308 redirect, .chip-invited CSS, StatusChip variant extension, Shell.tsx revert, chip.invited i18n
+  - [ ] 14-02-PLAN.md — /partners/new route: extended createPartnerFormSchema, adminCreateInvitation extension, server-component page + 3-section RHF form + ~30 partners.new.* i18n keys
+  - [ ] 14-03-PLAN.md — Admin home redesign: 3 AdminNavCards (Sliders/Users/History icons) replacing Phase 9 2-link layout + 9 admin.{home,nav}.* i18n keys
+  - [ ] 14-04-PLAN.md — Coefficients 2-col layout + CoefficientHistorySidebar (5 most-recent) + shared CoefficientDiffPanel (condensed + full modes) + 10 i18n keys
+  - [ ] 14-05-PLAN.md — Standalone /history route with cursor pagination + CoefficientHistoryList (single-active expand per D-25) + ~7 history.* i18n keys
+  - [ ] 14-06-PLAN.md — StatusChip rollout (partner list invited variant + Link CTA + ProposalsList/detail) + ADMIN-09 D-29 grep-contract test suite + color-contrast checkpoint
 **UI hint**: yes
 
 ### Phase 15: Public Surface Brand Polish
@@ -145,9 +151,9 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 11. Design System Foundation + Brand Assets | v1.2 | 0/5 | Planned | — |
 | 12. Schema Extensions for Drafts + History | v1.2 | 7/7 | Complete | 2026-05-12 |
 | 13. 3-Step Proposal Wizard | v1.2 | 6/6 | Ready for Verification | 2026-05-12 |
-| 14. Admin Polish — Partners + History + Home | v1.2 | 0/0 | Not started | — |
+| 14. Admin Polish — Partners + History + Home | v1.2 | 0/6 | Planned | — |
 | 15. Public Surface Brand Polish | v1.2 | 0/0 | Not started | — |
 
 ---
 
-*Last updated: 2026-05-12 after Phase 12 execution (7/7 plans complete, DB-01/02/03 satisfied, 492 vitest tests pass, 4 integration tests skipped pending DATABASE_URL_TEST). v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
+*Last updated: 2026-05-20 after Phase 14 planning (6 plans across 3 waves; ROUTE-02 with partner-home tile deferral to v1.3 and scope-inflated /history standalone route per CONTEXT.md). v1.2 phases 11-15 cover 14 requirements (DB-01..03, ROUTE-01..02, COMP-01..05, ASSET-01..02, PUB-01..02). v1.0 + v1.1 details archived in `milestones/`.*
