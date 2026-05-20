@@ -41,6 +41,15 @@ describe('StatusChip', () => {
     expect(chip).toHaveTextContent('Désactivé');
   });
 
+  it('AC-SC-08: variant=invited renders <span class="chip chip-invited">{label}</span> (gold tint, Phase 14)', () => {
+    const { container } = render(<StatusChip variant="invited" label="invité.e" />);
+    const chip = container.querySelector('span');
+    expect(chip).not.toBeNull();
+    expect(chip).toHaveClass('chip');
+    expect(chip).toHaveClass('chip-invited');
+    expect(chip).toHaveTextContent('invité.e');
+  });
+
   it('AC-SC-06: rendered chip is non-interactive (no role=button, no role=link)', () => {
     render(<StatusChip variant="active" label="Active" />);
     expect(screen.queryAllByRole('button')).toEqual([]);
