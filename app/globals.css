@@ -373,6 +373,11 @@ input[aria-invalid="true"] {
   color: var(--gold);
 }
 
+.chip-invited {
+  background: rgba(224, 133, 48, 0.12);
+  color: var(--gold);
+}
+
 .chip-deleted {
   background: rgba(220, 38, 38, 0.08);
   color: var(--danger);

@@ -6,12 +6,14 @@
  *   - draft    → gold tint    (.chip-draft, added to globals.css by Plan 11-01)
  *   - expired  → muted-gray   (.chip-expired, REWRITTEN by Plan 11-01 from prior gold)
  *   - disabled → red-danger   (.chip-disabled, existing Phase 9)
+ *   - invited  → gold tint    (.chip-invited, added Phase 14 — visually identical
+ *                              chrome to .chip-draft but semantically distinct per UI-SPEC §4.4)
  *
  * Server component — no state, no interaction. Consumers pass i18n-resolved
  * labels via the `label` prop; this component owns no i18n strings.
  */
 export interface StatusChipProps {
-  variant: 'active' | 'draft' | 'expired' | 'disabled';
+  variant: 'active' | 'draft' | 'expired' | 'disabled' | 'invited';
   label: string;
 }
 

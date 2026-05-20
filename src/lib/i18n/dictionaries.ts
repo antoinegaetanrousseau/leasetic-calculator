@@ -358,6 +358,9 @@ export const dictionaries = {
     'proposal.chip.tooltip.expires': "Valable jusqu\u2019au {0}",
     'proposal.chip.tooltip.expired': 'Expirée le {0}',
 
+    // Phase 14 — generic StatusChip variants (consumed by /partners, /history surfaces)
+    'chip.invited': 'invité.e',
+
     // 7.3 Detail page header + sections (7 keys)
     'proposal.detail.title': 'Proposition {0}',
     'proposal.detail.created.line': 'Créée le {0} à {1}',
@@ -936,6 +939,9 @@ export const dictionaries = {
     'proposal.chip.language.tooltip': 'Document generated in English.',
     'proposal.chip.tooltip.expires': 'Valid until {0}',
     'proposal.chip.tooltip.expired': 'Expired on {0}',
+
+    // Phase 14 — generic StatusChip variants (consumed by /partners, /history surfaces)
+    'chip.invited': 'Invited',
 
     // 7.3 Detail page header + sections (7 keys)
     'proposal.detail.title': 'Proposal {0}',
