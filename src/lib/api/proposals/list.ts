@@ -1,6 +1,7 @@
 import 'server-only';
 import {
   listProposalsByUser, searchProposals,
+  deriveDisplayStatus, type DisplayStatus,
   type ListResult, encodeCursor, decodeCursor,
 } from '@/lib/db/queries';
 
@@ -13,6 +14,13 @@ export interface ProposalRowDto {
   validityDays: 15 | 30 | 60;
   language: 'fr' | 'en';
   deletedAt: string | null;  // present in deleted-view; null otherwise
+  /**
+   * Phase 14 D-27 — server-derived chip variant. Computed via
+   * deriveDisplayStatus() at list-build time so the helper stays the single
+   * source of truth AND so the row's paramsSnapshot (which contains
+   * commission_pct) NEVER leaves the server. ADMIN-09 defense in depth.
+   */
+  displayStatus: DisplayStatus;
 }
 
 export interface ListResponse {
@@ -74,6 +82,11 @@ export async function buildListResponse(args: BuildListParams): Promise<ListResp
       validityDays: ((row.inputs as { validityDays?: unknown })?.validityDays as 15 | 30 | 60) ?? 30,
       language: row.language as 'fr' | 'en',
       deletedAt: row.deletedAt ? row.deletedAt.toISOString() : null,
+      // D-27 — derive server-side from full ProposalRow (status / deletedAt /
+      // pdfGeneratedAt / paramsSnapshot). The paramsSnapshot (commission_pct
+      // bearing) never leaves the server; we project the bounded 4-string
+      // DisplayStatus union onto the wire shape.
+      displayStatus: deriveDisplayStatus(row),
     })),
     hasMore: result.hasMore,
     nextCursor: result.nextCursor ? encodeCursor(result.nextCursor) : null,

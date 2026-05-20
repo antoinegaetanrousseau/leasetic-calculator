@@ -18,6 +18,7 @@ export {
   restoreProposal,
   hardPurgeProposal,
   listPurgeCandidates,
+  deriveDisplayStatus,
 } from './proposals';
 export type {
   Cursor,
@@ -26,6 +27,7 @@ export type {
   ListProposalsArgs,
   SearchProposalsArgs,
   ListResult,
+  DisplayStatus,
 } from './proposals';
 
 export {

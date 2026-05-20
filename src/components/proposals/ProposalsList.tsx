@@ -13,13 +13,18 @@ export interface ProposalsListProps {
   lang: Lang;
   initial: ListResponse;
   /**
-   * Unix-ms timestamp for "now" — computed server-side so ValidityChip stays
-   * a pure render function (react-hooks/purity pattern from Plan 08-10).
+   * Unix-ms timestamp for "now". Phase 14 D-27: no longer needed by the chip
+   * render (StatusChip uses server-derived `row.displayStatus`). Kept on the
+   * prop type for backward compatibility with `app/(authed)/page.tsx` which
+   * still passes it; no longer forwarded to ProposalRow.
    */
   nowMs: number;
 }
 
 export function ProposalsList({ lang, initial, nowMs }: ProposalsListProps) {
+  // nowMs is no longer needed by chip rendering (D-27 — server-derived).
+  // Kept in destructure to preserve the public prop contract; void marks intent.
+  void nowMs;
   const searchParams = useSearchParams();
   const q = searchParams.get('q') ?? '';
   const deleted = searchParams.get('deleted') === '1';
@@ -95,7 +100,6 @@ export function ProposalsList({ lang, initial, nowMs }: ProposalsListProps) {
           key={row.id}
           row={row}
           lang={lang}
-          nowMs={nowMs}
           deleted={deleted}
           restoreSlot={
             deleted ? <RestoreButtonClient proposalId={row.id} lang={lang} /> : null

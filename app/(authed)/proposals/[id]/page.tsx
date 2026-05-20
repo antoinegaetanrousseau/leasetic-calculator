@@ -4,14 +4,13 @@ import { notFound } from 'next/navigation';
 import { Download, Copy as CopyIcon, AlertTriangle } from 'lucide-react';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
-import type { Lang } from '@/lib/i18n/dictionaries';
+import type { Lang, DictKey } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate, formatNumber } from '@/lib/i18n/format';
 import { tLabel, type TrancheKey } from '@/lib/calc';
-import { getProposalById } from '@/lib/db/queries';
+import { getProposalById, deriveDisplayStatus } from '@/lib/db/queries';
 import { CopyRefButton } from '@/components/proposal/CopyRefButton';
-import { ValidityChip } from '@/components/proposals/ValidityChip';
+import { StatusChip } from '@/components/ui/StatusChip';
 import { LanguageChip } from '@/components/proposals/LanguageChip';
-import { DeletedChip } from '@/components/proposals/DeletedChip';
 import { EmbeddedPdfPreview } from '@/components/proposals/EmbeddedPdfPreview';
 import { DeleteButtonClient } from '@/components/proposals/DeleteButtonClient';
 import { RestoreButtonClient } from '@/components/proposals/RestoreButtonClient';
@@ -127,20 +126,22 @@ export default async function ProposalDetailPage({ params }: PageProps) {
           <CopyRefButton lcRef={proposal.lcRef ?? ''} lang={lang} variant="inline" />
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          {isDeleted ? (
-            <DeletedChip deletedAt={proposal.deletedAt as Date} lang={lang} />
-          ) : (
-            <ValidityChip
-              createdAt={proposal.createdAt}
-              validityDays={
-                typeof inputs.validityDays === 'number'
-                  ? (inputs.validityDays as 15 | 30 | 60)
-                  : 30
-              }
-              lang={lang}
-              nowMs={nowMs}
-            />
-          )}
+          {/* D-28 — header chip is now a single <StatusChip> driven by
+              deriveDisplayStatus (4-variant union: draft / active / expired /
+              deleted). The LanguageChip stays as a sibling per UI-SPEC §5.8.
+              The validity-countdown tooltip previously surfaced by ValidityChip
+              ("Valable jusqu'au DD/MM/YYYY") is dropped — UI-SPEC §5.8 does not
+              mandate tooltip parity for v1.2. ValidityChip.tsx + DeletedChip.tsx
+              remain on disk as Phase 8 code (now unused). */}
+          {(() => {
+            const ds = deriveDisplayStatus(proposal);
+            return (
+              <StatusChip
+                variant={ds}
+                label={t(`chip.${ds}` as DictKey, lang)}
+              />
+            );
+          })()}
           <LanguageChip proposalLanguage={proposal.language as 'fr' | 'en'} lang={lang} />
         </div>
       </div>
