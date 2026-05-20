@@ -10,11 +10,13 @@ export {
   adminCreateInvitation,
   adminCreatePasswordReset,
   adminReissueInvitation,
+  createPartnerInvitationAction,
 } from './actions';
 export type {
   AdminUpdateGlobalParamsArgs,
   AdminCreateInvitationArgs,
   AdminCreateInvitationResult,
+  CreatePartnerInvitationResult,
 } from './actions';
 
 export {

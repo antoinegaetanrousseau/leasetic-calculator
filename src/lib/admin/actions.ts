@@ -35,6 +35,11 @@ import { writeAuditLog } from '@/lib/db/queries/audit-log';
 import type { GlobalParamsRow } from '@/db/schema';
 import { db, schema } from '@/lib/db';
 import { eq } from 'drizzle-orm';
+import { getCurrentLang } from '@/lib/i18n';
+import {
+  createPartnerFormSchema,
+  type CreatePartnerFormValues,
+} from './schemas';
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  adminUpdateGlobalParams (ADMIN-02 + D-09-09 + ADMIN-09)                    */
@@ -444,5 +449,65 @@ export async function adminReissueInvitation(
       throw e;
     }
     throw new Error('admin.accounts.toast.reissue.error');
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  createPartnerInvitationAction (Phase 14 — /partners/new route action)      */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Result shape for the /partners/new client form. The client renders an
+ * <InviteUrlModal> on { ok: true } and a sonner toast on { ok: false }.
+ * `kind: 'invite'` aligns with the RedeemKind ('invite' | 'reset') consumed
+ * by InviteUrlModal (NOTE: the plan text said 'invitation'; the actual
+ * InviteUrlModal contract uses 'invite' — Phase 9 primitive, unchanged).
+ */
+export type CreatePartnerInvitationResult =
+  | { ok: true; url: string; kind: 'invite' }
+  | { ok: false; error: string };
+
+/**
+ * Phase 14 server action wired to the /partners/new client form.
+ *
+ * 1. Server-side re-validation with `createPartnerFormSchema.parse(data)`
+ *    (T-14-02-03: never trust the client RHF state).
+ * 2. Composes `displayName = firstName + ' ' + lastName` (trimmed).
+ * 3. Reads `lang` from the cookie (`getCurrentLang`) for the partner's
+ *    language preference (mirrors the modal's `language` field, which the
+ *    new form does not collect — UI-SPEC §5.1 omits the segmented control).
+ * 4. Delegates to `adminCreateInvitation` (which performs requireAdmin,
+ *    Phase 6 createInvitation, language preference write, and the two
+ *    audit_log writes with the new `profile` sub-key).
+ * 5. Returns a structured result; errors are caught and surfaced as
+ *    { ok: false, error: <stable i18n key or generic> }.
+ */
+export async function createPartnerInvitationAction(
+  data: CreatePartnerFormValues,
+): Promise<CreatePartnerInvitationResult> {
+  try {
+    // Server-side re-validation (defence-in-depth against tampered client state).
+    const parsed = createPartnerFormSchema.parse(data);
+
+    const displayName = `${parsed.firstName} ${parsed.lastName}`.trim();
+    const language = await getCurrentLang();
+
+    const result = await adminCreateInvitation({
+      email: parsed.email,
+      displayName,
+      language,
+      firstName: parsed.firstName,
+      lastName: parsed.lastName,
+      companyName: parsed.companyName,
+      siret: parsed.siret,
+      phone: parsed.phone,
+      invitationMessage: parsed.invitationMessage,
+    });
+
+    return { ok: true, url: result.url, kind: 'invite' };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'admin.accounts.error.create';
+    console.error('[createPartnerInvitationAction] failed:', msg);
+    return { ok: false, error: msg };
   }
 }
