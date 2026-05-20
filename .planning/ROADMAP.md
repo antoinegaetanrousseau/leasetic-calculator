@@ -117,7 +117,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   - [x] 14-02-PLAN.md — /partners/new route: extended createPartnerFormSchema, adminCreateInvitation extension, server-component page + 3-section RHF form + 28 partners.new.* i18n keys + error.field.siret.invalid (Rule 3 auto-fix)
   - [x] 14-03-PLAN.md — Admin home redesign: 3 AdminNavCards (Sliders/Users/History icons) replacing Phase 9 2-link layout + 9 admin.{home,nav}.* i18n keys
   - [x] 14-04-PLAN.md — Coefficients 2-col layout + CoefficientHistorySidebar (5 most-recent) + shared CoefficientDiffPanel (condensed + full modes) + 10 i18n keys
-  - [ ] 14-05-PLAN.md — Standalone /history route with cursor pagination + CoefficientHistoryList (single-active expand per D-25) + ~7 history.* i18n keys
+  - [x] 14-05-PLAN.md — Standalone /history route with cursor pagination + CoefficientHistoryList (single-active expand per D-25) + 8 history.* i18n keys
   - [ ] 14-06-PLAN.md — StatusChip rollout (partner list invited variant + Link CTA + ProposalsList/detail) + ADMIN-09 D-29 grep-contract test suite + color-contrast checkpoint
 **UI hint**: yes
 
@@ -151,7 +151,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 11. Design System Foundation + Brand Assets | v1.2 | 0/5 | Planned | — |
 | 12. Schema Extensions for Drafts + History | v1.2 | 7/7 | Complete | 2026-05-12 |
 | 13. 3-Step Proposal Wizard | v1.2 | 6/6 | Ready for Verification | 2026-05-12 |
-| 14. Admin Polish — Partners + History + Home | v1.2 | 1/6 | In Progress | — |
+| 14. Admin Polish — Partners + History + Home | v1.2 | 5/6 | In Progress|  |
 | 15. Public Surface Brand Polish | v1.2 | 0/0 | Not started | — |
 
 ---
