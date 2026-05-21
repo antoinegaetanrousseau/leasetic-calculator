@@ -1,10 +1,12 @@
 ---
 phase: 16
 slug: shell-refresh-contrast-gates
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-22
+reviewed_at: 2026-05-22
+checker_revision_pass: 1
 ---
 
 # Phase 16 — UI Design Contract
