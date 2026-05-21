@@ -434,6 +434,8 @@ export const dictionaries = {
     //   numeric values are encoded into i18n strings).
 
     // Admin home page (6 keys — Phase 9 legacy values; Phase 14 D-13..D-16 updates subtitle per UI-SPEC §6.1)
+    // Phase 16 D-06: eyebrow key for PageHero reference adopter (matches Topbar ADMIN pill text)
+    'admin.home.eyebrow': 'ADMIN',
     'admin.home.title': 'Administration',
     'admin.home.subtitle': 'Gérez les paramètres globaux et les comptes',
     'admin.home.coefficients.title': 'Coefficients & commission',
@@ -1088,6 +1090,8 @@ export const dictionaries = {
     // will fail if any key is missing or misspelled.
 
     // Admin home page (Phase 9 legacy; Phase 14 updates subtitle per UI-SPEC \u00a76.1)
+    // Phase 16 D-06: eyebrow key for PageHero reference adopter (matches Topbar ADMIN pill text)
+    'admin.home.eyebrow': 'ADMIN',
     'admin.home.title': 'Administration',
     'admin.home.subtitle': 'Manage global parameters and accounts',
     'admin.home.coefficients.title': 'Coefficients & commission',
