@@ -40,7 +40,7 @@ describe('PageHero', () => {
     expect(hasEyebrow).toBe(false);
   });
 
-  it('AC-PH-03: title + subtitle + eyebrow — eyebrow element has uppercase + var(--gd) in inline style', () => {
+  it('AC-PH-03: title + subtitle + eyebrow — eyebrow element has uppercase + var(--gd-text) in inline style', () => {
     const { container } = render(
       <PageHero title="Administration" subtitle="Manage accounts" eyebrow="ADMIN" />,
     );
@@ -48,7 +48,7 @@ describe('PageHero', () => {
     const eyebrowEl = allElements.find((el) => {
       const style = el.getAttribute('style') ?? '';
       return (
-        /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd\)/.test(style)
+        /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd-text\)/.test(style)
       );
     });
     expect(eyebrowEl).toBeDefined();
@@ -115,7 +115,7 @@ describe('PageHero', () => {
     const allElements = Array.from(container.querySelectorAll('*')) as HTMLElement[];
     const eyebrowEl = allElements.find((el) => {
       const style = el.getAttribute('style') ?? '';
-      return /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd\)/.test(style);
+      return /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd-text\)/.test(style);
     });
     expect(eyebrowEl).toBeDefined();
     expect(eyebrowEl!.textContent).toBe('LABEL');
@@ -143,7 +143,7 @@ describe('PageHero', () => {
     const allElements = Array.from(container.querySelectorAll('*')) as HTMLElement[];
     const eyebrowEl = allElements.find((el) => {
       const style = el.getAttribute('style') ?? '';
-      return /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd\)/.test(style);
+      return /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd-text\)/.test(style);
     });
     expect(eyebrowEl).toBeDefined();
     expect(eyebrowEl!.textContent).toBe('DARK');
