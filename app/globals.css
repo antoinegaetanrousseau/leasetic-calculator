@@ -10,6 +10,7 @@
   --navy-dark: #0a1e2a;
   --green:     #81c088;
   --gd:        #129657;
+  --gd-text:   #0e7544;  /* WCAG AA text variant for --gd over light backgrounds; matches --gd in dark mode */
   --gl:        #c8e2c8;
   --teal:      #2d7a8c;
   --paper:     #f5f7fc;
@@ -18,6 +19,7 @@
   --muted:     #6e7191;
   --border:    #d9dbe9;
   --gold:      #e08530;
+  --gold-text: #8a4e13;  /* WCAG AA text variant for --gold over light backgrounds; matches --gold in dark mode */
   --danger:    #dc2626;
   --brand-mark: #6DC388;
 
@@ -49,6 +51,8 @@ html[data-theme="dark"] {
   --shadow-card: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.25);
   --hover-overlay: rgba(255,255,255,0.05);
   --active-pill:   rgba(18,150,87,0.22);
+  --gd-text:   #129657;  /* Same as --gd — dark-mode contrast already AA-pass against --paper dark */
+  --gold-text: #e08530;  /* Same as --gold — dark-mode contrast already AA-pass against chip bg dark */
   color-scheme: dark;
 }
 /* Brand palette --navy/--green/--gd/--gl/--teal/--gold/--danger preserved across themes */
