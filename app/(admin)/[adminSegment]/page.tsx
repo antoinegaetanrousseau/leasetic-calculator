@@ -3,6 +3,7 @@ import { Sliders, Users, History } from 'lucide-react';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
 import { AdminNavCard } from '@/components/ui/AdminNavCard';
+import { PageHero } from '@/components/ui/PageHero';
 
 // PITFALLS §1.6 — opts out of static rendering (reads session cookie via requireAdmin).
 export const dynamic = 'force-dynamic';
@@ -39,28 +40,11 @@ export default async function AdminHomePage({ params }: PageProps) {
 
   return (
     <div>
-      <h1
-        style={{
-          fontSize: 32,
-          fontWeight: 700,
-          lineHeight: 1.2,
-          color: 'var(--ink)',
-          margin: 0,
-        }}
-      >
-        {t('admin.home.title', lang)}
-      </h1>
-      <p
-        style={{
-          fontSize: 16,
-          lineHeight: 1.55,
-          color: 'var(--muted)',
-          marginTop: 8,
-          marginBottom: 0,
-        }}
-      >
-        {t('admin.home.subtitle', lang)}
-      </p>
+      <PageHero
+        eyebrow={t('admin.home.eyebrow', lang)}
+        title={t('admin.home.title', lang)}
+        subtitle={t('admin.home.subtitle', lang)}
+      />
 
       <div
         style={{
