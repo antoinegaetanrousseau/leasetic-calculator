@@ -6,7 +6,7 @@ status: planning
 last_updated: "2026-05-21T21:31:30.817Z"
 last_activity: 2026-05-21
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 15 — public-surface-brand-polish
+**Current focus:** Phase 16 — shell-refresh-contrast-gates (v1.3, not yet planned)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 16 — Shell Refresh + Contrast Gates (TBD by /gsd-plan-phase 16)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-21 — Milestone v1.3 started
+Status: Roadmap created, planning not yet started
+Last activity: 2026-05-21 — v1.3 roadmap created (6 phases, 34 requirements mapped)
 
 ## Phase 15 Performance Metrics
 

@@ -140,45 +140,45 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHELL-01 | TBD | Pending |
-| SHELL-02 | TBD | Pending |
-| SHELL-03 | TBD | Pending |
-| SHELL-04 | TBD | Pending |
-| SHELL-05 | TBD | Pending |
-| THEME-01 | TBD | Pending |
-| THEME-02 | TBD | Pending |
-| CONTRAST-01 | TBD | Pending |
-| CONTRAST-02 | TBD | Pending |
-| PHOME-01 | TBD | Pending |
-| PHOME-02 | TBD | Pending |
-| PHOME-03 | TBD | Pending |
-| PROPS-01 | TBD | Pending |
-| PROPS-02 | TBD | Pending |
-| WIZ-01 | TBD | Pending |
-| WIZ-02 | TBD | Pending |
-| WIZ-03 | TBD | Pending |
-| WIZ-04 | TBD | Pending |
-| WIZ-05 | TBD | Pending |
-| WIZ-06 | TBD | Pending |
-| ADMIN-10 | TBD | Pending |
-| ADMIN-11 | TBD | Pending |
-| ADMIN-12 | TBD | Pending |
-| ADMIN-13 | TBD | Pending |
-| ADMIN-14 | TBD | Pending |
-| EXPORT-01 | TBD | Pending |
-| EXPORT-02 | TBD | Pending |
-| LCDASH-01 | TBD | Pending |
-| LCDASH-02 | TBD | Pending |
-| INFRA-01 | TBD | Pending |
-| INFRA-02 | TBD | Pending |
-| INFRA-03 | TBD | Pending |
-| GATE-01 | TBD | Pending |
-| GATE-02 | TBD | Pending |
+| SHELL-01 | 16 | Pending |
+| SHELL-02 | 16 | Pending |
+| SHELL-03 | 16 | Pending |
+| SHELL-04 | 16 | Pending |
+| SHELL-05 | 16 | Pending |
+| THEME-01 | 17 | Pending |
+| THEME-02 | 18 | Pending |
+| CONTRAST-01 | 16 | Pending |
+| CONTRAST-02 | 16 | Pending |
+| PHOME-01 | 17 | Pending |
+| PHOME-02 | 17 | Pending |
+| PHOME-03 | 17 | Pending |
+| PROPS-01 | 17 | Pending |
+| PROPS-02 | 17 | Pending |
+| WIZ-01 | 17 | Pending |
+| WIZ-02 | 17 | Pending |
+| WIZ-03 | 17 | Pending |
+| WIZ-04 | 17 | Pending |
+| WIZ-05 | 17 | Pending |
+| WIZ-06 | 17 | Pending |
+| ADMIN-10 | 18 | Pending |
+| ADMIN-11 | 18 | Pending |
+| ADMIN-12 | 18 | Pending |
+| ADMIN-13 | 18 | Pending |
+| ADMIN-14 | 18 | Pending |
+| EXPORT-01 | 19 | Pending |
+| EXPORT-02 | 19 | Pending |
+| LCDASH-01 | 19 | Pending |
+| LCDASH-02 | 19 | Pending |
+| INFRA-01 | 20 | Pending |
+| INFRA-02 | 20 | Pending |
+| INFRA-03 | 20 | Pending |
+| GATE-01 | 21 | Pending |
+| GATE-02 | 21 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 34 total
-- Mapped to phases: 0 ⚠️ (will be populated by gsd-roadmapper in next step)
-- Unmapped: 34
+- Mapped to phases: 34 ✅
+- Unmapped: 0
 
 ---
 
