@@ -25,8 +25,8 @@
 
 ### Contrast measurement (CONTRAST)
 
-- [ ] **CONTRAST-01**: Diff-panel changed-row composite (`rgba(224,133,48,0.10)` over `--surface` with `--ink` weight 600) measured at WCAG 2.1 AA (≥4.5:1) in both light and dark, signed off before any v1.3 wave touching `--gold` / `.chip-invited` / diff-panel merges. Resolves Phase 14 deferred Tier-2 carry-forward.
-- [ ] **CONTRAST-02**: Any new v1.3 surface introducing a foreground-on-background pair using `--gold`, `--teal`, or hero pill chips validated against WCAG 2.1 AA in light + dark before merge.
+- [x] **CONTRAST-01**: Diff-panel changed-row composite (`rgba(224,133,48,0.10)` over `--surface` with `--ink` weight 600) measured at WCAG 2.1 AA (≥4.5:1) in both light and dark, signed off before any v1.3 wave touching `--gold` / `.chip-invited` / diff-panel merges. Resolves Phase 14 deferred Tier-2 carry-forward.
+- [x] **CONTRAST-02**: Any new v1.3 surface introducing a foreground-on-background pair using `--gold`, `--teal`, or hero pill chips validated against WCAG 2.1 AA in light + dark before merge.
 
 ### Partner Home (PHOME)
 
@@ -147,8 +147,8 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | SHELL-05 | 16 | Pending |
 | THEME-01 | 17 | Pending |
 | THEME-02 | 18 | Pending |
-| CONTRAST-01 | 16 | Pending |
-| CONTRAST-02 | 16 | Pending |
+| CONTRAST-01 | 16 | Complete |
+| CONTRAST-02 | 16 | Complete |
 | PHOME-01 | 17 | Pending |
 | PHOME-02 | 17 | Pending |
 | PHOME-03 | 17 | Pending |
