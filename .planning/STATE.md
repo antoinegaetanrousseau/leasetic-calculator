@@ -3,14 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: planning
-last_updated: "2026-05-21T21:31:30.817Z"
-last_activity: 2026-05-21
+last_updated: "2026-05-21T22:23:40.183Z"
+last_activity: 2026-05-21 — v1.3 roadmap created (6 phases, 34 requirements mapped)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
 ---
 
 # State — Matrice Commerciale
