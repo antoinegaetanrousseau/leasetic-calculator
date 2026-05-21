@@ -27,7 +27,7 @@ export function PageHero({ title, subtitle, eyebrow, actions }: PageHeroProps) {
               fontWeight: 700,
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              color: 'var(--gd)',
+              color: 'var(--gd-text)',
               marginBottom: 8,
             }}
           >
