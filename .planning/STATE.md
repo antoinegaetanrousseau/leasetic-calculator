@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-21T22:56:42.797Z"
-last_activity: 2026-05-21 -- Phase 16 planning complete
+last_updated: "2026-05-21T23:04:50.234Z"
+last_activity: 2026-05-21
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # State — Matrice Commerciale
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 16 — shell-refresh-contrast-gates (v1.3, not yet planned)
+**Current focus:** Phase 16 — Shell Refresh + Contrast Gates
 
 ## Current Position
 
-Phase: 16 — Shell Refresh + Contrast Gates (TBD by /gsd-plan-phase 16)
-Plan: —
+Phase: 16 (Shell Refresh + Contrast Gates) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-05-21 -- Phase 16 planning complete
+Last activity: 2026-05-21
 
 ## Phase 15 Performance Metrics
 

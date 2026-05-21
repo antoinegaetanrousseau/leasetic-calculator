@@ -96,8 +96,8 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   2. The sidebar collapse toggle, the tri-state theme control (Light / System / Dark), and the FR/EN locale toggle all appear in the sidebar footer; System mode updates live when the OS theme changes; collapse preference persists across reload.
   3. The topbar and footer render the Figma `9:46` visual treatment in both light and dark on every authed route.
   4. A signed-off contrast audit record confirms the diff-panel changed-row composite (`rgba(224,133,48,0.10)` over `--surface` + `--ink` weight 600) reaches ≥4.5:1 in both light and dark, and any new `--gold` / `--teal` foreground-on-background pair introduced in this phase also passes WCAG AA.
-**Plans:** 5 plans
-- [ ] 16-01-PLAN.md — PageHero primitive + Vitest coverage (D-01..D-05, SHELL-03 scaffold)
+**Plans:** 1/5 plans executed
+- [x] 16-01-PLAN.md — PageHero primitive + Vitest coverage (D-01..D-05, SHELL-03 scaffold)
 - [ ] 16-02-PLAN.md — Sidebar icon-size micro-deltas + Topbar visual verification (D-12..D-16, SHELL-01/02/04 + SHELL-05 topbar half)
 - [ ] 16-03-PLAN.md — Shell footer extension with Mentions légales link (D-17/D-18, SHELL-05 footer half; reuses existing `shell.footer.privacy` key)
 - [ ] 16-04-PLAN.md — Admin home reference adopter for PageHero + new `admin.home.eyebrow` i18n key (D-06, SHELL-03 consumer)
@@ -188,7 +188,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 13. 3-Step Proposal Wizard | v1.2 | 6/6 | Complete | 2026-05-12 |
 | 14. Admin Polish — Partners + History + Home | v1.2 | 6/6 | Complete | 2026-05-20 |
 | 15. Public Surface Brand Polish | v1.2 | 1/1 | Complete | 2026-05-21 |
-| 16. Shell Refresh + Contrast Gates | v1.3 | 0/TBD | Not started | — |
+| 16. Shell Refresh + Contrast Gates | v1.3 | 1/5 | In Progress|  |
 | 17. Partner Surfaces | v1.3 | 0/TBD | Not started | — |
 | 18. Admin Surfaces | v1.3 | 0/TBD | Not started | — |
 | 19. New Capabilities | v1.3 | 0/TBD | Not started | — |
