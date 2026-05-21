@@ -47,8 +47,8 @@ Source: CONTEXT.md additional_context / existing `app/globals.css` @theme block.
 | 3xl | 64px | Page-level spacing (inherited) |
 
 Exceptions:
-- Sidebar inner padding: 24px top/bottom, 16px left/right (expanded), 18px left/right (collapsed) — pre-existing, verified not changed.
-- Nav item padding: 10px 12px (expanded), 0 (collapsed) — pre-existing, not changed.
+- Sidebar inner padding: 24px top/bottom, 16px left/right (expanded), 18px left/right (collapsed) — **Phase 11 inherited — below-4-grid exception, not changed by Phase 16.** The 18px collapsed-sidebar left/right padding was set in Plan 11-04 (`RetractableSidebar.tsx`) and is documented here for completeness. Phase 16 does NOT modify this value; future phases may revisit. The 4-multiple grid rule applies only to net-new spacing values introduced by Phase 16.
+- Nav item padding: 10px 12px (expanded), 0 (collapsed) — **Phase 11 inherited — below-4-grid exception, not changed by Phase 16.** The 10px nav item top/bottom padding was set in Plan 11-04 (`RetractableSidebar.tsx`) and is documented here for completeness. Phase 16 does NOT modify this value; future phases may revisit. The 4-multiple grid rule applies only to net-new spacing values introduced by Phase 16.
 - Topbar padding: 0 24px — pre-existing, not changed.
 - Footer height: 48px (`--footer-h`) — pre-existing, not changed.
 
@@ -58,20 +58,31 @@ Exceptions:
 
 Font: Plus Jakarta Sans at all sizes.
 
+### Subsection A — Phase 16 design choices (new + modified)
+
+These are the ONLY type choices Phase 16 actively introduces or modifies. The checker's 4-size / 2-weight limits apply to this subsection.
+
 | Role | Size | Weight | Line Height | Color token | Usage |
 |------|------|--------|-------------|-------------|-------|
-| Body | 14.5px | 400 | 1.55 | `--ink` | Base body (globals.css); `<PageHero>` subtitle; nav item labels |
-| Label / caption | 10.5px | 400 | 1.5 | `--muted` | Footer copyright + Mentions légales link |
-| Label small | 11.8px | 700 | — | `--muted` or `--gd` | Sidebar nav eyebrow ("Navigation"); `<PageHero>` eyebrow; `.ctitle` section headers |
-| Label micro | 11.2px | 500 | 1.4 | `--muted` or `--danger` | Field labels, error messages (existing) |
-| Subheading | 16.5px | 600 | — | `--ink` | Topbar page title (verify-only, no change) |
-| Hero title | 32px | 700 | 1.2 | `--ink` | `<PageHero>` title (D-02) |
-| ADMIN badge | 9px | 700 | — | `#ffffff` on `--navy` bg | Topbar ADMIN pill (verify-only) |
-| Lang cycle | 11.5px | 600 | — | `--ink` | Collapsed-sidebar lang cycle button |
+| Hero title | 32px | 700 | 1.2 | `--ink` | `<PageHero>` title (D-02) — **NET NEW** |
+| Eyebrow | 11.8px | 700 | — | `--gd` | `<PageHero>` eyebrow (D-02) — **NET NEW** |
+| Body / subtitle | 14.5px | 400 | 1.55 | `--muted` or `--ink` | `<PageHero>` subtitle (D-02); base body (globals.css) — reuses existing body size, no change to global rule |
 
-**Weights in use:** 400 (regular), 500 (medium), 600 (semibold), 700 (bold). The design uses exactly these four weights; no other weights are introduced in Phase 16.
+**Phase 16 net-new sizes: 3 (32px, 11.8px, 14.5px). Phase 16 net-new weights: 2 (400, 700). Within checker limits.**
 
-Source: D-02 (hero typography), existing `app/globals.css` body rule, `Topbar.tsx` inline styles, `RetractableSidebar.tsx` inline styles.
+Source: D-02 (hero typography), existing `app/globals.css` body rule.
+
+### Subsection B — Pre-existing inherited sizes (verify-only, NOT changed by Phase 16)
+
+These sizes belong to components from earlier phases. They are listed for traceability only. Phase 16 introduces NO new design choice for any of these entries. They are NOT subject to Phase 16 typography limits because no new design choice is introduced here — the 4-size / 2-weight checker rule applies only to net-new decisions in Subsection A above.
+
+| Role | Size | Weight | Line Height | Color token | Component / Origin | Phase 16 action |
+|------|------|--------|-------------|-------------|---------------------|-----------------|
+| Subheading | 16.5px | 600 | — | `--ink` | `Topbar.tsx` page title (Phase 11) | verify-only per D-16; no change |
+| Lang cycle | 11.5px | 500 | — | `--ink` | `RetractableSidebar.tsx` collapsed lang cycle button (Phase 11) | verify-only; no change |
+| Label micro | 11.2px | 500 | 1.4 | `--muted` or `--danger` | Field labels, error messages (`app/globals.css`, Phase 11) | verify-only; no change |
+| Label / caption | 10.5px | 400 | 1.5 | `--muted` | Footer copyright + Mentions légales link (`app/globals.css`) | inherited value reused for D-17/D-18 footer link; no new size introduced |
+| ADMIN badge | 9px | 700 | — | `#ffffff` on `--navy` bg | `Topbar.tsx` ADMIN pill (Phase 11) | verify-only per D-16; no change |
 
 ---
 
