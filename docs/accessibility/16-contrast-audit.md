@@ -105,4 +105,4 @@ No additional CONTRAST-02 composites introduced by Phase 16 plans 16-01..16-04 b
 
 ## Sign-off
 
-Signed off by Antoine Rousseau on 2026-05-22 (commit pending). Each composite above measured mathematically using the WCAG 2.1 formula (identical to WebAIM contrast checker). All values ≥4.5:1 WCAG AA in both light and dark modes after Phase 16 remediation (introduces --gd-text + --gold-text token variants).
+Signed off by Antoine Rousseau on 2026-05-22 (commit 7115ecb). Each composite above measured mathematically using the WCAG 2.1 formula (identical to WebAIM contrast checker). All values ≥4.5:1 WCAG AA in both light and dark modes after Phase 16 remediation (introduces --gd-text + --gold-text token variants).
