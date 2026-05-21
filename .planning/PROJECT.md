@@ -57,9 +57,54 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 - Admin password rotation, privacy policy confirmation (partner-onboarding gates)
 - Neon 3-branch split, post-deploy DB-smoke CI step (tech debt discovered during v1.2)
 
-## ◯ Next Milestone: v1.3 — TBD
+## 🚧 Current Milestone: v1.3 — Design Refresh + Partner-Onboarding Ready
 
-Run `/gsd-new-milestone v1.3` to define scope. The `v1.3-CARRYFORWARD.md` inventory categorizes 20+ candidates into 5 priority tiers; Tier 1 (admin password rotation, privacy policy confirmation) are partner-onboarding gates that should NOT slip past v1.3.
+**Started:** 2026-05-21 (post-v1.2 close, same-day Figma scope review)
+**Source of truth:** `.planning/REQUIREMENTS.md` (TBD by `/gsd-new-milestone`) + Figma design contract `vwOzirhL0vyxDWq4m6t4gC` section `9:46` ("v1.3 — Redesign sketches", 13 screens) + `.planning/v1.3-CARRYFORWARD.md` (5-tier inventory generated at v1.2 close)
+
+**Goal:** Apply the Figma `9:46` design contract uniformly across partner + admin surfaces in both light and dark mode, ship the deferred Tier-3 surfaces (Partner Home dashboard + `/proposals` with `Archivées` filter pill) and three Tier-5 partner-pain capabilities (Excel export, centralized LC reference dashboard, AccountsList→PartnersList rename), harden infra (Neon 3-branch split + post-deploy DB-smoke CI + Better Auth `trustedOrigins` Origin gate), and close all Tier-1 partner-onboarding gates last (admin password rotation + privacy policy confirmation with Thomas) — so the milestone ends with the app ready for the first real partner.
+
+**Target features (organized by theme):**
+
+- **App shell visual refresh** — Sidebar (expanded + 72px collapsed variant) with brand row + collapse toggle; Theme toggle tri-state (Light / **System** / Dark; System is new — respects `prefers-color-scheme`); FR/EN locale toggle repositioned into sidebar footer; topbar + footer visual refresh; hero pattern (`Bonjour, {prénom} 👋` + page subtitle + page-level CTA) on every authed page; **light + dark pair for every screen**
+- **Contrast measurement** — diff-panel changed-row composite (`rgba(224,133,48,0.10)` over `--surface` with `--ink` weight 600) measured in light + dark at WCAG 2.1 AA; bundled into the design work because the v1.3 palette is stable (no token-level refresh — Figma `color/*` variables match `app/globals.css` exactly)
+- **Partner Home `/`** — hero greeting + 3 MetricTiles (Ce mois-ci / Total / Brouillons, Europe/Paris calendar month scope) + Propositions récentes list (5 rows, "Voir toutes →" link)
+- **Partner Proposals `/proposals`** — table list with filter pills; **`Archivées` filter pill surfaces archived/expired proposals in-page** (no separate `/archives` route)
+- **Wizard redesign** — 3 steps (Paramètres / Calcul / Vérifier) visual refresh + new copy (`Commission apporteur (non visible client)` explicit annotation, consistent with Phase 13 D-12 envelope) + **validity-selector relocation from earlier step to step 3** (introduces `proposals.validity_days` default at draft creation; step-3 mutation); Phase 13 behavior contract + ADMIN-09 D-12 envelope + Phase 14 9-gate grep-contract suite remain in force throughout
+- **Admin Home enhancement** — hero + "Nouvelle proposition" CTA + 3 admin stats (Propositions ce mois / Partenaires actifs / Dernière modif. coeffs) + 3 AdminNavCards + Recent activity card (extends Phase 14's 3-card layout)
+- **Admin Partners list `/[adminSegment]/partners`** — styled table with rows + "Inviter partenaire" CTA + filter/search controls; **AccountsList → PartnersList component file rename** (Phase 14 closeout cleanup)
+- **Admin Créer partenaire `/[adminSegment]/partners/new`** — form card visual refresh
+- **Admin Coefficients refresh** — warning banner (orange) + inline history card refresh on top of Phase 14's 2-col history sidebar
+- **Excel export of proposals** (Tier 5) — per-partner XLSX export of their proposal portfolio; partner-requested in v1.0 feedback
+- **Centralized LC reference dashboard** (Tier 5) — admin tool: cross-partner LC reference view; MUST extend (not bypass) the ADMIN-09 9-gate grep-contract suite
+- **Neon 3-branch split** (Tier 2) — per-Vercel-scope `DATABASE_URL` routing (main / preview / development); resolves v1.1 BOOT-03 partial
+- **Post-deploy DB-smoke CI step** (Tier 2) — real-Postgres smoke on every PR touching `drizzle/*.sql`; closes the recurring "generator self-evaluation blind spot" class that bit v1.1 (correlated-subquery) + v1.2 Phase 12 (missing journal entry)
+- **Better Auth `trustedOrigins` hardening** (Tier 2) — middleware-level Origin gate on `/api/auth/sign-in/*` mutations on top of existing SameSite=Lax + `__Secure-` cookies
+- **Tier-1 partner-onboarding gates (LAST phase before cutover)** — Admin password rotation (`leasetic2026` shared → individual strong, both admins) + Privacy policy confirmation with Thomas (Vercel/Neon EU hosting + 10-yr PDF retention coverage)
+
+**Key context / decisions baked in at milestone start:**
+
+- **Palette is stable** — Figma `color/*` variables match `app/globals.css` tokens exactly (verified 2026-05-21 via `get_variable_defs` against node `9:46`). The Tier-2/Tier-3 "UI color refresh" carry-forward item reduces to **layout + hierarchy refresh, not token churn**. This decouples the contrast measurement from any token migration — it can run against current `--gold #e08530` over `--surface #ffffff` immediately.
+- **Light + dark pair per screen** — Figma section ships duplicate `82:*` frames for partner-side screens explicitly indicating both modes are in the design contract.
+- **ADMIN-09 envelope held** — Phase 13 D-12 partner-facing relaxation (deal-owner partner sees commission on wizard steps 2 + 3) continues; Phase 14 strict on all admin surfaces continues; the 9-gate grep-contract suite (`tests/admin-09-grep-contracts.test.ts`) must remain green throughout v1.3.
+- **"Archives" interpretation locked** — filter pill on `/proposals`, NOT a separate route. Archived = soft-deleted or expired proposals visible to the partner who owns them.
+- **Validity-selector relocation** — moving from current placement to step 3 of the wizard. Will likely require setting `proposals.validity_days` to a default (e.g. 30) at draft creation, with step 3 mutating the final value. To be confirmed during planning of the wizard phase.
+- **Tier-1 gates ordered last** so they ride the same partner-cutover communications window as the rest of partner-readiness work.
+
+## ◯ Next Milestone: v1.4 — TBD
+
+After v1.3 ships, candidates from `v1.3-CARRYFORWARD.md` Tier 5 not pulled into v1.3 remain available:
+- Playwright automated browser tests
+- SMTP self-service password reset
+- Sentry / APM observability
+- Mobile-optimized layout
+- Generic audit-log viewer beyond coefficient history
+- Webhook notifications to Leasétic on each proposal generation
+- Multi-language beyond FR + EN
+- Wizard step-1 sticky-footer action bar / `beforeunload` warning / per-step tab titles
+- Phase 11 sidebar adminHrefs config-driven refactor
+- `/accounts` 308 redirect sunset (warm-cache window ≥1 milestone is met after v1.3)
+- OVH production deployment + smoke execution (Tier 4 — September 2026 target)
 
 ---
 
@@ -159,20 +204,41 @@ Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; desig
 - ✓ **Public surface polish:** `<BrandLogo>` swap in shared `app/(public)/layout.tsx` + `.public-page-logo` CSS with `clamp(140px, 50vw, 200px)` responsive sizing — v1.2 (Phase 15, PUB-01/02)
 - ⚠ Deferred to v1.3: partner home dashboard restructure + 3 MetricTiles + /proposals route + UI color refresh + diff-panel contrast measurement (all bundled per CONTEXT.md decisions)
 
-### Deferred to v1.3+
+### Active (v1.3 in flight — REQ-IDs land in `.planning/REQUIREMENTS.md`)
+
+<!-- Building toward these now. Full requirements defined in REQUIREMENTS.md. -->
+
+- [ ] App shell visual refresh (sidebar + tri-state theme toggle + hero pattern + light/dark pair)
+- [ ] Contrast measurement (diff-panel + new gold/teal surfaces, WCAG 2.1 AA light + dark)
+- [ ] Partner Home `/` (hero + 3 MetricTiles + Propositions récentes)
+- [ ] Partner Proposals `/proposals` with `Archivées` filter pill
+- [ ] Wizard redesign (3 steps visual refresh + validity-selector relocation to step 3 + ADMIN-09 D-12 envelope preserved)
+- [ ] Admin Home enhancement (hero + CTA + 3 stats + 3 AdminNavCards + Recent activity)
+- [ ] Admin Partners list `/[adminSegment]/partners` (styled table + invite CTA + AccountsList→PartnersList rename)
+- [ ] Admin Créer partenaire form card refresh
+- [ ] Admin Coefficients refresh (warning banner + inline history card)
+- [ ] Excel export of proposal portfolio (per-partner XLSX)
+- [ ] Centralized LC reference dashboard (admin tool; ADMIN-09 9-gate extended)
+- [ ] Neon 3-branch split (`DATABASE_URL` per-Vercel-scope routing)
+- [ ] Post-deploy DB-smoke CI step (real-Postgres smoke on `drizzle/*.sql` PRs)
+- [ ] Better Auth `trustedOrigins` middleware-level Origin gate
+- [ ] Admin password rotation (Tier-1 gate — last phase before partner cutover)
+- [ ] Privacy policy confirmation with Thomas (Tier-1 gate — last phase before partner cutover)
+
+### Deferred to v1.4+
 
 - [ ] OVH production deployment + smoke-deploy execution (September 2026 target; capability shipped in v1.1)
-- [ ] Centralized LC reference dashboard
-- [ ] Excel export of proposal portfolio
 - [ ] Webhook notifications to Leasétic on each proposal generation
 - [ ] Mobile-optimized layout
 - [ ] Multi-language beyond FR + EN
 - [ ] Automated browser tests (Playwright or similar)
 - [ ] SMTP-driven self-service password reset
 - [ ] Sentry / APM observability beyond Vercel logs
-- [ ] Better Auth `trustedOrigins` hardening (currently relying on SameSite=Lax + `__Secure-` cookies)
 - [ ] Generic audit-log viewer beyond coefficient history
 - [ ] Admin cross-partner proposal read view
+- [ ] Wizard step-1 sticky-footer action bar / `beforeunload` warning / per-step tab titles
+- [ ] Phase 11 sidebar adminHrefs config-driven refactor
+- [ ] `/accounts` 308 redirect sunset (warm-cache window ≥1 milestone is met after v1.3)
 
 ### Out of scope (continuing constraints)
 
@@ -279,4 +345,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-11 — after v1.1 milestone close. v1.1 shipped (hosted web app foundation); v1.2 milestone (UX Polish + Proposal Wizard) is the active focus, context pre-staged in `.planning/MILESTONE-CONTEXT.md` from the 2026-05-11 Figma design session.*
+*Last updated: 2026-05-21 — after v1.2 milestone close + v1.3 milestone kickoff (`/gsd-new-milestone v1.3`). v1.2 shipped (UX Polish + Proposal Wizard, 14/14 reqs, 876 Vitest tests); v1.3 milestone (Design Refresh + Partner-Onboarding Ready) is the active focus, scope locked via Figma `9:46` review + `v1.3-CARRYFORWARD.md` triage.*

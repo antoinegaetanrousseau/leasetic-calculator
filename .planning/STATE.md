@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: — UX Polish + Proposal Wizard (SHIPPED 2026-05-21)
-status: shipped
-last_updated: "2026-05-21T01:00:00.000Z"
-last_activity: "2026-05-21 -- v1.2 milestone archived via /gsd-complete-milestone v1.2; ready for /gsd-new-milestone v1.3 (see .planning/v1.3-CARRYFORWARD.md for candidate scope)"
+milestone: v1.3
+milestone_name: Design Refresh + Partner-Onboarding Ready
+status: planning
+last_updated: "2026-05-21T21:31:30.817Z"
+last_activity: 2026-05-21
 progress:
-  total_phases: 15
-  completed_phases: 15
-  total_plans: 82
-  completed_plans: 82
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State — Matrice Commerciale
@@ -27,18 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 15 (public-surface-brand-polish) — COMPLETE (awaiting manual smoke)
-Plan: 1 of 1 (complete — see `15-01-SUMMARY.md`)
-
-  - Plan 1 — Shared Wizard Primitives + i18n Delta (WizardActionBar / PlusDeDetailsAccordion / PdfPreviewMock / RecapSection + 45 wizard.* keys)
-  - Plan 2 — Server Actions + Finalize Pipeline (3 actions + POST /api/proposals/finalize + completedSteps bookkeeping + legacy redirect + ADMIN-09 isolation barrier)
-  - Plan 3 — Step-1 Paramètres Route + Form Card (page.tsx + ParametresFormCard + WizardStep1Wiring + 28 Vitest assertions; ADMIN-09 step-1 grep-clean)
-  - Plan 4 — Step-2 Calcul Route (page.tsx with server-side computeLoyer + hero card + Détail du calcul + D-12 commission relaxation + Paramètres saisis recap; 15 Vitest assertions; ADMIN-09 commission-appears-exactly-once enforced)
-  - Plan 5 — Step-3 Verification Route (page.tsx with 2-column 1040px review + 3 RecapSection cards CLIENT/PROJET/CALCUL + PdfPreviewMock right column + FinalizeButton client adapter wiring Confirmer & Générer le PDF CTA to POST /api/proposals/finalize; D-24 spinner UX + D-12 bounded commission visibility on step-3 review; 23 Vitest assertions across 2 test files; Wave 2 complete)
-  - Plan 6 — Wave 3 Integration Tests + Security Closeout (stepperBehavior.test.ts 9 scenarios D-20/D-21/D-22/D-23; no-commission.test.ts 36 assertions across 30 golden fixtures with 4-layer defense-in-depth including binary PDF inspection; STRIDE addendum D-28 mandatory documenting D-12 envelope + 7 new threats; manual Chrome+Edge smoke runbook all 5 ROUTE-01 criteria + ADMIN-09 envelope + cross-partner isolation across 7 numbered tests; 788 Vitest tests pass total; ZERO new schema migrations)
-
-Status: Phase 15 implementation complete (manual smoke pending)
-Last activity: 2026-05-21 -- Phase 15 Plan 01 shipped: BrandLogo swap on shared (public) layout + .public-page-logo CSS clamp(140px, 50vw, 200px); PUB-01 + PUB-02 closed; 876 Vitest tests pass (+4 net)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-21 — Milestone v1.3 started
 
 ## Phase 15 Performance Metrics
 
