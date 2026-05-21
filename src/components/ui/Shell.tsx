@@ -109,12 +109,21 @@ export function Shell({
           height: 'var(--footer-h)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
+          padding: '0 24px',
           fontSize: '10.5px',
           color: 'var(--muted)',
         }}
       >
-        {t('shell.footer.copyright', lang)}
+        <span>{t('shell.footer.copyright', lang)}</span>
+        <a
+          href="https://leasetic.fr/mentions-legales"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--muted)', textDecoration: 'underline', fontSize: '10.5px' }}
+        >
+          {t('shell.footer.privacy', lang)}
+        </a>
       </footer>
     </div>
   );
