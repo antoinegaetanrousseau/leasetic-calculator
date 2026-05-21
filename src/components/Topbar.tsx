@@ -1,6 +1,8 @@
 import { UserMenu } from './UserMenu';
 import { t, type Lang } from '@/lib/i18n';
 
+// PHASE 16: verified visual match to Figma 9:46 on 2026-05-22 (D-16). Zero functional change.
+
 /**
  * Topbar — page title + ADMIN pill + UserMenu (UI-SPEC §6.7, Plan 11-05 D-06).
  *
