@@ -274,7 +274,9 @@ export function RetractableSidebar({
       )}
 
       {/* Nav items */}
-      <ul id="leasetic-sidebar-nav" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      {/* D-15: marginTop 24 only in collapsed mode — matches Figma 23:46 24px gap spacer between
+          brand row and first nav icon. In expanded mode the eyebrow div carries marginTop: 24. */}
+      <ul id="leasetic-sidebar-nav" style={{ listStyle: 'none', padding: 0, margin: 0, marginTop: collapsed ? 24 : 0 }}>
         {navItems.map((item) => {
           const isActive = item.key === activeNav;
           const itemStyle: CSSProperties = {
@@ -288,6 +290,8 @@ export function RetractableSidebar({
             borderRadius: 10,
             marginBottom: 4,
             textDecoration: 'none',
+            // D-13: 'transparent' (not literal 'white') — correct for dark-mode cascade
+            // (sidebar bg shifts to --surface dark in dark theme; explicit white would break).
             background: isActive ? 'rgba(18, 150, 87, 0.10)' : 'transparent',
             color: isActive ? 'var(--ink)' : 'var(--muted)',
             fontWeight: isActive ? 600 : 500,
@@ -301,7 +305,7 @@ export function RetractableSidebar({
                 style={itemStyle}
                 aria-label={collapsed ? t(item.labelKey, lang) : undefined}
               >
-                <Icon size={18} strokeWidth={1.6} color={isActive ? 'var(--gd)' : 'var(--muted)'} />
+                <Icon size={20} strokeWidth={1.6} color={isActive ? 'var(--gd)' : 'var(--muted)'} />
                 {!collapsed && <span>{t(item.labelKey, lang)}</span>}
               </Link>
             </li>
@@ -355,9 +359,9 @@ export function RetractableSidebar({
               cursor: 'pointer',
             }}
           >
-            {theme === 'light' && <Sun size={17} strokeWidth={1.6} />}
-            {theme === 'system' && <Monitor size={17} strokeWidth={1.6} />}
-            {theme === 'dark' && <Moon size={17} strokeWidth={1.6} />}
+            {theme === 'light' && <Sun size={16} strokeWidth={1.6} />}
+            {theme === 'system' && <Monitor size={16} strokeWidth={1.6} />}
+            {theme === 'dark' && <Moon size={16} strokeWidth={1.6} />}
           </button>
         </div>
       ) : (
