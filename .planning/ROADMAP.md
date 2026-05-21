@@ -188,7 +188,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 13. 3-Step Proposal Wizard | v1.2 | 6/6 | Complete | 2026-05-12 |
 | 14. Admin Polish — Partners + History + Home | v1.2 | 6/6 | Complete | 2026-05-20 |
 | 15. Public Surface Brand Polish | v1.2 | 1/1 | Complete | 2026-05-21 |
-| 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete   | 2026-05-21 |
+| 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete    | 2026-05-21 |
 | 17. Partner Surfaces | v1.3 | 0/TBD | Not started | — |
 | 18. Admin Surfaces | v1.3 | 0/TBD | Not started | — |
 | 19. New Capabilities | v1.3 | 0/TBD | Not started | — |

@@ -12,11 +12,11 @@
 
 ### Shell + Design System (SHELL)
 
-- [ ] **SHELL-01**: User sees a refreshed sidebar shell with brand row + collapse toggle, matching Figma `23:46` collapsed (72px) and expanded (260px) variants. Persists user's collapse preference (existing localStorage key from v1.2 COMP-02 reused).
-- [ ] **SHELL-02**: User can toggle theme between **Light / System / Dark** via a tri-state control in the sidebar footer. "System" respects `prefers-color-scheme` and updates live when the OS theme changes. Replaces the v1.1/v1.2 binary cookie toggle.
-- [ ] **SHELL-03**: Every authed page renders the hero pattern: `Bonjour, {prénom} 👋` greeting (or admin equivalent) + page subtitle + page-level CTA top-right.
-- [ ] **SHELL-04**: FR/EN locale toggle relocates from topbar to sidebar footer (alongside the theme toggle). Keyboard-navigable.
-- [ ] **SHELL-05**: Topbar (page title + user menu) and Footer (`© 2026 Leasétic — Application interne · Mentions légales`) ship the visual treatment shown across Figma `9:46` frames.
+- [x] **SHELL-01**: User sees a refreshed sidebar shell with brand row + collapse toggle, matching Figma `23:46` collapsed (72px) and expanded (260px) variants. Persists user's collapse preference (existing localStorage key from v1.2 COMP-02 reused).
+- [x] **SHELL-02**: User can toggle theme between **Light / System / Dark** via a tri-state control in the sidebar footer. "System" respects `prefers-color-scheme` and updates live when the OS theme changes. Replaces the v1.1/v1.2 binary cookie toggle.
+- [x] **SHELL-03**: Every authed page renders the hero pattern: `Bonjour, {prénom} 👋` greeting (or admin equivalent) + page subtitle + page-level CTA top-right.
+- [x] **SHELL-04**: FR/EN locale toggle relocates from topbar to sidebar footer (alongside the theme toggle). Keyboard-navigable.
+- [x] **SHELL-05**: Topbar (page title + user menu) and Footer (`© 2026 Leasétic — Application interne · Mentions légales`) ship the visual treatment shown across Figma `9:46` frames.
 
 ### Light + Dark mode coverage (THEME)
 
@@ -140,11 +140,11 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHELL-01 | 16 | Pending |
-| SHELL-02 | 16 | Pending |
-| SHELL-03 | 16 | Pending |
-| SHELL-04 | 16 | Pending |
-| SHELL-05 | 16 | Pending |
+| SHELL-01 | 16 | Complete |
+| SHELL-02 | 16 | Complete |
+| SHELL-03 | 16 | Complete |
+| SHELL-04 | 16 | Complete |
+| SHELL-05 | 16 | Complete |
 | THEME-01 | 17 | Pending |
 | THEME-02 | 18 | Pending |
 | CONTRAST-01 | 16 | Complete |
