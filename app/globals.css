@@ -374,12 +374,12 @@ input[aria-invalid="true"] {
 
 .chip-draft {
   background: rgba(224, 133, 48, 0.12);
-  color: var(--gold);
+  color: var(--gold-text);
 }
 
 .chip-invited {
   background: rgba(224, 133, 48, 0.12);
-  color: var(--gold);
+  color: var(--gold-text);
 }
 
 .chip-deleted {
