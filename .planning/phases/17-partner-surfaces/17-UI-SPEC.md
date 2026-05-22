@@ -1,10 +1,14 @@
 ---
 phase: 17
 slug: partner-surfaces
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-22
+reviewed_at: 2026-05-22
+checker_revision_pass: 0
+flags_outstanding:
+  - "CONTRAST-02 Row 11 (dark-mode filter-pill active state ~3.9:1) — planner must choose: (1) accept-with-deviation OR (2) introduce --active-pill token at higher opacity for dark mode. Recommended: (2)."
 ---
 
 # Phase 17 — UI Design Contract
