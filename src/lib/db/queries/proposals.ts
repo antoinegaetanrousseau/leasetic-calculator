@@ -31,6 +31,15 @@ export interface ListProposalsArgs {
   cursor?: Cursor | null;
   limit?: number;     // default 20 (returns up to 21 server-side, slices to 20 + sets hasMore)
   deleted?: boolean;  // false (default) → active rows; true → 30-day deleted window
+  /**
+   * Phase 17 D-13 — Archivées filter. When true, the helper returns rows
+   * matching `(status='active' AND past validity)` OR `(status='deleted' AND
+   * deleted_at within 30-day window)`, scoped to userId. The expired
+   * derivation defers to `deriveDisplayStatus` app-side (single source of
+   * truth — paramsSnapshot.validityDays + pdfGeneratedAt math lives there).
+   * Defaults to false. Orthogonal to `deleted` (D-13 retires the v1.1 toggle).
+   */
+  archived?: boolean;
 }
 
 export interface SearchProposalsArgs extends ListProposalsArgs {
@@ -154,18 +163,69 @@ export async function listProposalsByUser(args: ListProposalsArgs): Promise<List
   const limit = args.limit ?? DEFAULT_LIMIT;
   const fetchCount = limit + 1;
 
-  // deleted_at predicate
+  // cursor predicate: (created_at, id) < (cursor.createdAt, cursor.id)
+  const cursorPredicate = args.cursor
+    ? sql`(${schema.proposals.createdAt}, ${schema.proposals.id}) < (${args.cursor.createdAt}::timestamptz, ${args.cursor.id}::uuid)`
+    : undefined;
+
+  // Phase 17 D-13 — Archivées branch. Candidate set = (active rows that may be
+  // expired) UNION (soft-deleted within 30-day window). Then deriveDisplayStatus
+  // narrows to only expired-or-deleted rows app-side (D-12 single source of
+  // truth — keeps the paramsSnapshot.validityDays + pdfGeneratedAt math out of
+  // SQL). T-17-01-01 IDOR mitigation: userId scope is the FIRST AND predicate
+  // and is present in every branch below.
+  if (args.archived) {
+    const archivedCandidatePredicate = or(
+      // Active rows that MAY be expired (deriveDisplayStatus narrows further).
+      and(
+        eq(schema.proposals.status, 'active'),
+        isNull(schema.proposals.deletedAt),
+      ),
+      // Soft-deleted within the 30-day window.
+      and(
+        eq(schema.proposals.status, 'deleted'),
+        isNotNull(schema.proposals.deletedAt),
+        gt(schema.proposals.deletedAt, SOFT_DELETE_WINDOW),
+      ),
+    );
+    const whereArchived = and(
+      eq(schema.proposals.userId, args.userId), // CRITICAL: userId always first
+      archivedCandidatePredicate,
+      cursorPredicate,
+    );
+    // Fetch with extra headroom: app-side deriveDisplayStatus drop may shrink
+    // the result. Cap at fetchCount * 3 to bound the worst case; pagination
+    // boundary correctness in degraded edge cases is acceptable for v1.3
+    // partner volume (<1000 rows/partner per CONTEXT D-12 + threat T-17-01-06).
+    const candidateRows = await dbi.select().from(schema.proposals)
+      .where(whereArchived)
+      .orderBy(desc(schema.proposals.createdAt), desc(schema.proposals.id))
+      .limit(fetchCount * 3);
+
+    // App-side narrow: keep only rows whose deriveDisplayStatus is 'expired'
+    // (active-past-validity branch) or 'deleted' (soft-deleted-within-window
+    // branch). Drop active-not-yet-expired rows from the candidate set.
+    const narrowed = candidateRows.filter((row) => {
+      const ds = deriveDisplayStatus(row);
+      return ds === 'expired' || ds === 'deleted';
+    });
+
+    const hasMore = narrowed.length > limit;
+    const sliced = hasMore ? narrowed.slice(0, limit) : narrowed;
+    const last = sliced[sliced.length - 1];
+    const nextCursor = hasMore && last
+      ? { createdAt: last.createdAt.toISOString(), id: last.id }
+      : null;
+    return { rows: sliced, hasMore, nextCursor };
+  }
+
+  // deleted_at predicate (v1.1 toggle path — retiring with Partner Home Phase 17 rewrite).
   const deletedPredicate = args.deleted
     ? and(
         isNotNull(schema.proposals.deletedAt),
         gt(schema.proposals.deletedAt, SOFT_DELETE_WINDOW),
       )
     : isNull(schema.proposals.deletedAt);
-
-  // cursor predicate: (created_at, id) < (cursor.createdAt, cursor.id)
-  const cursorPredicate = args.cursor
-    ? sql`(${schema.proposals.createdAt}, ${schema.proposals.id}) < (${args.cursor.createdAt}::timestamptz, ${args.cursor.id}::uuid)`
-    : undefined;
 
   // D-08 / Phase 12: stored status is the source of truth. For the active list
   // (deleted=false), filter out drafts via status='active'. For the deleted-window
@@ -219,13 +279,6 @@ export async function searchProposals(args: SearchProposalsArgs): Promise<ListRe
   }
   const pattern = `%${q}%`;
 
-  const deletedPredicate = args.deleted
-    ? and(
-        isNotNull(schema.proposals.deletedAt),
-        gt(schema.proposals.deletedAt, SOFT_DELETE_WINDOW),
-      )
-    : isNull(schema.proposals.deletedAt);
-
   const cursorPredicate = args.cursor
     ? sql`(${schema.proposals.createdAt}, ${schema.proposals.id}) < (${args.cursor.createdAt}::timestamptz, ${args.cursor.id}::uuid)`
     : undefined;
@@ -234,6 +287,51 @@ export async function searchProposals(args: SearchProposalsArgs): Promise<ListRe
     sql`(${schema.proposals.inputs} ->> 'clientCo') ILIKE ${pattern}`,
     ilike(schema.proposals.lcRef, pattern),
   );
+
+  // Phase 17 D-13 — Archivées + q orthogonal branch. Same candidate-set +
+  // app-side deriveDisplayStatus narrow as listProposalsByUser.archived.
+  // T-17-01-01 IDOR mitigation: userId is the FIRST AND predicate.
+  if (args.archived) {
+    const archivedCandidatePredicate = or(
+      and(
+        eq(schema.proposals.status, 'active'),
+        isNull(schema.proposals.deletedAt),
+      ),
+      and(
+        eq(schema.proposals.status, 'deleted'),
+        isNotNull(schema.proposals.deletedAt),
+        gt(schema.proposals.deletedAt, SOFT_DELETE_WINDOW),
+      ),
+    );
+    const whereArchivedSearch = and(
+      eq(schema.proposals.userId, args.userId),
+      archivedCandidatePredicate,
+      searchPredicate,
+      cursorPredicate,
+    );
+    const candidateRows = await dbi.select().from(schema.proposals)
+      .where(whereArchivedSearch)
+      .orderBy(desc(schema.proposals.createdAt), desc(schema.proposals.id))
+      .limit(fetchCount * 3);
+    const narrowed = candidateRows.filter((row) => {
+      const ds = deriveDisplayStatus(row);
+      return ds === 'expired' || ds === 'deleted';
+    });
+    const hasMore = narrowed.length > limit;
+    const sliced = hasMore ? narrowed.slice(0, limit) : narrowed;
+    const last = sliced[sliced.length - 1];
+    const nextCursor = hasMore && last
+      ? { createdAt: last.createdAt.toISOString(), id: last.id }
+      : null;
+    return { rows: sliced, hasMore, nextCursor };
+  }
+
+  const deletedPredicate = args.deleted
+    ? and(
+        isNotNull(schema.proposals.deletedAt),
+        gt(schema.proposals.deletedAt, SOFT_DELETE_WINDOW),
+      )
+    : isNull(schema.proposals.deletedAt);
 
   // D-08 / Phase 12: same status filter as listProposalsByUser — drafts excluded
   // from active search results.

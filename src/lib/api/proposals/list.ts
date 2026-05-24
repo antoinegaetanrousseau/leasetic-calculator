@@ -34,7 +34,22 @@ export interface BuildListParams {
   userId: string;
   q?: string;
   cursorEncoded?: string | null;
+  /**
+   * v1.1 Partner Home "Recently Deleted" toggle param. Retiring with Phase 17
+   * (Partner Home no longer mounts RecentlyDeletedToggle), kept for backward
+   * compat until callers are confirmed migrated.
+   */
   deleted?: boolean;
+  /**
+   * Phase 17 D-13 — Archivées filter. When true, returns rows that are EITHER
+   * expired (status='active' but past validity) OR soft-deleted within the
+   * 30-day window. Scoped to `userId` (T-17-01-01 IDOR mitigation enforced
+   * inside listProposalsByUser/searchProposals). Defaults to false.
+   *
+   * Orthogonal to `q` per 17-CONTEXT.md Claude's Discretion: q + archived
+   * combine cleanly, e.g. `/proposals?archived=1&q=acme`.
+   */
+  archived?: boolean;
   limit?: number;
 }
 
@@ -51,18 +66,22 @@ export interface BuildListParams {
 export async function buildListResponse(args: BuildListParams): Promise<ListResponse> {
   const cursor = args.cursorEncoded ? decodeCursor(args.cursorEncoded) : null;
   const q = args.q?.trim() ?? '';
+  // Phase 17 D-13: thread the archived flag (default false → Actives).
+  const archived = args.archived ?? false;
 
   const result: ListResult = q.length > 0
     ? await searchProposals({
         userId: args.userId, q,
         cursor: cursor ?? undefined,
         deleted: args.deleted ?? false,
+        archived,
         limit: args.limit ?? 20,
       })
     : await listProposalsByUser({
         userId: args.userId,
         cursor: cursor ?? undefined,
         deleted: args.deleted ?? false,
+        archived,
         limit: args.limit ?? 20,
       });
 
