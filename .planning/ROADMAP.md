@@ -138,8 +138,8 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   4. `/[adminSegment]/coefficients` shows the Figma `45:46` orange warning banner (using `--gold` token) with copy confirming coefficient edits do not retroactively change existing PDFs, plus the refreshed inline history card alongside the Phase 14 2-column sidebar.
   5. Every admin-side screen ships both light and dark variants; the 9-gate grep-contract suite remains green.
   6. `/aide` landing renders the 3-card placeholder grid; `/aide/commencer-ici` renders the starter article; sidebar `Aide` link is visible for both partner and admin roles; light + dark verified.
-**Plans:** 7 plans
-- [ ] 18-01-PLAN.md — DB/API foundation: proposal-aggregates cross-partner + partner-aggregates + admin-activity 3-source union + /proposals admin user_id query (D-11) + per-role sidebar nav (D-27) + ~70 net-new i18n keys
+**Plans:** 1/7 plans executed
+- [x] 18-01-PLAN.md — DB/API foundation: proposal-aggregates cross-partner + partner-aggregates + admin-activity 3-source union + /proposals admin user_id query (D-11) + per-role sidebar nav (D-27) + ~70 net-new i18n keys
 - [ ] 18-02-PLAN.md — Admin Home rebuild (PageHero + 3 stat tiles all teal D-04 + 3 AdminNavCards + Recent activity card + RecentActivityRow component + MetricTile valueColor prop)
 - [ ] 18-03-PLAN.md — Partners list: AccountsList→PartnersList full rename (D-14), 6-col styled table, 4-tab filter pill (D-09), per-row overflow menu (D-10), cursor pagination (D-12), empty states (D-13)
 - [ ] 18-04-PLAN.md — Créer partenaire visual refresh: separate action card (D-15), inline red error state (D-16), dirty-form confirm dialog (D-18); behavior unchanged
@@ -206,7 +206,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 15. Public Surface Brand Polish | v1.2 | 1/1 | Complete | 2026-05-21 |
 | 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete    | 2026-05-21 |
 | 17. Partner Surfaces | v1.3 | 8/8 | Complete   | 2026-05-24 |
-| 18. Admin Surfaces + Help Center | v1.3 | 0/7 | Planned | — |
+| 18. Admin Surfaces + Help Center | v1.3 | 1/7 | In Progress|  |
 | 19. New Capabilities | v1.3 | 0/TBD | Not started | — |
 | 20. Infra Hardening | v1.3 | 0/TBD | Not started | — |
 | 21. Partner-Onboarding Gates | v1.3 | 0/TBD | Not started | — |

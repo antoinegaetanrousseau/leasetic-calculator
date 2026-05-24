@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
-status: verifying
-last_updated: "2026-05-24T18:33:00.193Z"
+status: executing
+last_updated: "2026-05-24T19:46:25.647Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 16
-  total_plans: 96
-  completed_plans: 95
+  total_plans: 103
+  completed_plans: 96
   percent: 76
 ---
 
@@ -23,13 +23,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 17 — partner-surfaces
+**Current focus:** Phase 18 — admin-surfaces
 
 ## Current Position
 
-Phase: 17 (partner-surfaces) — EXECUTING
-Plan: 8 of 8
-Status: Phase complete — ready for verification
+Phase: 18 (admin-surfaces) — EXECUTING
+Plan: 2 of 7
+Status: Ready to execute
 Last activity: 2026-05-24
 
 ## Phase 17 Performance Metrics
@@ -345,6 +345,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 17 P06 | ~6min | 1 tasks | 3 files |
 | Phase 17-partner-surfaces P07 | ~10min | 3 tasks | 5 files |
 | Phase 17 P17-08 | ~20min | 3 tasks tasks | 3 modified + 2 created files |
+| Phase 18 P01 | ~25min | 3 tasks | 11 (5 created + 6 modified incl. SUMMARY + deferred-items) files |
 
 ## Decisions
 
@@ -367,3 +368,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: 17-07: Optimistic UI no-rollback on server-action failure accepted per T-17-07-06 (internal tool); v1.4+ may add onError revert
 - [Phase ?]: Phase 17 Plan 08 — CONTRAST-02 Row 11 dark-mode active filter pill ~3.9:1 accepted as deviation (Option 1) — matches existing .chip-active baseline (Phase 8), no regression; palette stability invariant preserved per ROADMAP §v1.3 §3
 - [Phase ?]: Phase 17 Plan 08 — Antoine sign-off received 2026-05-24 for all 5 partner surfaces × light + dark (THEME-01); ADMIN-09 9/9 green (32ms), tsc exit 0, WIZ-05 closed; Phase 17 SHIPPED 8/8 plans, 12/12 reqs
+- [Phase ?]: Phase 12 DB-02 derivation (active = role=partner AND deletedAt IS NULL AND lastLoginAt IS NOT NULL) reused for getActivePartnerCount; no users.status column
+- [Phase ?]: Recent activity = 2-source union (coefficient_history + partner status); invitations source DEFERRED — schema has no invitations table
+- [Phase ?]: D-11 admin user_id override gated at BOTH SSR (session.role) AND library (_callerRole) layers — defense in depth IDOR mitigation
+- [Phase ?]: Rule 3 auto-fix: localStorage + sessionStorage polyfill added to __tests__/setup-dom.ts (jsdom 25 + Node 25 + Vitest 2.1.8 combo pre-existing infra gap)
