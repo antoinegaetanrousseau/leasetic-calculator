@@ -31,7 +31,7 @@
 ### Partner Home (PHOME)
 
 - [x] **PHOME-01**: Partner Home `/` renders the hero greeting (`Bonjour, {prénom} 👋`) + 3 MetricTile consumers (Ce mois-ci / Total / Brouillons) + Propositions récentes card per Figma `9:47`. Consumes the existing v1.2 `<MetricTile>` primitive (COMP-03 shipped, consumer deferred).
-- [ ] **PHOME-02**: MetricTile values are scoped to the requesting partner (`user_id` filter), computed over Europe/Paris calendar month for "Ce mois-ci", all-time for "Total", and `status = 'draft'` for "Brouillons". Display-only — tiles are not clickable in v1.3.
+- [x] **PHOME-02**: MetricTile values are scoped to the requesting partner (`user_id` filter), computed over Europe/Paris calendar month for "Ce mois-ci", all-time for "Total", and `status = 'draft'` for "Brouillons". Display-only — tiles are not clickable in v1.3.
 - [x] **PHOME-03**: Propositions récentes card shows the partner's 5 most recent proposals (any status except deleted), with a `Voir toutes →` link to `/proposals`. Each row uses `<StatusChip>` for status display.
 
 ### Partner Proposals + Archives (PROPS)
@@ -150,7 +150,7 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | CONTRAST-01 | 16 | Complete |
 | CONTRAST-02 | 16 | Complete |
 | PHOME-01 | 17 | Complete |
-| PHOME-02 | 17 | Pending |
+| PHOME-02 | 17 | Complete |
 | PHOME-03 | 17 | Complete |
 | PROPS-01 | 17 | Complete |
 | PROPS-02 | 17 | Complete |
