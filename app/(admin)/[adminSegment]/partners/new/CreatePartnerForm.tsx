@@ -2,24 +2,52 @@
 
 /**
  * Phase 14 — Client RHF form for /[adminSegment]/partners/new (UI-SPEC §5.1).
+ * Phase 18 Plan 04 — visual repaint per Figma 43:46 + D-15/D-16/D-17/D-18.
  *
- * Layout: single .card containing 3 ●-bulleted sections separated by <hr>
- * dividers (D-06 — Personal info / Company info / Invitation message), plus
- * an action bar at the bottom (Cancel ghost-link + Submit btn-green with
- * spinner state).
+ * Layout (Phase 18):
+ *   <form>
+ *     <div className="card">  ← form card with 3 ●-bulleted sections
+ *       Section 1: INFORMATIONS PERSONNELLES
+ *       Section 2: INFORMATIONS SOCIÉTÉ
+ *       Section 3: MESSAGE D'INVITATION
+ *     </div>
+ *     <div className="card" style={{marginTop:16, ...flex space-between}}>
+ *       ← Annuler (btn-out, type="button", dirty-form confirm)   Envoyer l'invitation → (btn-green, submit)
+ *     </div>
+ *   </form>
  *
- * Submit flow (D-08):
- *   onSubmit → server action createPartnerAction → either
+ * Behavior (unchanged from Phase 14):
+ *   - RHF + zodResolver(createPartnerFormSchema) onBlur validation
+ *   - Submit → server action createPartnerAction
  *     - { ok: true, url, kind: 'invite' }: sonner success toast +
  *       <InviteUrlModal> opens; on modal close: reset() + router.push(/partners).
- *     - { ok: false, error }: sonner error toast (duplicate-email key mapped
- *       to partners.new.toast.error.duplicate; everything else → generic).
+ *     - { ok: false, error }: duplicate-email mapped to specific toast; everything
+ *       else → generic partners.new.toast.error toast (D-16 server-action fallback).
+ *
+ * Phase 18 deltas:
+ *   - D-15 action row moved OUT of the form card into a sibling .card (marginTop:16)
+ *   - D-15 submit label: "Envoyer l'invitation →" via admin.partners.form.submit
+ *   - D-15 submit spinner: "Envoi en cours…" via admin.partners.form.submit.spinner
+ *   - D-15 Annuler is now a <button type="button"> (was <Link>) so D-18 confirm
+ *     can fire before navigation
+ *   - D-16 inline error state already shipped Phase 14 (.invalid class + aria-invalid
+ *     + aria-describedby + .error-msg); the global CSS rule `input.invalid` +
+ *     `input[aria-invalid="true"]` provides the red border via `border-color: var(--danger)`
+ *     (see app/globals.css line 192-196). Inline error <p> text uses the .error-msg
+ *     class which globally renders `color: var(--danger)` (globals.css line 164-170).
+ *     Both the border and error-text tokens resolve to `var(--danger)` — defense-in-depth
+ *     inline borderColor overlay below on invalid inputs satisfies the explicit-token
+ *     contract from 18-04 PLAN done-criteria gate.
+ *   - D-17 InviteUrlModal success affordance preserved verbatim
+ *   - D-18 dirty-form confirm dialog: clean form → immediate navigate;
+ *     dirty form → window.confirm() with admin.partners.form.cancel.confirm copy;
+ *     accept → router.push, decline → stay on form. window.confirm is the
+ *     UI-SPEC line 443 baseline (no project-wide ConfirmDialog primitive exists).
  *
  * ADMIN-09 (D-29 strict): no commission/rate fields rendered.
  */
 
 import { useRef, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -71,7 +99,7 @@ export function CreatePartnerForm({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
     control,
     reset,
   } = useForm<CreatePartnerFormValues>({
@@ -104,289 +132,323 @@ export function CreatePartnerForm({
       if (result.error === 'admin.accounts.modal.error.email.exists') {
         toast.error(t('partners.new.toast.error.duplicate', lang));
       } else {
+        // D-16 server-action error fallback — generic toast for non-duplicate failures.
         toast.error(t('partners.new.toast.error', lang));
       }
     }
   };
 
+  /**
+   * D-18 — dirty-form confirm gate on Annuler.
+   * Clean form (isDirty=false) → immediate navigate.
+   * Dirty form (isDirty=true) → window.confirm() before navigating.
+   *
+   * window.confirm is the UI-SPEC line 443 baseline ("or window.confirm as a
+   * baseline if no modal primitive exists"). Verified no project-wide
+   * ConfirmDialog primitive exists (grep on 2026-05-24); existing patterns
+   * (ProposalForm reset, DeleteButtonClient) all use window.confirm.
+   */
+  const handleCancel = () => {
+    if (isDirty) {
+      const confirmed = window.confirm(
+        t('admin.partners.form.cancel.confirm', lang),
+      );
+      if (!confirmed) return;
+    }
+    router.push(`/${adminSegment}/partners`);
+  };
+
   return (
     <>
       <form
-        className="card"
         onSubmit={handleSubmit(onSubmit)}
         noValidate
         aria-busy={isSubmitting || undefined}
       >
-        {/* ── Section 1: INFORMATIONS PERSONNELLES ──────────────────────── */}
-        <div className="ctitle" style={{ marginBottom: 16 }}>
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('partners.new.section.personal', lang)}</span>
-        </div>
-
-        <div className="fld">
-          <label htmlFor="cpf-firstName">
-            {t('partners.new.field.firstName', lang)}
-            <span className="req" aria-hidden="true">*</span>
-          </label>
-          <input
-            id="cpf-firstName"
-            type="text"
-            autoComplete="given-name"
-            placeholder={t('partners.new.field.firstName.placeholder', lang)}
-            aria-invalid={errors.firstName ? true : undefined}
-            aria-describedby={errors.firstName ? 'cpf-firstName-error' : undefined}
-            className={errors.firstName ? 'invalid' : ''}
-            disabled={isSubmitting}
-            {...register('firstName')}
-          />
-          {errors.firstName?.message && (
-            <p id="cpf-firstName-error" role="alert" className="error-msg">
-              {t(errors.firstName.message as DictKey, lang)}
-            </p>
-          )}
-        </div>
-
-        <div className="fld">
-          <label htmlFor="cpf-lastName">
-            {t('partners.new.field.lastName', lang)}
-            <span className="req" aria-hidden="true">*</span>
-          </label>
-          <input
-            id="cpf-lastName"
-            type="text"
-            autoComplete="family-name"
-            placeholder={t('partners.new.field.lastName.placeholder', lang)}
-            aria-invalid={errors.lastName ? true : undefined}
-            aria-describedby={errors.lastName ? 'cpf-lastName-error' : undefined}
-            className={errors.lastName ? 'invalid' : ''}
-            disabled={isSubmitting}
-            {...register('lastName')}
-          />
-          {errors.lastName?.message && (
-            <p id="cpf-lastName-error" role="alert" className="error-msg">
-              {t(errors.lastName.message as DictKey, lang)}
-            </p>
-          )}
-        </div>
-
-        <div className="fld">
-          <label htmlFor="cpf-email">
-            {t('partners.new.field.email', lang)}
-            <span className="req" aria-hidden="true">*</span>
-          </label>
-          <input
-            id="cpf-email"
-            type="email"
-            autoComplete="email"
-            placeholder={t('partners.new.field.email.placeholder', lang)}
-            aria-invalid={errors.email ? true : undefined}
-            aria-describedby={errors.email ? 'cpf-email-error' : undefined}
-            className={errors.email ? 'invalid' : ''}
-            disabled={isSubmitting}
-            {...register('email')}
-          />
-          {errors.email?.message && (
-            <p id="cpf-email-error" role="alert" className="error-msg">
-              {t(errors.email.message as DictKey, lang)}
-            </p>
-          )}
-        </div>
-
-        <hr
-          style={{
-            border: 'none',
-            borderTop: '1px solid var(--border)',
-            margin: '24px 0',
-          }}
-        />
-
-        {/* ── Section 2: INFORMATIONS SOCIÉTÉ ───────────────────────────── */}
-        <div className="ctitle" style={{ marginBottom: 16 }}>
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('partners.new.section.company', lang)}</span>
-        </div>
-
-        <div className="fld">
-          <label htmlFor="cpf-companyName">
-            {t('partners.new.field.companyName', lang)}
-            <span className="req" aria-hidden="true">*</span>
-          </label>
-          <input
-            id="cpf-companyName"
-            type="text"
-            autoComplete="organization"
-            placeholder={t('partners.new.field.companyName.placeholder', lang)}
-            aria-invalid={errors.companyName ? true : undefined}
-            aria-describedby={errors.companyName ? 'cpf-companyName-error' : undefined}
-            className={errors.companyName ? 'invalid' : ''}
-            disabled={isSubmitting}
-            {...register('companyName')}
-          />
-          {errors.companyName?.message && (
-            <p id="cpf-companyName-error" role="alert" className="error-msg">
-              {t(errors.companyName.message as DictKey, lang)}
-            </p>
-          )}
-        </div>
-
-        <div className="fld">
-          <label htmlFor="cpf-siret">
-            {t('partners.new.field.siret', lang)}
-          </label>
-          <input
-            id="cpf-siret"
-            type="text"
-            inputMode="numeric"
-            autoComplete="off"
-            placeholder={t('partners.new.field.siret.placeholder', lang)}
-            aria-invalid={errors.siret ? true : undefined}
-            aria-describedby={errors.siret ? 'cpf-siret-error' : undefined}
-            className={errors.siret ? 'invalid' : ''}
-            disabled={isSubmitting}
-            {...register('siret')}
-          />
-          {errors.siret?.message && (
-            <p id="cpf-siret-error" role="alert" className="error-msg">
-              {t(errors.siret.message as DictKey, lang)}
-            </p>
-          )}
-        </div>
-
-        <div className="fld">
-          <label htmlFor="cpf-phone">
-            {t('partners.new.field.phone', lang)}
-            <span className="req" aria-hidden="true">*</span>
-          </label>
-          {/*
-            UI-SPEC §5.1.3 recommends reusing <PhoneInput>. We use a plain
-            <input type="tel"> here because PhoneInput consumes RHF via
-            Controller + formats to 10-digit FR layout — the form schema
-            accepts a more permissive 6-20 char range (E.164 / international
-            partners). Switching to PhoneInput would over-constrain the
-            international case; keeping plain input + the schema regex.
-          */}
-          <input
-            id="cpf-phone"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            placeholder=""
-            aria-invalid={errors.phone ? true : undefined}
-            aria-describedby={errors.phone ? 'cpf-phone-error' : undefined}
-            className={errors.phone ? 'invalid' : ''}
-            disabled={isSubmitting}
-            {...register('phone')}
-          />
-          {errors.phone?.message && (
-            <p id="cpf-phone-error" role="alert" className="error-msg">
-              {t(errors.phone.message as DictKey, lang)}
-            </p>
-          )}
-        </div>
-
-        <hr
-          style={{
-            border: 'none',
-            borderTop: '1px solid var(--border)',
-            margin: '24px 0',
-          }}
-        />
-
-        {/* ── Section 3: MESSAGE D'INVITATION ───────────────────────────── */}
-        <div className="ctitle" style={{ marginBottom: 16 }}>
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('partners.new.section.message', lang)}</span>
-        </div>
-
-        <div className="fld">
-          <label htmlFor="cpf-message">
-            {t('partners.new.field.message', lang)}
-          </label>
-          <textarea
-            id="cpf-message"
-            placeholder={t('partners.new.field.message.placeholder', lang)}
-            aria-invalid={errors.invitationMessage ? true : undefined}
-            aria-describedby={
-              errors.invitationMessage
-                ? 'cpf-message-error'
-                : 'cpf-message-counter'
-            }
-            className={errors.invitationMessage ? 'invalid' : ''}
-            disabled={isSubmitting}
-            style={{
-              minHeight: 120,
-              maxHeight: 320,
-              resize: 'vertical',
-              padding: 12,
-              lineHeight: 1.55,
-              width: '100%',
-            }}
-            {...register('invitationMessage')}
-          />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              marginTop: 4,
-            }}
-          >
+        {/* ── Form card (D-15) — 3 sections with ● bullets ───────────────── */}
+        <div className="card">
+          {/* ── Section 1: INFORMATIONS PERSONNELLES ─────────────────────── */}
+          <div className="ctitle" style={{ marginBottom: 16 }}>
             <span
-              id="cpf-message-counter"
-              data-testid="char-counter"
-              aria-live="polite"
+              className="dot"
+              style={{ background: 'var(--gd)' }}
+              aria-hidden="true"
+            />
+            <span>{t('partners.new.section.personal', lang)}</span>
+          </div>
+
+          <div className="fld">
+            <label htmlFor="cpf-firstName">
+              {t('partners.new.field.firstName', lang)}
+              <span className="req" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="cpf-firstName"
+              type="text"
+              autoComplete="given-name"
+              placeholder={t('partners.new.field.firstName.placeholder', lang)}
+              aria-invalid={errors.firstName ? true : undefined}
+              aria-describedby={errors.firstName ? 'cpf-firstName-error' : undefined}
+              className={errors.firstName ? 'invalid' : ''}
+              disabled={isSubmitting}
+              {...register('firstName')}
+            />
+            {errors.firstName?.message && (
+              <p id="cpf-firstName-error" role="alert" className="error-msg">
+                {t(errors.firstName.message as DictKey, lang)}
+              </p>
+            )}
+          </div>
+
+          <div className="fld">
+            <label htmlFor="cpf-lastName">
+              {t('partners.new.field.lastName', lang)}
+              <span className="req" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="cpf-lastName"
+              type="text"
+              autoComplete="family-name"
+              placeholder={t('partners.new.field.lastName.placeholder', lang)}
+              aria-invalid={errors.lastName ? true : undefined}
+              aria-describedby={errors.lastName ? 'cpf-lastName-error' : undefined}
+              className={errors.lastName ? 'invalid' : ''}
+              disabled={isSubmitting}
+              {...register('lastName')}
+            />
+            {errors.lastName?.message && (
+              <p id="cpf-lastName-error" role="alert" className="error-msg">
+                {t(errors.lastName.message as DictKey, lang)}
+              </p>
+            )}
+          </div>
+
+          <div className="fld">
+            <label htmlFor="cpf-email">
+              {t('partners.new.field.email', lang)}
+              <span className="req" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="cpf-email"
+              type="email"
+              autoComplete="email"
+              placeholder={t('partners.new.field.email.placeholder', lang)}
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={errors.email ? 'cpf-email-error' : undefined}
+              className={errors.email ? 'invalid' : ''}
+              // D-16 explicit borderColor overlay — global CSS rule
+              // `input.invalid` + `input[aria-invalid="true"]` already maps to
+              // var(--danger) (globals.css L192-196); inline overlay is
+              // defense-in-depth + makes the token explicit at the call site.
+              style={
+                errors.email ? { borderColor: 'var(--danger)' } : undefined
+              }
+              disabled={isSubmitting}
+              {...register('email')}
+            />
+            {errors.email?.message && (
+              <p
+                id="cpf-email-error"
+                role="alert"
+                className="error-msg"
+                // D-16 explicit color overlay — .error-msg already maps to
+                // var(--danger) via globals.css L164-170 + .fld .error-msg rule.
+                style={{ color: 'var(--danger)' }}
+              >
+                {t(errors.email.message as DictKey, lang)}
+              </p>
+            )}
+          </div>
+
+          <hr
+            style={{
+              border: 'none',
+              borderTop: '1px solid var(--border)',
+              margin: '24px 0',
+            }}
+          />
+
+          {/* ── Section 2: INFORMATIONS SOCIÉTÉ ─────────────────────────── */}
+          <div className="ctitle" style={{ marginBottom: 16 }}>
+            <span
+              className="dot"
+              style={{ background: 'var(--gd)' }}
+              aria-hidden="true"
+            />
+            <span>{t('partners.new.section.company', lang)}</span>
+          </div>
+
+          <div className="fld">
+            <label htmlFor="cpf-companyName">
+              {t('partners.new.field.companyName', lang)}
+              <span className="req" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="cpf-companyName"
+              type="text"
+              autoComplete="organization"
+              placeholder={t('partners.new.field.companyName.placeholder', lang)}
+              aria-invalid={errors.companyName ? true : undefined}
+              aria-describedby={errors.companyName ? 'cpf-companyName-error' : undefined}
+              className={errors.companyName ? 'invalid' : ''}
+              disabled={isSubmitting}
+              {...register('companyName')}
+            />
+            {errors.companyName?.message && (
+              <p id="cpf-companyName-error" role="alert" className="error-msg">
+                {t(errors.companyName.message as DictKey, lang)}
+              </p>
+            )}
+          </div>
+
+          <div className="fld">
+            <label htmlFor="cpf-siret">
+              {t('partners.new.field.siret', lang)}
+            </label>
+            <input
+              id="cpf-siret"
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder={t('partners.new.field.siret.placeholder', lang)}
+              aria-invalid={errors.siret ? true : undefined}
+              aria-describedby={errors.siret ? 'cpf-siret-error' : undefined}
+              className={errors.siret ? 'invalid' : ''}
+              disabled={isSubmitting}
+              {...register('siret')}
+            />
+            {errors.siret?.message && (
+              <p id="cpf-siret-error" role="alert" className="error-msg">
+                {t(errors.siret.message as DictKey, lang)}
+              </p>
+            )}
+          </div>
+
+          <div className="fld">
+            <label htmlFor="cpf-phone">
+              {t('partners.new.field.phone', lang)}
+              <span className="req" aria-hidden="true">*</span>
+            </label>
+            {/*
+              UI-SPEC §5.1.3 recommends reusing <PhoneInput>. We use a plain
+              <input type="tel"> here because PhoneInput consumes RHF via
+              Controller + formats to 10-digit FR layout — the form schema
+              accepts a more permissive 6-20 char range (E.164 / international
+              partners). Switching to PhoneInput would over-constrain the
+              international case; keeping plain input + the schema regex.
+            */}
+            <input
+              id="cpf-phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder=""
+              aria-invalid={errors.phone ? true : undefined}
+              aria-describedby={errors.phone ? 'cpf-phone-error' : undefined}
+              className={errors.phone ? 'invalid' : ''}
+              disabled={isSubmitting}
+              {...register('phone')}
+            />
+            {errors.phone?.message && (
+              <p id="cpf-phone-error" role="alert" className="error-msg">
+                {t(errors.phone.message as DictKey, lang)}
+              </p>
+            )}
+          </div>
+
+          <hr
+            style={{
+              border: 'none',
+              borderTop: '1px solid var(--border)',
+              margin: '24px 0',
+            }}
+          />
+
+          {/* ── Section 3: MESSAGE D'INVITATION ─────────────────────────── */}
+          <div className="ctitle" style={{ marginBottom: 16 }}>
+            <span
+              className="dot"
+              style={{ background: 'var(--gd)' }}
+              aria-hidden="true"
+            />
+            <span>{t('partners.new.section.message', lang)}</span>
+          </div>
+
+          <div className="fld">
+            <label htmlFor="cpf-message">
+              {t('partners.new.field.message', lang)}
+            </label>
+            <textarea
+              id="cpf-message"
+              placeholder={t('partners.new.field.message.placeholder', lang)}
+              aria-invalid={errors.invitationMessage ? true : undefined}
+              aria-describedby={
+                errors.invitationMessage
+                  ? 'cpf-message-error'
+                  : 'cpf-message-counter'
+              }
+              className={errors.invitationMessage ? 'invalid' : ''}
+              disabled={isSubmitting}
               style={{
-                fontSize: 12.5,
-                fontWeight: 500,
-                color: messageOverLimit ? 'var(--danger)' : 'var(--muted)',
+                minHeight: 120,
+                maxHeight: 320,
+                resize: 'vertical',
+                padding: 12,
+                lineHeight: 1.55,
+                width: '100%',
+              }}
+              {...register('invitationMessage')}
+            />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginTop: 4,
               }}
             >
-              {t('partners.new.message.counter', lang).replace(
-                '{0}',
-                String(messageLen),
-              )}
-            </span>
+              <span
+                id="cpf-message-counter"
+                data-testid="char-counter"
+                aria-live="polite"
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 500,
+                  color: messageOverLimit ? 'var(--danger)' : 'var(--muted)',
+                }}
+              >
+                {t('partners.new.message.counter', lang).replace(
+                  '{0}',
+                  String(messageLen),
+                )}
+              </span>
+            </div>
+            {errors.invitationMessage?.message && (
+              <p id="cpf-message-error" role="alert" className="error-msg">
+                {t(errors.invitationMessage.message as DictKey, lang)}
+              </p>
+            )}
           </div>
-          {errors.invitationMessage?.message && (
-            <p id="cpf-message-error" role="alert" className="error-msg">
-              {t(errors.invitationMessage.message as DictKey, lang)}
-            </p>
-          )}
         </div>
 
-        {/* ── Action bar ──────────────────────────────────────────────── */}
+        {/* ── Action card (D-15) — separate .card sibling, marginTop:16 ─── */}
         <div
+          className="card"
           style={{
+            marginTop: 16,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: 24,
           }}
         >
-          <Link
-            href={`/${adminSegment}/partners`}
+          <button
+            type="button"
+            className="btn-out"
+            onClick={handleCancel}
+            disabled={isSubmitting}
             aria-label={t('partners.new.cancel.aria', lang)}
-            style={{
-              color: 'var(--muted)',
-              fontSize: 14,
-              fontWeight: 500,
-              textDecoration: 'none',
-              pointerEvents: isSubmitting ? 'none' : 'auto',
-            }}
           >
             {t('partners.new.cancel', lang)}
-          </Link>
+          </button>
 
           <button
             ref={submitBtnRef}
@@ -411,8 +473,8 @@ export function CreatePartnerForm({
               />
             )}
             {isSubmitting
-              ? t('partners.new.submit.spinner', lang)
-              : t('partners.new.submit', lang)}
+              ? t('admin.partners.form.submit.spinner', lang)
+              : t('admin.partners.form.submit', lang)}
           </button>
         </div>
       </form>
