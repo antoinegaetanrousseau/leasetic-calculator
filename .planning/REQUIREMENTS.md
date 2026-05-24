@@ -44,7 +44,7 @@
 - [x] **WIZ-01**: Wizard step 1 (Paramètres du projet) ships the Figma `35:46` visual: hero + ÉTAPE 1 SUR 3 eyebrow + stepper + form card with `● INFORMATIONS CLIENT` and `● DÉTAILS DU PROJET` section labels + segmented duration pill (24/36/48 mois) + WizardActionBar (Enregistrer comme brouillon / Continuer vers le calcul).
 - [x] **WIZ-02**: Wizard step 2 (Résultat du calcul) ships the Figma `39:46` visual: hero loyer-mensuel card (`2 770 €` in `--teal`) + `Tranche XK€ • Coefficient X.XX%` pill chip + Détail du calcul card with explicit `Commission apporteur (non visible client)` annotated row + Paramètres saisis recap card with `← Modifier` link. Preserves Phase 13 D-12 partner-facing commission relaxation; ADMIN-09 envelope unchanged.
 - [x] **WIZ-03**: Wizard step 3 (Vérifier la proposition) ships the Figma `40:46` 2-column 1040px layout: left = CLIENT / PROJET / CALCUL review cards via existing `<RecapSection>` primitive (v1.2 Phase 13); right = `<PdfPreviewMock>` card showing `Leasétic` logo + `Proposition de financement` + `Réf. LC-XXXX-XXX • {N} jours de validité` + loyer mensuel.
-- [ ] **WIZ-04**: `proposals.validity_days` selector (15j / 30j / 60j) relocates from its current placement to wizard step 3, inside the CALCUL review card. Implies a default value at draft creation (e.g. 30) with step-3 mutation. Migration / schema impact to be confirmed during planning.
+- [x] **WIZ-04**: `proposals.validity_days` selector (15j / 30j / 60j) relocates from its current placement to wizard step 3, inside the CALCUL review card. Implies a default value at draft creation (e.g. 30) with step-3 mutation. Migration / schema impact to be confirmed during planning.
 - [x] **WIZ-05**: Phase 13 ADMIN-09 D-12 envelope (deal-owner partner sees commission on wizard steps 2 + 3 only) + Phase 14 9-gate grep-contract suite (`tests/admin-09-grep-contracts.test.ts`) remain green throughout v1.3. No further relaxations.
 - [x] **WIZ-06**: PDF reference (LC-XXXX-XXX format) is reserved at draft creation (step 1 finalize) and visible in the step-3 `<PdfPreviewMock>` header before the finalize button is clicked. Reference becomes the canonical identifier on the persisted PDF.
 
@@ -157,7 +157,7 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | WIZ-01 | 17 | Complete |
 | WIZ-02 | 17 | Complete |
 | WIZ-03 | 17 | Complete |
-| WIZ-04 | 17 | Pending |
+| WIZ-04 | 17 | Complete |
 | WIZ-05 | 17 | Complete |
 | WIZ-06 | 17 | Complete |
 | ADMIN-10 | 18 | Pending |

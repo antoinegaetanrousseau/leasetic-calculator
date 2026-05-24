@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T15:54:53.156Z"
+last_updated: "2026-05-24T16:10:54.432Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 15
   total_plans: 96
-  completed_plans: 93
+  completed_plans: 94
   percent: 71
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 17 (partner-surfaces) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -343,6 +343,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 17 P04 | ~5min | 2 tasks | 4 files |
 | Phase 17 P05 | ~10min | 1 tasks | 1 files |
 | Phase 17 P06 | ~6min | 1 tasks | 3 files |
+| Phase 17-partner-surfaces P07 | ~10min | 3 tasks | 5 files |
 
 ## Decisions
 
@@ -359,3 +360,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: /proposals empty-state copy switch handled at server page level via inline conditional (proposals.empty.archived vs proposals.empty.actives) — approach (a) keeps ProposalsList unchanged
 - [Phase ?]: Plan 17-06: Added optional lastRowDivider prop to RecapSection.tsx (backward-compatible, default false) for the Détail card totalized-loyer separator.
 - [Phase ?]: Plan 17-06: Coefficient row composes new wizard.step2.detail.coefficient key + appended '(tranche {N}K€)' suffix at call site to preserve test expectation + match Plan 02 key shape.
+- [Phase ?]: 17-07: updateValidityAction in-place server action (no redirect) — discriminated-union return shape leaves the door open for future client-side onError handling
+- [Phase ?]: 17-07: PdfPreviewMock validityDays sourced from parsedData.validityDays (per-draft) not params.validityDays (global default) — required so WIZ-04 edits appear in preview on next render
+- [Phase ?]: 17-07: Defensive 'if (!draft.lcRef) redirect' bail INCLUDED in verification/page.tsx per 17-PATTERNS belt-and-suspenders recommendation
+- [Phase ?]: 17-07: Optimistic UI no-rollback on server-action failure accepted per T-17-07-06 (internal tool); v1.4+ may add onError revert
