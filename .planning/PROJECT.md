@@ -210,9 +210,9 @@ Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; desig
 
 - [ ] App shell visual refresh (sidebar + tri-state theme toggle + hero pattern + light/dark pair)
 - [ ] Contrast measurement (diff-panel + new gold/teal surfaces, WCAG 2.1 AA light + dark)
-- [ ] Partner Home `/` (hero + 3 MetricTiles + Propositions récentes)
-- [ ] Partner Proposals `/proposals` with `Archivées` filter pill
-- [ ] Wizard redesign (3 steps visual refresh + validity-selector relocation to step 3 + ADMIN-09 D-12 envelope preserved)
+- [x] Partner Home `/` (hero + 3 MetricTiles + Propositions récentes) — validated in Phase 17
+- [x] Partner Proposals `/proposals` with `Archivées` filter pill — validated in Phase 17
+- [x] Wizard redesign (3 steps visual refresh + validity-selector relocation to step 3 + ADMIN-09 D-12 envelope preserved) — validated in Phase 17
 - [ ] Admin Home enhancement (hero + CTA + 3 stats + 3 AdminNavCards + Recent activity)
 - [ ] Admin Partners list `/[adminSegment]/partners` (styled table + invite CTA + AccountsList→PartnersList rename)
 - [ ] Admin Créer partenaire form card refresh
@@ -345,4 +345,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-21 — after v1.2 milestone close + v1.3 milestone kickoff (`/gsd-new-milestone v1.3`). v1.2 shipped (UX Polish + Proposal Wizard, 14/14 reqs, 876 Vitest tests); v1.3 milestone (Design Refresh + Partner-Onboarding Ready) is the active focus, scope locked via Figma `9:46` review + `v1.3-CARRYFORWARD.md` triage.*
+*Last updated: 2026-05-24 — after Phase 17 (Partner Surfaces) ship. Partner Home, /proposals (incl. Archivées), and the 3-step wizard redesign are live and verified light + dark by Antoine. ADMIN-09 D-12 envelope intact (9/9 grep gates green). 12/12 Phase 17 reqs complete (PHOME, PROPS, WIZ, THEME-01). Active v1.3 work continues with Phase 18 (Admin Surfaces).*
