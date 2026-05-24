@@ -1,21 +1,11 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
-import { listPartnersWithCounts } from '@/lib/db/queries';
-import { listInvitedPartners } from '@/lib/db/queries/users';
-import { AccountsList } from './AccountsList';
+import { listPartnersWithLastActivity, type PartnerStatus } from '@/lib/db/queries/partners';
+import { PartnersList } from './PartnersList';
 
 // PITFALLS §1.6 — opts out of static rendering.
 export const dynamic = 'force-dynamic';
-
-/**
- * Module-level async helper so Date.now() is not called inside a React
- * component function — satisfies react-hooks/purity (same pattern as
- * app/(authed)/page.tsx).
- */
-async function getNowMs(): Promise<number> {
-  return Date.now();
-}
 
 export const metadata: Metadata = {
   title: 'Partenaires — Leasétic Matrice',
@@ -24,45 +14,59 @@ export const metadata: Metadata = {
 
 interface PageProps {
   params: Promise<{ adminSegment: string }>;
+  searchParams: Promise<{
+    status?: string;
+    q?: string;
+    cursor?: string;
+  }>;
 }
 
-export default async function AccountsPage({ params }: PageProps) {
+/** Enum-validate `status` searchParam (T-18-03-01) — invalid values silently drop to undefined. */
+function validateStatus(raw: string | undefined): PartnerStatus | undefined {
+  if (raw === 'active' || raw === 'invited' || raw === 'inactive') return raw;
+  return undefined;
+}
+
+/**
+ * Phase 18 Plan 03 — admin Partners list route.
+ *
+ * Task 1 wires the D-14 renamed PartnersList component to the new
+ * `listPartnersWithLastActivity` query helper. Task 3 layers PageHero + SearchBar
+ * + PartnersFilterPillTabs on top per UI-SPEC §Partners list layout.
+ */
+export default async function PartnersPage({ params, searchParams }: PageProps) {
   const { adminSegment } = await params;
   await requireAdmin(); // AUTH-15 defense in depth
   const lang = await getCurrentLang();
-  const partners = await listPartnersWithCounts();
 
-  // Phase 14 D-26 — fetch the invited partner set (role='partner' AND deleted_at IS NULL
-  // AND last_login_at IS NULL per Phase 12 listInvitedPartners contract). Returned IDs
-  // become a Set<string> on the client side for O(1) per-row chip-variant selection.
-  // ADMIN-09: this helper returns no commission fields (verified by listInvitedPartners
-  // type narrowing — id/email/displayName/name/language/createdAt only).
-  const invitedRows = await listInvitedPartners();
-  const invitedUserIds = new Set(invitedRows.map((r) => r.id));
+  const sp = await searchParams;
+  const status = validateStatus(sp.status); // T-18-03-01 — enum-validate
+  const q = sp.q?.trim() || undefined;
+  const cursor = sp.cursor || undefined;
 
-  // Stable now-ms for relative-time rendering — passed to client to avoid hydration drift.
-  // Called via module-level helper to avoid react-hooks/purity error (Date.now is impure).
-  const nowMs = await getNowMs();
+  const { rows, nextCursor } = await listPartnersWithLastActivity({
+    status,
+    q,
+    cursor,
+    limit: 20,
+  });
 
   return (
     <div>
-      <h1
-        style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)', marginBottom: 4 }}
-      >
-        {t('admin.accounts.page.title', lang)}
+      <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--ink)', marginBottom: 4 }}>
+        {t('admin.partners.page.title', lang)}
       </h1>
-      <p
-        style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 24 }}
-      >
-        {t('admin.accounts.page.sub', lang)}
+      <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 24 }}>
+        {t('admin.partners.page.subtitle', lang)}
       </p>
 
-      <AccountsList
+      <PartnersList
+        rows={rows}
+        nextCursor={nextCursor}
         lang={lang}
-        initialPartners={partners}
-        invitedUserIds={invitedUserIds}
         adminSegment={adminSegment}
-        nowMs={nowMs}
+        currentStatus={status}
+        currentQ={q}
       />
     </div>
   );

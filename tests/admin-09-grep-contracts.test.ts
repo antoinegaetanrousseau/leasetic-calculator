@@ -33,6 +33,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import type { PartnerWithCount } from '@/lib/db/queries/users';
+import type { PartnerRow } from '@/lib/db/queries/partners';
 import type { CoefficientHistoryListRow } from '@/lib/db/queries/coefficient-history';
 
 vi.mock('server-only', () => ({}));
@@ -115,7 +116,9 @@ vi.mock('@/lib/db/queries/coefficient-history', () => ({
 
 // Test file lives at tests/; app/ is the sibling at repo root. Use relative paths
 // because the @/* tsconfig alias maps only to src/* (the app/ directory is not aliased).
-import { AccountsList } from '../app/(admin)/[adminSegment]/partners/AccountsList';
+// Phase 18 Plan 03 D-14 — Surface 1 now imports PartnersList (renamed from
+// AccountsList) and uses the new PartnerRow shape from queries/partners.
+import { PartnersList } from '../app/(admin)/[adminSegment]/partners/PartnersList';
 import { CreatePartnerForm } from '../app/(admin)/[adminSegment]/partners/new/CreatePartnerForm';
 import AdminHomePage from '../app/(admin)/[adminSegment]/page';
 import { CoefficientHistoryList } from '../app/(admin)/[adminSegment]/history/CoefficientHistoryList';
@@ -135,6 +138,19 @@ function makePartner(overrides: Partial<PartnerWithCount> = {}): PartnerWithCoun
     language: 'fr',
     proposalsCount: 0,
     hasUnredeemedInvite: false,
+    ...overrides,
+  };
+}
+
+/** Phase 18 Plan 03 D-14 — PartnerRow fixture for Surface 1 (post-rename PartnersList consumer). */
+function makePartnerRow(overrides: Partial<PartnerRow> = {}): PartnerRow {
+  return {
+    id: 'p-1',
+    email: 'alice@example.com',
+    name: 'Alice Example',
+    status: 'active',
+    createdAt: new Date('2026-04-01T12:00:00Z'),
+    lastActivityAt: new Date('2026-05-15T10:00:00Z'),
     ...overrides,
   };
 }
@@ -167,57 +183,53 @@ function assertNoCommissionLeakage(html: string, surfaceName: string): void {
 // ── Suite ───────────────────────────────────────────────────────────────────
 
 describe('ADMIN-09 D-29 — strict commission-leakage grep contracts (Phase 14)', () => {
-  describe('Surface 1: partner list (post Plan 14-06 chip + Link CTA shape)', () => {
-    it('renders ZERO commission strings (active partner)', () => {
+  describe('Surface 1: partners list (post Plan 18-03 D-14 PartnersList rename + Figma 42:46 6-col table)', () => {
+    it('renders ZERO commission strings (active partner row)', () => {
       const html = renderToString(
-        createElement(AccountsList, {
+        createElement(PartnersList, {
+          rows: [makePartnerRow()],
+          nextCursor: null,
           lang: 'fr',
-          initialPartners: [makePartner()],
-          invitedUserIds: new Set<string>(),
           adminSegment: 'admin-secret',
-          nowMs: Date.now(),
         }),
       );
-      assertNoCommissionLeakage(html, 'partner list (active)');
+      assertNoCommissionLeakage(html, 'partners list (active)');
     });
 
-    it('renders ZERO commission strings (invited partner — gold chip variant)', () => {
+    it('renders ZERO commission strings (invited partner row — gold chip variant)', () => {
       const html = renderToString(
-        createElement(AccountsList, {
+        createElement(PartnersList, {
+          rows: [makePartnerRow({ id: 'p-invited', status: 'invited' })],
+          nextCursor: null,
           lang: 'fr',
-          initialPartners: [makePartner({ id: 'p-invited', lastLoginAt: null })],
-          invitedUserIds: new Set(['p-invited']),
           adminSegment: 'admin-secret',
-          nowMs: Date.now(),
         }),
       );
-      assertNoCommissionLeakage(html, 'partner list (invited variant)');
+      assertNoCommissionLeakage(html, 'partners list (invited variant)');
     });
 
-    it('renders ZERO commission strings (disabled partner)', () => {
+    it('renders ZERO commission strings (inactive/disabled partner row)', () => {
       const html = renderToString(
-        createElement(AccountsList, {
+        createElement(PartnersList, {
+          rows: [makePartnerRow({ id: 'p-disabled', status: 'inactive' })],
+          nextCursor: null,
           lang: 'fr',
-          initialPartners: [makePartner({ id: 'p-disabled', deletedAt: new Date() })],
-          invitedUserIds: new Set<string>(),
           adminSegment: 'admin-secret',
-          nowMs: Date.now(),
         }),
       );
-      assertNoCommissionLeakage(html, 'partner list (disabled variant)');
+      assertNoCommissionLeakage(html, 'partners list (inactive variant)');
     });
 
-    it('renders ZERO commission strings (empty state — pre-first-partner)', () => {
+    it('renders ZERO commission strings (D-13 empty state — pre-first-partner)', () => {
       const html = renderToString(
-        createElement(AccountsList, {
+        createElement(PartnersList, {
+          rows: [],
+          nextCursor: null,
           lang: 'fr',
-          initialPartners: [],
-          invitedUserIds: new Set<string>(),
           adminSegment: 'admin-secret',
-          nowMs: Date.now(),
         }),
       );
-      assertNoCommissionLeakage(html, 'partner list (empty state)');
+      assertNoCommissionLeakage(html, 'partners list (empty state)');
     });
   });
 
