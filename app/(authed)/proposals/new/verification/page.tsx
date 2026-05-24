@@ -328,13 +328,18 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
         </div>
 
         <div>
-          {/* D-15: PdfPreviewMock — CSS-only mock. Literal LC-2026-XXX (sourced
-              from the wizard.step3.pdf.ref.line dictionary entry, not hardcoded
-              in JSX). NO commission prop — ADMIN-09 invariant enforced
-              structurally by the component signature (plan 13-01 §5.3). */}
+          {/* Phase 17 D-17: PdfPreviewMock now takes a required `lcRef` prop
+              and renders the real value from `draft.lcRef` (Plan 17-01 moved
+              allocation to createDraft so post-Phase-17 drafts always carry
+              a non-null lcRef). The `?? 'LC-2026-XXX'` fallback is a
+              transitional bridge for any legacy pre-Phase-17 draft rows
+              and to preserve the existing Test 12 fixture shape until
+              Plan 17-07 wires the real value end-to-end. NO commission
+              prop — ADMIN-09 invariant enforced structurally. */}
           <PdfPreviewMock
             loyerDisplay={loyerDisplay}
             validityDays={params.validityDays as 15 | 30 | 60}
+            lcRef={draft.lcRef ?? 'LC-2026-XXX'}
             lang={lang}
           />
         </div>

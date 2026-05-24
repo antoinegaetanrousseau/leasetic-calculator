@@ -3,19 +3,22 @@
  * right column. Pure presentational: no state, no event handlers, no real
  * @react-pdf/renderer call.
  *
- * D-15: the partner-facing mock reference placeholder is sourced from the
- * i18n key `wizard.step3.pdf.ref.line` (FR + EN entries hold the literal
- * placeholder substring) and is NEVER hardcoded in JSX here — the
- * plan-level verification grep over this file returns 0 matches by design.
+ * Phase 17 D-17 / D-03 (inverts Phase 13 D-15): the reference line now
+ * displays the REAL `lcRef` allocated at draft creation (Plan 17-01 moved
+ * allocation from finalizeDraft to createDraft). The ref line is built
+ * inline (the retired step-3 PDF ref-line i18n key stays in the dictionary
+ * for now — removal is a downstream cleanup decision).
  *
- * NOT in this mock (per D-15 — guarded by plan 13-06's golden-PDF test):
- *   - No real lc_ref (the dictionary string is the only placeholder source)
+ * NOT in this mock (carried over from Phase 13 — guarded by plan 13-06's
+ * golden-PDF test and ADMIN-09 9-gate grep-contract suite):
  *   - No real PDF blob (no @react-pdf/renderer call)
  *   - No params_snapshot capture
  *   - No audit_log write
  *   - No idempotency_key allocation
+ *   - No commission prop / commission value (ADMIN-09 invariant)
  *
- * Locked in 13-UI-SPEC.md §5.3.
+ * Originally locked in 13-UI-SPEC.md §5.3; ref-line behavior updated by
+ * 17-UI-SPEC.md §<PdfPreviewMock> + 17-CONTEXT.md D-17.
  */
 
 import { BrandLogo } from '@/components/ui/BrandLogo';
@@ -29,6 +32,13 @@ export interface PdfPreviewMockProps {
    * partner-facing options 15 / 30 / 60.
    */
   validityDays: 15 | 30 | 60;
+  /**
+   * Phase 17 D-17 / D-03 — real `lc_ref` allocated at draft creation
+   * (format `LC-2026-NNN` per user). Required prop: every caller must
+   * thread the value from `draft.lcRef` (non-null on post-Phase-17 drafts;
+   * Plan 17-01 enforces allocation in `createDraft`).
+   */
+  lcRef: string;
   /** Language for static strings. */
   lang: Lang;
 }
@@ -36,17 +46,18 @@ export interface PdfPreviewMockProps {
 export function PdfPreviewMock({
   loyerDisplay,
   validityDays,
+  lcRef,
   lang,
 }: PdfPreviewMockProps) {
-  // D-15: the mock reference placeholder is baked into the i18n key
-  // `wizard.step3.pdf.ref.line` (FR + EN). We only interpolate {0} =
-  // validityDays here. Do NOT hardcode the ref placeholder in JSX —
-  // keeps the placeholder under copy-review and prevents accidental drift
-  // from the locked D-15 contract.
-  const refLine = t('wizard.step3.pdf.ref.line', lang).replace(
-    '{0}',
-    String(validityDays),
-  );
+  // Phase 17 D-17 — inline construction (the retired step-3 PDF ref-line
+  // dictionary key held the literal "LC-2026-XXX" placeholder per Phase 13
+  // D-15; that key is no longer read here). The inline strings match the
+  // UI-SPEC Copywriting Contract verbatim. ADMIN-09 trivial pass: lcRef
+  // format `LC-2026-NNN` contains no commission substring.
+  const refLine =
+    lang === 'fr'
+      ? `Réf. ${lcRef} · ${validityDays} jours de validité`
+      : `Ref. ${lcRef} · ${validityDays} days validity`;
 
   return (
     <div
