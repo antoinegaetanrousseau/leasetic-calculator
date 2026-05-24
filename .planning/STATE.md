@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T15:04:07.440Z"
+last_updated: "2026-05-24T15:18:07.666Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 15
   total_plans: 96
-  completed_plans: 88
+  completed_plans: 89
   percent: 71
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 17 (partner-surfaces) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -338,6 +338,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase | Plan | Duration | Notes |
 |-------|------|----------|-------|
 | Phase 17 P01 | 13min | 2 tasks | 6 files |
+| Phase 17 P02 | ~25min | 2 (TDD) tasks | 4 (1 modified i18n + 1 modified primitive src + 1 modified primitive test + 1 modified callsite) (+ SUMMARY) files |
 
 ## Decisions
 
@@ -345,3 +346,4 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: lc_ref allocator: SELECT DESC LIMIT 1 + parse + increment + retry-on-insert-error up to 3 attempts (Phase 12 D-05 partial unique index is backstop)
 - [Phase ?]: Archivées branch = candidate-set SQL + app-side deriveDisplayStatus narrow (single source of truth for expired derivation)
 - [Phase ?]: T-17-01-01 IDOR mitigation: userId is FIRST AND predicate in every query branch; Test 4 enforces cross-user assertion
+- [Phase ?]: Phase 17 Plan 02 — REUSE-not-rename policy honored across 9 existing dictionary keys; new wave-1 i18n keys + PdfPreviewMock lcRef prop API unblock Wave 2.
