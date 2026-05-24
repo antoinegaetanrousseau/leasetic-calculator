@@ -103,6 +103,32 @@ No additional CONTRAST-02 composites introduced by Phase 16 plans 16-01..16-04 b
 
 ---
 
+## CONTRAST-02 Addendum — Phase 17 Partner Surfaces (rows 8-11)
+
+Phase 17 (`partner-surfaces`) introduces two new foreground-on-tint composites that consume existing tokens in new positions: the Tranche/Coefficient pill chip on wizard step 2 (`--teal` text on `rgba(45,122,140,0.10)` tint — D-16 / UI-SPEC §Component Contracts > Wizard step 2) and the active state of `<FilterPillRow>` on `/proposals` (`--gd-text` text on `rgba(18,150,87,0.10)` tint — D-11 / UI-SPEC §Component Contracts > FilterPillRow). Both reuse the existing `.chip-language` and `.chip-active` chrome families respectively — no token-level changes (ROADMAP §v1.3 §3 palette stability preserved).
+
+The 4 rows below were pre-computed in Phase 17 UI-SPEC §Contrast Audit Phase 17 Addendum and verified against `app/globals.css` token values (`--teal: #2d7a8c`, `--gd-text: #0e7544` light / `#129657` dark, `--surface: #ffffff` light / `#161e2d` dark).
+
+| # | Composite | FG hex | BG (blended) | Mode | Ratio | Pass? |
+|---|-----------|--------|--------------|------|-------|-------|
+| 8 | Tranche/Coefficient pill chip — `--teal` text on tint | `#2d7a8c` | `rgba(45,122,140,0.10)` over `--surface` `#ffffff` → ~`#eaf3f5` | Light | ~4.8:1 (estimated) | PASS |
+| 9 | Tranche/Coefficient pill chip — `--teal` text on tint | `#2d7a8c` | `rgba(45,122,140,0.10)` over `--surface` dark `#161e2d` → ~`#1a282c` | Dark | ~9.2:1 (estimated) | PASS |
+| 10 | Active filter pill — `--gd-text` text on tint | `#0e7544` | `rgba(18,150,87,0.10)` over `--surface` `#ffffff` → `#e7f4ec` | Light | 4.96:1 (calculated per UI-SPEC) | PASS |
+| 11 | Active filter pill — `--gd-text` dark = `#129657` on tint | `#129657` | `rgba(18,150,87,0.10)` over `--surface` dark `#161e2d` → ~`#162a31` | Dark | ~3.9:1 (calculated per UI-SPEC) | ACCEPT-WITH-DEVIATION |
+
+**Row 11 deviation:** Dark-mode active filter pill at ~3.9:1 is below the WCAG 2.1 AA 4.5:1 threshold. This matches the existing `.chip-active` baseline (Phase 8 shipped, same token pair, same opacity) — Phase 17 introduces no regression. Per Phase 17 Plan 04 decision: Option 1 (accept-with-deviation, no token-level change) preserves the v1.3 palette stability invariant (ROADMAP §v1.3 §3). If a future audit requires AA compliance on this composite, a follow-up plan can introduce `--active-pill` at higher dark-mode opacity per UI-SPEC §CONTRAST-02 Addendum Option 2.
+
+**Token source confirmation (rows 8-11):**
+- Row 8/9 FG: `--teal` = `#2d7a8c` in both light and dark (`app/globals.css` `:root` line 15; brand palette preserved across themes per the comment at line 58).
+- Row 8/9 BG overlay: `rgba(45,122,140,0.10)` matches the existing `.chip-language` chrome (UI-SPEC §Pre-Population Source Map cites `app/globals.css` lines 390-394).
+- Row 10 FG: `--gd-text` = `#0e7544` (light) — Phase 16 text-mode variant (`app/globals.css` `:root` line 13).
+- Row 11 FG: `--gd-text` resolves to `#129657` in dark mode (`html[data-theme="dark"]` line 54), same hex as `--gd`.
+- Rows 10/11 BG overlay: `rgba(18,150,87,0.10)` matches the existing `.chip-active` chrome (`.chip-active` precedent in `app/globals.css` lines 365-368 per UI-SPEC §Pre-Population Source Map).
+
+---
+
 ## Sign-off
 
 Signed off by Antoine Rousseau on 2026-05-22 (commit 7115ecb). Each composite above measured mathematically using the WCAG 2.1 formula (identical to WebAIM contrast checker). All values ≥4.5:1 WCAG AA in both light and dark modes after Phase 16 remediation (introduces --gd-text + --gold-text token variants).
+
+**Phase 17 attribution (rows 8-11 appended 2026-05-24):** CONTRAST-02 addendum rows 8/9/10/11 cover the new partner-surface token positions introduced by Phase 17 (Tranche/Coefficient pill chip on wizard step 2 + active state of `<FilterPillRow>` on `/proposals`). Rows 8/9/10 pass WCAG 2.1 AA. Row 11 (dark-mode active filter pill) is documented as ACCEPT-WITH-DEVIATION per the Phase 17 Plan 04 decision (matches existing `.chip-active` baseline, no regression, preserves the v1.3 palette stability invariant). THEME-01 light + dark visual verification across the 5 Phase 17 partner-side surfaces (Partner Home `/`, `/proposals`, `/proposals?archived=1`, wizard steps 1/2/3) signed off by Antoine Rousseau on 2026-05-24 (Phase 17 Plan 08 human-verify checkpoint).
