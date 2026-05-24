@@ -27,10 +27,8 @@ import {
   Plus,
   ScrollText,
   HelpCircle,
-  LayoutDashboard,
   Sliders,
   Users,
-  History,
   ChevronLeft,
   ChevronRight,
   Sun,
@@ -44,9 +42,20 @@ import { LocaleToggle } from '../LocaleToggle';
 import { ThemeToggle } from '../ThemeToggle';
 import { BrandLogo } from './BrandLogo';
 
+/**
+ * Active nav key — Phase 18 D-27 reshaped per-role contract:
+ *   - Partner (4 items): home / proposals-new / proposals / help
+ *   - Admin (6 items):   admin-home / proposals-new / proposals /
+ *                        admin-partners / admin-coefficients / help
+ * `history` and `admin-history` retained for back-compat with existing
+ * route segments (Phase 14 /history page still exists; sidebar simply
+ * no longer surfaces a top-level link to it per D-27 — entry points are
+ * the Admin Home AdminNavCard + Recent activity "Voir tout" link).
+ */
 export type ActiveNav =
   | 'home'
   | 'proposals-new'
+  | 'proposals'
   | 'history'
   | 'help'
   | 'admin-home'
@@ -116,21 +125,39 @@ function subscribeCollapsed(callback: () => void): () => void {
 type LucideIcon = ComponentType<{ size: number; strokeWidth: number; color?: string }>;
 type NavItem = { key: ActiveNav; icon: LucideIcon; labelKey: DictKey; href: string };
 
+/**
+ * Phase 18 D-27 — Partner sidebar: exactly 4 items in order
+ *   [Accueil, Nouvelle proposition, Propositions, Aide]
+ * Historique REMOVED (no longer surfaced in sidebar).
+ */
 function partnerNavItems(): NavItem[] {
   return [
     { key: 'home', icon: Home, labelKey: 'sidebar.nav.home', href: '/' },
-    { key: 'proposals-new', icon: Plus, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new' },
-    { key: 'history', icon: ScrollText, labelKey: 'sidebar.nav.history', href: '/' },
-    { key: 'help', icon: HelpCircle, labelKey: 'sidebar.nav.help', href: '/help' },
+    { key: 'proposals-new', icon: Plus, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
+    { key: 'proposals', icon: ScrollText, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
+    { key: 'help', icon: HelpCircle, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];
 }
 
+/**
+ * Phase 18 D-27 — Admin sidebar: exactly 6 items in order
+ *   [Accueil, Nouvelle proposition, Propositions, Partenaires, Coefficients, Aide]
+ * Historique REMOVED from sidebar (entry points: Admin Home AdminNavCard +
+ * Recent activity "Voir tout →" link).
+ *
+ * Per D-27 the admin "Accueil" label reuses `sidebar.nav.home` ("Accueil"/"Home")
+ * — same canonical greeting across both role variants. The previous
+ * `sidebar.nav.adminHome` ("Tableau de bord") is no longer referenced from
+ * the sidebar nav; key retained in dictionaries for back-compat / future use.
+ */
 function adminNavItems(hrefs: NonNullable<RetractableSidebarProps['adminHrefs']>): NavItem[] {
   return [
-    { key: 'admin-home', icon: LayoutDashboard, labelKey: 'sidebar.nav.adminHome', href: hrefs.home },
-    { key: 'admin-coefficients', icon: Sliders, labelKey: 'sidebar.nav.adminCoefficients', href: hrefs.coefficients },
+    { key: 'admin-home', icon: Home, labelKey: 'sidebar.nav.home', href: hrefs.home },
+    { key: 'proposals-new', icon: Plus, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
+    { key: 'proposals', icon: ScrollText, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
     { key: 'admin-partners', icon: Users, labelKey: 'sidebar.nav.adminPartners', href: hrefs.partners },
-    { key: 'admin-history', icon: History, labelKey: 'sidebar.nav.adminHistory', href: hrefs.history },
+    { key: 'admin-coefficients', icon: Sliders, labelKey: 'sidebar.nav.adminCoefficients', href: hrefs.coefficients },
+    { key: 'help', icon: HelpCircle, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];
 }
 

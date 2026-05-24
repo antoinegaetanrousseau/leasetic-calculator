@@ -730,6 +730,98 @@ export const dictionaries = {
     'history.pagination.next': 'Page suivante →',
     'history.pagination.previous': '← Page précédente',
     'history.empty': 'Aucun changement de coefficient pour le moment.',
+
+    // ── Phase 18 — Admin Surfaces + Help Center (~70 net-new keys) ───────────
+    // Per UI-SPEC §Copywriting Contract + D-21 verify-and-reuse discipline.
+
+    // Sidebar nav (net-new — partner-facing sidebar item; Phase 18 D-27)
+    'sidebar.nav.proposals': 'Propositions',
+
+    // Admin Home stats tiles (UI-SPEC rows 5-11; D-01/D-02/D-03)
+    'admin.home.stats.partenairesActifs': 'Partenaires actifs',
+    'admin.home.stats.partenairesActifs.sublabel': 'sur {0} comptes',
+    'admin.home.stats.propositionsCeMois': 'Propositions ce mois',
+    'admin.home.stats.propositionsCeMois.sublabel': '{0}',
+    'admin.home.stats.derniereModifCoeffs': 'Dernière modif. coeffs',
+    'admin.home.stats.derniereModifCoeffs.value': 'il y a {0}j',
+    'admin.home.stats.derniereModifCoeffs.sublabel': '{0} — {1}',
+
+    // Admin Home Recent activity card (UI-SPEC rows 19-28; D-05/D-06/D-07)
+    'admin.home.activity.title': 'ACTIVITÉ RÉCENTE',
+    'admin.home.activity.empty': 'Aucune activité récente.',
+    'admin.home.activity.viewAll': 'Voir tout →',
+    'admin.home.activity.sentence.coefficientModified': '{0} a modifié les coefficients',
+    'admin.home.activity.sentence.partnerInvited': '{0} a invité {1}',
+    'admin.home.activity.sentence.partnerActivated': "{0} a activé le compte de {1}",
+    'admin.home.activity.sentence.partnerDeactivated': "{0} a désactivé le compte de {1}",
+    'admin.home.activity.time.minutesAgo': 'Il y a {0} min',
+    'admin.home.activity.time.hoursAgo': 'Il y a {0}h',
+    'admin.home.activity.time.daysAgo': 'Il y a {0} jours',
+
+    // Partners list (UI-SPEC rows 29-50; D-08/D-09/D-10/D-13/D-14)
+    'admin.partners.page.title': 'Partenaires',
+    'admin.partners.page.subtitle': 'Gérez les comptes partenaires et leurs accès.',
+    'admin.partners.invite.cta': 'Inviter un partenaire',
+    'admin.partners.search.placeholder': 'Rechercher par email ou nom…',
+    'admin.partners.filter.all': 'Tous',
+    'admin.partners.filter.active': 'Actifs',
+    'admin.partners.filter.invited': 'Invités',
+    'admin.partners.filter.inactive': 'Désactivés',
+    'admin.partners.col.partner': 'PARTENAIRE',
+    'admin.partners.col.email': 'EMAIL',
+    'admin.partners.col.created': 'DATE CRÉATION',
+    'admin.partners.col.lastActivity': 'DERNIÈRE ACTIVITÉ',
+    'admin.partners.col.status': 'STATUT',
+    'admin.partners.action.resendInvitation': "Renvoyer l'invitation",
+    'admin.partners.action.disableAccount': 'Désactiver le compte',
+    'admin.partners.action.enableAccount': 'Réactiver le compte',
+    'admin.partners.action.viewProposals': 'Voir les propositions du partenaire',
+    'admin.partners.empty.zero': "Aucun partenaire pour le moment.",
+    'admin.partners.empty.filter': "Aucun partenaire ne correspond aux filtres.",
+    'admin.partners.empty.clearFilters': 'Effacer les filtres →',
+
+    // Créer partenaire (UI-SPEC rows 51-63; D-15/D-16/D-18)
+    'admin.partners.breadcrumb.label': 'PARTENAIRES',
+    'admin.partners.form.submit': "Envoyer l'invitation →",
+    'admin.partners.form.submit.spinner': 'Envoi en cours…',
+    'admin.partners.form.cancel.confirm': 'Vous avez des changements non enregistrés. Continuer ?',
+
+    // Coefficients warning banner (UI-SPEC rows 67-69; D-19/D-20)
+    'admin.coefficients.warning.body': 'Modifier ces valeurs change le calcul de toutes les futures propositions. Les PDF déjà générés restent inchangés.',
+    'admin.coefficients.warning.dismiss.aria': "Masquer l'avertissement",
+    'admin.coefficients.history.viewAll': "Voir tout l'historique →",
+
+    // Aide landing (UI-SPEC rows 70-79; D-23/D-25)
+    'aide.landing.title': "Centre d'aide",
+    'aide.landing.subtitle': 'Tout pour démarrer et bien utiliser Leasétic',
+    'aide.landing.card.commencerIci.title': 'Commencer ici',
+    'aide.landing.card.commencerIci.body': 'Premier guide pour créer une proposition en 3 étapes.',
+    'aide.landing.card.commencerIci.cta': 'Lire le guide →',
+    'aide.landing.card.creerProposition.title': 'Créer une proposition',
+    'aide.landing.card.creerProposition.body': 'Guide détaillé du tunnel de proposition étape par étape.',
+    'aide.landing.card.creerProposition.badge': 'Bientôt disponible',
+    'aide.landing.card.contact.title': 'Contact',
+    'aide.landing.card.contact.body': 'Une question ? Écrivez-nous, nous vous répondons sous 24h ouvrées.',
+
+    // Aide article — Commencer ici (UI-SPEC rows 81-97; D-24/D-26)
+    // ASCII-safe French per planner note (user polishes accents during review).
+    'aide.commencer-ici.breadcrumb': "← Centre d'aide",
+    'aide.commencer-ici.title': 'Commencer ici',
+    'aide.commencer-ici.lead': "Vous decouvrez Leasetic ? Ce guide vous accompagne pas a pas dans la creation de votre premiere proposition de financement, depuis la saisie des informations client jusqu'a la generation du PDF.",
+    'aide.commencer-ici.section.overview.title': 'Aperçu du tunnel',
+    'aide.commencer-ici.section.overview.body': "La creation d'une proposition se deroule en trois etapes. Vous renseignez d'abord les informations du client et les parametres du projet, puis vous validez le calcul du loyer mensuel, et enfin vous verifiez l'apercu PDF avant de finaliser. A chaque etape, votre travail est sauvegarde automatiquement sous forme de brouillon — vous pouvez quitter et reprendre plus tard sans rien perdre.",
+    'aide.commencer-ici.section.step1.title': 'Étape 1 — Paramètres',
+    'aide.commencer-ici.section.step1.body': "L'etape Parametres rassemble toutes les informations de base : nom et email du client, intitule du projet, montant HT a financer et duree du leasing (24, 36 ou 48 mois). Validez ces champs pour generer un brouillon — vous recevez immediatement une reference LC unique au format LC-2026-NNN, visible des l'etape de verification. Cette reference est definitive : elle restera attachee a la proposition meme si vous modifiez d'autres parametres par la suite.",
+    'aide.commencer-ici.section.step1.screenshot.alt': "Capture d'écran de l'étape Paramètres",
+    'aide.commencer-ici.section.step2.title': 'Étape 2 — Calcul',
+    'aide.commencer-ici.section.step2.body': "L'etape Calcul affiche le resultat principal : le loyer mensuel, calcule a partir du coefficient applicable a votre tranche de montant et de duree. La carte centrale met en valeur ce montant en grand format, accompagne de la tranche et du coefficient appliques. Le detail du calcul, juste en dessous, vous permet de comprendre comment le loyer est obtenu — utile pour expliquer la proposition au client. Cliquez sur Modifier pour revenir a l'etape 1 si vous souhaitez ajuster les parametres saisis.",
+    'aide.commencer-ici.section.step2.screenshot.alt': "Capture d'écran de l'étape Calcul",
+    'aide.commencer-ici.section.step3.title': 'Étape 3 — Vérifier',
+    'aide.commencer-ici.section.step3.body': "L'etape Verifier affiche un recapitulatif complet a gauche (informations client, details du projet, parametres de calcul) et un apercu du PDF a droite. Verifiez la duree de validite de votre proposition (15, 30 ou 60 jours — 30 jours par defaut). Une fois satisfait, cliquez sur le bouton de finalisation : le PDF est genere, archive, et la proposition apparait dans votre liste avec son numero de reference definitif.",
+    'aide.commencer-ici.section.step3.screenshot.alt': "Capture d'écran de l'étape Vérifier",
+    'aide.commencer-ici.section.next.title': 'Et après ?',
+    'aide.commencer-ici.section.next.body': "Votre premiere proposition est prete. Vous la retrouverez dans la liste des Propositions, ou vous pouvez la rouvrir pour telecharger a nouveau le PDF. Pour les questions courantes, consultez les autres articles du Centre d'aide ou ecrivez-nous a l'adresse de contact.",
+    'aide.commencer-ici.cta.create': 'Créer ma première proposition',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -1404,6 +1496,95 @@ export const dictionaries = {
     'history.pagination.next': 'Next page →',
     'history.pagination.previous': '← Previous page',
     'history.empty': 'No coefficient changes yet.',
+
+    // ── Phase 18 — Admin Surfaces + Help Center (EN counterparts) ─────────────
+    // Sidebar nav
+    'sidebar.nav.proposals': 'Proposals',
+
+    // Admin Home stats tiles
+    'admin.home.stats.partenairesActifs': 'Active partners',
+    'admin.home.stats.partenairesActifs.sublabel': 'of {0} accounts',
+    'admin.home.stats.propositionsCeMois': 'Proposals this month',
+    'admin.home.stats.propositionsCeMois.sublabel': '{0}',
+    'admin.home.stats.derniereModifCoeffs': 'Last coeff. update',
+    'admin.home.stats.derniereModifCoeffs.value': '{0}d ago',
+    'admin.home.stats.derniereModifCoeffs.sublabel': '{0} — {1}',
+
+    // Admin Home Recent activity card
+    'admin.home.activity.title': 'RECENT ACTIVITY',
+    'admin.home.activity.empty': 'No recent activity.',
+    'admin.home.activity.viewAll': 'View all →',
+    'admin.home.activity.sentence.coefficientModified': '{0} updated the coefficients',
+    'admin.home.activity.sentence.partnerInvited': '{0} invited {1}',
+    'admin.home.activity.sentence.partnerActivated': "{0} activated {1}'s account",
+    'admin.home.activity.sentence.partnerDeactivated': "{0} deactivated {1}'s account",
+    'admin.home.activity.time.minutesAgo': '{0} min ago',
+    'admin.home.activity.time.hoursAgo': '{0}h ago',
+    'admin.home.activity.time.daysAgo': '{0} days ago',
+
+    // Partners list
+    'admin.partners.page.title': 'Partners',
+    'admin.partners.page.subtitle': 'Manage partner accounts and their access.',
+    'admin.partners.invite.cta': 'Invite a partner',
+    'admin.partners.search.placeholder': 'Search by email or name…',
+    'admin.partners.filter.all': 'All',
+    'admin.partners.filter.active': 'Active',
+    'admin.partners.filter.invited': 'Invited',
+    'admin.partners.filter.inactive': 'Disabled',
+    'admin.partners.col.partner': 'PARTNER',
+    'admin.partners.col.email': 'EMAIL',
+    'admin.partners.col.created': 'CREATED',
+    'admin.partners.col.lastActivity': 'LAST ACTIVITY',
+    'admin.partners.col.status': 'STATUS',
+    'admin.partners.action.resendInvitation': 'Resend invitation',
+    'admin.partners.action.disableAccount': 'Disable account',
+    'admin.partners.action.enableAccount': 'Re-enable account',
+    'admin.partners.action.viewProposals': "View partner's proposals",
+    'admin.partners.empty.zero': 'No partners yet.',
+    'admin.partners.empty.filter': 'No partners match the filters.',
+    'admin.partners.empty.clearFilters': 'Clear filters →',
+
+    // Créer partenaire
+    'admin.partners.breadcrumb.label': 'PARTNERS',
+    'admin.partners.form.submit': 'Send invitation →',
+    'admin.partners.form.submit.spinner': 'Sending…',
+    'admin.partners.form.cancel.confirm': 'You have unsaved changes. Continue?',
+
+    // Coefficients warning banner
+    'admin.coefficients.warning.body': 'Changing these values affects calculations for all future proposals. Already-generated PDFs remain unchanged.',
+    'admin.coefficients.warning.dismiss.aria': 'Dismiss warning',
+    'admin.coefficients.history.viewAll': 'View full history →',
+
+    // Aide landing
+    'aide.landing.title': 'Help Center',
+    'aide.landing.subtitle': 'Everything you need to get started with Leasétic',
+    'aide.landing.card.commencerIci.title': 'Start here',
+    'aide.landing.card.commencerIci.body': 'First guide to create a proposal in 3 steps.',
+    'aide.landing.card.commencerIci.cta': 'Read the guide →',
+    'aide.landing.card.creerProposition.title': 'Create a proposal',
+    'aide.landing.card.creerProposition.body': 'Detailed guide to the proposal flow step by step.',
+    'aide.landing.card.creerProposition.badge': 'Coming soon',
+    'aide.landing.card.contact.title': 'Contact',
+    'aide.landing.card.contact.body': 'A question? Email us — we reply within 24 business hours.',
+
+    // Aide article — Start here
+    'aide.commencer-ici.breadcrumb': '← Help Center',
+    'aide.commencer-ici.title': 'Start here',
+    'aide.commencer-ici.lead': 'New to Leasetic? This guide walks you through creating your first financing proposal step by step, from entering client information to generating the PDF.',
+    'aide.commencer-ici.section.overview.title': 'Flow overview',
+    'aide.commencer-ici.section.overview.body': 'Creating a proposal happens in three steps. You first enter client information and project parameters, then validate the monthly rent calculation, and finally review the PDF preview before finalizing. At each step your work is automatically saved as a draft — you can leave and come back later without losing anything.',
+    'aide.commencer-ici.section.step1.title': 'Step 1 — Parameters',
+    'aide.commencer-ici.section.step1.body': 'The Parameters step gathers all the basics: client name and email, project title, amount excl. tax to finance, and lease duration (24, 36, or 48 months). Validating these fields creates a draft — you immediately receive a unique LC reference in the format LC-2026-NNN, visible from the verification step onward. This reference is permanent: it stays attached to the proposal even if you change other parameters later.',
+    'aide.commencer-ici.section.step1.screenshot.alt': 'Screenshot of the Parameters step',
+    'aide.commencer-ici.section.step2.title': 'Step 2 — Calculation',
+    'aide.commencer-ici.section.step2.body': 'The Calculation step shows the main result: the monthly rent, computed from the coefficient that applies to your amount tier and duration. The central card highlights this amount in large format, alongside the applied tier and coefficient. The calculation detail just below helps you understand how the rent is derived — useful for explaining the proposal to the client. Click Edit to go back to step 1 if you need to adjust the parameters.',
+    'aide.commencer-ici.section.step2.screenshot.alt': 'Screenshot of the Calculation step',
+    'aide.commencer-ici.section.step3.title': 'Step 3 — Review',
+    'aide.commencer-ici.section.step3.body': 'The Review step shows a full recap on the left (client information, project details, calculation parameters) and a PDF preview on the right. Check your proposal’s validity duration (15, 30, or 60 days — 30 days by default). Once satisfied, click the finalize button: the PDF is generated, archived, and the proposal appears in your list with its final reference number.',
+    'aide.commencer-ici.section.step3.screenshot.alt': 'Screenshot of the Review step',
+    'aide.commencer-ici.section.next.title': "What's next?",
+    'aide.commencer-ici.section.next.body': "Your first proposal is ready. You'll find it in the Propositions list, where you can reopen it to download the PDF again. For common questions, check the other articles in the Help Center or email us at the contact address.",
+    'aide.commencer-ici.cta.create': 'Create my first proposal',
   },
 } as const;
 

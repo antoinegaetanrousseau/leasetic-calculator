@@ -22,19 +22,25 @@ afterEach(() => {
 });
 
 describe('RetractableSidebar', () => {
-  it('AC-RS-04: expanded partner nav renders 4 nav links in FR order with active green-tint on Accueil', () => {
+  // ── Phase 18 D-27 — Per-role nav contract ──────────────────────────────────
+  // Admin sidebar: 6 items [Accueil, Nouvelle proposition, Propositions,
+  // Partenaires, Coefficients, Aide]. Historique REMOVED (moved to Admin
+  // Home AdminNavCard + Recent activity "Voir tout" link).
+  // Partner sidebar: 4 items [Accueil, Nouvelle proposition, Propositions,
+  // Aide]. Partenaires + Coefficients NOT present.
+
+  it('AC-RS-04 / Phase 18 D-27: partner nav renders exactly 4 items in FR order [Accueil, Nouvelle proposition, Propositions, Aide]', () => {
     const { container } = render(
       <RetractableSidebar activeNav="home" isAdmin={false} lang="fr" theme="light" />,
     );
 
-    // 4 partner nav links in order
     const navUl = container.querySelector('#leasetic-sidebar-nav');
     expect(navUl).not.toBeNull();
     const navLinks = navUl!.querySelectorAll('a');
     expect(navLinks).toHaveLength(4);
     expect(navLinks[0].textContent).toContain('Accueil');
     expect(navLinks[1].textContent).toContain('Nouvelle proposition');
-    expect(navLinks[2].textContent).toContain('Historique');
+    expect(navLinks[2].textContent).toContain('Propositions');
     expect(navLinks[3].textContent).toContain('Aide');
 
     // Active item (Accueil = home) has green-tint background
@@ -42,7 +48,7 @@ describe('RetractableSidebar', () => {
     expect(activeStyle).toMatch(/rgba\(18,\s*150,\s*87/);
   });
 
-  it('AC-RS-05: admin nav requires adminHrefs — renders 4 admin links with active Coefficients', () => {
+  it('Phase 18 D-27: admin nav renders exactly 6 items in FR order [Accueil, Nouvelle proposition, Propositions, Partenaires, Coefficients, Aide] — Historique NOT in sidebar', () => {
     const { container } = render(
       <RetractableSidebar
         activeNav="admin-coefficients"
@@ -60,24 +66,33 @@ describe('RetractableSidebar', () => {
 
     const navUl = container.querySelector('#leasetic-sidebar-nav');
     const navLinks = navUl!.querySelectorAll('a');
-    expect(navLinks).toHaveLength(4);
-    expect(navLinks[0].textContent).toContain('Tableau de bord');
-    expect(navLinks[1].textContent).toContain('Coefficients');
-    expect(navLinks[2].textContent).toContain('Partenaires');
-    expect(navLinks[3].textContent).toContain('Historique');
+    expect(navLinks).toHaveLength(6);
+    expect(navLinks[0].textContent).toContain('Accueil');
+    expect(navLinks[1].textContent).toContain('Nouvelle proposition');
+    expect(navLinks[2].textContent).toContain('Propositions');
+    expect(navLinks[3].textContent).toContain('Partenaires');
+    expect(navLinks[4].textContent).toContain('Coefficients');
+    expect(navLinks[5].textContent).toContain('Aide');
 
-    // hrefs forwarded from adminHrefs prop
+    // Historique is REMOVED from admin sidebar (D-27)
+    const allLabels = Array.from(navLinks).map((l) => l.textContent ?? '');
+    expect(allLabels.some((l) => l.includes('Historique'))).toBe(false);
+
+    // hrefs forwarded — admin home uses adminHrefs.home; partners + coefficients
+    // forwarded; new + proposals + help go to canonical routes (NOT adminSegment).
     expect(navLinks[0]).toHaveAttribute('href', '/x');
-    expect(navLinks[1]).toHaveAttribute('href', '/x/coefficients');
-    expect(navLinks[2]).toHaveAttribute('href', '/x/partners');
-    expect(navLinks[3]).toHaveAttribute('href', '/x/history');
+    expect(navLinks[1]).toHaveAttribute('href', '/proposals/new/parametres');
+    expect(navLinks[2]).toHaveAttribute('href', '/proposals');
+    expect(navLinks[3]).toHaveAttribute('href', '/x/partners');
+    expect(navLinks[4]).toHaveAttribute('href', '/x/coefficients');
+    expect(navLinks[5]).toHaveAttribute('href', '/aide');
 
     // Coefficients is active (green tint)
-    const activeStyle = navLinks[1].getAttribute('style') ?? '';
+    const activeStyle = navLinks[4].getAttribute('style') ?? '';
     expect(activeStyle).toMatch(/rgba\(18,\s*150,\s*87/);
   });
 
-  it('AC-RS-04 (EN): partner nav renders English labels', () => {
+  it('AC-RS-04 (EN) / Phase 18 D-27: partner nav renders English labels — 4 items', () => {
     const { container } = render(
       <RetractableSidebar activeNav="home" isAdmin={false} lang="en" theme="light" />,
     );
@@ -85,7 +100,7 @@ describe('RetractableSidebar', () => {
     expect(navLinks).toHaveLength(4);
     expect(navLinks[0].textContent).toContain('Home');
     expect(navLinks[1].textContent).toContain('New proposal');
-    expect(navLinks[2].textContent).toContain('History');
+    expect(navLinks[2].textContent).toContain('Proposals');
     expect(navLinks[3].textContent).toContain('Help');
   });
 
