@@ -20,7 +20,7 @@
 
 ### Light + Dark mode coverage (THEME)
 
-- [ ] **THEME-01**: Every v1.3 partner-side screen (Partner Home, Partner Proposals, Wizard steps 1/2/3) ships both light and dark variants matching Figma's `82:*` duplicate frames (`82:1088`, `82:171`, `82:317`, `82:460`).
+- [x] **THEME-01**: Every v1.3 partner-side screen (Partner Home, Partner Proposals, Wizard steps 1/2/3) ships both light and dark variants matching Figma's `82:*` duplicate frames (`82:1088`, `82:171`, `82:317`, `82:460`).
 - [ ] **THEME-02**: Every v1.3 admin-side screen (Admin Home, Partners list, Créer partenaire, Coefficients refresh) ships both light and dark variants.
 
 ### Contrast measurement (CONTRAST)
@@ -145,7 +145,7 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | SHELL-03 | 16 | Complete |
 | SHELL-04 | 16 | Complete |
 | SHELL-05 | 16 | Complete |
-| THEME-01 | 17 | Pending |
+| THEME-01 | 17 | Complete |
 | THEME-02 | 18 | Pending |
 | CONTRAST-01 | 16 | Complete |
 | CONTRAST-02 | 16 | Complete |

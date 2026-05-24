@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
-status: executing
-last_updated: "2026-05-24T16:10:54.432Z"
+status: verifying
+last_updated: "2026-05-24T16:37:36.321Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
-  completed_phases: 15
+  completed_phases: 16
   total_plans: 96
-  completed_plans: 94
-  percent: 71
+  completed_plans: 95
+  percent: 76
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 17 (partner-surfaces) — EXECUTING
 Plan: 8 of 8
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-24
 
 ## Phase 17 Performance Metrics
@@ -344,6 +344,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 17 P05 | ~10min | 1 tasks | 1 files |
 | Phase 17 P06 | ~6min | 1 tasks | 3 files |
 | Phase 17-partner-surfaces P07 | ~10min | 3 tasks | 5 files |
+| Phase 17 P17-08 | ~20min | 3 tasks tasks | 3 modified + 2 created files |
 
 ## Decisions
 
@@ -364,3 +365,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: 17-07: PdfPreviewMock validityDays sourced from parsedData.validityDays (per-draft) not params.validityDays (global default) — required so WIZ-04 edits appear in preview on next render
 - [Phase ?]: 17-07: Defensive 'if (!draft.lcRef) redirect' bail INCLUDED in verification/page.tsx per 17-PATTERNS belt-and-suspenders recommendation
 - [Phase ?]: 17-07: Optimistic UI no-rollback on server-action failure accepted per T-17-07-06 (internal tool); v1.4+ may add onError revert
+- [Phase ?]: Phase 17 Plan 08 — CONTRAST-02 Row 11 dark-mode active filter pill ~3.9:1 accepted as deviation (Option 1) — matches existing .chip-active baseline (Phase 8), no regression; palette stability invariant preserved per ROADMAP §v1.3 §3
+- [Phase ?]: Phase 17 Plan 08 — Antoine sign-off received 2026-05-24 for all 5 partner surfaces × light + dark (THEME-01); ADMIN-09 9/9 green (32ms), tsc exit 0, WIZ-05 closed; Phase 17 SHIPPED 8/8 plans, 12/12 reqs

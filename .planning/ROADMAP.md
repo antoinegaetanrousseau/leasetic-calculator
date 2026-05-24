@@ -76,7 +76,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 ### v1.3 — Design Refresh + Partner-Onboarding Ready (Phases 16-21)
 
 - [x] **Phase 16: Shell Refresh + Contrast Gates** — Refreshed sidebar + tri-state theme + hero pattern + locale relocation + topbar/footer; WCAG AA contrast for diff-panel and gold surfaces measured and signed off (completed 2026-05-21)
-- [ ] **Phase 17: Partner Surfaces** — Partner Home dashboard (hero + MetricTiles + Propositions récentes), /proposals table with Archivées pill, full wizard redesign (3 steps + validity relocation + LC reference reservation); light+dark pair verified
+- [x] **Phase 17: Partner Surfaces** — Partner Home dashboard (hero + MetricTiles + Propositions récentes), /proposals table with Archivées pill, full wizard redesign (3 steps + validity relocation + LC reference reservation); light+dark pair verified (completed 2026-05-24)
 - [ ] **Phase 18: Admin Surfaces** — Admin Home enhancement (hero + stats + CTA), Partners list styled table + AccountsList→PartnersList rename, Créer partenaire form refresh, Coefficients warning banner + history card refresh; light+dark pair verified
 - [ ] **Phase 19: New Capabilities** — Per-partner XLSX export (ADMIN-09 clean, grep-contract suite extended), centralized LC reference dashboard (cross-partner, admin-only, grep-contract suite extended to 10+ gates)
 - [ ] **Phase 20: Infra Hardening** — Neon 3-branch split (per-scope DATABASE_URL), post-deploy DB-smoke CI step, Better Auth trustedOrigins middleware gate
@@ -115,7 +115,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   3. Wizard step 1 shows the Figma `35:46` form card with `● INFORMATIONS CLIENT` / `● DÉTAILS DU PROJET` section labels and segmented duration pill; step 2 shows the loyer-mensuel hero card in `--teal` with explicit `Commission apporteur (non visible client)` row; step 3 shows the 2-column 1040px layout with `<PdfPreviewMock>` header carrying the LC reference reserved at step 1 submission.
   4. The validity-selector (15j / 30j / 60j) is present on step 3 inside the CALCUL review card; a default value (30j) is set at draft creation; selecting a different value updates the draft before finalize.
   5. Every partner-side screen ships light and dark variants matching Figma `82:*` duplicate frames; ADMIN-09 D-12 envelope and the 9-gate grep-contract suite remain green throughout.
-**Plans:** 7/8 plans executed
+**Plans:** 8/8 plans complete
 - [x] 17-01-PLAN.md — Move lc_ref allocation to createDraft + add archived filter to buildListResponse (DB/API layer foundation)
 - [x] 17-02-PLAN.md — Add ~30 Phase 17 i18n keys (FR + EN) + PdfPreviewMock lcRef prop change
 - [x] 17-03-PLAN.md — Partner Home / rewrite (PageHero + 3 MetricTiles + Propositions récentes) + proposal-aggregates queries
@@ -123,7 +123,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] 17-05-PLAN.md — Wizard step 1 PageHero adoption (repaint only, no JSX restructure)
 - [x] 17-06-PLAN.md — Wizard step 2 restructure (PageHero + loyer hero card + Tranche/Coefficient chip + Détail du calcul + Paramètres saisis)
 - [x] 17-07-PLAN.md — Wizard step 3 PageHero adoption + validity selector inside CALCUL + PdfPreviewMock real lcRef + updateValidity server action
-- [ ] 17-08-PLAN.md — THEME-01 light+dark verification checkpoint + CONTRAST-02 audit append + ADMIN-09 final gate check
+- [x] 17-08-PLAN.md — THEME-01 light+dark verification checkpoint + CONTRAST-02 audit append + ADMIN-09 final gate check
 **UI hint:** yes
 
 ### Phase 18: Admin Surfaces
@@ -197,7 +197,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 14. Admin Polish — Partners + History + Home | v1.2 | 6/6 | Complete | 2026-05-20 |
 | 15. Public Surface Brand Polish | v1.2 | 1/1 | Complete | 2026-05-21 |
 | 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete    | 2026-05-21 |
-| 17. Partner Surfaces | v1.3 | 7/8 | In Progress|  |
+| 17. Partner Surfaces | v1.3 | 8/8 | Complete   | 2026-05-24 |
 | 18. Admin Surfaces | v1.3 | 0/TBD | Not started | — |
 | 19. New Capabilities | v1.3 | 0/TBD | Not started | — |
 | 20. Infra Hardening | v1.3 | 0/TBD | Not started | — |
