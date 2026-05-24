@@ -16,8 +16,8 @@ import 'server-only';
  *   3. computeLoyer using the params (server-side recompute)
  *   4. @react-pdf/renderer render to PDF buffer
  *   5. Upload PDF via lib/storage adapter; obtain pdfBlobKey + sha256 + size
- *   6. Allocate lc_ref (presentation-layer ref, Phase 8 generateLcRef) +
- *      idempotency_key (UUIDv4 — randomUUID)
+ *   6. Allocate idempotency_key (UUIDv4 — randomUUID). lc_ref is sourced
+ *      from the draft row itself (Phase 17 D-03: allocated at createDraft)
  *   7. Single-shot finalizeDraft (atomic UPDATE flipping status='draft' →
  *      'active') — Phase 12 owns the audit-trail entry write inside the
  *      same transaction
@@ -39,7 +39,6 @@ import { z } from 'zod';
 
 import {
   computeLoyer,
-  generateLcRef,
   proposalInputSchema,
   type ProposalInput,
 } from '@/lib/calc';
@@ -151,6 +150,16 @@ export async function finalizeWizard(
     throw err;
   }
 
+  // Phase 17 D-03 — lcRef is allocated at createDraft time (no longer here).
+  // Read it from the draft row to thread into the PDF data prop. A NULL
+  // lcRef would indicate a legacy pre-Phase 17 draft — bail with bounded
+  // code so the route maps to 'FinalizeFailed' (rather than rendering a PDF
+  // with an empty reference).
+  if (!draft.lcRef) {
+    throw new Error('FinalizeFailed');
+  }
+  const lcRef = draft.lcRef;
+
   // D-16 step 2 — read params snapshot (Stripe Option A: verbatim immutable).
   const params = await getLatestGlobalParams();
   if (!params) {
@@ -161,9 +170,8 @@ export async function finalizeWizard(
   // ADMIN-09-sensitive parameter name from this file's source.
   const compute = computeLoyer(buildComputeArgs(parsed, params));
 
-  // D-16 step 6 — allocate lcRef + idempotencyKey up-front so the PDF can
-  // embed lcRef in its data prop (the byte-deterministic PDF needs it).
-  const lcRef = generateLcRef();
+  // D-16 step 6 — idempotencyKey allocated here; lcRef was set at draft
+  // creation (Phase 17 D-03).
   const idempotencyKey = randomUUID();
 
   // D-16 step 4 — render the PDF.
@@ -183,8 +191,9 @@ export async function finalizeWizard(
   // D-16 step 7-8 — atomic single-shot UPDATE; Phase 12 finalizeDraft writes
   // status='active' + all 8 finalize columns + the audit entry inside a
   // single transaction. Phase 13 MUST NOT double-write the audit row.
+  // Phase 17 D-03: lcRef no longer passed in args — finalizeDraft sources it
+  // from the draft row itself.
   const finalized = await finalizeDraft(args.draftId, args.userId, {
-    lcRef,
     idempotencyKey,
     paramsSnapshot: buildParamsSnapshot(params),
     computed: buildComputedJson(compute.computed),

@@ -87,8 +87,13 @@ beforeEach(() => {
   storagePutMock.mockReset();
   storageMock.mockClear();
 
-  // Happy-path defaults
-  getDraftByIdMock.mockResolvedValue({ id: 'd-1', inputs: VALID_INPUTS, createdAt: new Date('2026-05-12') });
+  // Happy-path defaults — Phase 17 D-03: draft row carries pre-allocated lcRef.
+  getDraftByIdMock.mockResolvedValue({
+    id: 'd-1',
+    inputs: VALID_INPUTS,
+    createdAt: new Date('2026-05-12'),
+    lcRef: 'LC-2026-001',
+  });
   getLatestGlobalParamsMock.mockResolvedValue(PARAMS);
   renderProposalPdfMock.mockResolvedValue(PDF_RENDER_RESULT);
   storagePutMock.mockResolvedValue({
@@ -166,25 +171,30 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
     expect((optsArg as { contentType: string }).contentType).toBe('application/pdf');
   });
 
-  it('Test 6: allocates lc_ref + idempotency_key (D-16 step 6)', async () => {
+  it('Test 6: allocates idempotency_key (D-16 step 6); lc_ref sourced from the pre-allocated draft row (Phase 17 D-03)', async () => {
     await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr' });
     expect(finalizeDraftMock).toHaveBeenCalledTimes(1);
     const [, , payload] = finalizeDraftMock.mock.calls[0];
-    const p = payload as { lcRef: string; idempotencyKey: string };
-    expect(p.lcRef).toMatch(/^LC-/);
+    const p = payload as { idempotencyKey: string };
     expect(typeof p.idempotencyKey).toBe('string');
     expect(p.idempotencyKey.length).toBeGreaterThan(0);
+    // Phase 17 D-03: lcRef is NOT in the finalizeDraft args (finalizeDraft
+    // reads it from the draft row itself).
+    expect('lcRef' in (payload as Record<string, unknown>)).toBe(false);
+    // The PDF render data, however, MUST carry the real lcRef (WIZ-06).
+    const renderArg = renderProposalPdfMock.mock.calls[0][0] as { data: { lcRef: string } };
+    expect(renderArg.data.lcRef).toBe('LC-2026-001');
   });
 
-  it('Test 7: calls finalizeDraft(draftId, userId, { ...all 8 fields }) — single-shot atomic UPDATE (D-16 step 7-8)', async () => {
+  it('Test 7: calls finalizeDraft(draftId, userId, { ...7 fields }) — single-shot atomic UPDATE (D-16 step 7-8); lc_ref removed from args per Phase 17 D-03', async () => {
     await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr' });
     expect(finalizeDraftMock).toHaveBeenCalledTimes(1);
     const [draftIdArg, userIdArg, payload] = finalizeDraftMock.mock.calls[0];
     expect(draftIdArg).toBe('d-1');
     expect(userIdArg).toBe('u-1');
     const p = payload as Record<string, unknown>;
-    // All 8 finalize columns present
-    expect(p.lcRef).toBeDefined();
+    // Phase 17 D-03: 7 finalize columns present in args (lcRef removed).
+    expect('lcRef' in p).toBe(false);
     expect(p.idempotencyKey).toBeDefined();
     expect(p.paramsSnapshot).toBeDefined();
     expect(p.computed).toBeDefined();

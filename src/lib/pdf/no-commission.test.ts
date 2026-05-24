@@ -252,6 +252,8 @@ describe('ADMIN-09 no-commission-in-PDF — golden corpus (D-12 + D-28)', () => 
         id: 'd-1',
         inputs,
         createdAt: new Date('2026-05-12'),
+        // Phase 17 D-03: draft row carries pre-allocated lcRef.
+        lcRef: 'LC-2026-001',
       });
 
       await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr' });
@@ -318,6 +320,8 @@ describe('ADMIN-09 no-commission-in-PDF — golden corpus (D-12 + D-28)', () => 
         id: 'd-1',
         inputs: buildDraftInputs(fixture),
         createdAt: new Date('2026-05-12'),
+        // Phase 17 D-03: draft row carries pre-allocated lcRef.
+        lcRef: 'LC-2026-001',
       });
       await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr' });
       totalCalls += finalizeDraftMock.mock.calls.length;

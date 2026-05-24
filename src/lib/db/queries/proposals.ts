@@ -362,11 +362,95 @@ export interface CreateDraftArgs {
   language: 'fr' | 'en';
 }
 
+// ── Phase 17 D-03 / D-04 — per-user sequential lc_ref allocation ────────────
+
+/** Format constant for the v1.3 LC reference: `LC-2026-NNN` (≥3-digit pad). */
+const LC_REF_PREFIX = 'LC-2026-';
+const LC_REF_MIN_PAD = 3;
+const ALLOCATE_RETRY_MAX = 3;
+
 /**
- * DB-01 draft creation per 12-CONTEXT.md D-01..D-03. INSERTs a fresh row with
- * `status='draft'` and `inputs={}` (empty jsonb). The
- * `proposals_finalized_completeness_check` (D-04) permits NULL `lc_ref`,
+ * Format an integer suffix as `LC-2026-NNN` matching the v1.3 contract.
+ * Suffixes ≥ 1000 keep their natural width (no zero-padding to 4+ digits).
+ */
+function formatLcRef(n: number): string {
+  return `${LC_REF_PREFIX}${String(n).padStart(LC_REF_MIN_PAD, '0')}`;
+}
+
+/**
+ * Parse the numeric suffix from an `LC-2026-NNN` string. Returns NaN for
+ * non-matching strings (e.g. legacy `LC-12345` produced by Phase 8's random
+ * generator). Callers treat NaN as "no usable prior" and start at 1.
+ */
+function parseLcRefSuffix(ref: string | null | undefined): number {
+  if (!ref) return NaN;
+  if (!ref.startsWith(LC_REF_PREFIX)) return NaN;
+  const tail = ref.slice(LC_REF_PREFIX.length);
+  if (!/^\d+$/.test(tail)) return NaN;
+  return Number(tail);
+}
+
+/**
+ * Phase 17 D-03 — allocate the next sequential `lc_ref` for a partner.
+ *
+ * Per 17-PATTERNS.md recommendation (b): SELECT the most-recent matching
+ * `LC-2026-NNN` row for this user, parse its suffix, increment, format. If no
+ * prior matching row exists, start at `LC-2026-001`.
+ *
+ * D-04 gap-tolerance: abandoned drafts consume sequence numbers. The partial
+ * unique index `proposals_user_id_lc_ref_uq WHERE lc_ref IS NOT NULL` (Phase
+ * 12 D-05) is the uniqueness backstop. On unique-violation we re-SELECT and
+ * retry up to ALLOCATE_RETRY_MAX times — this handles the rare race between
+ * two concurrent createDraft calls for the same user that select the same
+ * tail value before either INSERTs.
+ *
+ * Internal helper (not exported). Used by createDraft below.
+ */
+async function allocateNextLcRefForUser(userId: string): Promise<string> {
+  const dbi = db();
+  // Order DESC over `lc_ref` text — `LC-2026-NNN` sorts lexicographically
+  // correct for same-width suffixes; the SQL filter `LIKE 'LC-2026-%'`
+  // excludes any legacy `LC-NNNNN` (Phase 8 random) rows so they don't shadow
+  // the v1.3 sequence. Real per-user volume is small (<1000 rows) so even an
+  // imperfect lex sort is bounded; parseLcRefSuffix guards the parse.
+  const rows = await dbi
+    .select({ lcRef: schema.proposals.lcRef })
+    .from(schema.proposals)
+    .where(
+      and(
+        eq(schema.proposals.userId, userId),
+        isNotNull(schema.proposals.lcRef),
+        sql`${schema.proposals.lcRef} LIKE ${`${LC_REF_PREFIX}%`}`,
+      ),
+    )
+    .orderBy(desc(schema.proposals.lcRef))
+    .limit(1);
+
+  const prior = rows[0]?.lcRef ?? null;
+  const priorSuffix = parseLcRefSuffix(prior);
+  const next = Number.isFinite(priorSuffix) ? priorSuffix + 1 : 1;
+  return formatLcRef(next);
+}
+
+/**
+ * DB-01 draft creation per 12-CONTEXT.md D-01..D-03 + Phase 17 D-03/D-04.
+ *
+ * INSERTs a fresh row with `status='draft'`, `inputs={}` (empty jsonb), and
+ * `lc_ref` pre-allocated via `allocateNextLcRefForUser`. The
+ * `proposals_finalized_completeness_check` (D-04) permits NULL
  * `idempotency_key`, `params_snapshot`, `computed` while status='draft'.
+ *
+ * Phase 17 D-03 inversion: lc_ref is allocated HERE (was in finalizeDraft
+ * pre-Phase 17). The PDF preview on wizard step 3 can therefore render the
+ * REAL lc_ref instead of the literal `LC-2026-XXX` (WIZ-06).
+ *
+ * Phase 13 D-16 invariant preserved: NO audit_log entry on draft creation.
+ * audit_log fires only at finalize (lifecycle event). lc_ref pre-allocation
+ * is a backend implementation detail.
+ *
+ * Phase 17 D-04 gap-tolerance: abandoned drafts consume sequence numbers.
+ * Retry on unique-violation up to ALLOCATE_RETRY_MAX (uniqueness backstop =
+ * Phase 12 D-05 partial unique index).
  *
  * Phase 13 wizard route handler calls this on `/proposals/new/parametres`
  * entry when no `?draft_id=` query param is present. Many drafts per partner
@@ -374,16 +458,31 @@ export interface CreateDraftArgs {
  */
 export async function createDraft(args: CreateDraftArgs): Promise<ProposalRow> {
   const dbi = db();
-  const insert: NewProposalRow = {
-    userId: args.userId,
-    language: args.language,
-    status: 'draft',
-    inputs: {},
-    schemaVersion: '1.0.0',
-    // lcRef, idempotencyKey, paramsSnapshot, computed all left undefined → NULL.
-  };
-  const [row] = await dbi.insert(schema.proposals).values(insert).returning();
-  return row;
+  let lastErr: unknown = null;
+  for (let attempt = 0; attempt < ALLOCATE_RETRY_MAX; attempt++) {
+    const lcRef = await allocateNextLcRefForUser(args.userId);
+    const insert: NewProposalRow = {
+      userId: args.userId,
+      language: args.language,
+      status: 'draft',
+      lcRef,
+      inputs: {},
+      schemaVersion: '1.0.0',
+      // idempotencyKey, paramsSnapshot, computed still NULL until finalize.
+    };
+    try {
+      const [row] = await dbi.insert(schema.proposals).values(insert).returning();
+      return row;
+    } catch (err) {
+      // Postgres unique_violation = SQLSTATE 23505. We can't reliably check
+      // the SQLSTATE through every driver wrapper without coupling — instead
+      // re-SELECT and retry on ANY insert error up to the retry cap. The
+      // SELECT in allocateNextLcRefForUser will pick up the just-inserted
+      // sibling row on the next attempt.
+      lastErr = err;
+    }
+  }
+  throw lastErr ?? new Error('createDraft: lc_ref allocation exhausted retries');
 }
 
 export interface UpdateDraftArgs {
@@ -422,7 +521,10 @@ export async function updateDraft(
 }
 
 export interface FinalizeDraftArgs {
-  lcRef: string;
+  // Phase 17 D-03: `lcRef` REMOVED from this interface. The draft row already
+  // has `lc_ref` allocated at createDraft time. finalizeDraft reads it from
+  // the draft row inside the transaction and copies it into the UPDATE +
+  // audit payload — callers must NOT pass it.
   idempotencyKey: string;
   paramsSnapshot: Record<string, unknown>;
   computed: Record<string, unknown>;
@@ -433,19 +535,29 @@ export interface FinalizeDraftArgs {
 }
 
 /**
- * DB-01 / D-06 / D-07 — sole writer of the `draft → active` transition.
+ * DB-01 / D-06 / D-07 + Phase 17 D-03 — sole writer of the `draft → active`
+ * transition.
  *
- * In ONE UPDATE: writes `status='active'` + the four previously-NULL columns
- * (lcRef, idempotencyKey, paramsSnapshot, computed) + the four PDF columns
- * (pdfBlobKey, pdfSha256, pdfSizeBytes, pdfGeneratedAt). This single-shot
- * write preserves Phase 8's `params_snapshot` immutability invariant as a
- * draft→active transition rule — after this returns, `paramsSnapshot` is
- * never updated again.
+ * In ONE UPDATE: writes `status='active'` + the three previously-NULL columns
+ * (idempotencyKey, paramsSnapshot, computed) + the four PDF columns
+ * (pdfBlobKey, pdfSha256, pdfSizeBytes, pdfGeneratedAt). The `lc_ref` column
+ * is re-written to the SAME value already present on the draft row (Phase 17
+ * D-03 pre-allocates at createDraft) — this is a no-op write that makes the
+ * audit_log entry deterministically reflect what was on the row, AND a
+ * defensive backstop in case the draft row somehow has a NULL lcRef
+ * (impossible after Phase 17 D-03, but throws bounded error rather than
+ * silently writing NULL into the active row which would violate the Phase 12
+ * D-04 completeness CHECK).
+ *
+ * This single-shot write preserves Phase 8's `params_snapshot` immutability
+ * invariant as a draft→active transition rule — after this returns,
+ * `paramsSnapshot` is never updated again.
  *
  * On success, writes one `audit_log` entry with `action='proposal.create'`
- * (matches Phase 8 semantics for the new-row audit trail). Returns the
- * finalized row or null if no row matched (cross-user attempt, already
- * finalized, or soft-deleted).
+ * (matches Phase 8 semantics for the new-row audit trail). The payload
+ * `lcRef` is sourced from the draft row (Phase 17 D-03), NOT from args.
+ * Returns the finalized row or null if no row matched (cross-user attempt,
+ * already finalized, or soft-deleted).
  */
 export async function finalizeDraft(
   proposalId: string,
@@ -453,11 +565,30 @@ export async function finalizeDraft(
   args: FinalizeDraftArgs,
 ): Promise<ProposalRow | null> {
   const dbi = db();
+
+  // Phase 17 D-03 — source lcRef from the draft row. getDraftById scopes by
+  // (id, userId, status='draft') so a cross-user or wrong-state lookup
+  // returns null and we short-circuit to the same null contract as a failed
+  // UPDATE below.
+  const draft = await getDraftById(proposalId, userId);
+  if (!draft) {
+    return null;
+  }
+  // Defensive: post-Phase 17 drafts always have lcRef. A legacy draft
+  // (pre-Phase 17 createDraft) would have NULL — bail rather than write a
+  // NULL active row that would violate the Phase 12 completeness CHECK.
+  if (!draft.lcRef) {
+    throw new Error(
+      'finalizeDraft: draft row is missing lc_ref — Phase 17 D-03 requires lc_ref allocated at createDraft',
+    );
+  }
+  const lcRef = draft.lcRef;
+
   const result = await dbi
     .update(schema.proposals)
     .set({
       status: 'active',
-      lcRef: args.lcRef,
+      lcRef,
       idempotencyKey: args.idempotencyKey,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       paramsSnapshot: args.paramsSnapshot as any,
@@ -486,7 +617,7 @@ export async function finalizeDraft(
     action: 'proposal.create',
     targetType: 'proposal',
     targetId: proposalId,
-    payload: { lcRef: args.lcRef },
+    payload: { lcRef },
   });
 
   return result[0];
