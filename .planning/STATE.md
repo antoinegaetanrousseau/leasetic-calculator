@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T15:39:42.456Z"
+last_updated: "2026-05-24T15:44:57.513Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 15
   total_plans: 96
-  completed_plans: 91
+  completed_plans: 92
   percent: 71
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 17 (partner-surfaces) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -341,6 +341,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 17 P02 | ~25min | 2 (TDD) tasks | 4 (1 modified i18n + 1 modified primitive src + 1 modified primitive test + 1 modified callsite) (+ SUMMARY) files |
 | Phase 17 P03 | ~18min | 2 (TDD) tasks | 4 (2 created src + 2 created test + 1 modified page) files |
 | Phase 17 P04 | ~5min | 2 tasks | 4 files |
+| Phase 17 P05 | ~10min | 1 tasks | 1 files |
 
 ## Decisions
 
