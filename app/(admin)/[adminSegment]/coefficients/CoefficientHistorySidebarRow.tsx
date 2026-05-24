@@ -1,98 +1,100 @@
-'use client';
-
 /**
- * Plan 14-04 Task 2 — Sidebar row (per-row client component).
+ * Plan 18-05 Task 2 — Sidebar row (D-21 chrome refresh + D-22 click-to-diff
+ * removal).
  *
- * Per UI-SPEC §5.2 + D-20 (multi-expand allowed):
- *   - Each row owns its own expanded state via useState — multiple rows
- *     can be expanded simultaneously.
- *   - Collapsed view: italic summary + meta line (date · changed_by).
- *   - Expanded view: renders CoefficientDiffPanel in 'condensed' mode
- *     below the meta line.
- *   - Keyboard: Enter/Space toggles expand; Escape collapses.
+ * Phase 14 baseline shipped each row as a role="button" with an expandable
+ * <CoefficientDiffPanel> mount. Plan 18-05 D-22 moves the diff modal to the
+ * /history full page only — sidebar rows are now READ-ONLY:
+ *   - No onClick handler.
+ *   - No role="button" / tabIndex.
+ *   - No cursor:pointer.
+ *   - No CoefficientDiffPanel import or mount.
  *
- * The diff panel is imported via relative path from the sibling /history
- * directory because Plan 14-05 colocates the shared component there.
+ * Row layout (D-21, UI-SPEC §Coefficients lines 511-518):
+ *   - padding 12px 16px + borderBottom 1px solid var(--border)
+ *   - Top line: relative time (13px/600/--ink) + admin name (13px/400/--muted)
+ *   - Middle line: change summary (12.5px/400/--muted/lineHeight 1.4)
+ *   - Optional note line (italic, when present)
+ *
+ * Identity preserved (per Plan 18-05 in-place refresh contract): same file
+ * path, same exported symbol, same prop shape. The 'use client' directive
+ * is no longer strictly required (no state, no handlers) but is kept off to
+ * let the parent server component compose without crossing the boundary.
  */
 
-import { useState } from 'react';
 import { formatDate } from '@/lib/i18n/format';
 import { type Lang } from '@/lib/i18n/dictionaries';
 import type { CoefficientHistoryListRow } from '@/lib/db/queries/coefficient-history';
-import { CoefficientDiffPanel } from '../history/CoefficientDiffPanel';
 
 export interface CoefficientHistorySidebarRowProps {
   row: CoefficientHistoryListRow;
   lang: Lang;
+  /** Optional note line rendered italic below the summary. */
+  note?: string;
 }
 
 export function CoefficientHistorySidebarRow({
   row,
   lang,
+  note,
 }: CoefficientHistorySidebarRowProps) {
-  const [expanded, setExpanded] = useState(false);
-  const toggle = () => setExpanded((v) => !v);
-
   return (
     <div
-      role="button"
-      tabIndex={0}
-      aria-expanded={expanded}
-      aria-controls={`history-diff-${row.id}`}
-      onClick={toggle}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggle();
-        } else if (e.key === 'Escape') {
-          setExpanded(false);
-        }
-      }}
       style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 12,
-        padding: 20,
-        cursor: 'pointer',
+        padding: '12px 16px',
+        borderBottom: '1px solid var(--border)',
+        cursor: 'default',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
       }}
     >
+      {/* Top line: time + admin name */}
+      <div>
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--ink)',
+          }}
+        >
+          {formatDate(row.changedAt, lang)}
+        </span>
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 400,
+            color: 'var(--muted)',
+            marginLeft: 8,
+          }}
+        >
+          {row.createdByDisplay ?? '—'}
+        </span>
+      </div>
+
+      {/* Middle line: change summary */}
       <div
-        id={`history-summary-${row.id}`}
         style={{
-          fontStyle: 'italic',
-          fontSize: 14.5,
+          fontSize: 12.5,
           fontWeight: 400,
-          lineHeight: 1.55,
-          color: 'var(--ink)',
+          color: 'var(--muted)',
+          lineHeight: 1.4,
         }}
       >
         {row.summary}
       </div>
-      <div
-        style={{
-          marginTop: 4,
-          fontSize: 12.5,
-          fontWeight: 500,
-          color: 'var(--muted)',
-        }}
-      >
-        <span>{formatDate(row.changedAt, lang)}</span>
-        <span> · </span>
-        <span>{row.createdByDisplay ?? '—'}</span>
-      </div>
 
-      {expanded && (
+      {/* Optional note line */}
+      {note && (
         <div
-          id={`history-diff-${row.id}`}
-          role="region"
-          aria-labelledby={`history-summary-${row.id}`}
-          style={{ marginTop: 16 }}
-          // Stop propagation so clicks/keys inside the panel do not toggle
-          // the parent row's expanded state.
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => e.stopPropagation()}
+          style={{
+            fontSize: 12.5,
+            fontStyle: 'italic',
+            color: 'var(--muted)',
+            marginTop: 4,
+          }}
         >
-          <CoefficientDiffPanel mode="condensed" row={row} lang={lang} />
+          {note}
         </div>
       )}
     </div>

@@ -1,19 +1,27 @@
 /**
- * Plan 14-04 Task 2 — Coefficient History Sidebar (server component).
+ * Plan 18-05 Task 2 — Coefficient History Sidebar (D-21 in-place refresh,
+ * D-22 click-to-diff removal).
  *
- * Per UI-SPEC §5.2 + D-17..D-20:
- *   - Fetches 5 most-recent coefficient_history rows via Phase 12's
- *     listCoefficientHistory({ limit: 5 }) helper.
- *   - Renders a single .card with the `● HISTORIQUE` chrome, up to 5
- *     CoefficientHistorySidebarRow client components, and a footer
- *     `Voir tout l'historique →` Link to /<seg>/history.
- *   - Empty state (no rows): italic muted "Aucun changement…" line +
- *     footer link HIDDEN.
+ * Phase 14 baseline preserved:
+ *   - Server component fetching 5 most-recent coefficient_history rows.
+ *   - Single .card with ● HISTORIQUE chrome.
+ *   - Empty state hides the footer link.
+ *   - 2-column layout owned by the parent page (left = editor, right = this).
+ *   - Cursor pagination preserved (the page-level "+ N autres" / load-more
+ *     control stays as the Phase 14 mount).
  *
- * Trust boundary inherited (T-14-04-01): the parent /coefficients page
- * calls requireAdmin() upstream; this server component is rendered ONLY
- * inside that gated surface. The sidebar's `listCoefficientHistory({
- * limit: 5 })` call is read-only (no untrusted input).
+ * Plan 18-05 changes:
+ *   - Rows render via the refreshed CoefficientHistorySidebarRow — tighter
+ *     row chrome per UI-SPEC §Coefficients lines 511-518, NO click-to-diff
+ *     handler, NO CoefficientDiffPanel mount.
+ *   - Footer link copy uses the Plan 18-01 new key
+ *     'admin.coefficients.history.viewAll' (FR: "Voir tout l'historique →").
+ *   - The CoefficientDiffPanel still lives at /history (full-page mode) per
+ *     D-22 — not referenced from this surface anymore.
+ *
+ * Trust boundary inherited (T-14-04-01): parent /coefficients page calls
+ * requireAdmin() upstream; this server component renders only inside that
+ * gated surface. listCoefficientHistory({ limit: 5 }) is read-only.
  */
 
 import Link from 'next/link';
@@ -62,7 +70,7 @@ export async function CoefficientHistorySidebar({
           {t('coefficients.history.empty', lang)}
         </p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div>
           {rows.map((row) => (
             <CoefficientHistorySidebarRow key={row.id} row={row} lang={lang} />
           ))}
@@ -70,23 +78,17 @@ export async function CoefficientHistorySidebar({
       )}
 
       {rows.length > 0 && (
-        <div
-          style={{
-            borderTop: '1px solid var(--border)',
-            marginTop: 16,
-            paddingTop: 12,
-          }}
-        >
+        <div style={{ marginTop: 16 }}>
           <Link
             href={`/${adminSegment}/history`}
             style={{
               color: 'var(--teal)',
-              fontSize: 14.5,
+              fontSize: 14,
               fontWeight: 500,
               textDecoration: 'none',
             }}
           >
-            {t('coefficients.history.viewAll', lang)}
+            {t('admin.coefficients.history.viewAll', lang)}
           </Link>
         </div>
       )}

@@ -1,21 +1,30 @@
 /**
- * Plan 14-04 Task 2 — CoefficientHistorySidebar + Row tests (RED → GREEN).
+ * Plan 18-05 Task 2 — CoefficientHistorySidebar tests (D-21 chrome refresh,
+ * D-22 click-to-diff removal).
  *
- * 6 automated test cases per PLAN.md `<behavior>` block:
- *   T1: sidebar renders 5 rows when listCoefficientHistory returns 5
- *   T2: empty state — sidebar renders empty copy AND footer link is hidden
- *   T3: footer link — href is `/<seg>/history` + i18n text
- *   T4: header — outer card has the `● HISTORIQUE` chrome + aria-label
- *   T5: row toggle — clicking the row toggles aria-expanded and reveals/hides
- *       the CoefficientDiffPanel mount
- *   T6: multi-expand — multiple rows can be expanded simultaneously (D-20)
+ * Replaces the Phase 14 click-to-diff suite. The diff modal now lives ONLY
+ * on the /history full page (CoefficientDiffPanel.tsx remains intact, just
+ * is no longer mounted from this sidebar).
  *
- * The CoefficientDiffPanel is mocked to a stub div to keep prop-passing
- * assertions tight without exercising the full panel (already covered in
- * Plan 14-04 Task 1's test file).
+ * Behavior contract (per Plan 18-05 task 2 <behavior> block):
+ *   T1: Rows have NO onClick handler / NO role="button" / NO cursor:pointer
+ *       (D-22 click-to-diff removed). Clicking a row does not mount any
+ *       diff panel.
+ *   T2: Row style.cursor === 'default'.
+ *   T3: 3-element vertical stack per row — top line (relative time + admin
+ *       name), middle line (change summary), optional note line (italic).
+ *   T4: Row chrome — padding:'12px 16px'; borderBottom:'1px solid var(--border)'.
+ *   T5: /history link at bottom uses the Plan 18-01 NEW key
+ *       admin.coefficients.history.viewAll = "Voir tout l'historique →".
+ *   T6: Empty state still renders without the footer link (preserved from Phase 14).
+ *   T7: Header chrome (● HISTORIQUE) preserved.
+ *   T8 (META — D-22 enforcement): There is NO CoefficientDiffPanel reference
+ *       in the sidebar source (test asserts via source-string read).
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 vi.mock('server-only', () => ({}));
 
@@ -28,21 +37,6 @@ vi.mock('@/lib/db/queries/coefficient-history', () => ({
     listCoefficientHistoryMock(...args),
 }));
 
-// Mock the CoefficientDiffPanel — the Row test asserts the panel mounts
-// when expanded; it does NOT re-verify the panel internals.
-vi.mock('../history/CoefficientDiffPanel', () => ({
-  CoefficientDiffPanel: ({
-    mode,
-    row,
-  }: {
-    mode: string;
-    row: { id: string };
-  }) => (
-    <div data-testid="diff-panel" data-mode={mode} data-row-id={row.id} />
-  ),
-}));
-
-// Import AFTER all mocks are in place.
 import { CoefficientHistorySidebar } from './CoefficientHistorySidebar';
 import { CoefficientHistorySidebarRow } from './CoefficientHistorySidebarRow';
 import type { CoefficientHistoryListRow } from '@/lib/db/queries/coefficient-history';
@@ -60,7 +54,11 @@ const SNAPSHOT: GlobalParamsSnapshot = {
   },
 };
 
-function mkRow(id: string, summary: string): CoefficientHistoryListRow {
+function mkRow(
+  id: string,
+  summary: string,
+  overrides: Partial<CoefficientHistoryListRow> = {},
+): CoefficientHistoryListRow {
   return {
     id,
     changedAt: new Date('2026-05-12T10:00:00Z'),
@@ -71,6 +69,7 @@ function mkRow(id: string, summary: string): CoefficientHistoryListRow {
     afterJson: SNAPSHOT as any,
     summary,
     createdByDisplay: 'Marie Dupont',
+    ...overrides,
   };
 }
 
@@ -79,61 +78,17 @@ afterEach(() => {
   listCoefficientHistoryMock.mockReset();
 });
 
-describe('CoefficientHistorySidebar (server component)', () => {
+describe('CoefficientHistorySidebar (server component) — Plan 18-05 D-21/D-22', () => {
   beforeEach(() => {
     listCoefficientHistoryMock.mockReset();
   });
 
-  it('T1: renders 5 rows when listCoefficientHistory returns 5', async () => {
-    const rows = Array.from({ length: 5 }, (_, i) =>
-      mkRow(`hist-${i}`, `Change ${i}`),
-    );
+  it('T5: footer link uses Plan 18-01 admin.coefficients.history.viewAll key', async () => {
     listCoefficientHistoryMock.mockResolvedValueOnce({
-      rows,
+      rows: [mkRow('hist-1', 'Commission: 5.00% → 5.50%')],
       hasMore: false,
       nextCursor: null,
     });
-
-    const ui = await CoefficientHistorySidebar({
-      lang: 'fr',
-      adminSegment: 'admin-segment',
-    });
-    const { container } = render(ui);
-    // Each row's summary text should appear in the DOM
-    for (let i = 0; i < 5; i++) {
-      expect(container.textContent).toContain(`Change ${i}`);
-    }
-    // listCoefficientHistory must have been called with { limit: 5 }
-    expect(listCoefficientHistoryMock).toHaveBeenCalledWith({ limit: 5 });
-  });
-
-  it('T2: empty state — renders empty copy AND footer link is hidden', async () => {
-    listCoefficientHistoryMock.mockResolvedValueOnce({
-      rows: [],
-      hasMore: false,
-      nextCursor: null,
-    });
-
-    const ui = await CoefficientHistorySidebar({
-      lang: 'fr',
-      adminSegment: 'admin-segment',
-    });
-    const { container } = render(ui);
-    expect(container.textContent).toContain(
-      'Aucun changement de coefficient pour le moment.',
-    );
-    // Footer link MUST NOT be in the DOM when rows are empty
-    const links = container.querySelectorAll('a');
-    expect(links.length).toBe(0);
-  });
-
-  it('T3: footer link has href `/<seg>/history` + i18n text', async () => {
-    listCoefficientHistoryMock.mockResolvedValueOnce({
-      rows: [mkRow('hist-1', 'Change 1')],
-      hasMore: false,
-      nextCursor: null,
-    });
-
     const ui = await CoefficientHistorySidebar({
       lang: 'fr',
       adminSegment: 'my-seg',
@@ -145,13 +100,29 @@ describe('CoefficientHistorySidebar (server component)', () => {
     expect(link!.textContent).toContain("Voir tout l'historique →");
   });
 
-  it('T4: outer card has ● HISTORIQUE header chrome + aria-label', async () => {
+  it('T6: empty state — empty copy + footer link hidden', async () => {
+    listCoefficientHistoryMock.mockResolvedValueOnce({
+      rows: [],
+      hasMore: false,
+      nextCursor: null,
+    });
+    const ui = await CoefficientHistorySidebar({
+      lang: 'fr',
+      adminSegment: 'admin-segment',
+    });
+    const { container } = render(ui);
+    expect(container.textContent).toContain(
+      'Aucun changement de coefficient pour le moment.',
+    );
+    expect(container.querySelectorAll('a').length).toBe(0);
+  });
+
+  it('T7: header chrome preserved (● HISTORIQUE + aria-label)', async () => {
     listCoefficientHistoryMock.mockResolvedValueOnce({
       rows: [mkRow('hist-1', 'Change 1')],
       hasMore: false,
       nextCursor: null,
     });
-
     const ui = await CoefficientHistorySidebar({
       lang: 'fr',
       adminSegment: 'admin-segment',
@@ -162,73 +133,99 @@ describe('CoefficientHistorySidebar (server component)', () => {
     expect(section!.getAttribute('aria-label')).toBe(
       'Historique des coefficients',
     );
-    // .ctitle + .dot chrome
     const ctitle = section!.querySelector('.ctitle');
     expect(ctitle).not.toBeNull();
-    const dot = ctitle!.querySelector('.dot');
-    expect(dot).not.toBeNull();
+    expect(ctitle!.querySelector('.dot')).not.toBeNull();
     expect(ctitle!.textContent).toContain('HISTORIQUE');
+  });
+
+  it('T8 (META — D-22): sidebar source contains NO CoefficientDiffPanel reference', () => {
+    const sidebarSource = readFileSync(
+      path.resolve(
+        __dirname,
+        'CoefficientHistorySidebar.tsx',
+      ),
+      'utf-8',
+    );
+    const rowSource = readFileSync(
+      path.resolve(
+        __dirname,
+        'CoefficientHistorySidebarRow.tsx',
+      ),
+      'utf-8',
+    );
+    // D-22: the diff modal stays on /history only — neither the sidebar
+    // nor its row component may IMPORT or MOUNT CoefficientDiffPanel.
+    // (JSDoc comments mentioning the symbol for traceability are allowed —
+    // we filter them out by stripping block comments before matching.)
+    const stripComments = (s: string) =>
+      s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const sidebarCode = stripComments(sidebarSource);
+    const rowCode = stripComments(rowSource);
+    expect(sidebarCode).not.toMatch(/CoefficientDiffPanel/);
+    expect(rowCode).not.toMatch(/CoefficientDiffPanel/);
+    // And no click-to-diff handler remains.
+    expect(sidebarCode).not.toMatch(/openDiff|onClick.*diff/i);
+    expect(rowCode).not.toMatch(/openDiff|onClick.*diff/i);
   });
 });
 
-describe('CoefficientHistorySidebarRow (client component)', () => {
-  it('T5: clicking the row toggles aria-expanded + mounts CoefficientDiffPanel in condensed mode', () => {
-    const row = mkRow('hist-1', 'Commission changed');
+describe('CoefficientHistorySidebarRow — Plan 18-05 D-21/D-22', () => {
+  it('T1 (D-22): row has NO role="button" + clicking does NOT mount a diff panel', () => {
+    const row = mkRow('hist-1', 'Coefficient 36 mois T2: 2.95 → 3.05');
     const { container } = render(
       <CoefficientHistorySidebarRow row={row} lang="fr" />,
     );
-    const trigger = container.querySelector('[role="button"]')!;
-    expect(trigger.getAttribute('aria-expanded')).toBe('false');
-    // No diff panel yet
-    expect(container.querySelector('[data-testid="diff-panel"]')).toBeNull();
-
-    fireEvent.click(trigger);
-    expect(trigger.getAttribute('aria-expanded')).toBe('true');
-    // Diff panel mounted in condensed mode
-    const panel = container.querySelector('[data-testid="diff-panel"]');
-    expect(panel).not.toBeNull();
-    expect(panel!.getAttribute('data-mode')).toBe('condensed');
-    expect(panel!.getAttribute('data-row-id')).toBe('hist-1');
-
-    // Re-click collapses
-    fireEvent.click(trigger);
-    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    // No interactive role — rows are now read-only.
+    expect(container.querySelector('[role="button"]')).toBeNull();
+    // Clicking the rendered root must not introduce any new DOM (i.e. no
+    // diff panel mount, no aria-expanded toggle).
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).not.toBeNull();
+    const beforeHtml = root.outerHTML;
+    fireEvent.click(root);
+    expect(root.outerHTML).toBe(beforeHtml);
+    // Defensive: even if a panel testid leaked, assert absence.
     expect(container.querySelector('[data-testid="diff-panel"]')).toBeNull();
   });
 
-  it('T6: multi-expand — multiple rows can be expanded simultaneously (D-20)', () => {
-    const rowA = mkRow('row-a', 'Change A');
-    const rowB = mkRow('row-b', 'Change B');
-    const { container } = render(
-      <div>
-        <CoefficientHistorySidebarRow row={rowA} lang="fr" />
-        <CoefficientHistorySidebarRow row={rowB} lang="fr" />
-      </div>,
-    );
-    const triggers = container.querySelectorAll('[role="button"]');
-    expect(triggers.length).toBe(2);
-
-    fireEvent.click(triggers[0]!);
-    fireEvent.click(triggers[1]!);
-
-    expect(triggers[0]!.getAttribute('aria-expanded')).toBe('true');
-    expect(triggers[1]!.getAttribute('aria-expanded')).toBe('true');
-
-    const panels = container.querySelectorAll('[data-testid="diff-panel"]');
-    expect(panels.length).toBe(2);
-    const panelRowIds = Array.from(panels).map((p) =>
-      p.getAttribute('data-row-id'),
-    );
-    expect(panelRowIds).toContain('row-a');
-    expect(panelRowIds).toContain('row-b');
-  });
-
-  it('T5b: row meta renders formatted date + createdByDisplay; summary renders too', () => {
-    const row = mkRow('hist-1', 'Commission: 5.00% → 5.50%');
+  it('T2 (D-22): row cursor is default, not pointer', () => {
+    const row = mkRow('hist-1', 'Change 1');
     const { container } = render(
       <CoefficientHistorySidebarRow row={row} lang="fr" />,
     );
-    expect(container.textContent).toContain('Commission: 5.00% → 5.50%');
+    const root = container.firstElementChild as HTMLElement;
+    const inline = root.getAttribute('style') ?? '';
+    // Must contain explicit cursor:default OR omit cursor entirely (browser
+    // default is already 'default' on a non-button div). The D-22 contract
+    // forbids cursor:pointer.
+    expect(inline).not.toMatch(/cursor:\s*pointer/);
+  });
+
+  it('T3 (D-21): row contains 3-element vertical stack — top line (time + admin), middle line (summary), optional note', () => {
+    const row = mkRow(
+      'hist-1',
+      'Coefficient 36 mois T2: 2.95 → 3.05',
+    );
+    const { container } = render(
+      <CoefficientHistorySidebarRow row={row} lang="fr" />,
+    );
+    // Top line: time + admin name both rendered.
     expect(container.textContent).toContain('Marie Dupont');
+    // Middle line: change summary.
+    expect(container.textContent).toContain(
+      'Coefficient 36 mois T2: 2.95 → 3.05',
+    );
+  });
+
+  it('T4 (D-21): row chrome — padding 12px 16px + borderBottom var(--border)', () => {
+    const row = mkRow('hist-1', 'Change 1');
+    const { container } = render(
+      <CoefficientHistorySidebarRow row={row} lang="fr" />,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    const inline = root.getAttribute('style') ?? '';
+    expect(inline).toMatch(/padding:\s*12px\s+16px/);
+    expect(inline).toMatch(/border-bottom:\s*1px solid var\(--border\)/);
   });
 });
