@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render, within } from '@testing-library/react';
-import { MetricTile } from './MetricTile';
+import { MetricTile, type MetricTileProps } from './MetricTile';
 
 afterEach(() => cleanup());
 
@@ -51,5 +51,52 @@ describe('MetricTile', () => {
     const children = group.querySelectorAll(':scope > div');
     const valueDiv = children[1] as HTMLDivElement;
     expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--navy\)/);
+  });
+
+  // ── Phase 18 Plan 02 Task 1 — valueColor override (D-04) ────────────────
+  // Admin Home requires ALL three stat tiles to render their value in --teal,
+  // regardless of label semantic. Variant remains required (preserves Phase 11
+  // chrome semantics + back-compat with PHOME-02 callers); valueColor is an
+  // additive override that wins when provided.
+  describe('Phase 18 valueColor prop (D-04)', () => {
+    it('AC-MT-VC-01: without valueColor, variant=month value uses default var(--gd)', () => {
+      const { container } = render(
+        <MetricTile variant="month" label="Partenaires actifs" value="42" />,
+      );
+      const group = within(container).getByRole('group');
+      const children = group.querySelectorAll(':scope > div');
+      const valueDiv = children[1] as HTMLDivElement;
+      expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--gd\)/);
+    });
+
+    it('AC-MT-VC-02: valueColor="var(--teal)" overrides variant default on value element', () => {
+      const { container } = render(
+        <MetricTile
+          variant="month"
+          label="Partenaires actifs"
+          value="42"
+          valueColor="var(--teal)"
+        />,
+      );
+      const group = within(container).getByRole('group');
+      const children = group.querySelectorAll(':scope > div');
+      const valueDiv = children[1] as HTMLDivElement;
+      expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--teal\)/);
+      // sanity — variant default not present
+      expect(valueDiv.getAttribute('style')).not.toMatch(/color:\s*var\(--gd\)(?!-text)/);
+    });
+
+    it('AC-MT-VC-03: valueColor override works on every variant (no regression)', () => {
+      const variants: Array<MetricTileProps['variant']> = ['month', 'total', 'drafts'];
+      for (const v of variants) {
+        const { container, unmount } = render(
+          <MetricTile variant={v} label="X" value="Y" valueColor="var(--teal)" />,
+        );
+        const group = within(container).getByRole('group');
+        const valueDiv = group.querySelectorAll(':scope > div')[1] as HTMLDivElement;
+        expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--teal\)/);
+        unmount();
+      }
+    });
   });
 });

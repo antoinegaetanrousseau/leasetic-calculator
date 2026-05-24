@@ -14,6 +14,18 @@ export interface MetricTileProps {
   value: string;
   sublabel?: string;
   variant: 'month' | 'total' | 'drafts';
+  /**
+   * Override the value text color. When provided, wins over the variant's
+   * default color (VALUE_COLOR_BY_VARIANT). Typically a `var(--token)`
+   * reference.
+   *
+   * Phase 18 D-04 uses `var(--teal)` for ALL three admin home stat tiles
+   * (user-confirmed deviation from Figma gold for `Dernière modif. coeffs`;
+   * `--gold` reserved for warnings only — palette discipline). Existing
+   * Phase 11/17 partner-home callers do NOT pass this prop and keep their
+   * variant-driven defaults.
+   */
+  valueColor?: string;
 }
 
 const VALUE_COLOR_BY_VARIANT: Record<MetricTileProps['variant'], string> = {
@@ -22,8 +34,8 @@ const VALUE_COLOR_BY_VARIANT: Record<MetricTileProps['variant'], string> = {
   drafts: 'var(--gold)',
 };
 
-export function MetricTile({ label, value, sublabel, variant }: MetricTileProps) {
-  const valueColor = VALUE_COLOR_BY_VARIANT[variant];
+export function MetricTile({ label, value, sublabel, variant, valueColor }: MetricTileProps) {
+  const resolvedValueColor = valueColor ?? VALUE_COLOR_BY_VARIANT[variant];
   return (
     <div
       role="group"
@@ -56,7 +68,7 @@ export function MetricTile({ label, value, sublabel, variant }: MetricTileProps)
           fontSize: 24,
           fontWeight: 600,
           lineHeight: 1.3,
-          color: valueColor,
+          color: resolvedValueColor,
         }}
       >
         {value}
