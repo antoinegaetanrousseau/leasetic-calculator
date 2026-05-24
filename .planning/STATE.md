@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T20:02:20.705Z"
+last_updated: "2026-05-24T20:25:26.636Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 16
   total_plans: 103
-  completed_plans: 97
+  completed_plans: 98
   percent: 76
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 18 (admin-surfaces) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -347,6 +347,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 17 P17-08 | ~20min | 3 tasks tasks | 3 modified + 2 created files |
 | Phase 18 P01 | ~25min | 3 tasks | 11 (5 created + 6 modified incl. SUMMARY + deferred-items) files |
 | Phase 18 P02 | 9min | 3 tasks | 6 files |
+| Phase 18 P03 | 15 | 3 tasks | 13 files |
 
 ## Decisions
 
@@ -376,3 +377,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: Phase 18 D-04 enforced: all 3 Admin Home stat tile values render in var(--teal) via additive MetricTile.valueColor prop (no new variant; user-confirmed deviation from Figma gold)
 - [Phase ?]: Phase 18 D-07 enforced: RecentActivityRow strictly read-only (no anchor, no button, no role=link, no cursor:pointer); verified by recursive style scan in component tests
 - [Phase ?]: tests/admin-09-grep-contracts Surface 3 now mocks 5 DB helpers (Admin Home became DB-coupled post-Phase-18 rewrite); 9/9 ADMIN-09 gates remain green
+- [Phase ?]: D-08 Drizzle leftJoin + groupBy + sql MAX(proposals.createdAt) — partners with zero non-deleted proposals project lastActivityAt=null; PartnersList renders em-dash
+- [Phase ?]: D-14 rename scope: file/symbol/page-import only; admin.accounts.* i18n keys preserved for back-compat per Plan 18-01 SUMMARY discipline
+- [Phase ?]: PartnerStatus inactive → existing .chip-disabled StatusChip variant (red-danger); no new chip variant added
+- [Phase ?]: PartnerRowActions custom popover (no Radix per UI-SPEC line 363); mousedown for click-outside + keydown for Escape
+- [Phase ?]: page.tsx Task 3 maxWidth 1280px per UI-SPEC line 893 (6-col table needs the width)
