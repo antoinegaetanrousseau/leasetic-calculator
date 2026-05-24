@@ -3,141 +3,232 @@ import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
+import { type DictKey } from '@/lib/i18n/dictionaries';
+import { PageHero } from '@/components/ui/PageHero';
+import { MetricTile } from '@/components/ui/MetricTile';
+import { StatusChip } from '@/components/ui/StatusChip';
+import {
+  countThisMonth,
+  countTotal,
+  countDrafts,
+} from '@/lib/db/queries/proposal-aggregates';
 import { buildListResponse } from '@/lib/api/proposals/list';
-import { ProposalsList } from '@/components/proposals/ProposalsList';
-import { SearchBar } from '@/components/proposals/SearchBar';
-import { RecentlyDeletedToggle } from '@/components/proposals/RecentlyDeletedToggle';
 import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
+import { formatCurrency } from '@/lib/i18n/format';
 
 // PITFALLS §1.6: cookie-reading layout opts out of static rendering.
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Accueil — Leasétic Matrice' };
 
-/**
- * Module-level async helper so Date.now() is not called inside a React
- * component function — satisfies react-hooks/purity (same pattern as
- * Plan 08-10's getNowMs in the detail page).
- */
-async function getNowMs(): Promise<number> {
-  return Date.now();
-}
-
 interface PageParams {
-  searchParams: Promise<{ q?: string; deleted?: string; cursor?: string }>;
+  // Kept Promise-typed for forward compatibility even though Phase 17 Partner
+  // Home no longer consumes any query params (search/cursor/deleted moved to
+  // /proposals via Plan 17-04). `?deleted_just=1` is read inside
+  // <DeleteJustToast/> on the client.
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 /**
- * Authenticated home page — Phase 8 (PROP-02..05, PROP-20).
+ * Partner Home — Phase 17 Plan 03 rewrite (PHOME-01/02/03, D-05..D-09, D-19).
  *
- * Server Component does the initial list fetch (SSR first paint) and passes
- * { rows, hasMore, nextCursor } to the <ProposalsList> client orchestrator.
+ * Replaces the v1.1 inline hero + full proposals list + recently-deleted
+ * toggle + search bar with:
+ *   1. <PageHero> — greeting + subtitle + Nouvelle proposition CTA (D-19)
+ *   2. 3 <MetricTile> grid — Ce mois-ci / Total / Brouillons (PHOME-02)
+ *   3. "Propositions récentes" preview card — up to 5 abbreviated rows +
+ *      Voir toutes → link to /proposals (PHOME-03, D-08)
  *
- * Defence in depth: requireUser() runs again here even though the parent
- * layout already gated the route (PITFALLS §7.3 ordering).
+ * The full list moves to /proposals (Plan 17-04). The recently-deleted
+ * toggle is RETIRED here (replaced by the Archivées filter pill on
+ * /proposals); its component file stays on disk per <deferred> in
+ * 17-CONTEXT.
+ *
+ * Defense in depth: requireUser() runs again here even though the parent
+ * layout already gated the route. Aggregate helpers + buildListResponse
+ * receive `session.user.id` derived from the validated session (NOT from
+ * searchParams) — T-17-03-01 / T-17-03-02 IDOR mitigations.
+ *
+ * SSR ordering: requireUser → Promise.all([3 aggregates, recent list]) →
+ * render. The Promise.all batching is a parallelization win over four
+ * sequential awaits; each query is independent and userId-scoped.
+ *
+ * D-18 ADMIN-09 invariant preserved: aggregates project only count integers;
+ * buildListResponse({ userId, limit: 5 }) returns ProposalRowDto which
+ * strips paramsSnapshot (commission_pct bearing). The abbreviated row
+ * render below uses only StatusChip + clientCo + lcRef + amountHT (no
+ * commission surface).
  */
-export default async function HomePage({ searchParams }: PageParams) {
+export default async function HomePage({ searchParams: _searchParams }: PageParams) {
   const { session } = await requireUser();
   const lang = await getCurrentLang();
 
   const u = session.user as {
+    id: string;
     email: string;
     displayName?: string | null;
     name?: string | null;
   };
   const displayName = u.displayName ?? u.name ?? u.email;
+  const userId = u.id;
 
-  const sp = await searchParams;
-  const q = sp.q ?? '';
-  const deleted = sp.deleted === '1';
-  const cursor = sp.cursor ?? null;
+  const [countThisMonthVal, countTotalVal, countDraftsVal, recentList] = await Promise.all([
+    countThisMonth(userId),
+    countTotal(userId),
+    countDrafts(userId),
+    buildListResponse({ userId, limit: 5 }),
+  ]);
 
-  // SSR initial fetch — called directly (no HTTP round-trip on the SSR pass).
-  const initial = await buildListResponse({
-    userId: session.user.id,
-    q,
-    cursorEncoded: cursor,
-    deleted,
-    limit: 20,
-  });
-
-  // nowMs passed as prop so ValidityChip stays a pure render function
-  // (react-hooks/purity pattern from Plan 08-10 getNowMs helper).
-  const nowMs = await getNowMs();
-
-  // SSR re-mount key: forces ProposalsList to reset rows when URL params change.
-  // Back/forward navigation re-renders the server component, which propagates
-  // fresh initial props — the key change re-mounts ProposalsList so stale
-  // client-side rows are discarded.
-  const remountKey = `${q}|${deleted ? '1' : '0'}|${cursor ?? ''}`;
+  const recentRows = recentList.rows.slice(0, 5);
 
   return (
     <div>
-      {/* D-8-09: fires delete-success toast when ?deleted_just=1 is in URL, then strips it */}
+      {/* D-8-09 carry-forward: fires delete-success toast when ?deleted_just=1
+          is in URL, then strips it. Reads searchParams via useSearchParams
+          inside the client component — independent of this server pass. */}
       <DeleteJustToast lang={lang} />
 
-      {/* Greeting section — UI-SPEC §3.1.1 */}
-      <section style={{ marginBottom: 32 }}>
-        <h1
-          style={{
-            fontSize: '24px',
-            fontWeight: 700,
-            color: 'var(--ink)',
-            marginBottom: 8,
-          }}
-        >
-          {t('dashboard.greeting', lang).replace('{0}', displayName)}
-        </h1>
-        <p
-          style={{
-            fontSize: '14.5px',
-            fontWeight: 400,
-            color: 'var(--muted)',
-            marginBottom: 24,
-          }}
-        >
-          {t('dashboard.subtext', lang)}
-        </p>
+      {/* PageHero — greeting + subtitle + Nouvelle proposition CTA (D-19) */}
+      <PageHero
+        title={t('dashboard.greeting', lang).replace('{0}', displayName)}
+        subtitle={t('dashboard.home.subtitle', lang)}
+        actions={
+          <Link
+            href="/proposals/new/parametres"
+            className="btn-green"
+            aria-label={t('dashboard.cta.new', lang)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              textDecoration: 'none',
+            }}
+          >
+            <Plus size={17} strokeWidth={1.6} aria-hidden="true" />
+            <span>{t('dashboard.cta.new', lang)}</span>
+          </Link>
+        }
+      />
 
-        {/* Primary CTA — UI-SPEC §3.1.1 */}
-        <Link
-          href="/proposals/new"
-          className="btn-green"
-          aria-label={t('dashboard.cta.new.proposal', lang)}
-          style={{
-            width: 'max-content',
-            padding: '0.75rem 1.5rem',
-            textDecoration: 'none',
-          }}
-        >
-          <Plus size={17} strokeWidth={1.6} aria-hidden="true" />
-          <span>{t('dashboard.cta.new.proposal', lang)}</span>
-        </Link>
-      </section>
+      {/* MetricTile 3-up grid (UI-SPEC §Partner Home Layout step 2; D-05) */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 24,
+          marginBottom: 32,
+        }}
+      >
+        <MetricTile
+          variant="month"
+          label={t('dashboard.metricTile.thisMonth', lang)}
+          value={String(countThisMonthVal)}
+        />
+        <MetricTile
+          variant="total"
+          label={t('dashboard.metricTile.total', lang)}
+          value={String(countTotalVal)}
+        />
+        <MetricTile
+          variant="drafts"
+          label={t('dashboard.metricTile.drafts', lang)}
+          value={String(countDraftsVal)}
+        />
+      </div>
 
-      {/* Recent-proposals card — UI-SPEC §3.1.1 */}
+      {/* Propositions récentes card (PHOME-03, D-08, D-09) */}
       <section className="card" style={{ marginTop: 0 }}>
-        {/* Card header: title left + toggle right */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 16,
-          }}
-        >
-          <div className="ctitle">
-            <span>{t('dashboard.recent.title', lang)}</span>
+        <div className="ctitle" style={{ marginBottom: 16 }}>
+          <span>{t('dashboard.recent.title', lang)}</span>
+        </div>
+
+        {recentRows.length === 0 ? (
+          <p
+            style={{
+              color: 'var(--muted)',
+              fontSize: '14.5px',
+              margin: 0,
+            }}
+          >
+            {t('dashboard.recent.empty', lang)}
+          </p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {recentRows.map((row) => {
+              const chipKey = `chip.${row.displayStatus}` as DictKey;
+              return (
+                <Link
+                  key={row.id}
+                  href={`/proposals/${row.id}`}
+                  className="list-row"
+                  aria-label={`${row.clientCo} ${row.lcRef}`}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '90px 1fr auto auto',
+                    alignItems: 'center',
+                    gap: 16,
+                    padding: '10px 12px',
+                    borderRadius: 8,
+                    textDecoration: 'none',
+                  }}
+                >
+                  <StatusChip
+                    variant={row.displayStatus}
+                    label={t(chipKey, lang)}
+                  />
+                  <span
+                    style={{
+                      fontSize: '14.5px',
+                      fontWeight: 600,
+                      color: 'var(--ink)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {row.clientCo}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: 'var(--ink)',
+                      fontFamily:
+                        'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+                    }}
+                  >
+                    {row.lcRef}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '14.5px',
+                      fontWeight: 600,
+                      color: 'var(--ink)',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {formatCurrency(Number(row.amountHT), lang)}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
-          <RecentlyDeletedToggle lang={lang} />
-        </div>
+        )}
 
-        {/* Search bar — full width inside card */}
-        <div style={{ marginTop: 16, marginBottom: 16 }}>
-          <SearchBar lang={lang} />
+        {/* Voir toutes → link (D-08: routes to /proposals with no params) */}
+        <div style={{ marginTop: 16, textAlign: 'right' }}>
+          <Link
+            href="/proposals"
+            style={{
+              fontSize: 14,
+              fontWeight: 500,
+              color: 'var(--teal)',
+              textDecoration: 'none',
+            }}
+          >
+            {t('dashboard.recent.viewAll', lang)}
+          </Link>
         </div>
-
-        {/* List orchestrator — re-mounts on every q/deleted/cursor change */}
-        <ProposalsList key={remountKey} lang={lang} initial={initial} nowMs={nowMs} />
       </section>
     </div>
   );
