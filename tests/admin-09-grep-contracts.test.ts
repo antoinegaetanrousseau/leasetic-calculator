@@ -60,6 +60,59 @@ vi.mock('@/lib/admin', async (importOriginal) => {
   };
 });
 
+// Phase 18 Plan 02 — Admin Home now Promise.alls 5 DB queries on render.
+// renderToString() in the ADMIN-09 gate runs the server component WITHOUT a
+// live DB connection, so each helper must be stubbed. The mocks all return
+// values that exercise the FULL render path (5 stat values + 5 activity
+// rows) — maximizing the surface scanned by the grep contract.
+vi.mock('@/lib/auth/require', () => ({
+  requireAdmin: vi.fn(async () => ({ session: { user: { id: 'admin-1' } } })),
+}));
+vi.mock('@/lib/db/queries/partner-aggregates', () => ({
+  getActivePartnerCount: vi.fn(async () => 7),
+  getTotalPartnerAccountCount: vi.fn(async () => 9),
+}));
+vi.mock('@/lib/db/queries/proposal-aggregates', () => ({
+  getMonthlyProposalCountAll: vi.fn(async () => 42),
+}));
+vi.mock('@/lib/db/queries/admin-activity', () => ({
+  getRecentAdminActivity: vi.fn(async () => [
+    {
+      id: 'ch-1',
+      source: 'coefficient_history' as const,
+      actorName: 'Antoine R.',
+      sentenceKey: 'admin.home.activity.sentence.coefficientModified',
+      sentenceArgs: ['Antoine R.'],
+      timestamp: new Date('2026-05-23T10:00:00Z'),
+    },
+    {
+      id: 'ps-1',
+      source: 'partner_status' as const,
+      actorName: 'Admin',
+      sentenceKey: 'admin.home.activity.sentence.partnerActivated',
+      sentenceArgs: ['Marie Dupont'],
+      timestamp: new Date('2026-05-22T10:00:00Z'),
+    },
+  ]),
+}));
+vi.mock('@/lib/db/queries/coefficient-history', () => ({
+  listCoefficientHistory: vi.fn(async () => ({
+    rows: [
+      {
+        id: 'row-1',
+        changedAt: new Date('2026-05-20T10:00:00Z'),
+        changedByUserId: 'admin-1',
+        beforeJson: {},
+        afterJson: {},
+        summary: 'Update',
+        createdByDisplay: 'Antoine R.',
+      },
+    ],
+    hasMore: false,
+    nextCursor: null,
+  })),
+}));
+
 // Test file lives at tests/; app/ is the sibling at repo root. Use relative paths
 // because the @/* tsconfig alias maps only to src/* (the app/ directory is not aliased).
 import { AccountsList } from '../app/(admin)/[adminSegment]/partners/AccountsList';
