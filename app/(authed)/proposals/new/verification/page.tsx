@@ -19,8 +19,11 @@
  *        - 2-column grid (1040px outer, minmax(0, 1fr) 360px columns, gap 24px)
  *          - Left column: 3 RecapSection cards (CLIENT / PROJET / CALCUL)
  *            with their respective ← Modifier links
- *          - Right column: PdfPreviewMock (D-15 — literal LC-2026-XXX, no
- *            real PDF blob, no lc_ref allocated until Confirmer click)
+ *          - Right column: PdfPreviewMock — real lcRef from draft.lcRef
+ *            (Phase 17 D-17 inverts Phase 13 D-15; Plan 17-01 allocates at
+ *            createDraft so the partner sees the actual reference on
+ *            step 3 before finalize). No real PDF blob is generated until
+ *            Confirmer click.
  *        - WizardActionBar (full 1040px width, OUTSIDE the 2-column grid),
  *          rendered via FinalizeButton — wires the Confirmer CTA to POST
  *          /api/proposals/finalize (D-24 spinner UX owned by FinalizeButton).
@@ -47,10 +50,12 @@ import {
   parseNumeric,
   proposalInputSchema,
 } from '@/lib/calc';
+import { PageHero } from '@/components/ui/PageHero';
 import { Stepper } from '@/components/ui/Stepper';
 
 import { PdfPreviewMock } from '../_components/PdfPreviewMock';
 import { RecapSection } from '../_components/RecapSection';
+import { ValiditySelectorClient } from '../_components/ValiditySelectorClient';
 import { saveAsDraftAction } from '../_actions/saveAsDraft.action';
 
 import { FinalizeButton } from './FinalizeButton';
@@ -108,6 +113,14 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
   // meaningless. Bounce to step 1.
   const params = await getLatestGlobalParams();
   if (!params) {
+    redirect('/proposals/new/parametres');
+  }
+
+  // Phase 17 D-03 / D-17 — defensive bail for legacy pre-Phase-17 drafts
+  // whose lc_ref was never allocated at createDraft. Post-Phase-17 drafts
+  // always carry a non-null lcRef; bouncing such a stale row to step 1
+  // is safer than rendering an empty `Réf.` line in PdfPreviewMock.
+  if (!draft.lcRef) {
     redirect('/proposals/new/parametres');
   }
 
@@ -242,28 +255,20 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
 
   return (
     <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 0' }}>
-      <h1
-        style={{
-          fontSize: 32,
-          fontWeight: 700,
-          color: 'var(--ink)',
-          margin: 0,
-        }}
-      >
-        {t('wizard.step3.title', lang)}
-      </h1>
-      <p
-        style={{
-          fontSize: 16,
-          color: 'var(--muted)',
-          marginTop: 8,
-        }}
-      >
-        {t('wizard.step3.subtitle', lang)}
-      </p>
+      {/* Phase 17 D-17 / D-19 — WIZ-03 adopts PageHero. Eyebrow uses the
+          'ÉTAPE 3 SUR 3' i18n key (Plan 17-02 shipped wizard.step3.eyebrow);
+          title + subtitle are the existing Phase 13 keys preserved per
+          Plan 17-02's REUSE-not-rename policy. */}
+      <PageHero
+        eyebrow={t('wizard.step3.eyebrow', lang)}
+        title={t('wizard.step3.title', lang)}
+        subtitle={t('wizard.step3.subtitle', lang)}
+      />
 
-      {/* D-20: Stepper currentStep=3 with completedSteps from the draft. */}
-      <div style={{ marginTop: 24 }}>
+      {/* D-19: Stepper lives BELOW PageHero as a sibling (NOT composed
+          inside PageHero). PageHero's baked-in marginBottom:32 already
+          provides the gap; no extra wrapper needed. */}
+      <div style={{ marginBottom: 32 }}>
         <Stepper
           currentStep={3}
           completedSteps={completedSteps}
@@ -285,7 +290,6 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
           gridTemplateColumns: 'minmax(0, 1fr) 360px',
           gap: 24,
           alignItems: 'start',
-          marginTop: 16,
         }}
       >
         <div>
@@ -325,21 +329,59 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
               2: t('wizard.step2.row.commission.sublabel', lang),
             }}
           />
+
+          {/* Phase 17 WIZ-04 (D-01) — Durée de validité segmented selector.
+              Rendered as a sibling block BELOW the CALCUL recap inside the
+              same left-column wrapper (RecapSection does not accept a
+              children prop). Default = draft.inputs.validityDays (set at
+              step 1 first-render from globalParams.validityDays per Phase 13
+              D-08); legacy drafts missing the field fall back to 30 (a
+              sensible default within the {15,30,60} enum). Selection writes
+              draft.inputs.validityDays via updateValidityAction WITHOUT
+              redirect — the partner stays on step 3 to finalize.
+
+              ADMIN-09 note: validity is metadata, not commission. The
+              validity selector + lcRef threading below introduce no
+              commission surface; the 9-gate grep-contract suite stays
+              green by construction. */}
+          <div style={{ marginTop: 16 }}>
+            <div
+              style={{
+                fontSize: 11.2,
+                fontWeight: 500,
+                color: 'var(--muted)',
+                marginBottom: 8,
+              }}
+            >
+              {t('proposal.validity.label', lang)}
+            </div>
+            <ValiditySelectorClient
+              draftId={draft.id}
+              defaultValidity={
+                (parsedData.validityDays as 15 | 30 | 60) ?? 30
+              }
+              lang={lang}
+            />
+          </div>
         </div>
 
         <div>
-          {/* Phase 17 D-17: PdfPreviewMock now takes a required `lcRef` prop
-              and renders the real value from `draft.lcRef` (Plan 17-01 moved
-              allocation to createDraft so post-Phase-17 drafts always carry
-              a non-null lcRef). The `?? 'LC-2026-XXX'` fallback is a
-              transitional bridge for any legacy pre-Phase-17 draft rows
-              and to preserve the existing Test 12 fixture shape until
-              Plan 17-07 wires the real value end-to-end. NO commission
-              prop — ADMIN-09 invariant enforced structurally. */}
+          {/* Phase 17 Plan 07 (D-17 / D-03 / WIZ-06) — PdfPreviewMock now
+              receives the REAL `draft.lcRef` allocated at createDraft by
+              Plan 17-01. The transitional null-coalescing fallback from
+              Plan 17-02 is removed; the early `if (!draft.lcRef) redirect`
+              upstream makes the non-null assertion safe.
+              `validityDays` is sourced from `parsedData.validityDays`
+              (i.e. `draft.inputs.validityDays`) so the preview always
+              reflects the latest per-proposal validity — the partner's
+              click in the WIZ-04 selector writes there and a subsequent
+              re-render shows the new value.
+              NO commission prop — ADMIN-09 invariant enforced
+              structurally. */}
           <PdfPreviewMock
             loyerDisplay={loyerDisplay}
-            validityDays={params.validityDays as 15 | 30 | 60}
-            lcRef={draft.lcRef ?? 'LC-2026-XXX'}
+            validityDays={parsedData.validityDays as 15 | 30 | 60}
+            lcRef={draft.lcRef}
             lang={lang}
           />
         </div>

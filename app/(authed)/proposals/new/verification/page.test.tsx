@@ -141,6 +141,12 @@ beforeEach(() => {
     userId: USER_ID,
     status: 'draft',
     deletedAt: null,
+    // Phase 17 Plan 07: post-Phase-17 drafts always carry a non-null lcRef
+    // (Plan 17-01 allocates at createDraft). The page's defensive bail
+    // `if (!draft.lcRef) redirect(...)` requires this in the happy-path
+    // mock; Plan 17-07 retargets Test 12 to assert the real value flows
+    // through PdfPreviewMock.
+    lcRef: 'LC-2026-042',
     inputs: COMPLETE_INPUTS,
   });
   getLatestGlobalParamsMock.mockResolvedValue(DEFAULT_PARAMS);
@@ -331,6 +337,7 @@ describe('verification/page.tsx (D-01 / D-03 / D-14 / D-15 / D-16)', () => {
       userId: USER_ID,
       status: 'draft',
       deletedAt: null,
+      lcRef: 'LC-2026-042',
       inputs: {
         ...COMPLETE_INPUTS,
         clientRole: 'Directeur Achats',
@@ -402,23 +409,30 @@ describe('verification/page.tsx (D-01 / D-03 / D-14 / D-15 / D-16)', () => {
   });
 
   // ──────────────────────────────────────────────────────────────────────────
-  // Test 12 — PdfPreviewMock in right column (D-15)
+  // Test 12 — PdfPreviewMock in right column (Phase 17 D-17 / WIZ-06)
   // ──────────────────────────────────────────────────────────────────────────
-  it('Test 12: right column renders PdfPreviewMock with literal LC-2026-XXX + validityDays + loyer', async () => {
+  it('Test 12: right column renders PdfPreviewMock with REAL draft.lcRef + validityDays + loyer (Phase 17 D-17)', async () => {
     const tree = await VerificationStep3Page({
       searchParams: Promise.resolve({ draft_id: 'd-1' }),
     });
     const { container } = render(tree);
     const text = container.textContent ?? '';
-    // D-15: literal LC-2026-XXX (the XXX is a literal placeholder).
-    expect(text).toContain('LC-2026-XXX');
-    // validityDays comes from getLatestGlobalParams → 30
+    // Phase 17 D-17 / D-03: the literal LC-2026-XXX placeholder is gone.
+    // The mocked draft carries lcRef='LC-2026-042' (set in beforeEach);
+    // PdfPreviewMock receives it and renders the ref line with the real
+    // value.
+    expect(text).toContain('LC-2026-042');
+    expect(text).not.toContain('LC-2026-XXX');
+    // validityDays now sourced from draft.inputs.validityDays (which
+    // COMPLETE_INPUTS sets to 30) — the Phase 17 D-01 inversion.
     expect(text).toMatch(/30\s*jours de validité/);
     // PDF mock displays the loyer (1 949,93 €) — must appear at least once,
-    // inside the PdfPreviewMock's role="img" wrapper.
+    // inside the PdfPreviewMock's role="img" wrapper, AND must carry the
+    // real lcRef in its rendered text.
     const pdfMock = container.querySelector('[role="img"]');
     expect(pdfMock).not.toBeNull();
     expect((pdfMock!.textContent ?? '')).toMatch(/1\s*949[.,]\s*93\s*€/);
+    expect((pdfMock!.textContent ?? '')).toContain('LC-2026-042');
   });
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -485,5 +499,55 @@ describe('verification/page.tsx (D-01 / D-03 / D-14 / D-15 / D-16)', () => {
         }
       }
     }
+  });
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Test 16 — Phase 17 WIZ-04: ValiditySelectorClient mounted with correct
+  //          defaultValidity from draft.inputs.validityDays
+  // ──────────────────────────────────────────────────────────────────────────
+  it('Test 16: ValiditySelectorClient mounts with defaultValidity from draft.inputs.validityDays (Phase 17 WIZ-04)', async () => {
+    const tree = await VerificationStep3Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const { container } = render(tree);
+    // The validity selector renders inside the CALCUL recap column with
+    // data-testid="validity-selector" and 3 buttons (15j / 30j / 60j).
+    const selector = container.querySelector(
+      '[data-testid="validity-selector"]',
+    );
+    expect(selector).not.toBeNull();
+    const buttons = selector!.querySelectorAll('button');
+    expect(buttons).toHaveLength(3);
+    // COMPLETE_INPUTS.validityDays === 30 → 30j button has aria-pressed=true.
+    const btn30 = Array.from(buttons).find(
+      (b) => (b.textContent ?? '').trim() === '30j',
+    );
+    expect(btn30).toBeDefined();
+    expect(btn30!.getAttribute('aria-pressed')).toBe('true');
+
+    // The selector label is rendered (FR copy from proposal.validity.label).
+    expect(container.textContent).toContain('Validité de la proposition');
+  });
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Test 17 — Phase 17 D-03 defensive bail when draft.lcRef is null
+  // ──────────────────────────────────────────────────────────────────────────
+  it('Test 17: draft with NULL lcRef (legacy pre-Phase-17 draft) → silent redirect to /parametres (Phase 17 D-03 defense)', async () => {
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      lcRef: null,
+      inputs: COMPLETE_INPUTS,
+    });
+    await expect(
+      VerificationStep3Page({
+        searchParams: Promise.resolve({ draft_id: 'd-1' }),
+      }),
+    ).rejects.toThrow(/NEXT_REDIRECT:\/proposals\/new\/parametres$/);
+    // The defensive lcRef bail fires AFTER global-params load but BEFORE
+    // computeLoyer — no compute work happens for a stale legacy draft.
+    expect(computeLoyerMock).not.toHaveBeenCalled();
   });
 });
