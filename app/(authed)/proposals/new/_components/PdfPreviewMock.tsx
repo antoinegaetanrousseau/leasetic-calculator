@@ -50,10 +50,10 @@ export function PdfPreviewMock({
   lang,
 }: PdfPreviewMockProps) {
   // Phase 17 D-17 — inline construction (the retired step-3 PDF ref-line
-  // dictionary key held the literal "LC-2026-XXX" placeholder per Phase 13
-  // D-15; that key is no longer read here). The inline strings match the
-  // UI-SPEC Copywriting Contract verbatim. ADMIN-09 trivial pass: lcRef
-  // format `LC-2026-NNN` contains no commission substring.
+  // dictionary key held a literal placeholder per Phase 13 D-15; that key
+  // is no longer read here). The inline strings match the UI-SPEC
+  // Copywriting Contract verbatim. ADMIN-09 trivial pass: lcRef format
+  // `LC-2026-NNN` contains no commission substring.
   const refLine =
     lang === 'fr'
       ? `Réf. ${lcRef} · ${validityDays} jours de validité`

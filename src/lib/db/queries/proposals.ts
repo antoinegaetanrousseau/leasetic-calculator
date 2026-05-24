@@ -540,7 +540,7 @@ async function allocateNextLcRefForUser(userId: string): Promise<string> {
  *
  * Phase 17 D-03 inversion: lc_ref is allocated HERE (was in finalizeDraft
  * pre-Phase 17). The PDF preview on wizard step 3 can therefore render the
- * REAL lc_ref instead of the literal `LC-2026-XXX` (WIZ-06).
+ * REAL lc_ref instead of the Phase 13 D-15 placeholder literal (WIZ-06).
  *
  * Phase 13 D-16 invariant preserved: NO audit_log entry on draft creation.
  * audit_log fires only at finalize (lifecycle event). lc_ref pre-allocation
