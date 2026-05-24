@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T20:37:16.544Z"
+last_updated: "2026-05-24T20:53:04.393Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 16
   total_plans: 103
-  completed_plans: 99
+  completed_plans: 100
   percent: 76
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 18 (admin-surfaces) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -349,6 +349,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 18 P02 | 9min | 3 tasks | 6 files |
 | Phase 18 P03 | 15 | 3 tasks | 13 files |
 | Phase 18 P04 | 6 | 2 tasks | 4 files |
+| Phase 18 P05 | 12 | 3 tasks | 7 files |
 
 ## Decisions
 
@@ -384,3 +385,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: PartnerRowActions custom popover (no Radix per UI-SPEC line 363); mousedown for click-outside + keydown for Escape
 - [Phase ?]: page.tsx Task 3 maxWidth 1280px per UI-SPEC line 893 (6-col table needs the width)
 - [Phase ?]: D-15 + D-18 enforced for /partners/new — action card separation + window.confirm dirty-form gate; D-17 InviteUrlModal preserved verbatim
+- [Phase ?]: Plan 18-05 — Open Q9: admin.coefficients.page.title value shortened FR+EN to 'Coefficients' (single consumer verified)
+- [Phase ?]: Plan 18-05 — sessionStorage spies replaced with observable-state assertions because the polyfill installs a plain object (not Storage.prototype)
+- [Phase ?]: Plan 18-05 — SeedBanner preserved ABOVE PageHero; both can coexist (SeedBanner is the Phase 10 first-edit prompt, higher priority than the new D-19 advisory banner)
+- [Phase ?]: Plan 18-05 — Sidebar row dropped 'use client' (no state/handlers after D-22 click-to-diff removal); composes inside server sidebar without client boundary
