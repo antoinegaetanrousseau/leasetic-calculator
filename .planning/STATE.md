@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: verifying
-last_updated: "2026-05-24T16:37:36.321Z"
+last_updated: "2026-05-24T17:53:26.489Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
