@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T15:44:57.513Z"
+last_updated: "2026-05-24T15:54:53.156Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 15
   total_plans: 96
-  completed_plans: 92
+  completed_plans: 93
   percent: 71
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 17 (partner-surfaces) — EXECUTING
-Plan: 6 of 8
+Plan: 7 of 8
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -342,6 +342,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 17 P03 | ~18min | 2 (TDD) tasks | 4 (2 created src + 2 created test + 1 modified page) files |
 | Phase 17 P04 | ~5min | 2 tasks | 4 files |
 | Phase 17 P05 | ~10min | 1 tasks | 1 files |
+| Phase 17 P06 | ~6min | 1 tasks | 3 files |
 
 ## Decisions
 
@@ -356,3 +357,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: CONTRAST-02 Row 11 dark-mode active filter pill ~3.9:1 accepted-as-is (Option 1) — matches existing .chip-active baseline; palette stability invariant preserved
 - [Phase ?]: FilterPillRow uses <Link> for URL-driven state (D-11 inversion of RecentlyDeletedToggle.router.replace) — full SSR re-render + shareable URLs; archived passed as prop, not useSearchParams
 - [Phase ?]: /proposals empty-state copy switch handled at server page level via inline conditional (proposals.empty.archived vs proposals.empty.actives) — approach (a) keeps ProposalsList unchanged
+- [Phase ?]: Plan 17-06: Added optional lastRowDivider prop to RecapSection.tsx (backward-compatible, default false) for the Détail card totalized-loyer separator.
+- [Phase ?]: Plan 17-06: Coefficient row composes new wizard.step2.detail.coefficient key + appended '(tranche {N}K€)' suffix at call site to preserve test expectation + match Plan 02 key shape.
