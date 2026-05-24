@@ -43,6 +43,14 @@ export interface RecapSectionProps {
    * passes `{ 1: '(non visible client)' }` (or similar index).
    */
   rowSublabels?: Record<number, string>;
+  /**
+   * Phase 17 WIZ-02 (D-16): when true, render the LAST row with a top
+   * border + extra spacing to visually separate it as a totalized result.
+   * Used by the step-2 Détail du calcul card so the "Loyer mensuel calculé"
+   * row reads as the summary of the rows above it.
+   * Default: false (no visual change for any pre-existing consumer).
+   */
+  lastRowDivider?: boolean;
 }
 
 export function RecapSection({
@@ -50,7 +58,9 @@ export function RecapSection({
   rows,
   modifierLink,
   rowSublabels,
+  lastRowDivider = false,
 }: RecapSectionProps) {
+  const lastIdx = rows.length - 1;
   return (
     <section className="card" style={{ marginBottom: 16 }}>
       <div
@@ -89,14 +99,20 @@ export function RecapSection({
         )}
       </div>
 
-      {rows.map((row, idx) => (
+      {rows.map((row, idx) => {
+        const isLastWithDivider = lastRowDivider && idx === lastIdx && rows.length > 1;
+        return (
         <div
           key={idx}
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            marginTop: idx === 0 ? 0 : 12,
+            marginTop: idx === 0 ? 0 : isLastWithDivider ? 12 : 12,
+            paddingTop: isLastWithDivider ? 12 : 0,
+            borderTop: isLastWithDivider
+              ? '1px solid var(--border)'
+              : undefined,
             gap: 12,
           }}
         >
@@ -141,7 +157,8 @@ export function RecapSection({
             {row.value}
           </div>
         </div>
-      ))}
+        );
+      })}
     </section>
   );
 }

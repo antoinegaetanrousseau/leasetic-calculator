@@ -198,8 +198,12 @@ describe('calcul/page.tsx (D-01 / D-03 / D-11 / D-12 / D-13 / D-22)', () => {
     // formatCurrency('fr', 1949.93) → '1 949,93 €' (NBSP separator). Use a
     // tolerant regex that matches any whitespace separator.
     expect(container.textContent).toMatch(/1\s*949[.,]\s*93\s*€/);
-    // Hero label (existing 'wizard.step2.hero.label' key = "LOYER MENSUEL").
-    expect(container.textContent).toContain('LOYER MENSUEL');
+    // Phase 17 WIZ-02 (D-16): the hero card is now restructured per Figma
+    // 39:46. The old "LOYER MENSUEL" .ctitle label is REMOVED — its role is
+    // taken by the PageHero eyebrow "ÉTAPE 2 SUR 3" + title +
+    // `par mois pendant {N} mois` sublabel on the hero card itself.
+    expect(container.textContent).toContain('ÉTAPE 2 SUR 3');
+    expect(container.textContent).toMatch(/par mois pendant\s*48\s*mois/);
   });
 
   // ──────────────────────────────────────────────────────────────────────────

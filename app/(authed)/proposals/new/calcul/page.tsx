@@ -53,6 +53,7 @@ import {
   proposalInputSchema,
   type ProposalInput,
 } from '@/lib/calc';
+import { PageHero } from '@/components/ui/PageHero';
 import { Stepper } from '@/components/ui/Stepper';
 
 import { RecapSection } from '../_components/RecapSection';
@@ -203,35 +204,40 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
   // no data-* attribute carries the value. Plan 13-06 audits the full
   // STRIDE picture in the addendum (D-28).
   // ──────────────────────────────────────────────────────────────────────────
+  // Phase 17 WIZ-02 (D-16) — Détail du calcul rows use the new
+  // `wizard.step2.detail.*` i18n keys (Plan 02 D-21). The coefficient
+  // row's "(tranche {N}K€)" suffix is appended at the call site since the
+  // new `.coefficient` key is the bare label per the Copywriting Contract.
   const detailRows = [
     {
-      label: t('wizard.step2.row.amount', lang),
+      label: t('wizard.step2.detail.montantHT', lang),
       value: amountHTDisplay,
     },
     {
       // D-12: ADMIN-09 partial relaxation — partner-facing step-2 surface only.
       // PDF render path / audit_log / server logs / pre-finalize traces all
       // remain commission-free. Plan 13-06 ships the STRIDE addendum (D-28).
-      label: t('wizard.step2.row.commission', lang),
+      label: t('wizard.step2.detail.commission', lang),
       value: commissionDisplay,
     },
     {
-      label: t('wizard.step2.row.coefficient', lang).replace(
-        '{0}',
-        trancheUpperK !== null ? String(trancheUpperK) : '—',
-      ),
+      label: `${t('wizard.step2.detail.coefficient', lang)} (tranche ${
+        trancheUpperK !== null ? String(trancheUpperK) : '—'
+      }K€)`,
       value: coefficientDisplay,
     },
     {
-      label: t('wizard.step2.row.duration', lang),
+      label: t('wizard.step2.detail.duree', lang),
       value: parsedData ? `${parsedData.durationMonths} mois` : '—',
     },
     {
-      label: t('wizard.step2.row.loyer.calculated', lang),
+      // WIZ-02 (D-16): last row is the totalized loyer — bold value rendered
+      // with --ink color, separator above provided by RecapSection's
+      // lastRowDivider={true} prop. The bold weight 600 + --ink matches
+      // UI-SPEC §Subsection B "Détail du calcul last row (bold)".
+      label: t('wizard.step2.detail.loyer', lang),
       value: (
-        <strong style={{ color: 'var(--gd)', fontWeight: 600 }}>
-          {loyerDisplay}
-        </strong>
+        <span style={{ fontWeight: 600 }}>{loyerDisplay}</span>
       ),
     },
   ];
@@ -290,28 +296,18 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
 
   return (
     <div style={{ maxWidth: 840, margin: '0 auto', padding: '32px 0' }}>
-      <h1
-        style={{
-          fontSize: 32,
-          fontWeight: 700,
-          color: 'var(--ink)',
-          margin: 0,
-        }}
-      >
-        {t('wizard.step2.title', lang)}
-      </h1>
-      <p
-        style={{
-          fontSize: 16,
-          color: 'var(--muted)',
-          marginTop: 8,
-        }}
-      >
-        {t('wizard.step2.subtitle', lang)}
-      </p>
+      {/* Phase 17 WIZ-02 (D-16 + D-19): PageHero adopter. Replaces the
+          previous inline <h1>+<p> heading block. Stepper sits BELOW
+          PageHero as a sibling per D-19; PageHero bakes marginBottom:32
+          so the Stepper inherits proper spacing automatically. */}
+      <PageHero
+        eyebrow={t('wizard.step2.eyebrow', lang)}
+        title={t('wizard.step2.title', lang)}
+        subtitle={t('wizard.step2.subtitle', lang)}
+      />
 
       {/* D-20: Stepper currentStep=2 with completedSteps from the draft. */}
-      <div style={{ marginTop: 24 }}>
+      <div>
         <Stepper
           currentStep={2}
           completedSteps={completedSteps}
@@ -323,21 +319,19 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
       </div>
 
       {/* ────────────────────────────────────────────────────────────────────
-          Hero loyer card (UI-SPEC §5.6).
-          - state='computed': big loyer value + sublabel + tranche chip
-          - state='on-demand': "Sur demande" at hero scale, chip hidden
-          - state='missing': "Coefficients manquants pour cette tranche" at
-            heading scale (per UI-SPEC §5.6 non-blocking recommendation)
-          - inputsIncomplete or paramsMissing: error msg + ← Retour CTA
+          Phase 17 WIZ-02 (D-16) — net-new loyer-mensuel hero card.
+          Layout: flex row, LEFT block (sublabel + 36px/700/--teal value)
+          and RIGHT block (Tranche/Coefficient chip via .chip-language
+          chrome). State machine preserved verbatim:
+            - state='computed': sublabel + big teal value + Tranche chip
+            - state='on-demand': "Sur demande" + contact line (no chip)
+            - state='missing': fallback heading + CTA replaced
+            - inputsIncomplete or paramsMissing: error msg + ← Retour CTA
       ──────────────────────────────────────────────────────────────────── */}
       <section
         className="card"
-        style={{ position: 'relative', marginTop: 16 }}
+        style={{ marginTop: 16 }}
       >
-        <div className="ctitle" style={{ marginBottom: 8 }}>
-          <span>{t('wizard.step2.hero.label', lang)}</span>
-        </div>
-
         {inputsIncomplete || paramsMissing ? (
           <div
             role="alert"
@@ -346,51 +340,63 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
               fontSize: 14.5,
               color: 'var(--danger)',
               fontWeight: 500,
-              marginTop: 8,
             }}
           >
             {t('wizard.step2.error.incomplete', lang)}
           </div>
         ) : result?.computed.state === 'computed' ? (
-          <>
-            <div
-              style={{
-                fontSize: 40,
-                fontWeight: 700,
-                lineHeight: 1.1,
-                letterSpacing: '-0.01em',
-                color: 'var(--gd)',
-                whiteSpace: 'nowrap',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {loyerDisplay}
-            </div>
-            <div
-              style={{
-                fontSize: 14.5,
-                color: 'var(--muted)',
-                marginTop: 8,
-              }}
-            >
-              {t('wizard.step2.hero.sub', lang).replace(
-                '{0}',
-                String(parsedData!.durationMonths),
-              )}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              gap: 16,
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: 'var(--muted)',
+                  marginBottom: 8,
+                }}
+              >
+                {t('wizard.step2.hero.sublabel', lang).replace(
+                  '{durationMonths}',
+                  String(parsedData!.durationMonths),
+                )}
+              </div>
+              <div
+                style={{
+                  fontSize: 36,
+                  fontWeight: 700,
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.01em',
+                  color: 'var(--teal)',
+                  whiteSpace: 'nowrap',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {loyerDisplay}
+              </div>
             </div>
             {trancheNumber !== null && (
               <div
                 className="chip-language"
                 style={{
-                  position: 'absolute',
-                  top: 20,
-                  right: 20,
-                  fontSize: 11.2,
+                  // UI-SPEC §Step-2 hero chip — relocated from absolute
+                  // positioning to flexbox top-right (alignSelf:flex-start).
+                  alignSelf: 'flex-start',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  fontSize: 11.8,
                   fontWeight: 600,
                   color: 'var(--teal)',
                   background: 'color-mix(in srgb, var(--teal) 10%, transparent)',
                   borderRadius: 999,
                   padding: '4px 10px',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {t('wizard.step2.chip.tranche', lang)
@@ -398,16 +404,16 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
                   .replace('{1}', coefficientNumber.toFixed(2))}
               </div>
             )}
-          </>
+          </div>
         ) : result?.computed.state === 'on-demand' ? (
           <>
             <div
               style={{
-                fontSize: 40,
+                fontSize: 36,
                 fontWeight: 700,
                 lineHeight: 1.1,
                 letterSpacing: '-0.01em',
-                color: 'var(--gd)',
+                color: 'var(--teal)',
               }}
             >
               {t('result.sur.demande', lang)}
@@ -427,8 +433,7 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
             style={{
               fontSize: 24,
               fontWeight: 600,
-              color: 'var(--gd)',
-              marginTop: 4,
+              color: 'var(--teal)',
             }}
           >
             {t('result.inline.missing', lang)}
@@ -442,7 +447,6 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
               fontSize: 14.5,
               color: 'var(--danger)',
               fontWeight: 500,
-              marginTop: 8,
             }}
           >
             {t('wizard.step2.error.incomplete', lang)}
@@ -459,14 +463,17 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
       {!inputsIncomplete && !paramsMissing && (
         <div style={{ marginTop: 16 }}>
           <RecapSection
-            sectionTitle={t('wizard.section.detail.calcul', lang)}
+            sectionTitle={t('wizard.step2.detail.title', lang)}
             rows={detailRows}
             rowSublabels={{
               // D-12: partner-facing parenthetical clarifying that the row's
               // value will NOT appear in the client-facing PDF. ONLY consumer
               // of rowSublabels on this page.
-              1: t('wizard.step2.row.commission.sublabel', lang),
+              1: t('wizard.step2.detail.commissionNote', lang),
             }}
+            // WIZ-02 (D-16): last row "Loyer mensuel calculé" rendered with
+            // a top border separator to read as the totalized result row.
+            lastRowDivider={true}
           />
         </div>
       )}
@@ -479,7 +486,7 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
       {!inputsIncomplete && recapRows.length > 0 && (
         <div style={{ marginTop: 16 }}>
           <RecapSection
-            sectionTitle={t('wizard.section.parametres.saisis', lang)}
+            sectionTitle={t('wizard.step2.recap.title', lang)}
             modifierLink={{
               href: `/proposals/new/parametres?draft_id=${draft.id}`,
               label: 'Modifier',
