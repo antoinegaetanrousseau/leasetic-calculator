@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T19:46:25.647Z"
+last_updated: "2026-05-24T20:02:20.705Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 16
   total_plans: 103
-  completed_plans: 96
+  completed_plans: 97
   percent: 76
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 18 (admin-surfaces) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -346,6 +346,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 17-partner-surfaces P07 | ~10min | 3 tasks | 5 files |
 | Phase 17 P17-08 | ~20min | 3 tasks tasks | 3 modified + 2 created files |
 | Phase 18 P01 | ~25min | 3 tasks | 11 (5 created + 6 modified incl. SUMMARY + deferred-items) files |
+| Phase 18 P02 | 9min | 3 tasks | 6 files |
 
 ## Decisions
 
@@ -372,3 +373,6 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: Recent activity = 2-source union (coefficient_history + partner status); invitations source DEFERRED — schema has no invitations table
 - [Phase ?]: D-11 admin user_id override gated at BOTH SSR (session.role) AND library (_callerRole) layers — defense in depth IDOR mitigation
 - [Phase ?]: Rule 3 auto-fix: localStorage + sessionStorage polyfill added to __tests__/setup-dom.ts (jsdom 25 + Node 25 + Vitest 2.1.8 combo pre-existing infra gap)
+- [Phase ?]: Phase 18 D-04 enforced: all 3 Admin Home stat tile values render in var(--teal) via additive MetricTile.valueColor prop (no new variant; user-confirmed deviation from Figma gold)
+- [Phase ?]: Phase 18 D-07 enforced: RecentActivityRow strictly read-only (no anchor, no button, no role=link, no cursor:pointer); verified by recursive style scan in component tests
+- [Phase ?]: tests/admin-09-grep-contracts Surface 3 now mocks 5 DB helpers (Admin Home became DB-coupled post-Phase-18 rewrite); 9/9 ADMIN-09 gates remain green
