@@ -192,4 +192,79 @@ describe('buildListResponse (Phase 17 D-13 — archived filter)', () => {
     const rowJson = JSON.stringify(response.rows[0]);
     expect(rowJson.toLowerCase()).not.toContain('commission');
   });
+
+  // ── Phase 18 Plan 01 Task 2 — admin user_id override (D-11) ───────────────
+  //
+  // D-11: admin can scope /proposals to another partner via `?user_id=` on
+  // the SSR route. buildListResponse accepts an optional
+  // adminUserIdOverride; it is HONORED only when _callerRole === 'admin'.
+  // For partners, the override is IGNORED — query stays scoped to the
+  // caller's own userId (T-18-01-01 IDOR mitigation).
+  //
+  // _callerRole MUST be derived from session.user.role by the SSR layer
+  // (never from request params). The library layer trusts the role hint;
+  // the SSR layer is the authorization gate.
+
+  describe('admin user_id override (D-11 / T-18-01-01)', () => {
+    it('Test 5: adminUserIdOverride is HONORED when _callerRole=admin (query scoped to override partner)', async () => {
+      await buildListResponse({
+        userId: 'admin-A',
+        adminUserIdOverride: 'partner-B',
+        _callerRole: 'admin',
+        archived: false,
+      });
+      expect(mocks.listProposalsByUser).toHaveBeenCalledTimes(1);
+      const callArgs = mocks.listProposalsByUser.mock.calls[0]![0] as Record<string, unknown>;
+      // The query MUST run scoped to partner-B (the override), NOT admin-A.
+      expect(callArgs.userId).toBe('partner-B');
+    });
+
+    it('Test 6 (IDOR negative): adminUserIdOverride is IGNORED when _callerRole=partner — partnerA cannot see partnerB rows', async () => {
+      await buildListResponse({
+        userId: 'partner-A',
+        adminUserIdOverride: 'partner-B',
+        _callerRole: 'partner',
+        archived: false,
+      });
+      expect(mocks.listProposalsByUser).toHaveBeenCalledTimes(1);
+      const callArgs = mocks.listProposalsByUser.mock.calls[0]![0] as Record<string, unknown>;
+      // CRITICAL: scope MUST remain on partner-A's own userId — the override
+      // is silently ignored. No cross-partner read possible.
+      expect(callArgs.userId).toBe('partner-A');
+      expect(callArgs.userId).not.toBe('partner-B');
+    });
+
+    it('Test 6b (IDOR negative): omitting _callerRole defaults to ignoring the override (defense in depth)', async () => {
+      // If a caller forgets to set _callerRole, the override must NOT be
+      // honored. Default behavior is "treat as non-admin" (fail-closed).
+      await buildListResponse({
+        userId: 'partner-A',
+        adminUserIdOverride: 'partner-B',
+        archived: false,
+      });
+      const callArgs = mocks.listProposalsByUser.mock.calls[0]![0] as Record<string, unknown>;
+      expect(callArgs.userId).toBe('partner-A');
+    });
+
+    it('admin caller with NO override passed continues to use caller userId (no surprise scope shift)', async () => {
+      await buildListResponse({
+        userId: 'admin-A',
+        _callerRole: 'admin',
+        archived: false,
+      });
+      const callArgs = mocks.listProposalsByUser.mock.calls[0]![0] as Record<string, unknown>;
+      expect(callArgs.userId).toBe('admin-A');
+    });
+
+    it('admin caller with empty-string override falls back to caller userId (treat as not-set)', async () => {
+      await buildListResponse({
+        userId: 'admin-A',
+        adminUserIdOverride: '',
+        _callerRole: 'admin',
+        archived: false,
+      });
+      const callArgs = mocks.listProposalsByUser.mock.calls[0]![0] as Record<string, unknown>;
+      expect(callArgs.userId).toBe('admin-A');
+    });
+  });
 });

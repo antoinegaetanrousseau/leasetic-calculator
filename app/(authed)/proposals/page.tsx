@@ -22,6 +22,14 @@ interface PageParams {
     q?: string;
     archived?: string;
     cursor?: string;
+    /**
+     * Phase 18 D-11 — admin scoping parameter. When the caller is admin AND
+     * this is set, the proposals list is scoped to the specified partner
+     * userId instead of the admin's own userId. For partners, this param is
+     * silently IGNORED — query stays scoped to session.user.id
+     * (T-18-01-01 IDOR mitigation).
+     */
+    user_id?: string;
   }>;
 }
 
@@ -55,13 +63,24 @@ interface PageParams {
  * (per PLAN.md <interfaces> note: approach (a) — page handles the switch).
  */
 export default async function ProposalsListPage({ searchParams }: PageParams) {
-  const { session } = await requireUser();
+  // Phase 18 D-11 — read role from session for admin user_id query-param gating.
+  // T-18-01-01: role MUST come from the session (server-derived), NEVER from
+  // request params; otherwise an attacker could spoof `_callerRole=admin`.
+  const { session, role } = await requireUser();
   const lang = await getCurrentLang();
 
   const sp = await searchParams;
   const q = sp.q ?? '';
   const archived = sp.archived === '1';
   const cursor = sp.cursor ?? null;
+  // Phase 18 D-11 — honor `?user_id=` only when the caller is admin.
+  // For partner callers, the param is silently ignored by buildListResponse
+  // (defense in depth: the library layer ALSO ignores the override when
+  // _callerRole !== 'admin').
+  const adminUserIdOverride =
+    role === 'admin' && typeof sp.user_id === 'string' && sp.user_id.length > 0
+      ? sp.user_id
+      : undefined;
 
   const initial = await buildListResponse({
     userId: session.user.id,
@@ -69,6 +88,8 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
     cursorEncoded: cursor,
     archived,
     limit: 20,
+    adminUserIdOverride,
+    _callerRole: role,
   });
 
   const nowMs = Date.now();

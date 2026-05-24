@@ -51,6 +51,32 @@ export interface BuildListParams {
    */
   archived?: boolean;
   limit?: number;
+  /**
+   * Phase 18 D-11 — admin scoping override. When set AND `_callerRole === 'admin'`,
+   * the list query runs scoped to `adminUserIdOverride` INSTEAD of `userId`
+   * (the caller's own session userId). This powers the admin Partners-list
+   * `Voir les propositions du partenaire` action, which navigates to
+   * `/proposals?user_id={partnerId}`.
+   *
+   * SECURITY (T-18-01-01 IDOR): the override is ONLY honored when the
+   * caller is admin. For partners, the override is silently IGNORED — the
+   * query stays scoped to the caller's own userId. `_callerRole` MUST be
+   * derived from `session.user.role` at the SSR layer (NEVER from request
+   * params). The library layer trusts the role hint; the SSR layer is the
+   * authorization gate.
+   *
+   * An empty-string override is treated as not-set (defensive — Next.js
+   * App Router string searchParams come through as the empty string when
+   * the URL has `?user_id=` with no value).
+   */
+  adminUserIdOverride?: string;
+  /**
+   * Phase 18 D-11 — caller's session role. Used to gate the
+   * `adminUserIdOverride` honoring. Defaults to 'partner' if omitted
+   * (fail-closed). MUST be derived from `session.user.role` at the SSR
+   * layer — NEVER from request params. See D-11 + T-18-01-01.
+   */
+  _callerRole?: 'admin' | 'partner';
 }
 
 /**
@@ -69,16 +95,26 @@ export async function buildListResponse(args: BuildListParams): Promise<ListResp
   // Phase 17 D-13: thread the archived flag (default false → Actives).
   const archived = args.archived ?? false;
 
+  // Phase 18 D-11 — admin can scope /proposals to another partner via
+  // ?user_id=; gate is admin role enforced at SSR layer. _callerRole MUST
+  // be passed in by the route — never derived from request params.
+  // Empty-string override (e.g. from `?user_id=` with no value) is treated
+  // as not-set (fail-closed). T-18-01-01 IDOR mitigation.
+  const effectiveUserId =
+    args._callerRole === 'admin' && args.adminUserIdOverride
+      ? args.adminUserIdOverride
+      : args.userId;
+
   const result: ListResult = q.length > 0
     ? await searchProposals({
-        userId: args.userId, q,
+        userId: effectiveUserId, q,
         cursor: cursor ?? undefined,
         deleted: args.deleted ?? false,
         archived,
         limit: args.limit ?? 20,
       })
     : await listProposalsByUser({
-        userId: args.userId,
+        userId: effectiveUserId,
         cursor: cursor ?? undefined,
         deleted: args.deleted ?? false,
         archived,
