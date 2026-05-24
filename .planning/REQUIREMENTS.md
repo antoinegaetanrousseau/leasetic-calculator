@@ -53,7 +53,7 @@
 - [x] **ADMIN-10**: Admin Home (`/[adminSegment]`) gains the Figma `41:46` enhancement: hero (`Bonjour, {prénom} 👋` with ADMIN badge) + `Nouvelle proposition` CTA + 3 admin stats row (Propositions ce mois / Partenaires actifs / Dernière modif. coeffs) + 3 AdminNavCards (Coefficients / Partenaires / Historique) + Recent activity card. Extends v1.2 Phase 14's 3-AdminNavCard layout.
 - [x] **ADMIN-11**: Admin Partners list `/[adminSegment]/partners` ships the Figma `42:46` styled table: hero row + `Inviter partenaire` CTA + filter/search controls row + table card with partner rows. Replaces the v1.1/v1.2 6-column AccountsList visual treatment.
 - [x] **ADMIN-12**: Partner list component file renames from `AccountsList.tsx` → `PartnersList.tsx` (Phase 14 closeout cleanup — directory was renamed in Phase 14-01, file name was kept). All imports updated.
-- [ ] **ADMIN-13**: Admin Créer partenaire `/[adminSegment]/partners/new` form card visual refresh per Figma `43:46`. Behavior unchanged from v1.2 Phase 14-02 (3-section RHF form + adminCreateInvitation server action + InviteUrlModal).
+- [x] **ADMIN-13**: Admin Créer partenaire `/[adminSegment]/partners/new` form card visual refresh per Figma `43:46`. Behavior unchanged from v1.2 Phase 14-02 (3-section RHF form + adminCreateInvitation server action + InviteUrlModal).
 - [ ] **ADMIN-14**: Admin Coefficients page (`/[adminSegment]/coefficients`) gains the Figma `45:46` warning banner (orange, `--gold` token) + inline history card refresh, on top of v1.2 Phase 14's 2-column history sidebar. Warning banner copy clarifies that coefficient edits create new history rows and do not retroactively change existing PDF proposals (`params_snapshot` invariant).
 
 ### Help Center / Aide (HELP)
@@ -167,7 +167,7 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | ADMIN-10 | 18 | Complete |
 | ADMIN-11 | 18 | Complete |
 | ADMIN-12 | 18 | Complete |
-| ADMIN-13 | 18 | Pending |
+| ADMIN-13 | 18 | Complete |
 | ADMIN-14 | 18 | Pending |
 | HELP-01 | 18 | Complete |
 | EXPORT-01 | 19 | Pending |
