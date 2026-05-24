@@ -221,14 +221,41 @@ describe('createDraft', () => {
     expect(payload.userId).toBe('u1');
     expect(payload.language).toBe('fr');
   });
-  it('does NOT define lc_ref / idempotency_key / params_snapshot / computed at insert time', async () => {
+  it('does NOT define idempotency_key / params_snapshot / computed at insert time (still NULL until finalize)', async () => {
     await createDraft({ userId: 'u1', language: 'en' });
     const ins = calls.find((c) => c.kind === 'insert.values');
     const payload = ins!.payload as Record<string, unknown>;
-    expect(payload.lcRef).toBeUndefined();
     expect(payload.idempotencyKey).toBeUndefined();
     expect(payload.paramsSnapshot).toBeUndefined();
     expect(payload.computed).toBeUndefined();
+  });
+
+  // ── Phase 17 D-03 / D-04 — lcRef allocated at draft creation ────────────────
+
+  it('Phase 17 D-03: persists a non-null lcRef matching format /^LC-2026-\\d+$/ on the new draft row', async () => {
+    // Allocator queries existing lcRefs first (returns []), then INSERTs with
+    // a freshly-allocated lcRef. The stub's .limit() resolves to [] so no
+    // prior lcRef exists.
+    await createDraft({ userId: 'u-phase17-a', language: 'fr' });
+    const ins = calls.find((c) => c.kind === 'insert.values');
+    expect(ins).toBeDefined();
+    const payload = ins!.payload as Record<string, unknown>;
+    expect(payload.lcRef).toBeDefined();
+    expect(typeof payload.lcRef).toBe('string');
+    expect(payload.lcRef as string).toMatch(/^LC-2026-\d+$/);
+  });
+
+  it('Phase 17 D-03: starts at LC-2026-001 when the user has no prior lcRef', async () => {
+    // Default stub state: .limit() resolves to [] (no prior rows).
+    await createDraft({ userId: 'u-phase17-new', language: 'fr' });
+    const ins = calls.find((c) => c.kind === 'insert.values');
+    const payload = ins!.payload as Record<string, unknown>;
+    expect(payload.lcRef).toBe('LC-2026-001');
+  });
+
+  it('Phase 17 D-03: does NOT call writeAuditLog (pre-finalize lifecycle invariant from Phase 13 D-16 preserved)', async () => {
+    await createDraft({ userId: 'u1', language: 'fr' });
+    expect(mockWriteAuditLog).not.toHaveBeenCalled();
   });
 });
 
@@ -249,8 +276,11 @@ describe('updateDraft', () => {
 });
 
 describe('finalizeDraft', () => {
+  // Phase 17 D-03: FinalizeDraftArgs no longer includes `lcRef`. The draft row
+  // already has lcRef pre-allocated at createDraft time. finalizeDraft reads
+  // it from the draft row (mocked via mockState.findFirstResult) and copies
+  // it into the UPDATE + audit payload.
   const finalArgs = {
-    lcRef: 'L-001',
     idempotencyKey: '11111111-2222-4333-8444-555555555555',
     paramsSnapshot: { commissionPct: '5.0000' },
     computed: { loyer: '1000.00' },
@@ -259,14 +289,23 @@ describe('finalizeDraft', () => {
     pdfSizeBytes: 12345,
     pdfGeneratedAt: new Date('2026-05-12T10:00:00Z'),
   };
-  it('writes status=active + all 4 nullable columns + pdf columns in one update', async () => {
-    mockState.returningResult = [{ id: 'p1', userId: 'u1' }];
+  const DRAFT_ROW = {
+    id: 'p1',
+    userId: 'u1',
+    status: 'draft',
+    lcRef: 'LC-2026-042',
+    inputs: {},
+  };
+  it('writes status=active + all 4 nullable columns + pdf columns in one update, copying lcRef from the draft row', async () => {
+    mockState.findFirstResult = DRAFT_ROW;
+    mockState.returningResult = [{ id: 'p1', userId: 'u1', lcRef: 'LC-2026-042' }];
     await finalizeDraft('p1', 'u1', finalArgs);
     const setCall = calls.find((c) => c.kind === 'update.set');
     expect(setCall).toBeDefined();
     const payload = setCall!.payload as Record<string, unknown>;
     expect(payload.status).toBe('active');
-    expect(payload.lcRef).toBe('L-001');
+    // Phase 17 D-03: lcRef sourced from the draft row, not args.
+    expect(payload.lcRef).toBe('LC-2026-042');
     expect(payload.idempotencyKey).toBe('11111111-2222-4333-8444-555555555555');
     expect(payload.paramsSnapshot).toEqual({ commissionPct: '5.0000' });
     expect(payload.computed).toEqual({ loyer: '1000.00' });
@@ -275,8 +314,9 @@ describe('finalizeDraft', () => {
     expect(payload.pdfSizeBytes).toBe(12345);
     expect(payload.pdfGeneratedAt).toBeInstanceOf(Date);
   });
-  it('calls writeAuditLog with proposal.create action when update succeeds', async () => {
-    mockState.returningResult = [{ id: 'p1', userId: 'u1' }];
+  it('calls writeAuditLog with proposal.create action AND payload.lcRef sourced from the draft row (D-03)', async () => {
+    mockState.findFirstResult = DRAFT_ROW;
+    mockState.returningResult = [{ id: 'p1', userId: 'u1', lcRef: 'LC-2026-042' }];
     await finalizeDraft('p1', 'u1', finalArgs);
     expect(mockWriteAuditLog).toHaveBeenCalledTimes(1);
     const callArgs = mockWriteAuditLog.mock.calls[0] as unknown as [Record<string, unknown>];
@@ -285,13 +325,16 @@ describe('finalizeDraft', () => {
     expect(arg.actorId).toBe('u1');
     expect(arg.targetType).toBe('proposal');
     expect(arg.targetId).toBe('p1');
+    expect((arg.payload as { lcRef: string }).lcRef).toBe('LC-2026-042');
   });
   it('does NOT call writeAuditLog when no row matched', async () => {
+    mockState.findFirstResult = DRAFT_ROW;
     mockState.returningResult = [];
     await finalizeDraft('p1', 'u1', finalArgs);
     expect(mockWriteAuditLog).not.toHaveBeenCalled();
   });
   it('returns null when no row matched (cross-user attempt)', async () => {
+    mockState.findFirstResult = null;
     mockState.returningResult = [];
     const result = await finalizeDraft('p1', 'u-other', finalArgs);
     expect(result).toBeNull();
