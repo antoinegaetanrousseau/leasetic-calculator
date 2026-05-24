@@ -56,6 +56,10 @@
 - [ ] **ADMIN-13**: Admin Créer partenaire `/[adminSegment]/partners/new` form card visual refresh per Figma `43:46`. Behavior unchanged from v1.2 Phase 14-02 (3-section RHF form + adminCreateInvitation server action + InviteUrlModal).
 - [ ] **ADMIN-14**: Admin Coefficients page (`/[adminSegment]/coefficients`) gains the Figma `45:46` warning banner (orange, `--gold` token) + inline history card refresh, on top of v1.2 Phase 14's 2-column history sidebar. Warning banner copy clarifies that coefficient edits create new history rows and do not retroactively change existing PDF proposals (`params_snapshot` invariant).
 
+### Help Center / Aide (HELP)
+
+- [ ] **HELP-01**: Help Center / Aide ships a `/aide` landing page (3-card placeholder grid: Commencer ici / Créer une proposition / Contact) plus a `/aide/commencer-ici` starter article (hardcoded TSX, ~500-1000 words FR + EN, walks through wizard step 1→2→3 with Phase 17 screenshots). Sidebar navigation includes `Aide` for both partner and admin users. Light + dark via Phase 16 token cascade. Net-new requirement filed during Phase 18 planning (scope expansion confirmed during `/gsd-discuss-phase`).
+
 ### Excel export (EXPORT)
 
 - [ ] **EXPORT-01**: Partner can export their proposals as `.xlsx` from `/proposals` via an export CTA. Export includes all visible proposals (respecting the current filter — Active vs. Archivées). Columns: Référence, Client, Projet, Montant HT, Durée, Loyer mensuel, Coefficient, Statut, Date de création, Date d'expiration.
@@ -165,6 +169,7 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | ADMIN-12 | 18 | Pending |
 | ADMIN-13 | 18 | Pending |
 | ADMIN-14 | 18 | Pending |
+| HELP-01 | 18 | Pending |
 | EXPORT-01 | 19 | Pending |
 | EXPORT-02 | 19 | Pending |
 | LCDASH-01 | 19 | Pending |
@@ -176,8 +181,8 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | GATE-02 | 21 | Pending |
 
 **Coverage:**
-- v1.3 requirements: 34 total
-- Mapped to phases: 34 ✅
+- v1.3 requirements: 35 total (HELP-01 added 2026-05-24 during Phase 18 planning — scope expansion confirmed in /gsd-discuss-phase)
+- Mapped to phases: 35 ✅
 - Unmapped: 0
 
 ---
