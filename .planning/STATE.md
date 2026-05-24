@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T20:53:04.393Z"
+last_updated: "2026-05-24T21:48:48.968Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 21
   completed_phases: 16
   total_plans: 103
-  completed_plans: 100
+  completed_plans: 101
   percent: 76
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 18 (admin-surfaces) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -350,6 +350,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 18 P03 | 15 | 3 tasks | 13 files |
 | Phase 18 P04 | 6 | 2 tasks | 4 files |
 | Phase 18 P05 | 12 | 3 tasks | 7 files |
+| Phase 18 P06 | 4 | 4 tasks | 5 files |
 
 ## Decisions
 
@@ -389,3 +390,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: Plan 18-05 — sessionStorage spies replaced with observable-state assertions because the polyfill installs a plain object (not Storage.prototype)
 - [Phase ?]: Plan 18-05 — SeedBanner preserved ABOVE PageHero; both can coexist (SeedBanner is the Phase 10 first-edit prompt, higher priority than the new D-19 advisory banner)
 - [Phase ?]: Plan 18-05 — Sidebar row dropped 'use client' (no state/handlers after D-22 click-to-diff removal); composes inside server sidebar without client boundary
+- [Phase ?]: Aide article ships text-only with placeholder figures (HELP-01); wizard screenshot capture deferred to HELP-02 — blocked by pre-existing seed-partner-launch.ts companyName gap; 3 follow-up to-do chips filed in deferred-items.md item #4
+- [Phase ?]: SUPPORT_EMAIL = antoine.rousseau@leasetic.com (Aide landing Contact card mailto); matches @leasetic.com launch-domain; T-18-06-05 harvesting risk explicitly accepted per D-25
