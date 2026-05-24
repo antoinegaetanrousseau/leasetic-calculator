@@ -45,6 +45,7 @@ import {
   getProposalById,
 } from '@/lib/db/queries/proposals';
 import { getLatestGlobalParams } from '@/lib/db/queries/global-params';
+import { PageHero } from '@/components/ui/PageHero';
 import { Stepper } from '@/components/ui/Stepper';
 import type { ProposalInput } from '@/lib/calc';
 
@@ -175,28 +176,19 @@ export default async function ParametresStep1Page({
           ?duplicate= and strips the flag itself. */}
       {sp.duplicate && <DuplicatePrefillToast lang={lang} />}
 
-      <h1
-        style={{
-          fontSize: 32,
-          fontWeight: 700,
-          color: 'var(--ink)',
-          margin: 0,
-        }}
-      >
-        {t('wizard.step1.title', lang)}
-      </h1>
-      <p
-        style={{
-          fontSize: 16,
-          color: 'var(--muted)',
-          marginTop: 8,
-        }}
-      >
-        {t('wizard.step1.subtitle', lang)}
-      </p>
+      {/* Phase 17 WIZ-01 (D-15 + D-19): PageHero adopter. Replaces the
+          previous inline heading block (title + subtitle). Stepper remains
+          a sibling BELOW PageHero (NOT composed inside) per D-19; PageHero
+          bakes marginBottom: 32 so the Stepper inherits proper spacing
+          automatically. */}
+      <PageHero
+        eyebrow={t('wizard.step1.eyebrow', lang)}
+        title={t('wizard.step1.title', lang)}
+        subtitle={t('wizard.step1.subtitle', lang)}
+      />
 
       {/* Stepper at the top — D-20: completedSteps from draft.inputs. */}
-      <div style={{ marginTop: 24 }}>
+      <div>
         <Stepper
           currentStep={1}
           completedSteps={completedSteps}
