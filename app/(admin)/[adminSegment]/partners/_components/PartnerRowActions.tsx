@@ -1,20 +1,42 @@
 'use client';
 
 /**
- * Phase 18 Plan 03 — PartnerRowActions (D-10, D-11).
+ * Phase 18 Plan 03 Task 2 — PartnerRowActions (D-10, D-11).
  *
- * Initial Task 1 stub renders a minimal ⋯ trigger so PartnersList compiles
- * without a placeholder. Task 2 of this plan replaces this stub with the
- * full popover menu (custom state + click-outside + Escape handler) wired
- * to the existing Phase 14 server actions (adminDisableUser /
- * adminReEnableUser / adminReissueInvitation) per UI-SPEC §Partners list
- * lines 345-364.
+ * Per-row overflow ⋯ menu rendered in Partners table cell 6. Custom React
+ * state + click-outside hook + Escape handler (no Radix — Phase 17 confirmed
+ * the codebase has no Radix dependency; UI-SPEC line 363 recommends option b).
  *
- * The placeholder trigger keeps the 6-cell row shape valid so the D-14
- * rename + Figma 42:46 layout can land atomically in Task 1.
+ * D-10 conditional visibility:
+ *   - Renvoyer l'invitation       (status === 'invited')
+ *   - Désactiver le compte        (status === 'active')
+ *   - Réactiver le compte         (status === 'inactive')
+ *   - Voir les propositions du partenaire  (always — D-11 link)
+ *
+ * D-11 link: <Link href="/proposals?user_id={partnerId}"> — the /proposals SSR
+ * route (Plan 18-01) accepts ?user_id= when the caller is admin (T-18-01-01
+ * IDOR mitigation gated at the SSR layer + library layer).
+ *
+ * Server actions reused as-is (Phase 14 / Plan 18-01 — no new actions in 18-03):
+ *   - adminDisableUser(partnerId)         — single-arg
+ *   - adminReEnableUser(partnerId)        — single-arg
+ *   - adminReissueInvitation({email, displayName, language})  — multi-arg;
+ *     partner email/name + the admin's current language pref are threaded
+ *     in via props. (Phase 18 follow-up note: partner's own language pref
+ *     would be more accurate; would require extending PartnerRow with a
+ *     language column projection. Out of scope for the visual rebuild.)
  */
-import { MoreVertical } from 'lucide-react';
-import type { Lang } from '@/lib/i18n/dictionaries';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { MoreVertical, Send, Ban, CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { t, type Lang } from '@/lib/i18n/dictionaries';
+import {
+  adminDisableUser,
+  adminReEnableUser,
+  adminReissueInvitation,
+} from '@/lib/admin';
 import type { PartnerStatus } from '@/lib/db/queries/partners';
 
 export interface PartnerRowActionsProps {
@@ -22,30 +44,220 @@ export interface PartnerRowActionsProps {
   status: PartnerStatus;
   adminSegment: string;
   lang: Lang;
+  /**
+   * Partner email + display name — required for the `Renvoyer l'invitation`
+   * action (adminReissueInvitation signature). Optional so PartnersList
+   * callers without these fields populated still compile; the action
+   * gracefully falls back to a toast error when missing.
+   */
+  partnerEmail?: string;
+  partnerDisplayName?: string;
 }
 
-export function PartnerRowActions(_props: PartnerRowActionsProps) {
-  // Task 1 stub — non-functional ⋯ trigger to preserve the 6-cell row shape.
-  // Task 2 replaces this with a full popover menu (4 conditional actions per D-10).
+const MENU_ITEM_STYLE = {
+  display: 'flex' as const,
+  alignItems: 'center' as const,
+  gap: 8,
+  padding: '8px 12px',
+  fontSize: 14,
+  color: 'var(--ink)',
+  cursor: 'pointer' as const,
+  background: 'transparent',
+  border: 'none',
+  width: '100%',
+  textAlign: 'left' as const,
+  textDecoration: 'none' as const,
+};
+
+export function PartnerRowActions({
+  partnerId,
+  status,
+  adminSegment: _adminSegment,
+  lang,
+  partnerEmail,
+  partnerDisplayName,
+}: PartnerRowActionsProps) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [, startTransition] = useTransition();
+  const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Click-outside hook — closes menu when mousedown lands outside the container.
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  // Escape key handler.
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [open]);
+
+  const refreshAfterAction = () => {
+    startTransition(() => router.refresh());
+  };
+
+  const onDisable = async () => {
+    setBusy(true);
+    try {
+      await adminDisableUser(partnerId);
+      toast.success(t('admin.accounts.toast.disable.success', lang).replace('{0}', partnerDisplayName ?? partnerEmail ?? ''));
+      refreshAfterAction();
+    } catch {
+      toast.error(t('admin.accounts.toast.disable.error', lang));
+    } finally {
+      setBusy(false);
+      setOpen(false);
+    }
+  };
+
+  const onReEnable = async () => {
+    setBusy(true);
+    try {
+      await adminReEnableUser(partnerId);
+      toast.success(t('admin.accounts.toast.enable.success', lang).replace('{0}', partnerDisplayName ?? partnerEmail ?? ''));
+      refreshAfterAction();
+    } catch {
+      toast.error(t('admin.accounts.toast.enable.error', lang));
+    } finally {
+      setBusy(false);
+      setOpen(false);
+    }
+  };
+
+  const onReissue = async () => {
+    if (!partnerEmail) {
+      toast.error(t('admin.accounts.toast.reissue.error', lang));
+      setOpen(false);
+      return;
+    }
+    setBusy(true);
+    try {
+      await adminReissueInvitation({
+        email: partnerEmail,
+        displayName: partnerDisplayName ?? partnerEmail,
+        language: lang,
+      });
+      toast.success(t('admin.accounts.toast.reissue.success', lang));
+      refreshAfterAction();
+    } catch {
+      toast.error(t('admin.accounts.toast.reissue.error', lang));
+    } finally {
+      setBusy(false);
+      setOpen(false);
+    }
+  };
+
+  // D-10 conditional visibility — exactly one of resend/disable/re-enable
+  // is rendered per row based on status.
+  const showResend = status === 'invited';
+  const showDisable = status === 'active';
+  const showReEnable = status === 'inactive';
+
   return (
-    <button
-      type="button"
-      aria-haspopup="menu"
-      aria-expanded={false}
-      style={{
-        width: 32,
-        height: 32,
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 6,
-        border: 'none',
-        background: 'transparent',
-        color: 'var(--muted)',
-        cursor: 'pointer',
-      }}
-    >
-      <MoreVertical size={16} strokeWidth={1.6} aria-hidden="true" />
-    </button>
+    <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={t('admin.partners.action.viewProposals', lang)}
+        onClick={() => setOpen((v) => !v)}
+        disabled={busy}
+        style={{
+          width: 32,
+          height: 32,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 6,
+          border: 'none',
+          background: 'transparent',
+          color: 'var(--muted)',
+          cursor: busy ? 'wait' : 'pointer',
+        }}
+      >
+        {busy ? (
+          <Loader2 size={16} strokeWidth={1.6} aria-hidden="true" style={{ animation: 'spin 1s linear infinite' }} />
+        ) : (
+          <MoreVertical size={16} strokeWidth={1.6} aria-hidden="true" />
+        )}
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            right: 0,
+            marginTop: 4,
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 8,
+            padding: '4px 0',
+            minWidth: 240,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            zIndex: 50,
+          }}
+        >
+          {showResend && (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={onReissue}
+              style={MENU_ITEM_STYLE}
+            >
+              <Send size={14} strokeWidth={1.6} aria-hidden="true" color="var(--muted)" />
+              {t('admin.partners.action.resendInvitation', lang)}
+            </button>
+          )}
+          {showDisable && (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={onDisable}
+              style={MENU_ITEM_STYLE}
+            >
+              <Ban size={14} strokeWidth={1.6} aria-hidden="true" color="var(--muted)" />
+              {t('admin.partners.action.disableAccount', lang)}
+            </button>
+          )}
+          {showReEnable && (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={onReEnable}
+              style={MENU_ITEM_STYLE}
+            >
+              <CheckCircle2 size={14} strokeWidth={1.6} aria-hidden="true" color="var(--gd)" />
+              {t('admin.partners.action.enableAccount', lang)}
+            </button>
+          )}
+          <Link
+            href={`/proposals?user_id=${partnerId}`}
+            role="menuitem"
+            style={MENU_ITEM_STYLE}
+            onClick={() => setOpen(false)}
+          >
+            <ExternalLink size={14} strokeWidth={1.6} aria-hidden="true" color="var(--muted)" />
+            {t('admin.partners.action.viewProposals', lang)}
+          </Link>
+        </div>
+      )}
+    </div>
   );
 }

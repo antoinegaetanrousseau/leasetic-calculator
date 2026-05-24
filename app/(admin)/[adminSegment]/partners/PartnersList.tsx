@@ -244,6 +244,8 @@ export function PartnersList({
                     status={row.status}
                     adminSegment={adminSegment}
                     lang={lang}
+                    partnerEmail={row.email}
+                    partnerDisplayName={row.name}
                   />
                 </td>
               </tr>
