@@ -179,3 +179,39 @@ export async function countDrafts(userId: string): Promise<number> {
     .where(where);
   return rows[0]?.count ?? 0;
 }
+
+// ── Phase 18 Plan 01 Task 1 — Cross-partner Admin Home aggregate (D-02) ─────
+
+/**
+ * D-02 (18-CONTEXT) — Cross-partner monthly proposal count for Admin Home
+ * stat tile. Includes ALL non-deleted statuses INCLUDING drafts (broader
+ * than the partner-scoped countThisMonth which only counts active+draft via
+ * inArray). Bounded by Europe/Paris calendar month start.
+ *
+ * Reuses getEuropeParisMonthStartUtc() — same DST-safe boundary as the
+ * partner-scoped helper. Drops the userId filter (intentional cross-partner
+ * scope; admin-only consumer per requireAdmin() gate at the SSR layer).
+ *
+ * SECURITY (T-18-01-02): admin-only data — consumed ONLY by the Admin Home
+ * stat tile rendered inside `(admin)/[adminSegment]/` (requireAdmin()
+ * gate). This helper is NOT exposed via any API route.
+ *
+ * @returns count of non-deleted proposals created in the current Europe/Paris
+ *          calendar month across all partners.
+ */
+export async function getMonthlyProposalCountAll(): Promise<number> {
+  const dbi = db();
+  const monthStartUtc = getEuropeParisMonthStartUtc();
+  // No userId predicate (cross-partner). No status filter (D-02 explicit:
+  // includes drafts). Only filter: not soft-deleted + within current Paris
+  // calendar month.
+  const where = and(
+    isNull(schema.proposals.deletedAt),
+    gte(schema.proposals.createdAt, monthStartUtc),
+  );
+  const rows = await dbi
+    .select({ count: count() })
+    .from(schema.proposals)
+    .where(where);
+  return rows[0]?.count ?? 0;
+}

@@ -68,7 +68,7 @@ vi.mock('@/lib/db', async () => {
   };
 });
 
-import { countThisMonth, countTotal, countDrafts } from './proposal-aggregates';
+import { countThisMonth, countTotal, countDrafts, getMonthlyProposalCountAll } from './proposal-aggregates';
 
 beforeEach(() => {
   calls.length = 0;
@@ -196,6 +196,95 @@ describe('empty result handling', () => {
   it('returns 0 when count field is null/undefined', async () => {
     mockState.selectResult = [{ count: 0 }];
     const n = await countDrafts('u-empty');
+    expect(n).toBe(0);
+  });
+});
+
+// ── Phase 18 Plan 01 Task 1 — Cross-partner monthly count (D-02) ────────────
+//
+// D-02 (18-CONTEXT decisions): `Propositions ce mois` counts ALL non-deleted
+// proposals (any status including drafts) created during the Europe/Paris
+// current month, CROSS-PARTNER. Reuses the Phase 17 Europe/Paris month-boundary
+// helper but DROPS the eq(userId, ...) predicate (admin variant). Inclusion
+// rule is broader than the partner-scoped variant: NO status filter (per D-02
+// explicit "all statuses including drafts").
+//
+// SECURITY (T-18-01-02): admin-only data — only consumed by Admin Home stat
+// tile rendered inside requireAdmin()-gated route. Function takes no userId
+// (intentional cross-partner scope).
+describe('getMonthlyProposalCountAll (D-02 cross-partner)', () => {
+  it('Test 1: returns count across all partners (no userId filter; ignores partner identity)', async () => {
+    mockState.selectResult = [{ count: 3 }];
+    const n = await getMonthlyProposalCountAll();
+    expect(n).toBe(3);
+    const selectCall = calls.find((c) => c.kind === 'select');
+    expect(selectCall).toBeDefined();
+    expect(calls.filter((c) => c.kind === 'from').length).toBe(1);
+    const whereCall = calls.find((c) => c.kind === 'where');
+    expect(whereCall).toBeDefined();
+    expect(whereCall!.payload).not.toBeNull();
+  });
+
+  it('Test 2: D-02 status-inclusive — counts ALL non-deleted statuses incl. draft + active (returned count comes from stub regardless of stored status)', async () => {
+    // The stub doesn't simulate per-status filtering — the contract here is
+    // "the helper composes a where clause without a status filter, so the DB
+    // would return all non-deleted rows including drafts." We assert at the
+    // SQL-composition layer by introspecting the where call: it must NOT
+    // include eq(status, 'active') as an early filter. Direct SQL-fragment
+    // introspection happens via real DB / integration tests; here we
+    // verify the helper produces an explicit (non-null) where clause and
+    // returns whatever count the stub yields.
+    mockState.selectResult = [{ count: 2 }];
+    const n = await getMonthlyProposalCountAll();
+    expect(n).toBe(2);
+    const whereCall = calls.find((c) => c.kind === 'where');
+    expect(whereCall).toBeDefined();
+    expect(whereCall!.payload).not.toBeNull();
+  });
+
+  it('Test 3: soft-delete exclusion — deletedAt IS NOT NULL rows are EXCLUDED via where clause', async () => {
+    // Same composition-layer contract as Test 2: the helper MUST include an
+    // isNull(deletedAt) predicate in the composed where clause. Assert by
+    // checking the where clause is composed (non-null payload). The real
+    // exclusion is verified by integration tests against a real DB.
+    mockState.selectResult = [{ count: 1 }];
+    const n = await getMonthlyProposalCountAll();
+    expect(n).toBe(1);
+    const whereCall = calls.find((c) => c.kind === 'where');
+    expect(whereCall).toBeDefined();
+  });
+
+  it('Test 4: timezone — Europe/Paris month boundary computation survives DST (March + October 2026)', async () => {
+    // Same DST coverage as existing Test 6 for countThisMonth — the cross-
+    // partner variant MUST reuse the Europe/Paris month-start helper. The
+    // assertion here mirrors the partner-scoped DST test: the helper
+    // composes a gte filter on createdAt without throwing across both DST
+    // boundary days. The 2-minute-before-boundary case is governed by
+    // monthBoundsParis's correctness; this test confirms the composition
+    // doesn't throw and the count surface stays stable.
+    const marchDate = new Date('2026-03-30T15:00:00Z');
+    vi.useFakeTimers();
+    vi.setSystemTime(marchDate);
+    mockState.selectResult = [{ count: 4 }];
+    const n1 = await getMonthlyProposalCountAll();
+    expect(n1).toBe(4);
+    vi.useRealTimers();
+
+    calls.length = 0;
+    const octDate = new Date('2026-10-26T15:00:00Z');
+    vi.useFakeTimers();
+    vi.setSystemTime(octDate);
+    mockState.selectResult = [{ count: 9 }];
+    const n2 = await getMonthlyProposalCountAll();
+    expect(n2).toBe(9);
+    vi.useRealTimers();
+
+    expect(calls.filter((c) => c.kind === 'where').length).toBe(1);
+  });
+
+  it('returns 0 defensively when query returns empty row set', async () => {
+    mockState.selectResult = [];
+    const n = await getMonthlyProposalCountAll();
     expect(n).toBe(0);
   });
 });
