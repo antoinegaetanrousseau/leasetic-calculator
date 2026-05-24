@@ -300,11 +300,35 @@ export const dictionaries = {
     'dashboard.empty.title': 'Aucune proposition pour le moment',
     'dashboard.empty.body': 'Cliquez sur « Nouvelle proposition » pour créer votre première proposition.',
     'header.proposals.new': 'Nouvelle proposition',
+    // ── Phase 17 — Partner Home rebuild (UI-SPEC §Copywriting Contract, D-21) ──
+    // PHOME-01..03 — new Partner Home: hero subtitle + 3 MetricTiles + recent
+    // proposals card. Existing keys reused: dashboard.greeting (hero title),
+    // dashboard.recent.title (recent card header).
+    'dashboard.home.subtitle': 'Bienvenue sur votre espace partenaire',
+    'dashboard.cta.new': 'Nouvelle proposition',
+    'dashboard.metricTile.thisMonth': 'Ce mois-ci',
+    'dashboard.metricTile.total': 'Total',
+    'dashboard.metricTile.drafts': 'Brouillons',
+    'dashboard.recent.empty': 'Aucune proposition pour le moment.',
+    'dashboard.recent.viewAll': 'Voir toutes →',
+    // ── Phase 17 — /proposals route (PROPS-01/02, D-11/D-12/D-13/D-21) ──
+    'proposals.title': 'Mes propositions',
+    'proposals.subtitle': 'Consultez et gérez vos propositions',
+    'proposals.filter.actives': 'Actives',
+    'proposals.filter.archived': 'Archivées',
+    'proposals.empty.actives':
+      'Aucune proposition pour le moment. Créez votre première proposition.',
+    'proposals.empty.archived': 'Aucune proposition archivée pour le moment.',
     // Live preview (07-05)
     'proposal.section.preview': 'Aperçu',
     'proposal.validity.label': 'Validité de la proposition',
     'proposal.validity.suffix': 'jours',
     'proposal.validity.computed.label': 'Valable {0} jours',
+    // Phase 17 D-01/D-21 — WIZ-04 validity selector on wizard step 3
+    'proposal.validity.ariaLabel': 'Sélectionner la durée de validité',
+    'proposal.validity.days15': '15j',
+    'proposal.validity.days30': '30j',
+    'proposal.validity.days60': '60j',
     // Toasts (07-04 / 07-05)
     'proposal.toast.copy.success': 'Référence copiée.',
     'proposal.toast.copy.error': 'Impossible de copier. Sélectionnez et copiez manuellement.',
@@ -573,6 +597,10 @@ export const dictionaries = {
     'wizard.step2.subtitle': 'Voici le loyer mensuel calculé selon les paramètres du projet. Vérifiez avant de continuer.',
     'wizard.step3.title': 'Vérifier la proposition',
     'wizard.step3.subtitle': 'Vérifiez tous les éléments puis confirmez pour générer le PDF final.',
+    // Phase 17 D-15/D-16/D-17/D-19/D-21 — PageHero eyebrow strings for each step.
+    'wizard.step1.eyebrow': 'ÉTAPE 1 SUR 3',
+    'wizard.step2.eyebrow': 'ÉTAPE 2 SUR 3',
+    'wizard.step3.eyebrow': 'ÉTAPE 3 SUR 3',
     // §6.2 Section bullet headers
     'wizard.section.informations.client': 'INFORMATIONS CLIENT',
     'wizard.section.details.projet': 'DÉTAILS DU PROJET',
@@ -602,6 +630,19 @@ export const dictionaries = {
     'wizard.step2.row.duration': 'Durée du contrat',
     'wizard.step2.row.loyer.calculated': 'Loyer mensuel calculé',
     'wizard.step2.error.incomplete': "Données du projet incomplètes — retournez à l'étape 1 pour les compléter.",
+    // Phase 17 D-16/D-21 — Step 2 net-new structure: hero sublabel + Détail du
+    // calcul card + Paramètres saisis recap card. D-12 ADMIN-09 partner-facing
+    // relaxation preserved: commission label visible to deal-owner partner;
+    // commissionNote is a parenthetical clarifier (no commission VALUE leak).
+    'wizard.step2.hero.sublabel': 'par mois pendant {durationMonths} mois',
+    'wizard.step2.detail.title': 'DÉTAIL DU CALCUL',
+    'wizard.step2.detail.montantHT': 'Montant HT du projet',
+    'wizard.step2.detail.commission': 'Commission apporteur',
+    'wizard.step2.detail.commissionNote': '(non visible client)',
+    'wizard.step2.detail.coefficient': 'Coefficient appliqué',
+    'wizard.step2.detail.duree': 'Durée du contrat',
+    'wizard.step2.detail.loyer': 'Loyer mensuel calculé',
+    'wizard.step2.recap.title': 'PARAMÈTRES SAISIS',
     // §6.6 Step-3 specific labels
     // D-15: the partner-facing mock reference placeholder is baked into
     // this dictionary string (never digits, never timestamps) so it never
@@ -968,11 +1009,32 @@ export const dictionaries = {
     'dashboard.empty.title': 'No proposals yet',
     'dashboard.empty.body': 'Click "New proposal" to create your first one.',
     'header.proposals.new': 'New proposal',
+    // ── Phase 17 — Partner Home rebuild (UI-SPEC §Copywriting Contract, D-21) ──
+    'dashboard.home.subtitle': 'Welcome to your partner space',
+    'dashboard.cta.new': 'New proposal',
+    'dashboard.metricTile.thisMonth': 'This month',
+    'dashboard.metricTile.total': 'Total',
+    'dashboard.metricTile.drafts': 'Drafts',
+    'dashboard.recent.empty': 'No proposals yet.',
+    'dashboard.recent.viewAll': 'View all →',
+    // ── Phase 17 — /proposals route (PROPS-01/02, D-11/D-12/D-13/D-21) ──
+    'proposals.title': 'My proposals',
+    'proposals.subtitle': 'View and manage your proposals',
+    'proposals.filter.actives': 'Active',
+    'proposals.filter.archived': 'Archived',
+    'proposals.empty.actives':
+      'No proposals yet. Create your first proposal.',
+    'proposals.empty.archived': 'No archived proposals yet.',
     // Live preview (07-05)
     'proposal.section.preview': 'Preview',
     'proposal.validity.label': 'Proposal validity',
     'proposal.validity.suffix': 'days',
     'proposal.validity.computed.label': 'Valid {0} days',
+    // Phase 17 D-01/D-21 — WIZ-04 validity selector on wizard step 3
+    'proposal.validity.ariaLabel': 'Select validity period',
+    'proposal.validity.days15': '15d',
+    'proposal.validity.days30': '30d',
+    'proposal.validity.days60': '60d',
     // Toasts (07-04 / 07-05)
     'proposal.toast.copy.success': 'Reference copied.',
     'proposal.toast.copy.error': 'Could not copy. Please select and copy manually.',
@@ -1225,6 +1287,10 @@ export const dictionaries = {
     'wizard.step2.subtitle': 'Here is the monthly rent calculated from the project parameters. Review before continuing.',
     'wizard.step3.title': 'Review the proposal',
     'wizard.step3.subtitle': 'Review all elements then confirm to generate the final PDF.',
+    // Phase 17 D-15/D-16/D-17/D-19/D-21 — PageHero eyebrow strings for each step.
+    'wizard.step1.eyebrow': 'STEP 1 OF 3',
+    'wizard.step2.eyebrow': 'STEP 2 OF 3',
+    'wizard.step3.eyebrow': 'STEP 3 OF 3',
     // §6.2 Section bullet headers
     'wizard.section.informations.client': 'CLIENT INFORMATION',
     'wizard.section.details.projet': 'PROJECT DETAILS',
@@ -1251,6 +1317,16 @@ export const dictionaries = {
     'wizard.step2.row.duration': 'Contract duration',
     'wizard.step2.row.loyer.calculated': 'Calculated monthly rent',
     'wizard.step2.error.incomplete': 'Project data incomplete — return to step 1 to complete it.',
+    // Phase 17 D-16/D-21 — Step 2 net-new structure (see FR block for rationale).
+    'wizard.step2.hero.sublabel': 'per month for {durationMonths} months',
+    'wizard.step2.detail.title': 'CALCULATION DETAIL',
+    'wizard.step2.detail.montantHT': 'Project amount excl. tax',
+    'wizard.step2.detail.commission': 'Referral commission',
+    'wizard.step2.detail.commissionNote': '(not shown to client)',
+    'wizard.step2.detail.coefficient': 'Applied coefficient',
+    'wizard.step2.detail.duree': 'Contract duration',
+    'wizard.step2.detail.loyer': 'Calculated monthly rent',
+    'wizard.step2.recap.title': 'ENTERED PARAMETERS',
     // §6.6 Step-3 specific labels (D-15 — see FR block for full rationale)
     'wizard.step3.modifier.link': '← Edit',
     'wizard.step3.pdf.title': 'Financing proposal',
