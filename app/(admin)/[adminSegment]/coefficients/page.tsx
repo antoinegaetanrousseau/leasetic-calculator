@@ -2,9 +2,11 @@ import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
 import { getLatestGlobalParams } from '@/lib/db/queries';
+import { PageHero } from '@/components/ui/PageHero';
 import { CoefficientsEditor } from './CoefficientsEditor';
 import { ExplainTool } from './ExplainTool';
 import { CoefficientHistorySidebar } from './CoefficientHistorySidebar';
+import { CoefficientWarningBanner } from './_components/CoefficientWarningBanner';
 import { SeedBanner } from './SeedBanner';
 import { seedParams } from '@/lib/calc/seed-params';
 import type { Coefficients } from '@/lib/calc/coefficients';
@@ -59,50 +61,39 @@ export default async function CoefficientsPage({ params }: PageProps) {
     seedParams.coefficients,
   );
 
-  // Plan 14-04 D-17 / UI-SPEC §5.6 — 2-column layout at max-width 1040px:
-  //   - Left column (minmax(0, 1fr)): editor + ExplainTool (Phase 9
-  //     HistoryTable JSX usage REMOVED per UI-SPEC §5.6 ruling — the
-  //     HistoryTable.tsx file stays on disk, only the page-level mount
-  //     is removed).
-  //   - Right column (360px fixed): CoefficientHistorySidebar (5 most-recent
-  //     coefficient_history rows + footer link to /<seg>/history).
+  // Plan 18-05 — Coefficients page wiring per UI-SPEC §Coefficients lines
+  // 458-471 + line 908 (max-width 1280px):
+  //   - PageHero (Phase 16 primitive) replaces the inline <h1>/<p>.
+  //   - SeedBanner stays above the hero (preserved Phase 10 surface — it is
+  //     a critical first-edit prompt that must precede the new D-19 warning).
+  //   - CoefficientWarningBanner mounts BETWEEN the hero subtitle and the
+  //     2-column layout, full width, marginBottom:16 (D-19).
+  //   - 2-column flex layout: left (flex:1, minWidth:0) = editor + Explain;
+  //     right (width:360, flexShrink:0) = CoefficientHistorySidebar (D-21
+  //     refreshed in place).
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+    <main style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
       <SeedBanner lang={lang} visible={isStillSeed} />
-      <h1
-        style={{
-          fontSize: 24,
-          fontWeight: 700,
-          color: 'var(--ink)',
-          marginBottom: 4,
-        }}
-      >
-        {t('admin.coefficients.page.title', lang)}
-      </h1>
-      <p
-        style={{
-          fontSize: 14,
-          color: 'var(--muted)',
-          marginBottom: 24,
-        }}
-      >
-        {t('admin.coefficients.page.sub', lang)}
-      </p>
-
+      <PageHero
+        title={t('admin.coefficients.page.title', lang)}
+        subtitle={t('admin.coefficients.page.sub', lang)}
+      />
+      <CoefficientWarningBanner lang={lang} />
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) 360px',
+          display: 'flex',
           gap: 24,
-          alignItems: 'start',
+          alignItems: 'flex-start',
         }}
       >
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <CoefficientsEditor lang={lang} latestParams={latestParams} />
           <ExplainTool lang={lang} latestParams={latestParams} />
         </div>
-        <CoefficientHistorySidebar lang={lang} adminSegment={adminSegment} />
+        <div style={{ width: 360, flexShrink: 0 }}>
+          <CoefficientHistorySidebar lang={lang} adminSegment={adminSegment} />
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

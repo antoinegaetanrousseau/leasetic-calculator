@@ -476,8 +476,11 @@ export const dictionaries = {
     'admin.nav.history.description': 'Historique des coefficients',
     'admin.nav.open': 'Ouvrir →',
 
-    // Coefficients page (UI-SPEC §3.1 + §9.2)
-    'admin.coefficients.page.title': 'Coefficients & Commission',
+    // Coefficients page (UI-SPEC §3.1 + §9.2; Plan 18-05 Open Q9 — value
+    // shortened to "Coefficients" to match Figma 45:46 hero. Single consumer
+    // is app/(admin)/[adminSegment]/coefficients/page.tsx — no other call
+    // sites depend on the longer string.)
+    'admin.coefficients.page.title': 'Coefficients',
     'admin.coefficients.page.sub': "Paramètres financiers globaux — toute modification crée une nouvelle ligne d'historique.",
     'admin.coefficients.editor.title': 'Paramètres actuels',
     'admin.coefficients.commission.label': 'Commission apporteur (%)',
@@ -1262,8 +1265,8 @@ export const dictionaries = {
     'admin.nav.history.description': 'Coefficient history',
     'admin.nav.open': 'Open \u2192',
 
-    // Coefficients page
-    'admin.coefficients.page.title': 'Coefficients & Commission',
+    // Coefficients page (Plan 18-05 Open Q9 — value shortened to match Figma)
+    'admin.coefficients.page.title': 'Coefficients',
     'admin.coefficients.page.sub': 'Global financial parameters \u2014 every save creates a new history entry.',
     'admin.coefficients.editor.title': 'Current parameters',
     'admin.coefficients.commission.label': 'Introducer commission (%)',
