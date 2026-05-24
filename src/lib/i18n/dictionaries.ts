@@ -825,6 +825,10 @@ export const dictionaries = {
     'aide.commencer-ici.section.next.title': 'Et après ?',
     'aide.commencer-ici.section.next.body': "Votre premiere proposition est prete. Vous la retrouverez dans la liste des Propositions, ou vous pouvez la rouvrir pour telecharger a nouveau le PDF. Pour les questions courantes, consultez les autres articles du Centre d'aide ou ecrivez-nous a l'adresse de contact.",
     'aide.commencer-ici.cta.create': 'Créer ma première proposition',
+    // Figure placeholder — used 3× (steps 1/2/3) until HELP-02 captures the real
+    // wizard screenshots. Interpolation `{0}` = step number (1, 2, 3).
+    // Deferred per deferred-items.md item #4 (seed-partner-launch.ts companyName gap).
+    'aide.commencer-ici.figure.placeholder': "Aperçu de l'étape {0} — à venir",
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -1588,6 +1592,9 @@ export const dictionaries = {
     'aide.commencer-ici.section.next.title': "What's next?",
     'aide.commencer-ici.section.next.body': "Your first proposal is ready. You'll find it in the Propositions list, where you can reopen it to download the PDF again. For common questions, check the other articles in the Help Center or email us at the contact address.",
     'aide.commencer-ici.cta.create': 'Create my first proposal',
+    // Figure placeholder — used 3× (steps 1/2/3) until HELP-02 captures the real
+    // wizard screenshots. Interpolation `{0}` = step number (1, 2, 3).
+    'aide.commencer-ici.figure.placeholder': 'Step {0} preview — coming soon',
   },
 } as const;
 

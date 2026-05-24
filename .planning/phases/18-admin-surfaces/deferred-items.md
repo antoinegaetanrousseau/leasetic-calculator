@@ -47,3 +47,18 @@ Section TITLES and breadcrumb already carry full accents (`Aperçu`, `Étape`, `
 
 **Rationale for deferring:** 18-06 ships HELP-01 (landing + 1 starter article). Body comprehension is intact (French readers parse ASCII-stripped French without friction); polish is cosmetic and decoupled from the structural launch. Per user 2026-05-24: "accept the article as drafted (ASCII body, accented titles)".
 
+## 4. Aide article wizard screenshots (steps 1/2/3) — HELP-02 follow-up
+
+**Discovered:** 2026-05-24 during 18-06 Task 3 checkpoint (capture wizard step screenshots).
+**Status:** **DEFERRED to HELP-02** — explicitly chosen by user on 2026-05-24 ("Skip all wizard screenshots, ship article text-only").
+**Blocker:** `scripts/seed-partner-launch.ts` does not set `users.companyName`. The proposal wizard's session-derived hydration on step 1 leaves `partnerCo` empty, which makes `proposalInputSchema.safeParse` fail when the user navigates to step 2. Both Antoine (admin) and Delphine (partner) hit this gate when attempting to walk a test draft through the wizard for screenshot capture. The wizard itself is correct; the gap is the seed script.
+
+**What ships in 18-06 instead:** Article walks through wizard step 1 → 2 → 3 in text, but each of the 3 `<figure>` slots renders a styled placeholder (`Aperçu de l'étape N — à venir` / `Step N preview — coming soon`) with a muted dashed border + centered grey text so the absence reads as intentional, not broken.
+
+**Follow-up to-dos filed as separate task chips (NOT Phase 18 scope):**
+1. **Fix `seed-partner-launch.ts` companyName gap.** Add `companyName: 'Test Company'` (or equivalent test value) to the seed script's user INSERT payload AND backfill existing seeded partner accounts (`UPDATE users SET company_name = 'Test Company' WHERE email = '<seeded partner email>' AND company_name IS NULL`). Once seeded accounts have a companyName, the wizard step 1 → step 2 transition unblocks for partners attempting to create demo drafts.
+2. **Fix topbar route-awareness.** Topbar currently shows the literal "Accueil" on every page regardless of route. Should derive the title from the active route's metadata or breadcrumb segment.
+3. **HELP-02 capture pass.** Once the companyName gap above is closed, capture the 3 wizard step screenshots per the 18-06 Task 3 contract (1280px viewport, retina, light-mode, commission-free per ADMIN-09 envelope D-12) and swap the placeholders in `app/(authed)/aide/commencer-ici/page.tsx` for `<Image>` elements pointing at `public/aide/wizard-step-{1,2,3}.png`.
+
+**Rationale for deferring:** the wizard companyName gap is its own bug with its own seed-script fix, independent of HELP-01. Shipping HELP-01 with placeholders unblocks the landing + article surface and lets the closing-out plan visual sign-off (12 checkpoints in 18-07) continue with the structural surface in place. The placeholders are visually intentional (dashed border + muted text) so a partner reading the article understands the screenshots are forthcoming rather than broken.
+
