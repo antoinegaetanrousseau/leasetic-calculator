@@ -36,8 +36,8 @@
 
 ### Partner Proposals + Archives (PROPS)
 
-- [ ] **PROPS-01**: Partner Proposals `/proposals` lists active proposals in a styled table card with cursor-based pagination, ILIKE search bar, and filter-pill row. Refreshes v1.1's PROP list view to the Figma table treatment.
-- [ ] **PROPS-02**: An `Archivées` filter pill on `/proposals` toggles the list between active and archived proposals (soft-deleted within the 30-day window + expired proposals owned by the partner) — **in-page**, NO separate `/archives` route. Each row keeps its `<StatusChip>` showing the true status (`expired`, `deleted`).
+- [x] **PROPS-01**: Partner Proposals `/proposals` lists active proposals in a styled table card with cursor-based pagination, ILIKE search bar, and filter-pill row. Refreshes v1.1's PROP list view to the Figma table treatment.
+- [x] **PROPS-02**: An `Archivées` filter pill on `/proposals` toggles the list between active and archived proposals (soft-deleted within the 30-day window + expired proposals owned by the partner) — **in-page**, NO separate `/archives` route. Each row keeps its `<StatusChip>` showing the true status (`expired`, `deleted`).
 
 ### Wizard redesign (WIZ)
 
@@ -46,7 +46,7 @@
 - [ ] **WIZ-03**: Wizard step 3 (Vérifier la proposition) ships the Figma `40:46` 2-column 1040px layout: left = CLIENT / PROJET / CALCUL review cards via existing `<RecapSection>` primitive (v1.2 Phase 13); right = `<PdfPreviewMock>` card showing `Leasétic` logo + `Proposition de financement` + `Réf. LC-XXXX-XXX • {N} jours de validité` + loyer mensuel.
 - [ ] **WIZ-04**: `proposals.validity_days` selector (15j / 30j / 60j) relocates from its current placement to wizard step 3, inside the CALCUL review card. Implies a default value at draft creation (e.g. 30) with step-3 mutation. Migration / schema impact to be confirmed during planning.
 - [ ] **WIZ-05**: Phase 13 ADMIN-09 D-12 envelope (deal-owner partner sees commission on wizard steps 2 + 3 only) + Phase 14 9-gate grep-contract suite (`tests/admin-09-grep-contracts.test.ts`) remain green throughout v1.3. No further relaxations.
-- [ ] **WIZ-06**: PDF reference (LC-XXXX-XXX format) is reserved at draft creation (step 1 finalize) and visible in the step-3 `<PdfPreviewMock>` header before the finalize button is clicked. Reference becomes the canonical identifier on the persisted PDF.
+- [x] **WIZ-06**: PDF reference (LC-XXXX-XXX format) is reserved at draft creation (step 1 finalize) and visible in the step-3 `<PdfPreviewMock>` header before the finalize button is clicked. Reference becomes the canonical identifier on the persisted PDF.
 
 ### Admin surfaces refresh (ADMIN)
 
@@ -152,14 +152,14 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | PHOME-01 | 17 | Pending |
 | PHOME-02 | 17 | Pending |
 | PHOME-03 | 17 | Pending |
-| PROPS-01 | 17 | Pending |
-| PROPS-02 | 17 | Pending |
+| PROPS-01 | 17 | Complete |
+| PROPS-02 | 17 | Complete |
 | WIZ-01 | 17 | Pending |
 | WIZ-02 | 17 | Pending |
 | WIZ-03 | 17 | Pending |
 | WIZ-04 | 17 | Pending |
 | WIZ-05 | 17 | Pending |
-| WIZ-06 | 17 | Pending |
+| WIZ-06 | 17 | Complete |
 | ADMIN-10 | 18 | Pending |
 | ADMIN-11 | 18 | Pending |
 | ADMIN-12 | 18 | Pending |

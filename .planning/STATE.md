@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
-status: ready_to_plan
-last_updated: "2026-05-21T23:26:59.279Z"
-last_activity: 2026-05-21
+status: executing
+last_updated: "2026-05-24T15:04:07.440Z"
+last_activity: 2026-05-24
 progress:
-  total_phases: 6
-  completed_phases: 1
-  total_plans: 5
-  completed_plans: 4
-  percent: 17
+  total_phases: 21
+  completed_phases: 15
+  total_plans: 96
+  completed_plans: 88
+  percent: 71
 ---
 
 # State — Matrice Commerciale
@@ -23,14 +23,20 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 16 — Shell Refresh + Contrast Gates
+**Current focus:** Phase 17 — partner-surfaces
 
 ## Current Position
 
-Phase: 17
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-21
+Phase: 17 (partner-surfaces) — EXECUTING
+Plan: 2 of 8
+Status: Ready to execute
+Last activity: 2026-05-24
+
+## Phase 17 Performance Metrics
+
+| Plan | Duration | Tasks | Files |
+|---|---|---|---|
+| 17-01 | ~13min | 2 (TDD) | 6 (1 created test + 5 modified src/test) (+ SUMMARY) |
 
 ## Phase 15 Performance Metrics
 
@@ -326,3 +332,16 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 ## Operator Next Steps
 
 - Start the next milestone with /gsd-new-milestone
+
+## Performance Metrics
+
+| Phase | Plan | Duration | Notes |
+|-------|------|----------|-------|
+| Phase 17 P01 | 13min | 2 tasks | 6 files |
+
+## Decisions
+
+- [Phase ?]: v1.3 lc_ref format = LC-2026-NNN (≥3-digit zero-pad); legacy LC-NNNNN random refs excluded from sequence via LIKE filter
+- [Phase ?]: lc_ref allocator: SELECT DESC LIMIT 1 + parse + increment + retry-on-insert-error up to 3 attempts (Phase 12 D-05 partial unique index is backstop)
+- [Phase ?]: Archivées branch = candidate-set SQL + app-side deriveDisplayStatus narrow (single source of truth for expired derivation)
+- [Phase ?]: T-17-01-01 IDOR mitigation: userId is FIRST AND predicate in every query branch; Test 4 enforces cross-user assertion
