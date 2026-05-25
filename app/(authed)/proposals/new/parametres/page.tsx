@@ -73,14 +73,17 @@ export default async function ParametresStep1Page({
 
   // D-07: session-derived partner attribution. Never visible inputs; carried
   // verbatim into draft.inputs at next updateDraft (via the RHF prefill).
+  // companyName is not a registered additionalField — fall back to
+  // displayName → name → email so partnerCo always satisfies schema min(1).
   const u = session.user as {
     email: string;
     displayName?: string | null;
     name?: string | null;
     companyName?: string | null;
   };
-  const partnerName = u.displayName ?? u.name ?? '';
-  const partnerCo = u.companyName ?? '';
+  const nameFallback = u.displayName?.trim() || u.name?.trim() || u.email;
+  const partnerName = nameFallback;
+  const partnerCo = u.companyName?.trim() || nameFallback;
 
   // D-08: validityDays resolved server-side; fallback 30 if the admin
   // hasn't seeded global_params yet.

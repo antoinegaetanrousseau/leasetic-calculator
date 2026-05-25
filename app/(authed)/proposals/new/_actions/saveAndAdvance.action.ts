@@ -52,18 +52,21 @@ export async function saveAndAdvanceAction(
   const { session } = await requireUser();
 
   // D-07: overlay session-hydrated fields before validation — these are never
-  // user-editable inputs, so we source them from the authoritative session,
-  // not from the client payload (which may have empty strings when the user's
-  // account lacks companyName/displayName).
+  // user-editable inputs, so we source them from the authoritative session.
+  // companyName is not a registered additionalField, so we fall back to
+  // displayName → name → email (email is always non-empty for auth users)
+  // so that partnerCo always satisfies min(1).
   const u = session.user as {
+    email: string;
     displayName?: string | null;
     name?: string | null;
     companyName?: string | null;
   };
+  const nameFallback = u.displayName?.trim() || u.name?.trim() || u.email;
   const enriched = {
     ...nextInputs,
-    partnerName: u.displayName ?? u.name ?? (nextInputs.partnerName as string | undefined) ?? '',
-    partnerCo: u.companyName ?? (nextInputs.partnerCo as string | undefined) ?? '',
+    partnerName: (nextInputs.partnerName as string | undefined)?.trim() || nameFallback,
+    partnerCo: u.companyName?.trim() || (nextInputs.partnerCo as string | undefined)?.trim() || nameFallback,
   };
 
   // D-13: re-validate the canonical schema server-side. Defence in depth
