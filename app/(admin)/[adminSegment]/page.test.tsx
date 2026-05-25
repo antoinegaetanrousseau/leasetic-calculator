@@ -28,7 +28,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, within } from '@testing-library/react';
-import { Sliders, Users, History } from 'lucide-react';
+import { Sliders, Users, History, Hash } from 'lucide-react';
 import type { ActivityRow } from '@/lib/db/queries/admin-activity';
 
 vi.mock('server-only', () => ({}));
@@ -299,26 +299,30 @@ describe('Admin Home page — Phase 18 rewrite (D-01..D-07, D-29)', () => {
     expect(tile.getAttribute('data-sublabel')).toBe('');
   });
 
-  it('Test 7: renders 3 AdminNavCards (coefficients / partners / history) — Historique RETAINED per UI-SPEC', async () => {
+  it('Test 7: renders 4 AdminNavCards (coefficients / partners / history / lc-references) — D-18 Phase 19 Plan 02', async () => {
     const { container } = await renderPage();
     const cards = container.querySelectorAll('[data-testid^="navcard-"]');
-    expect(cards.length).toBe(3);
+    expect(cards.length).toBe(4);
     const coef = within(container).getByTestId('navcard-coefficients');
     const partners = within(container).getByTestId('navcard-partners');
     const history = within(container).getByTestId('navcard-history');
+    const lcRefs = within(container).getByTestId('navcard-lc-references');
     expect(coef.getAttribute('data-href')).toBe(`/${SEG}/coefficients`);
     expect(partners.getAttribute('data-href')).toBe(`/${SEG}/partners`);
     expect(history.getAttribute('data-href')).toBe(`/${SEG}/history`);
-    // Variant identity preserved (Phase 14 contract carried)
+    expect(lcRefs.getAttribute('data-href')).toBe(`/${SEG}/lc-references`);
+    // Variant identity preserved
     expect(coef.getAttribute('data-variant')).toBe('coefficients');
     expect(partners.getAttribute('data-variant')).toBe('partners');
     expect(history.getAttribute('data-variant')).toBe('history');
-    // Icons preserved
+    expect(lcRefs.getAttribute('data-variant')).toBe('lc-references');
+    // Icons preserved + new Hash icon
     const calls = adminNavCardMock.mock.calls.map(([p]) => p);
     const byVariant = Object.fromEntries(calls.map((p) => [p.variant, p]));
     expect(byVariant.coefficients.icon).toBe(Sliders);
     expect(byVariant.partners.icon).toBe(Users);
     expect(byVariant.history.icon).toBe(History);
+    expect(byVariant['lc-references'].icon).toBe(Hash);
   });
 
   it('Test 8: Recent activity card renders header ACTIVITÉ RÉCENTE + Voir tout link → /<seg>/history', async () => {

@@ -362,6 +362,72 @@ describe('Gate 10: XLSX export — /commission/i absent in all cells, headers, s
   });
 });
 
+// ── Gate 11: Phase 19 Plan 02 — LcReferencesList all 4 status variants ───────
+// LcReferenceRow has no commission-bearing field (ADMIN-09 invariant).
+// This gate renders all 4 DisplayStatus variants and asserts zero commission leakage.
+
+describe('Gate 11: LcReferencesList — all 4 status variants, ZERO commission leakage', () => {
+  it('renders active + draft + expired + deleted rows with ZERO /commission_pct/ or /_pct/ tokens', async () => {
+    const { LcReferencesList } = await import('../app/(admin)/[adminSegment]/lc-references/_components/LcReferencesList');
+    const statuses = ['active', 'draft', 'expired', 'deleted'] as const;
+    for (const displayStatus of statuses) {
+      const html = renderToString(
+        createElement(LcReferencesList, {
+          rows: [
+            {
+              id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+              lcRef: 'LC-2026-001',
+              partnerName: 'Acme Corp',
+              clientName: 'Jean Dupont',
+              amountHt: 15000,
+              displayStatus,
+              createdAt: new Date('2026-04-12T10:00:00Z'),
+            },
+          ],
+          nextCursor: null,
+          lang: 'fr',
+          adminSegment: 'admin-secret',
+          currentQ: '',
+        }),
+      );
+      assertNoCommissionLeakage(html, `LcReferencesList (displayStatus=${displayStatus})`);
+    }
+  });
+});
+
+// ── Gate 12: Phase 19 Plan 02 — LcReferencesList empty states ────────────────
+// Both firstRun and search-empty states must have zero commission leakage.
+
+describe('Gate 12: LcReferencesList — empty states, ZERO commission leakage', () => {
+  it('firstRun empty state (no rows, no search) renders ZERO commission tokens', async () => {
+    const { LcReferencesList } = await import('../app/(admin)/[adminSegment]/lc-references/_components/LcReferencesList');
+    const html = renderToString(
+      createElement(LcReferencesList, {
+        rows: [],
+        nextCursor: null,
+        lang: 'fr',
+        adminSegment: 'admin-secret',
+        currentQ: '',
+      }),
+    );
+    assertNoCommissionLeakage(html, 'LcReferencesList (firstRun empty state)');
+  });
+
+  it('search-empty state (no rows, with q) renders ZERO commission tokens', async () => {
+    const { LcReferencesList } = await import('../app/(admin)/[adminSegment]/lc-references/_components/LcReferencesList');
+    const html = renderToString(
+      createElement(LcReferencesList, {
+        rows: [],
+        nextCursor: null,
+        lang: 'fr',
+        adminSegment: 'admin-secret',
+        currentQ: 'acme',
+      }),
+    );
+    assertNoCommissionLeakage(html, 'LcReferencesList (search-empty state)');
+  });
+});
+
 // ── auth/require mock for the admin home server-component test ──────────────
 // Hoist this above the imports above? vi.mock calls are hoisted automatically.
 // (Defined here for readability; the hoist makes it apply before the imports.)
