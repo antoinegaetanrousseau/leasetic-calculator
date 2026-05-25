@@ -170,7 +170,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   1. A partner can trigger an XLSX export from `/proposals`; the downloaded file contains all proposals matching the current filter (Active or Archivées) with columns: Référence, Client, Projet, Montant HT, Durée, Loyer mensuel, Coefficient, Statut, Date de création, Date d'expiration.
   2. The XLSX file contains no `Commission` column, no `commission_pct` cell, and no commission-related substring in any sheet; this is enforced by a new gate in `tests/admin-09-grep-contracts.test.ts`.
   3. An admin can navigate to `/[adminSegment]/lc-references` and see a cursor-paginated, searchable list of every issued LC reference across all partners (reference, partner name, client name, project amount, status, created_at).
-  4. The LC dashboard passes all ADMIN-09 grep-contract suite gates (now ≥10); list rows, search results, and any detail surfaces contain no commission data.**Plans:** 2/2 plans executed
+  4. The LC dashboard passes all ADMIN-09 grep-contract suite gates (now ≥10); list rows, search results, and any detail surfaces contain no commission data.**Plans:** 2/2 plans complete
 
 **Wave 1**
 
@@ -232,7 +232,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete    | 2026-05-21 |
 | 17. Partner Surfaces | v1.3 | 8/8 | Complete   | 2026-05-24 |
 | 18. Admin Surfaces + Help Center | v1.3 | 7/7 | Complete   | 2026-05-25 |
-| 19. New Capabilities | v1.3 | 1/2 | In Progress|  |
+| 19. New Capabilities | v1.3 | 2/2 | Complete    | 2026-05-25 |
 | 20. Infra Hardening | v1.3 | 0/TBD | Not started | — |
 | 21. Partner-Onboarding Gates | v1.3 | 0/TBD | Not started | — |
 

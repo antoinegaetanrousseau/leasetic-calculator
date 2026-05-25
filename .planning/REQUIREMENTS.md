@@ -62,13 +62,13 @@
 
 ### Excel export (EXPORT)
 
-- [ ] **EXPORT-01**: Partner can export their proposals as `.xlsx` from `/proposals` via an export CTA. Export includes all visible proposals (respecting the current filter — Active vs. Archivées). Columns: Référence, Client, Projet, Montant HT, Durée, Loyer mensuel, Coefficient, Statut, Date de création, Date d'expiration.
-- [ ] **EXPORT-02**: XLSX export is generated server-side (Vercel Functions) and respects ADMIN-09: no commission column, no commission cell content. Validated by extending the Phase 14 9-gate grep-contract suite with an XLSX-byte-inspection gate (no `Commission` substring, no `commission_pct` substring in any sheet).
+- [x] **EXPORT-01**: Partner can export their proposals as `.xlsx` from `/proposals` via an export CTA. Export includes all visible proposals (respecting the current filter — Active vs. Archivées). Columns: Référence, Client, Projet, Montant HT, Durée, Loyer mensuel, Coefficient, Statut, Date de création, Date d'expiration.
+- [x] **EXPORT-02**: XLSX export is generated server-side (Vercel Functions) and respects ADMIN-09: no commission column, no commission cell content. Validated by extending the Phase 14 9-gate grep-contract suite with an XLSX-byte-inspection gate (no `Commission` substring, no `commission_pct` substring in any sheet).
 
 ### Centralized LC reference dashboard (LCDASH)
 
-- [ ] **LCDASH-01**: Admin can view a centralized cross-partner LC reference dashboard at `/[adminSegment]/lc-references`. Lists every issued LC reference across all partners with: reference, partner name, client name, project amount, status, created_at. Cursor-paginated + searchable by reference or partner name.
-- [ ] **LCDASH-02**: LC dashboard extends the ADMIN-09 9-gate grep-contract suite to 10+ gates (zero commission leakage on the new admin surface). Test cases include: list view rows, detail view (if any), search results.
+- [x] **LCDASH-01**: Admin can view a centralized cross-partner LC reference dashboard at `/[adminSegment]/lc-references`. Lists every issued LC reference across all partners with: reference, partner name, client name, project amount, status, created_at. Cursor-paginated + searchable by reference or partner name.
+- [x] **LCDASH-02**: LC dashboard extends the ADMIN-09 9-gate grep-contract suite to 10+ gates (zero commission leakage on the new admin surface). Test cases include: list view rows, detail view (if any), search results.
 
 ### Infra hardening (INFRA)
 
@@ -170,10 +170,10 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | ADMIN-13 | 18 | Complete |
 | ADMIN-14 | 18 | Complete |
 | HELP-01 | 18 | Complete |
-| EXPORT-01 | 19 | Pending |
-| EXPORT-02 | 19 | Pending |
-| LCDASH-01 | 19 | Pending |
-| LCDASH-02 | 19 | Pending |
+| EXPORT-01 | 19 | Complete |
+| EXPORT-02 | 19 | Complete |
+| LCDASH-01 | 19 | Complete |
+| LCDASH-02 | 19 | Complete |
 | INFRA-01 | 20 | Pending |
 | INFRA-02 | 20 | Pending |
 | INFRA-03 | 20 | Pending |
