@@ -486,6 +486,25 @@ export const dictionaries = {
     'admin.nav.history.description': 'Historique des coefficients',
     'admin.nav.open': 'Ouvrir →',
 
+    // Phase 19 Plan 02 — LC Reference Dashboard (D-18, UI-SPEC §Surface 3 §i18n Keys Summary)
+    'admin.nav.lcReferences.title': 'Références LC',
+    'admin.nav.lcReferences.description': 'Voir toutes les références LC émises par les partenaires.',
+
+    // Phase 19 Plan 02 — LC dashboard page (D-11..D-17, UI-SPEC §Surface 2 §i18n Keys Summary)
+    'admin.lcReferences.title': 'Références LC',
+    'admin.lcReferences.subtitle': 'Toutes les références LC émises, tous partenaires confondus.',
+    'admin.lcReferences.search.placeholder': 'Rechercher par référence, partenaire ou client…',
+    'admin.lcReferences.col.reference': 'Référence',
+    'admin.lcReferences.col.partner': 'Partenaire',
+    'admin.lcReferences.col.client': 'Client',
+    'admin.lcReferences.col.amountHt': 'Montant HT',
+    'admin.lcReferences.col.status': 'Statut',
+    'admin.lcReferences.col.createdAt': 'Créée le',
+    'admin.lcReferences.empty.firstRun': 'Aucune référence LC pour le moment.',
+    'admin.lcReferences.empty.firstRun.body': "Les références apparaîtront ici dès qu'un partenaire créera une première proposition.",
+    'admin.lcReferences.empty.search': 'Aucune référence ne correspond à votre recherche.',
+    'admin.lcReferences.empty.search.clear': 'Effacer la recherche →',
+
     // Coefficients page (UI-SPEC §3.1 + §9.2; Plan 18-05 Open Q9 — value
     // shortened to "Coefficients" to match Figma 45:46 hero. Single consumer
     // is app/(admin)/[adminSegment]/coefficients/page.tsx — no other call
@@ -1310,6 +1329,25 @@ export const dictionaries = {
     'admin.nav.history.title': 'History',
     'admin.nav.history.description': 'Coefficient history',
     'admin.nav.open': 'Open \u2192',
+
+    // Phase 19 Plan 02 — LC Reference Dashboard EN keys
+    'admin.nav.lcReferences.title': 'LC References',
+    'admin.nav.lcReferences.description': 'View all LC references issued by partners.',
+
+    // Phase 19 Plan 02 — LC dashboard page EN keys
+    'admin.lcReferences.title': 'LC References',
+    'admin.lcReferences.subtitle': 'All LC references issued across all partners.',
+    'admin.lcReferences.search.placeholder': 'Search by reference, partner or client…',
+    'admin.lcReferences.col.reference': 'Reference',
+    'admin.lcReferences.col.partner': 'Partner',
+    'admin.lcReferences.col.client': 'Client',
+    'admin.lcReferences.col.amountHt': 'Amount HT',
+    'admin.lcReferences.col.status': 'Status',
+    'admin.lcReferences.col.createdAt': 'Created',
+    'admin.lcReferences.empty.firstRun': 'No LC references yet.',
+    'admin.lcReferences.empty.firstRun.body': 'References will appear here once a partner creates their first proposal.',
+    'admin.lcReferences.empty.search': 'No references match your search.',
+    'admin.lcReferences.empty.search.clear': 'Clear search \u2192',
 
     // Coefficients page (Plan 18-05 Open Q9 — value shortened to match Figma)
     'admin.coefficients.page.title': 'Coefficients',
