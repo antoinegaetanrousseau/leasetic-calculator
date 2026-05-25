@@ -52,20 +52,21 @@ export function WizardStep1Wiring({
     await saveAsDraftAction(draftId, values as Record<string, unknown>);
   };
 
-  // Validate + save + redirect to calcul. saveAndAdvanceAction redirects
-  // server-side on success; isRedirectError re-throws so Next.js handles navigation.
+  // Validate + save + redirect to calcul. Runs RHF validation first so field-
+  // level errors appear inline rather than as a generic toast. saveAndAdvanceAction
+  // redirects server-side on success; isRedirectError re-throws so Next.js handles
+  // navigation cleanly.
   const onContinue = () => {
     startContinueTransition(async () => {
+      const valid = await form.trigger();
+      if (!valid) return; // field errors already visible inline; no toast needed
+
       try {
         const values = form.getValues();
         await saveAndAdvanceAction(draftId, values as Record<string, unknown>, 1);
       } catch (e) {
         if (isRedirectError(e)) throw e;
-        if (e instanceof Error && e.message === 'ValidationFailed') {
-          toast.error(t('wizard.toast.validation.errors', lang));
-        } else {
-          toast.error(t('wizard.toast.draft.error', lang));
-        }
+        toast.error(t('wizard.toast.draft.error', lang));
       }
     });
   };
