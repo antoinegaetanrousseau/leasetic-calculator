@@ -315,6 +315,53 @@ describe('ADMIN-09 D-29 — strict commission-leakage grep contracts (Phase 14)'
   });
 });
 
+// ── Gate 10: Phase 19 Plan 01 — parser-based ExcelJS commission scan ─────────
+// This gate differs from gates 1-9: instead of grepping React-rendered HTML,
+// it calls generateProposalsXlsx directly and walks every cell in the real
+// ExcelJS workbook, asserting /commission/i matches zero cells, headers, or
+// sheet names. The XlsxExportRow type is the ADMIN-09 boundary — it has no
+// commission-bearing field, making any leakage a type error upstream.
+// (D-05 / EXPORT-02 / 19-01-PLAN.md Task 3)
+
+describe('Gate 10: XLSX export — /commission/i absent in all cells, headers, sheet names', () => {
+  it('generates a workbook with ZERO /commission/i occurrences anywhere', async () => {
+    const { generateProposalsXlsx } = await import('../src/lib/xlsx/render');
+    // XlsxExportRow type is the ADMIN-09 boundary — no commission-bearing field exists.
+    const fixtureRow = {
+      lcRef: 'LC-2026-001',
+      clientName: 'Dupont SARL',
+      projectName: 'Renouvellement postes',
+      amountHt: 12000,
+      durationMonths: 36,
+      monthlyRent: 333.33,
+      coefficient: '3.69%',
+      status: 'Actif',
+      createdAt: new Date('2026-05-01T00:00:00Z'),
+      expiresAt: new Date('2026-06-01T00:00:00Z'),
+    };
+
+    const buf = await generateProposalsXlsx({ rows: [fixtureRow], locale: 'fr' });
+    expect(buf).toBeInstanceOf(Buffer);
+
+    const ExcelJS = await import('exceljs');
+    const wb = new ExcelJS.Workbook();
+    // ExcelJS xlsx.load() expects the older unparameterized Buffer type.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await wb.xlsx.load(buf as any);
+
+    for (const sheet of wb.worksheets) {
+      expect(sheet.name, `Sheet name must not match /commission/i`).not.toMatch(/commission/i);
+
+      sheet.eachRow((row) => {
+        row.eachCell({ includeEmpty: false }, (cell) => {
+          const text = String(cell.value ?? '');
+          expect(text, `Cell value "${text}" must not match /commission/i`).not.toMatch(/commission/i);
+        });
+      });
+    }
+  });
+});
+
 // ── auth/require mock for the admin home server-component test ──────────────
 // Hoist this above the imports above? vi.mock calls are hoisted automatically.
 // (Defined here for readability; the hoist makes it apply before the imports.)

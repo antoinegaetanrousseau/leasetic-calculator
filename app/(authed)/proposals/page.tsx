@@ -9,6 +9,7 @@ import { SearchBar } from '@/components/proposals/SearchBar';
 import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
 import { PageHero } from '@/components/ui/PageHero';
 import { FilterPillRow } from './_components/FilterPillRow';
+import { ExportButton } from './_components/ExportButton';
 
 // PITFALLS §1.6: cookie-reading route opts out of static rendering.
 export const dynamic = 'force-dynamic';
@@ -109,20 +110,28 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
         title={t('proposals.title', lang)}
         subtitle={t('proposals.subtitle', lang)}
         actions={
-          <Link
-            href="/proposals/new/parametres"
-            className="btn-green"
-            aria-label={t('dashboard.cta.new', lang)}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              textDecoration: 'none',
-            }}
-          >
-            <Plus size={17} strokeWidth={1.6} aria-hidden="true" />
-            <span>{t('dashboard.cta.new', lang)}</span>
-          </Link>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <ExportButton
+              lang={lang}
+              resultCount={initial.rows.length}
+              q={q || undefined}
+              archived={archived || undefined}
+            />
+            <Link
+              href="/proposals/new/parametres"
+              className="btn-green"
+              aria-label={t('dashboard.cta.new', lang)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                textDecoration: 'none',
+              }}
+            >
+              <Plus size={17} strokeWidth={1.6} aria-hidden="true" />
+              <span>{t('dashboard.cta.new', lang)}</span>
+            </Link>
+          </div>
         }
       />
 
