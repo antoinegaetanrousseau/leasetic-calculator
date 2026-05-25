@@ -86,10 +86,13 @@ export default async function ParametresStep1Page({
   const partnerCo = u.companyName?.trim() || nameFallback;
 
   // D-08: validityDays resolved server-side; fallback 30 if the admin
-  // hasn't seeded global_params yet.
+  // hasn't seeded global_params yet or has set a value outside the whitelist.
   const params = await getLatestGlobalParams();
-  const defaultValidityDays =
-    (params?.validityDays as 15 | 30 | 60 | undefined) ?? 30;
+  const rawValidity = params?.validityDays;
+  const defaultValidityDays: 15 | 30 | 60 =
+    rawValidity === 15 || rawValidity === 30 || rawValidity === 60
+      ? rawValidity
+      : 30;
 
   // ──────────────────────────────────────────────────────────────────────
   // D-26 win-rule: when no ?draft_id= is present we mint a draft. If a

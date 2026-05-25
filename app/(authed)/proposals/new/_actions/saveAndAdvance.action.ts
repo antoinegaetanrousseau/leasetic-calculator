@@ -63,28 +63,22 @@ export async function saveAndAdvanceAction(
     companyName?: string | null;
   };
   const nameFallback = u.displayName?.trim() || u.name?.trim() || u.email;
+  // Also clamp validityDays to the schema whitelist (15 | 30 | 60) — the admin
+  // may have stored an out-of-whitelist value (e.g. 90) in global_params.
+  const rawValidity = nextInputs.validityDays;
+  const safeValidityDays: 15 | 30 | 60 =
+    rawValidity === 15 || rawValidity === 30 || rawValidity === 60 ? rawValidity : 30;
   const enriched = {
     ...nextInputs,
     partnerName: (nextInputs.partnerName as string | undefined)?.trim() || nameFallback,
     partnerCo: u.companyName?.trim() || (nextInputs.partnerCo as string | undefined)?.trim() || nameFallback,
+    validityDays: safeValidityDays,
   };
 
   // D-13: re-validate the canonical schema server-side. Defence in depth
   // against client-bypass tampering; the client's RHF resolver already gates.
-  console.log('[saveAndAdvance] enriched:', JSON.stringify({
-    partnerName: enriched.partnerName,
-    partnerCo: enriched.partnerCo,
-    clientCo: nextInputs.clientCo,
-    amountHT: nextInputs.amountHT,
-    durationMonths: nextInputs.durationMonths,
-    validityDays: nextInputs.validityDays,
-    session_displayName: u.displayName,
-    session_name: u.name,
-    session_email: u.email,
-  }));
   const parsed = proposalInputSchema.safeParse(enriched);
   if (!parsed.success) {
-    console.error('[saveAndAdvance] validation failed:', JSON.stringify(parsed.error.flatten(), null, 2));
     throw new Error('ValidationFailed');
   }
 
