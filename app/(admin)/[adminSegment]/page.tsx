@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Sliders, Users, History, Plus } from 'lucide-react';
+import { Sliders, Users, History, Hash, Plus } from 'lucide-react';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
 import { AdminNavCard } from '@/components/ui/AdminNavCard';
@@ -157,14 +157,11 @@ export default async function AdminHomePage({ params }: PageProps) {
         />
       </div>
 
-      {/* ── 3. AdminNavCard 3-up grid (Coefficients / Partenaires / Historique) ── */}
+      {/* ── 3. AdminNavCard 4-up grid (Coefficients / Partenaires / Historique / Références LC) ── */}
+      {/* D-18 Phase 19 Plan 02: grid extended from 3→4 to add LC reference dashboard card. */}
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 24,
-          marginBottom: 32,
-        }}
+        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
+        style={{ gap: 24, marginBottom: 32 }}
       >
         <AdminNavCard
           variant="coefficients"
@@ -188,6 +185,14 @@ export default async function AdminHomePage({ params }: PageProps) {
           description={t('admin.nav.history.description', lang)}
           href={`/${adminSegment}/history`}
           icon={History}
+          openLabel={t('admin.nav.open', lang)}
+        />
+        <AdminNavCard
+          variant="lc-references"
+          title={t('admin.nav.lcReferences.title', lang)}
+          description={t('admin.nav.lcReferences.description', lang)}
+          href={`/${adminSegment}/lc-references`}
+          icon={Hash}
           openLabel={t('admin.nav.open', lang)}
         />
       </div>
