@@ -745,6 +745,28 @@ export async function listDraftsByUser(userId: string): Promise<ProposalRow[]> {
 }
 
 /**
+ * Hard-deletes draft rows for `userId` where `inputs` is still the empty
+ * object `{}` — i.e., rows minted by the wizard page-load but abandoned
+ * before the user typed anything. Called before minting a new draft so
+ * phantom empty rows don't inflate the BROUILLONS metric.
+ *
+ * Hard-delete is safe: an empty draft has no meaningful content and has
+ * never been seen by the user (they were immediately redirected to the
+ * wizard URL with the draft_id; the redirect target is what they see).
+ */
+export async function deleteEmptyDraftsByUser(userId: string): Promise<void> {
+  const dbi = db();
+  await dbi.delete(schema.proposals).where(
+    and(
+      eq(schema.proposals.userId, userId),
+      eq(schema.proposals.status, 'draft'),
+      isNull(schema.proposals.deletedAt),
+      sql`${schema.proposals.inputs} = '{}'::jsonb`,
+    ),
+  );
+}
+
+/**
  * DB-01 — fetch a single draft by id, scoped to the owning userId. Returns
  * null for cross-user access attempts OR if the row is not a draft. Used by
  * Phase 13 wizard route handlers to resume a draft via `?draft_id=`.

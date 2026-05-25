@@ -40,6 +40,7 @@ import { ProposalFormProvider } from '@/components/proposal/ProposalForm';
 import { DuplicatePrefillToast } from '@/components/proposals/DuplicatePrefillToast';
 import {
   createDraft,
+  deleteEmptyDraftsByUser,
   getDraftById,
   updateDraft,
   getProposalById,
@@ -94,6 +95,10 @@ export default async function ParametresStep1Page({
   // present, ?duplicate= is silently ignored regardless of validity.
   // ──────────────────────────────────────────────────────────────────────
   if (!sp.draft_id) {
+    // Remove phantom drafts (inputs={}) before minting so they don't
+    // inflate the BROUILLONS metric on the partner home page.
+    await deleteEmptyDraftsByUser(session.user.id);
+
     // D-02: mint a fresh draft.
     const newDraft = await createDraft({
       userId: session.user.id,
