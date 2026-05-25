@@ -6,9 +6,12 @@
  *   Test 2: resultCount > 0 → button enabled, idle label = proposals.export.cta key.
  *   Test 3: click → loading state: label swaps to proposals.export.loading, button disabled.
  *   Test 4: successful export → success toast fired + button returns to idle.
- *   Test 5: failed export (action throws) → error toast fired + button returns to idle.
- *   Test 6: q and archived props are forwarded to exportProposalsAction.
+ *   Test 5: failed export (network/non-200) → error toast fired + button returns to idle.
+ *   Test 6: q and archived props are POSTed to /api/proposals/export.
  *   Test 7: loading state renders Loader2 spinner (aria-busy="true").
+ *
+ * Post-hotfix: the client uses global fetch() to POST /api/proposals/export
+ * (was: Server Action). Tests mock global.fetch accordingly.
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -19,10 +22,8 @@ import { ExportButton } from './ExportButton';
 
 vi.mock('server-only', () => ({}));
 
-const exportProposalsActionMock = vi.fn();
-vi.mock('../_actions/exportProposals.action', () => ({
-  exportProposalsAction: (...args: unknown[]) => exportProposalsActionMock(...args),
-}));
+const fetchMock = vi.fn();
+globalThis.fetch = fetchMock as unknown as typeof fetch;
 
 const toastSuccessMock = vi.fn();
 const toastErrorMock = vi.fn();
@@ -80,7 +81,7 @@ describe('ExportButton (Phase 19 Plan 01)', () => {
 
   it('Test 3: click → loading state: aria-busy true, label = proposals.export.loading, button disabled', async () => {
     // Never resolve so we can inspect loading state mid-flight.
-    exportProposalsActionMock.mockReturnValue(new Promise(() => {}));
+    fetchMock.mockReturnValue(new Promise(() => {}));
 
     render(<ExportButton lang="fr" resultCount={3} />);
     const btn = screen.getByRole('button');
@@ -97,7 +98,7 @@ describe('ExportButton (Phase 19 Plan 01)', () => {
   });
 
   it('Test 4: successful export → success toast fired and button returns to idle', async () => {
-    exportProposalsActionMock.mockResolvedValue(makeOkResponse());
+    fetchMock.mockResolvedValue(makeOkResponse());
 
     render(<ExportButton lang="fr" resultCount={2} />);
     const btn = screen.getByRole('button');
@@ -111,8 +112,8 @@ describe('ExportButton (Phase 19 Plan 01)', () => {
     });
   });
 
-  it('Test 5: failed export (action throws) → error toast fired and button returns to idle', async () => {
-    exportProposalsActionMock.mockRejectedValue(new Error('network error'));
+  it('Test 5: failed export (fetch rejects) → error toast fired and button returns to idle', async () => {
+    fetchMock.mockRejectedValue(new Error('network error'));
 
     render(<ExportButton lang="fr" resultCount={2} />);
     const btn = screen.getByRole('button');
@@ -125,8 +126,8 @@ describe('ExportButton (Phase 19 Plan 01)', () => {
     });
   });
 
-  it('Test 6: q and archived props are forwarded to exportProposalsAction', async () => {
-    exportProposalsActionMock.mockResolvedValue(makeOkResponse());
+  it('Test 6: q and archived props are POSTed to /api/proposals/export as JSON body', async () => {
+    fetchMock.mockResolvedValue(makeOkResponse());
 
     render(<ExportButton lang="fr" resultCount={10} q="acme" archived={true} />);
     const btn = screen.getByRole('button');
@@ -134,15 +135,20 @@ describe('ExportButton (Phase 19 Plan 01)', () => {
     await act(async () => { btn.click(); });
 
     await waitFor(() => {
-      expect(exportProposalsActionMock).toHaveBeenCalledWith(
-        expect.objectContaining({ q: 'acme', archived: true }),
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/proposals/export',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ q: 'acme', archived: true }),
+        }),
       );
     });
   });
 
   it('Test 7: loading state renders aria-busy="true" on the button', async () => {
     // Hold the promise so the component stays in loading state.
-    exportProposalsActionMock.mockReturnValue(new Promise(() => {}));
+    fetchMock.mockReturnValue(new Promise(() => {}));
 
     render(<ExportButton lang="fr" resultCount={1} />);
     const btn = screen.getByRole('button');

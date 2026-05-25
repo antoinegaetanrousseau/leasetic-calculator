@@ -12,15 +12,17 @@
  *   - D-10: disabled when resultCount === 0 (empty-state); tooltip via aria-label.
  *   - CSS: .btn-out (secondary outline variant) — NOT .btn-green (primary).
  *   - sonner toast: success 'Export prêt' / failure 'Échec de l'export, réessayez'.
- *   - Browser download: client calls the action, reads the Response as a Blob,
- *     creates an <a download> and clicks it — standard no-new-tab download pattern.
+ *   - Browser download: client POSTs to /api/proposals/export, reads the Response
+ *     as a Blob, creates an <a download> and clicks it — standard no-new-tab
+ *     download pattern. Endpoint is a Route Handler (not a Server Action) because
+ *     Server Actions cannot return binary Response bodies — see
+ *     app/api/proposals/export/route.ts header for the rationale.
  *   - q + archived: passed as props from the server page (SSR-derived URL state).
  */
 
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { exportProposalsAction } from '../_actions/exportProposals.action';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
 export interface ExportButtonProps {
@@ -45,7 +47,11 @@ export function ExportButton({ lang, resultCount, q, archived }: ExportButtonPro
     setState('loading');
 
     try {
-      const res = await exportProposalsAction({ q, archived });
+      const res = await fetch('/api/proposals/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q, archived }),
+      });
 
       if (!res.ok) {
         throw new Error(`Export failed: ${res.status}`);
