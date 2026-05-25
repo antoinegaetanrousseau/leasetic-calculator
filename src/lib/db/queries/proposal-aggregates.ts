@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, count, eq, gte, inArray, isNull } from 'drizzle-orm';
+import { and, count, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 
 /**
@@ -164,7 +164,9 @@ export async function countTotal(userId: string): Promise<number> {
 }
 
 /**
- * D-05 — count of partner's drafts (status='draft'), excluding soft-deleted.
+ * D-05 — count of partner's drafts (status='draft'), excluding soft-deleted
+ * and excluding empty phantom rows (inputs='{}') minted on wizard page-load
+ * but never touched by the user.
  */
 export async function countDrafts(userId: string): Promise<number> {
   const dbi = db();
@@ -172,6 +174,7 @@ export async function countDrafts(userId: string): Promise<number> {
     eq(schema.proposals.userId, userId),
     eq(schema.proposals.status, 'draft'),
     isNull(schema.proposals.deletedAt),
+    sql`${schema.proposals.inputs} != '{}'::jsonb`,
   );
   const rows = await dbi
     .select({ count: count() })
