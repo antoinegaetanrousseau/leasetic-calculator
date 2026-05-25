@@ -8,6 +8,7 @@ import type { ListResponse, ProposalRowDto } from '@/lib/api/proposals/list';
 import { ProposalRow } from './ProposalRow';
 import { LoadMoreButton } from './LoadMoreButton';
 import { RestoreButtonClient } from './RestoreButtonClient';
+import { DraftActionsClient } from './DraftActionsClient';
 
 export interface ProposalsListProps {
   lang: Lang;
@@ -95,6 +96,9 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
           draftMode={draftMode}
           restoreSlot={
             deleted ? <RestoreButtonClient proposalId={row.id} lang={lang} /> : null
+          }
+          draftActionsSlot={
+            draftMode ? <DraftActionsClient proposalId={row.id} lang={lang} /> : null
           }
         />
       ))}

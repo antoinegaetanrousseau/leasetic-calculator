@@ -817,6 +817,34 @@ export async function deleteEmptyDraftsByUser(userId: string): Promise<void> {
   );
 }
 
+/** Soft-delete a draft (set deletedAt). Returns true if a row was updated. */
+export async function softDeleteDraft(id: string, userId: string): Promise<boolean> {
+  const dbi = db();
+  const rows = await dbi.update(schema.proposals)
+    .set({ deletedAt: new Date() })
+    .where(and(
+      eq(schema.proposals.id, id),
+      eq(schema.proposals.userId, userId),
+      eq(schema.proposals.status, 'draft'),
+      isNull(schema.proposals.deletedAt),
+    ))
+    .returning();
+  return rows.length > 0;
+}
+
+/** Hard-delete a draft row permanently. Returns true if a row was deleted. */
+export async function hardDeleteDraft(id: string, userId: string): Promise<boolean> {
+  const dbi = db();
+  const rows = await dbi.delete(schema.proposals)
+    .where(and(
+      eq(schema.proposals.id, id),
+      eq(schema.proposals.userId, userId),
+      eq(schema.proposals.status, 'draft'),
+    ))
+    .returning();
+  return rows.length > 0;
+}
+
 /**
  * DB-01 — fetch a single draft by id, scoped to the owning userId. Returns
  * null for cross-user access attempts OR if the row is not a draft. Used by

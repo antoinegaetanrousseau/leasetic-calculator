@@ -10,9 +10,11 @@
  * during buildListResponse. This test exercises the projected DTO directly to
  * avoid bringing the DB layer into a client-component unit test.
  */
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import type { ProposalRowDto } from '@/lib/api/proposals/list';
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 import { ProposalRow } from './ProposalRow';
 

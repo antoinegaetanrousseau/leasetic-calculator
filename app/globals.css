@@ -429,6 +429,7 @@ input[aria-invalid="true"] {
 .list-row:hover { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); }
 .list-row:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--teal); }
 .list-row.is-deleted { opacity: 0.7; grid-template-columns: 1fr 100px 130px 100px auto auto; }
+.list-row.is-draft  { grid-template-columns: 1fr 100px 130px 100px 92px auto; }
 
 .search-bar {
   display: flex;

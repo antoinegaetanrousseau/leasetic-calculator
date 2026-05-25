@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate } from '@/lib/i18n/format';
 import { StatusChip } from '@/components/ui/StatusChip';
@@ -18,8 +21,10 @@ export interface ProposalRowProps {
   deleted?: boolean;
   /** Optional Restore button slot — Plan 08-12 fills this in for the deleted view. */
   restoreSlot?: React.ReactNode;
-  /** When true, link to the wizard resume URL instead of the proposal detail page. */
+  /** When true, render a clickable div (not a Link) with draftActionsSlot on the right. */
   draftMode?: boolean;
+  /** Icon action buttons rendered in the rightmost column for draft rows. */
+  draftActionsSlot?: React.ReactNode;
 }
 
 /**
@@ -44,18 +49,17 @@ export function ProposalRow({
   deleted = false,
   restoreSlot = null,
   draftMode = false,
+  draftActionsSlot = null,
 }: ProposalRowProps) {
-  const className = deleted ? 'list-row is-deleted' : 'list-row';
+  const router = useRouter();
+  const className = deleted ? 'list-row is-deleted' : draftMode ? 'list-row is-draft' : 'list-row';
   const ariaLabel = row.clientCo
     ? `${row.clientCo}${row.lcRef ? ` ${row.lcRef}` : ''}`
     : t('proposal.detail.title', lang).replace('{0}', row.lcRef);
   const chipLabelKey = `chip.${row.displayStatus}` as DictKey;
-  const href = draftMode
-    ? `/proposals/new/parametres?draft_id=${row.id}`
-    : `/proposals/${row.id}`;
 
-  return (
-    <Link href={href} className={className} aria-label={ariaLabel}>
+  const columns = (
+    <>
       <span
         style={{
           fontSize: '14.5px',
@@ -93,6 +97,30 @@ export function ProposalRow({
         {formatDate(new Date(row.createdAt), lang)}
       </span>
       <StatusChip variant={row.displayStatus} label={t(chipLabelKey, lang)} />
+    </>
+  );
+
+  if (draftMode) {
+    return (
+      <div
+        className={className}
+        role="button"
+        tabIndex={0}
+        aria-label={ariaLabel}
+        onClick={() => router.push(`/proposals/new/parametres?draft_id=${row.id}`)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') router.push(`/proposals/new/parametres?draft_id=${row.id}`);
+        }}
+      >
+        {columns}
+        {draftActionsSlot}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={`/proposals/${row.id}`} className={className} aria-label={ariaLabel}>
+      {columns}
       {deleted && restoreSlot}
     </Link>
   );
