@@ -51,6 +51,7 @@ html[data-theme="dark"] {
   --shadow-card: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.25);
   --hover-overlay: rgba(255,255,255,0.05);
   --active-pill:   rgba(18,150,87,0.22);
+  --navy:      #4a8fa8;  /* Navy lightened for dark-mode legibility on --surface dark */
   --gd-text:   #129657;  /* Same as --gd — dark-mode contrast already AA-pass against --paper dark */
   --gold-text: #e08530;  /* Same as --gold — dark-mode contrast already AA-pass against chip bg dark */
   color-scheme: dark;
