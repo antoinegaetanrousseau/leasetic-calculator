@@ -18,6 +18,7 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
   const searchParams = useSearchParams();
   const q = searchParams.get('q') ?? '';
   const deleted = searchParams.get('deleted') === '1';
+  const draftMode = searchParams.get('drafts') === '1';
 
   // React re-mounts this component (via key={remountKey} in page.tsx) whenever
   // q or deleted changes — so useState initial values are fresh on each navigation.
@@ -91,6 +92,7 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
           row={row}
           lang={lang}
           deleted={deleted}
+          draftMode={draftMode}
           restoreSlot={
             deleted ? <RestoreButtonClient proposalId={row.id} lang={lang} /> : null
           }
@@ -101,6 +103,7 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
           lang={lang}
           q={q}
           deleted={deleted}
+          drafts={draftMode}
           cursor={cursor}
           onAppend={onAppend}
         />

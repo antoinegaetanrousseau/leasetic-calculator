@@ -77,6 +77,8 @@ export interface BuildListParams {
    * layer — NEVER from request params. See D-11 + T-18-01-01.
    */
   _callerRole?: 'admin' | 'partner';
+  /** Brouillons filter — show non-phantom drafts instead of active proposals. */
+  drafts?: boolean;
 }
 
 /**
@@ -94,6 +96,7 @@ export async function buildListResponse(args: BuildListParams): Promise<ListResp
   const q = args.q?.trim() ?? '';
   // Phase 17 D-13: thread the archived flag (default false → Actives).
   const archived = args.archived ?? false;
+  const drafts = args.drafts ?? false;
 
   // Phase 18 D-11 — admin can scope /proposals to another partner via
   // ?user_id=; gate is admin role enforced at SSR layer. _callerRole MUST
@@ -111,6 +114,7 @@ export async function buildListResponse(args: BuildListParams): Promise<ListResp
         cursor: cursor ?? undefined,
         deleted: args.deleted ?? false,
         archived,
+        drafts,
         limit: args.limit ?? 20,
       })
     : await listProposalsByUser({
@@ -118,15 +122,15 @@ export async function buildListResponse(args: BuildListParams): Promise<ListResp
         cursor: cursor ?? undefined,
         deleted: args.deleted ?? false,
         archived,
+        drafts,
         limit: args.limit ?? 20,
       });
 
   return {
     rows: result.rows.map((row) => ({
       id: row.id,
-      // Active rows (filtered by status='active' in the helper) always have lcRef
-      // set per proposals_finalized_completeness_check (Phase 12 D-04).
-      lcRef: row.lcRef!,
+      // Draft rows have lcRef=null; active rows always have it set.
+      lcRef: row.lcRef ?? '',
       clientCo: typeof (row.inputs as { clientCo?: unknown })?.clientCo === 'string'
         ? (row.inputs as { clientCo: string }).clientCo
         : '',

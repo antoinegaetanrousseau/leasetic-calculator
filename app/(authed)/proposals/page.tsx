@@ -21,6 +21,7 @@ interface PageParams {
   searchParams: Promise<{
     q?: string;
     archived?: string;
+    drafts?: string;
     cursor?: string;
     /**
      * Phase 18 D-11 — admin scoping parameter. When the caller is admin AND
@@ -72,6 +73,7 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
   const sp = await searchParams;
   const q = sp.q ?? '';
   const archived = sp.archived === '1';
+  const drafts = sp.drafts === '1';
   const cursor = sp.cursor ?? null;
   // Phase 18 D-11 — honor `?user_id=` only when the caller is admin.
   // For partner callers, the param is silently ignored by buildListResponse
@@ -87,12 +89,13 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
     q,
     cursorEncoded: cursor,
     archived,
+    drafts,
     limit: 20,
     adminUserIdOverride,
     _callerRole: role,
   });
 
-  const remountKey = `${q}|${archived ? '1' : '0'}|${cursor ?? ''}`;
+  const remountKey = `${q}|${archived ? '1' : '0'}|${drafts ? '1' : '0'}|${cursor ?? ''}`;
 
   return (
     <div>
@@ -133,7 +136,7 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
           gap: 16,
         }}
       >
-        <FilterPillRow archived={archived} lang={lang} />
+        <FilterPillRow archived={archived} drafts={drafts} lang={lang} />
         <SearchBar lang={lang} />
       </div>
 
@@ -150,7 +153,7 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
             }}
           >
             {t(
-              archived ? 'proposals.empty.archived' : 'proposals.empty.actives',
+              drafts ? 'proposals.empty.drafts' : archived ? 'proposals.empty.archived' : 'proposals.empty.actives',
               lang,
             )}
           </p>

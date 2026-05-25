@@ -315,9 +315,11 @@ export const dictionaries = {
     'proposals.title': 'Mes propositions',
     'proposals.subtitle': 'Consultez et gérez vos propositions',
     'proposals.filter.actives': 'Actives',
+    'proposals.filter.drafts': 'Brouillons',
     'proposals.filter.archived': 'Archivées',
     'proposals.empty.actives':
       'Aucune proposition pour le moment. Créez votre première proposition.',
+    'proposals.empty.drafts': 'Aucun brouillon en cours.',
     'proposals.empty.archived': 'Aucune proposition archivée pour le moment.',
     // Live preview (07-05)
     'proposal.section.preview': 'Aperçu',
@@ -1121,9 +1123,11 @@ export const dictionaries = {
     'proposals.title': 'My proposals',
     'proposals.subtitle': 'View and manage your proposals',
     'proposals.filter.actives': 'Active',
+    'proposals.filter.drafts': 'Drafts',
     'proposals.filter.archived': 'Archived',
     'proposals.empty.actives':
       'No proposals yet. Create your first proposal.',
+    'proposals.empty.drafts': 'No drafts in progress.',
     'proposals.empty.archived': 'No archived proposals yet.',
     // Live preview (07-05)
     'proposal.section.preview': 'Preview',

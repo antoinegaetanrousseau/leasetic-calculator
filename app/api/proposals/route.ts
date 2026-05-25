@@ -80,11 +80,12 @@ export async function GET(req: NextRequest) {
   const q = url.searchParams.get('q') ?? undefined;
   const cursor = url.searchParams.get('cursor');
   const deleted = url.searchParams.get('deleted') === '1';
+  const drafts = url.searchParams.get('drafts') === '1';
   const limitParam = url.searchParams.get('limit');
   const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 20, 1), 50) : 20;
 
   const response = await buildListResponse({
-    userId, q, cursorEncoded: cursor, deleted, limit,
+    userId, q, cursorEncoded: cursor, deleted, drafts, limit,
   });
 
   return NextResponse.json(response, {

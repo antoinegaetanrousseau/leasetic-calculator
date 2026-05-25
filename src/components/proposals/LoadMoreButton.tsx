@@ -10,6 +10,7 @@ export interface LoadMoreButtonProps {
   lang: Lang;
   q: string;
   deleted: boolean;
+  drafts: boolean;
   cursor: string | null;
   onAppend: (response: ListResponse) => void;
 }
@@ -18,6 +19,7 @@ export function LoadMoreButton({
   lang,
   q,
   deleted,
+  drafts,
   cursor,
   onAppend,
 }: LoadMoreButtonProps) {
@@ -31,6 +33,7 @@ export function LoadMoreButton({
       params.set('cursor', cursor);
       if (q) params.set('q', q);
       if (deleted) params.set('deleted', '1');
+      if (drafts) params.set('drafts', '1');
       const res = await fetch(`/api/proposals?${params.toString()}`);
       if (res.ok) {
         const json = (await res.json()) as ListResponse;

@@ -40,6 +40,12 @@ export interface ListProposalsArgs {
    * Defaults to false. Orthogonal to `deleted` (D-13 retires the v1.1 toggle).
    */
   archived?: boolean;
+  /**
+   * Brouillons filter. When true, returns rows where status='draft' AND
+   * inputs != '{}' (non-phantom) AND deletedAt IS NULL. Mutually exclusive
+   * with `archived` — callers should set at most one of the two to true.
+   */
+  drafts?: boolean;
 }
 
 export interface SearchProposalsArgs extends ListProposalsArgs {
@@ -168,6 +174,28 @@ export async function listProposalsByUser(args: ListProposalsArgs): Promise<List
     ? sql`(${schema.proposals.createdAt}, ${schema.proposals.id}) < (${args.cursor.createdAt}::timestamptz, ${args.cursor.id}::uuid)`
     : undefined;
 
+  // Brouillons branch — non-phantom drafts only (inputs != '{}').
+  if (args.drafts) {
+    const where = and(
+      eq(schema.proposals.userId, args.userId),
+      eq(schema.proposals.status, 'draft'),
+      isNull(schema.proposals.deletedAt),
+      sql`${schema.proposals.inputs} != '{}'::jsonb`,
+      cursorPredicate,
+    );
+    const rows = await dbi.select().from(schema.proposals)
+      .where(where)
+      .orderBy(desc(schema.proposals.createdAt), desc(schema.proposals.id))
+      .limit(fetchCount);
+    const hasMore = rows.length > limit;
+    const sliced = hasMore ? rows.slice(0, limit) : rows;
+    const last = sliced[sliced.length - 1];
+    const nextCursor = hasMore && last
+      ? { createdAt: last.createdAt.toISOString(), id: last.id }
+      : null;
+    return { rows: sliced, hasMore, nextCursor };
+  }
+
   // Phase 17 D-13 — Archivées branch. Candidate set = (active rows that may be
   // expired) UNION (soft-deleted within 30-day window). Then deriveDisplayStatus
   // narrows to only expired-or-deleted rows app-side (D-12 single source of
@@ -287,6 +315,29 @@ export async function searchProposals(args: SearchProposalsArgs): Promise<ListRe
     sql`(${schema.proposals.inputs} ->> 'clientCo') ILIKE ${pattern}`,
     ilike(schema.proposals.lcRef, pattern),
   );
+
+  // Brouillons + q branch.
+  if (args.drafts) {
+    const where = and(
+      eq(schema.proposals.userId, args.userId),
+      eq(schema.proposals.status, 'draft'),
+      isNull(schema.proposals.deletedAt),
+      sql`${schema.proposals.inputs} != '{}'::jsonb`,
+      searchPredicate,
+      cursorPredicate,
+    );
+    const rows = await dbi.select().from(schema.proposals)
+      .where(where)
+      .orderBy(desc(schema.proposals.createdAt), desc(schema.proposals.id))
+      .limit(fetchCount);
+    const hasMore = rows.length > limit;
+    const sliced = hasMore ? rows.slice(0, limit) : rows;
+    const last = sliced[sliced.length - 1];
+    const nextCursor = hasMore && last
+      ? { createdAt: last.createdAt.toISOString(), id: last.id }
+      : null;
+    return { rows: sliced, hasMore, nextCursor };
+  }
 
   // Phase 17 D-13 — Archivées + q orthogonal branch. Same candidate-set +
   // app-side deriveDisplayStatus narrow as listProposalsByUser.archived.

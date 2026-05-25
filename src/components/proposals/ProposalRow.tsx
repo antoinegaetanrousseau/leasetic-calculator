@@ -18,6 +18,8 @@ export interface ProposalRowProps {
   deleted?: boolean;
   /** Optional Restore button slot — Plan 08-12 fills this in for the deleted view. */
   restoreSlot?: React.ReactNode;
+  /** When true, link to the wizard resume URL instead of the proposal detail page. */
+  draftMode?: boolean;
 }
 
 /**
@@ -41,13 +43,19 @@ export function ProposalRow({
   lang,
   deleted = false,
   restoreSlot = null,
+  draftMode = false,
 }: ProposalRowProps) {
   const className = deleted ? 'list-row is-deleted' : 'list-row';
-  const ariaLabel = `${t('proposal.detail.title', lang).replace('{0}', row.lcRef)} ${row.clientCo}`;
+  const ariaLabel = row.clientCo
+    ? `${row.clientCo}${row.lcRef ? ` ${row.lcRef}` : ''}`
+    : t('proposal.detail.title', lang).replace('{0}', row.lcRef);
   const chipLabelKey = `chip.${row.displayStatus}` as DictKey;
+  const href = draftMode
+    ? `/proposals/new/parametres?draft_id=${row.id}`
+    : `/proposals/${row.id}`;
 
   return (
-    <Link href={`/proposals/${row.id}`} className={className} aria-label={ariaLabel}>
+    <Link href={href} className={className} aria-label={ariaLabel}>
       <span
         style={{
           fontSize: '14.5px',

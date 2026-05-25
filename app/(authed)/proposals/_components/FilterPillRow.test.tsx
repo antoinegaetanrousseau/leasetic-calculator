@@ -26,7 +26,7 @@ describe('FilterPillRow (Phase 17 PROPS-02, D-11)', () => {
   // AC-FPR-01 — archived=false → Actives active styling, Archivées inactive
   // ──────────────────────────────────────────────────────────────────────────
   it('AC-FPR-01: archived=false → Actives pill has active styling, Archivées inactive', () => {
-    render(<FilterPillRow archived={false} lang="fr" />);
+    render(<FilterPillRow archived={false} drafts={false} lang="fr" />);
 
     const activesPill = screen.getByTestId('filter-pill-actives');
     const archivedPill = screen.getByTestId('filter-pill-archived');
@@ -49,7 +49,7 @@ describe('FilterPillRow (Phase 17 PROPS-02, D-11)', () => {
   // AC-FPR-02 — archived=true → Archivées active styling, Actives inactive
   // ──────────────────────────────────────────────────────────────────────────
   it('AC-FPR-02: archived=true → Archivées pill has active styling, Actives inactive', () => {
-    render(<FilterPillRow archived={true} lang="fr" />);
+    render(<FilterPillRow archived={true} drafts={false} lang="fr" />);
 
     const activesPill = screen.getByTestId('filter-pill-actives');
     const archivedPill = screen.getByTestId('filter-pill-archived');
@@ -72,7 +72,7 @@ describe('FilterPillRow (Phase 17 PROPS-02, D-11)', () => {
   // AC-FPR-03 — Actives pill href = /proposals
   // ──────────────────────────────────────────────────────────────────────────
   it('AC-FPR-03: Actives pill href = "/proposals" (no query params)', () => {
-    render(<FilterPillRow archived={false} lang="fr" />);
+    render(<FilterPillRow archived={false} drafts={false} lang="fr" />);
 
     const activesPill = screen.getByTestId('filter-pill-actives');
     expect(activesPill.tagName).toBe('A');
@@ -83,7 +83,7 @@ describe('FilterPillRow (Phase 17 PROPS-02, D-11)', () => {
   // AC-FPR-04 — Archivées pill href = /proposals?archived=1
   // ──────────────────────────────────────────────────────────────────────────
   it('AC-FPR-04: Archivées pill href = "/proposals?archived=1"', () => {
-    render(<FilterPillRow archived={false} lang="fr" />);
+    render(<FilterPillRow archived={false} drafts={false} lang="fr" />);
 
     const archivedPill = screen.getByTestId('filter-pill-archived');
     expect(archivedPill.tagName).toBe('A');
@@ -94,7 +94,7 @@ describe('FilterPillRow (Phase 17 PROPS-02, D-11)', () => {
   // AC-FPR-05 — both pills carry data-testid attributes
   // ──────────────────────────────────────────────────────────────────────────
   it('AC-FPR-05: both pills carry data-testid attributes filter-pill-actives + filter-pill-archived', () => {
-    const { container } = render(<FilterPillRow archived={false} lang="fr" />);
+    const { container } = render(<FilterPillRow archived={false} drafts={false} lang="fr" />);
 
     const actives = container.querySelector('[data-testid="filter-pill-actives"]');
     const archived = container.querySelector('[data-testid="filter-pill-archived"]');
@@ -109,7 +109,7 @@ describe('FilterPillRow (Phase 17 PROPS-02, D-11)', () => {
   it('AC-FPR-06: pills render copy from i18n keys proposals.filter.actives / .archived (FR + EN)', () => {
     // FR — Actives / Archivées
     const { container: frContainer } = render(
-      <FilterPillRow archived={false} lang="fr" />,
+      <FilterPillRow archived={false} drafts={false} lang="fr" />,
     );
     expect(
       frContainer.querySelector('[data-testid="filter-pill-actives"]')!.textContent,
@@ -122,7 +122,7 @@ describe('FilterPillRow (Phase 17 PROPS-02, D-11)', () => {
 
     // EN — Active / Archived
     const { container: enContainer } = render(
-      <FilterPillRow archived={false} lang="en" />,
+      <FilterPillRow archived={false} drafts={false} lang="en" />,
     );
     expect(
       enContainer.querySelector('[data-testid="filter-pill-actives"]')!.textContent,

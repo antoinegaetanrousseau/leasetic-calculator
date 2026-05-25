@@ -30,6 +30,7 @@ import { t, type Lang } from '@/lib/i18n/dictionaries';
  */
 export interface FilterPillRowProps {
   archived: boolean;
+  drafts: boolean;
   lang: Lang;
 }
 
@@ -57,7 +58,8 @@ const INACTIVE_PILL_STYLE = {
   fontWeight: 500,
 } as const;
 
-export function FilterPillRow({ archived, lang }: FilterPillRowProps) {
+export function FilterPillRow({ archived, drafts, lang }: FilterPillRowProps) {
+  const activesActive = !archived && !drafts;
   return (
     <div
       role="tablist"
@@ -74,10 +76,19 @@ export function FilterPillRow({ archived, lang }: FilterPillRowProps) {
         href="/proposals"
         data-testid="filter-pill-actives"
         role="tab"
-        aria-selected={!archived}
-        style={archived ? INACTIVE_PILL_STYLE : ACTIVE_PILL_STYLE}
+        aria-selected={activesActive}
+        style={activesActive ? ACTIVE_PILL_STYLE : INACTIVE_PILL_STYLE}
       >
         {t('proposals.filter.actives', lang)}
+      </Link>
+      <Link
+        href="/proposals?drafts=1"
+        data-testid="filter-pill-drafts"
+        role="tab"
+        aria-selected={drafts}
+        style={drafts ? ACTIVE_PILL_STYLE : INACTIVE_PILL_STYLE}
+      >
+        {t('proposals.filter.drafts', lang)}
       </Link>
       <Link
         href="/proposals?archived=1"
