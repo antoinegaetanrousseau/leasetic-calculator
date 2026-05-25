@@ -80,6 +80,11 @@ const config = [
               message:
                 '`@react-pdf/renderer` may only be imported from src/lib/pdf/. PDF rendering goes through src/lib/pdf/render.ts (renderProposalPdf).',
             },
+            {
+              name: 'exceljs',
+              message:
+                '`exceljs` may only be imported from src/lib/xlsx/. XLSX generation goes through src/lib/xlsx/render.ts (generateProposalsXlsx). (D-02)',
+            },
           ],
           patterns: [
             {
@@ -135,6 +140,16 @@ const config = [
     // PDF-only literals. They are not app UI strings — they don't go through
     // the runtime t() path. Per plan 08-05 planner discretion D-A3 / T-08-05-07.
     files: ['src/lib/pdf/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': 'off',
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    // Allow exceljs imports only inside the XLSX adapter directory.
+    // All other app code must go through generateProposalsXlsx() from '@/lib/xlsx'.
+    // no-restricted-syntax is also off: xlsx adapter has no JSX text literals. (D-02)
+    files: ['src/lib/xlsx/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': 'off',
       'no-restricted-syntax': 'off',

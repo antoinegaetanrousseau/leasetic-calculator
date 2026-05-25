@@ -4,6 +4,8 @@ import {
   deriveDisplayStatus, type DisplayStatus,
   type ListResult, encodeCursor, decodeCursor,
 } from '@/lib/db/queries';
+import { t } from '@/lib/i18n/dictionaries';
+import type { XlsxExportRow } from '@/lib/xlsx/types';
 
 export interface ProposalRowDto {
   id: string;
@@ -150,4 +152,124 @@ export async function buildListResponse(args: BuildListParams): Promise<ListResp
     hasMore: result.hasMore,
     nextCursor: result.nextCursor ? encodeCursor(result.nextCursor) : null,
   };
+}
+
+// ── Phase 19 Plan 01 — XLSX Export ──────────────────────────────────────────
+
+/**
+ * D-EXPORT-01: hard cap on unbounded export query. Partners with
+ * >10 000 proposals (unreachable in v1.3 scope, per CONTEXT) would see
+ * a silent truncation — acceptable versus an unbounded query.
+ */
+export const MAX_EXPORT_ROWS = 10_000;
+
+export interface BuildExportParams {
+  userId: string;
+  q?: string;
+  archived?: boolean;
+  locale: 'fr' | 'en';
+}
+
+/**
+ * Unbounded (no cursor) export query. Returns at most MAX_EXPORT_ROWS rows
+ * projected to XlsxExportRow, applying the same q + archived filter logic as
+ * buildListResponse.
+ *
+ * ADMIN-09 commission scrub (D-05 / EXPORT-02): `paramsSnapshot` is read ONLY
+ * to derive `deriveDisplayStatus` (via the shared helper that already reads
+ * validityDays internally). The `commissionPct` field from `paramsSnapshot` is
+ * NEVER written to any XlsxExportRow field — the type itself has no commission
+ * field, making accidental leakage a compile-time error.
+ *
+ * T-19-01-01 IDOR mitigation: userId is the FIRST predicate passed to both
+ * listProposalsByUser and searchProposals, identical to buildListResponse.
+ */
+export async function buildExportQuery(params: BuildExportParams): Promise<XlsxExportRow[]> {
+  const q = params.q?.trim() ?? '';
+  const archived = params.archived ?? false;
+  const locale = params.locale;
+
+  const result: ListResult = q.length > 0
+    ? await searchProposals({
+        userId: params.userId,
+        q,
+        archived,
+        limit: MAX_EXPORT_ROWS,
+      })
+    : await listProposalsByUser({
+        userId: params.userId,
+        archived,
+        limit: MAX_EXPORT_ROWS,
+      });
+
+  // Derive i18n-resolved status label using the existing chip.* keys (D-21 reuse).
+  // DisplayStatus → chip.{status} → t(key, locale).
+  function resolveStatusLabel(displayStatus: DisplayStatus): string {
+    return t(`chip.${displayStatus}`, locale);
+  }
+
+  return result.rows.map((row) => {
+    const inputs = row.inputs as {
+      clientCo?: unknown;
+      amountHT?: unknown;
+      durationMonths?: unknown;
+      projectDesc?: unknown;
+    };
+    const computed = row.computed as {
+      loyerHT?: unknown;
+      coeff?: unknown;
+    } | null;
+
+    // Parse amountHt — stored as string digit-only in inputs.amountHT.
+    const amountHt = typeof inputs.amountHT === 'string'
+      ? parseFloat(inputs.amountHT)
+      : typeof inputs.amountHT === 'number'
+        ? inputs.amountHT
+        : 0;
+
+    // Parse durationMonths — stored as number in inputs.durationMonths.
+    const durationMonths = typeof inputs.durationMonths === 'number'
+      ? inputs.durationMonths
+      : 0;
+
+    // Parse monthlyRent — stored as number in computed.loyerHT.
+    const monthlyRent = typeof computed?.loyerHT === 'number'
+      ? computed.loyerHT
+      : typeof computed?.loyerHT === 'string'
+        ? parseFloat(computed.loyerHT)
+        : 0;
+
+    // Parse coefficient — stored as number in computed.coeff (e.g. 0.0369).
+    // Format as percentage string "X.XX%" per UI-SPEC coefficient column.
+    const coeffRaw = computed?.coeff;
+    const coefficient = typeof coeffRaw === 'number'
+      ? `${(coeffRaw * 100).toFixed(2)}%`
+      : typeof coeffRaw === 'string'
+        ? coeffRaw
+        : '';
+
+    const displayStatus = deriveDisplayStatus(row);
+
+    return {
+      lcRef: row.lcRef ?? '',
+      clientName: typeof inputs.clientCo === 'string' ? inputs.clientCo : '',
+      projectName: typeof inputs.projectDesc === 'string' ? inputs.projectDesc : '',
+      amountHt,
+      durationMonths,
+      monthlyRent,
+      coefficient,
+      status: resolveStatusLabel(displayStatus),
+      createdAt: row.createdAt,
+      expiresAt: (() => {
+        // expiresAt = pdfGeneratedAt + validityDays (days→ms).
+        // null for drafts and rows without pdfGeneratedAt.
+        if (!row.pdfGeneratedAt || !row.paramsSnapshot) return null;
+        const validityDays =
+          (row.paramsSnapshot as { validityDays?: number } | null)?.validityDays ?? 30;
+        return new Date(
+          row.pdfGeneratedAt.getTime() + validityDays * 24 * 60 * 60 * 1000,
+        );
+      })(),
+    };
+  });
 }

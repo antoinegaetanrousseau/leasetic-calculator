@@ -841,6 +841,26 @@ export const dictionaries = {
     // wizard screenshots. Interpolation `{0}` = step number (1, 2, 3).
     // Deferred per deferred-items.md item #4 (seed-partner-launch.ts companyName gap).
     'aide.commencer-ici.figure.placeholder': "Aperçu de l'étape {0} — à venir",
+
+    // ── Phase 19 Plan 01 — XLSX Export (D-09, UI-SPEC §Copy + §i18n Keys Summary) ──
+    // 15 net-new keys. Verify-and-reuse first (D-21): chip.active/draft/expired/deleted
+    // reused for status cell values (see exportProposalsAction). No other reusable
+    // keys exist for proposals.export.* (confirmed zero hits before adding).
+    'proposals.export.cta': 'Exporter en XLSX',
+    'proposals.export.loading': 'Génération…',
+    'proposals.export.disabled.tooltip': 'Aucune proposition à exporter',
+    'proposals.export.toast.success': 'Export prêt',
+    'proposals.export.toast.error': "Échec de l'export, réessayez",
+    'proposals.export.column.reference': 'Référence',
+    'proposals.export.column.client': 'Client',
+    'proposals.export.column.project': 'Projet',
+    'proposals.export.column.amountHt': 'Montant HT',
+    'proposals.export.column.duration': 'Durée',
+    'proposals.export.column.monthlyRent': 'Loyer mensuel',
+    'proposals.export.column.coefficient': 'Coefficient',
+    'proposals.export.column.status': 'Statut',
+    'proposals.export.column.createdAt': 'Date de création',
+    'proposals.export.column.expiresAt': "Date d'expiration",
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -1619,6 +1639,23 @@ export const dictionaries = {
     // Figure placeholder — used 3× (steps 1/2/3) until HELP-02 captures the real
     // wizard screenshots. Interpolation `{0}` = step number (1, 2, 3).
     'aide.commencer-ici.figure.placeholder': 'Step {0} preview — coming soon',
+
+    // ── Phase 19 Plan 01 — XLSX Export EN counterparts (D-09, _EnHasAllFrKeys parity) ──
+    'proposals.export.cta': 'Export to XLSX',
+    'proposals.export.loading': 'Generating…',
+    'proposals.export.disabled.tooltip': 'No proposals to export',
+    'proposals.export.toast.success': 'Export ready',
+    'proposals.export.toast.error': 'Export failed, try again',
+    'proposals.export.column.reference': 'Reference',
+    'proposals.export.column.client': 'Client',
+    'proposals.export.column.project': 'Project',
+    'proposals.export.column.amountHt': 'Amount (excl. VAT)',
+    'proposals.export.column.duration': 'Duration',
+    'proposals.export.column.monthlyRent': 'Monthly rent',
+    'proposals.export.column.coefficient': 'Coefficient',
+    'proposals.export.column.status': 'Status',
+    'proposals.export.column.createdAt': 'Created on',
+    'proposals.export.column.expiresAt': 'Expires on',
   },
 } as const;
 
