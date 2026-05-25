@@ -137,6 +137,7 @@ export async function countThisMonth(userId: string): Promise<number> {
     inArray(schema.proposals.status, [...ACTIVE_INCLUSION_STATUSES]),
     isNull(schema.proposals.deletedAt),
     gte(schema.proposals.createdAt, monthStartUtc),
+    sql`(${schema.proposals.status} = 'active' OR ${schema.proposals.inputs} != '{}'::jsonb)`,
   );
   const rows = await dbi
     .select({ count: count() })
@@ -155,6 +156,7 @@ export async function countTotal(userId: string): Promise<number> {
     eq(schema.proposals.userId, userId),
     inArray(schema.proposals.status, [...ACTIVE_INCLUSION_STATUSES]),
     isNull(schema.proposals.deletedAt),
+    sql`(${schema.proposals.status} = 'active' OR ${schema.proposals.inputs} != '{}'::jsonb)`,
   );
   const rows = await dbi
     .select({ count: count() })
