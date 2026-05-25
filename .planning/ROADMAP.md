@@ -92,16 +92,20 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Depends on:** Phase 15 (v1.2 final)
 **Requirements:** SHELL-01, SHELL-02, SHELL-03, SHELL-04, SHELL-05, CONTRAST-01, CONTRAST-02
 **Success Criteria** (what must be TRUE):
+
   1. Every authed page renders the hero pattern (`Bonjour, {prénom} 👋` + subtitle + page CTA) in both light and dark without layout shift.
   2. The sidebar collapse toggle, the tri-state theme control (Light / System / Dark), and the FR/EN locale toggle all appear in the sidebar footer; System mode updates live when the OS theme changes; collapse preference persists across reload.
   3. The topbar and footer render the Figma `9:46` visual treatment in both light and dark on every authed route.
   4. A signed-off contrast audit record confirms the diff-panel changed-row composite (`rgba(224,133,48,0.10)` over `--surface` + `--ink` weight 600) reaches ≥4.5:1 in both light and dark, and any new `--gold` / `--teal` foreground-on-background pair introduced in this phase also passes WCAG AA.
+
 **Plans:** 5/5 plans complete
+
 - [x] 16-01-PLAN.md — PageHero primitive + Vitest coverage (D-01..D-05, SHELL-03 scaffold)
 - [x] 16-02-PLAN.md — Sidebar icon-size micro-deltas + Topbar visual verification (D-12..D-16, SHELL-01/02/04 + SHELL-05 topbar half)
 - [x] 16-03-PLAN.md — Shell footer extension with Mentions légales link (D-17/D-18, SHELL-05 footer half; reuses existing `shell.footer.privacy` key)
 - [x] 16-04-PLAN.md — Admin home reference adopter for PageHero + new `admin.home.eyebrow` i18n key (D-06, SHELL-03 consumer)
 - [x] 16-05-PLAN.md — Manual WCAG 2.1 AA contrast audit + Antoine sign-off (D-08..D-11, CONTRAST-01/02)
+
 **UI hint:** yes
 
 ### Phase 17: Partner Surfaces
@@ -110,12 +114,15 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Depends on:** Phase 16 (contrast gates signed off; shell primitives available)
 **Requirements:** PHOME-01, PHOME-02, PHOME-03, PROPS-01, PROPS-02, WIZ-01, WIZ-02, WIZ-03, WIZ-04, WIZ-05, WIZ-06, THEME-01
 **Success Criteria** (what must be TRUE):
+
   1. Partner Home `/` shows `Bonjour, {prénom} 👋`, three MetricTile values scoped to the current partner and calendar month (Europe/Paris), and a Propositions récentes card with the 5 most recent proposals and a `Voir toutes →` link — in both light and dark.
   2. `/proposals` renders a styled table with an `Archivées` filter pill; toggling it surfaces soft-deleted and expired proposals in-page with correct `<StatusChip>` labels, without navigating away.
   3. Wizard step 1 shows the Figma `35:46` form card with `● INFORMATIONS CLIENT` / `● DÉTAILS DU PROJET` section labels and segmented duration pill; step 2 shows the loyer-mensuel hero card in `--teal` with explicit `Commission apporteur (non visible client)` row; step 3 shows the 2-column 1040px layout with `<PdfPreviewMock>` header carrying the LC reference reserved at step 1 submission.
   4. The validity-selector (15j / 30j / 60j) is present on step 3 inside the CALCUL review card; a default value (30j) is set at draft creation; selecting a different value updates the draft before finalize.
   5. Every partner-side screen ships light and dark variants matching Figma `82:*` duplicate frames; ADMIN-09 D-12 envelope and the 9-gate grep-contract suite remain green throughout.
+
 **Plans:** 8/8 plans complete
+
 - [x] 17-01-PLAN.md — Move lc_ref allocation to createDraft + add archived filter to buildListResponse (DB/API layer foundation)
 - [x] 17-02-PLAN.md — Add ~30 Phase 17 i18n keys (FR + EN) + PdfPreviewMock lcRef prop change
 - [x] 17-03-PLAN.md — Partner Home / rewrite (PageHero + 3 MetricTiles + Propositions récentes) + proposal-aggregates queries
@@ -124,6 +131,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] 17-06-PLAN.md — Wizard step 2 restructure (PageHero + loyer hero card + Tranche/Coefficient chip + Détail du calcul + Paramètres saisis)
 - [x] 17-07-PLAN.md — Wizard step 3 PageHero adoption + validity selector inside CALCUL + PdfPreviewMock real lcRef + updateValidity server action
 - [x] 17-08-PLAN.md — THEME-01 light+dark verification checkpoint + CONTRAST-02 audit append + ADMIN-09 final gate check
+
 **UI hint:** yes
 
 ### Phase 18: Admin Surfaces + Help Center
@@ -132,13 +140,16 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Depends on:** Phase 16 (shell primitives available), Phase 17 not required (no partner↔admin coupling)
 **Requirements:** ADMIN-10, ADMIN-11, ADMIN-12, ADMIN-13, ADMIN-14, THEME-02, HELP-01
 **Success Criteria** (what must be TRUE):
+
   1. Admin Home shows a hero with ADMIN badge + `Nouvelle proposition` CTA + 3 stats row (Propositions ce mois / Partenaires actifs / Dernière modif. coeffs) + 3 AdminNavCards + Recent activity card in both light and dark.
   2. `/[adminSegment]/partners` renders the Figma `42:46` styled table with an `Inviter partenaire` CTA and filter/search controls; the component file is `PartnersList.tsx` (renamed from `AccountsList.tsx`) and all imports resolve cleanly.
   3. `/[adminSegment]/partners/new` renders the Figma `43:46` form card visual treatment; behavior (3-section RHF form + adminCreateInvitation + InviteUrlModal) is unchanged from Phase 14.
   4. `/[adminSegment]/coefficients` shows the Figma `45:46` orange warning banner (using `--gold` token) with copy confirming coefficient edits do not retroactively change existing PDFs, plus the refreshed inline history card alongside the Phase 14 2-column sidebar.
   5. Every admin-side screen ships both light and dark variants; the 9-gate grep-contract suite remains green.
   6. `/aide` landing renders the 3-card placeholder grid; `/aide/commencer-ici` renders the starter article; sidebar `Aide` link is visible for both partner and admin roles; light + dark verified.
+
 **Plans:** 7/7 plans complete
+
 - [x] 18-01-PLAN.md — DB/API foundation: proposal-aggregates cross-partner + partner-aggregates + admin-activity 3-source union + /proposals admin user_id query (D-11) + per-role sidebar nav (D-27) + ~70 net-new i18n keys
 - [x] 18-02-PLAN.md — Admin Home rebuild (PageHero + 3 stat tiles all teal D-04 + 3 AdminNavCards + Recent activity card + RecentActivityRow component + MetricTile valueColor prop)
 - [x] 18-03-PLAN.md — Partners list: AccountsList→PartnersList full rename (D-14), 6-col styled table, 4-tab filter pill (D-09), per-row overflow menu (D-10), cursor pagination (D-12), empty states (D-13)
@@ -146,6 +157,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] 18-05-PLAN.md — Coefficients: new CoefficientWarningBanner (sessionStorage dismissable D-19/D-20) + CoefficientHistorySidebar in-place refresh (D-21) + click-to-diff removal (D-22)
 - [x] 18-06-PLAN.md — Aide landing (3-card placeholder D-25) + Commencer ici starter article (hardcoded TSX D-24/26 + 3 wizard screenshots) + SUPPORT_EMAIL decision checkpoint
 - [x] 18-07-PLAN.md — Closing-out: visual sweep + contrast addendum + ADMIN-09 9-gate verification + 4 visual gap fixes + topbar route-awareness
+
 **UI hint:** yes
 
 ### Phase 19: New Capabilities
@@ -154,11 +166,20 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Depends on:** Phase 17 (XLSX export CTA lives on `/proposals`; ADMIN-09 suite baseline from Phase 17), Phase 18 (LC dashboard is an admin surface)
 **Requirements:** EXPORT-01, EXPORT-02, LCDASH-01, LCDASH-02
 **Success Criteria** (what must be TRUE):
+
   1. A partner can trigger an XLSX export from `/proposals`; the downloaded file contains all proposals matching the current filter (Active or Archivées) with columns: Référence, Client, Projet, Montant HT, Durée, Loyer mensuel, Coefficient, Statut, Date de création, Date d'expiration.
   2. The XLSX file contains no `Commission` column, no `commission_pct` cell, and no commission-related substring in any sheet; this is enforced by a new gate in `tests/admin-09-grep-contracts.test.ts`.
   3. An admin can navigate to `/[adminSegment]/lc-references` and see a cursor-paginated, searchable list of every issued LC reference across all partners (reference, partner name, client name, project amount, status, created_at).
-  4. The LC dashboard passes all ADMIN-09 grep-contract suite gates (now ≥10); list rows, search results, and any detail surfaces contain no commission data.
-**Plans:** TBD
+  4. The LC dashboard passes all ADMIN-09 grep-contract suite gates (now ≥10); list rows, search results, and any detail surfaces contain no commission data.**Plans:** 2/2 plans
+
+**Wave 1**
+
+- [ ] 19-01-PLAN.md — EXPORT: per-partner XLSX export (src/lib/xlsx adapter + Server Action + ExportButton + ADMIN-09 gate 10)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 19-02-PLAN.md — LCDASH: cross-partner LC reference dashboard (lc-references DB query + admin SSR page + LcReferencesList + 4th AdminNavCard + Admin Home grid 3→4 + ADMIN-09 gates 11+12)
+
 **UI hint:** yes
 
 ### Phase 20: Infra Hardening
@@ -167,9 +188,11 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Depends on:** Phase 16 (no functional dependency; can run in parallel with 17/18, but ordered after to let design phases ship first and avoid migration noise)
 **Requirements:** INFRA-01, INFRA-02, INFRA-03
 **Success Criteria** (what must be TRUE):
+
   1. Vercel production scope uses the Neon `main` branch endpoint, preview scope uses `preview`, development scope uses `development`; each scope's `DATABASE_URL` env var points to the corresponding Neon pooled endpoint; a PR against a development branch can no longer accidentally touch production data.
   2. A GitHub Actions CI step runs a real-Postgres smoke on every PR touching `drizzle/migrations/*.sql` or `drizzle/meta/_journal.json`, using a Neon ephemeral branch; the step fails (and blocks merge) if the schema cannot be applied cleanly.
   3. A middleware-level Origin gate on `/api/auth/sign-in/*` mutations hard-blocks requests whose `Origin` header is not in the `trustedOrigins` list; verified by a test that sends an untrusted Origin and asserts a non-2xx response.
+
 **Plans:** TBD
 
 ### Phase 21: Partner-Onboarding Gates
@@ -178,9 +201,11 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Depends on:** Phases 16-20 (all v1.3 product work complete before the operational gate runs)
 **Requirements:** GATE-01, GATE-02
 **Success Criteria** (what must be TRUE):
+
   1. Both admin accounts (`antoine.rousseau@memento.eco` and the second admin) have individual strong passwords set via the admin↔admin password-reset flow; the shared `leasetic2026` password is no longer valid for either account; confirmed by a successful login + failed login test with the old credential.
   2. `docs/legal/privacy-coverage-confirmation.md` is updated (committed) with Thomas Heufke's explicit confirmation covering (a) Vercel/Neon EU hosting and (b) 10-year PDF retention; the stub placeholder text is replaced with dated confirmation copy.
   3. Both criteria above are met before any non-test partner account (`not @test.leasetic.com`) is invited via the admin `/partners/new` flow.
+
 **Plans:** TBD
 
 ---
@@ -207,7 +232,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete    | 2026-05-21 |
 | 17. Partner Surfaces | v1.3 | 8/8 | Complete   | 2026-05-24 |
 | 18. Admin Surfaces + Help Center | v1.3 | 7/7 | Complete   | 2026-05-25 |
-| 19. New Capabilities | v1.3 | 0/TBD | Not started | — |
+| 19. New Capabilities | v1.3 | 0/2 | Planned    | — |
 | 20. Infra Hardening | v1.3 | 0/TBD | Not started | — |
 | 21. Partner-Onboarding Gates | v1.3 | 0/TBD | Not started | — |
 
