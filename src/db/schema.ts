@@ -57,7 +57,6 @@ export const users = pgTable('users', {
   theme: text('theme').notNull().default('system'),
   sessionVersion: integer('session_version').notNull().default(1),
   createdBy: text('created_by'),
-  companyName: text('company_name'),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
 }, (table) => [

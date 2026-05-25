@@ -10,7 +10,7 @@
  *  - Session: DB-backed, 8h sliding (updateAge: 1h), cookieCache 5min (D-03 / AUTH-16
  *    revocation window).
  *  - additionalFields: role, displayName, language, theme, sessionVersion, createdBy,
- *    companyName, deletedAt, lastLoginAt — registered with Better Auth so it includes them in
+ *    deletedAt, lastLoginAt — registered with Better Auth so it includes them in
  *    session.user (input: false on role + sessionVersion to prevent self-elevation).
  *  - databaseHooks.user.create.before: lowercase email (P9 case-insensitive matching).
  *
@@ -131,7 +131,6 @@ function createAuth() {
         theme: { type: 'string', required: false, defaultValue: 'system', input: true },
         sessionVersion: { type: 'number', required: false, defaultValue: 1, input: false },
         createdBy: { type: 'string', required: false, input: false },
-        companyName: { type: 'string', required: false, input: false },
         deletedAt: { type: 'date', required: false, input: false },
         lastLoginAt: { type: 'date', required: false, input: false },
       },

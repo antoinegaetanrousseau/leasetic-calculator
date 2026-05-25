@@ -248,19 +248,10 @@ export async function adminCreateInvitation(
       throw new Error('admin.accounts.error.create');
     }
 
-    // Set the partner's language preference and companyName (createInvitation
-    // does not set either). companyName is written here so session.user.companyName
-    // is available when the partner reaches the proposal wizard (step 1 reads it
-    // into partnerCo, which proposalInputSchema requires as min(1)).
-    const profileUpdate: { language: string; companyName?: string } = {
-      language: args.language,
-    };
-    if (args.companyName && args.companyName.trim().length > 0) {
-      profileUpdate.companyName = args.companyName.trim();
-    }
+    // Set the partner's language preference (createInvitation does not set it).
     await db()
       .update(schema.users)
-      .set(profileUpdate)
+      .set({ language: args.language })
       .where(eq(schema.users.id, userRow.id));
 
     // Phase 14: persist the /partners/new extended fields under a `profile`
