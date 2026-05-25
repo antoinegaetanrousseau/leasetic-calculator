@@ -71,6 +71,17 @@ export async function saveAndAdvanceAction(
 
   // D-13: re-validate the canonical schema server-side. Defence in depth
   // against client-bypass tampering; the client's RHF resolver already gates.
+  console.log('[saveAndAdvance] enriched:', JSON.stringify({
+    partnerName: enriched.partnerName,
+    partnerCo: enriched.partnerCo,
+    clientCo: enriched.clientCo,
+    amountHT: enriched.amountHT,
+    durationMonths: enriched.durationMonths,
+    validityDays: enriched.validityDays,
+    session_displayName: u.displayName,
+    session_name: u.name,
+    session_email: u.email,
+  }));
   const parsed = proposalInputSchema.safeParse(enriched);
   if (!parsed.success) {
     console.error('[saveAndAdvance] validation failed:', JSON.stringify(parsed.error.flatten(), null, 2));
