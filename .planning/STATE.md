@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-24T21:48:48.968Z"
-last_activity: 2026-05-24
+last_updated: "2026-05-25T00:00:00.000Z"
+last_activity: 2026-05-25
 progress:
   total_phases: 21
-  completed_phases: 16
+  completed_phases: 17
   total_plans: 103
-  completed_plans: 101
-  percent: 76
+  completed_plans: 103
+  percent: 81
 ---
 
 # State — Matrice Commerciale
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 18 — admin-surfaces
+**Current focus:** Phase 19 — new-capabilities (XLSX export + LC reference dashboard)
 
 ## Current Position
 
-Phase: 18 (admin-surfaces) — EXECUTING
-Plan: 7 of 7
-Status: Ready to execute
-Last activity: 2026-05-24
+Phase: 18 (admin-surfaces) — COMPLETE (2026-05-25)
+Phase: 19 (new-capabilities) — NEXT
+Status: Phase 18 shipped; ready to plan Phase 19
+Last activity: 2026-05-25
 
 ## Phase 17 Performance Metrics
 
