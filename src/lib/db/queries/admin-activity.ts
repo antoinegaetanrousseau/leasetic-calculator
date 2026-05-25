@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, desc, eq, gte, isNull, isNotNull, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, isNotNull, or, sql } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 
 /**

@@ -21,7 +21,7 @@
  *   CONFIRM=SEED-PARTNER-<email> \
  *   INITIAL_PASSWORD=<password> \
  *   DATABASE_URL=<...> \
- *     npx tsx scripts/seed-partner-launch.ts <email> [--display-name "Full Name"]
+ *     npx tsx scripts/seed-partner-launch.ts <email> [--display-name "Full Name"] [--company "Société SAS"]
  *
  * Required env:
  *   DATABASE_URL     — Neon URL (pull via `vercel env pull --environment=production`)
@@ -65,27 +65,31 @@ function deriveDisplayName(email: string): string {
     .join(' ');
 }
 
-function parseArgs(argv: string[]): { email: string; displayName?: string } {
+function parseArgs(argv: string[]): { email: string; displayName?: string; companyName?: string } {
   const args = argv.slice(2);
   const email = args[0];
   if (!email || email.startsWith('--')) {
     console.error(
-      'Usage: CONFIRM=SEED-PARTNER-<email> INITIAL_PASSWORD=... DATABASE_URL=... npx tsx scripts/seed-partner-launch.ts <email> [--display-name "Full Name"]',
+      'Usage: CONFIRM=SEED-PARTNER-<email> INITIAL_PASSWORD=... DATABASE_URL=... npx tsx scripts/seed-partner-launch.ts <email> [--display-name "Full Name"] [--company "Société SAS"]',
     );
     process.exit(2);
   }
   let displayName: string | undefined;
+  let companyName: string | undefined;
   for (let i = 1; i < args.length; i++) {
     if (args[i] === '--display-name' && args[i + 1]) {
       displayName = args[i + 1];
       i += 1;
+    } else if (args[i] === '--company' && args[i + 1]) {
+      companyName = args[i + 1];
+      i += 1;
     }
   }
-  return { email, displayName };
+  return { email, displayName, companyName };
 }
 
 async function main(): Promise<void> {
-  const { email: rawEmail, displayName: nameArg } = parseArgs(process.argv);
+  const { email: rawEmail, displayName: nameArg, companyName: companyArg } = parseArgs(process.argv);
   const email = rawEmail.trim().toLowerCase();
 
   // Gate 0: D-10-10 — seed-partner-launch.ts is for TEST partners ONLY.
@@ -125,10 +129,20 @@ async function main(): Promise<void> {
   }
 
   const displayName = nameArg ?? deriveDisplayName(email);
+  // Default companyName: derive from email local part + " SAS" (overridable via --company).
+  // A blank companyName would silently block the partner at proposal wizard step 2
+  // (proposalInputSchema requires partnerCo.min(1)), so we fail loud here instead.
+  const companyName = companyArg?.trim() ?? `${deriveDisplayName(email)} SAS`;
+  if (!companyName) {
+    console.error('[seed-partner] FATAL: companyName resolved to empty string.');
+    console.error('[seed-partner] Pass --company "Société SAS" to set it explicitly.');
+    process.exit(2);
+  }
 
   console.log(`[seed-partner] Connected to: ${maskUrl(process.env.DATABASE_URL)}`);
   console.log(`[seed-partner] Email:        ${email}`);
   console.log(`[seed-partner] Display name: ${displayName}`);
+  console.log(`[seed-partner] Company name: ${companyName}`);
   console.log();
 
   // Lazy imports so env-var validation runs before db init.
@@ -178,6 +192,7 @@ async function main(): Promise<void> {
     email,
     name: displayName,
     displayName,
+    companyName,
     role: 'partner',
     language: 'fr',
     theme: 'system',

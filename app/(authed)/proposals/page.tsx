@@ -92,7 +92,6 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
     _callerRole: role,
   });
 
-  const nowMs = Date.now();
   const remountKey = `${q}|${archived ? '1' : '0'}|${cursor ?? ''}`;
 
   return (
@@ -161,7 +160,6 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
           key={remountKey}
           lang={lang}
           initial={initial}
-          nowMs={nowMs}
         />
       )}
     </div>

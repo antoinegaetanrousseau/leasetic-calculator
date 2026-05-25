@@ -46,8 +46,6 @@ const SCALAR_SUFFIXES: Record<ScalarKey, string> = {
 const TRANCHES = ['t1', 't2', 't3', 't4'] as const;
 const DURATIONS = ['36', '48', '60'] as const;
 
-type Tranche = (typeof TRANCHES)[number];
-type Duration = (typeof DURATIONS)[number];
 
 function formatScalar(key: ScalarKey, value: string | number): string {
   return `${value}${SCALAR_SUFFIXES[key]}`;

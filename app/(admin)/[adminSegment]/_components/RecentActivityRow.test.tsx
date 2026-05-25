@@ -14,7 +14,7 @@
  *     correct unit selection (<60min / <24h / >=24h).
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, within } from '@testing-library/react';
+import { cleanup, render } from '@testing-library/react';
 import { RecentActivityRow, getInitials } from './RecentActivityRow';
 import type { ActivityRow } from '@/lib/db/queries/admin-activity';
 

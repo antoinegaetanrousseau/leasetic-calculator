@@ -83,6 +83,7 @@ export default async function AdminHomePage({ params }: PageProps) {
   let derniereModifValue = '—';
   let derniereModifSublabel = '';
   if (latestCoeff) {
+    // eslint-disable-next-line react-hooks/purity -- server component, Date.now() is safe per-request
     const ageMs = Date.now() - latestCoeff.changedAt.getTime();
     const ageDays = Math.max(0, Math.floor(ageMs / (24 * 60 * 60 * 1000)));
     derniereModifValue = t('admin.home.stats.derniereModifCoeffs.value', lang).replace(

@@ -12,19 +12,9 @@ import { RestoreButtonClient } from './RestoreButtonClient';
 export interface ProposalsListProps {
   lang: Lang;
   initial: ListResponse;
-  /**
-   * Unix-ms timestamp for "now". Phase 14 D-27: no longer needed by the chip
-   * render (StatusChip uses server-derived `row.displayStatus`). Kept on the
-   * prop type for backward compatibility with `app/(authed)/page.tsx` which
-   * still passes it; no longer forwarded to ProposalRow.
-   */
-  nowMs: number;
 }
 
-export function ProposalsList({ lang, initial, nowMs }: ProposalsListProps) {
-  // nowMs is no longer needed by chip rendering (D-27 — server-derived).
-  // Kept in destructure to preserve the public prop contract; void marks intent.
-  void nowMs;
+export function ProposalsList({ lang, initial }: ProposalsListProps) {
   const searchParams = useSearchParams();
   const q = searchParams.get('q') ?? '';
   const deleted = searchParams.get('deleted') === '1';

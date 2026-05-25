@@ -562,7 +562,7 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
     }
   }
 
-  it('Phase 13 ships ZERO new schema migrations (drizzle directory unchanged)', async () => {
+  it('no unanticipated schema migrations beyond known set (drizzle guard)', async () => {
     const fs = await import('node:fs/promises');
     const path = await import('node:path');
     const drizzleDir = path.resolve(process.cwd(), 'drizzle');
@@ -572,14 +572,22 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
     } catch {
       // No drizzle dir at all → OK.
     }
-    // Find migration files numbered higher than Phase 12's DB-01 (0004).
-    // Phase 13 must NOT introduce a 0005+ migration.
-    const phase13Migrations = files.filter(
-      (f) => /^00(0[5-9]|1[0-9])_/.test(f) && f.endsWith('.sql'),
-    );
+    // Allowlist of all migrations expected to exist. When adding a new migration,
+    // append it here alongside the schema change. This fails loud on any
+    // unreviewed migration appearing in the directory.
+    const KNOWN_MIGRATIONS = new Set([
+      '0000_striped_metal_master.sql',    // Phase 5 — baseline schema
+      '0001_kind_doctor_faustus.sql',     // Phase 6 — Better Auth tables
+      '0002_phase8_persistence.sql',      // Phase 8 — proposals + global_params
+      '0003_seed_global_params.sql',      // Phase 8 — seed global_params row
+      '0004_phase12_drafts_and_history.sql', // Phase 12 — drafts + coefficient_history
+      '0005_partner_company_name.sql',    // Phase 18 — users.company_name for proposal wizard
+    ]);
+    const sqlFiles = files.filter((f) => f.endsWith('.sql'));
+    const unexpected = sqlFiles.filter((f) => !KNOWN_MIGRATIONS.has(f));
     expect(
-      phase13Migrations,
-      `Phase 13 must ship NO new migrations; found: ${phase13Migrations.join(', ')}`,
+      unexpected,
+      `Found unanticipated migration(s) — add to KNOWN_MIGRATIONS after review: ${unexpected.join(', ')}`,
     ).toEqual([]);
   });
 });

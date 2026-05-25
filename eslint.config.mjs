@@ -26,6 +26,7 @@ const config = [
       'drizzle/**',
       'public/**',
       'out/**',
+      '.remember/**',
       'coverage/**',
     ],
   },

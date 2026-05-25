@@ -128,8 +128,7 @@ afterEach(() => {
 
 describe('Partner Home / — PHOME-01/02/03', () => {
   it('Test 1: renders PageHero with title containing displayName + Nouvelle proposition CTA to /proposals/new/parametres', async () => {
-    const sp = Promise.resolve({});
-    const node = await HomePage({ searchParams: sp });
+    const node = await HomePage();
     const { container } = render(node);
 
     // Title: dashboard.greeting = `Bonjour, {0} 👋` → contains the displayName
@@ -148,8 +147,7 @@ describe('Partner Home / — PHOME-01/02/03', () => {
     countThisMonthMock.mockResolvedValue(7);
     countTotalMock.mockResolvedValue(42);
     countDraftsMock.mockResolvedValue(3);
-    const sp = Promise.resolve({});
-    const node = await HomePage({ searchParams: sp });
+    const node = await HomePage();
     const { container } = render(node);
 
     // MetricTile gives each tile role="group" with aria-label `${label}: ${value}`.
@@ -165,8 +163,7 @@ describe('Partner Home / — PHOME-01/02/03', () => {
   it('Test 3: when partner has >=5 proposals, renders exactly 5 abbreviated row Links to /proposals/{id}', async () => {
     const rows = [1, 2, 3, 4, 5].map(makeRow);
     buildListResponseMock.mockResolvedValue({ rows, hasMore: true, nextCursor: 'next' });
-    const sp = Promise.resolve({});
-    const node = await HomePage({ searchParams: sp });
+    const node = await HomePage();
     const { container } = render(node);
 
     const rowLinks = Array.from(container.querySelectorAll('a[href^="/proposals/prop-"]'));
@@ -177,16 +174,14 @@ describe('Partner Home / — PHOME-01/02/03', () => {
 
   it('Test 4: when partner has 0 proposals, empty-state copy renders inside the recent card using i18n key dashboard.recent.empty', async () => {
     buildListResponseMock.mockResolvedValue({ rows: [], hasMore: false, nextCursor: null });
-    const sp = Promise.resolve({});
-    const node = await HomePage({ searchParams: sp });
+    const node = await HomePage();
     const { container } = render(node);
     // dashboard.recent.empty FR = "Aucune proposition pour le moment."
     expect(container.textContent).toContain('Aucune proposition pour le moment.');
   });
 
   it('Test 5: Voir toutes link href is exactly /proposals (no params — D-08)', async () => {
-    const sp = Promise.resolve({});
-    const node = await HomePage({ searchParams: sp });
+    const node = await HomePage();
     const { container } = render(node);
 
     const voirToutesLinks = Array.from(
@@ -196,8 +191,7 @@ describe('Partner Home / — PHOME-01/02/03', () => {
   });
 
   it('Test 6: RecentlyDeletedToggle and SearchBar are NOT mounted on this page', async () => {
-    const sp = Promise.resolve({});
-    const node = await HomePage({ searchParams: sp });
+    const node = await HomePage();
     const { container } = render(node);
     // SearchBar from Phase 8 renders an <input type="search">. Its absence
     // confirms the search/list/toggle mount was retired from Partner Home.
@@ -209,8 +203,7 @@ describe('Partner Home / — PHOME-01/02/03', () => {
   });
 
   it('Test 7: DeleteJustToast IS still mounted (carry-forward, fires on ?deleted_just=1)', async () => {
-    const sp = Promise.resolve({});
-    const node = await HomePage({ searchParams: sp });
+    const node = await HomePage();
     // The component is a client-component that returns null when the flag
     // isn't present in searchParams (it relies on useSearchParams under the
     // hood). We assert the import is referenced by inspecting the rendered
@@ -222,8 +215,7 @@ describe('Partner Home / — PHOME-01/02/03', () => {
   });
 
   it('Test 8: requireUser is called BEFORE buildListResponse + the aggregates (defense-in-depth ordering)', async () => {
-    const sp = Promise.resolve({});
-    await HomePage({ searchParams: sp });
+    await HomePage();
 
     const userIdx = callOrder.indexOf('requireUser');
     const buildIdx = callOrder.indexOf('buildListResponse');

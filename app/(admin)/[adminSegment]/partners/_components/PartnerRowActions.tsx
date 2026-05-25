@@ -74,7 +74,6 @@ const MENU_ITEM_STYLE = {
 export function PartnerRowActions({
   partnerId,
   status,
-  adminSegment: _adminSegment,
   lang,
   partnerEmail,
   partnerDisplayName,

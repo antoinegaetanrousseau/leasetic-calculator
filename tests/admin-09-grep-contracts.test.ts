@@ -32,7 +32,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
-import type { PartnerWithCount } from '@/lib/db/queries/users';
 import type { PartnerRow } from '@/lib/db/queries/partners';
 import type { CoefficientHistoryListRow } from '@/lib/db/queries/coefficient-history';
 
@@ -125,22 +124,6 @@ import { CoefficientHistoryList } from '../app/(admin)/[adminSegment]/history/Co
 
 // ── Fixtures (small / deterministic / no commission values) ─────────────────
 
-function makePartner(overrides: Partial<PartnerWithCount> = {}): PartnerWithCount {
-  return {
-    id: 'p-1',
-    email: 'alice@example.com',
-    displayName: 'Alice Example',
-    name: 'Alice Example',
-    role: 'partner',
-    deletedAt: null,
-    lastLoginAt: new Date('2026-05-15T10:00:00Z'),
-    createdAt: new Date('2026-04-01T12:00:00Z'),
-    language: 'fr',
-    proposalsCount: 0,
-    hasUnredeemedInvite: false,
-    ...overrides,
-  };
-}
 
 /** Phase 18 Plan 03 D-14 — PartnerRow fixture for Surface 1 (post-rename PartnersList consumer). */
 function makePartnerRow(overrides: Partial<PartnerRow> = {}): PartnerRow {

@@ -35,7 +35,6 @@ const DATABASE_URL = process.env.DATABASE_URL_TEST;
 const shouldRun = !!DATABASE_URL;
 
 if (!shouldRun) {
-  // eslint-disable-next-line no-console
   console.log(
     '[integration] DATABASE_URL_TEST not set — skipping coefficient_history trigger test. ' +
       'Set it to your dev/preview DB to run.',

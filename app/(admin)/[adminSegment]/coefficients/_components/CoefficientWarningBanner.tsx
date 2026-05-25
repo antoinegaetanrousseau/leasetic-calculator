@@ -16,11 +16,9 @@
  *     warning returns on the next tab visit but doesn't nag the admin during
  *     a single editing session.
  *
- * SSR safety: initial render is always "banner visible" (hidden=false). The
- * sessionStorage read happens in a useEffect, so server-side rendering never
- * touches window.sessionStorage. A user who already dismissed within the
- * session sees one frame of banner before the effect hides it — accepted per
- * UI-SPEC line 498-500 baseline.
+ * SSR safety: lazy useState initializer reads sessionStorage only on the
+ * client (typeof window guard). Server renders hidden=false (banner visible)
+ * and the client initializes to the persisted value without a flash.
  *
  * Threat model (Plan 18-05):
  *   - T-18-05-01 sessionStorage tampering: accepted (informational UI only).
@@ -29,7 +27,7 @@
  *   - T-18-05-05 SSR crash: mitigated — useEffect + typeof window guard.
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -44,23 +42,14 @@ export interface CoefficientWarningBannerProps {
 export function CoefficientWarningBanner({
   lang,
 }: CoefficientWarningBannerProps) {
-  const [hidden, setHidden] = useState(false);
-
-  useEffect(() => {
-    // T-18-05-05 — guard against any SSR/edge runtime that lacks window.
-    if (typeof window === 'undefined') return;
+  const [hidden, setHidden] = useState(() => {
+    if (typeof window === 'undefined') return false;
     try {
-      if (
-        window.sessionStorage.getItem(COEFFICIENT_WARNING_DISMISS_KEY) === '1'
-      ) {
-        setHidden(true);
-      }
+      return window.sessionStorage.getItem(COEFFICIENT_WARNING_DISMISS_KEY) === '1';
     } catch {
-      // sessionStorage may throw in private-browsing or storage-disabled
-      // contexts — fall through and keep the banner visible (safer default
-      // than crashing the editor surface).
+      return false;
     }
-  }, []);
+  });
 
   if (hidden) return null;
 

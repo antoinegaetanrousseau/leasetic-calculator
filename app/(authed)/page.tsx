@@ -20,13 +20,6 @@ import { formatCurrency } from '@/lib/i18n/format';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Accueil — Leasétic Matrice' };
 
-interface PageParams {
-  // Kept Promise-typed for forward compatibility even though Phase 17 Partner
-  // Home no longer consumes any query params (search/cursor/deleted moved to
-  // /proposals via Plan 17-04). `?deleted_just=1` is read inside
-  // <DeleteJustToast/> on the client.
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}
 
 /**
  * Partner Home — Phase 17 Plan 03 rewrite (PHOME-01/02/03, D-05..D-09, D-19).
@@ -58,7 +51,7 @@ interface PageParams {
  * render below uses only StatusChip + clientCo + lcRef + amountHT (no
  * commission surface).
  */
-export default async function HomePage({ searchParams: _searchParams }: PageParams) {
+export default async function HomePage() {
   const { session } = await requireUser();
   const lang = await getCurrentLang();
 
