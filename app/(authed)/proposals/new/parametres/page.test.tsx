@@ -61,6 +61,7 @@ vi.mock('@/lib/i18n', async () => {
   };
 });
 vi.mock('@/lib/db/queries/proposals', () => ({
+  deleteEmptyDraftsByUser: vi.fn().mockResolvedValue(undefined),
   createDraft: (...args: unknown[]) => createDraftMock(...args),
   getDraftById: (...args: unknown[]) => getDraftByIdMock(...args),
   updateDraft: (...args: unknown[]) => updateDraftMock(...args),
