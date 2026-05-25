@@ -13,7 +13,7 @@ import type { ComponentType } from 'react';
  * + lucide icon component. Existing Phase 9 .admin-nav-card hover+focus CSS in
  * app/globals.css is reused (chained via .admin-nav-card-v2 for v1.2 layout).
  */
-type Variant = 'coefficients' | 'partners' | 'history';
+type Variant = 'coefficients' | 'partners' | 'history' | 'lc-references';
 
 export interface AdminNavCardProps {
   title: string;
@@ -29,6 +29,7 @@ const ACCENT_BY_VARIANT: Record<Variant, { rgb: string; token: string }> = {
   coefficients: { rgb: '18, 150, 87', token: 'var(--gd)' },
   partners: { rgb: '45, 122, 140', token: 'var(--teal)' },
   history: { rgb: '17, 44, 59', token: 'var(--navy)' },
+  'lc-references': { rgb: '45, 122, 140', token: 'var(--teal)' },
 };
 
 export function AdminNavCard({
