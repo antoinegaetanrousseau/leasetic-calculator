@@ -1,5 +1,6 @@
 import 'server-only';
 import { createHash } from 'node:crypto';
+import { inflateRawSync, inflateSync } from 'node:zlib';
 import { renderToBuffer, type DocumentProps } from '@react-pdf/renderer';
 import React, { type ReactElement } from 'react';
 import { ProposalDocument, type ProposalDocumentProps } from './document';
@@ -51,12 +52,17 @@ export interface RenderProposalPdfResult {
 function computeContentHash(buffer: Buffer): string {
   const str = buffer.toString('binary');
   const streamHashes: string[] = [];
-  // Match all `stream\r?\n ... \r?\nendstream` blocks (raw compressed bytes)
   const streamRe = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
   let match = streamRe.exec(str);
   while (match !== null) {
-    const payload = Buffer.from(match[1], 'binary');
-    streamHashes.push(createHash('sha256').update(payload).digest('hex'));
+    const raw = Buffer.from(match[1], 'binary');
+    // Decompress before hashing so the gate is invariant to zlib differences
+    // between Node versions / platforms (PROP-17 cross-platform fix).
+    let content: Buffer = raw;
+    try { content = inflateSync(raw); } catch {
+      try { content = inflateRawSync(raw); } catch { /* uncompressed stream */ }
+    }
+    streamHashes.push(createHash('sha256').update(content).digest('hex'));
     match = streamRe.exec(str);
   }
   streamHashes.sort();
