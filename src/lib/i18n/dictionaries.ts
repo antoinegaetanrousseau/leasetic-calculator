@@ -607,6 +607,7 @@ export const dictionaries = {
     // §6.2 Section bullet headers
     'wizard.section.informations.client': 'INFORMATIONS CLIENT',
     'wizard.section.details.projet': 'DÉTAILS DU PROJET',
+    'wizard.section.details.complementaires': 'INFORMATIONS COMPLÉMENTAIRES',
     'wizard.section.parametres.saisis': 'PARAMÈTRES SAISIS',
     'wizard.section.detail.calcul': 'DÉTAIL DU CALCUL',
     'wizard.section.client': 'CLIENT',
@@ -1393,6 +1394,7 @@ export const dictionaries = {
     // §6.2 Section bullet headers
     'wizard.section.informations.client': 'CLIENT INFORMATION',
     'wizard.section.details.projet': 'PROJECT DETAILS',
+    'wizard.section.details.complementaires': 'ADDITIONAL INFORMATION',
     'wizard.section.parametres.saisis': 'ENTERED PARAMETERS',
     'wizard.section.detail.calcul': 'CALCULATION DETAIL',
     'wizard.section.client': 'CLIENT',

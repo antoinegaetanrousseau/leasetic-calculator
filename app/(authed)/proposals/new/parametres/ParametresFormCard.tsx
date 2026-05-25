@@ -42,7 +42,6 @@ import { NumberInputAmount } from '@/components/proposal/NumberInputAmount';
 import { PhoneInput } from '@/components/proposal/PhoneInput';
 import { SirenInput } from '@/components/proposal/SirenInput';
 import { YesNoToggle } from '@/components/proposal/YesNoToggle';
-import { PlusDeDetailsAccordion } from '../_components/PlusDeDetailsAccordion';
 
 // Match the ProposalFormProvider's input-side generic (the validity field is
 // optional because the schema applies .default(30) — see ProposalForm.tsx:36).
@@ -56,20 +55,11 @@ const DURATION_OPTIONS = [
 
 export interface ParametresFormCardProps {
   draftId: string;
-  /** Initial open state for the "Plus de détails" accordion (D-06). */
-  accordionDefaultOpen: boolean;
-  /**
-   * Fire-and-forget toggle handler — caller wires to persistAccordionOpenAction.
-   * The accordion calls this with the next open state on every click.
-   */
-  onAccordionToggle: (open: boolean) => void;
   /** Active language for labels + placeholders. */
   lang: Lang;
 }
 
 export function ParametresFormCard({
-  accordionDefaultOpen,
-  onAccordionToggle,
   lang,
 }: ParametresFormCardProps) {
   const form = useFormContext<ProposalFormValues>();
@@ -277,103 +267,109 @@ export function ParametresFormCard({
             </p>
           )}
         </div>
-      </section>
+        <hr
+          style={{
+            border: 'none',
+            borderTop: '1px solid var(--border)',
+            margin: '24px 0',
+          }}
+        />
 
-      {/* D-06: PlusDeDetailsAccordion sits BELOW the .card with the 5 optional
-          fields. defaultOpen hydrates from draft.inputs._uiAccordionOpen via the
-          page server component. */}
-      <div style={{ marginTop: 16 }}>
-        <PlusDeDetailsAccordion
-          defaultOpen={accordionDefaultOpen}
-          onToggle={onAccordionToggle}
-          lang={lang}
-        >
-          {/* clientRole */}
-          <div className="fld">
-            <label htmlFor="client-role">{t('form.client.role', lang)}</label>
-            <input
-              id="client-role"
-              type="text"
-              placeholder={t('form.client.role.placeholder', lang)}
-              {...register('clientRole')}
-            />
-          </div>
+        {/* ── Section 3: INFORMATIONS COMPLÉMENTAIRES ───────────────────── */}
+        <div className="ctitle">
+          <span
+            className="dot"
+            style={{ background: 'var(--gd)' }}
+            aria-hidden="true"
+          />
+          <span>{t('wizard.section.details.complementaires', lang)}</span>
+        </div>
 
-          {/* clientSiren — Controller-bound SirenInput */}
-          <div className="fld">
-            <label htmlFor="client-siren">{t('form.client.siren', lang)}</label>
-            <Controller
-              name="clientSiren"
-              control={control}
-              render={({ field }) => (
-                <SirenInput
-                  inputId="client-siren"
-                  placeholder={t('form.client.siren.placeholder', lang)}
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  invalid={!!errors.clientSiren}
-                  ariaDescribedBy={
-                    errors.clientSiren ? 'client-siren-error' : undefined
-                  }
-                />
-              )}
-            />
-            {errors.clientSiren && (
-              <p id="client-siren-error" role="alert" className="error-msg">
-                {t('error.field.siren.invalid', lang)}
-              </p>
+        {/* clientRole */}
+        <div className="fld">
+          <label htmlFor="client-role">{t('form.client.role', lang)}</label>
+          <input
+            id="client-role"
+            type="text"
+            placeholder={t('form.client.role.placeholder', lang)}
+            {...register('clientRole')}
+          />
+        </div>
+
+        {/* clientSiren — Controller-bound SirenInput */}
+        <div className="fld">
+          <label htmlFor="client-siren">{t('form.client.siren', lang)}</label>
+          <Controller
+            name="clientSiren"
+            control={control}
+            render={({ field }) => (
+              <SirenInput
+                inputId="client-siren"
+                placeholder={t('form.client.siren.placeholder', lang)}
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                invalid={!!errors.clientSiren}
+                ariaDescribedBy={
+                  errors.clientSiren ? 'client-siren-error' : undefined
+                }
+              />
             )}
-          </div>
+          />
+          {errors.clientSiren && (
+            <p id="client-siren-error" role="alert" className="error-msg">
+              {t('error.field.siren.invalid', lang)}
+            </p>
+          )}
+        </div>
 
-          {/* projectDesc */}
-          <div className="fld">
-            <label htmlFor="project-desc">{t('form.project.desc', lang)}</label>
-            <input
-              id="project-desc"
-              type="text"
-              placeholder={t('form.project.desc.placeholder', lang)}
-              {...register('projectDesc')}
-            />
-          </div>
+        {/* projectDesc */}
+        <div className="fld">
+          <label htmlFor="project-desc">{t('form.project.desc', lang)}</label>
+          <input
+            id="project-desc"
+            type="text"
+            placeholder={t('form.project.desc.placeholder', lang)}
+            {...register('projectDesc')}
+          />
+        </div>
 
-          {/* slb — YesNoToggle */}
-          <div className="fld">
-            <label>{t('form.interests.slb', lang)}</label>
-            <Controller
-              name="slb"
-              control={control}
-              render={({ field }) => (
-                <YesNoToggle
-                  ariaLabel={t('form.interests.slb', lang)}
-                  yesLabel={t('common.yes', lang)}
-                  noLabel={t('common.no', lang)}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </div>
+        {/* slb — YesNoToggle */}
+        <div className="fld">
+          <label>{t('form.interests.slb', lang)}</label>
+          <Controller
+            name="slb"
+            control={control}
+            render={({ field }) => (
+              <YesNoToggle
+                ariaLabel={t('form.interests.slb', lang)}
+                yesLabel={t('common.yes', lang)}
+                noLabel={t('common.no', lang)}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </div>
 
-          {/* evalParc — YesNoToggle */}
-          <div className="fld">
-            <label>{t('form.interests.eval', lang)}</label>
-            <Controller
-              name="evalParc"
-              control={control}
-              render={({ field }) => (
-                <YesNoToggle
-                  ariaLabel={t('form.interests.eval', lang)}
-                  yesLabel={t('common.yes', lang)}
-                  noLabel={t('common.no', lang)}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          </div>
-        </PlusDeDetailsAccordion>
-      </div>
+        {/* evalParc — YesNoToggle */}
+        <div className="fld">
+          <label>{t('form.interests.eval', lang)}</label>
+          <Controller
+            name="evalParc"
+            control={control}
+            render={({ field }) => (
+              <YesNoToggle
+                ariaLabel={t('form.interests.eval', lang)}
+                yesLabel={t('common.yes', lang)}
+                noLabel={t('common.no', lang)}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </div>
+      </section>
     </>
   );
 }

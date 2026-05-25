@@ -387,7 +387,6 @@ export function CreatePartnerForm({
                   ? 'cpf-message-error'
                   : 'cpf-message-counter'
               }
-              className={errors.invitationMessage ? 'invalid' : ''}
               disabled={isSubmitting}
               style={{
                 minHeight: 120,
@@ -396,6 +395,15 @@ export function CreatePartnerForm({
                 padding: 12,
                 lineHeight: 1.55,
                 width: '100%',
+                border: errors.invitationMessage
+                  ? '1px solid var(--danger)'
+                  : '1px solid var(--border)',
+                borderRadius: 12,
+                boxSizing: 'border-box',
+                outline: 'none',
+                transition: 'border-color 150ms',
+                fontFamily: 'inherit',
+                fontSize: 14.5,
               }}
               {...register('invitationMessage')}
             />

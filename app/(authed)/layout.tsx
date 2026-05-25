@@ -35,7 +35,6 @@ export default async function AuthedLayout({
       theme={theme}
       displayName={displayName}
       email={u.email}
-      activeNav="home"
     >
       {children}
     </Shell>

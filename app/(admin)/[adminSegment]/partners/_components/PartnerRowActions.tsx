@@ -39,6 +39,8 @@ import {
 } from '@/lib/admin';
 import type { PartnerStatus } from '@/lib/db/queries/partners';
 
+interface MenuPos { top: number; right: number; }
+
 export interface PartnerRowActionsProps {
   partnerId: string;
   status: PartnerStatus;
@@ -79,15 +81,27 @@ export function PartnerRowActions({
 }: PartnerRowActionsProps) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [menuPos, setMenuPos] = useState<MenuPos | null>(null);
   const [, startTransition] = useTransition();
   const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  // Click-outside hook — closes menu when mousedown lands outside the container.
+  // Compute fixed position when the menu opens so it escapes any overflow:hidden ancestor.
+  useEffect(() => {
+    if (!open || !buttonRef.current) { setMenuPos(null); return; }
+    const rect = buttonRef.current.getBoundingClientRect();
+    setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+  }, [open]);
+
+  // Click-outside: close when mousedown lands outside both the button and the menu.
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) {
+      if (
+        !buttonRef.current?.contains(e.target as Node) &&
+        !menuRef.current?.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -99,9 +113,7 @@ export function PartnerRowActions({
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setOpen(false);
-      }
+      if (e.key === 'Escape') setOpen(false);
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
@@ -169,8 +181,9 @@ export function PartnerRowActions({
   const showReEnable = status === 'inactive';
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
+    <div style={{ display: 'inline-block' }}>
       <button
+        ref={buttonRef}
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -197,21 +210,21 @@ export function PartnerRowActions({
         )}
       </button>
 
-      {open && (
+      {open && menuPos && (
         <div
+          ref={menuRef}
           role="menu"
           style={{
-            position: 'absolute',
-            top: '100%',
-            right: 0,
-            marginTop: 4,
+            position: 'fixed',
+            top: menuPos.top,
+            right: menuPos.right,
             background: 'var(--surface)',
             border: '1px solid var(--border)',
             borderRadius: 8,
             padding: '4px 0',
             minWidth: 240,
             boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-            zIndex: 50,
+            zIndex: 1000,
           }}
         >
           {showResend && (

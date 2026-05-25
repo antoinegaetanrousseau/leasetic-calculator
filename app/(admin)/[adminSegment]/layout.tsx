@@ -66,7 +66,6 @@ export default async function AdminLayout({ params, children }: AdminLayoutProps
       theme={theme}
       displayName={displayName}
       email={u.email}
-      activeNav="admin-home"
       adminSegment={adminSegment}
     >
       {children}

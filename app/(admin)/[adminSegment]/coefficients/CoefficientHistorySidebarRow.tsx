@@ -49,13 +49,14 @@ export function CoefficientHistorySidebarRow({
         gap: 4,
       }}
     >
-      {/* Top line: time + admin name */}
-      <div>
+      {/* Top line: date + admin name — flex row keeps both on the same line */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
         <span
           style={{
             fontSize: 13,
             fontWeight: 600,
             color: 'var(--ink)',
+            flexShrink: 0,
           }}
         >
           {formatDate(row.changedAt, lang)}
@@ -65,20 +66,26 @@ export function CoefficientHistorySidebarRow({
             fontSize: 13,
             fontWeight: 400,
             color: 'var(--muted)',
-            marginLeft: 8,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            minWidth: 0,
           }}
         >
           {row.createdByDisplay ?? '—'}
         </span>
       </div>
 
-      {/* Middle line: change summary */}
+      {/* Middle line: change summary — single line with ellipsis (full diff on /history) */}
       <div
         style={{
           fontSize: 12.5,
           fontWeight: 400,
           color: 'var(--muted)',
           lineHeight: 1.4,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}
       >
         {row.summary}

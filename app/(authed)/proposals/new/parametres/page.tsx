@@ -144,8 +144,6 @@ export default async function ParametresStep1Page({
   const inputs = draft.inputs as Record<string, unknown>;
   const completedSteps =
     ((inputs._completedSteps as number[] | undefined) ?? []) as number[];
-  const accordionOpen =
-    (inputs._uiAccordionOpen as boolean | undefined) ?? false;
 
   // Build the RHF prefill. Partial<ProposalInput> tolerates missing fields;
   // the resolver enforces required fields on blur per D-10.
@@ -203,7 +201,6 @@ export default async function ParametresStep1Page({
         <ProposalFormProvider prefill={prefill}>
           <WizardStep1Wiring
             draftId={draft.id}
-            accordionDefaultOpen={accordionOpen}
             lang={lang}
           />
         </ProposalFormProvider>

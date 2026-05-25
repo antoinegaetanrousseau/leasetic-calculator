@@ -17,7 +17,8 @@
  * builds the 4 admin nav hrefs and passes them through (UI-SPEC §11.6).
  */
 import { Topbar } from '@/components/Topbar';
-import { RetractableSidebar, type ActiveNav } from '@/components/ui/RetractableSidebar';
+import { RetractableSidebar } from '@/components/ui/RetractableSidebar';
+import type { ActiveNav } from '@/lib/route-meta';
 import { t, type Lang } from '@/lib/i18n';
 
 export interface ShellProps {
@@ -26,8 +27,11 @@ export interface ShellProps {
   theme: 'light' | 'dark' | 'system';
   displayName: string;
   email: string;
-  pageTitle?: string;
-  activeNav: ActiveNav;
+  /**
+   * Optional override for sidebar active-nav highlighting. When omitted,
+   * RetractableSidebar derives it from the current pathname via getRouteMeta.
+   */
+  activeNav?: ActiveNav;
   /** Required when isAdmin=true; used to build admin nav hrefs (UI-SPEC §11.6). */
   adminSegment?: string;
   children: React.ReactNode;
@@ -39,7 +43,6 @@ export function Shell({
   theme,
   displayName,
   email,
-  pageTitle,
   activeNav,
   adminSegment,
   children,
@@ -73,6 +76,7 @@ export function Shell({
         lang={lang}
         theme={theme}
         adminHrefs={adminHrefs}
+        adminSegment={adminSegment}
       />
 
       {/* Topbar (row 1, col 2) — refactored in Plan 11-05 Task 2; no `theme` prop */}
@@ -81,7 +85,7 @@ export function Shell({
         email={email}
         lang={lang}
         isAdmin={isAdmin}
-        pageTitle={pageTitle}
+        adminSegment={adminSegment}
       />
 
       {/* Main content (row 2, col 2) */}

@@ -1,4 +1,5 @@
 import { UserMenu } from './UserMenu';
+import { TopbarTitle } from './TopbarTitle';
 import { t, type Lang } from '@/lib/i18n';
 
 // PHASE 16: verified visual match to Figma 9:46 on 2026-05-22 (D-16). Zero functional change.
@@ -6,16 +7,16 @@ import { t, type Lang } from '@/lib/i18n';
 /**
  * Topbar — page title + ADMIN pill + UserMenu (UI-SPEC §6.7, Plan 11-05 D-06).
  *
- * Plan 11-05 refactor: `<LocaleToggle />` + `<ThemeToggle />` relocated to the
- * bottom of `<RetractableSidebar />` (Plan 11-04). The `theme` prop is removed —
- * Topbar no longer renders any theme-aware controls.
+ * The title is rendered by the `<TopbarTitle>` client island so it can read
+ * the current pathname; the rest of the topbar chrome stays server-rendered.
  */
 export interface TopbarProps {
   displayName: string;
   email: string;
   lang: Lang;
   isAdmin?: boolean;
-  pageTitle?: string;
+  /** Forwarded to TopbarTitle so admin-tree paths resolve to admin titles. */
+  adminSegment?: string;
 }
 
 export function Topbar({
@@ -23,10 +24,8 @@ export function Topbar({
   email,
   lang,
   isAdmin = false,
-  pageTitle,
+  adminSegment,
 }: TopbarProps) {
-  const title = pageTitle ?? t('header.home', lang);
-
   return (
     <header
       style={{
@@ -44,19 +43,7 @@ export function Topbar({
         zIndex: 100,
       }}
     >
-      <span
-        style={{
-          fontSize: '16.5px',
-          fontWeight: 600,
-          color: 'var(--ink)',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          maxWidth: '60%',
-        }}
-      >
-        {title}
-      </span>
+      <TopbarTitle lang={lang} adminSegment={adminSegment} />
       {isAdmin && (
         <span
           style={{

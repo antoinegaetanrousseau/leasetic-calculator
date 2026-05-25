@@ -19,21 +19,18 @@ afterEach(() => {
 });
 
 function renderCard(
-  opts: { accordionDefaultOpen?: boolean; prefill?: Record<string, unknown> } = {},
+  opts: { prefill?: Record<string, unknown> } = {},
 ) {
-  const { accordionDefaultOpen = false, prefill } = opts;
-  const onToggle = vi.fn();
+  const { prefill } = opts;
   const utils = render(
     <ProposalFormProvider prefill={prefill}>
       <ParametresFormCard
         draftId="d-1"
-        accordionDefaultOpen={accordionDefaultOpen}
-        onAccordionToggle={onToggle}
         lang="fr"
       />
     </ProposalFormProvider>,
   );
-  return { ...utils, onToggle };
+  return utils;
 }
 
 describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
@@ -84,22 +81,21 @@ describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
     expect(style).toMatch(/margin:\s*24px 0/);
   });
 
-  it('Test 7: <PlusDeDetailsAccordion> appears BELOW the .card (not inside it) and respects accordionDefaultOpen', () => {
-    const { container } = renderCard({ accordionDefaultOpen: true });
-    // Accordion trigger button + ARIA region — derived from PlusDeDetailsAccordion.tsx.
-    const trigger = screen.getByRole('button', { name: /Plus de détails/ });
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    // Trigger must NOT be inside the .card.
+  it('Test 7: INFORMATIONS COMPLÉMENTAIRES section header appears inside the .card', () => {
+    const { container } = renderCard();
     const card = container.querySelector('section.card');
-    expect(card!.contains(trigger)).toBe(false);
+    expect(card).not.toBeNull();
+    expect(card!.textContent).toMatch(/INFORMATIONS COMPL/);
+    // No accordion trigger — fields are always visible.
+    expect(screen.queryByRole('button', { name: /Plus de détails/ })).toBeNull();
   });
 
-  it('Test 8: 5 optional fields inside the accordion in order: clientRole, clientSiren, projectDesc, slb, evalParc', () => {
-    const { container } = renderCard({ accordionDefaultOpen: true });
-    const region = container.querySelector('#plus-de-details-region');
-    expect(region).not.toBeNull();
-    // Read the inputs/labels inside the region IN ORDER.
-    const labels = Array.from(region!.querySelectorAll('label')).map((l) =>
+  it('Test 8: 5 optional fields are always visible inside the .card in order: clientRole, clientSiren, projectDesc, slb, evalParc', () => {
+    const { container } = renderCard();
+    const card = container.querySelector('section.card');
+    expect(card).not.toBeNull();
+    // Read the inputs/labels inside the card IN ORDER.
+    const labels = Array.from(card!.querySelectorAll('label')).map((l) =>
       l.textContent?.trim() ?? '',
     );
     // The 5 optional fields must be in the canonical UI-SPEC §5.2 order.
@@ -165,18 +161,26 @@ describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
   });
 
   it('Test 14 (extra — ADMIN-09 step-1 surface): no "commission" string appears anywhere in the rendered HTML', () => {
-    const { container } = renderCard({ accordionDefaultOpen: true });
+    const { container } = renderCard();
     // ADMIN-09: commission MUST NOT appear on step-1 — commission visibility
     // relaxation lives ONLY on steps 2 and 3 (D-12).
     expect(container.innerHTML.toLowerCase()).not.toMatch(/commission/);
   });
 
-  it('Test 15 (extra): the accordion onToggle wiring is called when the trigger is clicked', () => {
-    const { onToggle } = renderCard({ accordionDefaultOpen: false });
-    const trigger = screen.getByRole('button', { name: /Plus de détails/ });
-    trigger.click();
-    expect(onToggle).toHaveBeenCalledTimes(1);
-    expect(onToggle).toHaveBeenCalledWith(true);
+  it('Test 15 (extra): register()-wired fields carry their name attributes; Controller-wrapped fields visible by label', () => {
+    const { container } = renderCard();
+    // register()-based fields carry [name] attributes directly.
+    const registerNames = ['clientCo', 'clientName', 'clientEmail',
+      'partnerRef', 'clientRole', 'projectDesc'];
+    for (const name of registerNames) {
+      expect(
+        container.querySelector(`[name="${name}"]`),
+        `expected [name="${name}"] in DOM`,
+      ).not.toBeNull();
+    }
+    // Controller-wrapped fields are visible by their labels.
+    expect(screen.getByLabelText(/Téléphone/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/SIREN/)).toBeInTheDocument();
   });
 
   it('Test 16 (extra): unused `within` import not required — sanity smoke (file imports correctly)', () => {

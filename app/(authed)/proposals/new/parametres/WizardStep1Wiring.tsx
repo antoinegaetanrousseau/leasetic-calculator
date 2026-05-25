@@ -25,7 +25,6 @@ import type { z } from 'zod';
 import { proposalInputSchema } from '@/lib/calc';
 import { type Lang, t } from '@/lib/i18n/dictionaries';
 import { saveAsDraftAction } from '../_actions/saveAsDraft.action';
-import { persistAccordionOpenAction } from '../_actions/persistAccordionOpen.action';
 import { WizardActionBar } from '../_components/WizardActionBar';
 import { ParametresFormCard } from './ParametresFormCard';
 
@@ -33,36 +32,25 @@ type ProposalFormValues = z.input<typeof proposalInputSchema>;
 
 export interface WizardStep1WiringProps {
   draftId: string;
-  accordionDefaultOpen: boolean;
   lang: Lang;
 }
 
 export function WizardStep1Wiring({
   draftId,
-  accordionDefaultOpen,
   lang,
 }: WizardStep1WiringProps) {
   const form = useFormContext<ProposalFormValues>();
 
-  // D-17: save-as-draft binds the current RHF values + invokes the server
-  // action. The action redirects to '/' on success; WizardActionBar surfaces
-  // the success toast before the redirect resolves.
+  // D-17: save-as-draft binds the current RHF values + invokes the server action.
   const onSaveDraft = async () => {
     const values = form.getValues();
     await saveAsDraftAction(draftId, values as Record<string, unknown>);
-  };
-
-  // D-06: fire-and-forget accordion persistence — no await, no toast.
-  const onAccordionToggle = (open: boolean) => {
-    void persistAccordionOpenAction(draftId, open);
   };
 
   return (
     <>
       <ParametresFormCard
         draftId={draftId}
-        accordionDefaultOpen={accordionDefaultOpen}
-        onAccordionToggle={onAccordionToggle}
         lang={lang}
       />
       <div style={{ marginTop: 16 }}>

@@ -22,6 +22,7 @@
 
 import { useSyncExternalStore, startTransition, useCallback, useEffect, type CSSProperties, type ComponentType } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Home,
   Plus,
@@ -38,35 +39,22 @@ import {
 import { t, type DictKey, type Lang } from '@/lib/i18n/dictionaries';
 import { setTheme } from '@/lib/theme/actions';
 import { setLang } from '@/lib/i18n/actions';
+import { getRouteMeta, type ActiveNav } from '@/lib/route-meta';
 import { LocaleToggle } from '../LocaleToggle';
 import { ThemeToggle } from '../ThemeToggle';
 import { BrandLogo } from './BrandLogo';
 
-/**
- * Active nav key — Phase 18 D-27 reshaped per-role contract:
- *   - Partner (4 items): home / proposals-new / proposals / help
- *   - Admin (6 items):   admin-home / proposals-new / proposals /
- *                        admin-partners / admin-coefficients / help
- * `history` and `admin-history` retained for back-compat with existing
- * route segments (Phase 14 /history page still exists; sidebar simply
- * no longer surfaces a top-level link to it per D-27 — entry points are
- * the Admin Home AdminNavCard + Recent activity "Voir tout" link).
- */
-export type ActiveNav =
-  | 'home'
-  | 'proposals-new'
-  | 'proposals'
-  | 'history'
-  | 'help'
-  | 'admin-home'
-  | 'admin-coefficients'
-  | 'admin-partners'
-  | 'admin-history';
+// Re-exported for back-compat with existing imports (e.g. tests). The
+// canonical home is now @/lib/route-meta.
+export type { ActiveNav };
 
 export interface RetractableSidebarProps {
-  /** Active route key for highlighting the active nav item. */
-  activeNav: ActiveNav;
-  /** When true, render the 4 admin nav items; when false, the 4 partner nav items. */
+  /**
+   * Optional override for highlighting. When omitted, the active nav is
+   * derived from the current pathname via getRouteMeta.
+   */
+  activeNav?: ActiveNav;
+  /** When true, render the 6 admin nav items; when false, the 4 partner nav items. */
   isAdmin: boolean;
   /** Current language for i18n labels + LocaleToggle current value. */
   lang: Lang;
@@ -83,6 +71,12 @@ export interface RetractableSidebarProps {
     partners: string;
     history: string;
   };
+  /**
+   * Admin-only: passed through to getRouteMeta so admin paths resolve to admin
+   * active-nav keys. Required for correct derivation when isAdmin=true and
+   * `activeNav` is not explicitly provided.
+   */
+  adminSegment?: string;
 }
 
 const STORAGE_KEY = 'leasetic.sidebar.collapsed';
@@ -167,7 +161,14 @@ export function RetractableSidebar({
   lang,
   theme,
   adminHrefs,
+  adminSegment,
 }: RetractableSidebarProps) {
+  // Derive active-nav from the current pathname when not explicitly overridden.
+  // usePathname() can return null outside a router context (e.g. some test
+  // setups); the safe fallback in getRouteMeta handles it.
+  const pathname = usePathname();
+  const resolvedActiveNav: ActiveNav =
+    activeNav ?? getRouteMeta(pathname ?? '/', adminSegment).activeNav;
   // Read collapsed state from localStorage via useSyncExternalStore — the canonical
   // React 19 pattern for binding component render to an external store (avoids
   // react-hooks/set-state-in-effect; cleanly handles SSR via getServerSnapshot).
@@ -305,7 +306,7 @@ export function RetractableSidebar({
           brand row and first nav icon. In expanded mode the eyebrow div carries marginTop: 24. */}
       <ul id="leasetic-sidebar-nav" style={{ listStyle: 'none', padding: 0, margin: 0, marginTop: collapsed ? 24 : 0 }}>
         {navItems.map((item) => {
-          const isActive = item.key === activeNav;
+          const isActive = item.key === resolvedActiveNav;
           const itemStyle: CSSProperties = {
             display: 'flex',
             alignItems: 'center',
