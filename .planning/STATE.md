@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
-status: executing
-last_updated: "2026-05-25T22:14:35.059Z"
-last_activity: 2026-05-25
+status: verifying
+last_updated: "2026-05-26T00:35:00.000Z"
+last_activity: 2026-05-26
 progress:
   total_phases: 21
-  completed_phases: 17
+  completed_phases: 18
   total_plans: 105
-  completed_plans: 103
-  percent: 81
+  completed_plans: 105
+  percent: 87
 ---
 
 # State — Matrice Commerciale
@@ -27,9 +27,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 19 (New Capabilities) — EXECUTING
-Plan: 2 of 2 (Plan 01 complete)
-Status: Plan 01 complete — Plan 02 ready to execute
+Phase: 19 (New Capabilities) — COMPLETE
+Plan: 2 of 2 (Plans 01+02 complete)
+Status: Phase complete — ready for verification
 Last activity: 2026-05-26
 
 ## Phase 17 Performance Metrics
@@ -392,3 +392,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: Plan 18-05 — Sidebar row dropped 'use client' (no state/handlers after D-22 click-to-diff removal); composes inside server sidebar without client boundary
 - [Phase ?]: Aide article ships text-only with placeholder figures (HELP-01); wizard screenshot capture deferred to HELP-02 — blocked by pre-existing seed-partner-launch.ts companyName gap; 3 follow-up to-do chips filed in deferred-items.md item #4
 - [Phase ?]: SUPPORT_EMAIL = antoine.rousseau@leasetic.com (Aide landing Contact card mailto); matches @leasetic.com launch-domain; T-18-06-05 harvesting risk explicitly accepted per D-25
+- [Phase 19]: D-13: LC dashboard rows read-only — no Link wrapper, no onClick, no cursor:pointer (LcReferencesList)
+- [Phase 19]: D-18: LC dashboard reachable only via 4th AdminNavCard on Admin Home — sidebar D-27 lock honored, no new sidebar item
+- [Phase 19]: AdminNavCard lc-references variant uses teal accent (rgb 45,122,140) — same as partners, no new color token
+- [Phase 19]: Admin Home grid changed from repeat(3,1fr) inline style to Tailwind grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 for 4-card responsive layout

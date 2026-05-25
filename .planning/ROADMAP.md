@@ -78,7 +78,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] **Phase 16: Shell Refresh + Contrast Gates** — Refreshed sidebar + tri-state theme + hero pattern + locale relocation + topbar/footer; WCAG AA contrast for diff-panel and gold surfaces measured and signed off (completed 2026-05-21)
 - [x] **Phase 17: Partner Surfaces** — Partner Home dashboard (hero + MetricTiles + Propositions récentes), /proposals table with Archivées pill, full wizard redesign (3 steps + validity relocation + LC reference reservation); light+dark pair verified (completed 2026-05-24)
 - [x] **Phase 18: Admin Surfaces + Help Center** — Admin Home enhancement (hero + stats + CTA), Partners list styled table + AccountsList→PartnersList rename, Créer partenaire form refresh, Coefficients warning banner + history card refresh, Aide / Help Center (landing + Commencer ici starter article); light+dark pair verified; topbar route-awareness + 4 visual gaps closed; wizard step-1 CTA fixed (partnerCo fallback + validityDays whitelist clamp) (completed 2026-05-25)
-- [ ] **Phase 19: New Capabilities** — Per-partner XLSX export (ADMIN-09 clean, grep-contract suite extended), centralized LC reference dashboard (cross-partner, admin-only, grep-contract suite extended to 10+ gates)
+- [x] **Phase 19: New Capabilities** — Per-partner XLSX export (ADMIN-09 clean, grep-contract suite extended to gate 10), centralized LC reference dashboard (cross-partner, admin-only, grep-contract suite extended to gates 11+12)
 - [ ] **Phase 20: Infra Hardening** — Neon 3-branch split (per-scope DATABASE_URL), post-deploy DB-smoke CI step, Better Auth trustedOrigins middleware gate
 - [ ] **Phase 21: Partner-Onboarding Gates** — Admin password rotation (shared `leasetic2026` → individual strong), privacy policy confirmation with Thomas; final phase before first real partner
 
@@ -170,15 +170,15 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   1. A partner can trigger an XLSX export from `/proposals`; the downloaded file contains all proposals matching the current filter (Active or Archivées) with columns: Référence, Client, Projet, Montant HT, Durée, Loyer mensuel, Coefficient, Statut, Date de création, Date d'expiration.
   2. The XLSX file contains no `Commission` column, no `commission_pct` cell, and no commission-related substring in any sheet; this is enforced by a new gate in `tests/admin-09-grep-contracts.test.ts`.
   3. An admin can navigate to `/[adminSegment]/lc-references` and see a cursor-paginated, searchable list of every issued LC reference across all partners (reference, partner name, client name, project amount, status, created_at).
-  4. The LC dashboard passes all ADMIN-09 grep-contract suite gates (now ≥10); list rows, search results, and any detail surfaces contain no commission data.**Plans:** 1/2 plans executed
+  4. The LC dashboard passes all ADMIN-09 grep-contract suite gates (now ≥10); list rows, search results, and any detail surfaces contain no commission data.**Plans:** 2/2 plans executed
 
 **Wave 1**
 
 - [x] 19-01-PLAN.md — EXPORT: per-partner XLSX export (src/lib/xlsx adapter + Server Action + ExportButton + ADMIN-09 gate 10)
 
-**Wave 2** *(blocked on Wave 1 completion)*
+**Wave 2**
 
-- [ ] 19-02-PLAN.md — LCDASH: cross-partner LC reference dashboard (lc-references DB query + admin SSR page + LcReferencesList + 4th AdminNavCard + Admin Home grid 3→4 + ADMIN-09 gates 11+12)
+- [x] 19-02-PLAN.md — LCDASH: cross-partner LC reference dashboard (lc-references DB query + admin SSR page + LcReferencesList + 4th AdminNavCard + Admin Home grid 3→4 + ADMIN-09 gates 11+12)
 
 **UI hint:** yes
 
