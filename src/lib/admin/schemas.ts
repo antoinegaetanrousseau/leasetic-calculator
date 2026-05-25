@@ -29,10 +29,11 @@ export const coeffEditorSchema = z.object({
   maxAmount: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/, { message: 'admin.coefficients.error.max_amount.format' }),
-  // D-09-13: schema unchanged — single int default. Allowed VALUES at calc layer
-  // stay {15,30,60} via src/lib/calc/schema.ts.validityDaysSchema. The admin's
-  // default is a UI affordance only; we accept any positive int here.
-  validityDays: z.coerce.number().int().min(1, { message: 'admin.coefficients.error.validity.min' }),
+  validityDays: z.coerce
+    .number()
+    .refine((v): v is 15 | 30 | 60 => ([15, 30, 60] as number[]).includes(v), {
+      message: 'admin.coefficients.error.validity.invalid',
+    }),
   coefficients: z.object({
     t1: tranchePerDuration,
     t2: tranchePerDuration,

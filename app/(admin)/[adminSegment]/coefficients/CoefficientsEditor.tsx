@@ -160,18 +160,19 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
               {t('admin.coefficients.validity.label', lang)}
               <span className="req" aria-hidden="true">*</span>
             </label>
-            <input
+            <select
               id="validity-days"
-              type="number"
-              min={1}
-              step={1}
               aria-invalid={errors.validityDays ? true : undefined}
               aria-describedby={
                 errors.validityDays ? 'validity-days-error' : 'validity-days-hint'
               }
               className={errors.validityDays ? 'invalid' : ''}
-              {...register('validityDays', { valueAsNumber: true })}
-            />
+              {...register('validityDays')}
+            >
+              {([15, 30, 60] as const).map((v) => (
+                <option key={v} value={v}>{v}</option>
+              ))}
+            </select>
             <p
               id="validity-days-hint"
               style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}
