@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { t, type Lang } from '@/lib/i18n';
+import { t, type Lang } from '@/lib/i18n/dictionaries';
 import { getRouteMeta } from '@/lib/route-meta';
 
 export interface TopbarTitleProps {
