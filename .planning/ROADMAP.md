@@ -77,7 +77,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 - [x] **Phase 16: Shell Refresh + Contrast Gates** — Refreshed sidebar + tri-state theme + hero pattern + locale relocation + topbar/footer; WCAG AA contrast for diff-panel and gold surfaces measured and signed off (completed 2026-05-21)
 - [x] **Phase 17: Partner Surfaces** — Partner Home dashboard (hero + MetricTiles + Propositions récentes), /proposals table with Archivées pill, full wizard redesign (3 steps + validity relocation + LC reference reservation); light+dark pair verified (completed 2026-05-24)
-- [x] **Phase 18: Admin Surfaces + Help Center** — Admin Home enhancement (hero + stats + CTA), Partners list styled table + AccountsList→PartnersList rename, Créer partenaire form refresh, Coefficients warning banner + history card refresh, Aide / Help Center (landing + Commencer ici starter article); light+dark pair verified; topbar route-awareness + 4 visual gaps closed (completed 2026-05-25)
+- [x] **Phase 18: Admin Surfaces + Help Center** — Admin Home enhancement (hero + stats + CTA), Partners list styled table + AccountsList→PartnersList rename, Créer partenaire form refresh, Coefficients warning banner + history card refresh, Aide / Help Center (landing + Commencer ici starter article); light+dark pair verified; topbar route-awareness + 4 visual gaps closed; wizard step-1 CTA fixed (partnerCo fallback + validityDays whitelist clamp) (completed 2026-05-25)
 - [ ] **Phase 19: New Capabilities** — Per-partner XLSX export (ADMIN-09 clean, grep-contract suite extended), centralized LC reference dashboard (cross-partner, admin-only, grep-contract suite extended to 10+ gates)
 - [ ] **Phase 20: Infra Hardening** — Neon 3-branch split (per-scope DATABASE_URL), post-deploy DB-smoke CI step, Better Auth trustedOrigins middleware gate
 - [ ] **Phase 21: Partner-Onboarding Gates** — Admin password rotation (shared `leasetic2026` → individual strong), privacy policy confirmation with Thomas; final phase before first real partner
@@ -206,7 +206,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 15. Public Surface Brand Polish | v1.2 | 1/1 | Complete | 2026-05-21 |
 | 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete    | 2026-05-21 |
 | 17. Partner Surfaces | v1.3 | 8/8 | Complete   | 2026-05-24 |
-| 18. Admin Surfaces + Help Center | v1.3 | 6/7 | In Progress|  |
+| 18. Admin Surfaces + Help Center | v1.3 | 7/7 | Complete   | 2026-05-25 |
 | 19. New Capabilities | v1.3 | 0/TBD | Not started | — |
 | 20. Infra Hardening | v1.3 | 0/TBD | Not started | — |
 | 21. Partner-Onboarding Gates | v1.3 | 0/TBD | Not started | — |
