@@ -25,6 +25,7 @@ import { useTransition } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
 export type WizardActionBarPrimary =
@@ -78,7 +79,8 @@ export function WizardActionBar({
         toast.success(t('wizard.toast.save.draft.success', lang));
         // D-17: server action handles the redirect to `/` itself. No
         // router.push here — keeps the action-bar a pure surface.
-      } catch {
+      } catch (e) {
+        if (isRedirectError(e)) throw e;
         toast.error(t('wizard.toast.draft.error', lang));
       }
     });

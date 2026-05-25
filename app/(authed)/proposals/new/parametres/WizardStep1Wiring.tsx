@@ -20,11 +20,15 @@
  * saveAndAdvanceAction (plan 13-04).
  */
 
+import { useTransition } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { z } from 'zod';
+import { toast } from 'sonner';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { proposalInputSchema } from '@/lib/calc';
 import { type Lang, t } from '@/lib/i18n/dictionaries';
 import { saveAsDraftAction } from '../_actions/saveAsDraft.action';
+import { saveAndAdvanceAction } from '../_actions/saveAndAdvance.action';
 import { WizardActionBar } from '../_components/WizardActionBar';
 import { ParametresFormCard } from './ParametresFormCard';
 
@@ -40,11 +44,30 @@ export function WizardStep1Wiring({
   lang,
 }: WizardStep1WiringProps) {
   const form = useFormContext<ProposalFormValues>();
+  const [isContinuePending, startContinueTransition] = useTransition();
 
   // D-17: save-as-draft binds the current RHF values + invokes the server action.
   const onSaveDraft = async () => {
     const values = form.getValues();
     await saveAsDraftAction(draftId, values as Record<string, unknown>);
+  };
+
+  // Validate + save + redirect to calcul. saveAndAdvanceAction redirects
+  // server-side on success; isRedirectError re-throws so Next.js handles navigation.
+  const onContinue = () => {
+    startContinueTransition(async () => {
+      try {
+        const values = form.getValues();
+        await saveAndAdvanceAction(draftId, values as Record<string, unknown>, 1);
+      } catch (e) {
+        if (isRedirectError(e)) throw e;
+        if (e instanceof Error && e.message === 'ValidationFailed') {
+          toast.error(t('wizard.toast.validation.errors', lang));
+        } else {
+          toast.error(t('wizard.toast.draft.error', lang));
+        }
+      }
+    });
   };
 
   return (
@@ -60,9 +83,11 @@ export function WizardStep1Wiring({
           lang={lang}
           onSaveDraft={onSaveDraft}
           primary={{
-            kind: 'link',
-            href: `/proposals/new/calcul?draft_id=${draftId}`,
+            kind: 'action',
+            onClick: onContinue,
             label: t('wizard.action.step1.continue', lang),
+            spinnerLabel: t('wizard.action.step1.continue.spinner', lang),
+            isSubmitting: isContinuePending,
           }}
         />
       </div>

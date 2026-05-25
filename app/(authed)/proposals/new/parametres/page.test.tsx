@@ -26,6 +26,7 @@ const {
   getLatestGlobalParamsMock,
   persistAccordionOpenMock,
   saveAsDraftMock,
+  saveAndAdvanceMock,
 } = vi.hoisted(() => ({
   redirectMock: vi.fn((path: string) => {
     throw new Error(`NEXT_REDIRECT:${path}`);
@@ -39,6 +40,7 @@ const {
   getLatestGlobalParamsMock: vi.fn(),
   persistAccordionOpenMock: vi.fn(),
   saveAsDraftMock: vi.fn(),
+  saveAndAdvanceMock: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -77,6 +79,9 @@ vi.mock('@/(authed)/proposals/new/_actions/persistAccordionOpen.action', () => (
 vi.mock('@/(authed)/proposals/new/_actions/saveAsDraft.action', () => ({
   saveAsDraftAction: (...args: unknown[]) => saveAsDraftMock(...args),
 }));
+vi.mock('@/(authed)/proposals/new/_actions/saveAndAdvance.action', () => ({
+  saveAndAdvanceAction: (...args: unknown[]) => saveAndAdvanceMock(...args),
+}));
 
 // Import AFTER all mocks are in place.
 import ParametresStep1Page from './page';
@@ -95,6 +100,7 @@ beforeEach(() => {
   getLatestGlobalParamsMock.mockReset();
   persistAccordionOpenMock.mockReset();
   saveAsDraftMock.mockReset();
+  saveAndAdvanceMock.mockReset();
 
   // Default happy path: a logged-in user with a draft owned by them.
   requireUserMock.mockResolvedValue({
@@ -327,7 +333,7 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
   // ──────────────────────────────────────────────────────────────────────────
   // WizardActionBar wiring (D-19)
   // ──────────────────────────────────────────────────────────────────────────
-  it('Test 11: WizardActionBar renders with currentStep=1 (no Précédent), primary link "Continuer vers le calcul →", href=/proposals/new/calcul?draft_id=<id>', async () => {
+  it('Test 11: WizardActionBar renders with currentStep=1 (no Précédent), primary button "Continuer vers le calcul →" (calls saveAndAdvanceAction on click)', async () => {
     getDraftByIdMock.mockResolvedValue({
       id: 'd-1',
       userId: USER_ID,
@@ -341,13 +347,11 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
     const { container, queryByLabelText, getByText } = render(tree);
     // Step 1 → no Précédent link.
     expect(queryByLabelText(/étape précédente/i)).toBeNull();
-    // Primary CTA = link with the step-1 continue label.
+    // Primary CTA = button (not a link) — it saves via saveAndAdvanceAction before navigating.
     const cta = getByText(/Continuer vers le calcul/);
     expect(cta).toBeInTheDocument();
-    expect(cta.closest('a')).toHaveAttribute(
-      'href',
-      '/proposals/new/calcul?draft_id=d-1',
-    );
+    expect(cta.closest('button')).not.toBeNull();
+    expect(cta.closest('a')).toBeNull();
     // Ghost button "Enregistrer comme brouillon" must be present.
     expect(getByText(/Enregistrer comme brouillon/)).toBeInTheDocument();
     // Sanity: no commission rendered (ADMIN-09 step-1 — Test 13).
