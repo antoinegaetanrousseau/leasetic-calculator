@@ -51,9 +51,24 @@ export async function saveAndAdvanceAction(
   // D-01: auth FIRST.
   const { session } = await requireUser();
 
+  // D-07: overlay session-hydrated fields before validation — these are never
+  // user-editable inputs, so we source them from the authoritative session,
+  // not from the client payload (which may have empty strings when the user's
+  // account lacks companyName/displayName).
+  const u = session.user as {
+    displayName?: string | null;
+    name?: string | null;
+    companyName?: string | null;
+  };
+  const enriched = {
+    ...nextInputs,
+    partnerName: u.displayName ?? u.name ?? (nextInputs.partnerName as string | undefined) ?? '',
+    partnerCo: u.companyName ?? (nextInputs.partnerCo as string | undefined) ?? '',
+  };
+
   // D-13: re-validate the canonical schema server-side. Defence in depth
   // against client-bypass tampering; the client's RHF resolver already gates.
-  const parsed = proposalInputSchema.safeParse(nextInputs);
+  const parsed = proposalInputSchema.safeParse(enriched);
   if (!parsed.success) {
     // Caller's WizardActionBar catch converts this to toast
     // 'wizard.toast.validation.errors' (UI-SPEC §6.8).
@@ -71,7 +86,7 @@ export async function saveAndAdvanceAction(
   const prevInputs = (prev.inputs ?? {}) as Record<string, unknown>;
   const completed = deriveCompletedSteps(prevInputs, nextInputs, fromStep);
   const merged: Record<string, unknown> = {
-    ...nextInputs,
+    ...enriched,
     _uiAccordionOpen: prevInputs._uiAccordionOpen ?? false,
     _completedSteps: markStepCompleted(completed, fromStep),
   };

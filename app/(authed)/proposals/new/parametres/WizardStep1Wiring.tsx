@@ -58,8 +58,11 @@ export function WizardStep1Wiring({
   // navigation cleanly.
   const onContinue = () => {
     startContinueTransition(async () => {
-      const valid = await form.trigger();
-      if (!valid) return; // field errors already visible inline; no toast needed
+      // Only trigger the 3 visible required fields — partnerCo/partnerName/validityDays
+      // are session/server-hydrated hidden fields; triggering them would silently
+      // block advance when the user's account has no companyName set.
+      const valid = await form.trigger(['clientCo', 'amountHT', 'durationMonths']);
+      if (!valid) return; // field errors visible inline; no toast needed
 
       try {
         const values = form.getValues();
