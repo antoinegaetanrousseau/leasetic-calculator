@@ -73,8 +73,7 @@ export async function saveAndAdvanceAction(
   // against client-bypass tampering; the client's RHF resolver already gates.
   const parsed = proposalInputSchema.safeParse(enriched);
   if (!parsed.success) {
-    // Caller's WizardActionBar catch converts this to toast
-    // 'wizard.toast.validation.errors' (UI-SPEC §6.8).
+    console.error('[saveAndAdvance] validation failed:', JSON.stringify(parsed.error.flatten(), null, 2));
     throw new Error('ValidationFailed');
   }
 
