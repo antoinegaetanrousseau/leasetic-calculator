@@ -193,7 +193,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   2. A GitHub Actions CI step runs a real-Postgres smoke on every PR touching `drizzle/migrations/*.sql` or `drizzle/meta/_journal.json`, using a Neon ephemeral branch; the step fails (and blocks merge) if the schema cannot be applied cleanly.
   3. A middleware-level Origin gate on `/api/auth/sign-in/*` mutations hard-blocks requests whose `Origin` header is not in the `trustedOrigins` list; verified by a test that sends an untrusted Origin and asserts a non-2xx response.
 
-**Plans:** TBD
+**Plans:** 1/3 plans executed
 
 ### Phase 21: Partner-Onboarding Gates
 
@@ -233,7 +233,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 17. Partner Surfaces | v1.3 | 8/8 | Complete   | 2026-05-24 |
 | 18. Admin Surfaces + Help Center | v1.3 | 7/7 | Complete   | 2026-05-25 |
 | 19. New Capabilities | v1.3 | 2/2 | Complete    | 2026-05-25 |
-| 20. Infra Hardening | v1.3 | 0/TBD | Not started | — |
+| 20. Infra Hardening | v1.3 | 1/3 | In Progress|  |
 | 21. Partner-Onboarding Gates | v1.3 | 0/TBD | Not started | — |
 
 ---

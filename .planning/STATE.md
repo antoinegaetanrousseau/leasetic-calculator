@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
 status: executing
-last_updated: "2026-05-26T19:25:34.210Z"
-last_activity: 2026-05-26 -- Phase 20 planning complete
+last_updated: "2026-05-27T09:41:29.879Z"
+last_activity: 2026-05-27 -- Phase 20 execution started
 progress:
   total_phases: 21
   completed_phases: 18
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 20 — infra hardening
+**Current focus:** Phase 20 — Infra Hardening
 
 ## Current Position
 
-Phase: 20
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-26 -- Phase 20 planning complete
+Phase: 20 (Infra Hardening) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 20
+Last activity: 2026-05-27 -- Phase 20 execution started
 
 ## Phase 17 Performance Metrics
 

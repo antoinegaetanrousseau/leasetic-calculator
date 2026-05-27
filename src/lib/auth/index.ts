@@ -68,7 +68,40 @@ function resolveBaseUrl(): string {
   return 'http://localhost:3000';
 }
 
+/**
+ * Phase 20-01 (INFRA-03): Origin allow-list for Better Auth CSRF gate.
+ *
+ * Derives the `trustedOrigins` array from existing env vars plus a Vercel-preview
+ * wildcard. No new env vars are introduced (D-13). Better Auth 1.6.x wildcard
+ * support confirmed by 20-RESEARCH.md §1 — eliminates the need to compute
+ * VERCEL_URL at runtime per deployment.
+ *
+ * `baseURL` (from `resolveBaseUrl()`) is auto-trusted by Better Auth and is NOT
+ * duplicated in this list.
+ *
+ * Exported for unit testing (pure function, no I/O). Consumed by `createAuth()`
+ * below. The `__` prefix marks it test-internal — production callers should
+ * read `auth()` instead.
+ *
+ * Note on rejection-response shape: Better Auth rejects requests whose Origin
+ * is not in this list with a non-2xx status (exact code varies between rejection
+ * paths and library point releases). Tests assert membership of this list, not
+ * the Better Auth response shape, to stay forward-compatible (20-RESEARCH.md §1).
+ */
+export function __resolveTrustedOriginsForTests(): string[] {
+  return [
+    process.env.APP_URL?.trim(),
+    process.env.NEXT_PUBLIC_APP_URL?.trim(),
+    // Covers all Vercel preview URLs for this project (PR-scoped, branch-scoped, etc.)
+    'https://leasetic-matrice-*.vercel.app',
+    // Always trust localhost for local development.
+    'http://localhost:3000',
+  ].filter((v): v is string => Boolean(v));
+}
+
 function createAuth() {
+  const allowedOrigins = __resolveTrustedOriginsForTests();
+
   return betterAuth({
     baseURL: resolveBaseUrl(),
     secret: process.env.AUTH_SECRET ?? '',
@@ -170,7 +203,7 @@ function createAuth() {
       admin(),
     ],
 
-    trustedOrigins: [resolveBaseUrl(), 'http://localhost:3000'].filter(Boolean),
+    trustedOrigins: allowedOrigins,
   });
 }
 
