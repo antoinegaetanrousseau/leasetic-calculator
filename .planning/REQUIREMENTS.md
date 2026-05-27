@@ -72,9 +72,9 @@
 
 ### Infra hardening (INFRA)
 
-- [ ] **INFRA-01**: Neon 3-branch split with `DATABASE_URL` per-Vercel-scope routing: production scope → `main` Neon branch, preview scope → `preview` Neon branch, development scope → `development` Neon branch. Resolves v1.1 BOOT-03 partial (all 3 Vercel scopes currently route to `main` pooled endpoint).
-- [ ] **INFRA-02**: GitHub Actions CI gains a post-deploy DB-smoke step that runs against a Neon ephemeral branch on every PR touching `drizzle/migrations/*.sql` or `drizzle/meta/_journal.json`. Closes the recurring "generator self-evaluation blind spot" class that bit v1.1 (correlated-subquery SQL bug) and v1.2 Phase 12 (missing `_journal.json` entry → 24h prod un-applied).
-- [ ] **INFRA-03**: Better Auth `trustedOrigins` hardening via middleware-level Origin gate on `/api/auth/sign-in/*` mutations. Hard-blocks based on Origin header (in addition to the existing SameSite=Lax + `__Secure-` cookies CSRF defense). Resolves Phase 6 follow-up #2.
+- [x] **INFRA-01**: Neon 3-branch split with `DATABASE_URL` per-Vercel-scope routing: production scope → `main` Neon branch, preview scope → `preview` Neon branch, development scope → `development` Neon branch. Resolves v1.1 BOOT-03 partial (all 3 Vercel scopes currently route to `main` pooled endpoint).
+- [x] **INFRA-02**: GitHub Actions CI gains a post-deploy DB-smoke step that runs against a Neon ephemeral branch on every PR touching `drizzle/migrations/*.sql` or `drizzle/meta/_journal.json`. Closes the recurring "generator self-evaluation blind spot" class that bit v1.1 (correlated-subquery SQL bug) and v1.2 Phase 12 (missing `_journal.json` entry → 24h prod un-applied).
+- [x] **INFRA-03**: Better Auth `trustedOrigins` hardening via middleware-level Origin gate on `/api/auth/sign-in/*` mutations. Hard-blocks based on Origin header (in addition to the existing SameSite=Lax + `__Secure-` cookies CSRF defense). Resolves Phase 6 follow-up #2.
 
 ### Partner-onboarding gates — LAST PHASE before partner cutover (GATE)
 
@@ -174,9 +174,9 @@ Which phases cover which requirements. Updated during roadmap creation by the gs
 | EXPORT-02 | 19 | Complete |
 | LCDASH-01 | 19 | Complete |
 | LCDASH-02 | 19 | Complete |
-| INFRA-01 | 20 | Pending |
-| INFRA-02 | 20 | Pending |
-| INFRA-03 | 20 | Pending |
+| INFRA-01 | 20 | Complete |
+| INFRA-02 | 20 | Complete |
+| INFRA-03 | 20 | Complete |
 | GATE-01 | 21 | Pending |
 | GATE-02 | 21 | Pending |
 

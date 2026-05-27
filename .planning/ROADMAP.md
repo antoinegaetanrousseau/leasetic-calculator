@@ -233,7 +233,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 17. Partner Surfaces | v1.3 | 8/8 | Complete   | 2026-05-24 |
 | 18. Admin Surfaces + Help Center | v1.3 | 7/7 | Complete   | 2026-05-25 |
 | 19. New Capabilities | v1.3 | 2/2 | Complete    | 2026-05-25 |
-| 20. Infra Hardening | v1.3 | 3/3 | Complete   | 2026-05-27 |
+| 20. Infra Hardening | v1.3 | 3/3 | Complete    | 2026-05-27 |
 | 21. Partner-Onboarding Gates | v1.3 | 0/TBD | Not started | — |
 
 ---
