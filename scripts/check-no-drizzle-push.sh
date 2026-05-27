@@ -8,13 +8,16 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Search package.json, shell scripts, GitHub Actions workflows, README, and source files.
-# Skip node_modules, .next (build outputs), .planning/ (docs discuss the rule itself),
+# Skip node_modules, .next (build outputs), .planning/ + docs/ (documentation that
+# discusses the rule itself — Phase 20 adds docs/operations/neon-branch-routing.md
+# which mentions the prohibition in a 'Locked rules' section),
 # drizzle.config.ts (has a comment explaining the prohibition), and this script itself.
 matches=$(
   grep -rEn \
     --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
     --include='*.md' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.mjs' --include='*.cjs' \
-    --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=drizzle --exclude-dir=.planning \
+    --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=drizzle \
+    --exclude-dir=.planning --exclude-dir=docs \
     --exclude='check-no-drizzle-push.sh' --exclude='drizzle.config.ts' --exclude='migrate.ts' \
     "drizzle-kit push" . 2>/dev/null \
   || true
