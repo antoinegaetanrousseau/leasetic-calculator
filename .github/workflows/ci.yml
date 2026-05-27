@@ -67,3 +67,61 @@ jobs:
 
       - name: Verify standalone artifact present (BOOT-07 sanity)
         run: test -f .next/standalone/server.js
+
+  # INFRA-02: CI migration smoke gate (D-05/D-06/D-07/D-08 + RESEARCH §5 Pattern B).
+  # Pattern B: job always runs so the required-status-check is always satisfiable.
+  # Internal steps are gated on the paths-filter output — exits in ~5s when no schema diff.
+  db-smoke:
+    name: db-smoke — migration apply gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Detect schema-relevant changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            schema:
+              - 'drizzle/migrations/*.sql'
+              - 'drizzle/meta/_journal.json'
+
+      - name: Setup Node.js
+        if: steps.filter.outputs.schema == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: steps.filter.outputs.schema == 'true'
+        run: npm ci
+
+      - name: Create ephemeral Neon branch
+        if: steps.filter.outputs.schema == 'true'
+        id: create-branch
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          parent: main
+          branch_name: ci-${{ github.run_id }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Apply migrations against ephemeral branch
+        if: steps.filter.outputs.schema == 'true'
+        env:
+          DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
+        run: npm run db:migrate
+
+      - name: Cleanup ephemeral Neon branch
+        # always() ensures cleanup fires on success AND failure (D-06)
+        if: always() && steps.filter.outputs.schema == 'true'
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: ci-${{ github.run_id }}
+          api_key: ${{ secrets.NEON_API_KEY }}
