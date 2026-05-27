@@ -15,7 +15,7 @@
  *   Test 11: AdminNavCard with variant='lc-references' renders with accent color 45,122,140
  */
 import { describe, expect, it, vi } from 'vitest';
-import { cleanup, render, within } from '@testing-library/react';
+import { cleanup, render } from '@testing-library/react';
 import { afterEach } from 'vitest';
 
 vi.mock('server-only', () => ({}));

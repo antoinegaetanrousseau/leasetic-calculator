@@ -132,11 +132,10 @@ jobs:
         # scripts/migrate.ts reads DATABASE_URL.
         # All inputs flow through env: vars — no shell interpolation of user input.
         env:
-          DATABASE_URL: ${{
-            (github.event.inputs.branch == 'main'        && secrets.DATABASE_URL_MAIN)        ||
-            (github.event.inputs.branch == 'preview'     && secrets.DATABASE_URL_PREVIEW)     ||
-            (github.event.inputs.branch == 'development' && secrets.DATABASE_URL_DEVELOPMENT)
-          }}
+          # Single-line expression: GitHub Actions YAML parser is finicky about
+          # multi-line ${{ }} blocks (commit 9421e65 caused a workflow registration
+          # failure). Keep as one line per env entry.
+          DATABASE_URL: ${{ (github.event.inputs.branch == 'main' && secrets.DATABASE_URL_MAIN) || (github.event.inputs.branch == 'preview' && secrets.DATABASE_URL_PREVIEW) || (github.event.inputs.branch == 'development' && secrets.DATABASE_URL_DEVELOPMENT) }}
           TARGET_BRANCH: ${{ github.event.inputs.branch }}
         run: |
           if [ -z "$DATABASE_URL" ]; then
