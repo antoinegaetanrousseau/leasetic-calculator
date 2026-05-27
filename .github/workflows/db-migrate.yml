@@ -1,18 +1,49 @@
-name: DB Migrate (Production)
+name: DB Migrate (Branch-Scoped)
 
 # MANUAL TRIGGER ONLY. No on:push, no on:pull_request, no on:schedule.
-# Per BOOT-10 + STATE.md: migrations apply to production only via this gated, human-approved path.
+# Per BOOT-10 + STATE.md: migrations apply only via this gated, human-approved path.
+#
+# Phase 20-02 (INFRA-02): extended to support per-branch routing.
+# - branch=main (default)        → applies to Neon main branch (production); requires "MIGRATE PROD" confirmation
+# - branch=preview               → applies to Neon preview branch (Vercel preview scope)
+# - branch=development           → applies to Neon development branch (Vercel development scope)
+#
+# Each target has its own GitHub secret + GitHub Environment:
+#   - DATABASE_URL_MAIN          (renamed from DATABASE_URL_PROD per 20-RESEARCH.md §4)
+#   - DATABASE_URL_PREVIEW       (provisioned during Phase 20-03 Task 1)
+#   - DATABASE_URL_DEVELOPMENT   (provisioned during Phase 20-03 Task 1)
+#
+# Antoine: rename the existing DATABASE_URL_PROD secret to DATABASE_URL_MAIN in
+# GitHub Settings → Environments → production → Environment secrets (or add the
+# new name and delete the old one). See Phase 20-03 runbook for exact steps.
+#
+# Security note (Phase 20-02): workflow_dispatch inputs are operator-controlled
+# (requires repo write access to trigger). `branch` is type: choice (constrained
+# to [main, preview, development]); `confirm` flows through env: vars before any
+# shell evaluation — no command-injection surface. Unlike PR/issue-driven inputs,
+# workflow_dispatch inputs do not need the github.event.* sanitization patterns.
 on:
   workflow_dispatch:
     inputs:
-      confirm:
-        description: 'Type "MIGRATE PROD" exactly to confirm you intend to apply migrations to production'
+      branch:
+        description: 'Target Neon branch (main = production)'
         required: true
+        type: choice
+        default: main
+        options:
+          - main
+          - preview
+          - development
+      confirm:
+        description: 'For main: type "MIGRATE PROD" exactly to confirm. For preview/development: any string (or leave blank).'
+        required: false
         type: string
 
-# Cancel concurrent runs against the same environment to avoid double-apply races.
+# Cancel concurrent runs against the same target branch to avoid double-apply races.
+# The group is parameterized by branch input so concurrent runs to different branches
+# don't block each other.
 concurrency:
-  group: db-migrate-prod
+  group: db-migrate-${{ github.event.inputs.branch }}
   cancel-in-progress: false  # Do NOT cancel a running migration; let it finish
 
 permissions:
@@ -23,7 +54,7 @@ jobs:
     name: Dry run — list pending migrations
     runs-on: ubuntu-24.04
     timeout-minutes: 5
-    # Note: dry-run does NOT use the production environment because it doesn't connect to the DB.
+    # Note: dry-run does NOT use any production environment because it doesn't connect to the DB.
     # It just lists files from drizzle/ directory.
     steps:
       - name: Checkout
@@ -31,16 +62,25 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Verify confirmation phrase
-        # Use env var to avoid direct interpolation of user input into shell (command injection safety)
+      - name: Verify confirmation phrase (main only)
+        # Production migration gate: only enforced when branch=main.
+        # Preview/development branches don't require the confirmation phrase because
+        # they're isolated environments (per Phase 20 INFRA-01 Neon branch model).
+        # Inputs flow through env: vars — no direct shell interpolation (defense in depth
+        # even though workflow_dispatch inputs are operator-controlled).
         env:
           CONFIRM_INPUT: ${{ github.event.inputs.confirm }}
+          TARGET_BRANCH: ${{ github.event.inputs.branch }}
         run: |
-          if [ "$CONFIRM_INPUT" != "MIGRATE PROD" ]; then
-            echo "ERROR: confirm input must be exactly 'MIGRATE PROD' (got: '$CONFIRM_INPUT')"
-            exit 1
+          if [ "$TARGET_BRANCH" = "main" ]; then
+            if [ "$CONFIRM_INPUT" != "MIGRATE PROD" ]; then
+              echo "ERROR: branch=main requires confirm='MIGRATE PROD' exactly (got: '$CONFIRM_INPUT')"
+              exit 1
+            fi
+            echo "Production migration confirmation OK."
+          else
+            echo "Target branch is '$TARGET_BRANCH' (non-production) — confirmation phrase not required."
           fi
-          echo "Confirmation OK."
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -58,14 +98,20 @@ jobs:
         run: npm run db:migrate:dry-run
 
   apply:
-    name: Apply migrations to production
+    name: Apply migrations to ${{ github.event.inputs.branch }}
     needs: dry-run
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    # The 'production' environment provides the human approval gate.
-    # Antoine must configure this environment in GitHub Settings → Environments
-    # with required-reviewers protection (one-time setup, see docs/operations/migrations.md).
-    environment: production
+    # GitHub Environment per branch. The 'production' environment (main) keeps
+    # required-reviewers protection — Antoine must approve. The 'preview' and
+    # 'development' environments are configured with no required reviewer so
+    # they can apply without manual approval.
+    #
+    # Antoine: configure environments in GitHub Settings → Environments:
+    #   - production    (required reviewer: yes; existing)
+    #   - preview       (required reviewer: no; one-time setup during Phase 20-03)
+    #   - development   (required reviewer: no; one-time setup during Phase 20-03)
+    environment: ${{ github.event.inputs.branch == 'main' && 'production' || github.event.inputs.branch }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -82,14 +128,20 @@ jobs:
         run: npm ci
 
       - name: Apply migrations
-        # DATABASE_URL_PROD is a SECRET on the 'production' environment.
-        # Setting it as DATABASE_URL because scripts/migrate.ts reads that var.
+        # DATABASE_URL secret is selected per branch from the corresponding GitHub Environment.
+        # scripts/migrate.ts reads DATABASE_URL.
+        # All inputs flow through env: vars — no shell interpolation of user input.
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          DATABASE_URL: ${{
+            (github.event.inputs.branch == 'main'        && secrets.DATABASE_URL_MAIN)        ||
+            (github.event.inputs.branch == 'preview'     && secrets.DATABASE_URL_PREVIEW)     ||
+            (github.event.inputs.branch == 'development' && secrets.DATABASE_URL_DEVELOPMENT)
+          }}
+          TARGET_BRANCH: ${{ github.event.inputs.branch }}
         run: |
           if [ -z "$DATABASE_URL" ]; then
-            echo "ERROR: DATABASE_URL_PROD secret is not set on the 'production' environment."
-            echo "Set it in GitHub Settings → Environments → production → Environment secrets."
+            echo "ERROR: DATABASE_URL_$(echo "$TARGET_BRANCH" | tr 'a-z' 'A-Z') secret is not set on the '$TARGET_BRANCH' environment."
+            echo "Set it in GitHub Settings → Environments → $TARGET_BRANCH → Environment secrets."
             exit 2
           fi
           npm run db:migrate
