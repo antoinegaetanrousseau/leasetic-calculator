@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Design Refresh + Partner-Onboarding Ready
-status: executing
-last_updated: "2026-05-29T18:06:27.364Z"
-last_activity: 2026-05-29 -- Phase 21 execution started
+milestone: v1.4
+milestone_name: Partner Types, Admin Dual-View & Rebrand
+status: planning
+last_updated: "2026-05-29T20:26:43.155Z"
+last_activity: 2026-05-29
 progress:
-  total_phases: 21
-  completed_phases: 19
-  total_plans: 110
-  completed_plans: 107
-  percent: 90
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State — Matrice Commerciale
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 21 (partner-onboarding-gates) — EXECUTING
-Plan: 1 of 2
-Status: Executing Phase 21
-Last activity: 2026-05-29 -- Phase 21 execution started
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-29 — Milestone v1.4 started
 
 ## Phase 17 Performance Metrics
 

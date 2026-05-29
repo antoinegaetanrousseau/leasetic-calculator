@@ -57,9 +57,11 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 - Admin password rotation, privacy policy confirmation (partner-onboarding gates)
 - Neon 3-branch split, post-deploy DB-smoke CI step (tech debt discovered during v1.2)
 
-## 🚧 Current Milestone: v1.3 — Design Refresh + Partner-Onboarding Ready
+## ✅ v1.3 — Design Refresh + Partner-Onboarding Ready — SHIPPED 2026-05-29
 
-**Started:** 2026-05-21 (post-v1.2 close, same-day Figma scope review)
+**Started:** 2026-05-21 · **Shipped:** 2026-05-29 — 8 days, 6 phases (16–21), 27 plans, 175 commits, 1122 tests passing. Summary: `.planning/reports/MILESTONE_SUMMARY-v1.3.md`. The app is now ready for the first real (non-test) partner invite.
+
+**Started (original):** 2026-05-21 (post-v1.2 close, same-day Figma scope review)
 **Source of truth:** `.planning/REQUIREMENTS.md` (TBD by `/gsd-new-milestone`) + Figma design contract `vwOzirhL0vyxDWq4m6t4gC` section `9:46` ("v1.3 — Redesign sketches", 13 screens) + `.planning/v1.3-CARRYFORWARD.md` (5-tier inventory generated at v1.2 close)
 
 **Goal:** Apply the Figma `9:46` design contract uniformly across partner + admin surfaces in both light and dark mode, ship the deferred Tier-3 surfaces (Partner Home dashboard + `/proposals` with `Archivées` filter pill) and three Tier-5 partner-pain capabilities (Excel export, centralized LC reference dashboard, AccountsList→PartnersList rename), harden infra (Neon 3-branch split + post-deploy DB-smoke CI + Better Auth `trustedOrigins` Origin gate), and close all Tier-1 partner-onboarding gates last (admin password rotation + privacy policy confirmation with Thomas) — so the milestone ends with the app ready for the first real partner.
@@ -91,20 +93,29 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 - **Validity-selector relocation** — moving from current placement to step 3 of the wizard. Will likely require setting `proposals.validity_days` to a default (e.g. 30) at draft creation, with step 3 mutating the final value. To be confirmed during planning of the wizard phase.
 - **Tier-1 gates ordered last** so they ride the same partner-cutover communications window as the rest of partner-readiness work.
 
-## ◯ Next Milestone: v1.4 — TBD
+## 🚧 Current Milestone: v1.4 — Partner Types, Admin Dual-View & Rebrand
 
-After v1.3 ships, candidates from `v1.3-CARRYFORWARD.md` Tier 5 not pulled into v1.3 remain available:
-- Playwright automated browser tests
-- SMTP self-service password reset
-- Sentry / APM observability
-- Mobile-optimized layout
-- Generic audit-log viewer beyond coefficient history
-- Webhook notifications to Leasétic on each proposal generation
-- Multi-language beyond FR + EN
-- Wizard step-1 sticky-footer action bar / `beforeunload` warning / per-step tab titles
-- Phase 11 sidebar adminHrefs config-driven refactor
-- `/accounts` 308 redirect sunset (warm-cache window ≥1 milestone is met after v1.3)
-- OVH production deployment + smoke execution (Tier 4 — September 2026 target)
+**Started:** 2026-05-29 (post-v1.3 close, same-day scope from Antoine)
+**Source of truth:** `.planning/REQUIREMENTS.md` (defined by `/gsd-new-milestone`). Continues phase numbering from v1.3 — **first phase is Phase 22**.
+
+**Goal:** Differentiate proposal economics by partner type (a commission-free path for Agent/Commercial), give admins a self-service view switch between admin and agent surfaces, fix PDF rendering defects, and re-skin the app to the new teal brand — alongside targeted admin-home label and component polish.
+
+**Target features (organized by theme):**
+
+- **Partner types & commission-free proposals** — a `partner_type` selector (`Agent` / `Commercial` / `Partenaire`) on the invite/create-partner form, backfilled to `Partenaire` for existing accounts and editable later by an admin. For `Agent` and `Commercial`, the commission is **removed from the loyer calculation entirely** (`loyer = montant HT × coefficient ÷ 100`, no `(1 + commission/100)` markup) **and** never appears in the UI or PDF. `Partenaire` keeps the v1.0-frozen formula. Requires a commission-free proposal + PDF render variant that respects (and extends) the ADMIN-09 envelope.
+- **Admin dual-view toggle** — a bottom-left settings toggle (next to the theme/locale controls), visible only to admin-level users, that switches the whole nav between admin routes (`/[adminSegment]`, `/coefficients`, `/partners`, `/lc-references`) and agent routes (`/`, `/proposals`). Admins land in **Admin** view on each login; the choice is **session-only** (not persisted across logout).
+- **PDF rendering fixes** — resolve the number/typography rendering defect on generated proposals (the loyer figure overlaps; root-cause spike in `@react-pdf/renderer` font + French thousands-separator handling), and **remove the "Destinataire" block** beneath the "Proposition de location financière" title.
+- **Teal rebrand** — replace the UI **accent green** with `#2D7A8C` at the design-token layer (light + dark). The **logo green and semantic success green stay** (the "Actif" pill and "activé" activity stay green).
+- **Admin-home & label polish** — rename the "Références LC" card + page heading to **"Toutes les propositions"** (display label only; `/[adminSegment]/lc-references` route unchanged); "Coefficients & commission" → **"Coefficients & Commissions"**; "Dernière modif. coeffs" → **"Dernière Modif Coef"**.
+- **Status-pill sizing fix** — the proposal status pill (e.g. "Actif") renders at a fixed width; make it hug its text adaptively.
+
+**Key context / decisions baked in at milestone start:**
+
+- **The frozen-formula constraint gains a partner-type exception.** Until v1.4 the calculation formula was frozen for all partners. Antoine (business owner) has approved a partner-type-conditional variant: `Partenaire` keeps `montant HT × (1 + commission/100) × coefficient / 100`; `Agent`/`Commercial` drop the commission factor. Agent/Commercial monthly payments are therefore genuinely lower for identical inputs — intended (their compensation is handled outside this tool).
+- **Commission invisibility is reinforced, not relaxed.** The ADMIN-09 envelope (and the Phase 13 D-12 partner-facing relaxation for `Partenaire` deal-owners) stays in force. For `Agent`/`Commercial`, commission must be absent end-to-end (calc, UI, PDF, logs, audit payloads) — a stricter case the existing 12-gate grep-contract suite should be extended to cover.
+- **View toggle is session-only by design** — no cookie/DB persistence, so no new SSR no-flash work; admins re-enter Admin view each login.
+- **Rebrand is token-scoped** — only the accent token changes; logo SVGs and success green are explicitly out of the recolor.
+- **PDF defect root-cause is a planning spike** — likely the narrow-no-break-space (U+202F) French thousands separator or a missing glyph in the embedded font; to be confirmed before the PDF phase plans.
 
 ---
 
@@ -204,26 +215,22 @@ Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; desig
 - ✓ **Public surface polish:** `<BrandLogo>` swap in shared `app/(public)/layout.tsx` + `.public-page-logo` CSS with `clamp(140px, 50vw, 200px)` responsive sizing — v1.2 (Phase 15, PUB-01/02)
 - ⚠ Deferred to v1.3: partner home dashboard restructure + 3 MetricTiles + /proposals route + UI color refresh + diff-panel contrast measurement (all bundled per CONTEXT.md decisions)
 
-### Active (v1.3 in flight — REQ-IDs land in `.planning/REQUIREMENTS.md`)
+### Validated (shipped in v1.3)
+
+All v1.3 requirements shipped — 6 phases (16–21), 35 requirements, no documented partials. Full coverage in `.planning/reports/MILESTONE_SUMMARY-v1.3.md` §4. Highlights: app-shell visual refresh + WCAG-AA diff-panel contrast, Partner Home + `/proposals` Archivées pill, 3-step wizard redesign, admin home + partners-list refresh (AccountsList→PartnersList), per-partner XLSX export, centralized LC reference dashboard (ADMIN-09 envelope 9→12 gates), Neon 3-branch split, post-deploy DB-smoke CI gate, Better Auth `trustedOrigins`, in-app self-service password change (`/parametres`), and both Tier-1 onboarding gates (admin password rotation + privacy notice).
+
+### Active (v1.4 in flight — REQ-IDs land in `.planning/REQUIREMENTS.md`)
 
 <!-- Building toward these now. Full requirements defined in REQUIREMENTS.md. -->
 
-- [ ] App shell visual refresh (sidebar + tri-state theme toggle + hero pattern + light/dark pair)
-- [ ] Contrast measurement (diff-panel + new gold/teal surfaces, WCAG 2.1 AA light + dark)
-- [x] Partner Home `/` (hero + 3 MetricTiles + Propositions récentes) — validated in Phase 17
-- [x] Partner Proposals `/proposals` with `Archivées` filter pill — validated in Phase 17
-- [x] Wizard redesign (3 steps visual refresh + validity-selector relocation to step 3 + ADMIN-09 D-12 envelope preserved) — validated in Phase 17
-- [ ] Admin Home enhancement (hero + CTA + 3 stats + 3 AdminNavCards + Recent activity)
-- [ ] Admin Partners list `/[adminSegment]/partners` (styled table + invite CTA + AccountsList→PartnersList rename)
-- [ ] Admin Créer partenaire form card refresh
-- [ ] Admin Coefficients refresh (warning banner + inline history card)
-- [ ] Excel export of proposal portfolio (per-partner XLSX)
-- [ ] Centralized LC reference dashboard (admin tool; ADMIN-09 9-gate extended)
-- [ ] Neon 3-branch split (`DATABASE_URL` per-Vercel-scope routing)
-- [ ] Post-deploy DB-smoke CI step (real-Postgres smoke on `drizzle/*.sql` PRs)
-- [ ] Better Auth `trustedOrigins` middleware-level Origin gate
-- [ ] Admin password rotation (Tier-1 gate — last phase before partner cutover)
-- [ ] Privacy policy confirmation with Thomas (Tier-1 gate — last phase before partner cutover)
+- [ ] Partner-type selector (`Agent` / `Commercial` / `Partenaire`) on invite/create form; default `Partenaire`, admin-editable
+- [ ] Commission-free loyer calc + PDF/UI render variant for `Agent`/`Commercial` (commission removed from formula and never shown)
+- [ ] Admin dual-view toggle (admin-only, bottom-left, session-only, lands in Admin; remaps nav between admin/agent routes)
+- [ ] PDF number/typography rendering fix
+- [ ] Remove "Destinataire" block from generated PDF
+- [ ] Teal rebrand — accent green → `#2D7A8C` (token layer, light + dark; logo + success green untouched)
+- [ ] Status-pill adaptive sizing fix
+- [ ] Admin-home label changes: "Toutes les propositions" / "Coefficients & Commissions" / "Dernière Modif Coef"
 
 ### Deferred to v1.4+
 
@@ -242,8 +249,8 @@ Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; desig
 
 ### Out of scope (continuing constraints)
 
-- **Changing the calculation formula or tranche boundaries** — frozen, partner expectations + business rules. Any change requires explicit business approval.
-- **Removing the "commission invisible" rule** — non-negotiable business rule.
+- **Changing the calculation formula or tranche boundaries** — frozen by default (partner expectations + business rules); any change requires explicit business approval. **v1.4 exception (approved by Antoine 2026-05-29):** a partner-type-conditional variant drops the commission factor for `Agent`/`Commercial` only; the `Partenaire` formula and all tranche boundaries stay frozen.
+- **Removing the "commission invisible" rule** — non-negotiable business rule (reinforced in v1.4: commission is fully absent for `Agent`/`Commercial`).
 - **Mutating already-saved PDFs** — once a proposal is stored, its PDF is immutable. Future coefficient changes apply only to new proposals.
 
 ## Constraints
@@ -257,8 +264,8 @@ Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; desig
 
 ### Still in force
 
-- **Calculation formula frozen.** `loyer = montantHT × (1 + commission/100) × coefficient / 100`.
-- **Commission invisibility:** commission apporteur must never appear in UI or generated proposal.
+- **Calculation formula frozen** (with v1.4 partner-type exception). `Partenaire`: `loyer = montantHT × (1 + commission/100) × coefficient / 100`. `Agent`/`Commercial` (v1.4): `loyer = montantHT × coefficient / 100` (commission factor removed). Tranche boundaries unchanged.
+- **Commission invisibility:** commission apporteur must never appear in UI or generated proposal. For `Agent`/`Commercial` (v1.4) it is absent from the math as well.
 - **Desktop browsers** are the primary target. Chrome and Edge are required; Firefox and Safari best-effort. Mobile is out of scope until a future milestone.
 - **PDF immutability** (new in v1.1): once a proposal is stored, neither its inputs nor its rendered PDF may be retroactively changed by anything — including coefficient updates.
 - **Portability constraint** (new in v1.1): the v1.1 stack must be deployable to OVH (generic Node + Postgres + S3-compatible blob) without rewrite. No Vercel-only primitives.
@@ -312,6 +319,9 @@ Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; desig
 | **v1.2** — Phase 11 sidebar adminHrefs forward-references | Shell.tsx wired sidebar to `/partners` + `/history` routes that don't exist yet (Phase 14 territory). Temporary patch: partners → /accounts, history → /coefficients placeholder. Phase 14 must either rename `accounts/` → `partners/` directory + add history sidebar inside coefficients page, OR hide the History nav entry until ready | ✓ Closed in Phase 14 (rename + standalone /history + Shell.tsx revert) |
 | **v1.2** — Phase 14 color-contrast measurement deferred to v1.3 | The diff-panel changed-row composite (`rgba(224,133,48,0.10)` over `--surface` with `--ink` weight 600) needs WCAG 2.1 AA measurement in light + dark modes. User signaled an upcoming UI color refresh in v1.3 — measuring on tokens that will change is wasted work. Carried as a HARD PREREQUISITE for any v1.3 plan touching `--gold` / `.chip-invited` / diff-panel composite: contrast must be measured + signed off before merge. | ⏳ v1.3 prerequisite — measure during color refresh |
 | **v1.2** — Phase 14 ADMIN-09 strict (no relaxation) | Phase 13 partner-facing wizard relaxed ADMIN-09 for step-2/3 commission visibility (D-12). Phase 14 introduces NO further relaxation: 9-gate grep-contract suite (`tests/admin-09-grep-contracts.test.ts`) blocks any future commission leak on partner list / /partners/new / admin home / sidebar collapsed / /history list. Admin-only exceptions (diff panels) explicitly tested as positive cases | ✓ Validated v1.2 (Phase 14, 9 grep gates live in CI) |
+| **v1.4** — Partner-type-conditional loyer formula (`Agent`/`Commercial` drop the commission factor) | Agent/Commercial are compensated outside this tool, so no apporteur margin is added; commission removed from calc + UI + PDF + logs to avoid client confusion. `Partenaire` formula unchanged. Business-approved by Antoine 2026-05-29. | ◯ Planned v1.4 |
+| **v1.4** — Admin/agent view toggle is session-only, lands in Admin | Avoids SSR no-flash persistence work; admins re-enter Admin view each login. Toggle remaps the nav between admin and agent route sets. | ◯ Planned v1.4 |
+| **v1.4** — Teal rebrand is token-scoped (accent only) | Swap the single accent token to `#2D7A8C`; logo SVGs and semantic success green are explicitly excluded so success/"Actif" states stay green. | ◯ Planned v1.4 |
 
 ## Team
 
@@ -345,4 +355,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-24 — after Phase 17 (Partner Surfaces) ship. Partner Home, /proposals (incl. Archivées), and the 3-step wizard redesign are live and verified light + dark by Antoine. ADMIN-09 D-12 envelope intact (9/9 grep gates green). 12/12 Phase 17 reqs complete (PHOME, PROPS, WIZ, THEME-01). Active v1.3 work continues with Phase 18 (Admin Surfaces).*
+*Last updated: 2026-05-29 — v1.3 (Design Refresh + Partner-Onboarding Ready) shipped (6 phases, 27 plans, 1122 tests); v1.4 (Partner Types, Admin Dual-View & Rebrand) started. Requirements being defined in REQUIREMENTS.md; roadmap continues at Phase 22.*
