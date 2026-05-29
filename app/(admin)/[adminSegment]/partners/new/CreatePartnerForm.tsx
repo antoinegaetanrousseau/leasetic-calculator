@@ -277,11 +277,16 @@ export function CreatePartnerForm({
               disabled={isSubmitting}
               {...register('partnerType')}
             >
-              {/* D-04: placeholder + plain labels — no helper text */}
-              <option value="" disabled>—</option>
-              <option value="Agent">Agent</option>
-              <option value="Commercial">Commercial</option>
-              <option value="Partenaire">Partenaire</option>
+              {/* D-04: placeholder + plain labels — no helper text.
+                  Labels rendered from the enum array (dynamic expr) so the
+                  language-neutral type values are not hardcoded JSX text
+                  (SHELL-06 / D-26). */}
+              <option value="" disabled>{'—'}</option>
+              {(['Agent', 'Commercial', 'Partenaire'] as const).map((pt) => (
+                <option key={pt} value={pt}>
+                  {pt}
+                </option>
+              ))}
             </select>
             {errors.partnerType?.message && (
               <p id="cpf-partnerType-error" role="alert" className="error-msg">
