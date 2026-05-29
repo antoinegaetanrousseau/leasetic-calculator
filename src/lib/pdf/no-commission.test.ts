@@ -562,6 +562,137 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
     }
   }
 
+  /**
+   * PTYPE-06 reproducibility: Agent and Commercial finalize runs assert the same
+   * 4-layer no-commission invariant AND prove the snapshot records
+   * partnerType + commissionApplied:false (PTYPE-06 byte-determinism under
+   * a future admin type change per 22-04 buildParamsSnapshot).
+   *
+   * For these types: commissionPct is forced to 0 by buildComputeArgs
+   * (finalize-helpers.ts), so the loyer = amountHT × coeff / 100 (no
+   * commission addend). The commission amount string therefore differs from
+   * the Partenaire corpus but we still check the formatted variants since
+   * even commissionPct:0 (i.e. 0 × amount) should not appear labelled as
+   * commission anywhere.
+   */
+  for (const partnerType of ['Agent', 'Commercial'] as const) {
+    describe(`PTYPE-06 / PTYPE-07 — partnerType="${partnerType}" (commission-free finalize)`, () => {
+      // Pick two representative fixtures: one mid-range, one large.
+      const ptypeSubset = [
+        GOLDEN_FIXTURES.find((f) => f.name === 't2/75000/48')!,
+        GOLDEN_FIXTURES.find((f) => f.name === 't4/400000/60')!,
+      ];
+
+      for (const fixture of ptypeSubset) {
+        it(`fixture "${fixture.name}" / partnerType="${partnerType}": 4-layer no-commission + snapshot integrity`, async () => {
+          const inputs = buildDraftInputs(fixture);
+          getDraftByIdMock.mockResolvedValue({
+            id: 'd-1',
+            inputs,
+            createdAt: new Date('2026-05-12'),
+            lcRef: 'LC-2026-001',
+          });
+
+          await finalizeWizard({
+            userId: 'u-1',
+            draftId: 'd-1',
+            language: 'fr',
+            partnerType,
+          });
+
+          // ── Layer 1: PDF render data has no commission ──────────────
+          expect(renderProposalPdfMock).toHaveBeenCalledTimes(1);
+          const renderArg = renderProposalPdfMock.mock.calls[0]![0] as {
+            data: {
+              inputs: Record<string, unknown>;
+              computed: Record<string, unknown>;
+              lcRef: string;
+              language: string;
+            };
+          };
+          const renderJson = JSON.stringify(renderArg.data);
+          expect(renderJson.toLowerCase()).not.toContain('commission');
+
+          // Formatted commission amount strings must not appear in render data.
+          // For Agent/Commercial, commissionPct is forced to 0, so the commission
+          // amount is 0 — but we still verify no labelled commission appears.
+          for (const fmt of commissionFormatsFor(fixture)) {
+            expect(
+              renderJson.includes(fmt),
+              `partnerType=${partnerType} fixture ${fixture.name}: render data contained commission amount ${fmt}`,
+            ).toBe(false);
+          }
+
+          // ── Layer 2: persisted computed jsonb has no commission ──────
+          expect(finalizeDraftMock).toHaveBeenCalledTimes(1);
+          const [, , payload] = finalizeDraftMock.mock.calls[0]!;
+          const finalizePayload = payload as {
+            computed: Record<string, unknown>;
+            paramsSnapshot: Record<string, unknown>;
+          };
+          expect('commission' in finalizePayload.computed).toBe(false);
+          const computedJson = JSON.stringify(finalizePayload.computed);
+          expect(computedJson.toLowerCase()).not.toContain('commission');
+          for (const fmt of commissionFormatsFor(fixture)) {
+            expect(
+              computedJson.includes(fmt),
+              `partnerType=${partnerType} fixture ${fixture.name}: computed contained commission amount ${fmt}`,
+            ).toBe(false);
+          }
+
+          // ── Layer 3: paramsSnapshot DOES contain commissionPct (PCT) ─
+          // The percentage is still archived for byte-determinism reference.
+          expect(finalizePayload.paramsSnapshot.commissionPct).toBe(FIXTURE_PARAMS.commissionPct);
+
+          // ── PTYPE-06 reproducibility: snapshot records partnerType + commissionApplied:false ──
+          // Proves that a later admin type-change (22-03 adminUpdatePartnerType) cannot
+          // retroactively alter the economics of an already-finalized proposal.
+          expect(finalizePayload.paramsSnapshot.partnerType).toBe(partnerType);
+          expect(finalizePayload.paramsSnapshot.commissionApplied).toBe(false);
+        });
+      }
+
+      it(`partnerType="${partnerType}": loyer equals commission-free formula (amountHT × coeff / 100)`, async () => {
+        // Use t1/30000/36 — simplest fixture for exact arithmetic verification.
+        const fixture = GOLDEN_FIXTURES.find((f) => f.name === 't1/30000/36')!;
+        const inputs = buildDraftInputs(fixture);
+        getDraftByIdMock.mockResolvedValue({
+          id: 'd-1',
+          inputs,
+          createdAt: new Date('2026-05-12'),
+          lcRef: 'LC-2026-001',
+        });
+
+        await finalizeWizard({
+          userId: 'u-1',
+          draftId: 'd-1',
+          language: 'fr',
+          partnerType,
+        });
+
+        // Commission-free loyer: commissionPct forced to 0.
+        // For t1/30000/36: coeff = 3.0000%, loyerHT = 30000 × 3.0000 / 100 = 900.00
+        const commissionFreeResult = computeLoyer({
+          amountHT: inputs.amountHT,
+          durationMonths: inputs.durationMonths,
+          validityDays: inputs.validityDays,
+          coefficients: FIXTURE_PARAMS.coefficients,
+          commissionPct: 0,
+          maxAmount: Number(FIXTURE_PARAMS.maxAmount),
+        });
+
+        expect(renderProposalPdfMock).toHaveBeenCalledTimes(1);
+        const renderArg = renderProposalPdfMock.mock.calls[0]![0] as {
+          data: { computed: Record<string, unknown> };
+        };
+
+        if (commissionFreeResult.computed.state === 'computed') {
+          expect(renderArg.data.computed.loyerHT).toBe(commissionFreeResult.computed.loyerHT);
+        }
+      });
+    });
+  }
+
   it('no unanticipated schema migrations beyond known set (drizzle guard)', async () => {
     const fs = await import('node:fs/promises');
     const path = await import('node:path');
