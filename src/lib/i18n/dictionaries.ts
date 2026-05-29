@@ -824,6 +824,14 @@ export const dictionaries = {
     'admin.partners.form.submit.spinner': 'Envoi en cours…',
     'admin.partners.form.cancel.confirm': 'Vous avez des changements non enregistrés. Continuer ?',
 
+    // Phase 22 Plan 03 — PTYPE-03: type-change confirmation (D-08) + bounded error key.
+    // D-08: the confirm message explains that future proposals change economics;
+    // existing saved proposals and their PDFs remain frozen (params_snapshot invariant).
+    // ADMIN-09: copy refers to "type" only — no commission/rate copy.
+    'admin.partners.type.change.confirm': 'Changer le type de ce partenaire modifiera l\'économie de ses futures propositions. Les propositions et PDFs déjà sauvegardés restent inchangés. Continuer ?',
+    'admin.partners.action.changeType': 'Changer le type',
+    'admin.partners.error.type_change': 'Erreur lors du changement de type. Réessayez.',
+
     // Coefficients warning banner (UI-SPEC rows 67-69; D-19/D-20)
     'admin.coefficients.warning.body': 'Modifier ces valeurs change le calcul de toutes les futures propositions. Les PDF déjà générés restent inchangés.',
     'admin.coefficients.warning.dismiss.aria': "Masquer l'avertissement",
@@ -1692,6 +1700,11 @@ export const dictionaries = {
     'admin.partners.form.submit': 'Send invitation →',
     'admin.partners.form.submit.spinner': 'Sending…',
     'admin.partners.form.cancel.confirm': 'You have unsaved changes. Continue?',
+    // Phase 22 Plan 03 — PTYPE-03 EN counterparts (D-08 consequence-explaining confirm).
+    // ADMIN-09: type reference only — no commission/rate copy.
+    'admin.partners.type.change.confirm': "Changing this partner's type will affect the economics of their future proposals. Already saved proposals and PDFs remain frozen. Continue?",
+    'admin.partners.action.changeType': 'Change type',
+    'admin.partners.error.type_change': 'Error changing partner type. Please try again.',
 
     // Coefficients warning banner
     'admin.coefficients.warning.body': 'Changing these values affects calculations for all future proposals. Already-generated PDFs remain unchanged.',

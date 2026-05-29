@@ -177,6 +177,68 @@ export async function adminReEnableUser(userId: string): Promise<void> {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
+/*  adminUpdatePartnerType (PTYPE-03 + D-02 + D-08 + ADMIN-09)                 */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * PTYPE-03 — admin-only partner-type change, audited before/after as specific
+ * type strings (D-02). No-op changes are skipped — only real changes write
+ * an audit_log entry.
+ *
+ * Security (T-22-03-E): requireAdmin() is the FIRST statement — a partner
+ * cannot self-escalate their type to Agent/Commercial via this action, because
+ * it is gated before any DB read or write.
+ *
+ * ADMIN-09: partner_type is a business-classification enum, NOT a commission/
+ * rate value. The audit payload records type strings only; no financial fields.
+ */
+export async function adminUpdatePartnerType(
+  userId: string,
+  newType: 'Agent' | 'Commercial' | 'Partenaire',
+): Promise<void> {
+  // T-22-03-E: admin gate FIRST — PITFALLS §7.3 privilege-escalation mitigation.
+  const { session } = await requireAdmin();
+  try {
+    // Read current type to capture before-value for audit and no-op check.
+    const userRow = await db().query.users.findFirst({
+      where: eq(schema.users.id, userId),
+      columns: { partnerType: true },
+    });
+    if (!userRow) {
+      throw new Error('admin.partners.error.type_change');
+    }
+    const previousType = userRow.partnerType as 'Agent' | 'Commercial' | 'Partenaire';
+
+    // D-02 no-op guard: skip write + audit when the type is unchanged.
+    if (previousType === newType) return;
+
+    await db()
+      .update(schema.users)
+      .set({ partnerType: newType })
+      .where(eq(schema.users.id, userId));
+
+    // D-09-09b: ADMIN-09 redaction — partner_type is a business-classification
+    // field, NOT a commission/rate value. The before/after record the specific
+    // type string (D-02), never a boolean.
+    await writeAuditLog({
+      actorId: session.user.id,
+      action: 'user.partner_type_change',
+      targetType: 'user',
+      targetId: null,
+      payload: { userId, before: previousType, after: newType },
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[adminUpdatePartnerType] failed:', msg);
+    // Re-throw already-structured error keys without double-wrapping.
+    if (e instanceof Error && e.message.startsWith('admin.')) {
+      throw e;
+    }
+    throw new Error('admin.partners.error.type_change');
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
 /*  adminCreateInvitation (ADMIN-05 + D-09-09 + D-09-12)                       */
 /* ─────────────────────────────────────────────────────────────────────────── */
 

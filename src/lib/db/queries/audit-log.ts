@@ -21,7 +21,11 @@ export type AuditAction =
   | 'password_reset.create'
   | 'role.grant'   // reserved — scripts/grant-admin.ts does NOT yet write to audit_log; future hook only.
   // ── Phase 10 — Cutover & Polish (D-10-11) ──────────────────────────────────
-  | 'user.purge';   // pre-launch hard-delete of test accounts (@test.leasetic.com)
+  | 'user.purge'   // pre-launch hard-delete of test accounts (@test.leasetic.com)
+  // ── Phase 22 — Partner Types (PTYPE-03 / D-02) ──────────────────────────────
+  // before/after record the SPECIFIC type string, never a boolean (D-02).
+  // ADMIN-09: partner_type is a business-classification field, NOT a commission/rate value.
+  | 'user.partner_type_change';
 
 export type AuditTargetType = 'proposal' | 'user' | 'global_params';
 
