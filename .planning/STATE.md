@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
 status: executing
-last_updated: "2026-05-29T21:42:09.358Z"
-last_activity: 2026-05-29 -- Phase 22 planning complete
+last_updated: "2026-05-29T21:57:03.210Z"
+last_activity: 2026-05-29
 progress:
   total_phases: 25
   completed_phases: 20
   total_plans: 115
-  completed_plans: 109
+  completed_plans: 110
   percent: 80
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 22 — Partner Types & Commission-Free Proposals
+**Current focus:** Phase 22 — partner-types-commission-free-proposals
 
 ## Current Position
 
-Phase: 22 of 4 v1.4 phases (Partner Types & Commission-Free Proposals)
-Plan: —
+Phase: 22 (partner-types-commission-free-proposals) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-05-29 -- Phase 22 planning complete
+Last activity: 2026-05-29
 
 ## Phase 17 Performance Metrics
 
@@ -351,6 +351,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 18 P04 | 6 | 2 tasks | 4 files |
 | Phase 18 P05 | 12 | 3 tasks | 7 files |
 | Phase 18 P06 | 4 | 4 tasks | 5 files |
+| Phase 22 P01 | 25min | 3 tasks | 7 files |
 
 ## Decisions
 
@@ -396,3 +397,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 19]: D-18: LC dashboard reachable only via 4th AdminNavCard on Admin Home — sidebar D-27 lock honored, no new sidebar item
 - [Phase 19]: AdminNavCard lc-references variant uses teal accent (rgb 45,122,140) — same as partners, no new color token
 - [Phase 19]: Admin Home grid changed from repeat(3,1fr) inline style to Tailwind grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 for 4-card responsive layout
+- [Phase ?]: Phase 22-01 migration ordinal is 0005_workable_yellow_claw.sql (drizzle-kit auto-assigned after repairing an orphaned journal entry)
+- [Phase ?]: users.partner_type registered with input:false in Better Auth so partners cannot self-escalate via /api/auth/update-user (T-22-01-E)
