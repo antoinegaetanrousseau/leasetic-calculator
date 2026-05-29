@@ -1,42 +1,41 @@
-# Privacy Coverage Confirmation — v1.1 Launch
+# Privacy Coverage Confirmation — v1.3 Launch
 
-**Created:** 2026-05-10
-**Status:** Pending Thomas's reply (Open Q3)
+**Created:** 2026-05-10 (stub) — **Updated:** 2026-05-29 (Phase 21 publication record per D-01).
+**Status:** Closed — privacy notice updated 2026-05-29.
 
-This document is the paper trail for Antoine's legal check with Thomas before onboarding pilot
-partners. It is committed as a stub before Thomas replies. When Thomas responds, fill in the
-`## Response` section and commit the update.
+This document is the legal-side paper trail for the v1.3 partner-onboarding gates. It confirms
+that Leasétic's public privacy notice on `leasetic.fr` was updated to cover (a) Vercel + Neon
+EU hosting as data processors and (b) 10-year PDF retention as a new processing activity tied
+to French Commercial Code L123-22 / L110-4.
 
-**Planner's note:** Review this document for sensitive context before committing Thomas's reply —
-Leasétic-internal business context in the response may warrant redaction or exclusion from the
-public repo (D-10-17/18 / T-10-06-03).
+**Phase 21 reframe (D-01):** Antoine owns the leasetic.fr website directly. Phase 10's "ask
+Thomas Heufke for written confirmation" framing is **superseded** — the publication itself
+(a self-edit on the leasetic.fr project) is the artifact; no third-party confirmation is
+required. The prompt Antoine used for the self-edit session is captured verbatim in
+`.planning/phases/21-partner-onboarding-gates/21-DISCUSSION-LOG.md` under "Prompt drafted
+for the leasetic.fr edit session."
 
-## Question on record (D-10-18)
+## Publication
 
-The following email was sent to Thomas by Antoine before pilot partner onboarding:
-
-> Thomas — quick legal check before we onboard pilot partners on v1.1: does Leasétic's existing
-> privacy notice cover (a) hosting partner data on Vercel/Neon EU regions and (b) 10-year PDF
-> retention as a new processing activity tied to commercial-document compliance? If yes, please
-> reply confirming. If your read is "needs counsel review," flag and we'll route to legal.
-
-## Response
-
-**Date:** _pending_
-
-**Confirmation status:** _pending_
-
-**Thomas's verbatim reply:**
-
-> _pending_
+- **Public URL of the updated privacy notice:** <https://leasetic.fr/politique-de-confidentialite>
+- **Publication date:** 2026-05-29
+- **Visible additions confirmed:** Vercel/Neon EU hosting added under "Sous-traitants";
+  10-year PDF retention added under "Durée de conservation" with French Commercial Code
+  L123-22 / L110-4 citation.
 
 ## Resolution
 
-- [ ] Confirmed by Thomas — proceed with launch (fill `## Response` above + tick this box).
-- [ ] Counsel review required — Open Q3 escalates; launch path adjusts (discuss with Antoine
-      before proceeding to pilot partner onboarding).
+- [x] Privacy notice published with both additions (Antoine, 2026-05-29).
 
 ---
 
-*Document context: D-10-17 (privacy URLs via env vars), D-10-18 (legal counsel ask + paper trail).*
-*Open Q3 status: unresolved until Thomas replies.*
+*Document context: D-10-17 (privacy URLs via env vars), D-01 (this phase's reframe of D-10-18).*
+
+*Cross-references:*
+
+- `docs/operations/phase-21-gate-evidence.md` GATE-02 section — the evidence-log home where
+  this publication is referenced alongside the GATE-01 admin rotations.
+- `.planning/phases/21-partner-onboarding-gates/21-DISCUSSION-LOG.md` — verbatim self-edit
+  prompt under "Prompt drafted for the leasetic.fr edit session."
+- `.planning/phases/21-partner-onboarding-gates/21-CONTEXT.md` D-01 — the binding decision
+  that supersedes the original Thomas-confirmation framing.
