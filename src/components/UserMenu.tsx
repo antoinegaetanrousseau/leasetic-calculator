@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
+import { LogOut, ChevronDown, Settings } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -170,6 +171,43 @@ export function UserMenu({ displayName, email, lang }: UserMenuProps) {
               {email}
             </div>
           </div>
+          <Link
+            role="menuitem"
+            href="/parametres"
+            onClick={() => setOpen(false)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              width: '100%',
+              padding: '10px 16px',
+              borderRadius: 8,
+              background: 'transparent',
+              color: 'var(--ink)',
+              border: 'none',
+              fontSize: '14.5px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              textAlign: 'left',
+              textDecoration: 'none',
+              boxSizing: 'border-box',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background =
+                'var(--hover-overlay)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background =
+                'transparent';
+            }}
+          >
+            <Settings
+              size={17}
+              strokeWidth={1.6}
+              style={{ color: 'var(--muted)' }}
+            />
+            <span>{t('shell.user.menu.settings', lang)}</span>
+          </Link>
           <button
             role="menuitem"
             type="button"

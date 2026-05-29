@@ -276,6 +276,7 @@ export const dictionaries = {
     'auth.modal.button.close': 'Fermer',
     'auth.modal.footer.note': 'Validité 24 heures, usage unique.',
     'shell.user.menu.aria': 'Menu utilisateur',
+    'shell.user.menu.settings': 'Paramètres',
     'shell.user.menu.logout': 'Se déconnecter',
     'shell.topbar.admin.badge': 'ADMIN',
     'shell.locale.toggle.aria': 'Changer la langue',
@@ -880,6 +881,52 @@ export const dictionaries = {
     'proposals.export.column.status': 'Statut',
     'proposals.export.column.createdAt': 'Date de création',
     'proposals.export.column.expiresAt': "Date d'expiration",
+
+    // ── Phase 21 — /parametres self-service settings (D-06, D-06b, D-06c, D-06d, D-07, D-08, D-10 rev 2) ──
+    // Hero (D-06 — Figma 132:867; FR subtitle preserves verbatim typo "vos information").
+    'parametres.hero.title': 'Paramètres',
+    'parametres.hero.subtitle': 'Changer vos information et réinitialiser votre mot de passe.',
+    // Eyebrow section header (Figma 134:492 — uppercase + 8×8 filled-circle bullet).
+    'parametres.card.eyebrow.identity': 'INFORMATIONS PERSONNELLES',
+    // Identity labels (Figma 134:495/499/503). Email demoted to read-only per D-06d.
+    'parametres.identity.firstName.label': 'Prénom',
+    'parametres.identity.firstName.placeholder': 'Prénom',
+    'parametres.identity.lastName.label': 'Nom',
+    'parametres.identity.lastName.placeholder': 'Nom',
+    'parametres.identity.email.label': 'Email professionnel',
+    'parametres.identity.email.placeholder': 'prenom.nom@leasetic.com',
+    'parametres.identity.email.readonly.notice':
+      'Pour changer votre adresse e-mail, contactez un administrateur.',
+    // Password row labels (D-07 rev 2 — Ancien + Nouveau, NO confirm field).
+    'parametres.password.current.label': 'Ancien mot de passe',
+    'parametres.password.current.placeholder': '••••••••',
+    'parametres.password.new.label': 'Nouveau mot de passe',
+    'parametres.password.new.placeholder': '••••••••',
+    'parametres.password.new.hint': 'Au moins 8 caractères.',
+    // Session-invalidation notice (D-08 + Plr-7 rev 2) — below the password row.
+    'parametres.password.session.notice':
+      'Modifier votre mot de passe vous déconnectera de vos autres appareils.',
+    // Inline validation errors.
+    'parametres.error.required': 'Champ requis.',
+    'parametres.error.password.required.pair':
+      'Champ requis pour modifier le mot de passe.',
+    'parametres.error.password.current.wrong': 'Ancien mot de passe incorrect.',
+    'parametres.error.password.tooShort': 'Au moins 8 caractères requis.',
+    'parametres.error.password.tooLong': 'Maximum 128 caractères.',
+    'parametres.error.email.invalid': 'Adresse e-mail invalide.',
+    'parametres.error.unknown': 'Une erreur est survenue. Réessayez.',
+    // Action footer (Figma 134:534 + 134:536).
+    'parametres.action.cancel': 'Annuler',
+    'parametres.action.save': 'Enregistrer les modifications',
+    'parametres.action.saving': 'Enregistrement…',
+    // Success / partial-success toasts (D-06c matrix).
+    'parametres.toast.identity.saved': 'Informations mises à jour.',
+    'parametres.toast.password.saved': 'Mot de passe mis à jour.',
+    'parametres.toast.both.saved': 'Modifications enregistrées.',
+    'parametres.toast.partialSuccess.identityOk.passwordErr':
+      "Informations enregistrées, mais le mot de passe n'a pas été modifié.",
+    'parametres.toast.partialSuccess.passwordOk.identityErr':
+      "Mot de passe modifié, mais les informations n'ont pas été enregistrées.",
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -1135,6 +1182,7 @@ export const dictionaries = {
     'auth.modal.button.close': 'Close',
     'auth.modal.footer.note': '24-hour validity, single-use.',
     'shell.user.menu.aria': 'User menu',
+    'shell.user.menu.settings': 'Settings',
     'shell.user.menu.logout': 'Log out',
     'shell.topbar.admin.badge': 'ADMIN',
     'shell.locale.toggle.aria': 'Change language',
@@ -1694,6 +1742,46 @@ export const dictionaries = {
     'proposals.export.column.status': 'Status',
     'proposals.export.column.createdAt': 'Created on',
     'proposals.export.column.expiresAt': 'Expires on',
+
+    // ── Phase 21 — /parametres self-service settings (D-06, D-06b, D-06c, D-06d, D-07, D-08, D-10 rev 2) ──
+    // Hero (EN subtitle corrects the FR Figma typo "vos information").
+    'parametres.hero.title': 'Settings',
+    'parametres.hero.subtitle': 'Update your information and reset your password.',
+    'parametres.card.eyebrow.identity': 'PERSONAL INFORMATION',
+    'parametres.identity.firstName.label': 'First name',
+    'parametres.identity.firstName.placeholder': 'First name',
+    'parametres.identity.lastName.label': 'Last name',
+    'parametres.identity.lastName.placeholder': 'Last name',
+    'parametres.identity.email.label': 'Work email',
+    'parametres.identity.email.placeholder': 'firstname.lastname@leasetic.com',
+    'parametres.identity.email.readonly.notice':
+      'To change your email address, please contact an administrator.',
+    'parametres.password.current.label': 'Previous password',
+    'parametres.password.current.placeholder': '••••••••',
+    'parametres.password.new.label': 'New password',
+    'parametres.password.new.placeholder': '••••••••',
+    'parametres.password.new.hint': 'At least 8 characters.',
+    'parametres.password.session.notice':
+      'Changing your password will sign you out of your other devices.',
+    'parametres.error.required': 'Required.',
+    'parametres.error.password.required.pair':
+      'Required to change your password.',
+    'parametres.error.password.current.wrong':
+      'Previous password is incorrect.',
+    'parametres.error.password.tooShort': 'At least 8 characters required.',
+    'parametres.error.password.tooLong': 'Maximum 128 characters.',
+    'parametres.error.email.invalid': 'Invalid email address.',
+    'parametres.error.unknown': 'Something went wrong. Try again.',
+    'parametres.action.cancel': 'Cancel',
+    'parametres.action.save': 'Save changes',
+    'parametres.action.saving': 'Saving…',
+    'parametres.toast.identity.saved': 'Profile updated.',
+    'parametres.toast.password.saved': 'Password updated.',
+    'parametres.toast.both.saved': 'Changes saved.',
+    'parametres.toast.partialSuccess.identityOk.passwordErr':
+      'Profile saved, but password was not changed.',
+    'parametres.toast.partialSuccess.passwordOk.identityErr':
+      'Password changed, but profile was not updated.',
   },
 } as const;
 
