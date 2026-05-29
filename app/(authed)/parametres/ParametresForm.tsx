@@ -303,6 +303,27 @@ export function ParametresForm({
     passwordForm.reset();
   };
 
+  // Map Zod issue codes (preserved by @hookform/resolvers/zod on
+  // `error.type`) to localized dict messages. Manual setError calls
+  // already pass translated strings through t() so we let those flow
+  // through unchanged — only Zod's default English messages
+  // ("Too small: expected string to have >=8 characters", etc.) need
+  // converting at render time so the FR/EN inline error matches the
+  // surrounding UI locale.
+  const localizePwError = (
+    field: 'currentPassword' | 'newPassword',
+    error: { type?: string; message?: string } | undefined,
+  ): string | null => {
+    if (!error) return null;
+    if (error.type === 'too_small' && field === 'newPassword') {
+      return t('parametres.error.password.tooShort', lang);
+    }
+    if (error.type === 'too_big' && field === 'newPassword') {
+      return t('parametres.error.password.tooLong', lang);
+    }
+    return error.message ?? null;
+  };
+
   const saveDisabled =
     isPending ||
     (!identityForm.formState.isDirty && !passwordEitherFilled);
@@ -575,9 +596,9 @@ export function ParametresForm({
                 )}
               </button>
             </div>
-            {passwordErrors.currentPassword?.message && (
+            {passwordErrors.currentPassword && (
               <p role="alert" style={errorStyle}>
-                {passwordErrors.currentPassword.message}
+                {localizePwError('currentPassword', passwordErrors.currentPassword)}
               </p>
             )}
           </div>
@@ -635,9 +656,9 @@ export function ParametresForm({
                 )}
               </button>
             </div>
-            {passwordErrors.newPassword?.message && (
+            {passwordErrors.newPassword && (
               <p role="alert" style={errorStyle}>
-                {passwordErrors.newPassword.message}
+                {localizePwError('newPassword', passwordErrors.newPassword)}
               </p>
             )}
             {/* Strength meter (Plr-3) — 4-segment bar. */}
