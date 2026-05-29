@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
 status: executing
-last_updated: "2026-05-29T22:13:38.927Z"
-last_activity: 2026-05-29
+last_updated: "2026-05-30T00:25:00.000Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 25
   completed_phases: 20
   total_plans: 115
-  completed_plans: 112
+  completed_plans: 113
   percent: 80
 ---
 
@@ -28,9 +28,15 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 22 (partner-types-commission-free-proposals) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
-Last activity: 2026-05-29
+Last activity: 2026-05-30
+
+## Phase 22 Performance Metrics
+
+| Plan | Duration | Tasks | Files |
+|---|---|---|---|
+| 22-04 | ~12min | 3 | 9 (8 modified src/test + 1 created deferred-items) (+ SUMMARY) |
 
 ## Phase 17 Performance Metrics
 
@@ -248,6 +254,8 @@ v1.1 ████████████████████ 6/6 phases com
 | vitest.config.ts include glob extended with `tests/**/*.test.{ts,tsx}` for the top-level grep-contract test file. Pre-Phase-14 globs only covered colocated tests; cross-cutting STRIDE-style grep suites at `tests/` need explicit inclusion | 14-06 Rule 3 auto-fix | 14-06 |
 | ValidityChip tooltip dropped during the StatusChip swap. ValidityChip rendered `title="Valable jusqu'au DD/MM/YYYY"` on the row chip; StatusChip has no tooltip prop. UI-SPEC §5.8 does not mandate parity for v1.2. Expiration date still visible on /proposals/[id] detail-page Computed card ValidityFooter (dt/dd row). v1.3 polish candidate | 14-06 D-27 trade-off | 14-06 |
 | renderToString grep-contract harness uses `React.createElement` (not direct function calls) so client-component hooks (useState/useEffect) fire under React's SSR dispatcher. Calling client components as plain JS functions throws `Cannot read properties of null (reading 'useState')` because the hook dispatcher is uninitialized outside React's render cycle | 14-06 grep-contract harness pattern | 14-06 |
+| Commission-free seam threads `session.user.partnerType` (Agent/Commercial/Partenaire) through finalize compute + snapshot, wizard steps 2/3, and the live preview; `commissionPct:0` for Agent/Commercial, params value for Partenaire. formula.ts stays frozen (22-02 golden corpus guard); the `commission` literal stays isolated in finalize-helpers.ts (finalize-wizard.ts grep-clean = 0). Snapshot records partnerType + commissionApplied for PTYPE-06 reproducibility | 22-04 PTYPE-04/05/06 | 22-04 |
+| 22-04 Task 3 deviation: ParametresFormCard does NOT thread partnerType into LiveLoyerPreview — D-09 retired the 2-column layout, the card no longer mounts the preview (ParametresFormCard.test Test 13 asserts absence). partnerType prop added to the dormant LiveLoyerPreview component only (default 'Partenaire'); threading into the card would be dead code violating D-09 | 22-04 Rule 1 plan-premise correction | 22-04 |
 
 ## Session Notes
 
