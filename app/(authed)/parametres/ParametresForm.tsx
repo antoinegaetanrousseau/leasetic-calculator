@@ -257,7 +257,14 @@ export function ParametresForm({
         return false;
       };
 
-      if (identityOk && !passwordOk) {
+      // Partial success requires BOTH sections to have been ACTUALLY attempted —
+      // identityOk/passwordOk default to true when their section wasn't dirty,
+      // which previously caused misleading "Informations enregistrées" /
+      // "Mot de passe modifié" toasts to fire when only the OTHER section was
+      // attempted and failed. The `identityDirty && passwordIntent` gates below
+      // restrict partial-success messaging to genuine two-section attempts.
+
+      if (identityDirty && passwordIntent && identityOk && !passwordOk) {
         const inlineHandled = surfacePasswordInlineError();
         if (!inlineHandled) {
           toast.error(t('parametres.error.unknown', lang));
@@ -270,7 +277,7 @@ export function ParametresForm({
         return;
       }
 
-      if (!identityOk && passwordOk) {
+      if (identityDirty && passwordIntent && !identityOk && passwordOk) {
         toast.success(
           t('parametres.toast.partialSuccess.passwordOk.identityErr', lang),
         );
@@ -280,9 +287,14 @@ export function ParametresForm({
         return;
       }
 
-      // Both failed.
-      surfacePasswordInlineError();
-      toast.error(t('parametres.error.unknown', lang));
+      // Single-section failure (or both-failure): surface inline pw error if
+      // applicable; fire a generic toast only when no inline error was set
+      // (i.e. unknown code OR identity-only failure with no inline mapping).
+      const inlineHandled =
+        passwordIntent && !passwordOk ? surfacePasswordInlineError() : false;
+      if (!inlineHandled) {
+        toast.error(t('parametres.error.unknown', lang));
+      }
     });
   };
 
