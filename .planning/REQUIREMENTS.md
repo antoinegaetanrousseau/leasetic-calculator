@@ -90,27 +90,27 @@ REQ-ID → Phase mapping (filled by the roadmapper; phases start at 22).
 
 | REQ-ID | Requirement (short) | Phase |
 |--------|---------------------|-------|
-| PTYPE-01 | Partner-type selector on invite form | — |
-| PTYPE-02 | Backfill existing accounts → Partenaire | — |
-| PTYPE-03 | Admin can edit partner type later (audited) | — |
-| PTYPE-04 | Commission-free loyer calc for Agent/Commercial | — |
-| PTYPE-05 | Commission absent from all UI for Agent/Commercial | — |
-| PTYPE-06 | Commission-free PDF variant + snapshot integrity | — |
-| PTYPE-07 | ADMIN-09 grep suite extended for Agent/Commercial | — |
-| VIEW-01 | Admin-only Admin/Agent toggle (bottom-left) | — |
-| VIEW-02 | Nav remaps to admin vs agent route set | — |
-| VIEW-03 | Land in Admin, session-only persistence | — |
-| VIEW-04 | Toggle is view-only, not an authz change | — |
-| PDF-01 | Fix number/typography rendering glitch | — |
-| PDF-02 | Remove "Destinataire" block | — |
-| PDF-03 | Update byte-determinism gate + golden corpus | — |
-| BRAND-01 | Accent green → #2D7A8C (token, light+dark) | — |
-| BRAND-02 | Logo green + success green unchanged | — |
-| BRAND-03 | WCAG 2.1 AA on recolored pairs | — |
-| COPY-01 | "Toutes les propositions" (label only) | — |
-| COPY-02 | "Coefficients & Commissions" | — |
-| COPY-03 | "Dernière Modif Coef" | — |
-| COPY-04 | FR+EN dict entries, parity proof green | — |
-| UIFIX-01 | Status pill hugs its text | — |
+| PTYPE-01 | Partner-type selector on invite form | Phase 22 |
+| PTYPE-02 | Backfill existing accounts → Partenaire | Phase 22 |
+| PTYPE-03 | Admin can edit partner type later (audited) | Phase 22 |
+| PTYPE-04 | Commission-free loyer calc for Agent/Commercial | Phase 22 |
+| PTYPE-05 | Commission absent from all UI for Agent/Commercial | Phase 22 |
+| PTYPE-06 | Commission-free PDF variant + snapshot integrity | Phase 22 |
+| PTYPE-07 | ADMIN-09 grep suite extended for Agent/Commercial | Phase 22 |
+| VIEW-01 | Admin-only Admin/Agent toggle (bottom-left) | Phase 24 |
+| VIEW-02 | Nav remaps to admin vs agent route set | Phase 24 |
+| VIEW-03 | Land in Admin, session-only persistence | Phase 24 |
+| VIEW-04 | Toggle is view-only, not an authz change | Phase 24 |
+| PDF-01 | Fix number/typography rendering glitch | Phase 23 |
+| PDF-02 | Remove "Destinataire" block | Phase 23 |
+| PDF-03 | Update byte-determinism gate + golden corpus | Phase 23 |
+| BRAND-01 | Accent green → #2D7A8C (token, light+dark) | Phase 25 |
+| BRAND-02 | Logo green + success green unchanged | Phase 25 |
+| BRAND-03 | WCAG 2.1 AA on recolored pairs | Phase 25 |
+| COPY-01 | "Toutes les propositions" (label only) | Phase 25 |
+| COPY-02 | "Coefficients & Commissions" | Phase 25 |
+| COPY-03 | "Dernière Modif Coef" | Phase 25 |
+| COPY-04 | FR+EN dict entries, parity proof green | Phase 25 |
+| UIFIX-01 | Status pill hugs its text | Phase 25 |
 
-**Coverage:** 22 requirements across 6 categories. All map to a phase once the roadmap is approved.
+**Coverage:** 22/22 requirements mapped across 4 phases (Phases 22-25). No orphans.

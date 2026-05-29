@@ -6,7 +6,7 @@ status: planning
 last_updated: "2026-05-29T20:26:43.155Z"
 last_activity: 2026-05-29
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 21 — partner-onboarding-gates
+**Current focus:** Phase 22 — Partner Types & Commission-Free Proposals
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 22 of 4 v1.4 phases (Partner Types & Commission-Free Proposals)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-29 — Milestone v1.4 started
+Status: Ready to plan
+Last activity: 2026-05-29 — v1.4 roadmap created (4 phases, Phases 22-25)
 
 ## Phase 17 Performance Metrics
 

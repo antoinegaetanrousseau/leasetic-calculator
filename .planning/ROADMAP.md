@@ -5,25 +5,34 @@
 - ✅ **v1.0 — v10 Refactor** — Phases 1-4 (shipped 2026-04-30) — see `milestones/v1.0-ROADMAP.md`
 - ✅ **v1.1 — Hosted Web App Foundation** — Phases 5-10 (shipped 2026-05-11) — see `milestones/v1.1-ROADMAP.md`
 - ✅ **v1.2 — UX Polish + Proposal Wizard** — Phases 11-15 (shipped 2026-05-21) — see `milestones/v1.2-ROADMAP.md`
-- 🚧 **v1.3 — Design Refresh + Partner-Onboarding Ready** — Phases 16-21 (in progress, started 2026-05-21)
+- ✅ **v1.3 — Design Refresh + Partner-Onboarding Ready** — Phases 16-21 (shipped 2026-05-29) — see `milestones/v1.3-ROADMAP.md`
+- 🚧 **v1.4 — Partner Types, Admin Dual-View & Rebrand** — Phases 22-25 (in progress, started 2026-05-29)
 
 ---
 
-## v1.3 Cross-Cutting Invariants
+## v1.4 Cross-Cutting Invariants
 
-These are not delivery targets — they are constraints that every phase in v1.3 must satisfy. Documented here so each phase planner can verify compliance before merging.
+These are not delivery targets — they are constraints that every phase in v1.4 must satisfy. Documented here so each phase planner can verify compliance before merging.
 
-### 1. Light + dark pair per design phase (THEME-01 / THEME-02)
+### 1. ADMIN-09 commission invisibility — reinforced and extended (PTYPE-05 / PTYPE-07)
 
-Every screen shipped in a design phase (Phases 16, 17, 18) must ship both light and dark variants simultaneously. A phase plan that ships only the light variant is incomplete. THEME-01 and THEME-02 are recorded as requirements of the phases where they are verified (Phase 17 and Phase 18 respectively), but the light+dark discipline applies to Phase 16 as well.
+The ADMIN-09 envelope applies to all v1.4 phases. For `Agent`/`Commercial` partner types, commission must be **fully absent** from calc output, UI surfaces, PDF render path, server logs, and audit payloads — not conditionally hidden, but structurally absent. The existing 12-gate grep-contract suite (`tests/admin-09-grep-contracts.test.ts`) must stay green throughout and is extended during Phase 22 (PTYPE-07). The Phase 13 D-12 partner-facing relaxation (`Partenaire` deal-owner sees commission on wizard steps 2+3) continues to hold for `Partenaire` type only.
 
-### 2. ADMIN-09 D-12 envelope + 9-gate grep-contract suite (WIZ-05)
+### 2. `params_snapshot` PDF immutability (PTYPE-06)
 
-The Phase 13 partner-facing commission relaxation (deal-owner partner sees commission on wizard steps 2+3 only) and the Phase 14 `tests/admin-09-grep-contracts.test.ts` 9-gate CI suite must remain green throughout every phase of v1.3. Any PR that touches admin or wizard surfaces must leave the suite green. No further relaxations to ADMIN-09 are in scope for v1.3. This suite will grow monotonically during Phase 19 (EXPORT-02 and LCDASH-02 extend it to 10+ gates).
+Every v1.4 phase that touches proposal creation or the calc engine must preserve the `params_snapshot` immutability invariant: once a proposal is stored, its inputs and rendered PDF are permanently frozen. The snapshot schema is extended in Phase 22 to record `partner_type` + `commission_applied` boolean so PDFs remain reproducible after a partner's type changes.
 
-### 3. Palette stability
+### 3. Light + dark pair per design change (BRAND-01 / BRAND-03)
 
-No token-level changes to `--gold`, `--navy`, `--ink`, `--teal`, `--paper`, or `--surface` in v1.3. The Figma `9:46` `color/*` variables match `app/globals.css` exactly (verified 2026-05-21). All v1.3 surfaces consume existing `--*` tokens. The v1.3 "design refresh" is layout and hierarchy — not token churn. Contrast measurement in Phase 16 runs against the current token values and must be signed off before any wave touching `--gold` / `.chip-invited` / diff-panel merges.
+Any visual change — including the Phase 25 teal rebrand token swap — must ship light and dark simultaneously. Every recolored foreground/background pair must meet WCAG 2.1 AA (≥4.5:1 text contrast). Logo SVGs and the semantic success green (`#6DC388` / "Actif" pill) are explicitly excluded from the rebrand.
+
+### 4. PDF byte-determinism CI gate (PDF-03)
+
+The byte-determinism CI gate must remain green throughout. Phase 23 regenerates the fixture after the PDF layout changes (Destinataire removal + typography fix); Phase 22's commission-free variant extends the golden corpus. Any phase that touches `src/lib/pdf/` must leave the gate green before merge.
+
+### 5. Frozen formula + tranche boundaries
+
+The `Partenaire` formula (`loyer = montant HT × (1 + commission/100) × coefficient / 100`) and all tranche boundaries stay frozen. The v1.4 business-approved exception is strictly limited to `Agent`/`Commercial` dropping the commission factor (`loyer = montant HT × coefficient / 100`). No other formula change is in scope.
 
 ---
 
@@ -73,7 +82,8 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 </details>
 
-### v1.3 — Design Refresh + Partner-Onboarding Ready (Phases 16-21)
+<details>
+<summary>✅ v1.3 — Design Refresh + Partner-Onboarding Ready (Phases 16-21) — SHIPPED 2026-05-29</summary>
 
 - [x] **Phase 16: Shell Refresh + Contrast Gates** — Refreshed sidebar + tri-state theme + hero pattern + locale relocation + topbar/footer; WCAG AA contrast for diff-panel and gold surfaces measured and signed off (completed 2026-05-21)
 - [x] **Phase 17: Partner Surfaces** — Partner Home dashboard (hero + MetricTiles + Propositions récentes), /proposals table with Archivées pill, full wizard redesign (3 steps + validity relocation + LC reference reservation); light+dark pair verified (completed 2026-05-24)
@@ -81,6 +91,18 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] **Phase 19: New Capabilities** — Per-partner XLSX export (ADMIN-09 clean, grep-contract suite extended to gate 10), centralized LC reference dashboard (cross-partner, admin-only, grep-contract suite extended to gates 11+12)
 - [x] **Phase 20: Infra Hardening** — Neon 3-branch split (per-scope DATABASE_URL), post-deploy DB-smoke CI step, Better Auth trustedOrigins middleware gate (completed 2026-05-27)
 - [x] **Phase 21: Partner-Onboarding Gates** — Admin password rotation (shared `leasetic2026` → individual strong), privacy policy confirmation with Thomas; final phase before first real partner (completed 2026-05-29)
+
+**Shipped:** 2026-05-29 · **Plans:** 27 · **Tests:** 1122/1122 passing · **Commits:** 175
+**Full archive:** `milestones/v1.3-ROADMAP.md` · **Summary:** `reports/MILESTONE_SUMMARY-v1.3.md`
+
+</details>
+
+### v1.4 — Partner Types, Admin Dual-View & Rebrand (Phases 22-25)
+
+- [ ] **Phase 22: Partner Types & Commission-Free Proposals** — `partner_type` enum + Drizzle migration + backfill; commission-free calc variant for Agent/Commercial; UI surfaces (selector on create/edit form, commission structurally absent from wizard + preview); commission-free PDF render variant + snapshot integrity; ADMIN-09 grep-contract suite extended
+- [ ] **Phase 23: PDF Rendering Fixes** — Root-cause spike + fix for number/typography glyph overlap; remove "Destinataire" block; regenerate byte-determinism fixture; extend golden corpus to cover Agent/Commercial commission-free render
+- [ ] **Phase 24: Admin Dual-View Toggle** — Admin-only Admin/Agent view toggle in the bottom-left settings area; nav remaps between admin and agent route sets; session-only (no persistence); authorization unchanged in both views
+- [ ] **Phase 25: Teal Rebrand & Polish** — Accent green → `#2D7A8C` at design-token layer (light + dark, WCAG AA); admin-home label changes; status-pill adaptive sizing fix
 
 ---
 
@@ -210,6 +232,69 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 ---
 
+### Phase 22: Partner Types & Commission-Free Proposals
+
+**Goal:** Partners have an assigned type (Agent / Commercial / Partenaire) that conditions their proposal economics end-to-end — from the create/edit form through the calc engine, UI surfaces, PDF output, and audit trail — with the ADMIN-09 grep-contract suite extended to assert zero commission leakage for Agent/Commercial.
+**Depends on:** Phase 21 (v1.3 complete; baseline 12-gate grep suite green)
+**Requirements:** PTYPE-01, PTYPE-02, PTYPE-03, PTYPE-04, PTYPE-05, PTYPE-06, PTYPE-07
+**Success Criteria** (what must be TRUE):
+
+  1. When creating or inviting a partner, an admin sees a "Type de partenaire" selector (Agent / Commercial / Partenaire) on the form; all existing accounts show as Partenaire after the migration applies, with behavior identical to pre-migration for all current partners.
+  2. An admin can open an existing partner's detail/edit surface and change their partner type; the change appears in `audit_log` with the before/after values.
+  3. A proposal created for an Agent or Commercial account computes `loyer = montant HT × coefficient / 100` (no commission factor); a proposal for a Partenaire uses the unchanged formula; the golden test corpus covers all three partner types with verified ±0.01 € accuracy.
+  4. For Agent/Commercial, no commission annotation, line, figure, or label appears anywhere in the wizard steps, live preview, or partner-facing dashboards — the commission UI is structurally absent (not hidden via CSS).
+  5. A PDF generated for an Agent or Commercial proposal contains no commission figure, no commission-derived wording, and renders the correct commission-free loyer; the `params_snapshot` records `partner_type` + `commission_applied: false` so the PDF is reproducible even if the partner's type changes later.
+  6. The `tests/admin-09-grep-contracts.test.ts` suite gains new gates asserting zero commission leakage across the Agent/Commercial calc output, UI render paths, PDF template, server logs, and audit payloads; all existing 12 gates remain green.
+
+**Plans:** TBD
+**UI hint:** yes
+
+### Phase 23: PDF Rendering Fixes
+
+**Goal:** Resolve the existing number/typography rendering defect on generated proposals, remove the "Destinataire" block, and keep the byte-determinism CI gate green after the layout changes — extending the golden corpus to cover the commission-free Agent/Commercial render introduced in Phase 22.
+**Depends on:** Phase 22 (Agent/Commercial commission-free PDF variant must exist before the golden corpus can be extended to cover it; PDF-03 depends on PTYPE-04/06)
+**Requirements:** PDF-01, PDF-02, PDF-03
+**Success Criteria** (what must be TRUE):
+
+  1. A generated PDF for any partner type renders all numeric values (loyer, montant HT, € symbol, thousands separators) without glyph overlap, artifact, or misplaced character — verified visually in a generated fixture and confirmed by the root-cause fix being committed with a reproduction test.
+  2. The generated PDF no longer contains a "Destinataire" block beneath the "Proposition de location financière" title; the remaining layout reflows cleanly with no blank gap where the block was.
+  3. The byte-determinism CI gate passes with regenerated SHA-256 fixtures that reflect the new layout; the golden corpus includes at least one Agent/Commercial fixture asserting the commission-free loyer and the absence of any commission wording.
+
+**Plans:** TBD
+**UI hint:** yes
+
+### Phase 24: Admin Dual-View Toggle
+
+**Goal:** Admin-level users can switch the navigation between admin and agent route sets via a session-only toggle in the bottom-left settings area — giving admins a self-service way to experience the partner view without losing admin rights.
+**Depends on:** Phase 22 (the agent route set now conditionally renders commission-free UI for Agent/Commercial; the toggle must work correctly with the Phase 22 nav changes)
+**Requirements:** VIEW-01, VIEW-02, VIEW-03, VIEW-04
+**Success Criteria** (what must be TRUE):
+
+  1. An admin user sees an Admin / Agent toggle in the bottom-left settings area (alongside theme + locale controls); a non-admin partner user never sees the toggle.
+  2. Switching to Agent view replaces the sidebar nav with the agent route set (Accueil `/`, Nouvelle proposition, Propositions `/proposals`, Aide); switching back to Admin view restores the admin route set (Accueil `/[adminSegment]`, Coefficients, Partenaires, Toutes les propositions, Aide).
+  3. After logout and a fresh login, the admin lands in Admin view regardless of the toggle state before logout; the session-only requirement means no cookie or DB column stores the view preference.
+  4. In Agent view, the admin's authorization is unchanged — they retain admin rights, and any attempt to directly navigate to an admin route still works; the toggle is a nav convenience, not a permission change.
+
+**Plans:** TBD
+**UI hint:** yes
+
+### Phase 25: Teal Rebrand & Polish
+
+**Goal:** Replace the UI accent color with `#2D7A8C` at the design-token layer across light and dark, close three admin-home label changes, and fix the status-pill sizing — shipping a consistent visual identity update without touching the logo green or semantic success green.
+**Depends on:** Phase 22 (commission-free UI surfaces exist; any new accent-colored commission-related elements from Phase 22 must be recolored here), Phase 24 (dual-view toggle renders accent-colored elements that must also be recolored)
+**Requirements:** BRAND-01, BRAND-02, BRAND-03, COPY-01, COPY-02, COPY-03, COPY-04, UIFIX-01
+**Success Criteria** (what must be TRUE):
+
+  1. Every surface that previously used the accent green (primary buttons, active nav items, focus rings, hero accents, CTAs) now renders `#2D7A8C` in light mode and the appropriate dark-mode variant from the same token; the Leasétic logo mark (`#6DC388`) and the "Actif" / "activé" semantic success green are visually unchanged.
+  2. Every recolored foreground/background pair meets WCAG 2.1 AA (≥4.5:1 for text) in both light and dark — confirmed by a contrast audit record committed alongside the token change.
+  3. The admin-home cards and stat labels read "Toutes les propositions", "Coefficients & Commissions", and "Dernière Modif Coef" in both FR and EN; the compile-time `_EnHasAllFrKeys` parity proof stays green; the `/[adminSegment]/lc-references` route is unchanged.
+  4. The proposal status pill ("Actif", "Brouillon", "Expirée", "Archivée") hugs its text content in all variants and both languages, with no fixed minimum width causing clipping or excess padding.
+
+**Plans:** TBD
+**UI hint:** yes
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -229,13 +314,17 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 13. 3-Step Proposal Wizard | v1.2 | 6/6 | Complete | 2026-05-12 |
 | 14. Admin Polish — Partners + History + Home | v1.2 | 6/6 | Complete | 2026-05-20 |
 | 15. Public Surface Brand Polish | v1.2 | 1/1 | Complete | 2026-05-21 |
-| 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete    | 2026-05-21 |
-| 17. Partner Surfaces | v1.3 | 8/8 | Complete   | 2026-05-24 |
-| 18. Admin Surfaces + Help Center | v1.3 | 7/7 | Complete   | 2026-05-25 |
-| 19. New Capabilities | v1.3 | 2/2 | Complete    | 2026-05-25 |
-| 20. Infra Hardening | v1.3 | 3/3 | Complete    | 2026-05-27 |
-| 21. Partner-Onboarding Gates | v1.3 | 2/2 | Complete   | 2026-05-29 |
+| 16. Shell Refresh + Contrast Gates | v1.3 | 5/5 | Complete | 2026-05-21 |
+| 17. Partner Surfaces | v1.3 | 8/8 | Complete | 2026-05-24 |
+| 18. Admin Surfaces + Help Center | v1.3 | 7/7 | Complete | 2026-05-25 |
+| 19. New Capabilities | v1.3 | 2/2 | Complete | 2026-05-25 |
+| 20. Infra Hardening | v1.3 | 3/3 | Complete | 2026-05-27 |
+| 21. Partner-Onboarding Gates | v1.3 | 2/2 | Complete | 2026-05-29 |
+| 22. Partner Types & Commission-Free Proposals | v1.4 | 0/? | Not started | - |
+| 23. PDF Rendering Fixes | v1.4 | 0/? | Not started | - |
+| 24. Admin Dual-View Toggle | v1.4 | 0/? | Not started | - |
+| 25. Teal Rebrand & Polish | v1.4 | 0/? | Not started | - |
 
 ---
 
-*Last updated: 2026-05-21 — v1.3 roadmap created by `/gsd-roadmapper` (6 phases, 34 requirements mapped). Production live at https://leasetic-matrice.vercel.app. Next: `/gsd-plan-phase 16`.*
+*Last updated: 2026-05-29 — v1.3 shipped (6 phases, 27 plans, 1122 tests); v1.4 roadmap created (4 phases, 22 requirements mapped). Production live at https://leasetic-matrice.vercel.app. Next: `/gsd-plan-phase 22`.*
