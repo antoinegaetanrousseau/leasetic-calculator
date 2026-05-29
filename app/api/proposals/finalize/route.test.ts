@@ -66,10 +66,13 @@ describe('POST /api/proposals/finalize (D-16 atomic finalize)', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toEqual({ id: 'p-finalized-1' });
+    // PTYPE-06: route threads the author's partnerType into finalizeWizard.
+    // This session user has no partnerType → route falls back to 'Partenaire'.
     expect(finalizeWizardMock).toHaveBeenCalledWith({
       userId: 'u-1',
       draftId: 'd-1',
       language: 'fr',
+      partnerType: 'Partenaire',
     });
   });
 
@@ -123,6 +126,32 @@ describe('POST /api/proposals/finalize (D-16 atomic finalize)', () => {
       userId: 'u-99',
       draftId: 'd-99',
       language: 'en',
+      partnerType: 'Partenaire',
     });
+  });
+
+  it('Test 16d (PTYPE-06): threads the author partnerType (Agent/Commercial) into finalizeWizard', async () => {
+    for (const type of ['Agent', 'Commercial', 'Partenaire'] as const) {
+      finalizeWizardMock.mockClear();
+      requireUserMock.mockResolvedValue({
+        session: { user: { id: 'u-pt', partnerType: type } },
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await POST(makeReq({ draftId: 'd-pt' }) as any);
+      expect(finalizeWizardMock).toHaveBeenCalledWith(
+        expect.objectContaining({ partnerType: type }),
+      );
+    }
+  });
+
+  it('Test 16e (PTYPE-06): unknown/legacy partnerType falls back to Partenaire', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'u-legacy', partnerType: 'bogus' } },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await POST(makeReq({ draftId: 'd-legacy' }) as any);
+    expect(finalizeWizardMock).toHaveBeenCalledWith(
+      expect.objectContaining({ partnerType: 'Partenaire' }),
+    );
   });
 });

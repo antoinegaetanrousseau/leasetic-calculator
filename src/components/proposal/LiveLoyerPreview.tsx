@@ -24,6 +24,18 @@ export interface LiveLoyerPreviewProps {
    * Phase 8 flips this from a global_params freshness probe.
    */
   coefficientsExpired?: boolean;
+  /**
+   * PTYPE-04 / PTYPE-05 (step 1): the proposal author's partner type drives the
+   * previewed economics. For Agent/Commercial the loyer is commission-free
+   * (commissionPct:0, i.e. montant HT × coefficient / 100); for Partenaire the
+   * historical default applies (omit → seedParams.commissionPct, unchanged).
+   *
+   * Defaults to 'Partenaire' so any caller that has not yet been migrated keeps
+   * the pre-PTYPE behaviour byte-for-byte. The preview renders no commission
+   * annotation in any case, so PTYPE-05's "no commission text" holds for all
+   * types — this prop only corrects the loyer VALUE.
+   */
+  partnerType?: 'Agent' | 'Commercial' | 'Partenaire';
 }
 
 type EffectiveState = ComputeLoyerState['state'] | 'expired';
@@ -48,6 +60,7 @@ type EffectiveState = ComputeLoyerState['state'] | 'expired';
 export function LiveLoyerPreview({
   lang,
   coefficientsExpired = false,
+  partnerType = 'Partenaire',
 }: LiveLoyerPreviewProps) {
   const { control, setValue } = useFormContext<ProposalInput>();
 
@@ -85,8 +98,18 @@ export function LiveLoyerPreview({
       amountHT: debounced.amountHT,
       durationMonths: debounced.durationMonths as 36 | 48 | 60,
       validityDays: (debounced.validityDays ?? 30) as 15 | 30 | 60,
+      // PTYPE-04 commissionPct:0 seam. Partenaire → omit so the engine falls
+      // back to seedParams.commissionPct (pre-PTYPE behaviour, unchanged);
+      // Agent/Commercial → 0 so the previewed loyer is commission-free
+      // (montant HT × coefficient / 100). formula.ts stays frozen (22-02).
+      ...(partnerType === 'Partenaire' ? {} : { commissionPct: 0 }),
     });
-  }, [debounced.amountHT, debounced.durationMonths, debounced.validityDays]);
+  }, [
+    debounced.amountHT,
+    debounced.durationMonths,
+    debounced.validityDays,
+    partnerType,
+  ]);
 
   // Effective state: 'expired' (D-7-12 stub) takes precedence over computed.
   const effectiveState: EffectiveState = useMemo(() => {
