@@ -59,8 +59,12 @@ export const users = pgTable('users', {
   createdBy: text('created_by'),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
+  // PTYPE-01: partner type dimension — Agent / Commercial / Partenaire.
+  // DEFAULT 'Partenaire' ensures existing rows stay Partenaire on migration (PTYPE-02).
+  partnerType: text('partner_type').notNull().default('Partenaire'),
 }, (table) => [
   check('users_role_check', sql`${table.role} IN ('partner', 'admin')`),
+  check('users_partner_type_check', sql`${table.partnerType} IN ('Agent', 'Commercial', 'Partenaire')`),
 ]);
 
 export const sessions = pgTable('sessions', {
@@ -209,6 +213,7 @@ export const proposals = pgTable('proposals', {
   // inputs stays NOT NULL — drafts INSERT with inputs = '{}' then accumulate (D-03).
   inputs: jsonb('inputs').$type<Record<string, unknown>>().notNull(),
   // D-03 (12-CONTEXT): paramsSnapshot nullable — NULL for drafts; written once by finalizeDraft().
+  // PTYPE-06: extended with partnerType + commissionApplied so future snapshots record them.
   paramsSnapshot: jsonb('params_snapshot').$type<{
     commissionPct: string;
     maxAmount: string;
@@ -219,6 +224,8 @@ export const proposals = pgTable('proposals', {
       t3: { 36: string; 48: string; 60: string };
       t4: { 36: string; 48: string; 60: string };
     };
+    partnerType: 'Agent' | 'Commercial' | 'Partenaire';
+    commissionApplied: boolean;
   }>(),
   // D-03 (12-CONTEXT): computed nullable — NULL for drafts; written once by finalizeDraft().
   computed: jsonb('computed').$type<Record<string, unknown>>(),

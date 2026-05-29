@@ -166,6 +166,10 @@ function createAuth() {
         createdBy: { type: 'string', required: false, input: false },
         deletedAt: { type: 'date', required: false, input: false },
         lastLoginAt: { type: 'date', required: false, input: false },
+        // PTYPE-01: partner type rides on session.user. input:false — client cannot
+        // mutate their own type via /api/auth/update-user (T-22-01-E privilege-escalation
+        // mitigation). Type changes are admin-only server actions (Plan 22-03).
+        partnerType: { type: 'string', required: false, defaultValue: 'Partenaire', input: false },
       },
     },
 
