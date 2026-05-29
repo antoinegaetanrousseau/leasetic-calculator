@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
-status: executing
-last_updated: "2026-05-30T00:25:00.000Z"
+status: verifying
+last_updated: "2026-05-30T00:35:00.000Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 25
-  completed_phases: 20
+  completed_phases: 21
   total_plans: 115
-  completed_plans: 113
-  percent: 80
+  completed_plans: 115
+  percent: 85
 ---
 
 # State — Matrice Commerciale
@@ -29,8 +29,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 22 (partner-types-commission-free-proposals) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-05-30
+Status: Phase complete — ready for verification
+Last activity: 2026-05-29
 
 ## Phase 22 Performance Metrics
 
@@ -362,9 +362,13 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 22 P01 | 25min | 3 tasks | 7 files |
 | Phase 22 P02 | 2min | 1 tasks | 1 files |
 | Phase 22 P03 | 9min | 3 tasks | 14 files |
+| Phase 22 P04 | ~12min | 3 tasks | varies files |
+| Phase 22 P05 | ~12min | 3 tasks | 3 files |
 
 ## Decisions
 
+- [Phase 22-05]: partner-type <option> labels render from the enum array (dynamic JSX expr), not dictionary keys — values are language-neutral proper nouns; satisfies SHELL-06 no-hardcoded-JSX-text gate
+- [Phase 22-05]: PTYPE-06/07 CI gates extended per partner-type value (not one combined gate); assertNoCommissionLeakage reused verbatim and baseline gate count must increase (13→19) to prevent silent gate removal
 - [Phase ?]: v1.3 lc_ref format = LC-2026-NNN (≥3-digit zero-pad); legacy LC-NNNNN random refs excluded from sequence via LIKE filter
 - [Phase ?]: lc_ref allocator: SELECT DESC LIMIT 1 + parse + increment + retry-on-insert-error up to 3 attempts (Phase 12 D-05 partial unique index is backstop)
 - [Phase ?]: Archivées branch = candidate-set SQL + app-side deriveDisplayStatus narrow (single source of truth for expired derivation)

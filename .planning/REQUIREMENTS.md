@@ -22,7 +22,7 @@ The headline feature. Introduces a `partner_type` dimension that conditions prop
 - [x] **PTYPE-04**: For an **Agent** or **Commercial** account, a proposal's monthly loyer is computed **without** the commission factor (`loyer = montant HT × coefficient ÷ 100`). For a **Partenaire**, the existing formula (`montant HT × (1 + commission/100) × coefficient / 100`) is unchanged. Verified by golden test cases for all three types.
 - [x] **PTYPE-05**: For Agent/Commercial, commission never appears in any UI surface (wizard steps, live preview, dashboards, partner-facing views) — the commission annotation/line is structurally absent, not conditionally hidden.
 - [x] **PTYPE-06**: For Agent/Commercial, the generated PDF contains no commission figure or commission-derived wording and renders the commission-free loyer. The `params_snapshot` immutability invariant still holds, and the snapshot records the partner type + whether commission was applied so the PDF stays reproducible.
-- [ ] **PTYPE-07**: The ADMIN-09 grep-contract suite is extended to assert zero commission leakage for Agent/Commercial across calc output, UI, PDF render path, server logs, and audit payloads. The existing 12-gate suite stays green.
+- [x] **PTYPE-07**: The ADMIN-09 grep-contract suite is extended to assert zero commission leakage for Agent/Commercial across calc output, UI, PDF render path, server logs, and audit payloads. The existing 12-gate suite stays green.
 
 ### Admin Dual-View Toggle (VIEW)
 
