@@ -18,7 +18,7 @@ The headline feature. Introduces a `partner_type` dimension that conditions prop
 
 - [x] **PTYPE-01**: When inviting/creating a partner, an admin can select a partner type — **Agent**, **Commercial**, or **Partenaire** — via a selector in the create-partner form (`/[adminSegment]/partners/new`).
 - [x] **PTYPE-02**: Every existing account is migrated to `Partenaire` so behavior is unchanged for all current partners after the schema migration applies.
-- [ ] **PTYPE-03**: An admin can change an existing account's partner type later (partner detail/edit surface); the change is recorded in `audit_log`.
+- [x] **PTYPE-03**: An admin can change an existing account's partner type later (partner detail/edit surface); the change is recorded in `audit_log`.
 - [x] **PTYPE-04**: For an **Agent** or **Commercial** account, a proposal's monthly loyer is computed **without** the commission factor (`loyer = montant HT × coefficient ÷ 100`). For a **Partenaire**, the existing formula (`montant HT × (1 + commission/100) × coefficient / 100`) is unchanged. Verified by golden test cases for all three types.
 - [ ] **PTYPE-05**: For Agent/Commercial, commission never appears in any UI surface (wizard steps, live preview, dashboards, partner-facing views) — the commission annotation/line is structurally absent, not conditionally hidden.
 - [x] **PTYPE-06**: For Agent/Commercial, the generated PDF contains no commission figure or commission-derived wording and renders the commission-free loyer. The `params_snapshot` immutability invariant still holds, and the snapshot records the partner type + whether commission was applied so the PDF stays reproducible.

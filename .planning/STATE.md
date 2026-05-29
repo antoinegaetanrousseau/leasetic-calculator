@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
 status: executing
-last_updated: "2026-05-29T22:00:48.793Z"
+last_updated: "2026-05-29T22:13:38.927Z"
 last_activity: 2026-05-29
 progress:
   total_phases: 25
   completed_phases: 20
   total_plans: 115
-  completed_plans: 111
+  completed_plans: 112
   percent: 80
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 22 (partner-types-commission-free-proposals) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-05-29
 
@@ -353,6 +353,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 18 P06 | 4 | 4 tasks | 5 files |
 | Phase 22 P01 | 25min | 3 tasks | 7 files |
 | Phase 22 P02 | 2min | 1 tasks | 1 files |
+| Phase 22 P03 | 9min | 3 tasks | 14 files |
 
 ## Decisions
 
