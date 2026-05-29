@@ -2,17 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
-status: planning
-last_updated: "2026-05-29T16:23:43.603Z"
-last_activity: 2026-05-29 -- Phase 21 context gathered
+status: executing
+last_updated: "2026-05-29T18:06:27.364Z"
+last_activity: 2026-05-29 -- Phase 21 execution started
 progress:
   total_phases: 21
   completed_phases: 19
-  total_plans: 108
+  total_plans: 110
   completed_plans: 107
   percent: 90
-stopped_at: Phase 21 context gathered — ready to plan (Figma URL pending from Antoine before /gsd-plan-phase 21)
-resume_file: .planning/phases/21-partner-onboarding-gates/21-CONTEXT.md
 ---
 
 # State — Matrice Commerciale
@@ -25,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 21 — partner onboarding gates
+**Current focus:** Phase 21 — partner-onboarding-gates
 
 ## Current Position
 
-Phase: 21
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-27
+Phase: 21 (partner-onboarding-gates) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 21
+Last activity: 2026-05-29 -- Phase 21 execution started
 
 ## Phase 17 Performance Metrics
 

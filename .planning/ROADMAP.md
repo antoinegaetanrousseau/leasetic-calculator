@@ -206,7 +206,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   2. `docs/legal/privacy-coverage-confirmation.md` is updated (committed) with Thomas Heufke's explicit confirmation covering (a) Vercel/Neon EU hosting and (b) 10-year PDF retention; the stub placeholder text is replaced with dated confirmation copy.
   3. Both criteria above are met before any non-test partner account (`not @test.leasetic.com`) is invited via the admin `/partners/new` flow.
 
-**Plans:** TBD
+**Plans:** 1/2 plans executed
 
 ---
 
@@ -234,7 +234,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 | 18. Admin Surfaces + Help Center | v1.3 | 7/7 | Complete   | 2026-05-25 |
 | 19. New Capabilities | v1.3 | 2/2 | Complete    | 2026-05-25 |
 | 20. Infra Hardening | v1.3 | 3/3 | Complete    | 2026-05-27 |
-| 21. Partner-Onboarding Gates | v1.3 | 0/TBD | Not started | — |
+| 21. Partner-Onboarding Gates | v1.3 | 1/2 | In Progress|  |
 
 ---
 
