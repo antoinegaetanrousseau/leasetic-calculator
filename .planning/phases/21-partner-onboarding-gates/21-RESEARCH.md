@@ -340,28 +340,28 @@ under `src/lib/.../schemas.ts` per feature domain. They are pure modules
 (no framework imports, no `'use server'` / `'use client'`), explicitly
 designed to be imported by BOTH client and server (D-29 / SHELL-11).
 
-**New schema for Phase 21 (the planner writes this verbatim):**
+**New schema for Phase 21 (the planner writes this verbatim — rev 2 drops confirmNewPassword to match Figma):**
 
 ```ts
 // src/lib/auth/schemas.ts — append after setPasswordSchema
 
 /**
- * In-app self-service password change (Phase 21 — D-07).
+ * In-app self-service password change (Phase 21 — D-07, rev 2).
  *
  * The server-side Better Auth changePassword endpoint additionally
  * verifies that currentPassword matches the stored hash; client-side
- * only the length/equality constraints are enforced.
+ * only the length constraint is enforced.
+ *
+ * Rev 2 (2026-05-29 evening): the "Confirmer le nouveau mot de passe"
+ * field was DROPPED to match Figma's 2-field row (Ancien + Nouveau).
+ * No client-side equality refine. If a user typos newPassword, they
+ * discover it on the next sign-in and use the existing admin-mediated
+ * reset flow as recovery. Documented as accepted UX risk in CONTEXT.md D-07.
  */
-export const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, 'Mot de passe actuel requis'),
-    newPassword: z.string().min(8).max(128),
-    confirmNewPassword: z.string(),
-  })
-  .refine((d) => d.newPassword === d.confirmNewPassword, {
-    message: 'Les mots de passe ne correspondent pas',
-    path: ['confirmNewPassword'],
-  });
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Ancien mot de passe requis'),
+  newPassword: z.string().min(8).max(128),
+});
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
@@ -423,7 +423,12 @@ where the new "Paramètres" menu item lives (`shell.user.menu.settings`).
 ### 5b. New keys for Phase 21 (planner adds these verbatim)
 
 ```ts
-// In dictionaries.fr — append in alphabetical/grouped order matching existing convention:
+// In dictionaries.fr — append in alphabetical/grouped order matching existing convention.
+// Rev 2 (2026-05-29 evening): drop `parametres.card.section.password`, drop the
+// three `parametres.password.confirm.*` keys, drop `parametres.error.password.mismatch`,
+// rename `parametres.identity.email.label` to "Email professionnel", rename
+// `parametres.password.current.*` to use "Ancien mot de passe" label, rename
+// `parametres.card.section.identity` to the eyebrow "INFORMATIONS PERSONNELLES".
 
 // Sidebar / user menu access
 'shell.user.menu.settings': 'Paramètres',
@@ -432,42 +437,37 @@ where the new "Paramètres" menu item lives (`shell.user.menu.settings`).
 'parametres.hero.title': 'Paramètres',
 'parametres.hero.subtitle': 'Changer vos information et réinitialiser votre mot de passe.',
 
-// Account card sections
-'parametres.card.section.identity': 'Informations',
-'parametres.card.section.password': 'Mot de passe',
+// Eyebrow section header (Figma 134:492 — uppercase, with ellipse bullet)
+'parametres.card.eyebrow.identity': 'INFORMATIONS PERSONNELLES',
 
-// Identity section labels (Figma) — phone + avatar omitted per D-06b
+// Identity labels (Figma 134:495, 134:499, 134:503) — phone + avatar omitted per D-06b
 'parametres.identity.firstName.label': 'Prénom',
 'parametres.identity.firstName.placeholder': 'Prénom',
 'parametres.identity.lastName.label': 'Nom',
 'parametres.identity.lastName.placeholder': 'Nom',
-'parametres.identity.email.label': 'Adresse e-mail',
+'parametres.identity.email.label': 'Email professionnel',
 'parametres.identity.email.placeholder': 'prenom.nom@leasetic.com',
 'parametres.identity.email.readonly.notice': 'Pour changer votre adresse e-mail, contactez un administrateur.',  // shown if D-06d demotes email
 
-// Avatar placeholder (no upload UI in Phase 21 per D-06b)
-'parametres.identity.avatar.placeholder.alt': 'Avatar par défaut',
-
-// Password section labels (D-07 — current pw + new + confirm)
-'parametres.password.current.label': 'Mot de passe actuel',
+// Password row labels (D-07 rev 2 — Ancien + Nouveau, NO confirm field)
+// Label text matches Figma 134:513 ("Ancien mot de passe") + 134:517 ("Nouveau mot de passe").
+'parametres.password.current.label': 'Ancien mot de passe',
 'parametres.password.current.placeholder': '••••••••',
 'parametres.password.new.label': 'Nouveau mot de passe',
 'parametres.password.new.placeholder': '••••••••',
 'parametres.password.new.hint': 'Au moins 8 caractères.',
-'parametres.password.confirm.label': 'Confirmer le nouveau mot de passe',
-'parametres.password.confirm.placeholder': '••••••••',
-'parametres.password.session.notice': 'Modifier votre mot de passe vous déconnectera de vos autres appareils.',  // D-08
+'parametres.password.session.notice': 'Modifier votre mot de passe vous déconnectera de vos autres appareils.',  // D-08 — rendered as muted helper text below the password row
 
 // Inline validation errors (shown beneath fields)
 'parametres.error.required': 'Champ requis.',
-'parametres.error.password.current.wrong': 'Mot de passe actuel incorrect.',
+'parametres.error.password.required.pair': 'Champ requis pour modifier le mot de passe.',  // shown when only one of the two pw fields is filled (D-06c rev 2 edge case)
+'parametres.error.password.current.wrong': 'Ancien mot de passe incorrect.',
 'parametres.error.password.tooShort': 'Au moins 8 caractères requis.',
 'parametres.error.password.tooLong': 'Maximum 128 caractères.',
-'parametres.error.password.mismatch': 'Les mots de passe ne correspondent pas.',
 'parametres.error.email.invalid': 'Adresse e-mail invalide.',
 'parametres.error.unknown': 'Une erreur est survenue. Réessayez.',
 
-// Action footer
+// Action footer (Figma 134:534 + 134:536)
 'parametres.action.cancel': 'Annuler',
 'parametres.action.save': 'Enregistrer les modifications',
 'parametres.action.saving': 'Enregistrement…',
@@ -481,40 +481,38 @@ where the new "Paramètres" menu item lives (`shell.user.menu.settings`).
 ```
 
 ```ts
-// In dictionaries.en — append the EN mirror (planner translates these):
+// In dictionaries.en — append the EN mirror (planner translates these). Rev 2
+// matches the FR key set above — drops password.confirm.*, drops password.mismatch,
+// renames email label, renames current label to "Previous password", renames the
+// section header to the eyebrow style.
 
 'shell.user.menu.settings': 'Settings',
 
 'parametres.hero.title': 'Settings',
 'parametres.hero.subtitle': 'Update your information and reset your password.',  // EN corrects the typo per D-06
 
-'parametres.card.section.identity': 'Profile',
-'parametres.card.section.password': 'Password',
+'parametres.card.eyebrow.identity': 'PERSONAL INFORMATION',
 
 'parametres.identity.firstName.label': 'First name',
 'parametres.identity.firstName.placeholder': 'First name',
 'parametres.identity.lastName.label': 'Last name',
 'parametres.identity.lastName.placeholder': 'Last name',
-'parametres.identity.email.label': 'Email',
+'parametres.identity.email.label': 'Work email',
 'parametres.identity.email.placeholder': 'firstname.lastname@leasetic.com',
 'parametres.identity.email.readonly.notice': 'To change your email address, please contact an administrator.',
 
-'parametres.identity.avatar.placeholder.alt': 'Default avatar',
-
-'parametres.password.current.label': 'Current password',
+'parametres.password.current.label': 'Previous password',
 'parametres.password.current.placeholder': '••••••••',
 'parametres.password.new.label': 'New password',
 'parametres.password.new.placeholder': '••••••••',
 'parametres.password.new.hint': 'At least 8 characters.',
-'parametres.password.confirm.label': 'Confirm new password',
-'parametres.password.confirm.placeholder': '••••••••',
 'parametres.password.session.notice': 'Changing your password will sign you out of your other devices.',
 
 'parametres.error.required': 'Required.',
-'parametres.error.password.current.wrong': 'Current password is incorrect.',
+'parametres.error.password.required.pair': 'Required to change your password.',
+'parametres.error.password.current.wrong': 'Previous password is incorrect.',
 'parametres.error.password.tooShort': 'At least 8 characters required.',
 'parametres.error.password.tooLong': 'Maximum 128 characters.',
-'parametres.error.password.mismatch': 'Passwords do not match.',
 'parametres.error.email.invalid': 'Invalid email address.',
 'parametres.error.unknown': 'Something went wrong. Try again.',
 
@@ -972,10 +970,13 @@ navigating away, matching the standard "discard local edits" pattern.
 ### Plr-7. Where to render "Modifier votre mot de passe vous déconnectera…" notice
 
 D-08 specifies the copy but is silent on exact placement. **Planner
-picks:** render it as helper text immediately under the "Mot de passe"
-section heading (above the three password inputs), with the
-`parametres.password.session.notice` dict key. Styled in muted
-typography matching other section-level hints.
+picks (rev 2):** rev 2 Figma removed the "Mot de passe" section
+heading — the password row sits directly under the divider. Render
+the notice as **muted helper text below the password row**,
+spanning the full card width, with the `parametres.password.session.notice`
+dict key. Styled with `color: var(--muted)` and ~13px font-size.
+This reads naturally as "this is what happens when you submit"
+rather than as a section-header subtitle.
 
 ### Plr-8. Better Auth session freshness
 

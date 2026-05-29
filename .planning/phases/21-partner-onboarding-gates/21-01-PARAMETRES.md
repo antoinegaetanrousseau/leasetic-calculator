@@ -21,15 +21,16 @@ must_haves:
     - "Logged-in user can open the Topbar user menu and see a new 'Paramètres' (FR) / 'Settings' (EN) entry between the displayName+email header and the existing 'Se déconnecter' button."
     - "Clicking 'Paramètres' navigates to /parametres; the page renders the Paramètres hero ('Paramètres' + Figma-verbatim subtitle including the 'vos information' typo in FR) inside the existing (authed) Shell."
     - "Visiting /parametres while logged out redirects to /login (gate inherited from app/(authed)/layout.tsx)."
-    - "The Account card shows two sections — 'Informations' (Prénom / Nom / Adresse e-mail) and 'Mot de passe' (Mot de passe actuel + Nouveau mot de passe + Confirmer le nouveau mot de passe) — separated by a divider, with a single 'Annuler' + 'Enregistrer les modifications' action footer (per D-06)."
-    - "Avatar block is rendered as an initials placeholder (e.g. 'AR') matching the existing UserMenu pattern; no upload UI (per D-06b)."
-    - "Numéro de téléphone field is omitted (per D-06b)."
-    - "Password section displays an Eye/EyeOff show/hide toggle on each of the three password inputs (per Plr-2) and a 0–4 strength meter beneath 'Nouveau mot de passe' driven by auth.password.strength.* keys + strengthScore() helper (per Plr-3)."
-    - "Password section header includes a muted static notice rendered immediately under the heading: 'Modifier votre mot de passe vous déconnectera de vos autres appareils.' (FR) / EN equivalent (per D-08, Plr-7)."
+    - "The form card displays the eyebrow header 'INFORMATIONS PERSONNELLES' (FR) / 'PERSONAL INFORMATION' (EN) with a small filled-circle bullet, followed by a 2-column row (Prénom + Nom), a full-width row (Email professionnel), a horizontal divider, and a 2-column password row (Ancien mot de passe + Nouveau mot de passe). NO 'Confirmer le nouveau mot de passe' field. Per D-06 + D-07 (rev 2)."
+    - "Action footer rendered as a SEPARATE frame OUTSIDE the form card, full content width, with 'Annuler' (secondary, left) and 'Enregistrer les modifications' (primary, right). Per D-06 rev 2."
+    - "No avatar block and no Numéro de téléphone field rendered — matches rev 2 Figma which removed both (per D-06b)."
+    - "Password row displays an Eye/EyeOff show/hide toggle on EACH of the TWO password inputs (per Plr-2) and a 0–4 strength meter beneath 'Nouveau mot de passe' driven by auth.password.strength.* keys + strengthScore() helper (per Plr-3)."
+    - "A muted static notice is rendered as helper text BELOW the password row spanning the card width: 'Modifier votre mot de passe vous déconnectera de vos autres appareils.' (FR) / 'Changing your password will sign you out of your other devices.' (EN). Per D-08 + Plr-7 (rev 2)."
     - "Save button is disabled when neither section is dirty (per D-06c)."
     - "When only the identity section is dirty, Save calls authClient.updateUser({ name: `${firstName} ${lastName}` }) (and authClient.changeEmail({ newEmail }) iff D-06d resolved to 'email editable') and surfaces a success toast 'parametres.toast.identity.saved'."
-    - "When only the password section is dirty (all three password fields non-empty + new === confirm), Save calls authClient.changePassword({ currentPassword, newPassword, revokeOtherSessions: true }) and surfaces success toast 'parametres.toast.password.saved'."
-    - "When both sections are dirty, identity runs first then password; both succeed → 'parametres.toast.both.saved'; identity ok + password fails (e.g. INVALID_PASSWORD) → INLINE error 'parametres.error.password.current.wrong' under 'Mot de passe actuel' + 'parametres.toast.partialSuccess.identityOk.passwordErr'; conversely 'parametres.toast.partialSuccess.passwordOk.identityErr' (per D-06c)."
+    - "When only the password section is dirty (both Ancien and Nouveau fields non-empty), Save calls authClient.changePassword({ currentPassword, newPassword, revokeOtherSessions: true }) and surfaces success toast 'parametres.toast.password.saved'."
+    - "When the user filled ONE of the two password fields but not the other, an INLINE error 'parametres.error.password.required.pair' surfaces under the empty field; the password section is treated as 'intended but incomplete', NOT 'untouched' (per D-06c rev 2 edge case)."
+    - "When both sections are dirty, identity runs first then password; both succeed → 'parametres.toast.both.saved'; identity ok + password fails (e.g. INVALID_PASSWORD) → INLINE error 'parametres.error.password.current.wrong' under 'Ancien mot de passe' + 'parametres.toast.partialSuccess.identityOk.passwordErr'; conversely 'parametres.toast.partialSuccess.passwordOk.identityErr' (per D-06c)."
     - "On successful changePassword, all OTHER sessions of the same user are revoked (revokeOtherSessions: true); the current device's session remains active per Better Auth 1.6.9 contract (per D-08)."
     - "The existing /[adminSegment]/partners admin↔admin reset flow (PartnersList → InviteUrlModal → src/lib/auth/redeem.ts) remains untouched and functional as the forgotten-password fallback (per D-02)."
     - "All new FR + EN dict keys for Phase 21 are present in src/lib/i18n/dictionaries.ts and the compile-time _EnHasAllFrKeys parity proof passes."
@@ -72,12 +73,12 @@ verification:
   - "npm run build"
   - "npm run test -- src/lib/i18n/dictionaries.test.ts"
   - "Manual: sign in → user menu → 'Paramètres' → /parametres renders the Account card."
-  - "Manual: enter wrong current password → INLINE error under 'Mot de passe actuel' surfaces 'parametres.error.password.current.wrong'."
-  - "Manual: enter correct currentPassword + valid new+confirm → success toast; sign out on a second browser/incognito → that session is invalidated (revokeOtherSessions: true verified)."
+  - "Manual: enter wrong current password → INLINE error under 'Ancien mot de passe' surfaces 'parametres.error.password.current.wrong'."
+  - "Manual: enter correct currentPassword + valid new password → success toast; sign out on a second browser/incognito → that session is invalidated (revokeOtherSessions: true verified)."
 ---
 
 <objective>
-Ship the new self-service Paramètres page available to all logged-in users (admin AND partner) at /parametres, accessed via a new "Paramètres" entry in the Topbar user-menu dropdown. The page renders one Account card with two sections — Informations (Prénom / Nom / Adresse e-mail) and Mot de passe (current + new + confirm, with strength meter and show/hide toggles) — and a single Save button that handles identity-only, password-only, or combined updates with partial-success semantics. Password changes call Better Auth's changePassword endpoint with revokeOtherSessions: true.
+Ship the new self-service Paramètres page available to all logged-in users (admin AND partner) at /parametres, accessed via a new "Paramètres" entry in the Topbar user-menu dropdown. The page renders one form card matching Figma 132:867 (rev 2): an eyebrow "INFORMATIONS PERSONNELLES" header, a 2-column Prénom/Nom row, a full-width Email professionnel row, a horizontal divider, and a 2-column password row (Ancien mot de passe + Nouveau mot de passe — NO confirm field). A separate action footer below the card carries "Annuler" + "Enregistrer les modifications" (single Save button handling identity-only, password-only, or combined updates with partial-success semantics). Password changes call Better Auth's changePassword endpoint with revokeOtherSessions: true.
 
 This plan closes GATE-01 structurally (the new flow exists in production). The actual admin password rotations + the GATE-02 privacy-notice publication are operational steps executed in Plan 21-02 once this plan is deployed.
 
@@ -124,11 +125,11 @@ Output: A new /parametres route, a new client-island form component, schema addi
   </read_first>
 
   <behavior>
-    - changePasswordSchema parses { currentPassword: "abc", newPassword: "newpass12", confirmNewPassword: "newpass12" } → success.
-    - changePasswordSchema rejects when currentPassword is empty string → error.message "Mot de passe actuel requis", path ["currentPassword"].
+    - changePasswordSchema parses { currentPassword: "abc", newPassword: "newpass12" } → success.
+    - changePasswordSchema rejects when currentPassword is empty string → error.message "Ancien mot de passe requis", path ["currentPassword"].
     - changePasswordSchema rejects when newPassword.length < 8 → error path ["newPassword"].
     - changePasswordSchema rejects when newPassword.length > 128 → error path ["newPassword"].
-    - changePasswordSchema rejects when newPassword !== confirmNewPassword → error.message "Les mots de passe ne correspondent pas", path ["confirmNewPassword"].
+    - changePasswordSchema does NOT include a confirmNewPassword field and does NOT enforce a client-side equality refine (rev 2 — matches Figma's 2-field row; the accepted UX risk is documented in CONTEXT.md D-07).
     - identitySchema parses { firstName: "Antoine", lastName: "Rousseau", email: "a@leasetic.com" } → success (only if D-06d resolves to "email editable"; otherwise identitySchema has only firstName + lastName).
     - identitySchema rejects when firstName is empty string → error path ["firstName"].
     - identitySchema rejects when lastName is empty string → error path ["lastName"].
@@ -170,11 +171,9 @@ Output: A new /parametres route, a new client-island form component, schema addi
 
     Step C — Append new schemas to `src/lib/auth/schemas.ts` (after the existing `setPasswordSchema` export, preserving the existing structure):
 
-    Add `changePasswordSchema` as a `z.object({ currentPassword, newPassword, confirmNewPassword }).refine(...)` where:
-    - `currentPassword: z.string().min(1, 'Mot de passe actuel requis')`
+    Add `changePasswordSchema` as a `z.object({ currentPassword, newPassword })` (rev 2 — NO confirmNewPassword, NO .refine):
+    - `currentPassword: z.string().min(1, 'Ancien mot de passe requis')`
     - `newPassword: z.string().min(8).max(128)`
-    - `confirmNewPassword: z.string()`
-    - `.refine((d) => d.newPassword === d.confirmNewPassword, { message: 'Les mots de passe ne correspondent pas', path: ['confirmNewPassword'] })`
 
     Add `identitySchema` as a `z.object({ firstName, lastName, email? })`:
     - `firstName: z.string().min(1, 'Prénom requis').max(60)`
@@ -221,34 +220,30 @@ Output: A new /parametres route, a new client-island form component, schema addi
 
     Open `src/lib/i18n/dictionaries.ts` and add the following keys verbatim. Insert each key in the position matching the existing alphabetical/grouped convention (the planner inspects the existing file structure to decide grouping — keys starting with `parametres.*` form a new namespace block; the existing `shell.user.menu.*` block already exists and the new `settings` key goes there).
 
-    FR side — insert all of these into `dictionaries.fr`:
+    FR side — insert all of these into `dictionaries.fr` (rev 2 — see also RESEARCH §5b for the canonical list):
 
     - `'shell.user.menu.settings': 'Paramètres',`
     - `'parametres.hero.title': 'Paramètres',`
     - `'parametres.hero.subtitle': 'Changer vos information et réinitialiser votre mot de passe.',` (VERBATIM Figma typo "vos information" preserved per D-06 + D-10).
-    - `'parametres.card.section.identity': 'Informations',`
-    - `'parametres.card.section.password': 'Mot de passe',`
+    - `'parametres.card.eyebrow.identity': 'INFORMATIONS PERSONNELLES',`
     - `'parametres.identity.firstName.label': 'Prénom',`
     - `'parametres.identity.firstName.placeholder': 'Prénom',`
     - `'parametres.identity.lastName.label': 'Nom',`
     - `'parametres.identity.lastName.placeholder': 'Nom',`
-    - `'parametres.identity.email.label': 'Adresse e-mail',`
+    - `'parametres.identity.email.label': 'Email professionnel',`
     - `'parametres.identity.email.placeholder': 'prenom.nom@leasetic.com',`
     - `'parametres.identity.email.readonly.notice': 'Pour changer votre adresse e-mail, contactez un administrateur.',`
-    - `'parametres.identity.avatar.placeholder.alt': 'Avatar par défaut',`
-    - `'parametres.password.current.label': 'Mot de passe actuel',`
+    - `'parametres.password.current.label': 'Ancien mot de passe',`
     - `'parametres.password.current.placeholder': '••••••••',`
     - `'parametres.password.new.label': 'Nouveau mot de passe',`
     - `'parametres.password.new.placeholder': '••••••••',`
     - `'parametres.password.new.hint': 'Au moins 8 caractères.',`
-    - `'parametres.password.confirm.label': 'Confirmer le nouveau mot de passe',`
-    - `'parametres.password.confirm.placeholder': '••••••••',`
     - `'parametres.password.session.notice': 'Modifier votre mot de passe vous déconnectera de vos autres appareils.',`
     - `'parametres.error.required': 'Champ requis.',`
-    - `'parametres.error.password.current.wrong': 'Mot de passe actuel incorrect.',`
+    - `'parametres.error.password.required.pair': 'Champ requis pour modifier le mot de passe.',`
+    - `'parametres.error.password.current.wrong': 'Ancien mot de passe incorrect.',`
     - `'parametres.error.password.tooShort': 'Au moins 8 caractères requis.',`
     - `'parametres.error.password.tooLong': 'Maximum 128 caractères.',`
-    - `'parametres.error.password.mismatch': 'Les mots de passe ne correspondent pas.',`
     - `'parametres.error.email.invalid': 'Adresse e-mail invalide.',`
     - `'parametres.error.unknown': 'Une erreur est survenue. Réessayez.',`
     - `'parametres.action.cancel': 'Annuler',`
@@ -260,34 +255,32 @@ Output: A new /parametres route, a new client-island form component, schema addi
     - `'parametres.toast.partialSuccess.identityOk.passwordErr': 'Informations enregistrées, mais le mot de passe n\'a pas été modifié.',`
     - `'parametres.toast.partialSuccess.passwordOk.identityErr': 'Mot de passe modifié, mais les informations n\'ont pas été enregistrées.',`
 
+    Rev 2 — keys DROPPED vs. rev 1: `parametres.card.section.identity`, `parametres.card.section.password`, `parametres.identity.avatar.placeholder.alt`, `parametres.password.confirm.label`, `parametres.password.confirm.placeholder`, `parametres.error.password.mismatch`. Do NOT add these.
+
     EN side — insert the matching keys into `dictionaries.en` at the exact same positions:
 
     - `'shell.user.menu.settings': 'Settings',`
     - `'parametres.hero.title': 'Settings',`
     - `'parametres.hero.subtitle': 'Update your information and reset your password.',` (typo CORRECTED in EN per D-06 + D-10).
-    - `'parametres.card.section.identity': 'Profile',`
-    - `'parametres.card.section.password': 'Password',`
+    - `'parametres.card.eyebrow.identity': 'PERSONAL INFORMATION',`
     - `'parametres.identity.firstName.label': 'First name',`
     - `'parametres.identity.firstName.placeholder': 'First name',`
     - `'parametres.identity.lastName.label': 'Last name',`
     - `'parametres.identity.lastName.placeholder': 'Last name',`
-    - `'parametres.identity.email.label': 'Email',`
+    - `'parametres.identity.email.label': 'Work email',`
     - `'parametres.identity.email.placeholder': 'firstname.lastname@leasetic.com',`
     - `'parametres.identity.email.readonly.notice': 'To change your email address, please contact an administrator.',`
-    - `'parametres.identity.avatar.placeholder.alt': 'Default avatar',`
-    - `'parametres.password.current.label': 'Current password',`
+    - `'parametres.password.current.label': 'Previous password',`
     - `'parametres.password.current.placeholder': '••••••••',`
     - `'parametres.password.new.label': 'New password',`
     - `'parametres.password.new.placeholder': '••••••••',`
     - `'parametres.password.new.hint': 'At least 8 characters.',`
-    - `'parametres.password.confirm.label': 'Confirm new password',`
-    - `'parametres.password.confirm.placeholder': '••••••••',`
     - `'parametres.password.session.notice': 'Changing your password will sign you out of your other devices.',`
     - `'parametres.error.required': 'Required.',`
-    - `'parametres.error.password.current.wrong': 'Current password is incorrect.',`
+    - `'parametres.error.password.required.pair': 'Required to change your password.',`
+    - `'parametres.error.password.current.wrong': 'Previous password is incorrect.',`
     - `'parametres.error.password.tooShort': 'At least 8 characters required.',`
     - `'parametres.error.password.tooLong': 'Maximum 128 characters.',`
-    - `'parametres.error.password.mismatch': 'Passwords do not match.',`
     - `'parametres.error.email.invalid': 'Invalid email address.',`
     - `'parametres.error.unknown': 'Something went wrong. Try again.',`
     - `'parametres.action.cancel': 'Cancel',`
@@ -410,47 +403,49 @@ Output: A new /parametres route, a new client-island form component, schema addi
     }
     ```
 
-    State + form setup:
+    State + form setup (rev 2 — no confirmNewPassword):
     - TWO separate `useForm` calls (one per section) so each section has its own `formState.isDirty`. Both use `mode: 'onBlur'` and `zodResolver`:
       - `identityForm = useForm<IdentityInput>({ resolver: zodResolver(identitySchema), mode: 'onBlur', defaultValues: { firstName: initialFirstName, lastName: initialLastName, ...(emailEditable ? { email: initialEmail } : {}) } })`
-      - `passwordForm = useForm<ChangePasswordInput>({ resolver: zodResolver(changePasswordSchema), mode: 'onBlur', defaultValues: { currentPassword: '', newPassword: '', confirmNewPassword: '' } })`
+      - `passwordForm = useForm<ChangePasswordInput>({ resolver: zodResolver(changePasswordSchema), mode: 'onBlur', defaultValues: { currentPassword: '', newPassword: '' } })`
     - `const [showCurrent, setShowCurrent] = useState(false);`
     - `const [showNew, setShowNew] = useState(false);`
-    - `const [showConfirm, setShowConfirm] = useState(false);`
     - `const [isPending, startTransition] = useTransition();`
     - `const router = useRouter();`
     - `const newPwd = useWatch({ control: passwordForm.control, name: 'newPassword' });`
     - `const strength = strengthScore(newPwd ?? '');`
 
-    Layout (matches Figma 132:867 + the Account card pattern):
+    Layout (matches Figma 132:867 rev 2):
 
-    Wrap everything in a single `<form noValidate onSubmit={handleSubmit}>` where `handleSubmit` is the combined submit function (defined below). Form style: width 100%, maxWidth 760 (Figma proportions for the Account card), padding 28, background var(--surface), borderRadius 16, boxShadow var(--shadow-card), marginTop 32 (below the hero).
+    Render TWO sibling top-level frames inside the page-content wrapper:
+    1. **Form card** — a single `<form id="parametres-form" noValidate onSubmit={handleSubmit}>` containing eyebrow header + identity rows + divider + password row + below-row notice. Form-card style: width 100%, padding 28, background var(--surface), borderRadius 16, boxShadow var(--shadow-card), marginTop 32 (below the hero), maxWidth 1188 to match Figma's content column.
+    2. **Action footer** — a SEPARATE sibling element below the form card (NOT inside it), full content width, 24px gap above. Style: padding 16, background var(--surface), borderRadius 12, display flex, justifyContent space-between, alignItems center. Contains the Annuler + Enregistrer buttons (form="parametres-form" attribute on the submit button so it submits the card-wrapped form despite being outside the `<form>` element).
 
-    Section 1 — Informations:
-    - Section heading `<h2>{t('parametres.card.section.identity', lang)}</h2>`.
-    - Avatar row: a circular initials placeholder (re-use the SAME inline styles UserMenu uses for its initials circle — copy verbatim from `src/components/UserMenu.tsx`). NO upload button (D-06b deviation logged).
-    - Three input rows: firstName, lastName, email. Each row uses the existing Input Text design-system styling (mirror CreatePartnerForm.tsx for the exact JSX shape — label above, input below, error span beneath). The email row:
-      - If `emailEditable === true`: rendered as a normal text input bound to `identityForm.register('email')`.
-      - If `emailEditable === false`: rendered as static text (`<p>{initialEmail}</p>`) followed by a muted helper line displaying `t('parametres.identity.email.readonly.notice', lang)`.
-    - Inline error span beneath each input pulls from `identityForm.formState.errors.firstName?.message` and translates via the dict keys `parametres.error.required` / `parametres.error.email.invalid` as appropriate (the schema's FR-literal message is replaced at render time by the dict-driven message — match the SetPasswordForm error-rendering pattern at the relevant lines).
+    Inside the form card, in order:
 
-    Divider:
-    - A horizontal rule (`<hr>` or styled `<div>`) between Section 1 and Section 2, color `var(--border)` or matching the existing `.card` divider convention.
+    Eyebrow section header (Figma 134:490–134:492):
+    - A row containing a small filled-circle bullet (`<span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: 'var(--teal)' }} />`) + uppercase eyebrow text `<span style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--muted)' }}>{t('parametres.card.eyebrow.identity', lang)}</span>`. NO separate "Mot de passe" section header — rev 2 has only the one eyebrow.
 
-    Section 2 — Mot de passe:
-    - Section heading `<h2>{t('parametres.card.section.password', lang)}</h2>`.
-    - Static muted notice IMMEDIATELY beneath the heading: `<p style={{ color: 'var(--muted)', fontSize: 13 }}>{t('parametres.password.session.notice', lang)}</p>` — per D-08 + Plr-7.
-    - Three password input rows: currentPassword, newPassword, confirmNewPassword. Each row:
-      - Label, input, show/hide toggle button (Eye when hidden, EyeOff when visible — clicking toggles the per-field `showCurrent`/`showNew`/`showConfirm` state). MIRROR the show/hide toggle JSX from `SetPasswordForm.tsx` lines that handle Eye/EyeOff (copy the button shape verbatim).
-      - Inline error span beneath each input.
-      - `input type={showX ? 'text' : 'password'}` — toggled per Plr-2.
-    - Helper text under "Nouveau mot de passe": `{t('parametres.password.new.hint', lang)}`.
-    - Strength meter BELOW "Nouveau mot de passe" (above the confirm row): a 4-segment bar driven by `strength` (0–4) with colors from `STRENGTH_COLORS[strength]` and label from `t(STRENGTH_KEYS[strength], lang)` per Plr-3. MIRROR the JSX from `SetPasswordForm.tsx`.
+    Identity rows:
+    - Row 1 (2-column, Figma 134:493 — 1132px wide split 558/16/558): firstName (left) + lastName (right). Each cell: label above, input below, error span beneath. Match CreatePartnerForm.tsx for the exact input JSX shape.
+    - Row 2 (full-width, Figma 134:502 — single 1132px column): email. Either:
+      - If `emailEditable === true`: text input bound to `identityForm.register('email')`.
+      - If `emailEditable === false`: static text (`<p>{initialEmail}</p>`) followed by a muted helper line displaying `t('parametres.identity.email.readonly.notice', lang)`.
+    - Inline error span beneath each input pulls from `identityForm.formState.errors.firstName?.message` and translates via the dict keys `parametres.error.required` / `parametres.error.email.invalid` as appropriate (the schema's FR-literal message is replaced at render time by the dict-driven message — match the SetPasswordForm error-rendering pattern).
 
-    Action footer:
-    - Two buttons side by side at the bottom of the form:
-      - Annuler (`type="button"`): `onClick={() => { identityForm.reset(); passwordForm.reset(); }}` — per Plr-6.
-      - Enregistrer les modifications (`type="submit"`): disabled iff `!identityForm.formState.isDirty && !passwordForm.formState.isDirty`. Label switches to `t('parametres.action.saving', lang)` while `isPending`.
+    Divider (Figma 134:507):
+    - A horizontal rule (`<hr>` or styled `<div>`) spanning the card width, color `var(--border)` or matching the existing `.card` divider convention. No section heading after the divider — the password row sits directly under it.
+
+    Password row (Figma 134:511, 2-column 558/16/558 — TWO fields only):
+    - Left cell: Ancien mot de passe — label `{t('parametres.password.current.label', lang)}`, input bound to `passwordForm.register('currentPassword')`, show/hide toggle (Eye/EyeOff button toggling `showCurrent` state), inline error span. `input type={showCurrent ? 'text' : 'password'}`. Mirror the show/hide toggle JSX from `SetPasswordForm.tsx`.
+    - Right cell: Nouveau mot de passe — label `{t('parametres.password.new.label', lang)}`, input bound to `passwordForm.register('newPassword')`, show/hide toggle (showNew), inline error span. Below the input: strength meter (4-segment bar driven by `strength` (0–4) with colors from `STRENGTH_COLORS[strength]` and label from `t(STRENGTH_KEYS[strength], lang)` per Plr-3; mirror SetPasswordForm.tsx) AND/OR the static helper text `{t('parametres.password.new.hint', lang)}` if the strength meter is hidden when newPwd is empty.
+
+    Below the password row, spanning full card width:
+    - Muted notice `<p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 16 }}>{t('parametres.password.session.notice', lang)}</p>` — per D-08 + Plr-7 rev 2. This replaces the rev 1 "under the section heading" placement.
+
+    Action footer (OUTSIDE the form card, Figma 134:532):
+    - Two buttons side by side, justifyContent space-between:
+      - Annuler (`type="button"`, secondary styling): `onClick={() => { identityForm.reset(); passwordForm.reset(); }}` — per Plr-6.
+      - Enregistrer les modifications (`type="submit" form="parametres-form"`, primary styling): disabled iff `!identityForm.formState.isDirty && !passwordForm.formState.isDirty`. Label switches to `t('parametres.action.saving', lang)` while `isPending`.
 
     Combined submit handler `handleSubmit`:
 
@@ -576,9 +571,9 @@ Output: A new /parametres route, a new client-island form component, schema addi
       3. Click 'Paramètres' → URL becomes /parametres; the page renders the hero ('Paramètres' + Figma subtitle including 'vos information' typo) and the Account card.
       4. Test Save disabled state: the button is disabled until you modify a field.
       5. Test identity-only: change firstName, click Save → success toast 'parametres.toast.identity.saved'.
-      6. Test password-only with WRONG currentPassword: type a wrong current password + valid new + matching confirm, click Save → INLINE error 'Mot de passe actuel incorrect' under the current-password field. No success toast.
-      7. Test password-only with CORRECT currentPassword: type the real current password + valid new + matching confirm, click Save → success toast 'parametres.toast.password.saved'. Open a second browser/incognito and confirm any prior session there is signed out (revokeOtherSessions verified).
-      8. Test combined dirty + password failure: in a fresh session, change firstName AND enter wrong currentPassword + new + confirm → identity success toast + INLINE password error + partial-success toast.
+      6. Test password-only with WRONG currentPassword: type a wrong current password + valid new password (2 fields total — no confirm field), click Save → INLINE error 'Ancien mot de passe incorrect' under the 'Ancien mot de passe' field. No success toast.
+      7. Test password-only with CORRECT currentPassword: type the real current password + valid new password (Ancien + Nouveau, 2 fields), click Save → success toast 'parametres.toast.password.saved'. Open a second browser/incognito and confirm any prior session there is signed out (revokeOtherSessions verified).
+      8. Test combined dirty + password failure: in a fresh session, change firstName AND enter wrong currentPassword + new password → identity success toast + INLINE password error under 'Ancien mot de passe' + partial-success toast.
       9. Sign out and confirm the existing /[adminSegment]/partners admin↔admin reset flow still works (regression check).
       10. Visit /parametres while logged out → redirect to /login.
     </human-check>
@@ -588,7 +583,7 @@ Output: A new /parametres route, a new client-island form component, schema addi
     - `app/(authed)/parametres/page.tsx` exists, renders PageHero + ParametresForm inside the `(authed)` Shell.
     - `app/(authed)/parametres/ParametresForm.tsx` exists, implements two-section RHF form with combined Save semantics matching D-06c.
     - `revokeOtherSessions: true` is wired on every changePassword call.
-    - INVALID_PASSWORD is surfaced INLINE under "Mot de passe actuel" per Plr-9.
+    - INVALID_PASSWORD is surfaced INLINE under "Ancien mot de passe" per Plr-9.
     - `npm run build` succeeds; manual verification steps 1–10 all pass.
     - `RetractableSidebar.tsx` is unchanged.
   </done>
@@ -601,18 +596,24 @@ Output: A new /parametres route, a new client-island form component, schema addi
 
 This section is the binding artifact a future "Account v2" phase reads to understand what Phase 21 deliberately left undone vs. Figma node `132:867`.
 
+**Rev 2 (2026-05-29 evening):** Antoine reworked Figma `132:867` to remove avatar + phone (matching prior deferrals D-06b) and add "Ancien mot de passe" (matching prior security extension D-07). Rev 1 deviations #1, #2, #3 are NO LONGER DEVIATIONS — Figma now matches scope. The list below is the binding rev 2 deviation log.
+
 | # | Deviation | Source decision | Disposition |
 |---|-----------|-----------------|-------------|
-| 1 | Avatar block replaced with initials placeholder (matches existing UserMenu pattern, e.g. "AR"). No "Télécharger nouveau" button. No "Taille de la photo de profil : 400px x 400px" hint. | D-06b | Deferred to Account v2 — requires image-storage infra (Vercel Blob or equivalent) not yet in the project. |
-| 2 | Numéro de téléphone field omitted from the Informations section. | D-06b | Deferred to Account v2 — requires a User-model schema migration + Drizzle type regeneration + Better Auth additionalFields extension. |
-| 3 | Three password fields rendered (Mot de passe actuel + Nouveau + Confirmer) instead of Figma's single "Nouveau mot de passe". | D-07 | Permanent — required by Better Auth `changePassword` contract (currentPassword challenge) + client-side confirm equality check. |
-| 4 | Static muted notice rendered under the "Mot de passe" section heading: "Modifier votre mot de passe vous déconnectera de vos autres appareils." | D-08 + Plr-7 | Permanent — surfaces the revokeOtherSessions: true behavior to the user. |
-| 5 | FR hero subtitle preserved verbatim including the Figma typo "vos information"; EN hero subtitle corrected to "Update your information and reset your password.". | D-06 + D-10 | Intentional — copy fidelity to design source-of-truth for FR; EN is a fresh translation, no typo to preserve. |
-| 6 | Email field disposition contingent on Task 1 D-06d resolution. If "email editable" → normal input bound to `authClient.changeEmail`. If "email read-only" → static text + muted notice "Pour changer votre adresse e-mail, contactez un administrateur.". | D-06d | Contingent — Task 1's DB probe of `users.emailVerified` decides at build time. The compile-time `emailEditable` boolean prop on `<ParametresForm>` encodes the resolution. |
-| 7 | Show/hide toggles (Eye/EyeOff) rendered on ALL three password inputs (current + new + confirm). Figma doesn't constrain this. | Plr-2 | Permanent — parity with the existing SetPasswordForm UX. |
-| 8 | 0–4 strength meter rendered beneath "Nouveau mot de passe" reusing existing `auth.password.strength.*` keys + `strengthScore()` helper. Figma doesn't constrain this. | Plr-3 | Permanent — reuses existing infrastructure; no new strings or helpers. |
-| 9 | NO new sidebar entry. RetractableSidebar.tsx is untouched. Access to /parametres is ONLY via the Topbar user-menu dropdown. | D-06 + Plr-5 | Permanent (non-deviation — mirrors Figma which shows the sidebar unchanged). Documented here for explicitness. |
-| 10 | Annuler button resets BOTH sections' forms to initial values without navigating away (matches the standard "discard local edits" pattern). Figma doesn't specify Annuler behavior. | Plr-6 | Permanent. |
+| 1 | Show/hide toggles (Eye/EyeOff) rendered on BOTH password inputs (current + new). Figma's `xxxxx-xxxxx-xxxxx` placeholder does not visually show toggles. | Plr-2 | Permanent — parity with existing SetPasswordForm UX; reuses lucide-react icons already in the dependency tree. |
+| 2 | 0–4 strength meter rendered beneath "Nouveau mot de passe" reusing existing `auth.password.strength.*` keys + `strengthScore()` helper. Figma reserves vertical space below the input but does not render the meter explicitly. | Plr-3 | Permanent — reuses existing infrastructure; no new strings. |
+| 3 | Static muted notice rendered BELOW the password row spanning the card width: "Modifier votre mot de passe vous déconnectera de vos autres appareils." | D-08 + Plr-7 rev 2 | Permanent — surfaces the revokeOtherSessions:true behavior to the user. Rev 2 changed the placement from "under the section heading" (rev 1) to "below the password row" because rev 2 removed the separate "Mot de passe" section heading. |
+| 4 | FR hero subtitle preserved verbatim including the Figma typo "vos information"; EN hero subtitle corrected to "Update your information and reset your password.". | D-06 + D-10 | Intentional — copy fidelity to design source-of-truth for FR; EN is a fresh translation, no typo to preserve. |
+| 5 | Email field disposition contingent on Task 1 D-06d resolution. If "email editable" → normal input bound to `authClient.changeEmail`. If "email read-only" → static text + muted notice "Pour changer votre adresse e-mail, contactez un administrateur.". | D-06d | Contingent — Task 1's DB probe of `users.emailVerified` decides at build time. The compile-time `emailEditable` boolean prop on `<ParametresForm>` encodes the resolution. |
+| 6 | NO new sidebar entry. RetractableSidebar.tsx is untouched. Access to /parametres is ONLY via the Topbar user-menu dropdown. | D-06 + Plr-5 | Permanent (non-deviation — mirrors Figma which shows the sidebar unchanged). Documented for explicitness. |
+| 7 | Annuler button resets BOTH sections' forms to initial values without navigating away (matches the standard "discard local edits" pattern). Figma doesn't specify Annuler behavior. | Plr-6 | Permanent. |
+| 8 | Email label uses "Email professionnel" (FR) / "Work email" (EN) per Figma `134:503` (rev 2 — was "Adresse e-mail" / "Email" in rev 1). | D-06 rev 2 | Non-deviation — adopted from rev 2 Figma. |
+
+**Rev 1 deviations REMOVED (Figma now matches scope):**
+
+- ~~Avatar block replaced with initials placeholder~~ — rev 2 Figma has no avatar in the form; no deviation. The Topbar UserMenu's initials avatar is unchanged and unrelated to Paramètres.
+- ~~Numéro de téléphone field omitted~~ — rev 2 Figma has no phone field.
+- ~~Three password fields instead of one~~ — rev 2 Figma now shows two password fields (Ancien + Nouveau); Phase 21 ships two; no deviation. The `confirmNewPassword` field is dropped to match.
 
 If any new design choices emerge during execution that introduce additional deviations, the executor appends rows to this table in the resulting SUMMARY.md.
 </figma_deviations>

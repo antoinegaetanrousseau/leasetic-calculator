@@ -194,10 +194,9 @@ Output: Two committed markdown files — `docs/operations/phase-21-gate-evidence
 
     4. Confirm /parametres renders correctly (hero + Account card).
 
-    5. In the "Mot de passe" section:
-       - Mot de passe actuel: `leasetic2026`
+    5. In the password row (rev 2 — TWO fields only, no confirm):
+       - Ancien mot de passe: `leasetic2026`
        - Nouveau mot de passe: <the new strong password from step 1>
-       - Confirmer le nouveau mot de passe: <same>
 
     6. Click "Enregistrer les modifications". Confirm the success toast `parametres.toast.password.saved` ("Mot de passe mis à jour.").
 
@@ -243,10 +242,9 @@ Output: Two committed markdown files — `docs/operations/phase-21-gate-evidence
 
     4. Confirm /parametres renders.
 
-    5. In the "Mot de passe" section:
-       - Mot de passe actuel: `leasetic2026`
+    5. In the password row (rev 2 — TWO fields only, no confirm):
+       - Ancien mot de passe: `leasetic2026`
        - Nouveau mot de passe: <the new strong password from step 1>
-       - Confirmer le nouveau mot de passe: <same>
 
     6. Click "Enregistrer les modifications". Confirm the success toast.
 
