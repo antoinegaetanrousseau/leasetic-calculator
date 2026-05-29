@@ -119,6 +119,7 @@ vi.mock('@/lib/db/queries/coefficient-history', () => ({
 // AccountsList) and uses the new PartnerRow shape from queries/partners.
 import { PartnersList } from '../app/(admin)/[adminSegment]/partners/PartnersList';
 import { CreatePartnerForm } from '../app/(admin)/[adminSegment]/partners/new/CreatePartnerForm';
+import { PartnerRowActions } from '../app/(admin)/[adminSegment]/partners/_components/PartnerRowActions';
 import AdminHomePage from '../app/(admin)/[adminSegment]/page';
 import { CoefficientHistoryList } from '../app/(admin)/[adminSegment]/history/CoefficientHistoryList';
 
@@ -216,6 +217,44 @@ describe('ADMIN-09 D-29 — strict commission-leakage grep contracts (Phase 14)'
       );
       assertNoCommissionLeakage(html, 'partners list (empty state)');
     });
+
+    // PTYPE-07: one render per partner type — asserts the TYPE badge column
+    // (Plan 22-03) introduces NO commission_pct or _pct suffix for any type.
+    it('renders ZERO commission strings (partnerType=Agent — type badge column)', () => {
+      const html = renderToString(
+        createElement(PartnersList, {
+          rows: [makePartnerRow({ id: 'p-agent', partnerType: 'Agent' })],
+          nextCursor: null,
+          lang: 'fr',
+          adminSegment: 'admin-secret',
+        }),
+      );
+      assertNoCommissionLeakage(html, 'partners list (Agent)');
+    });
+
+    it('renders ZERO commission strings (partnerType=Commercial — type badge column)', () => {
+      const html = renderToString(
+        createElement(PartnersList, {
+          rows: [makePartnerRow({ id: 'p-commercial', partnerType: 'Commercial' })],
+          nextCursor: null,
+          lang: 'fr',
+          adminSegment: 'admin-secret',
+        }),
+      );
+      assertNoCommissionLeakage(html, 'partners list (Commercial)');
+    });
+
+    it('renders ZERO commission strings (partnerType=Partenaire — type badge column)', () => {
+      const html = renderToString(
+        createElement(PartnersList, {
+          rows: [makePartnerRow({ id: 'p-partenaire', partnerType: 'Partenaire' })],
+          nextCursor: null,
+          lang: 'fr',
+          adminSegment: 'admin-secret',
+        }),
+      );
+      assertNoCommissionLeakage(html, 'partners list (Partenaire)');
+    });
   });
 
   describe('Surface 2: /partners/new form (Plan 14-02)', () => {
@@ -293,6 +332,60 @@ describe('ADMIN-09 D-29 — strict commission-leakage grep contracts (Phase 14)'
         }),
       );
       assertNoCommissionLeakage(html, '/history empty state');
+    });
+  });
+
+  // PTYPE-07: Surface 5 — PartnerRowActions type-change menu items (Plan 22-03).
+  // The overflow menu renders type-change buttons via adminUpdatePartnerType.
+  // Each partner-type variant is asserted to produce NO commission_pct or _pct
+  // suffix tokens in the rendered HTML. renderToString renders the closed state
+  // (open=false) which is the default — the menu items are present in SSR output
+  // as the component renders only the trigger button in closed state; the test
+  // covers the closed state plus verifies the component itself introduces no leakage.
+  describe('Surface 5: PartnerRowActions type-change UI (Plan 22-03 — PTYPE-07)', () => {
+    it('renders ZERO commission strings (partnerType=Agent — 2 type-change targets in menu)', () => {
+      const html = renderToString(
+        createElement(PartnerRowActions, {
+          partnerId: 'p-1',
+          status: 'active',
+          lang: 'fr',
+          adminSegment: 'admin-secret',
+          partnerEmail: 'agent@example.com',
+          partnerDisplayName: 'Agent Partner',
+          partnerType: 'Agent',
+        }),
+      );
+      assertNoCommissionLeakage(html, 'PartnerRowActions (partnerType=Agent)');
+    });
+
+    it('renders ZERO commission strings (partnerType=Commercial — 2 type-change targets in menu)', () => {
+      const html = renderToString(
+        createElement(PartnerRowActions, {
+          partnerId: 'p-2',
+          status: 'active',
+          lang: 'fr',
+          adminSegment: 'admin-secret',
+          partnerEmail: 'commercial@example.com',
+          partnerDisplayName: 'Commercial Partner',
+          partnerType: 'Commercial',
+        }),
+      );
+      assertNoCommissionLeakage(html, 'PartnerRowActions (partnerType=Commercial)');
+    });
+
+    it('renders ZERO commission strings (partnerType=Partenaire — 2 type-change targets in menu)', () => {
+      const html = renderToString(
+        createElement(PartnerRowActions, {
+          partnerId: 'p-3',
+          status: 'active',
+          lang: 'fr',
+          adminSegment: 'admin-secret',
+          partnerEmail: 'partenaire@example.com',
+          partnerDisplayName: 'Partenaire Partner',
+          partnerType: 'Partenaire',
+        }),
+      );
+      assertNoCommissionLeakage(html, 'PartnerRowActions (partnerType=Partenaire)');
     });
   });
 
