@@ -581,7 +581,7 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
       '0002_phase8_persistence.sql',      // Phase 8 — proposals + global_params
       '0003_seed_global_params.sql',      // Phase 8 — seed global_params row
       '0004_phase12_drafts_and_history.sql', // Phase 12 — drafts + coefficient_history
-      '0005_partner_company_name.sql',    // Phase 18 — users.company_name for proposal wizard
+      '0005_workable_yellow_claw.sql',    // Phase 22 — users.partner_type column + CHECK
     ]);
     const sqlFiles = files.filter((f) => f.endsWith('.sql'));
     const unexpected = sqlFiles.filter((f) => !KNOWN_MIGRATIONS.has(f));
