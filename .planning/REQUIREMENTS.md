@@ -1,191 +1,116 @@
-# Requirements: Matrice Commerciale v1.3 — Design Refresh + Partner-Onboarding Ready
+# Requirements: Matrice Commerciale v1.4 — Partner Types, Admin Dual-View & Rebrand
 
-**Defined:** 2026-05-21
-**Milestone:** v1.3
-**Core value (unchanged since v1.0):** A partner fills client info + amount + duration and gets a pixel-correct PDF proposal with the v9 calculation formula intact — now via a hosted multi-page Next.js web app with persistent per-partner PDFs (v1.1 evolution) and a 3-step wizard with server-side draft persistence (v1.2 evolution).
+**Defined:** 2026-05-29
+**Milestone:** v1.4
+**Core value (unchanged since v1.0):** A partner fills client info + amount + duration and gets a pixel-correct PDF proposal with the correct lease calculation — now with a partner-type-conditional formula (commission-free for Agent/Commercial) and a self-service admin/agent view switch.
 
-**Source of truth:** Figma design contract `vwOzirhL0vyxDWq4m6t4gC` section `9:46` ("v1.3 — Redesign sketches", 13 screens) + `.planning/v1.3-CARRYFORWARD.md` (5-tier inventory generated at v1.2 close) + this milestone's scope conversation (2026-05-21).
+**Source of truth:** This milestone's scope conversation with Antoine (2026-05-29) + the v1.3 deferred-items list (`.planning/reports/MILESTONE_SUMMARY-v1.3.md` §6). No domain research (all internal feature work on the known stack).
 
----
-
-## v1.3 Requirements
-
-### Shell + Design System (SHELL)
-
-- [x] **SHELL-01**: User sees a refreshed sidebar shell with brand row + collapse toggle, matching Figma `23:46` collapsed (72px) and expanded (260px) variants. Persists user's collapse preference (existing localStorage key from v1.2 COMP-02 reused).
-- [x] **SHELL-02**: User can toggle theme between **Light / System / Dark** via a tri-state control in the sidebar footer. "System" respects `prefers-color-scheme` and updates live when the OS theme changes. Replaces the v1.1/v1.2 binary cookie toggle.
-- [x] **SHELL-03**: Every authed page renders the hero pattern: `Bonjour, {prénom} 👋` greeting (or admin equivalent) + page subtitle + page-level CTA top-right.
-- [x] **SHELL-04**: FR/EN locale toggle relocates from topbar to sidebar footer (alongside the theme toggle). Keyboard-navigable.
-- [x] **SHELL-05**: Topbar (page title + user menu) and Footer (`© 2026 Leasétic — Application interne · Mentions légales`) ship the visual treatment shown across Figma `9:46` frames.
-
-### Light + Dark mode coverage (THEME)
-
-- [x] **THEME-01**: Every v1.3 partner-side screen (Partner Home, Partner Proposals, Wizard steps 1/2/3) ships both light and dark variants matching Figma's `82:*` duplicate frames (`82:1088`, `82:171`, `82:317`, `82:460`).
-- [x] **THEME-02**: Every v1.3 admin-side screen (Admin Home, Partners list, Créer partenaire, Coefficients refresh) ships both light and dark variants.
-
-### Contrast measurement (CONTRAST)
-
-- [x] **CONTRAST-01**: Diff-panel changed-row composite (`rgba(224,133,48,0.10)` over `--surface` with `--ink` weight 600) measured at WCAG 2.1 AA (≥4.5:1) in both light and dark, signed off before any v1.3 wave touching `--gold` / `.chip-invited` / diff-panel merges. Resolves Phase 14 deferred Tier-2 carry-forward.
-- [x] **CONTRAST-02**: Any new v1.3 surface introducing a foreground-on-background pair using `--gold`, `--teal`, or hero pill chips validated against WCAG 2.1 AA in light + dark before merge.
-
-### Partner Home (PHOME)
-
-- [x] **PHOME-01**: Partner Home `/` renders the hero greeting (`Bonjour, {prénom} 👋`) + 3 MetricTile consumers (Ce mois-ci / Total / Brouillons) + Propositions récentes card per Figma `9:47`. Consumes the existing v1.2 `<MetricTile>` primitive (COMP-03 shipped, consumer deferred).
-- [x] **PHOME-02**: MetricTile values are scoped to the requesting partner (`user_id` filter), computed over Europe/Paris calendar month for "Ce mois-ci", all-time for "Total", and `status = 'draft'` for "Brouillons". Display-only — tiles are not clickable in v1.3.
-- [x] **PHOME-03**: Propositions récentes card shows the partner's 5 most recent proposals (any status except deleted), with a `Voir toutes →` link to `/proposals`. Each row uses `<StatusChip>` for status display.
-
-### Partner Proposals + Archives (PROPS)
-
-- [x] **PROPS-01**: Partner Proposals `/proposals` lists active proposals in a styled table card with cursor-based pagination, ILIKE search bar, and filter-pill row. Refreshes v1.1's PROP list view to the Figma table treatment.
-- [x] **PROPS-02**: An `Archivées` filter pill on `/proposals` toggles the list between active and archived proposals (soft-deleted within the 30-day window + expired proposals owned by the partner) — **in-page**, NO separate `/archives` route. Each row keeps its `<StatusChip>` showing the true status (`expired`, `deleted`).
-
-### Wizard redesign (WIZ)
-
-- [x] **WIZ-01**: Wizard step 1 (Paramètres du projet) ships the Figma `35:46` visual: hero + ÉTAPE 1 SUR 3 eyebrow + stepper + form card with `● INFORMATIONS CLIENT` and `● DÉTAILS DU PROJET` section labels + segmented duration pill (24/36/48 mois) + WizardActionBar (Enregistrer comme brouillon / Continuer vers le calcul).
-- [x] **WIZ-02**: Wizard step 2 (Résultat du calcul) ships the Figma `39:46` visual: hero loyer-mensuel card (`2 770 €` in `--teal`) + `Tranche XK€ • Coefficient X.XX%` pill chip + Détail du calcul card with explicit `Commission apporteur (non visible client)` annotated row + Paramètres saisis recap card with `← Modifier` link. Preserves Phase 13 D-12 partner-facing commission relaxation; ADMIN-09 envelope unchanged.
-- [x] **WIZ-03**: Wizard step 3 (Vérifier la proposition) ships the Figma `40:46` 2-column 1040px layout: left = CLIENT / PROJET / CALCUL review cards via existing `<RecapSection>` primitive (v1.2 Phase 13); right = `<PdfPreviewMock>` card showing `Leasétic` logo + `Proposition de financement` + `Réf. LC-XXXX-XXX • {N} jours de validité` + loyer mensuel.
-- [x] **WIZ-04**: `proposals.validity_days` selector (15j / 30j / 60j) relocates from its current placement to wizard step 3, inside the CALCUL review card. Implies a default value at draft creation (e.g. 30) with step-3 mutation. Migration / schema impact to be confirmed during planning.
-- [x] **WIZ-05**: Phase 13 ADMIN-09 D-12 envelope (deal-owner partner sees commission on wizard steps 2 + 3 only) + Phase 14 9-gate grep-contract suite (`tests/admin-09-grep-contracts.test.ts`) remain green throughout v1.3. No further relaxations.
-- [x] **WIZ-06**: PDF reference (LC-XXXX-XXX format) is reserved at draft creation (step 1 finalize) and visible in the step-3 `<PdfPreviewMock>` header before the finalize button is clicked. Reference becomes the canonical identifier on the persisted PDF.
-
-### Admin surfaces refresh (ADMIN)
-
-- [x] **ADMIN-10**: Admin Home (`/[adminSegment]`) gains the Figma `41:46` enhancement: hero (`Bonjour, {prénom} 👋` with ADMIN badge) + `Nouvelle proposition` CTA + 3 admin stats row (Propositions ce mois / Partenaires actifs / Dernière modif. coeffs) + 3 AdminNavCards (Coefficients / Partenaires / Historique) + Recent activity card. Extends v1.2 Phase 14's 3-AdminNavCard layout.
-- [x] **ADMIN-11**: Admin Partners list `/[adminSegment]/partners` ships the Figma `42:46` styled table: hero row + `Inviter partenaire` CTA + filter/search controls row + table card with partner rows. Replaces the v1.1/v1.2 6-column AccountsList visual treatment.
-- [x] **ADMIN-12**: Partner list component file renames from `AccountsList.tsx` → `PartnersList.tsx` (Phase 14 closeout cleanup — directory was renamed in Phase 14-01, file name was kept). All imports updated.
-- [x] **ADMIN-13**: Admin Créer partenaire `/[adminSegment]/partners/new` form card visual refresh per Figma `43:46`. Behavior unchanged from v1.2 Phase 14-02 (3-section RHF form + adminCreateInvitation server action + InviteUrlModal).
-- [x] **ADMIN-14**: Admin Coefficients page (`/[adminSegment]/coefficients`) gains the Figma `45:46` warning banner (orange, `--gold` token) + inline history card refresh, on top of v1.2 Phase 14's 2-column history sidebar. Warning banner copy clarifies that coefficient edits create new history rows and do not retroactively change existing PDF proposals (`params_snapshot` invariant).
-
-### Help Center / Aide (HELP)
-
-- [x] **HELP-01**: Help Center / Aide ships a `/aide` landing page (3-card placeholder grid: Commencer ici / Créer une proposition / Contact) plus a `/aide/commencer-ici` starter article (hardcoded TSX, ~500-1000 words FR + EN, walks through wizard step 1→2→3 with Phase 17 screenshots). Sidebar navigation includes `Aide` for both partner and admin users. Light + dark via Phase 16 token cascade. Net-new requirement filed during Phase 18 planning (scope expansion confirmed during `/gsd-discuss-phase`).
-
-### Excel export (EXPORT)
-
-- [x] **EXPORT-01**: Partner can export their proposals as `.xlsx` from `/proposals` via an export CTA. Export includes all visible proposals (respecting the current filter — Active vs. Archivées). Columns: Référence, Client, Projet, Montant HT, Durée, Loyer mensuel, Coefficient, Statut, Date de création, Date d'expiration.
-- [x] **EXPORT-02**: XLSX export is generated server-side (Vercel Functions) and respects ADMIN-09: no commission column, no commission cell content. Validated by extending the Phase 14 9-gate grep-contract suite with an XLSX-byte-inspection gate (no `Commission` substring, no `commission_pct` substring in any sheet).
-
-### Centralized LC reference dashboard (LCDASH)
-
-- [x] **LCDASH-01**: Admin can view a centralized cross-partner LC reference dashboard at `/[adminSegment]/lc-references`. Lists every issued LC reference across all partners with: reference, partner name, client name, project amount, status, created_at. Cursor-paginated + searchable by reference or partner name.
-- [x] **LCDASH-02**: LC dashboard extends the ADMIN-09 9-gate grep-contract suite to 10+ gates (zero commission leakage on the new admin surface). Test cases include: list view rows, detail view (if any), search results.
-
-### Infra hardening (INFRA)
-
-- [x] **INFRA-01**: Neon 3-branch split with `DATABASE_URL` per-Vercel-scope routing: production scope → `main` Neon branch, preview scope → `preview` Neon branch, development scope → `development` Neon branch. Resolves v1.1 BOOT-03 partial (all 3 Vercel scopes currently route to `main` pooled endpoint).
-- [x] **INFRA-02**: GitHub Actions CI gains a post-deploy DB-smoke step that runs against a Neon ephemeral branch on every PR touching `drizzle/migrations/*.sql` or `drizzle/meta/_journal.json`. Closes the recurring "generator self-evaluation blind spot" class that bit v1.1 (correlated-subquery SQL bug) and v1.2 Phase 12 (missing `_journal.json` entry → 24h prod un-applied).
-- [x] **INFRA-03**: Better Auth `trustedOrigins` hardening via middleware-level Origin gate on `/api/auth/sign-in/*` mutations. Hard-blocks based on Origin header (in addition to the existing SameSite=Lax + `__Secure-` cookies CSRF defense). Resolves Phase 6 follow-up #2.
-
-### Partner-onboarding gates — LAST PHASE before partner cutover (GATE)
-
-- [ ] **GATE-01**: Both admins (`antoine.rousseau@memento.eco` + 2nd admin email) rotate from the shared `leasetic2026` password to individual strong passwords via the admin↔admin password-reset flow at `/[adminSegment]/partners`. Resolves Phase 6 follow-up #1. MUST close before any real partner is invited.
-- [ ] **GATE-02**: Privacy policy confirmation obtained from Thomas Heufke covering (a) Vercel/Neon EU hosting + (b) 10-year PDF retention. Stub `docs/legal/privacy-coverage-confirmation.md` (committed in v1.1) updated with Thomas's confirmation. Resolves DATA-11 legal counsel sign-off deferral. MUST close before any real partner is invited.
+**Phase numbering:** continues from v1.3 (ended at Phase 21) — v1.4's first phase is **Phase 22**.
 
 ---
 
-## Future Requirements (v1.4+)
+## v1.4 Requirements
 
-Deferred to future milestones. Tracked but not in current roadmap. Most carried forward from `v1.3-CARRYFORWARD.md` Tier 5 not pulled into v1.3.
+### Partner Types & Commission-Free Proposals (PTYPE)
 
-### Operations + scaling
+The headline feature. Introduces a `partner_type` dimension that conditions proposal economics. **Business-approved exception to the frozen-formula constraint** (PROJECT.md Key Decisions, 2026-05-29).
 
-- **OVH-01**: OVH production deployment + smoke-deploy execution (September 2026 target; capability shipped in v1.1)
-- **OBS-01**: Sentry / APM observability beyond Vercel logs
-- **AUDIT-01**: Generic audit-log viewer beyond coefficient history
+- [ ] **PTYPE-01**: When inviting/creating a partner, an admin can select a partner type — **Agent**, **Commercial**, or **Partenaire** — via a selector in the create-partner form (`/[adminSegment]/partners/new`).
+- [ ] **PTYPE-02**: Every existing account is migrated to `Partenaire` so behavior is unchanged for all current partners after the schema migration applies.
+- [ ] **PTYPE-03**: An admin can change an existing account's partner type later (partner detail/edit surface); the change is recorded in `audit_log`.
+- [ ] **PTYPE-04**: For an **Agent** or **Commercial** account, a proposal's monthly loyer is computed **without** the commission factor (`loyer = montant HT × coefficient ÷ 100`). For a **Partenaire**, the existing formula (`montant HT × (1 + commission/100) × coefficient / 100`) is unchanged. Verified by golden test cases for all three types.
+- [ ] **PTYPE-05**: For Agent/Commercial, commission never appears in any UI surface (wizard steps, live preview, dashboards, partner-facing views) — the commission annotation/line is structurally absent, not conditionally hidden.
+- [ ] **PTYPE-06**: For Agent/Commercial, the generated PDF contains no commission figure or commission-derived wording and renders the commission-free loyer. The `params_snapshot` immutability invariant still holds, and the snapshot records the partner type + whether commission was applied so the PDF stays reproducible.
+- [ ] **PTYPE-07**: The ADMIN-09 grep-contract suite is extended to assert zero commission leakage for Agent/Commercial across calc output, UI, PDF render path, server logs, and audit payloads. The existing 12-gate suite stays green.
 
-### Partner-side polish
+### Admin Dual-View Toggle (VIEW)
 
-- **WIZ-FUT-01**: Wizard step-1 sticky-footer action bar (currently scrolls with content)
-- **WIZ-FUT-02**: `beforeunload` warning on `/partners/new` and wizard step 1 (currently no warn)
-- **WIZ-FUT-03**: Per-step browser tab titles in wizard (currently single `Nouvelle proposition` title)
-- **WIZ-FUT-04**: Inline `Loyer estimé` chip on wizard step 1 (compact preview chip near Montant HT / Durée inputs)
-- **WIZ-FUT-05**: Field-level git-style colored diffs on coefficient changes (Phase 14 ships structured table; per-character diffs deferred)
+- [ ] **VIEW-01**: An admin-level user sees an **Admin / Agent** view toggle in the bottom-left settings area (alongside the theme + locale controls). Non-admin users never see the toggle.
+- [ ] **VIEW-02**: Choosing **Agent** view remaps the navigation to the agent route set (Accueil `/`, Nouvelle proposition, Propositions `/proposals`, Aide). Choosing **Admin** view remaps to the admin route set (Accueil `/[adminSegment]`, Coefficients, Partenaires `/[adminSegment]/partners`, Toutes les propositions `/[adminSegment]/lc-references`, Aide).
+- [ ] **VIEW-03**: On each login an admin lands in **Admin** view by default; the toggle choice is **session-only** and resets after logout (no cookie/DB persistence).
+- [ ] **VIEW-04**: The toggle is a navigation/landing convenience only — it does not alter authorization (the admin keeps admin rights in both views) and does not expose admin-only data inside the agent view beyond what the agent routes already render.
 
-### Admin-side polish
+### PDF Rendering Fixes (PDF)
 
-- **ADMIN-FUT-01**: Admin cross-partner proposal read view
-- **ADMIN-FUT-02**: Phase 11 sidebar adminHrefs config-driven refactor (currently hard-codes 4 admin hrefs in Shell.tsx)
+- [ ] **PDF-01**: Numbers and typography on the generated PDF render with no glyph overlap or artifacts — specifically the loyer figure and all monetary/numeric values — under French number formatting (thousands separators, € symbol). Root cause confirmed in a planning spike (likely the U+202F narrow-no-break-space separator or a missing glyph in the embedded font).
+- [ ] **PDF-02**: The **"Destinataire"** block beneath the "Proposition de location financière" title is removed; the layout reflows cleanly without it.
+- [ ] **PDF-03**: The PDF byte-determinism CI gate is updated for the new layout (fixture regenerated) and remains green; the calc golden corpus is extended to cover the Agent/Commercial commission-free render.
 
-### New capabilities
+### Teal Rebrand (BRAND)
 
-- **NOTIF-01**: Webhook notifications to Leasétic on each proposal generation
-- **AUTH-FUT-01**: SMTP-driven self-service password reset (currently admin-mediated only)
-- **TEST-FUT-01**: Playwright automated browser tests (currently Vitest-only at 876 tests + manual smoke runbooks)
-- **MOBILE-01**: Mobile-optimized layout (currently desktop-primary)
-- **I18N-FUT-01**: Multi-language beyond FR + EN (currently 263 keys × 2)
+- [ ] **BRAND-01**: The UI **accent color** is `#2D7A8C` everywhere the previous accent green appeared (primary buttons, links, active nav, hero accents, focus rings, CTAs), in both light and dark mode, driven from the design-token layer (single source of truth).
+- [ ] **BRAND-02**: The Leasétic **logo green** and the **semantic success green** (the "Actif" status pill, "activé le compte" activity entries) are left unchanged.
+- [ ] **BRAND-03**: Every recolored foreground/background pair meets WCAG 2.1 AA (≥4.5:1 text) in light + dark, consistent with the v1.3 CONTRAST discipline.
 
-### Cleanup
+### Admin-Home Labels (COPY)
 
-- **REDIR-01**: `/accounts` → `/partners` 308 redirect sunset (warm-cache window ≥1 milestone is met after v1.3 ships)
+- [ ] **COPY-01**: The admin-home "Références LC" card title and the corresponding page heading read **"Toutes les propositions"** (FR) / equivalent EN. The `/[adminSegment]/lc-references` route is unchanged (display label only).
+- [ ] **COPY-02**: The admin-home "Coefficients & commission" card title reads **"Coefficients & Commissions"**.
+- [ ] **COPY-03**: The admin-home "Dernière modif. coeffs" stat label reads **"Dernière Modif Coef"**.
+- [ ] **COPY-04**: All label changes ship FR + EN dictionary entries; the compile-time `_EnHasAllFrKeys` parity proof stays green.
+
+### Component Fix (UIFIX)
+
+- [ ] **UIFIX-01**: The proposal status pill (e.g. "Actif", "Brouillon", "Expirée") sizes to its text content (hugs content) rather than rendering at a fixed width — verified across all status variants and both languages.
 
 ---
 
-## Out of Scope
+## Future Requirements (deferred — not in v1.4)
 
-Explicitly excluded from v1.3. Documented to prevent scope creep.
+Carried forward; available for v1.5+ scoping:
 
-| Feature / change | Reason |
-|---|---|
-| Token-level color refresh (changing `--gold` / `--navy` / `--ink` / `--paper`) | Figma `color/*` variables match `app/globals.css` exactly (verified 2026-05-21 via `get_variable_defs` on node `9:46`). The "color refresh" carry-forward item reduces to layout + hierarchy refresh — no token churn. |
-| Separate `/archives` route | Per scope conversation: archives surface as a filter pill on `/proposals`, in-page. No new route. |
-| ADMIN-09 further relaxations beyond Phase 13 D-12 | The deal-owner partner-facing commission relaxation on wizard steps 2 + 3 (D-12) is the final allowed exception. Phase 14 9-gate grep-contract suite remains the mechanical enforcement. |
-| Mutating `params_snapshot` of already-shipped PDFs | v1.1 PDF immutability invariant continues. Coefficient edits create new history rows, never alter existing PDFs. |
-| Removing or rewriting the v10 calculation formula | Frozen per business rule. `loyer = montantHT × (1 + commission/100) × coefficient / 100`. |
-| Mobile layout work | Continues to be desktop-primary. Mobile is a v1.4+ candidate. |
-| MetricTile click-through navigation | Per Tier-3 carry-forward locked decision: MetricTiles are display-only in v1.3. Clickable variants are v1.4+ if a real need emerges. |
-| FIFO auto-closure of intercompany debts | Not applicable (intercompany is a separate project — memento-hub). |
-| OVH production deployment execution | Scheduled for September 2026 (Tier 4 carry-forward); capability shipped in v1.1. |
+- [ ] Account v2 — avatar upload (needs Blob image infra), phone field (schema + Better Auth additionalFields), editable email (needs SMTP)
+- [ ] SMTP-driven self-service forgotten-password reset
+- [ ] Multi-factor authentication on admin accounts
+- [ ] Centralized forms-i18n / Zod error-localization helper (remove the EN-leak duplication across SetPasswordForm + identity schema) + regression tests for the Phase 21 partial-success + Zod fixes
+- [ ] OVH production deployment + smoke-deploy execution (September 2026 target)
+- [ ] Webhook notifications to Leasétic on each proposal generation
+- [ ] Mobile-optimized layout
+- [ ] Automated browser tests (Playwright or similar)
+- [ ] Sentry / APM observability beyond Vercel logs
+- [ ] Generic audit-log viewer beyond coefficient history
+- [ ] Wizard step-1 sticky-footer action bar / `beforeunload` warning / per-step tab titles
+- [ ] `/accounts` 308 redirect sunset
+
+## Out of Scope (v1.4 — explicit exclusions)
+
+- **Changing the `Partenaire` formula or any tranche boundaries** — still frozen. Only the Agent/Commercial commission-free variant is approved.
+- **SMTP / editable email / avatar / phone** — Account v2; deferred (no SMTP in v1.4).
+- **MFA and SMTP password reset** — deferred to a dedicated auth-hardening milestone.
+- **Persisting the view toggle across sessions** — explicitly session-only by decision.
+- **Recoloring the logo or the semantic success green** — out of the rebrand scope by decision.
+- **Mobile-optimized layout, Playwright, Sentry** — deferred.
 
 ---
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation by the gsd-roadmapper agent.
+REQ-ID → Phase mapping (filled by the roadmapper; phases start at 22).
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| SHELL-01 | 16 | Complete |
-| SHELL-02 | 16 | Complete |
-| SHELL-03 | 16 | Complete |
-| SHELL-04 | 16 | Complete |
-| SHELL-05 | 16 | Complete |
-| THEME-01 | 17 | Complete |
-| THEME-02 | 18 | Complete |
-| CONTRAST-01 | 16 | Complete |
-| CONTRAST-02 | 16 | Complete |
-| PHOME-01 | 17 | Complete |
-| PHOME-02 | 17 | Complete |
-| PHOME-03 | 17 | Complete |
-| PROPS-01 | 17 | Complete |
-| PROPS-02 | 17 | Complete |
-| WIZ-01 | 17 | Complete |
-| WIZ-02 | 17 | Complete |
-| WIZ-03 | 17 | Complete |
-| WIZ-04 | 17 | Complete |
-| WIZ-05 | 17 | Complete |
-| WIZ-06 | 17 | Complete |
-| ADMIN-10 | 18 | Complete |
-| ADMIN-11 | 18 | Complete |
-| ADMIN-12 | 18 | Complete |
-| ADMIN-13 | 18 | Complete |
-| ADMIN-14 | 18 | Complete |
-| HELP-01 | 18 | Complete |
-| EXPORT-01 | 19 | Complete |
-| EXPORT-02 | 19 | Complete |
-| LCDASH-01 | 19 | Complete |
-| LCDASH-02 | 19 | Complete |
-| INFRA-01 | 20 | Complete |
-| INFRA-02 | 20 | Complete |
-| INFRA-03 | 20 | Complete |
-| GATE-01 | 21 | Pending |
-| GATE-02 | 21 | Pending |
+| REQ-ID | Requirement (short) | Phase |
+|--------|---------------------|-------|
+| PTYPE-01 | Partner-type selector on invite form | — |
+| PTYPE-02 | Backfill existing accounts → Partenaire | — |
+| PTYPE-03 | Admin can edit partner type later (audited) | — |
+| PTYPE-04 | Commission-free loyer calc for Agent/Commercial | — |
+| PTYPE-05 | Commission absent from all UI for Agent/Commercial | — |
+| PTYPE-06 | Commission-free PDF variant + snapshot integrity | — |
+| PTYPE-07 | ADMIN-09 grep suite extended for Agent/Commercial | — |
+| VIEW-01 | Admin-only Admin/Agent toggle (bottom-left) | — |
+| VIEW-02 | Nav remaps to admin vs agent route set | — |
+| VIEW-03 | Land in Admin, session-only persistence | — |
+| VIEW-04 | Toggle is view-only, not an authz change | — |
+| PDF-01 | Fix number/typography rendering glitch | — |
+| PDF-02 | Remove "Destinataire" block | — |
+| PDF-03 | Update byte-determinism gate + golden corpus | — |
+| BRAND-01 | Accent green → #2D7A8C (token, light+dark) | — |
+| BRAND-02 | Logo green + success green unchanged | — |
+| BRAND-03 | WCAG 2.1 AA on recolored pairs | — |
+| COPY-01 | "Toutes les propositions" (label only) | — |
+| COPY-02 | "Coefficients & Commissions" | — |
+| COPY-03 | "Dernière Modif Coef" | — |
+| COPY-04 | FR+EN dict entries, parity proof green | — |
+| UIFIX-01 | Status pill hugs its text | — |
 
-**Coverage:**
-- v1.3 requirements: 35 total (HELP-01 added 2026-05-24 during Phase 18 planning — scope expansion confirmed in /gsd-discuss-phase)
-- Mapped to phases: 35 ✅
-- Unmapped: 0
-
----
-
-*Requirements defined: 2026-05-21*
-*Last updated: 2026-05-21 after initial definition (`/gsd-new-milestone v1.3`)*
+**Coverage:** 22 requirements across 6 categories. All map to a phase once the roadmap is approved.
