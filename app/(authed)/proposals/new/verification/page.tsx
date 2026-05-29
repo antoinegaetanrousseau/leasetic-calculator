@@ -83,6 +83,12 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
   // D-01: auth FIRST (PITFALLS §7.3).
   const { session } = await requireUser();
   const lang = await getCurrentLang();
+  // PTYPE-05: the author's partner type gates the commission row. Agent/Commercial
+  // proposals are commission-free; Partenaire keeps the D-12 relaxation.
+  const rawType = (session.user as { partnerType?: unknown }).partnerType;
+  const partnerType: 'Agent' | 'Commercial' | 'Partenaire' =
+    rawType === 'Agent' || rawType === 'Commercial' ? rawType : 'Partenaire';
+  const isPartenaire = partnerType === 'Partenaire';
   const sp = await searchParams;
 
   // D-03 silent self-heal — no ?draft_id= → redirect to step 1.
@@ -133,7 +139,9 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
     durationMonths: parsedData.durationMonths,
     validityDays: parsedData.validityDays,
     coefficients: params.coefficients,
-    commissionPct: parseNumeric(params.commissionPct),
+    // PTYPE-04/05: commission-free path for Agent/Commercial (commissionPct:0).
+    // Partenaire uses the persisted global_params value (D-12 relaxation).
+    commissionPct: isPartenaire ? parseNumeric(params.commissionPct) : 0,
     maxAmount: parseNumeric(params.maxAmount),
   });
 
@@ -143,12 +151,12 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
   const amountHTNumber = parseNumeric(parsedData.amountHT);
   const amountHTDisplay = formatCurrency(amountHTNumber, lang);
 
-  // D-12: commission = amountHT × commissionPct / 100. Same formula + same
-  // params snapshot computeLoyer consumes internally (formula.ts:114-121).
-  // No drift risk — both values flow from the SAME getLatestGlobalParams call.
-  const commissionPctNumber = parseNumeric(params.commissionPct);
-  const commissionAmount = (amountHTNumber * commissionPctNumber) / 100;
-  const commissionDisplay = formatCurrency(commissionAmount, lang);
+  // D-12: commission = amountHT × commissionPct / 100. Only computed for
+  // Partenaire (D-12 ADMIN-09 partial relaxation). For Agent/Commercial the
+  // value is never materialized — PTYPE-05 structural absence (not CSS hiding).
+  const commissionPctNumber = isPartenaire ? parseNumeric(params.commissionPct) : 0;
+  const commissionAmount = isPartenaire ? (amountHTNumber * commissionPctNumber) / 100 : 0;
+  const commissionDisplay = isPartenaire ? formatCurrency(commissionAmount, lang) : '—';
 
   // Loyer + coefficient — only meaningful when state==='computed'. The
   // 'on-demand' branch falls back to a localized "Sur demande" placeholder
@@ -226,25 +234,27 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
     });
   }
 
-  // ● CALCUL — row 2 (commission) is the D-12 ADMIN-09 partial-relaxation
-  // surface for step 3. SAFETY NOTE: this is the SOLE site in the page where
-  // the commission amount appears. The PdfPreviewMock has no commission prop;
-  // the ● CLIENT and ● PROJET recap arrays do not include commission rows.
-  const calculRows = [
+  // ● CALCUL — PTYPE-05 (D-05): for Partenaire, row 2 is the D-12 ADMIN-09
+  // partial-relaxation commission surface. For Agent/Commercial the commission
+  // row is structurally absent — the array has 2 entries, not 3; surrounding
+  // rows close up with no gap. The value is never materialized on that path.
+  const calculRows: Array<{ label: string; value: string }> = [
     { label: 'Coefficient appliqué', value: coefficientDisplay },
     {
       label: 'Tranche',
       value: trancheNumber !== null ? String(trancheNumber) : '—',
     },
-    {
-      // D-12: ADMIN-09 partial relaxation — partner-facing step-3 review
-      // surface. The eventual PDF (plan 13-02 finalize-wizard) excludes
-      // commission from the persisted computed jsonb and the rendered PDF.
-      // Plan 13-06's golden-PDF test enforces this cross-surface invariant.
+  ];
+  if (isPartenaire) {
+    // D-12: ADMIN-09 partial relaxation — Partenaire partner-facing step-3
+    // review surface only. The eventual PDF (plan 13-02 finalize-wizard)
+    // excludes commission from the persisted computed jsonb and the rendered
+    // PDF. Plan 13-06's golden-PDF test enforces this cross-surface invariant.
+    calculRows.push({
       label: t('wizard.step2.row.commission', lang),
       value: commissionDisplay,
-    },
-  ];
+    });
+  }
 
   // Bound server action for the Save ghost button. Inline 'use server' arrow
   // captures draft.id + inputs from server scope; mirrors plan 13-04's idiom.
@@ -313,9 +323,10 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
             rows={projetRows}
           />
 
-          {/* ● CALCUL — links back to step 2 (D-23). Row 2 carries the
-              commission amount per D-12 (the ONLY commission disclosure
-              site on this page). */}
+          {/* ● CALCUL — links back to step 2 (D-23). For Partenaire: row 2
+              carries the commission amount per D-12 (ONLY commission
+              disclosure site on this page). For Agent/Commercial: 2 rows only,
+              no commission disclosure (PTYPE-05 structural absence). */}
           <RecapSection
             sectionTitle={t('wizard.section.calcul', lang)}
             modifierLink={{
@@ -323,11 +334,10 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
               label: 'Modifier',
             }}
             rows={calculRows}
-            rowSublabels={{
-              // D-12: partner-facing parenthetical clarifying that the row's
-              // value will NOT appear in the client-facing PDF.
-              2: t('wizard.step2.row.commission.sublabel', lang),
-            }}
+            rowSublabels={
+              // D-12: sublabel (idx 2) only for Partenaire; absent for Agent/Commercial (PTYPE-05).
+              isPartenaire ? { 2: t('wizard.step2.row.commission.sublabel', lang) } : undefined
+            }
           />
 
           {/* Phase 17 WIZ-04 (D-01) — Durée de validité segmented selector.

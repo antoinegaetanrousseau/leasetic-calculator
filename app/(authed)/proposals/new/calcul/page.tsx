@@ -39,6 +39,7 @@
  * ships the D-28 STRIDE addendum documenting this single carve-out against
  * Phase 9's 97-threat closure.
  */
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -92,6 +93,12 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
   // D-01: auth FIRST (PITFALLS §7.3).
   const { session } = await requireUser();
   const lang = await getCurrentLang();
+  // PTYPE-05: the author's partner type gates the commission row. Agent/Commercial
+  // proposals are commission-free; Partenaire keeps the D-12 relaxation.
+  const rawType = (session.user as { partnerType?: unknown }).partnerType;
+  const partnerType: 'Agent' | 'Commercial' | 'Partenaire' =
+    rawType === 'Agent' || rawType === 'Commercial' ? rawType : 'Partenaire';
+  const isPartenaire = partnerType === 'Partenaire';
   const sp = await searchParams;
 
   // D-03 silent self-heal — no ?draft_id= → redirect to step 1.
@@ -136,7 +143,9 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
       durationMonths: parsedData.durationMonths,
       validityDays: parsedData.validityDays,
       coefficients: params.coefficients,
-      commissionPct: parseNumeric(params.commissionPct),
+      // PTYPE-04/05: commission-free path for Agent/Commercial (commissionPct:0).
+      // Partenaire uses the persisted global_params value (D-12 relaxation).
+      commissionPct: isPartenaire ? parseNumeric(params.commissionPct) : 0,
       maxAmount: parseNumeric(params.maxAmount),
     });
   }
@@ -147,13 +156,14 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
   const amountHTDisplay = parsedData ? formatCurrency(amountHTNumber, lang) : '—';
 
   // D-12: the partner-only-visible amount = amountHT × commissionPct / 100.
-  // Computed from the SAME global_params snapshot the computeLoyer call uses
-  // — keeps the displayed value consistent with the underlying loyer math.
-  const commissionPctNumber = params ? parseNumeric(params.commissionPct) : 0;
-  const commissionAmount = parsedData
+  // Computed ONLY for Partenaire (D-12 ADMIN-09 partial relaxation). For
+  // Agent/Commercial the value is never materialized — PTYPE-05 structural
+  // absence (not CSS hiding).
+  const commissionPctNumber = isPartenaire && params ? parseNumeric(params.commissionPct) : 0;
+  const commissionAmount = isPartenaire && parsedData
     ? (amountHTNumber * commissionPctNumber) / 100
     : 0;
-  const commissionDisplay = parsedData
+  const commissionDisplay = isPartenaire && parsedData
     ? formatCurrency(commissionAmount, lang)
     : '—';
 
@@ -208,18 +218,26 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
   // `wizard.step2.detail.*` i18n keys (Plan 02 D-21). The coefficient
   // row's "(tranche {N}K€)" suffix is appended at the call site since the
   // new `.coefficient` key is the bare label per the Copywriting Contract.
-  const detailRows = [
+  // PTYPE-05 (D-05): for Agent/Commercial the commission row is structurally
+  // absent — the array is simply shorter. Surrounding rows close up with no
+  // gap or placeholder. The value is never materialized on this path.
+  const detailRows: Array<{ label: string; value: string | ReactNode }> = [
     {
       label: t('wizard.step2.detail.montantHT', lang),
       value: amountHTDisplay,
     },
-    {
-      // D-12: ADMIN-09 partial relaxation — partner-facing step-2 surface only.
-      // PDF render path / audit_log / server logs / pre-finalize traces all
-      // remain commission-free. Plan 13-06 ships the STRIDE addendum (D-28).
+  ];
+  if (isPartenaire) {
+    // D-12: ADMIN-09 partial relaxation — Partenaire partner-facing step-2
+    // surface only. PDF render path / audit_log / server logs / pre-finalize
+    // traces all remain commission-free. Plan 13-06 ships the STRIDE addendum
+    // (D-28).
+    detailRows.push({
       label: t('wizard.step2.detail.commission', lang),
       value: commissionDisplay,
-    },
+    });
+  }
+  detailRows.push(
     {
       label: `${t('wizard.step2.detail.coefficient', lang)} (tranche ${
         trancheUpperK !== null ? String(trancheUpperK) : '—'
@@ -240,7 +258,7 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
         <span style={{ fontWeight: 600 }}>{loyerDisplay}</span>
       ),
     },
-  ];
+  );
 
   // ──────────────────────────────────────────────────────────────────────────
   // Paramètres saisis recap — mirrors step-1 fields. NEVER includes the
@@ -465,12 +483,10 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
           <RecapSection
             sectionTitle={t('wizard.step2.detail.title', lang)}
             rows={detailRows}
-            rowSublabels={{
-              // D-12: partner-facing parenthetical clarifying that the row's
-              // value will NOT appear in the client-facing PDF. ONLY consumer
-              // of rowSublabels on this page.
-              1: t('wizard.step2.detail.commissionNote', lang),
-            }}
+            rowSublabels={
+              // D-12: sublabel (idx 1) only for Partenaire; absent for Agent/Commercial (PTYPE-05).
+              isPartenaire ? { 1: t('wizard.step2.detail.commissionNote', lang) } : undefined
+            }
             // WIZ-02 (D-16): last row "Loyer mensuel calculé" rendered with
             // a top border separator to read as the totalized result row.
             lastRowDivider={true}
