@@ -44,6 +44,12 @@ export interface PartnerRow {
   createdAt: Date;
   /** D-08 — MAX(proposals.created_at) per partner, excluding deleted rows. Null when zero proposals. */
   lastActivityAt: Date | null;
+  /**
+   * PTYPE-01 / D-07 — partner type at-a-glance badge on the list.
+   * ADMIN-09: business-classification enum — NOT a commission/rate projection.
+   * No commission_pct field exists on users; 9-gate grep contract trivially honored.
+   */
+  partnerType: 'Agent' | 'Commercial' | 'Partenaire';
 }
 
 export interface ListPartnersArgs {
@@ -159,6 +165,9 @@ export async function listPartnersWithLastActivity(
       deletedAt: schema.users.deletedAt,
       lastLoginAt: schema.users.lastLoginAt,
       createdAt: schema.users.createdAt,
+      // PTYPE-01 / D-07: project partner_type for at-a-glance badge.
+      // ADMIN-09: business-classification enum — NOT a commission/rate field.
+      partnerType: schema.users.partnerType,
       lastActivityAt:
         sql<Date | null>`MAX(${schema.proposals.createdAt})`.as('last_activity_at'),
     })
@@ -179,6 +188,7 @@ export async function listPartnersWithLastActivity(
       schema.users.deletedAt,
       schema.users.lastLoginAt,
       schema.users.createdAt,
+      schema.users.partnerType,
     )
     .orderBy(desc(schema.users.createdAt), desc(schema.users.id))
     .limit(fetchCount);
@@ -208,6 +218,9 @@ export async function listPartnersWithLastActivity(
       status: deriveStatus(r.deletedAt, r.lastLoginAt),
       createdAt: r.createdAt,
       lastActivityAt,
+      // PTYPE-01 / D-07: the DB column has DEFAULT 'Partenaire' NOT NULL so
+      // the value is always one of the three enum members.
+      partnerType: (r.partnerType ?? 'Partenaire') as 'Agent' | 'Commercial' | 'Partenaire',
     };
   });
 

@@ -11,6 +11,8 @@ export {
   adminCreatePasswordReset,
   adminReissueInvitation,
   createPartnerInvitationAction,
+  // Phase 22 Plan 03 — PTYPE-03: admin-only partner type change (audited).
+  adminUpdatePartnerType,
 } from './actions';
 export type {
   AdminUpdateGlobalParamsArgs,

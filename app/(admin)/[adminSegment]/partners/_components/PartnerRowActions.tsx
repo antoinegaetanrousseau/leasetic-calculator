@@ -29,13 +29,14 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MoreVertical, Send, Ban, CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
+import { MoreVertical, Send, Ban, CheckCircle2, ExternalLink, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import {
   adminDisableUser,
   adminReEnableUser,
   adminReissueInvitation,
+  adminUpdatePartnerType,
 } from '@/lib/admin';
 import type { PartnerStatus } from '@/lib/db/queries/partners';
 
@@ -54,6 +55,11 @@ export interface PartnerRowActionsProps {
    */
   partnerEmail?: string;
   partnerDisplayName?: string;
+  /**
+   * PTYPE-03 / D-08: current partner type — used to build the type-change
+   * target options in the overflow menu. Optional for backward-compat.
+   */
+  partnerType?: 'Agent' | 'Commercial' | 'Partenaire';
 }
 
 const MENU_ITEM_STYLE = {
@@ -77,6 +83,7 @@ export function PartnerRowActions({
   lang,
   partnerEmail,
   partnerDisplayName,
+  partnerType,
 }: PartnerRowActionsProps) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -173,6 +180,25 @@ export function PartnerRowActions({
     }
   };
 
+  // PTYPE-03 / D-08: type-change handler.
+  // D-08: window.confirm explains future-vs-frozen economics before calling the action.
+  // The three target types are the other two options relative to the current type
+  // — simplest pattern consistent with the existing window.confirm baseline (UI-SPEC §443).
+  const onChangeType = async (targetType: 'Agent' | 'Commercial' | 'Partenaire') => {
+    if (!window.confirm(t('admin.partners.type.change.confirm', lang))) return;
+    setBusy(true);
+    try {
+      await adminUpdatePartnerType(partnerId, targetType);
+      toast.success(t('admin.partners.action.changeType', lang));
+      refreshAfterAction();
+    } catch {
+      toast.error(t('admin.partners.error.type_change', lang));
+    } finally {
+      setBusy(false);
+      setOpen(false);
+    }
+  };
+
   // D-10 conditional visibility — exactly one of resend/disable/re-enable
   // is rendered per row based on status.
   const showResend = status === 'invited';
@@ -259,6 +285,22 @@ export function PartnerRowActions({
               {t('admin.partners.action.enableAccount', lang)}
             </button>
           )}
+          {/* PTYPE-03 / D-08: type-change options — show all types except the current one.
+              D-04: plain labels (Agent/Commercial/Partenaire) per the enum. */}
+          {(['Agent', 'Commercial', 'Partenaire'] as const)
+            .filter((type) => type !== partnerType)
+            .map((targetType) => (
+              <button
+                key={targetType}
+                type="button"
+                role="menuitem"
+                onClick={() => onChangeType(targetType)}
+                style={MENU_ITEM_STYLE}
+              >
+                <RefreshCw size={14} strokeWidth={1.6} aria-hidden="true" color="var(--muted)" />
+                {`${t('admin.partners.action.changeType', lang)} → ${targetType}`}
+              </button>
+            ))}
           <Link
             href={`/proposals?user_id=${partnerId}`}
             role="menuitem"

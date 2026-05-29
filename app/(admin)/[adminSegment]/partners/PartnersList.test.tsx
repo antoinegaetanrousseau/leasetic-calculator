@@ -32,6 +32,8 @@ function makeRow(overrides: Partial<PartnerRow> = {}): PartnerRow {
     status: 'active',
     createdAt: new Date('2026-04-01T12:00:00Z'),
     lastActivityAt: new Date('2026-05-15T10:00:00Z'),
+    // Phase 22 Plan 03: partnerType added to PartnerRow (PTYPE-01 D-07).
+    partnerType: 'Partenaire',
     ...overrides,
   };
 }
@@ -58,20 +60,22 @@ describe('PartnersList — 6-column table (UI-SPEC §Partners list)', () => {
       />,
     );
     const ths = container.querySelectorAll('thead th');
-    expect(ths.length).toBe(6);
+    // Phase 22 Plan 03: 7 columns now (added TYPE col between STATUT and ⋯).
+    expect(ths.length).toBe(7);
     const labels = Array.from(ths).map((th) => (th.textContent ?? '').trim());
-    // Per UI-SPEC §Partners list line 332-337.
+    // Per UI-SPEC §Partners list line 332-337 + PTYPE-01 D-07 type col.
     expect(labels[0]).toBe('PARTENAIRE');
     expect(labels[1]).toBe('EMAIL');
     expect(labels[2]).toBe('DATE CRÉATION');
     expect(labels[3]).toBe('DERNIÈRE ACTIVITÉ');
     expect(labels[4]).toBe('STATUT');
-    // Column 6 header is non-text (visual ⋯ or sr-only) — assert that the 6th
-    // header exists but does NOT include the same label as cols 1-5.
-    expect(labels[5]).not.toBe('PARTENAIRE');
+    expect(labels[5]).toBe('TYPE');
+    // Column 7 header is non-text (visual ⋯ or sr-only) — assert it exists but
+    // does NOT include the same label as cols 1-6.
+    expect(labels[6]).not.toBe('PARTENAIRE');
   });
 
-  it('Test 11 (cont.): renders one <tr> per row with 6 cells each', () => {
+  it('Test 11 (cont.): renders one <tr> per row with 7 cells each', () => {
     const rows = [
       makeRow({ id: 'p-a' }),
       makeRow({ id: 'p-b', email: 'bob@example.com', name: 'Bob' }),
@@ -83,7 +87,8 @@ describe('PartnersList — 6-column table (UI-SPEC §Partners list)', () => {
     expect(trs.length).toBe(2);
     for (const tr of Array.from(trs)) {
       const tds = tr.querySelectorAll('td');
-      expect(tds.length).toBe(6);
+      // Phase 22 Plan 03: 7 cells now (added TYPE col between STATUT and ⋯).
+      expect(tds.length).toBe(7);
     }
   });
 });
@@ -95,8 +100,9 @@ describe('PartnersList — D-08 em-dash fallback', () => {
       <PartnersList rows={rows} nextCursor={null} lang="fr" adminSegment="admin-secret" />,
     );
     const cells = container.querySelectorAll('tbody tr td');
-    expect(cells.length).toBe(6);
-    // Cell index 3 = DERNIÈRE ACTIVITÉ (0-indexed: 0 PARTENAIRE / 1 EMAIL / 2 DATE / 3 DERNIÈRE / 4 STATUT / 5 ⋯)
+    // Phase 22 Plan 03: 7 cells per row now.
+    expect(cells.length).toBe(7);
+    // Cell index 3 = DERNIÈRE ACTIVITÉ (0-indexed: 0 PARTENAIRE / 1 EMAIL / 2 DATE / 3 DERNIÈRE / 4 STATUT / 5 TYPE / 6 ⋯)
     expect((cells[3].textContent ?? '').trim()).toBe('—');
   });
 });

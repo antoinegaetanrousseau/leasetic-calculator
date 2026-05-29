@@ -23,6 +23,8 @@ const VALID = {
   siret: '12345678901234',
   phone: '01 23 45 67 89',
   invitationMessage: 'Bonjour Marie,',
+  // Phase 22 Plan 03: partnerType is now required (PTYPE-01, D-03 force-choice).
+  partnerType: 'Partenaire' as const,
 };
 
 describe('createPartnerFormSchema (Phase 14 UI-SPEC §5.1)', () => {

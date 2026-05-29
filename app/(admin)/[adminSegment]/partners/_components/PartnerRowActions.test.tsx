@@ -33,6 +33,8 @@ vi.mock('@/lib/admin', async (importOriginal) => {
     adminDisableUser: vi.fn(),
     adminReEnableUser: vi.fn(),
     adminReissueInvitation: vi.fn(),
+    // Phase 22 Plan 03: stub the new type-change action.
+    adminUpdatePartnerType: vi.fn(),
   };
 });
 
@@ -43,25 +45,30 @@ afterEach(() => {
 });
 
 describe('PartnerRowActions — D-10 conditional menu items', () => {
-  it('Test 5: invited status → Renvoyer + Voir les propositions (2 items)', () => {
+  // Phase 22 Plan 03: type-change items added (2 per row = all types except current).
+  // With partnerType='Partenaire', menu adds: "Changer le type → Agent" + "Changer le type → Commercial".
+  // Total per status: status-action (1) + type-change (2) + view-proposals (1) = 4 items.
+  it('Test 5: invited status → Renvoyer + 2 type-change + Voir les propositions (4 items)', () => {
     const { container, getByLabelText } = render(
       <PartnerRowActions
         partnerId="p-1"
         status="invited"
         adminSegment="admin-secret"
         lang="fr"
+        partnerType="Partenaire"
       />,
     );
     // Open menu via the ⋯ trigger.
     const trigger = container.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement;
     expect(trigger).not.toBeNull();
     fireEvent.click(trigger);
-    // Assert exactly 2 visible menu items.
     const items = container.querySelectorAll('[role="menuitem"]');
-    expect(items.length).toBe(2);
+    expect(items.length).toBe(4);
     const labels = Array.from(items).map((i) => (i.textContent ?? '').trim());
     expect(labels.some((l) => l.includes("Renvoyer l'invitation"))).toBe(true);
     expect(labels.some((l) => l.includes('Voir les propositions'))).toBe(true);
+    expect(labels.some((l) => l.includes('Agent'))).toBe(true);
+    expect(labels.some((l) => l.includes('Commercial'))).toBe(true);
     // Negative: no Désactiver / Réactiver for invited.
     expect(labels.some((l) => l.startsWith('Désactiver'))).toBe(false);
     expect(labels.some((l) => l.startsWith('Réactiver'))).toBe(false);
@@ -69,42 +76,48 @@ describe('PartnerRowActions — D-10 conditional menu items', () => {
     expect(getByLabelText).toBeDefined();
   });
 
-  it('Test 6: active status → Désactiver + Voir les propositions', () => {
+  it('Test 6: active status → Désactiver + 2 type-change + Voir les propositions (4 items)', () => {
     const { container } = render(
       <PartnerRowActions
         partnerId="p-1"
         status="active"
         adminSegment="admin-secret"
         lang="fr"
+        partnerType="Partenaire"
       />,
     );
     const trigger = container.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement;
     fireEvent.click(trigger);
     const items = container.querySelectorAll('[role="menuitem"]');
-    expect(items.length).toBe(2);
+    expect(items.length).toBe(4);
     const labels = Array.from(items).map((i) => (i.textContent ?? '').trim());
     expect(labels.some((l) => l.startsWith('Désactiver'))).toBe(true);
     expect(labels.some((l) => l.includes('Voir les propositions'))).toBe(true);
+    expect(labels.some((l) => l.includes('Agent'))).toBe(true);
+    expect(labels.some((l) => l.includes('Commercial'))).toBe(true);
     expect(labels.some((l) => l.startsWith('Renvoyer'))).toBe(false);
     expect(labels.some((l) => l.startsWith('Réactiver'))).toBe(false);
   });
 
-  it('Test 7: inactive status → Réactiver + Voir les propositions', () => {
+  it('Test 7: inactive status → Réactiver + 2 type-change + Voir les propositions (4 items)', () => {
     const { container } = render(
       <PartnerRowActions
         partnerId="p-1"
         status="inactive"
         adminSegment="admin-secret"
         lang="fr"
+        partnerType="Partenaire"
       />,
     );
     const trigger = container.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement;
     fireEvent.click(trigger);
     const items = container.querySelectorAll('[role="menuitem"]');
-    expect(items.length).toBe(2);
+    expect(items.length).toBe(4);
     const labels = Array.from(items).map((i) => (i.textContent ?? '').trim());
     expect(labels.some((l) => l.startsWith('Réactiver'))).toBe(true);
     expect(labels.some((l) => l.includes('Voir les propositions'))).toBe(true);
+    expect(labels.some((l) => l.includes('Agent'))).toBe(true);
+    expect(labels.some((l) => l.includes('Commercial'))).toBe(true);
   });
 });
 

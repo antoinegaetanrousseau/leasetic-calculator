@@ -81,6 +81,9 @@ function fillRequiredFields() {
   fireEvent.input(screen.getByLabelText(/Prénom/), { target: { value: VALID.firstName } });
   fireEvent.input(screen.getByLabelText(/^Nom/), { target: { value: VALID.lastName } });
   fireEvent.input(screen.getByLabelText(/^Email/), { target: { value: VALID.email } });
+  // Phase 22 Plan 03: partnerType is now a required select (PTYPE-01, D-03 force-choice).
+  // Select 'Partenaire' to satisfy the required enum validation.
+  fireEvent.change(screen.getByLabelText(/Type de partenaire/), { target: { value: 'Partenaire' } });
   fireEvent.input(screen.getByLabelText(/Société/), { target: { value: VALID.companyName } });
   fireEvent.input(screen.getByLabelText(/Téléphone/), { target: { value: VALID.phone } });
 }

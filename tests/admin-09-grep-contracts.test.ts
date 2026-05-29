@@ -134,6 +134,8 @@ function makePartnerRow(overrides: Partial<PartnerRow> = {}): PartnerRow {
     status: 'active',
     createdAt: new Date('2026-04-01T12:00:00Z'),
     lastActivityAt: new Date('2026-05-15T10:00:00Z'),
+    // Phase 22 Plan 03: partnerType added to PartnerRow (PTYPE-01 D-07).
+    partnerType: 'Partenaire',
     ...overrides,
   };
 }

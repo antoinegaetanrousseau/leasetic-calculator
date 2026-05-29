@@ -172,6 +172,10 @@ export function PartnersList({
             <th scope="col" style={{ ...TH_BASE_STYLE, width: 110, textAlign: 'center' }}>
               {t('admin.partners.col.status', lang)}
             </th>
+            {/* D-07: at-a-glance partner type badge column. ADMIN-09: type enum, not a rate. */}
+            <th scope="col" style={{ ...TH_BASE_STYLE, width: 120, textAlign: 'center' }}>
+              {t('admin.partners.col.partnerType', lang)}
+            </th>
             <th scope="col" style={COL6_TH_STYLE}>
               {/* Visual ⋯ glyph — accessible name carried by per-row PartnerRowActions trigger. */}
               <span aria-hidden="true">⋯</span>
@@ -230,6 +234,30 @@ export function PartnersList({
                     label={chipLabel(row.status, lang)}
                   />
                 </td>
+                {/* Col 5b — TYPE (D-07: at-a-glance partner type badge). ADMIN-09: enum, not a rate. */}
+                <td
+                  style={{
+                    ...TD_BASE_STYLE,
+                    borderBottom: lastBorder,
+                    textAlign: 'center',
+                  }}
+                >
+                  <span
+                    className="chip chip-type"
+                    style={{
+                      display: 'inline-block',
+                      padding: '2px 10px',
+                      borderRadius: 999,
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      letterSpacing: '0.02em',
+                      background: 'var(--border)',
+                      color: 'var(--ink)',
+                    }}
+                  >
+                    {row.partnerType}
+                  </span>
+                </td>
                 {/* Col 6 — ⋯ overflow menu (D-10, wired in Task 2) */}
                 <td
                   style={{
@@ -246,6 +274,7 @@ export function PartnersList({
                     lang={lang}
                     partnerEmail={row.email}
                     partnerDisplayName={row.name}
+                    partnerType={row.partnerType}
                   />
                 </td>
               </tr>

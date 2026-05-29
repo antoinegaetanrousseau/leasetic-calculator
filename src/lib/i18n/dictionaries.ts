@@ -810,6 +810,9 @@ export const dictionaries = {
     'admin.partners.col.created': 'DATE CRÉATION',
     'admin.partners.col.lastActivity': 'DERNIÈRE ACTIVITÉ',
     'admin.partners.col.status': 'STATUT',
+    // Phase 22 Plan 03 — D-07: at-a-glance partner type column header.
+    // ADMIN-09: type label only — no commission/rate copy.
+    'admin.partners.col.partnerType': 'TYPE',
     'admin.partners.action.resendInvitation': "Renvoyer l'invitation",
     'admin.partners.action.disableAccount': 'Désactiver le compte',
     'admin.partners.action.enableAccount': 'Réactiver le compte',
@@ -1687,6 +1690,8 @@ export const dictionaries = {
     'admin.partners.col.created': 'CREATED',
     'admin.partners.col.lastActivity': 'LAST ACTIVITY',
     'admin.partners.col.status': 'STATUS',
+    // Phase 22 Plan 03 — D-07 EN counterpart. ADMIN-09: type label only.
+    'admin.partners.col.partnerType': 'TYPE',
     'admin.partners.action.resendInvitation': 'Resend invitation',
     'admin.partners.action.disableAccount': 'Disable account',
     'admin.partners.action.enableAccount': 'Re-enable account',
