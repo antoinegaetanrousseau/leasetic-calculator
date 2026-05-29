@@ -57,6 +57,10 @@ export interface FinalizeWizardArgs {
   draftId: string;
   /** Language captured at finalize time (Phase 8 D-A2 immutability). */
   language: 'fr' | 'en';
+  /** PTYPE-06: the proposal author's partner type (read from session by the
+   *  route handler). Passed opaquely to finalize-helpers.ts which owns the
+   *  branching logic and parameter naming (grep-isolation barrier D-28). */
+  partnerType: 'Agent' | 'Commercial' | 'Partenaire';
 }
 
 export interface FinalizeWizardResult {
@@ -168,7 +172,9 @@ export async function finalizeWizard(
 
   // D-16 step 3 — server-side recompute (CALC-07). Helper hides the
   // ADMIN-09-sensitive parameter name from this file's source.
-  const compute = computeLoyer(buildComputeArgs(parsed, params));
+  // PTYPE-06: partnerType is threaded opaquely; finalize-helpers.ts owns the
+  // branch that names the commission parameter (grep-isolation barrier).
+  const compute = computeLoyer(buildComputeArgs(parsed, params, args.partnerType));
 
   // D-16 step 6 — idempotencyKey allocated here; lcRef was set at draft
   // creation (Phase 17 D-03).
@@ -195,7 +201,7 @@ export async function finalizeWizard(
   // from the draft row itself.
   const finalized = await finalizeDraft(args.draftId, args.userId, {
     idempotencyKey,
-    paramsSnapshot: buildParamsSnapshot(params),
+    paramsSnapshot: buildParamsSnapshot(params, args.partnerType),
     computed: buildComputedJson(compute.computed),
     pdfBlobKey,
     pdfSha256: sha256,

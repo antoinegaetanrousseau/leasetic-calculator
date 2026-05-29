@@ -256,7 +256,7 @@ describe('ADMIN-09 no-commission-in-PDF — golden corpus (D-12 + D-28)', () => 
         lcRef: 'LC-2026-001',
       });
 
-      await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr' });
+      await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const });
 
       // ── Layer 1: PDF render data has no commission ─────────────────────
       expect(renderProposalPdfMock).toHaveBeenCalledTimes(1);
@@ -323,7 +323,7 @@ describe('ADMIN-09 no-commission-in-PDF — golden corpus (D-12 + D-28)', () => 
         // Phase 17 D-03: draft row carries pre-allocated lcRef.
         lcRef: 'LC-2026-001',
       });
-      await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr' });
+      await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const });
       totalCalls += finalizeDraftMock.mock.calls.length;
     }
     expect(totalCalls).toBe(GOLDEN_FIXTURES.length);

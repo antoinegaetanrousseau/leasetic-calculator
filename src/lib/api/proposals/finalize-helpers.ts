@@ -31,13 +31,24 @@ import type { ProposalInput } from '@/lib/calc';
 /**
  * Build the verbatim `paramsSnapshot` jsonb (Stripe Option A — written
  * once at finalize time, never updated). Mirrors submit.ts:105-110.
+ *
+ * PTYPE-06: the snapshot now records `partnerType` + `commissionApplied`
+ * for byte-determinism after a future admin type change (D-02). The
+ * `commissionPct` field is still stored (the percentage is archived for
+ * reference); `commissionApplied` records whether it was factored into
+ * the loyer computation at finalize time.
  */
-export function buildParamsSnapshot(params: GlobalParamsRow): Record<string, unknown> {
+export function buildParamsSnapshot(
+  params: GlobalParamsRow,
+  partnerType: 'Agent' | 'Commercial' | 'Partenaire',
+): Record<string, unknown> {
   return {
     commissionPct: params.commissionPct,
     maxAmount: params.maxAmount,
     validityDays: params.validityDays,
     coefficients: params.coefficients,
+    partnerType,
+    commissionApplied: partnerType === 'Partenaire',
   };
 }
 
@@ -47,17 +58,22 @@ export function buildParamsSnapshot(params: GlobalParamsRow): Record<string, unk
  * contract requires `commissionPct` + `maxAmount` as numbers; this helper
  * parses both. The substring "commission" lives in this file ONLY so the
  * downstream finalize-wizard.ts can stay grep-clean.
+ *
+ * PTYPE-04: for Agent/Commercial, `commissionPct` is forced to 0 so the
+ * loyer formula reduces to `montant HT × coefficient / 100`. For Partenaire
+ * the persisted global_params value is used unchanged.
  */
 export function buildComputeArgs(
   parsed: ProposalInput,
   params: GlobalParamsRow,
+  partnerType: 'Agent' | 'Commercial' | 'Partenaire',
 ): ComputeLoyerInput {
   return {
     amountHT: parsed.amountHT,
     durationMonths: parsed.durationMonths,
     validityDays: parsed.validityDays,
     coefficients: params.coefficients,
-    commissionPct: parseNumeric(params.commissionPct),
+    commissionPct: partnerType === 'Partenaire' ? parseNumeric(params.commissionPct) : 0,
     maxAmount: parseNumeric(params.maxAmount),
   };
 }

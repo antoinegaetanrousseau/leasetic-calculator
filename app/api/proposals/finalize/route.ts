@@ -55,9 +55,18 @@ export async function POST(req: NextRequest) {
   // into a 401 JSON so API consumers can handle it without following the
   // redirect chain.
   let userId: string;
+  let partnerType: 'Agent' | 'Commercial' | 'Partenaire';
   try {
     const { session } = await requireUser();
     userId = session.user.id;
+    // PTYPE-06: the author's partner type drives proposal economics. The type
+    // is admin-assigned and client-immutable (input:false), so reading it here
+    // is safe. Cast with fallback to 'Partenaire' to guard against legacy rows
+    // that predate the migration (DEFAULT 'Partenaire' covers them in DB, but
+    // a belt-and-suspenders cast protects during schema transition).
+    const rawType = (session.user as { partnerType?: unknown }).partnerType;
+    partnerType =
+      rawType === 'Agent' || rawType === 'Commercial' ? rawType : 'Partenaire';
   } catch {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
@@ -78,7 +87,7 @@ export async function POST(req: NextRequest) {
   const language = await getCurrentLang();
 
   try {
-    const result = await finalizeWizard({ userId, draftId, language });
+    const result = await finalizeWizard({ userId, draftId, language, partnerType });
     return NextResponse.json({ id: result.id }, { status: 200 });
   } catch (err) {
     const message = err instanceof Error ? err.message : '';
