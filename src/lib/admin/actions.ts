@@ -194,6 +194,9 @@ export interface AdminCreateInvitationArgs {
   siret?: string;
   phone?: string;
   invitationMessage?: string;
+  // Phase 22 Plan 03 — PTYPE-01: partner_type persisted at invitation time.
+  // ADMIN-09: this is a business-classification field, NOT a commission/rate value.
+  partnerType?: 'Agent' | 'Commercial' | 'Partenaire';
 }
 
 export interface AdminCreateInvitationResult extends InviteResult {
@@ -248,10 +251,15 @@ export async function adminCreateInvitation(
       throw new Error('admin.accounts.error.create');
     }
 
-    // Set the partner's language preference (createInvitation does not set it).
+    // Set the partner's language preference and partner_type (createInvitation does not set them).
+    // PTYPE-01: partnerType is persisted here exactly as language is — via UPDATE users SET.
+    // ADMIN-09: partner_type is a business-classification field, NOT a commission/rate value.
     await db()
       .update(schema.users)
-      .set({ language: args.language })
+      .set({
+        language: args.language,
+        ...(args.partnerType ? { partnerType: args.partnerType } : {}),
+      })
       .where(eq(schema.users.id, userRow.id));
 
     // Phase 14: persist the /partners/new extended fields under a `profile`
@@ -502,6 +510,10 @@ export async function createPartnerInvitationAction(
       siret: parsed.siret,
       phone: parsed.phone,
       invitationMessage: parsed.invitationMessage,
+      // PTYPE-01: thread partnerType through to adminCreateInvitation so it is
+      // persisted via UPDATE users SET partner_type = ... at invitation time.
+      // ADMIN-09: business-classification field, NOT a commission/rate value.
+      partnerType: parsed.partnerType,
     });
 
     return { ok: true, url: result.url, kind: 'invite' };

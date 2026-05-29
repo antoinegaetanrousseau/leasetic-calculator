@@ -739,6 +739,9 @@ export const dictionaries = {
       'Un partenaire avec cet email existe déjà.',
     'partners.new.toast.validation.errors':
       'Veuillez corriger les erreurs dans le formulaire.',
+    // Phase 22 Plan 03 — PTYPE-01: partner type selector label (D-04: plain label, no helper text).
+    // ADMIN-09: type label only — no commission/rate copy.
+    'partners.new.field.partnerType': 'Type de partenaire',
 
     // ── Phase 14 Plan 04 — Coefficient history sidebar + shared diff panel
     // (10 keys per UI-SPEC §6.5 + §6.6 subset + §6.8) ──────────────────────
@@ -1610,6 +1613,9 @@ export const dictionaries = {
       'A partner with this email already exists.',
     'partners.new.toast.validation.errors':
       'Please correct the errors in the form.',
+    // Phase 22 Plan 03 — PTYPE-01: partner type selector label (EN counterpart).
+    // ADMIN-09: type label only — no commission/rate copy.
+    'partners.new.field.partnerType': 'Partner type',
 
     // ── Phase 14 Plan 04 — Coefficient history sidebar + shared diff panel ──
     'coefficients.history.title': 'HISTORY',

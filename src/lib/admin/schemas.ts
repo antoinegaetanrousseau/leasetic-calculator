@@ -90,6 +90,15 @@ export const createPartnerFormSchema = z.object({
     .min(1, 'error.field.required')
     .regex(/^[\d\s+()-]{6,20}$/, 'error.field.phone.invalid'),
   invitationMessage: z.string().max(1000, 'partners.new.message.tooLong').optional(),
+  /**
+   * PTYPE-01 / D-03 force-explicit-choice: NO .default() so parse() fails when
+   * the field is unset. D-04: plain labels (Agent/Commercial/Partenaire).
+   * ADMIN-09: this is a business-classification enum, NOT a commission/rate value.
+   */
+  // Rule 1 auto-fix: Zod v4 uses `error` not `errorMap` for the custom error param.
+  partnerType: z.enum(['Agent', 'Commercial', 'Partenaire'], {
+    error: 'error.field.required',
+  }),
 });
 
 export type CreatePartnerFormValues = z.infer<typeof createPartnerFormSchema>;

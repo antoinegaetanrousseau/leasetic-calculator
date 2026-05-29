@@ -110,6 +110,9 @@ export function CreatePartnerForm({
       firstName: '',
       lastName: '',
       email: '',
+      // PTYPE-01 D-03 force-explicit-choice: empty string → placeholder selected →
+      // parse() fails validation if the user never picks a type.
+      partnerType: '' as CreatePartnerFormValues['partnerType'],
       companyName: '',
       siret: '',
       phone: '',
@@ -256,6 +259,33 @@ export function CreatePartnerForm({
                 style={{ color: 'var(--danger)' }}
               >
                 {t(errors.email.message as DictKey, lang)}
+              </p>
+            )}
+          </div>
+
+          {/* ── partnerType selector (PTYPE-01, D-03/D-04) ───────────────── */}
+          <div className="fld">
+            <label htmlFor="cpf-partnerType">
+              {t('partners.new.field.partnerType', lang)}
+              <span className="req" aria-hidden="true">*</span>
+            </label>
+            <select
+              id="cpf-partnerType"
+              aria-invalid={errors.partnerType ? true : undefined}
+              aria-describedby={errors.partnerType ? 'cpf-partnerType-error' : undefined}
+              className={errors.partnerType ? 'invalid' : ''}
+              disabled={isSubmitting}
+              {...register('partnerType')}
+            >
+              {/* D-04: placeholder + plain labels — no helper text */}
+              <option value="" disabled>—</option>
+              <option value="Agent">Agent</option>
+              <option value="Commercial">Commercial</option>
+              <option value="Partenaire">Partenaire</option>
+            </select>
+            {errors.partnerType?.message && (
+              <p id="cpf-partnerType-error" role="alert" className="error-msg">
+                {t(errors.partnerType.message as DictKey, lang)}
               </p>
             )}
           </div>
