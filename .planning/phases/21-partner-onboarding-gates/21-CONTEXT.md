@@ -325,7 +325,192 @@ Enforcement is **process-only** (no code-level guard) — see D-04.
 
 </deferred>
 
+<plan_phase_addendum>
+## Plan-phase addendum (2026-05-29, Figma extraction)
+
+Established during `/gsd-plan-phase 21` after extracting Figma node
+`132:867` ("Paramètres — v1.3 sketch") via the Dev Mode MCP. These
+decisions are LOCKED, downstream of CONTEXT.md's <decisions> block,
+and binding on the planner.
+
+### D-06 (Page surface — Paramètres route)
+
+GATE-01 ships as a new **Paramètres page** matching Figma `132:867`,
+not a standalone password form. The page contains a single "Account"
+card divided into two sections:
+
+1. **Informations** (top section) — editable: Prénom, Nom, Adresse
+   e-mail. Avatar upload and Numéro de téléphone shown in Figma but
+   **explicitly out of scope** for Phase 21 (D-06b below).
+2. **Mot de passe** (bottom section, under separator line) — editable
+   password fields (D-07 below).
+
+Single action footer with "Annuler" + "Enregistrer les modifications"
+buttons. The Save button submits both sections; if only one section
+was modified, only that operation runs (D-06c).
+
+- **Route placement:** `/parametres` (FR-first naming, consistent with
+  existing `/coefficients`, `/partners`, `/proposals`, `/history`).
+  The planner confirms exact route group during research (likely
+  `app/(authed)/parametres/page.tsx` or the project's analog — verify
+  by reading the existing authed-route map).
+- **Sidebar nav:** NO new sidebar item. Access is via the user-menu
+  dropdown in the Topbar ("Antoine Rousseau ▾" → "Paramètres").
+  Figma shows the sidebar nav unchanged (Accueil / Nouvelle
+  proposition / Propositions / Aide). The user-menu dropdown does
+  not yet exist as an interactive component in the codebase — the
+  planner must add a small "Paramètres" entry there. If the topbar
+  user-menu component doesn't yet exist as a dropdown menu (the
+  current topbar may just display the name without a menu), the
+  planner adds it minimally to host the Paramètres link + the
+  existing "Se déconnecter" action.
+- **Hero copy:** Title = "Paramètres". Subtitle = "Changer vos
+  information et réinitialiser votre mot de passe." Figma's subtitle
+  has a typo ("vos information" → should be "vos informations").
+  **Preserve Figma's copy verbatim in the FR dict** — copy fidelity
+  to the design source-of-truth matters more than the typo. EN dict
+  uses the corrected English equivalent: "Update your information
+  and reset your password."
+
+### D-06b (Avatar + phone — explicitly deferred)
+
+Figma shows an avatar upload (with "Télécharger nouveau" button +
+"Taille de la photo de profil : 400px x 400px" hint) and a Numéro
+de téléphone field. Both are **OUT OF SCOPE for Phase 21**:
+
+- **Avatar upload** requires image-storage infrastructure (Vercel
+  Blob or equivalent) that doesn't yet exist in the project. Adding
+  it is a separate infra phase. Phase 21 renders a static
+  default-avatar placeholder (or initials, matching the existing
+  Topbar user menu pattern — "AR" for Antoine Rousseau) where Figma
+  shows the avatar image. No upload UI rendered.
+- **Numéro de téléphone** isn't a field on the existing User model.
+  Adding it requires a schema migration + Drizzle/Prisma type
+  regeneration + Better Auth user-schema extension. Out of scope
+  for v1.3. The phone field is **omitted from the rendered form** —
+  Phase 21's identity row contains only Prénom + Nom + Adresse e-mail.
+
+The planner documents these deferrals in PLAN.md and leaves a tracking
+note for a future "Account v2" phase (avatar + phone + any further
+profile fields).
+
+### D-06c (Single Save button — partial-success behavior)
+
+The Figma "Enregistrer les modifications" button submits both
+sections. Backend translates to two distinct Better Auth calls:
+
+- `authClient.updateUser({ name: ..., email: ... })` for identity
+  (only if Prénom/Nom/Email changed vs. the loaded session).
+- `authClient.changePassword({ currentPassword, newPassword,
+  revokeOtherSessions: true })` for password (only if password
+  fields are non-empty AND match each other).
+
+**Edge case — partial success:** If identity update succeeds but
+password change fails (wrong current password, weak new password,
+etc.), the UI surfaces the password error inline on the password
+section AND a success toast for the identity update. The user is
+not left wondering which half landed. Conversely if the password
+succeeds but updateUser fails (e.g., email collision — see D-06d
+on email-change verification), surface the identity error inline
+in the identity section + a success toast for the password.
+
+**Edge case — neither section dirty:** Save button is disabled
+(or no-op) when both sections are unchanged. Use react-hook-form's
+`formState.isDirty` per section, gated on the combined dirty state.
+
+### D-06d (Email change — verify-without-SMTP behavior)
+
+Better Auth's `updateUser` may trigger an email-change verification
+flow when SMTP is configured. CONTEXT.md pins "no SMTP" (deferred
+since v1.1). The planner MUST research and confirm during the
+research step:
+
+- Does Better Auth `updateUser` allow `email` updates **without**
+  verification when `sendChangeEmailVerification` is not wired? If
+  YES, identity edits proceed normally; the planner specifies that
+  configuration.
+- If Better Auth REQUIRES a verification flow for email changes
+  regardless of SMTP config, the planner **demotes email to
+  read-only** in this phase (rendered as static text, not an input)
+  and documents the demotion in PLAN.md. Email change then becomes
+  a v1.4 follow-up once SMTP lands.
+
+Discretion: the planner picks whichever path matches Better Auth's
+1.6.9 behavior. The user's preference is "edit email if possible,
+demote to read-only if Better Auth requires verification we can't
+satisfy."
+
+### D-07 (Password section — current-password challenge + confirm)
+
+Figma `132:867` shows ONLY a single "Nouveau mot de passe" input.
+This is intentionally extended for security:
+
+- Render THREE password inputs stacked vertically in the password
+  section (in this order):
+  1. **Mot de passe actuel** — required, prove identity before
+     change. Mapped to Better Auth `changePassword.currentPassword`.
+  2. **Nouveau mot de passe** — the new password (Figma's only
+     visible field). Mapped to Better Auth
+     `changePassword.newPassword`.
+  3. **Confirmer le nouveau mot de passe** — client-side equality
+     check vs. Nouveau mot de passe. Not sent to the server.
+- Each input uses the existing `Input Text` design-system component
+  (matches Figma's identity inputs visually) with `type="password"`.
+  Show/hide toggle is **not required by Figma**; planner discretion
+  (the secure default is no toggle; the convenience default is a
+  toggle). Pick whichever is simpler given the existing input
+  component.
+- Helper text below "Nouveau mot de passe": minimum 8 characters
+  (matches Better Auth's default minimum — confirm exact value in
+  research). FR + EN strings in dict.
+- **Document the deviation from Figma in PLAN.md** with a short
+  note: "Figma omits current-password + confirm fields; added for
+  security per Better Auth changePassword contract." This is the
+  binding deviation log for downstream Figma diffs.
+
+### D-08 (Session-invalidation on password change)
+
+Better Auth's `changePassword` supports `revokeOtherSessions: true`.
+Phase 21 always sets it to `true` (revoke OTHER sessions of the same
+user, keep the current session active so the user isn't kicked from
+the page they just changed the password on). No copy is shown in
+Figma announcing this; surface it via a small note under "Mot de
+passe actuel": "Modifier votre mot de passe vous déconnectera de vos
+autres appareils." (FR) / "Changing your password will sign you out
+of your other devices." (EN). Place the note inside the password
+section header area, not as a toast.
+
+### D-09 (Locale + i18n parity)
+
+Figma is FR-only (no EN variant present in the sketch). All new
+strings ship in BOTH `fr` and `en` dicts at compile time (the
+established parity-proof pattern catches drift). EN strings are the
+planner's translation of the FR copy.
+
+### D-10 (Figma deviation log — binding)
+
+PLAN.md MUST include a "Figma deviations" section listing every
+visible difference between the rendered UI and Figma node
+`132:867`. Required entries (planner adds more if it deviates
+elsewhere):
+
+- Avatar block replaced with initials placeholder (D-06b).
+- Numéro de téléphone field omitted (D-06b).
+- Three password fields instead of one (D-07).
+- "Modifier votre mot de passe vous déconnectera..." notice added
+  to password section (D-08).
+- Hero subtitle copy preserved verbatim including the "vos
+  information" typo for FR; corrected in EN (D-06).
+- Email field may be demoted to read-only pending Better Auth
+  verification-flow finding (D-06d).
+
+This becomes the artifact a future "Account v2" phase reads to
+understand what Phase 21 deliberately left undone.
+
+</plan_phase_addendum>
+
 ---
 
 *Phase: 21-partner-onboarding-gates*
 *Context gathered: 2026-05-29*
+*Plan-phase addendum: 2026-05-29 (Figma `132:867` extraction + user decisions on scope D-06–D-10)*
