@@ -271,7 +271,17 @@ Wave 3 (after 22-03 + 22-04):
   2. The generated PDF no longer contains a "Destinataire" block beneath the "Proposition de location financière" title; the remaining layout reflows cleanly with no blank gap where the block was.
   3. The byte-determinism CI gate passes with regenerated SHA-256 fixtures that reflect the new layout; the golden corpus includes at least one Agent/Commercial fixture asserting the commission-free loyer and the absence of any commission wording.
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+Wave 1:
+- [ ] 23-01-PLAN.md — PDF-01: PDF-scoped number sanitizer (U+202F/U+00A0 → space) + reproduction test; format.ts untouched
+
+Wave 2:
+- [ ] 23-02-PLAN.md — PDF-02: remove Destinataire block + dead LABELS/lbl() helpers + pdf.section.recipient dict keys; clean reflow
+
+Wave 3:
+- [ ] 23-03-PLAN.md — PDF-03: Agent/Commercial commission-free byte-determinism fixture + [BLOCKING] expected.sha256.txt regen + full PDF/ADMIN-09 regression
+
 **UI hint:** yes
 
 ### Phase 24: Admin Dual-View Toggle
