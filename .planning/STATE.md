@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
-status: planning
-last_updated: "2026-05-29T21:21:10.856Z"
-last_activity: 2026-05-29 — v1.4 roadmap created (4 phases, Phases 22-25)
+status: executing
+last_updated: "2026-05-29T21:42:09.358Z"
+last_activity: 2026-05-29 -- Phase 22 planning complete
 progress:
   total_phases: 25
   completed_phases: 20
-  total_plans: 110
+  total_plans: 115
   completed_plans: 109
   percent: 80
 ---
@@ -29,8 +29,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 22 of 4 v1.4 phases (Partner Types & Commission-Free Proposals)
 Plan: —
-Status: Ready to plan
-Last activity: 2026-05-29 — v1.4 roadmap created (4 phases, Phases 22-25)
+Status: Ready to execute
+Last activity: 2026-05-29 -- Phase 22 planning complete
 
 ## Phase 17 Performance Metrics
 
