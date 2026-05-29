@@ -1,0 +1,2 @@
+ALTER TABLE "users" ADD COLUMN "partner_type" text DEFAULT 'Partenaire' NOT NULL;--> statement-breakpoint
+ALTER TABLE "users" ADD CONSTRAINT "users_partner_type_check" CHECK ("users"."partner_type" IN ('Agent', 'Commercial', 'Partenaire'));
