@@ -2,16 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Design Refresh + Partner-Onboarding Ready
-status: ready_to_plan
-last_updated: 2026-05-27T13:46:38.729Z
-last_activity: 2026-05-27 -- Phase 20 execution started
+status: planning
+last_updated: "2026-05-29T16:23:43.603Z"
+last_activity: 2026-05-29 -- Phase 21 context gathered
 progress:
   total_phases: 21
-  completed_phases: 18
+  completed_phases: 19
   total_plans: 108
   completed_plans: 107
-  percent: 86
-stopped_at: Phase 20 complete (3/3) — ready to discuss Phase 21
+  percent: 90
+stopped_at: Phase 21 context gathered — ready to plan (Figma URL pending from Antoine before /gsd-plan-phase 21)
+resume_file: .planning/phases/21-partner-onboarding-gates/21-CONTEXT.md
 ---
 
 # State — Matrice Commerciale
