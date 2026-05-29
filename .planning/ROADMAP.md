@@ -246,7 +246,18 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   5. A PDF generated for an Agent or Commercial proposal contains no commission figure, no commission-derived wording, and renders the correct commission-free loyer; the `params_snapshot` records `partner_type` + `commission_applied: false` so the PDF is reproducible even if the partner's type changes later.
   6. The `tests/admin-09-grep-contracts.test.ts` suite gains new gates asserting zero commission leakage across the Agent/Commercial calc output, UI render paths, PDF template, server logs, and audit payloads; all existing 12 gates remain green.
 
-**Plans:** TBD
+**Plans:** 5 plans
+
+Wave 1 (parallel):
+- [ ] 22-01-PLAN.md — Schema: partner_type column + Better Auth registration + snapshot type + generated migration + idempotent backfill (PTYPE-01 schema, PTYPE-02, PTYPE-06 type)
+- [ ] 22-02-PLAN.md — Commission-free golden corpus via commissionPct:0 seam; formula.ts frozen (PTYPE-04)
+
+Wave 2 (parallel, after 22-01):
+- [ ] 22-03-PLAN.md — Admin surfaces: required type selector on create form + audited adminUpdatePartnerType + list badge/column (PTYPE-01, PTYPE-03)
+- [ ] 22-04-PLAN.md — Commission-free presentation end-to-end: wizard steps 2+3 structural absence + live preview + finalize snapshot (PTYPE-04, PTYPE-05, PTYPE-06)
+
+Wave 3 (after 22-03 + 22-04):
+- [ ] 22-05-PLAN.md — ADMIN-09 grep-contract extension + no-commission PDF 4-layer corpus for Agent/Commercial + full-suite regression (PTYPE-06, PTYPE-07)
 **UI hint:** yes
 
 ### Phase 23: PDF Rendering Fixes
