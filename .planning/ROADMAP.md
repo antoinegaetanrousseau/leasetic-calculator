@@ -246,11 +246,11 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
   5. A PDF generated for an Agent or Commercial proposal contains no commission figure, no commission-derived wording, and renders the correct commission-free loyer; the `params_snapshot` records `partner_type` + `commission_applied: false` so the PDF is reproducible even if the partner's type changes later.
   6. The `tests/admin-09-grep-contracts.test.ts` suite gains new gates asserting zero commission leakage across the Agent/Commercial calc output, UI render paths, PDF template, server logs, and audit payloads; all existing 12 gates remain green.
 
-**Plans:** 1/5 plans executed
+**Plans:** 2/5 plans executed
 
 Wave 1 (parallel):
 - [x] 22-01-PLAN.md — Schema: partner_type column + Better Auth registration + snapshot type + generated migration + idempotent backfill (PTYPE-01 schema, PTYPE-02, PTYPE-06 type)
-- [ ] 22-02-PLAN.md — Commission-free golden corpus via commissionPct:0 seam; formula.ts frozen (PTYPE-04)
+- [x] 22-02-PLAN.md — Commission-free golden corpus via commissionPct:0 seam; formula.ts frozen (PTYPE-04)
 
 Wave 2 (parallel, after 22-01):
 - [ ] 22-03-PLAN.md — Admin surfaces: required type selector on create form + audited adminUpdatePartnerType + list badge/column (PTYPE-01, PTYPE-03)
@@ -331,7 +331,7 @@ Wave 3 (after 22-03 + 22-04):
 | 19. New Capabilities | v1.3 | 2/2 | Complete | 2026-05-25 |
 | 20. Infra Hardening | v1.3 | 3/3 | Complete | 2026-05-27 |
 | 21. Partner-Onboarding Gates | v1.3 | 2/2 | Complete | 2026-05-29 |
-| 22. Partner Types & Commission-Free Proposals | v1.4 | 1/5 | In Progress|  |
+| 22. Partner Types & Commission-Free Proposals | v1.4 | 2/5 | In Progress|  |
 | 23. PDF Rendering Fixes | v1.4 | 0/? | Not started | - |
 | 24. Admin Dual-View Toggle | v1.4 | 0/? | Not started | - |
 | 25. Teal Rebrand & Polish | v1.4 | 0/? | Not started | - |
