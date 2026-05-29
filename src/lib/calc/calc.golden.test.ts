@@ -249,8 +249,171 @@ describe('CALC-06 golden corpus — edge cases (6 cases)', () => {
 });
 
 /**
- * Total case count = 12 + 8 + 4 + 6 = 30 cases
- * (CALC-06's "≥30 representative golden test cases" — D-1 enumeration satisfied.)
+ * Commission-free corpus — PTYPE-04.
  *
- * Static lexical gate: grep -c "  it(" src/lib/calc/calc.golden.test.ts ≥ 30.
+ * The commission-free formula is the frozen applyFormula evaluated with
+ * commissionPct: 0, which reduces to:
+ *   loyer = amount × coefficient / 100
+ *
+ * This is achieved purely via the existing commissionPct override seam in
+ * computeLoyer — formula.ts is NOT edited (frozen-formula invariant preserved).
+ *
+ * Coverage: 4 tranches × 3 durations = 12 individual it() cases.
+ * Each case asserts:
+ *   1. call0(amount, dur).computed.loyer equals expectedLoyerFree(amount, coeff) ±0.01 €
+ *   2. The commission-free loyer is strictly LESS than the Partenaire loyer
+ *      (call with fixtureComm: 5) for the same inputs — proving the branch drops
+ *      the commission factor.
+ *
+ * Individual it() calls (no for-loop) to preserve the static-count grep gate
+ * discipline from STATE.md.
+ */
+
+function expectedLoyerFree(amount: number, coeffStr: string): number {
+  return +((amount * Number(coeffStr)) / 100).toFixed(2);
+}
+
+function call0(amount: number | string, durationMonths: 36 | 48 | 60) {
+  return computeLoyer({
+    amountHT: typeof amount === 'string' ? amount : String(amount),
+    durationMonths,
+    validityDays: 30,
+    coefficients: fixtureCoeffs,
+    commissionPct: 0,
+    maxAmount: fixtureMax,
+  });
+}
+
+describe('commission-free corpus (Agent/Commercial — PTYPE-04)', () => {
+  // Tranche t1 (25 001 .. 50 000) representative: 30 000 €
+  it('free / t1 / 30 000 € / 36 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(30000, 36);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(30000, fixtureCoeffs.t1[36]), 2);
+      const partenaire = Number(call(30000, 36).computed.state === 'computed' ? (call(30000, 36).computed as { loyerHT: string }).loyerHT : '0');
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  it('free / t1 / 30 000 € / 48 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(30000, 48);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(30000, fixtureCoeffs.t1[48]), 2);
+      const partenaire = Number((call(30000, 48).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  it('free / t1 / 30 000 € / 60 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(30000, 60);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(30000, fixtureCoeffs.t1[60]), 2);
+      const partenaire = Number((call(30000, 60).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  // Tranche t2 (50 001 .. 100 000) representative: 75 000 €
+  it('free / t2 / 75 000 € / 36 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(75000, 36);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(75000, fixtureCoeffs.t2[36]), 2);
+      const partenaire = Number((call(75000, 36).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  it('free / t2 / 75 000 € / 48 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(75000, 48);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(75000, fixtureCoeffs.t2[48]), 2);
+      const partenaire = Number((call(75000, 48).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  it('free / t2 / 75 000 € / 60 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(75000, 60);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(75000, fixtureCoeffs.t2[60]), 2);
+      const partenaire = Number((call(75000, 60).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  // Tranche t3 (100 001 .. 250 000) representative: 150 000 €
+  it('free / t3 / 150 000 € / 36 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(150000, 36);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(150000, fixtureCoeffs.t3[36]), 2);
+      const partenaire = Number((call(150000, 36).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  it('free / t3 / 150 000 € / 48 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(150000, 48);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(150000, fixtureCoeffs.t3[48]), 2);
+      const partenaire = Number((call(150000, 48).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  it('free / t3 / 150 000 € / 60 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(150000, 60);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(150000, fixtureCoeffs.t3[60]), 2);
+      const partenaire = Number((call(150000, 60).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  // Tranche t4 (> 250 000, but ≤ fixtureMax = 500 000) representative: 400 000 €
+  it('free / t4 / 400 000 € / 36 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(400000, 36);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(400000, fixtureCoeffs.t4[36]), 2);
+      const partenaire = Number((call(400000, 36).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  it('free / t4 / 400 000 € / 48 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(400000, 48);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(400000, fixtureCoeffs.t4[48]), 2);
+      const partenaire = Number((call(400000, 48).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+  it('free / t4 / 400 000 € / 60 mo — loyer = amount × coeff / 100 and < Partenaire', () => {
+    const r = call0(400000, 60);
+    expect(r.computed.state).toBe('computed');
+    if (r.computed.state === 'computed') {
+      const free = Number(r.computed.loyerHT);
+      expect(free).toBeCloseTo(expectedLoyerFree(400000, fixtureCoeffs.t4[60]), 2);
+      const partenaire = Number((call(400000, 60).computed as { loyerHT: string }).loyerHT);
+      expect(free).toBeLessThan(partenaire);
+    }
+  });
+});
+
+/**
+ * Total case count = 12 + 8 + 4 + 6 + 12 = 42 cases
+ * (CALC-06 original: 30 + PTYPE-04 commission-free: 12)
+ *
+ * Static lexical gate: grep -c "  it(" src/lib/calc/calc.golden.test.ts ≥ 42.
  */
