@@ -8,9 +8,14 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { setPasswordSchema, type SetPasswordInput } from '@/lib/auth/schemas';
 import { redeemToken, type RedeemKind } from '@/lib/auth/redeem';
-// Import t + Lang + DictKey from dictionaries (not index.ts) — index.ts imports
+import {
+  strengthScore,
+  STRENGTH_KEYS,
+  STRENGTH_COLORS,
+} from '@/lib/auth/strength';
+// Import t + Lang from dictionaries (not index.ts) — index.ts imports
 // next/headers which is Server-Component-only and cannot be bundled for client.
-import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
+import { t, type Lang } from '@/lib/i18n/dictionaries';
 
 interface SetPasswordFormProps {
   token: string;
@@ -18,42 +23,9 @@ interface SetPasswordFormProps {
   lang: Lang;
 }
 
-/**
- * Password strength score (0–4) per UI-SPEC §Invite:
- *   0 = empty
- *   1 = < 8 chars
- *   2 = ≥8 chars + number
- *   3 = ≥8 chars + number + upper ("Strong")
- *   4 = ≥12 chars + number + upper + symbol ("Very strong")
- */
-function strengthScore(pwd: string): 0 | 1 | 2 | 3 | 4 {
-  if (!pwd) return 0;
-  const hasMinLength = pwd.length >= 8;
-  if (!hasMinLength) return 1;
-  const hasNumber = /\d/.test(pwd);
-  const hasUpper = /[A-Z]/.test(pwd);
-  const hasLongAndSymbol = pwd.length >= 12 && /[^A-Za-z0-9]/.test(pwd);
-  if (hasNumber && hasUpper && hasLongAndSymbol) return 4;
-  if (hasNumber && hasUpper) return 3;
-  if (hasNumber) return 2;
-  return 1;
-}
-
-const STRENGTH_KEYS: Record<0 | 1 | 2 | 3 | 4, DictKey> = {
-  0: 'auth.password.strength.weak',
-  1: 'auth.password.strength.weak',
-  2: 'auth.password.strength.medium',
-  3: 'auth.password.strength.strong',
-  4: 'auth.password.strength.very_strong',
-};
-
-const STRENGTH_COLORS: Record<0 | 1 | 2 | 3 | 4, string> = {
-  0: 'var(--border)',
-  1: 'var(--danger)',
-  2: '#e08530',
-  3: 'var(--teal)',
-  4: 'var(--gd)',
-};
+// strengthScore / STRENGTH_KEYS / STRENGTH_COLORS moved to
+// src/lib/auth/strength.ts (Phase 21 / Plan 21-01 Task 3) so /parametres
+// ParametresForm can reuse them. Kept the import surface unchanged.
 
 export function SetPasswordForm({ token, kind, lang }: SetPasswordFormProps) {
   const router = useRouter();
