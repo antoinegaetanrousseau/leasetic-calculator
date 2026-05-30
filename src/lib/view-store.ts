@@ -39,6 +39,19 @@ export function getViewSnapshot(): ViewMode {
 /**
  * Server-rendered snapshot: always DEFAULT_VIEW ('admin').
  * Matches VIEW-03 — a fresh login always starts in Admin view.
+ *
+ * WR-03 (known shift, documented): because the server snapshot is always
+ * 'admin', an admin whose stored view is 'agent' gets one server/initial-client
+ * render with the 6-item admin nav, then useSyncExternalStore re-renders to the
+ * 4-item agent nav once getViewSnapshot() reads sessionStorage. This is a
+ * one-frame admin→agent nav flip on each page load for admins working in agent
+ * view — the same class as the documented collapse one-frame shift
+ * (RetractableSidebar.tsx §6.3) and is a UX detail, not a security issue
+ * (non-admins never see admin nav — isAdmin gates that, see RetractableSidebar
+ * navItems). Eliminating it requires cookie-driven SSR so the server render can
+ * match the stored view (anticipated alongside the Phase 13 cookie-collapse
+ * upgrade); deferred as out-of-scope here. Tracked as a known shift, not a
+ * regression.
  */
 export function getServerViewSnapshot(): ViewMode {
   return DEFAULT_VIEW;
