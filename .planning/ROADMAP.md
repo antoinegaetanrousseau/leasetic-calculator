@@ -363,7 +363,11 @@ Wave 2 (after 26-01):
 
   1. The status chip on the home "Propositions récentes" list displays its full label (e.g. "Actif") with no text clipping, no vertical misalignment, and no fixed-width artifact across desktop viewport widths in both light and dark mode.
   2. The status chip on the `/proposals` table renders with the same content-hugging behavior as the home surface, correct in both light and dark mode; no regression introduced on draft or archived rows.
-**Plans**: TBD
+**Plans**: 2 plans
+
+- [ ] 27-01-PLAN.md — Home "Propositions récentes" recent-list row: reorder to trailing content-hugging chip (UIFIX-02)
+- [ ] 27-02-PLAN.md — Light+dark human-verify on home + /proposals; /proposals post-Phase-26 re-verification (UIFIX-02, UIFIX-03)
+
 **UI hint**: yes
 
 ---
@@ -398,7 +402,7 @@ Wave 2 (after 26-01):
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
-| 27. Status-Pill Rendering Fix | v1.5 | 0/TBD | Not started | - |
+| 27. Status-Pill Rendering Fix | v1.5 | 0/2 | Planning | - |
 
 ---
 
