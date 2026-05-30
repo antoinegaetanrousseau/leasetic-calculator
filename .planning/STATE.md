@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
 status: executing
-last_updated: "2026-05-29T23:48:31.267Z"
-last_activity: 2026-05-29 -- Phase 23 planning complete
+last_updated: "2026-05-30T00:04:56.805Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 25
   completed_phases: 21
   total_plans: 118
-  completed_plans: 114
+  completed_plans: 115
   percent: 84
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 22 — partner-types-commission-free-proposals
+**Current focus:** Phase 23 — pdf-rendering-fixes
 
 ## Current Position
 
-Phase: 22 (partner-types-commission-free-proposals) — EXECUTING
-Plan: 5 of 5
+Phase: 23 (pdf-rendering-fixes) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-05-29 -- Phase 23 planning complete
+Last activity: 2026-05-30
 
 ## Phase 22 Performance Metrics
 
@@ -364,6 +364,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 22 P03 | 9min | 3 tasks | 14 files |
 | Phase 22 P04 | ~12min | 3 tasks | varies files |
 | Phase 22 P05 | ~12min | 3 tasks | 3 files |
+| Phase 23-pdf-rendering-fixes P01 | ~10min | 2 tasks | 3 files |
 
 ## Decisions
 

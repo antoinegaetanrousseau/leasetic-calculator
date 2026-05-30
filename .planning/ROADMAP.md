@@ -271,10 +271,10 @@ Wave 3 (after 22-03 + 22-04):
   2. The generated PDF no longer contains a "Destinataire" block beneath the "Proposition de location financière" title; the remaining layout reflows cleanly with no blank gap where the block was.
   3. The byte-determinism CI gate passes with regenerated SHA-256 fixtures that reflect the new layout; the golden corpus includes at least one Agent/Commercial fixture asserting the commission-free loyer and the absence of any commission wording.
 
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Wave 1:
-- [ ] 23-01-PLAN.md — PDF-01: PDF-scoped number sanitizer (U+202F/U+00A0 → space) + reproduction test; format.ts untouched
+- [x] 23-01-PLAN.md — PDF-01: PDF-scoped number sanitizer (U+202F/U+00A0 → space) + reproduction test; format.ts untouched
 
 Wave 2:
 - [ ] 23-02-PLAN.md — PDF-02: remove Destinataire block + dead LABELS/lbl() helpers + pdf.section.recipient dict keys; clean reflow
@@ -342,7 +342,7 @@ Wave 3:
 | 20. Infra Hardening | v1.3 | 3/3 | Complete | 2026-05-27 |
 | 21. Partner-Onboarding Gates | v1.3 | 2/2 | Complete | 2026-05-29 |
 | 22. Partner Types & Commission-Free Proposals | v1.4 | 5/5 | Complete   | 2026-05-29 |
-| 23. PDF Rendering Fixes | v1.4 | 0/? | Not started | - |
+| 23. PDF Rendering Fixes | v1.4 | 1/3 | In Progress|  |
 | 24. Admin Dual-View Toggle | v1.4 | 0/? | Not started | - |
 | 25. Teal Rebrand & Polish | v1.4 | 0/? | Not started | - |
 
