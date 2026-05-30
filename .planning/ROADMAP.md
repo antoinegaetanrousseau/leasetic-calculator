@@ -100,7 +100,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 ### v1.4 — Partner Types, Admin Dual-View & Rebrand (Phases 22-25)
 
 - [x] **Phase 22: Partner Types & Commission-Free Proposals** — `partner_type` enum + Drizzle migration + backfill; commission-free calc variant for Agent/Commercial; UI surfaces (selector on create/edit form, commission structurally absent from wizard + preview); commission-free PDF render variant + snapshot integrity; ADMIN-09 grep-contract suite extended (completed 2026-05-29)
-- [ ] **Phase 23: PDF Rendering Fixes** — Root-cause spike + fix for number/typography glyph overlap; remove "Destinataire" block; regenerate byte-determinism fixture; extend golden corpus to cover Agent/Commercial commission-free render
+- [x] **Phase 23: PDF Rendering Fixes** — Root-cause spike + fix for number/typography glyph overlap; remove "Destinataire" block; regenerate byte-determinism fixture; extend golden corpus to cover Agent/Commercial commission-free render (completed 2026-05-30)
 - [ ] **Phase 24: Admin Dual-View Toggle** — Admin-only Admin/Agent view toggle in the bottom-left settings area; nav remaps between admin and agent route sets; session-only (no persistence); authorization unchanged in both views
 - [ ] **Phase 25: Teal Rebrand & Polish** — Accent green → `#2D7A8C` at design-token layer (light + dark, WCAG AA); admin-home label changes; status-pill adaptive sizing fix
 
@@ -271,7 +271,7 @@ Wave 3 (after 22-03 + 22-04):
   2. The generated PDF no longer contains a "Destinataire" block beneath the "Proposition de location financière" title; the remaining layout reflows cleanly with no blank gap where the block was.
   3. The byte-determinism CI gate passes with regenerated SHA-256 fixtures that reflect the new layout; the golden corpus includes at least one Agent/Commercial fixture asserting the commission-free loyer and the absence of any commission wording.
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Wave 1:
 - [x] 23-01-PLAN.md — PDF-01: PDF-scoped number sanitizer (U+202F/U+00A0 → space) + reproduction test; format.ts untouched
@@ -280,7 +280,7 @@ Wave 2:
 - [x] 23-02-PLAN.md — PDF-02: remove Destinataire block + dead LABELS/lbl() helpers + pdf.section.recipient dict keys; clean reflow
 
 Wave 3:
-- [ ] 23-03-PLAN.md — PDF-03: Agent/Commercial commission-free byte-determinism fixture + [BLOCKING] expected.sha256.txt regen + full PDF/ADMIN-09 regression
+- [x] 23-03-PLAN.md — PDF-03: Agent/Commercial commission-free byte-determinism fixture + [BLOCKING] expected.sha256.txt regen + full PDF/ADMIN-09 regression
 
 **UI hint:** yes
 
@@ -342,7 +342,7 @@ Wave 3:
 | 20. Infra Hardening | v1.3 | 3/3 | Complete | 2026-05-27 |
 | 21. Partner-Onboarding Gates | v1.3 | 2/2 | Complete | 2026-05-29 |
 | 22. Partner Types & Commission-Free Proposals | v1.4 | 5/5 | Complete   | 2026-05-29 |
-| 23. PDF Rendering Fixes | v1.4 | 2/3 | In Progress|  |
+| 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
 | 24. Admin Dual-View Toggle | v1.4 | 0/? | Not started | - |
 | 25. Teal Rebrand & Polish | v1.4 | 0/? | Not started | - |
 
