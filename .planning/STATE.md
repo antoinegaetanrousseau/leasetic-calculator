@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Partner Types, Admin Dual-View & Rebrand
-status: shipped
-last_updated: "2026-05-30T17:30:00.000Z"
-last_activity: 2026-05-30 -- v1.4 milestone closed + archived (tag v1.4 created + pushed)
+milestone: v1.5
+milestone_name: Proposal List Actions & Pill Fix
+status: planning
+last_updated: "2026-05-30T16:02:22.610Z"
+last_activity: 2026-05-30
 progress:
-  total_phases: 25
-  completed_phases: 24
-  total_plans: 122
-  completed_plans: 121
-  percent: 97
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State — Matrice Commerciale
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Milestone: v1.4 — SHIPPED & ARCHIVED 2026-05-30 (phases 22-25, 12 plans, 1184 tests)
-Phase: none active — milestone closed
-Status: v1.4 complete; archives in `milestones/v1.4-*` + `reports/MILESTONE_SUMMARY-v1.4.md`; tag `v1.4` pushed
-Next: `/gsd-new-milestone`
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-30 — Milestone v1.5 started
 
 ## Deferred Items
 
