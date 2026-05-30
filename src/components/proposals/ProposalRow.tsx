@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate } from '@/lib/i18n/format';
@@ -19,12 +18,17 @@ export interface ProposalRowProps {
   nowMs?: number;
   /** When true, render the deleted-row variant (opacity 0.7 + StatusChip 'deleted' + Restore slot). */
   deleted?: boolean;
-  /** Optional Restore button slot — Plan 08-12 fills this in for the deleted view. */
+  /**
+   * Optional Restore button slot — kept for backward compatibility; no longer rendered in
+   * the finalized path (action buttons now arrive via actionsSlot, D-06).
+   */
   restoreSlot?: React.ReactNode;
   /** When true, render a clickable div (not a Link) with draftActionsSlot on the right. */
   draftMode?: boolean;
   /** Icon action buttons rendered in the rightmost column for draft rows. */
   draftActionsSlot?: React.ReactNode;
+  /** Icon action buttons rendered on the right for finalized (active/expired/deleted) rows (D-06). */
+  actionsSlot?: React.ReactNode;
 }
 
 /**
@@ -50,6 +54,7 @@ export function ProposalRow({
   restoreSlot = null,
   draftMode = false,
   draftActionsSlot = null,
+  actionsSlot = null,
 }: ProposalRowProps) {
   const router = useRouter();
   const className = deleted ? 'list-row is-deleted' : draftMode ? 'list-row is-draft' : 'list-row';
@@ -119,9 +124,18 @@ export function ProposalRow({
   }
 
   return (
-    <Link href={`/proposals/${row.id}`} className={className} aria-label={ariaLabel}>
+    <div
+      className={className}
+      role="button"
+      tabIndex={0}
+      aria-label={ariaLabel}
+      onClick={() => router.push(`/proposals/${row.id}`)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') router.push(`/proposals/${row.id}`);
+      }}
+    >
       {columns}
-      {deleted && restoreSlot}
-    </Link>
+      {actionsSlot}
+    </div>
   );
 }
