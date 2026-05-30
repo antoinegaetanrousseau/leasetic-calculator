@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { LogOut, ChevronDown, Settings } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
+import { clearView } from '@/lib/view-store';
 
 interface UserMenuProps {
   displayName: string;
@@ -54,6 +55,8 @@ export function UserMenu({ displayName, email, lang }: UserMenuProps) {
   const handleLogout = async () => {
     // AUTH-18 / D-24: official client function only — never custom POST.
     await authClient.signOut();
+    // D-04 / VIEW-03: clear session view flag so a fresh login always lands in Admin view.
+    clearView();
     // The Sonner success toast is shown on /login via the ?logged_out=1 query
     // param pickup in LoginForm (Plan 06-05).
     router.push('/login?logged_out=1');
