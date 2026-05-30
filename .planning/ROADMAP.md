@@ -334,7 +334,7 @@ Plans:
 **Plans:** 2 plans
 
 - [x] 25-01-PLAN.md — Admin-home label changes (COPY-01..04): FR+EN dict edits, parity proof green
-- [ ] 25-02-PLAN.md — Status-pill hug-content fix (UIFIX-01): .list-row status track to max-content
+- [x] 25-02-PLAN.md — Status-pill hug-content fix (UIFIX-01): .list-row status track to max-content
 
 **UI hint:** yes
 
@@ -368,7 +368,7 @@ Plans:
 | 22. Partner Types & Commission-Free Proposals | v1.4 | 5/5 | Complete   | 2026-05-29 |
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
-| 25. Admin-Home Labels & Pill Fix | v1.4 | 0/? | Not started | - |
+| 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
 
 ---
 

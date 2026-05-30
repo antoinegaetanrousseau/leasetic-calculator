@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
 status: executing
-last_updated: "2026-05-30T14:43:00.000Z"
-last_activity: 2026-05-30 -- Phase 25 Plan 01 complete (COPY-01..04)
+last_updated: "2026-05-30T16:39:00.000Z"
+last_activity: 2026-05-30 -- Phase 25 Plan 02 complete (UIFIX-01 status-pill hug fix)
 progress:
   total_phases: 25
-  completed_phases: 23
+  completed_phases: 24
   total_plans: 122
-  completed_plans: 120
-  percent: 93
+  completed_plans: 121
+  percent: 97
 ---
 
 # State — Matrice Commerciale
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 25 (teal-rebrand-polish) — EXECUTING
-Plan: 1 of 2 complete — next: Plan 02 (UIFIX-01)
-Status: Executing Phase 25
-Last activity: 2026-05-30 -- Phase 25 Plan 01 complete (COPY-01..04 admin-home label changes)
+Phase: 25 (teal-rebrand-polish) — COMPLETE
+Plan: 2 of 2 complete — all plans done
+Status: Phase 25 complete
+Last activity: 2026-05-30 -- Phase 25 Plan 02 complete (UIFIX-01 status-pill hug fix)
 
 ## Phase 22 Performance Metrics
 
