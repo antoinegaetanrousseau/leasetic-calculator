@@ -18,11 +18,6 @@ export interface ProposalRowProps {
   nowMs?: number;
   /** When true, render the deleted-row variant (opacity 0.7 + StatusChip 'deleted' + Restore slot). */
   deleted?: boolean;
-  /**
-   * Optional Restore button slot — kept for backward compatibility; no longer rendered in
-   * the finalized path (action buttons now arrive via actionsSlot, D-06).
-   */
-  restoreSlot?: React.ReactNode;
   /** When true, render a clickable div (not a Link) with draftActionsSlot on the right. */
   draftMode?: boolean;
   /** Icon action buttons rendered in the rightmost column for draft rows. */
@@ -51,7 +46,6 @@ export function ProposalRow({
   row,
   lang,
   deleted = false,
-  restoreSlot = null,
   draftMode = false,
   draftActionsSlot = null,
   actionsSlot = null,
