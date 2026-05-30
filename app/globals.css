@@ -414,7 +414,11 @@ input[aria-invalid="true"] {
 
 .list-row {
   display: grid;
-  grid-template-columns: 1fr 100px 130px 100px max-content;
+  /* 6th `auto` track holds the right-aligned row-action slot (Archive/Restore).
+     Active/expired rows now render an actionsSlot (Phase 26); without this track
+     the extra child wrapped onto a new implicit grid row (icon dropped below).
+     Drafts (.is-draft) and deleted (.is-deleted) already declare the same track. */
+  grid-template-columns: 1fr 100px 130px 100px max-content auto;
   align-items: center;
   gap: 16px;
   padding: 16px 16px;
