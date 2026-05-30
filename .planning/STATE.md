@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
 status: executing
-last_updated: "2026-05-30T12:05:18.089Z"
-last_activity: 2026-05-30 -- Phase 24 planning complete
+last_updated: "2026-05-30T12:11:24.476Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 25
   completed_phases: 22
   total_plans: 120
-  completed_plans: 117
+  completed_plans: 118
   percent: 88
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 23 — pdf-rendering-fixes
+**Current focus:** Phase 24 — admin-dual-view-toggle
 
 ## Current Position
 
-Phase: 23 (pdf-rendering-fixes) — EXECUTING
-Plan: 3 of 3
+Phase: 24 (admin-dual-view-toggle) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-05-30 -- Phase 24 planning complete
+Last activity: 2026-05-30
 
 ## Phase 22 Performance Metrics
 
@@ -366,6 +366,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 22 P05 | ~12min | 3 tasks | 3 files |
 | Phase 23-pdf-rendering-fixes P01 | ~10min | 2 tasks | 3 files |
 | Phase 23-pdf-rendering-fixes P03 | ~8min | 3 tasks | 3 files |
+| Phase 24-admin-dual-view-toggle P01 | 2min | 2 tasks | 4 files |
 
 ## Decisions
 
@@ -415,3 +416,4 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 19]: Admin Home grid changed from repeat(3,1fr) inline style to Tailwind grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 for 4-card responsive layout
 - [Phase ?]: Phase 22-01 migration ordinal is 0005_workable_yellow_claw.sql (drizzle-kit auto-assigned after repairing an orphaned journal entry)
 - [Phase ?]: users.partner_type registered with input:false in Better Auth so partners cannot self-escalate via /api/auth/update-user (T-22-01-E)
+- [Phase ?]: view-store.ts has no 'use client'

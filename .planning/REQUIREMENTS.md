@@ -28,7 +28,7 @@ The headline feature. Introduces a `partner_type` dimension that conditions prop
 
 - [ ] **VIEW-01**: An admin-level user sees an **Admin / Agent** view toggle in the bottom-left settings area (alongside the theme + locale controls). Non-admin users never see the toggle.
 - [ ] **VIEW-02**: Choosing **Agent** view remaps the navigation to the agent route set (Accueil `/`, Nouvelle proposition, Propositions `/proposals`, Aide). Choosing **Admin** view remaps to the admin route set (Accueil `/[adminSegment]`, Coefficients, Partenaires `/[adminSegment]/partners`, Toutes les propositions `/[adminSegment]/lc-references`, Aide).
-- [ ] **VIEW-03**: On each login an admin lands in **Admin** view by default; the toggle choice is **session-only** and resets after logout (no cookie/DB persistence).
+- [x] **VIEW-03**: On each login an admin lands in **Admin** view by default; the toggle choice is **session-only** and resets after logout (no cookie/DB persistence).
 - [ ] **VIEW-04**: The toggle is a navigation/landing convenience only — it does not alter authorization (the admin keeps admin rights in both views) and does not expose admin-only data inside the agent view beyond what the agent routes already render.
 
 ### PDF Rendering Fixes (PDF)
