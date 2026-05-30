@@ -87,7 +87,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 ### v1.5 — Proposal List Actions & Pill Fix (Phases 26-27)
 
-- [ ] **Phase 26: Active/Expired Row Actions** — Archive + Delete icon buttons on non-draft proposal rows; ADMIN-09 envelope held (19-gate grep suite stays green)
+- [ ] **Phase 26: Active/Expired Row Actions** — Archive icon button on non-draft proposal rows + Restore in Archivées (Delete descoped); ADMIN-09 envelope held (19-gate grep suite stays green)
 - [ ] **Phase 27: Status-Pill Rendering Fix** — Content-hugging `.chip` sizing on home "Propositions récentes" list and `/proposals` table; light + dark verified
 
 ---
@@ -328,15 +328,16 @@ Plans:
 
 ### Phase 26: Active/Expired Row Actions
 
-**Goal:** Partners can archive or delete any active or expired proposal directly from the `/proposals` row, using the same icon-button pattern already wired for draft rows — with the ADMIN-09 envelope held throughout.
+**Goal:** Partners can ARCHIVE any active or expired proposal directly from the `/proposals` row (and RESTORE soft-deleted proposals from the Archivées view), using the same icon-button pattern already wired for draft rows — with the ADMIN-09 envelope held throughout.
 **Depends on:** Phase 25 (v1.4 complete; 19-gate grep suite baseline; `DraftActionsClient` pattern established)
-**Requirements:** ROWACT-01, ROWACT-02, ROWACT-03, ROWACT-04
+**Requirements:** ROWACT-01, ROWACT-03, ROWACT-04, ROWACT-05 *(ROWACT-02 descoped)*
 **Success Criteria** (what must be TRUE):
 
   1. From `/proposals`, archiving an active or expired proposal via its per-row Archive icon button moves it to the Archivées view without a full-page navigation; the row disappears from the Actives list and reappears in the Archivées list.
-  2. From `/proposals`, clicking the Delete icon button on an active or expired row shows a confirmation prompt; confirming soft-deletes the proposal so it remains accessible via the Recently Deleted toggle.
-  3. Draft rows continue to show Edit + Archive + Delete unchanged; active and expired rows show only Archive + Delete (no Edit button).
+  2. From the Archivées view, clicking the per-row Restore icon button on a soft-deleted proposal returns it to the Actives list in place (no full-page navigation).
+  3. Draft rows continue to show Edit + Archive + Delete unchanged; active and expired rows show ONLY Archive (no Edit, no Delete).
   4. `ProposalRowDto` carries no `params_snapshot` or commission data; the 19-gate grep-contract suite passes without modification.
+  5. Clicking an active/expired row body still opens the proposal detail page; the Archive/Restore icon button acts without navigating (stopPropagation).
 
 > **Scope note (planner, 2026-05-30 — D-01).** Per-row Delete on finalized rows (ROWACT-02) is descoped to Archive-only; a per-row Restore is added in the Archivees view (D-02). Plan 26-03 reconciles the Goal + criteria above and REQUIREMENTS.md at execute time. See 26-CONTEXT.md.
 
@@ -401,4 +402,4 @@ Wave 2 (after 26-01):
 
 ---
 
-*Last updated: 2026-05-30 — Phase 26 planned (3 plans, 2 waves). Archive-only descope (D-01): ROWACT-02 dropped, ROWACT-05 Restore added; goal/criteria + REQUIREMENTS.md reconciled by Plan 26-03 at execute time.*
+*Last updated: 2026-05-30 — Phase 26 Archive-only descope (D-01) reconciled: Goal/criteria updated to Archive + Restore; Delete criterion replaced with Restore; ROWACT-02 descoped; v1.5 bullet updated.*
