@@ -73,6 +73,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ROWACT-05 | Phase 26 | Mapped |
 | UIFIX-02 | Phase 27 | Mapped |
 | UIFIX-03 | Phase 27 | Mapped |
+| BRAND-01 | — | ⊘ Shelved (Future Requirements — descoped v1.4 Phase 25) |
+| BRAND-02 | — | ⊘ Shelved (Future Requirements — descoped v1.4 Phase 25) |
+| BRAND-03 | — | ⊘ Shelved (Future Requirements — descoped v1.4 Phase 25) |
 
 **Coverage:**
 - v1.5 requirements: 7 defined; 6 active + 1 descoped (ROWACT-02)
