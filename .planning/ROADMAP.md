@@ -337,7 +337,20 @@ Plans:
   2. From `/proposals`, clicking the Delete icon button on an active or expired row shows a confirmation prompt; confirming soft-deletes the proposal so it remains accessible via the Recently Deleted toggle.
   3. Draft rows continue to show Edit + Archive + Delete unchanged; active and expired rows show only Archive + Delete (no Edit button).
   4. `ProposalRowDto` carries no `params_snapshot` or commission data; the 19-gate grep-contract suite passes without modification.
-**Plans**: TBD
+
+> **Scope note (planner, 2026-05-30 — D-01).** Per-row Delete on finalized rows (ROWACT-02) is descoped to Archive-only; a per-row Restore is added in the Archivees view (D-02). Plan 26-03 reconciles the Goal + criteria above and REQUIREMENTS.md at execute time. See 26-CONTEXT.md.
+
+**Plans:** 3 plans
+
+Wave 1 (parallel):
+
+- [ ] 26-01-PLAN.md — i18n keys (FR+EN) + shared RowActionsClient (Archive for active/expired, Restore for deleted, keyed off displayStatus) — ROWACT-01/03/04
+- [ ] 26-03-PLAN.md — Doc reconciliation: REQUIREMENTS.md + ROADMAP.md to Archive-only (ROWACT-02 descoped, ROWACT-03 rewritten, ROWACT-05 Restore added)
+
+Wave 2 (after 26-01):
+
+- [ ] 26-02-PLAN.md — Wire RowActionsClient into ProposalRow (clickable-div + actionsSlot, D-06) + ProposalsList (mount per displayStatus, D-03) + human-verify checkpoint — ROWACT-01/03/04
+
 **UI hint**: yes
 
 ### Phase 27: Status-Pill Rendering Fix
@@ -383,9 +396,9 @@ Plans:
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
-| 26. Active/Expired Row Actions | v1.5 | 0/TBD | Not started | - |
+| 26. Active/Expired Row Actions | v1.5 | 0/3 | Not started | - |
 | 27. Status-Pill Rendering Fix | v1.5 | 0/TBD | Not started | - |
 
 ---
 
-*Last updated: 2026-05-30 — v1.5 roadmap created (2 phases, 26-27; 6 requirements: ROWACT-01..04 + UIFIX-02..03). Phase numbering continues from v1.4 (ended Phase 25).*
+*Last updated: 2026-05-30 — Phase 26 planned (3 plans, 2 waves). Archive-only descope (D-01): ROWACT-02 dropped, ROWACT-05 Restore added; goal/criteria + REQUIREMENTS.md reconciled by Plan 26-03 at execute time.*
