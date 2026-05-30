@@ -1,5 +1,48 @@
 # Milestones — Matrice Commerciale
 
+## v1.5 — Proposal List Actions & Pill Fix
+
+**Shipped:** 2026-05-30
+**Phases:** 2 (26-27) | **Plans:** 5 | **Plan↔Summary parity:** 5/5
+**Requirements:** 6/6 active satisfied (ROWACT-02 per-row Delete descoped → Archive-only, D-01)
+**Tests:** 1184 passing / 4 skipped (env-gated) / 0 failed · typecheck + `eslint --max-warnings=0` clean
+**Git range:** `add7599..8dfb1d6` (37 commits since v1.4 tag · code +2,277 / −51 across 30 files)
+**Timeline:** 2026-05-30 (1 day)
+**Known deferred items:** 4 (stale planning artifacts from v1.1/v1.4 — see `STATE.md` Deferred Items)
+
+### What shipped
+
+A focused UI-regression milestone on the partner `/proposals` surface — no change to the core
+proposal flow. Restored per-row management actions: active/expired rows now expose a per-row
+**Archive** icon button (instant in-place refresh + toast), the Archivées view (`?archived=1`)
+gains a per-row **Restore**, and draft rows keep their existing Edit + Archive + Delete set — all
+without disturbing the ADMIN-09 commission-invisibility envelope (19-gate grep-contract suite stays
+green). Per-row Delete on finalized rows was descoped mid-milestone (D-01): given the single
+soft-delete state, Archive and Delete collapse to the same operation, so a single Archive button
+ships. Separately, the status-pill rendering regression was fixed — the chip on both the home
+"Propositions récentes" list and the `/proposals` table now hugs its content adaptively (trailing
+`max-content` grid track), full label, aligned, in light and dark; the chip component + color
+tokens stayed frozen.
+
+### Key accomplishments
+
+- **Active/expired row actions** — per-row Archive on non-draft rows + Restore in the Archivées view; instant in-place refresh + toast; body-click navigation preserved; `ProposalRowDto` never carries commission/`params_snapshot`; ADMIN-09 19-gate grep suite green (Phase 26: ROWACT-01/03/04/05; ROWACT-02 descoped D-01)
+- **Status-pill rendering fix** — home "Propositions récentes" chip moved to a trailing content-hugging `max-content` grid track with a `justifySelf:'start'` wrapper, eliminating the fixed-90px stretch/clip; `/proposals` re-verified post-Phase-26 row-action slots; `globals.css` `.chip*` + `StatusChip.tsx` untouched (Phase 27: UIFIX-02/03)
+
+### Verification
+
+- Phase 26 — 3/3 plans verified; Phase 27 — 2/2 plans verified + **human-tested** (both surfaces, light + dark, FR + EN).
+- Full vitest suite 1184 passing / 0 failed; `tsc --noEmit` clean; `eslint --max-warnings=0` clean.
+- Code review (Phase 27, standard depth): 0 critical / 0 warning / 2 info (inert CSS, non-blocking).
+
+### Known gaps
+None — all active v1.5 requirements satisfied. (Teal rebrand BRAND-01/02/03 remains shelved as Future Requirements, descoped since v1.4 Phase 25.)
+
+### Archive
+- `milestones/v1.5-ROADMAP.md` · `milestones/v1.5-REQUIREMENTS.md`
+
+---
+
 ## v1.4 — Partner Types, Admin Dual-View & Rebrand
 
 **Shipped:** 2026-05-30

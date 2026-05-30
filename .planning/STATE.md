@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Proposal List Actions & Pill Fix
-status: Phase 27 shipped — pushed to origin/main (6813044)
-last_updated: "2026-05-30T21:07:14.242Z"
-last_activity: 2026-05-30
+status: Awaiting next milestone
+last_updated: "2026-05-30T21:24:31.590Z"
+last_activity: 2026-05-30 — Milestone v1.5 completed and archived
 progress:
   total_phases: 12
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 44
-  completed_plans: 126
-  percent: 92
+  completed_plans: 44
+  percent: 100
 ---
 
 # State — Matrice Commerciale
@@ -27,15 +27,18 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 27
-Plan: Not started
-Status: Phase 27 shipped — pushed to origin/main (6813044)
-Last activity: 2026-05-30
+Phase: Milestone v1.5 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-30 — Milestone v1.5 completed and archived
 
 ## Deferred Items
 
-Items acknowledged and deferred at v1.4 milestone close on 2026-05-30. All are stale planning
-artifacts from already-shipped work — none are v1.4 functional gaps (the v1.4 audit passed 19/19).
+Items acknowledged and deferred at v1.4 milestone close on 2026-05-30, and re-acknowledged
+unchanged at v1.5 close on 2026-05-30. All are stale planning artifacts from already-shipped
+work — none are v1.4 or v1.5 functional gaps (v1.4 audit passed 19/19; v1.5 phases 26-27 verified
+
++ human-tested). The Phase 22 cold-start UAT blocker was superseded by the Phase 23 migration apply.
 
 | Category | Item | Status |
 |----------|------|--------|

@@ -247,14 +247,18 @@ All 19 active v1.4 requirements shipped — 4 phases (22–25), no documented pa
 - ✓ Admin dual-view toggle (admin-only, session-only, server-derived authz) — v1.4 (VIEW-01..04)
 - ✓ Admin-home label changes + status-pill adaptive sizing — v1.4 (COPY-01..04, UIFIX-01)
 
-### Active (v1.5 — Proposal List Actions & Pill Fix)
+### Validated (shipped in v1.5)
 
-See `.planning/REQUIREMENTS.md` for the full scoped list. Phase numbering continues at 26.
+All 6 active v1.5 requirements shipped — 2 phases (26–27); 1 descoped (ROWACT-02 per-row Delete → Archive-only, D-01). Full coverage in `milestones/v1.5-REQUIREMENTS.md`. Highlights:
 
-- [ ] Active/expired proposal rows expose Archive + Delete actions on `/proposals` (no Edit)
-- [x] Status pill renders correctly + responsively on the home "Propositions récentes" list and the `/proposals` table — v1.5 (Phase 27, UIFIX-02/03; light + dark human-verified)
+- ✓ Per-row Archive on active/expired `/proposals` rows + Restore in the Archivées view; instant in-place refresh + toast; drafts keep Edit + Archive + Delete; ADMIN-09 19-gate grep suite green — v1.5 (ROWACT-01/03/04/05)
+- ✓ Status pill renders full-label, content-hugging, aligned on the home "Propositions récentes" list and the `/proposals` table, light + dark (human-verified) — v1.5 (UIFIX-02/03)
 
-### Deferred to v1.5+
+### Active (next milestone)
+
+None yet — defined at `/gsd-new-milestone`. Candidate scope carried forward below.
+
+### Deferred to next milestone
 
 - [ ] Teal accent rebrand (`#2D7A8C`) — descoped from v1.4 Phase 25; needs splitting the overloaded `--gd` token into distinct accent (→ teal) vs. success (→ `#129657`) tokens, recoloring ~63 sites + hardcoded `rgba(18,150,87,…)` tints, then a fresh light+dark WCAG AA audit
 - [ ] OVH production deployment + smoke-deploy execution (September 2026 target; capability shipped in v1.1)
@@ -378,4 +382,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-30 — Phase 27 (status-pill-rendering-fix) complete: home "Propositions récentes" chip moved to a trailing `max-content` track (UIFIX-02), `/proposals` re-verified post-Phase-26 (UIFIX-03), light + dark human-verified. v1.5 phases 26–27 both shipped; milestone ready for `/gsd-complete-milestone`.*
+*Last updated: 2026-05-30 after v1.5 milestone (Proposal List Actions & Pill Fix). Phases 26–27 shipped: per-row Archive/Restore on `/proposals` (Delete descoped → Archive-only, D-01) + status-pill content-hugging fix on home + `/proposals` (light + dark human-verified). 1184 tests passing. Next: `/gsd-new-milestone`.*
