@@ -1845,5 +1845,4 @@ export function t(key: DictKey, lang: Lang): string {
 type _EnHasAllFrKeys = {
   [K in DictKey]: K extends keyof typeof dictionaries.en ? true : never;
 };
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type _EnParityProof = _EnHasAllFrKeys; // fails compile if any K maps to never
