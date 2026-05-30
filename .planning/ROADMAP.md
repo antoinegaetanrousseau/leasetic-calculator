@@ -101,7 +101,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 - [x] **Phase 22: Partner Types & Commission-Free Proposals** — `partner_type` enum + Drizzle migration + backfill; commission-free calc variant for Agent/Commercial; UI surfaces (selector on create/edit form, commission structurally absent from wizard + preview); commission-free PDF render variant + snapshot integrity; ADMIN-09 grep-contract suite extended (completed 2026-05-29)
 - [x] **Phase 23: PDF Rendering Fixes** — Root-cause spike + fix for number/typography glyph overlap; remove "Destinataire" block; regenerate byte-determinism fixture; extend golden corpus to cover Agent/Commercial commission-free render (completed 2026-05-30)
-- [ ] **Phase 24: Admin Dual-View Toggle** — Admin-only Admin/Agent view toggle in the bottom-left settings area; nav remaps between admin and agent route sets; session-only (no persistence); authorization unchanged in both views
+- [x] **Phase 24: Admin Dual-View Toggle** — Admin-only Admin/Agent view toggle in the bottom-left settings area; nav remaps between admin and agent route sets; session-only (no persistence); authorization unchanged in both views (completed 2026-05-30)
 - [ ] **Phase 25: Teal Rebrand & Polish** — Accent green → `#2D7A8C` at design-token layer (light + dark, WCAG AA); admin-home label changes; status-pill adaptive sizing fix
 
 ---
@@ -303,7 +303,7 @@ Wave 3:
   3. After logout and a fresh login, the admin lands in Admin view regardless of the toggle state before logout; the session-only requirement means no cookie or DB column stores the view preference.
   4. In Agent view, the admin's authorization is unchanged — they retain admin rights, and any attempt to directly navigate to an admin route still works; the toggle is a nav convenience, not a permission change.
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 **Wave 1**
 
@@ -311,7 +311,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 24-02-PLAN.md — ViewToggle component + sidebar effectiveView nav remap + Shell/(authed)-layout redirect-target plumbing (VIEW-01/02/04)
+- [x] 24-02-PLAN.md — ViewToggle component + sidebar effectiveView nav remap + Shell/(authed)-layout redirect-target plumbing (VIEW-01/02/04)
 
 **UI hint:** yes
 
@@ -359,7 +359,7 @@ Plans:
 | 21. Partner-Onboarding Gates | v1.3 | 2/2 | Complete | 2026-05-29 |
 | 22. Partner Types & Commission-Free Proposals | v1.4 | 5/5 | Complete   | 2026-05-29 |
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
-| 24. Admin Dual-View Toggle | v1.4 | 1/2 | In Progress|  |
+| 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete   | 2026-05-30 |
 | 25. Teal Rebrand & Polish | v1.4 | 0/? | Not started | - |
 
 ---

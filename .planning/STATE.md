@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
-status: executing
-last_updated: "2026-05-30T12:11:24.476Z"
+status: verifying
+last_updated: "2026-05-30T12:19:30.914Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 25
-  completed_phases: 22
+  completed_phases: 23
   total_plans: 120
-  completed_plans: 118
-  percent: 88
+  completed_plans: 119
+  percent: 92
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 24 (admin-dual-view-toggle) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-30
 
 ## Phase 22 Performance Metrics
@@ -367,6 +367,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 23-pdf-rendering-fixes P01 | ~10min | 2 tasks | 3 files |
 | Phase 23-pdf-rendering-fixes P03 | ~8min | 3 tasks | 3 files |
 | Phase 24-admin-dual-view-toggle P01 | 2min | 2 tasks | 4 files |
+| Phase 24-admin-dual-view-toggle P02 | ~5min | 3 tasks | 6 files |
 
 ## Decisions
 
@@ -417,3 +418,6 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: Phase 22-01 migration ordinal is 0005_workable_yellow_claw.sql (drizzle-kit auto-assigned after repairing an orphaned journal entry)
 - [Phase ?]: users.partner_type registered with input:false in Better Auth so partners cannot self-escalate via /api/auth/update-user (T-22-01-E)
 - [Phase ?]: view-store.ts has no 'use client'
+- [Phase ?]: TDD RED/GREEN for ViewToggle — test-first with 9 behavior cases before implementation
+- [Phase ?]: effectiveView = adminSegment ? admin : storedView — D-02 auto-reconcile: admin route presence overrides stored agent flag
+- [Phase ?]: adminHomeHref forwarded server-side from ADMIN_URL_SEGMENT — not adminSegment, to preserve D-02 isolation
