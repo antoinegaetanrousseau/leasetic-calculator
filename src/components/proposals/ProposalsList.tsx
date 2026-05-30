@@ -7,8 +7,8 @@ import { t, type Lang } from '@/lib/i18n/dictionaries';
 import type { ListResponse, ProposalRowDto } from '@/lib/api/proposals/list';
 import { ProposalRow } from './ProposalRow';
 import { LoadMoreButton } from './LoadMoreButton';
-import { RestoreButtonClient } from './RestoreButtonClient';
 import { DraftActionsClient } from './DraftActionsClient';
+import { RowActionsClient } from './RowActionsClient';
 
 export interface ProposalsListProps {
   lang: Lang;
@@ -94,8 +94,8 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
           lang={lang}
           deleted={deleted}
           draftMode={draftMode}
-          restoreSlot={
-            deleted ? <RestoreButtonClient proposalId={row.id} lang={lang} /> : null
+          actionsSlot={
+            !draftMode ? <RowActionsClient proposalId={row.id} lang={lang} displayStatus={row.displayStatus} /> : null
           }
           draftActionsSlot={
             draftMode ? <DraftActionsClient proposalId={row.id} lang={lang} /> : null

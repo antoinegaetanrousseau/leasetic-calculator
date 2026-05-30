@@ -1,16 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Partner Types, Admin Dual-View & Rebrand
-status: shipped
-last_updated: "2026-05-30T17:30:00.000Z"
-last_activity: 2026-05-30 -- v1.4 milestone closed + archived (tag v1.4 created + pushed)
+milestone: v1.5
+milestone_name: Proposal List Actions & Pill Fix
+status: ready_to_plan
+last_updated: 2026-05-30T17:42:28.397Z
+last_activity: 2026-05-30
 progress:
-  total_phases: 25
-  completed_phases: 24
-  total_plans: 122
-  completed_plans: 121
-  percent: 97
+  total_phases: 12
+  completed_phases: 10
+  total_plans: 42
+  completed_plans: 124
+  percent: 83
+stopped_at: Phase 26 complete (3/3) — ready to discuss Phase 27
 ---
 
 # State — Matrice Commerciale
@@ -23,14 +24,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** v1.4 shipped & archived 2026-05-30 — ready for `/gsd-new-milestone` (phase numbering continues at 26)
+**Current focus:** Phase 27 — status pill rendering fix
 
 ## Current Position
 
-Milestone: v1.4 — SHIPPED & ARCHIVED 2026-05-30 (phases 22-25, 12 plans, 1184 tests)
-Phase: none active — milestone closed
-Status: v1.4 complete; archives in `milestones/v1.4-*` + `reports/MILESTONE_SUMMARY-v1.4.md`; tag `v1.4` pushed
-Next: `/gsd-new-milestone`
+Phase: 27
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-05-30
 
 ## Deferred Items
 

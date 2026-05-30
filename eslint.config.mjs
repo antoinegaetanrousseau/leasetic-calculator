@@ -155,6 +155,24 @@ const config = [
       'no-restricted-syntax': 'off',
     },
   },
+  {
+    // Honor the leading-underscore convention for intentionally-unused identifiers
+    // (e.g. destructured props kept for API shape: `fullWidth: _fullWidth`). Strictly
+    // more lenient than the next/typescript default — only ignores `^_`-prefixed names.
+    files: ['**/*.{ts,tsx,js,jsx,mjs,cjs}'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
+  },
 ];
 
 export default config;

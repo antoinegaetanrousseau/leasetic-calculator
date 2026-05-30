@@ -7,6 +7,7 @@
 - ✅ **v1.2 — UX Polish + Proposal Wizard** — Phases 11-15 (shipped 2026-05-21) — see `milestones/v1.2-ROADMAP.md`
 - ✅ **v1.3 — Design Refresh + Partner-Onboarding Ready** — Phases 16-21 (shipped 2026-05-29) — see `milestones/v1.3-ROADMAP.md`
 - ✅ **v1.4 — Partner Types, Admin Dual-View & Rebrand** — Phases 22-25 (shipped 2026-05-30) — see `milestones/v1.4-ROADMAP.md`
+- 🔄 **v1.5 — Proposal List Actions & Pill Fix** — Phases 26-27 (in progress)
 
 ---
 
@@ -83,6 +84,11 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Full archive:** `milestones/v1.4-ROADMAP.md` · `milestones/v1.4-REQUIREMENTS.md` · `milestones/v1.4-MILESTONE-AUDIT.md` · **Summary:** `reports/MILESTONE_SUMMARY-v1.4.md`
 
 </details>
+
+### v1.5 — Proposal List Actions & Pill Fix (Phases 26-27)
+
+- [x] **Phase 26: Active/Expired Row Actions** — Archive icon button on non-draft proposal rows + Restore in Archivées (Delete descoped); ADMIN-09 envelope held (19-gate grep suite stays green) (completed 2026-05-30)
+- [ ] **Phase 27: Status-Pill Rendering Fix** — Content-hugging `.chip` sizing on home "Propositions récentes" list and `/proposals` table; light + dark verified
 
 ---
 
@@ -320,6 +326,48 @@ Plans:
 
 ---
 
+### Phase 26: Active/Expired Row Actions
+
+**Goal:** Partners can ARCHIVE any active or expired proposal directly from the `/proposals` row (and RESTORE soft-deleted proposals from the Archivées view), using the same icon-button pattern already wired for draft rows — with the ADMIN-09 envelope held throughout.
+**Depends on:** Phase 25 (v1.4 complete; 19-gate grep suite baseline; `DraftActionsClient` pattern established)
+**Requirements:** ROWACT-01, ROWACT-03, ROWACT-04, ROWACT-05 *(ROWACT-02 descoped)*
+**Success Criteria** (what must be TRUE):
+
+  1. From `/proposals`, archiving an active or expired proposal via its per-row Archive icon button moves it to the Archivées view without a full-page navigation; the row disappears from the Actives list and reappears in the Archivées list.
+  2. From the Archivées view, clicking the per-row Restore icon button on a soft-deleted proposal returns it to the Actives list in place (no full-page navigation).
+  3. Draft rows continue to show Edit + Archive + Delete unchanged; active and expired rows show ONLY Archive (no Edit, no Delete).
+  4. `ProposalRowDto` carries no `params_snapshot` or commission data; the 19-gate grep-contract suite passes without modification.
+  5. Clicking an active/expired row body still opens the proposal detail page; the Archive/Restore icon button acts without navigating (stopPropagation).
+
+> **Scope note (planner, 2026-05-30 — D-01).** Per-row Delete on finalized rows (ROWACT-02) is descoped to Archive-only; a per-row Restore is added in the Archivees view (D-02). Plan 26-03 reconciles the Goal + criteria above and REQUIREMENTS.md at execute time. See 26-CONTEXT.md.
+
+**Plans:** 3/3 plans complete
+
+Wave 1 (parallel):
+
+- [x] 26-01-PLAN.md — i18n keys (FR+EN) + shared RowActionsClient (Archive for active/expired, Restore for deleted, keyed off displayStatus) — ROWACT-01/03/04
+- [x] 26-03-PLAN.md — Doc reconciliation: REQUIREMENTS.md + ROADMAP.md to Archive-only (ROWACT-02 descoped, ROWACT-03 rewritten, ROWACT-05 Restore added)
+
+Wave 2 (after 26-01):
+
+- [x] 26-02-PLAN.md — Wire RowActionsClient into ProposalRow (clickable-div + actionsSlot, D-06) + ProposalsList (mount per displayStatus, D-03) + human-verify checkpoint — ROWACT-01/03/04
+
+**UI hint**: yes
+
+### Phase 27: Status-Pill Rendering Fix
+
+**Goal:** The status chip ("Actif", "Brouillon", "Expirée", "Archivée") renders with content-hugging, responsive sizing on both the home "Propositions récentes" list and the `/proposals` table — in light and dark mode — closing the regression left open after v1.4's `max-content` column fix.
+**Depends on:** Phase 26 (row-actions wiring adds new layout context to `/proposals` rows; pill fix should run on the stable post-26 DOM structure to avoid churn)
+**Requirements:** UIFIX-02, UIFIX-03
+**Success Criteria** (what must be TRUE):
+
+  1. The status chip on the home "Propositions récentes" list displays its full label (e.g. "Actif") with no text clipping, no vertical misalignment, and no fixed-width artifact across desktop viewport widths in both light and dark mode.
+  2. The status chip on the `/proposals` table renders with the same content-hugging behavior as the home surface, correct in both light and dark mode; no regression introduced on draft or archived rows.
+**Plans**: TBD
+**UI hint**: yes
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -349,7 +397,9 @@ Plans:
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
+| 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
+| 27. Status-Pill Rendering Fix | v1.5 | 0/TBD | Not started | - |
 
 ---
 
-*Last updated: 2026-05-30 — v1.4 shipped (4 phases, 12 plans, 1184 tests; partner types + commission-free proposals, admin dual-view toggle, PDF fixes, admin-home polish; teal rebrand descoped). Production live at https://leasetic-matrice.vercel.app. Next: `/gsd-new-milestone` (phase numbering continues at 26).*
+*Last updated: 2026-05-30 — Phase 26 Archive-only descope (D-01) reconciled: Goal/criteria updated to Archive + Restore; Delete criterion replaced with Restore; ROWACT-02 descoped; v1.5 bullet updated.*
