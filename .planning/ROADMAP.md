@@ -88,7 +88,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 ### v1.5 — Proposal List Actions & Pill Fix (Phases 26-27)
 
 - [x] **Phase 26: Active/Expired Row Actions** — Archive icon button on non-draft proposal rows + Restore in Archivées (Delete descoped); ADMIN-09 envelope held (19-gate grep suite stays green) (completed 2026-05-30)
-- [ ] **Phase 27: Status-Pill Rendering Fix** — Content-hugging `.chip` sizing on home "Propositions récentes" list and `/proposals` table; light + dark verified
+- [x] **Phase 27: Status-Pill Rendering Fix** — Content-hugging `.chip` sizing on home "Propositions récentes" list and `/proposals` table; light + dark verified (completed 2026-05-30)
 
 ---
 
@@ -366,7 +366,7 @@ Wave 2 (after 26-01):
 **Plans**: 2 plans
 
 - [x] 27-01-PLAN.md — Home "Propositions récentes" recent-list row: reorder to trailing content-hugging chip (UIFIX-02)
-- [ ] 27-02-PLAN.md — Light+dark human-verify on home + /proposals; /proposals post-Phase-26 re-verification (UIFIX-02, UIFIX-03)
+- [x] 27-02-PLAN.md — Light+dark human-verify on home + /proposals; /proposals post-Phase-26 re-verification (UIFIX-02, UIFIX-03)
 
 **UI hint**: yes
 
@@ -402,7 +402,7 @@ Wave 2 (after 26-01):
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
-| 27. Status-Pill Rendering Fix | v1.5 | 1/2 | In Progress|  |
+| 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete   | 2026-05-30 |
 
 ---
 
