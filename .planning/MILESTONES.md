@@ -1,5 +1,63 @@
 # Milestones — Matrice Commerciale
 
+## v1.4 — Partner Types, Admin Dual-View & Rebrand
+
+**Shipped:** 2026-05-30
+**Phases:** 4 (22-25) | **Plans:** 12 | **Plan↔Summary parity:** 12/12
+**Requirements:** 19/19 active satisfied (BRAND-01/02/03 teal rebrand descoped)
+**Tests:** 1184 passing / 4 skipped (env-gated) / 0 failed · typecheck clean
+**Git range:** `6893a4f..effb59c` (129 commits) · code +12,244 / −1,421 across 155 files
+**Timeline:** 2026-05-29 → 2026-05-30 (2 days)
+**Known deferred items:** 4 (stale planning artifacts — see `STATE.md` Deferred Items)
+
+### What shipped
+
+A `partner_type` dimension (Agent / Commercial / Partenaire) that conditions proposal economics
+end-to-end. Agent/Commercial proposals compute the loyer **without** the commission factor, with
+commission **structurally absent** from every surface (wizard, live preview, dashboards, PDF,
+server logs, audit payloads) — the first approved exception to the frozen formula, kept tightly
+scoped (`Partenaire` formula + tranches unchanged; all existing accounts backfilled to
+`Partenaire`). Plus a session-only Admin/Agent view toggle for admins, a PDF typography fix
+(U+202F glyph overlap) + Destinataire-block removal, and admin-home label changes + status-pill
+sizing fix. The teal rebrand (BRAND-01/02/03) was descoped mid-milestone and shelved.
+
+### Key accomplishments
+
+- **Partner types + commission-free calc** — `partner_type` column (migration `0006` + Better Auth additionalField + idempotent backfill); commission-free variant via a `commissionPct:0` seam with 12 golden cases (±0.01 €, `formula.ts` frozen); required type selector on the create form + audited `adminUpdatePartnerType` (Phase 22: PTYPE-01..07)
+- **Commission structural absence + 19-gate grep suite** — commission omitted (not hidden) across wizard steps 2+3, live preview, PDF; `params_snapshot` records `partner_type` + `commission_applied` for reproducibility; ADMIN-09 grep-contract suite grown 13→19 gates; 21 STRIDE threats closed (ASVS L1) (Phase 22)
+- **PDF rendering fixes** — root-caused number/typography glyph overlap to U+202F; PDF-scoped `sanitizePdfNumber` (U+202F/U+00A0 → space) with reproduction test, `format.ts` untouched; Destinataire block removed with clean reflow; byte-determinism fixture regenerated + Agent/Commercial commission-free corpus (Phase 23: PDF-01..03)
+- **Admin dual-view toggle** — session-only view store (`sessionStorage` + `useSyncExternalStore`, cleared on logout); `ViewToggle` behind `isAdmin` gate; `effectiveView` nav remap; authorization unchanged (server-derived `isAdmin` short-circuits forged flags); 7 STRIDE threats closed; 5 code-review warnings fixed (Phase 24: VIEW-01..04)
+- **Admin-home polish** — COPY-01..04 FR+EN relabels ("Toutes les propositions", "Coefficients & Commissions", "Dernière Modif Coef") with `_EnHasAllFrKeys` parity proof green; status-pill `max-content` hug-content fix (Phase 25: COPY-01..04, UIFIX-01)
+
+### Verification artifacts
+
+- `milestones/v1.4-ROADMAP.md` — full phase + plan archive with milestone summary
+- `milestones/v1.4-REQUIREMENTS.md` — 22-requirement traceability with final outcomes (19 satisfied, 3 descoped)
+- `milestones/v1.4-MILESTONE-AUDIT.md` — convergent-evidence audit (19/19 reqs, 6/6 integration, 2/2 E2E flows, PASSED)
+- `reports/MILESTONE_SUMMARY-v1.4.md` — narrative milestone report (onboarding pointer + next-session notes)
+- Per-phase `SUMMARY.md` (12 files); SECURITY.md for Phases 22+24; REVIEW.md + REVIEW-FIX.md + UAT.md for Phase 22/24
+
+### Key decisions (v1.4)
+
+- **Partner-type formula exception** — Agent/Commercial drop the commission factor; first break in the frozen-formula constraint, strictly scoped (`Partenaire` formula + tranches stay frozen)
+- **Commission as structural absence, not CSS hiding** — defense-in-depth against leakage, enforced by the 19-gate grep suite
+- **View toggle is session-only + server-derived authz** — a nav convenience, never a permission change (VIEW-04)
+- **PDF-scoped sanitizer** — confine the U+202F fix to the PDF layer; leave `format.ts` and the byte-determinism surface untouched
+- **Teal rebrand descoped 2026-05-30** — `--gd` token split + WCAG re-audit across ~63 sites judged too much effort for too little value; shelved (revisitable), not killed
+
+### Known gaps / tech debt at close (acknowledged, non-blocking, all Info-level)
+
+- Stale `deferred-items.md` lint entry in Phase 22 (already resolved in 22-05; delete the file)
+- Migration label drift `0005`→`0006_workable_yellow_claw.sql` reconciled 2026-05-30 (doc-only)
+- Phase 24: dead `fullWidth` prop on `ViewToggle`; unused `adminHrefs.history`; duplicated `rgba(18,150,87,0.10)` active-tint literal (extract to a CSS var); retained back-compat i18n keys
+- `partnerType` session fallback re-derived in 3 places (finalize route + calcul + verification) — a shared helper would reduce drift risk
+
+### Deploy gate (pre-onboarding, not a code blocker)
+
+Migration `0006_workable_yellow_claw.sql` + `partner_type` backfill (`db:backfill:partner-type`, `BACKFILL_CONFIRM=YES`) must be applied to Neon `main` via the `MIGRATE PROD` GitHub Action before the first real Agent/Commercial partner is onboarded. Per session record the 0005→0006 reconcile + Neon apply occurred 2026-05-30 — **confirm applied** before onboarding.
+
+---
+
 ## v1.1 — Hosted Web App Foundation
 
 **Shipped:** 2026-05-11

@@ -6,33 +6,7 @@
 - ✅ **v1.1 — Hosted Web App Foundation** — Phases 5-10 (shipped 2026-05-11) — see `milestones/v1.1-ROADMAP.md`
 - ✅ **v1.2 — UX Polish + Proposal Wizard** — Phases 11-15 (shipped 2026-05-21) — see `milestones/v1.2-ROADMAP.md`
 - ✅ **v1.3 — Design Refresh + Partner-Onboarding Ready** — Phases 16-21 (shipped 2026-05-29) — see `milestones/v1.3-ROADMAP.md`
-- 🚧 **v1.4 — Partner Types, Admin Dual-View & Rebrand** — Phases 22-25 (in progress, started 2026-05-29)
-
----
-
-## v1.4 Cross-Cutting Invariants
-
-These are not delivery targets — they are constraints that every phase in v1.4 must satisfy. Documented here so each phase planner can verify compliance before merging.
-
-### 1. ADMIN-09 commission invisibility — reinforced and extended (PTYPE-05 / PTYPE-07)
-
-The ADMIN-09 envelope applies to all v1.4 phases. For `Agent`/`Commercial` partner types, commission must be **fully absent** from calc output, UI surfaces, PDF render path, server logs, and audit payloads — not conditionally hidden, but structurally absent. The existing 12-gate grep-contract suite (`tests/admin-09-grep-contracts.test.ts`) must stay green throughout and is extended during Phase 22 (PTYPE-07). The Phase 13 D-12 partner-facing relaxation (`Partenaire` deal-owner sees commission on wizard steps 2+3) continues to hold for `Partenaire` type only.
-
-### 2. `params_snapshot` PDF immutability (PTYPE-06)
-
-Every v1.4 phase that touches proposal creation or the calc engine must preserve the `params_snapshot` immutability invariant: once a proposal is stored, its inputs and rendered PDF are permanently frozen. The snapshot schema is extended in Phase 22 to record `partner_type` + `commission_applied` boolean so PDFs remain reproducible after a partner's type changes.
-
-### 3. Light + dark pair per design change (BRAND-01 / BRAND-03)
-
-Any visual change must ship light and dark simultaneously. Every recolored foreground/background pair must meet WCAG 2.1 AA (≥4.5:1 text contrast). *(The Phase 25 teal rebrand that this invariant originally anticipated was descoped 2026-05-30 — no token swap ships in v1.4; this invariant remains as standing policy for any future visual change.)*
-
-### 4. PDF byte-determinism CI gate (PDF-03)
-
-The byte-determinism CI gate must remain green throughout. Phase 23 regenerates the fixture after the PDF layout changes (Destinataire removal + typography fix); Phase 22's commission-free variant extends the golden corpus. Any phase that touches `src/lib/pdf/` must leave the gate green before merge.
-
-### 5. Frozen formula + tranche boundaries
-
-The `Partenaire` formula (`loyer = montant HT × (1 + commission/100) × coefficient / 100`) and all tranche boundaries stay frozen. The v1.4 business-approved exception is strictly limited to `Agent`/`Commercial` dropping the commission factor (`loyer = montant HT × coefficient / 100`). No other formula change is in scope.
+- ✅ **v1.4 — Partner Types, Admin Dual-View & Rebrand** — Phases 22-25 (shipped 2026-05-30) — see `milestones/v1.4-ROADMAP.md`
 
 ---
 
@@ -97,12 +71,18 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 </details>
 
-### v1.4 — Partner Types, Admin Dual-View & Rebrand (Phases 22-25)
+<details>
+<summary>✅ v1.4 — Partner Types, Admin Dual-View & Rebrand (Phases 22-25) — SHIPPED 2026-05-30</summary>
 
-- [x] **Phase 22: Partner Types & Commission-Free Proposals** — `partner_type` enum + Drizzle migration + backfill; commission-free calc variant for Agent/Commercial; UI surfaces (selector on create/edit form, commission structurally absent from wizard + preview); commission-free PDF render variant + snapshot integrity; ADMIN-09 grep-contract suite extended (completed 2026-05-29)
-- [x] **Phase 23: PDF Rendering Fixes** — Root-cause spike + fix for number/typography glyph overlap; remove "Destinataire" block; regenerate byte-determinism fixture; extend golden corpus to cover Agent/Commercial commission-free render (completed 2026-05-30)
-- [x] **Phase 24: Admin Dual-View Toggle** — Admin-only Admin/Agent view toggle in the bottom-left settings area; nav remaps between admin and agent route sets; session-only (no persistence); authorization unchanged in both views (completed 2026-05-30)
-- [x] **Phase 25: Admin-Home Labels & Pill Fix** — Admin-home label changes (COPY-01..04: FR+EN dictionary relabels); status-pill adaptive sizing fix (UIFIX-01: `.list-row` status track → `max-content`). *(Teal rebrand BRAND-01/02/03 descoped 2026-05-30 — see REQUIREMENTS.md.)* (completed 2026-05-30)
+- [x] **Phase 22: Partner Types & Commission-Free Proposals** (5/5 plans) — `partner_type` enum + Drizzle migration `0006` + backfill; commission-free calc variant for Agent/Commercial; commission structurally absent from wizard/preview/PDF; ADMIN-09 grep suite 13→19 gates; 21 STRIDE closed
+- [x] **Phase 23: PDF Rendering Fixes** (3/3 plans) — U+202F glyph-overlap fix (PDF-scoped sanitizer); Destinataire block removed; byte-determinism fixture regenerated + Agent/Commercial commission-free corpus
+- [x] **Phase 24: Admin Dual-View Toggle** (2/2 plans) — session-only Admin/Agent toggle (admin-gated, `sessionStorage`); `effectiveView` nav remap; authz unchanged (server-derived `isAdmin`); 7 STRIDE closed
+- [x] **Phase 25: Admin-Home Labels & Pill Fix** (2/2 plans) — COPY-01..04 FR+EN relabels (parity proof green); status-pill `max-content` sizing fix. *(Teal rebrand BRAND-01/02/03 descoped 2026-05-30.)*
+
+**Shipped:** 2026-05-30 · **Plans:** 12 · **Requirements:** 19/19 active (3 descoped) · **Tests:** 1184 passing · **Commits:** 129
+**Full archive:** `milestones/v1.4-ROADMAP.md` · `milestones/v1.4-REQUIREMENTS.md` · `milestones/v1.4-MILESTONE-AUDIT.md` · **Summary:** `reports/MILESTONE_SUMMARY-v1.4.md`
+
+</details>
 
 ---
 
@@ -372,4 +352,4 @@ Plans:
 
 ---
 
-*Last updated: 2026-05-29 — v1.3 shipped (6 phases, 27 plans, 1122 tests); v1.4 roadmap created (4 phases, 22 requirements mapped). Production live at https://leasetic-matrice.vercel.app. Next: `/gsd-plan-phase 22`.*
+*Last updated: 2026-05-30 — v1.4 shipped (4 phases, 12 plans, 1184 tests; partner types + commission-free proposals, admin dual-view toggle, PDF fixes, admin-home polish; teal rebrand descoped). Production live at https://leasetic-matrice.vercel.app. Next: `/gsd-new-milestone` (phase numbering continues at 26).*
