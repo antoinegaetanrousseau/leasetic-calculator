@@ -85,24 +85,6 @@ export interface ProposalDocumentProps {
   };
 }
 
-// ── Inline recipient row labels (planner discretion T-08-05-07 / D-A3) ──────
-// Short bilingual strings used as KeyValueRow keyText inside the recipient block.
-// Not threaded through the runtime t() system — these are PDF-only literals.
-// If Phase 9/10 wants centralization, it's a 6-key migration (logged SUMMARY).
-const LABELS: Record<'partnerCo' | 'partnerName' | 'clientCo' | 'contact' | 'role' | 'tel' | 'email' | 'siren', Record<Lang, string>> = {
-  partnerCo:   { fr: 'Société',     en: 'Company'  },
-  partnerName: { fr: 'Commercial',  en: 'Sales rep' },
-  clientCo:    { fr: 'Société',     en: 'Company'   },
-  contact:     { fr: 'Contact',     en: 'Contact'   },
-  role:        { fr: 'Fonction',    en: 'Role'       },
-  tel:         { fr: 'Téléphone',   en: 'Phone'      },
-  email:       { fr: 'Email',       en: 'Email'      },
-  siren:       { fr: 'SIREN',       en: 'SIREN'      },
-};
-
-function lbl(key: keyof typeof LABELS, lang: Lang): string {
-  return LABELS[key][lang];
-}
 
 export function ProposalDocument({ data }: ProposalDocumentProps) {
   const { lcRef, language: lang, createdAt, inputs, computed } = data;
@@ -179,30 +161,6 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
           color: pdfColors.navy,
           marginBottom: 24,
         }}>{t('pdf.title', lang)}</Text>
-
-        {/* ── Recipient block ───────────────────────────────────────────── */}
-        <View style={{ marginBottom: 12 }}>
-          <SectionLabel>{t('pdf.section.recipient', lang)}</SectionLabel>
-          <KeyValueRow keyText={lbl('partnerCo', lang)} valueText={inputs.partnerCo} />
-          <KeyValueRow keyText={lbl('partnerName', lang)} valueText={inputs.partnerName} />
-          <View style={{ height: 1, backgroundColor: pdfColors.border, marginVertical: 6 }} />
-          <KeyValueRow keyText={lbl('clientCo', lang)} valueText={inputs.clientCo} />
-          {inputs.clientName && (
-            <KeyValueRow keyText={lbl('contact', lang)} valueText={inputs.clientName} />
-          )}
-          {inputs.clientRole && (
-            <KeyValueRow keyText={lbl('role', lang)} valueText={inputs.clientRole} />
-          )}
-          {inputs.clientTel && (
-            <KeyValueRow keyText={lbl('tel', lang)} valueText={inputs.clientTel} />
-          )}
-          {inputs.clientEmail && (
-            <KeyValueRow keyText={lbl('email', lang)} valueText={inputs.clientEmail} />
-          )}
-          {inputs.clientSiren && (
-            <KeyValueRow keyText={lbl('siren', lang)} valueText={inputs.clientSiren} />
-          )}
-        </View>
 
         {/* ── Project block ─────────────────────────────────────────────── */}
         <View style={{ marginBottom: 12 }}>
