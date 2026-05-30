@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Proposal List Actions & Pill Fix
-status: planning
-last_updated: "2026-05-30T19:39:26.772Z"
-last_activity: 2026-05-30
+status: executing
+last_updated: "2026-05-30T20:03:55.750Z"
+last_activity: 2026-05-30 -- Phase 27 execution started
 progress:
   total_phases: 12
   completed_phases: 11
-  total_plans: 42
+  total_plans: 44
   completed_plans: 42
   percent: 92
 ---
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 27 — status pill rendering fix
+**Current focus:** Phase 27 — status-pill-rendering-fix
 
 ## Current Position
 
-Phase: 27
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-30
+Phase: 27 (status-pill-rendering-fix) — EXECUTING
+Plan: 27-01 complete (UIFIX-02 source fix); 27-02 human-verify checkpoint pending
+Status: Awaiting human verification (light + dark, home + /proposals)
+Last activity: 2026-05-30 -- Phase 27 plan 27-01 executed
 
 ## Deferred Items
 
