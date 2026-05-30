@@ -249,15 +249,19 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Plans:** 5/5 plans complete
 
 Wave 1 (parallel):
+
 - [x] 22-01-PLAN.md — Schema: partner_type column + Better Auth registration + snapshot type + generated migration + idempotent backfill (PTYPE-01 schema, PTYPE-02, PTYPE-06 type)
 - [x] 22-02-PLAN.md — Commission-free golden corpus via commissionPct:0 seam; formula.ts frozen (PTYPE-04)
 
 Wave 2 (parallel, after 22-01):
+
 - [x] 22-03-PLAN.md — Admin surfaces: required type selector on create form + audited adminUpdatePartnerType + list badge/column (PTYPE-01, PTYPE-03)
 - [x] 22-04-PLAN.md — Commission-free presentation end-to-end: wizard steps 2+3 structural absence + live preview + finalize snapshot (PTYPE-04, PTYPE-05, PTYPE-06)
 
 Wave 3 (after 22-03 + 22-04):
+
 - [x] 22-05-PLAN.md — ADMIN-09 grep-contract extension + no-commission PDF 4-layer corpus for Agent/Commercial + full-suite regression (PTYPE-06, PTYPE-07)
+
 **UI hint:** yes
 
 ### Phase 23: PDF Rendering Fixes
@@ -274,12 +278,15 @@ Wave 3 (after 22-03 + 22-04):
 **Plans:** 3/3 plans complete
 
 Wave 1:
+
 - [x] 23-01-PLAN.md — PDF-01: PDF-scoped number sanitizer (U+202F/U+00A0 → space) + reproduction test; format.ts untouched
 
 Wave 2:
+
 - [x] 23-02-PLAN.md — PDF-02: remove Destinataire block + dead LABELS/lbl() helpers + pdf.section.recipient dict keys; clean reflow
 
 Wave 3:
+
 - [x] 23-03-PLAN.md — PDF-03: Agent/Commercial commission-free byte-determinism fixture + [BLOCKING] expected.sha256.txt regen + full PDF/ADMIN-09 regression
 
 **UI hint:** yes
@@ -297,9 +304,13 @@ Wave 3:
   4. In Agent view, the admin's authorization is unchanged — they retain admin rights, and any attempt to directly navigate to an admin route still works; the toggle is a nav convenience, not a permission change.
 
 **Plans:** 2 plans
-
 Plans:
+**Wave 1**
+
 - [ ] 24-01-PLAN.md — Session-only view-store (sessionStorage useSyncExternalStore) + 4 i18n keys (FR+EN) + logout clear (VIEW-03)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 24-02-PLAN.md — ViewToggle component + sidebar effectiveView nav remap + Shell/(authed)-layout redirect-target plumbing (VIEW-01/02/04)
 
 **UI hint:** yes
