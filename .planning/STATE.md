@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Proposal List Actions & Pill Fix
-status: ready_to_plan
-last_updated: 2026-05-30T17:42:28.397Z
+status: planning
+last_updated: "2026-05-30T19:39:26.772Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 12
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 42
-  completed_plans: 124
-  percent: 83
-stopped_at: Phase 26 complete (3/3) — ready to discuss Phase 27
+  completed_plans: 42
+  percent: 92
 ---
 
 # State — Matrice Commerciale
