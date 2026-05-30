@@ -333,7 +333,7 @@ Plans:
 
 **Plans:** 2 plans
 
-- [ ] 25-01-PLAN.md — Admin-home label changes (COPY-01..04): FR+EN dict edits, parity proof green
+- [x] 25-01-PLAN.md — Admin-home label changes (COPY-01..04): FR+EN dict edits, parity proof green
 - [ ] 25-02-PLAN.md — Status-pill hug-content fix (UIFIX-01): .list-row status track to max-content
 
 **UI hint:** yes

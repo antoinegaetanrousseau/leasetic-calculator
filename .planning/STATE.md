@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
 status: executing
-last_updated: "2026-05-30T14:29:59.646Z"
-last_activity: 2026-05-30 -- Phase 25 planning complete
+last_updated: "2026-05-30T14:43:00.000Z"
+last_activity: 2026-05-30 -- Phase 25 Plan 01 complete (COPY-01..04)
 progress:
   total_phases: 25
   completed_phases: 23
   total_plans: 122
-  completed_plans: 119
-  percent: 92
+  completed_plans: 120
+  percent: 93
 ---
 
 # State — Matrice Commerciale
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 25 — teal rebrand & polish
+**Current focus:** Phase 25 — teal-rebrand-polish
 
 ## Current Position
 
-Phase: 25
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-30 -- Phase 25 planning complete
+Phase: 25 (teal-rebrand-polish) — EXECUTING
+Plan: 1 of 2 complete — next: Plan 02 (UIFIX-01)
+Status: Executing Phase 25
+Last activity: 2026-05-30 -- Phase 25 Plan 01 complete (COPY-01..04 admin-home label changes)
 
 ## Phase 22 Performance Metrics
 
