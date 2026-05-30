@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Proposal List Actions & Pill Fix
-status: milestone_complete
-last_updated: 2026-05-30T20:31:44.741Z
-last_activity: 2026-05-30 -- Phase 27 execution started
+status: Phase 27 shipped — pushed to origin/main (6813044)
+last_updated: "2026-05-30T21:07:14.242Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 12
   completed_phases: 11
   total_plans: 44
   completed_plans: 126
   percent: 92
-stopped_at: Milestone complete (Phase 27 was final phase)
 ---
 
 # State — Matrice Commerciale
@@ -30,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 27
 Plan: Not started
-Status: Milestone complete
+Status: Phase 27 shipped — pushed to origin/main (6813044)
 Last activity: 2026-05-30
 
 ## Deferred Items
