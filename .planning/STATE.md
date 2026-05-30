@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
-status: ready_to_plan
-last_updated: 2026-05-30T12:28:44.188Z
+status: planning
+last_updated: "2026-05-30T13:38:43.860Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 25
@@ -11,7 +11,6 @@ progress:
   total_plans: 120
   completed_plans: 119
   percent: 92
-stopped_at: Phase 24 complete (2/2) — ready to discuss Phase 25
 ---
 
 # State — Matrice Commerciale
