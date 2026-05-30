@@ -444,6 +444,10 @@ export const dictionaries = {
     'proposal.draft.toast.delete.error': 'Erreur lors de la suppression. Réessayez.',
     'proposal.toast.restore.success': 'Proposition restaurée.',
     'proposal.toast.restore.error': 'Erreur lors de la restauration. Réessayez.',
+    'proposal.row.action.archive': 'Archiver',
+    'proposal.row.toast.archive.success': 'Proposition archivée.',
+    'proposal.row.toast.archive.error': 'Erreur lors de l’archivage. Réessayez.',
+    'proposal.row.toast.archive.action.viewArchived': 'Voir les archivées',
     'proposal.toast.duplicate.prefilled': "Champs pré-remplis depuis la proposition d\u2019origine. Modifiez si nécessaire.",
 
     // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
@@ -1357,6 +1361,10 @@ export const dictionaries = {
     'proposal.draft.toast.delete.error': 'Could not delete. Please try again.',
     'proposal.toast.restore.success': 'Proposal restored.',
     'proposal.toast.restore.error': 'Could not restore. Please try again.',
+    'proposal.row.action.archive': 'Archive',
+    'proposal.row.toast.archive.success': 'Proposal archived.',
+    'proposal.row.toast.archive.error': 'Archiving failed. Please try again.',
+    'proposal.row.toast.archive.action.viewArchived': 'View archived',
     'proposal.toast.duplicate.prefilled': 'Fields pre-filled from source proposal. Edit if needed.',
 
     // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
