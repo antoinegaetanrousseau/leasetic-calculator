@@ -37,11 +37,16 @@ The headline feature. Introduces a `partner_type` dimension that conditions prop
 - [x] **PDF-02**: The **"Destinataire"** block beneath the "Proposition de location financière" title is removed; the layout reflows cleanly without it.
 - [x] **PDF-03**: The PDF byte-determinism CI gate is updated for the new layout (fixture regenerated) and remains green; the calc golden corpus is extended to cover the Agent/Commercial commission-free render.
 
-### Teal Rebrand (BRAND)
+### Teal Rebrand (BRAND) — ⊘ DESCOPED 2026-05-30 (Phase 25 discussion)
 
-- [ ] **BRAND-01**: The UI **accent color** is `#2D7A8C` everywhere the previous accent green appeared (primary buttons, links, active nav, hero accents, focus rings, CTAs), in both light and dark mode, driven from the design-token layer (single source of truth).
-- [ ] **BRAND-02**: The Leasétic **logo green** and the **semantic success green** (the "Actif" status pill, "activé le compte" activity entries) are left unchanged.
-- [ ] **BRAND-03**: Every recolored foreground/background pair meets WCAG 2.1 AA (≥4.5:1 text) in light + dark, consistent with the v1.3 CONTRAST discipline.
+> Dropped during Phase 25 discussion: splitting the overloaded `--gd` accent/success
+> token across ~63 call sites + a fresh light+dark WCAG audit was judged too much effort
+> for too little value. Green stays the brand accent. Shelved (not killed) — revisitable
+> in a later milestone. See `.planning/phases/25-teal-rebrand-polish/25-CONTEXT.md` (D-01).
+
+- [~] **BRAND-01** *(descoped)*: The UI **accent color** is `#2D7A8C` everywhere the previous accent green appeared (primary buttons, links, active nav, hero accents, focus rings, CTAs), in both light and dark mode, driven from the design-token layer (single source of truth).
+- [~] **BRAND-02** *(descoped)*: The Leasétic **logo green** and the **semantic success green** (the "Actif" status pill, "activé le compte" activity entries) are left unchanged.
+- [~] **BRAND-03** *(descoped)*: Every recolored foreground/background pair meets WCAG 2.1 AA (≥4.5:1 text) in light + dark, consistent with the v1.3 CONTRAST discipline.
 
 ### Admin-Home Labels (COPY)
 
@@ -60,6 +65,7 @@ The headline feature. Introduces a `partner_type` dimension that conditions prop
 
 Carried forward; available for v1.5+ scoping:
 
+- [ ] Teal accent rebrand (`#2D7A8C`) — descoped from Phase 25 (BRAND-01/02/03). Requires splitting the overloaded `--gd` token into distinct accent (→ teal) vs. success (→ `#129657`) tokens, recoloring ~63 sites + hardcoded `rgba(18,150,87,…)` tints, then a fresh light+dark WCAG AA audit.
 - [ ] Account v2 — avatar upload (needs Blob image infra), phone field (schema + Better Auth additionalFields), editable email (needs SMTP)
 - [ ] SMTP-driven self-service forgotten-password reset
 - [ ] Multi-factor authentication on admin accounts
@@ -104,13 +110,13 @@ REQ-ID → Phase mapping (filled by the roadmapper; phases start at 22).
 | PDF-01 | Fix number/typography rendering glitch | Phase 23 |
 | PDF-02 | Remove "Destinataire" block | Phase 23 |
 | PDF-03 | Update byte-determinism gate + golden corpus | Phase 23 |
-| BRAND-01 | Accent green → #2D7A8C (token, light+dark) | Phase 25 |
-| BRAND-02 | Logo green + success green unchanged | Phase 25 |
-| BRAND-03 | WCAG 2.1 AA on recolored pairs | Phase 25 |
+| BRAND-01 | Accent green → #2D7A8C (token, light+dark) | ⊘ Descoped (was Phase 25) |
+| BRAND-02 | Logo green + success green unchanged | ⊘ Descoped (was Phase 25) |
+| BRAND-03 | WCAG 2.1 AA on recolored pairs | ⊘ Descoped (was Phase 25) |
 | COPY-01 | "Toutes les propositions" (label only) | Phase 25 |
 | COPY-02 | "Coefficients & Commissions" | Phase 25 |
 | COPY-03 | "Dernière Modif Coef" | Phase 25 |
 | COPY-04 | FR+EN dict entries, parity proof green | Phase 25 |
 | UIFIX-01 | Status pill hugs its text | Phase 25 |
 
-**Coverage:** 22/22 requirements mapped across 4 phases (Phases 22-25). No orphans.
+**Coverage:** 19/22 requirements active across 4 phases (Phases 22-25); BRAND-01/02/03 descoped 2026-05-30. No orphans.

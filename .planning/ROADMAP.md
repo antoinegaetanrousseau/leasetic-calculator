@@ -24,7 +24,7 @@ Every v1.4 phase that touches proposal creation or the calc engine must preserve
 
 ### 3. Light + dark pair per design change (BRAND-01 / BRAND-03)
 
-Any visual change — including the Phase 25 teal rebrand token swap — must ship light and dark simultaneously. Every recolored foreground/background pair must meet WCAG 2.1 AA (≥4.5:1 text contrast). Logo SVGs and the semantic success green (`#6DC388` / "Actif" pill) are explicitly excluded from the rebrand.
+Any visual change must ship light and dark simultaneously. Every recolored foreground/background pair must meet WCAG 2.1 AA (≥4.5:1 text contrast). *(The Phase 25 teal rebrand that this invariant originally anticipated was descoped 2026-05-30 — no token swap ships in v1.4; this invariant remains as standing policy for any future visual change.)*
 
 ### 4. PDF byte-determinism CI gate (PDF-03)
 
@@ -102,7 +102,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] **Phase 22: Partner Types & Commission-Free Proposals** — `partner_type` enum + Drizzle migration + backfill; commission-free calc variant for Agent/Commercial; UI surfaces (selector on create/edit form, commission structurally absent from wizard + preview); commission-free PDF render variant + snapshot integrity; ADMIN-09 grep-contract suite extended (completed 2026-05-29)
 - [x] **Phase 23: PDF Rendering Fixes** — Root-cause spike + fix for number/typography glyph overlap; remove "Destinataire" block; regenerate byte-determinism fixture; extend golden corpus to cover Agent/Commercial commission-free render (completed 2026-05-30)
 - [x] **Phase 24: Admin Dual-View Toggle** — Admin-only Admin/Agent view toggle in the bottom-left settings area; nav remaps between admin and agent route sets; session-only (no persistence); authorization unchanged in both views (completed 2026-05-30)
-- [ ] **Phase 25: Teal Rebrand & Polish** — Accent green → `#2D7A8C` at design-token layer (light + dark, WCAG AA); admin-home label changes; status-pill adaptive sizing fix
+- [ ] **Phase 25: Admin-Home Labels & Pill Fix** — Admin-home label changes (COPY); status-pill adaptive sizing fix. *(Teal rebrand BRAND-01/02/03 descoped 2026-05-30 — see REQUIREMENTS.md.)*
 
 ---
 
@@ -315,17 +315,21 @@ Plans:
 
 **UI hint:** yes
 
-### Phase 25: Teal Rebrand & Polish
+### Phase 25: Admin-Home Labels & Pill Fix
 
-**Goal:** Replace the UI accent color with `#2D7A8C` at the design-token layer across light and dark, close three admin-home label changes, and fix the status-pill sizing — shipping a consistent visual identity update without touching the logo green or semantic success green.
-**Depends on:** Phase 22 (commission-free UI surfaces exist; any new accent-colored commission-related elements from Phase 22 must be recolored here), Phase 24 (dual-view toggle renders accent-colored elements that must also be recolored)
-**Requirements:** BRAND-01, BRAND-02, BRAND-03, COPY-01, COPY-02, COPY-03, COPY-04, UIFIX-01
+> **Scope reduced 2026-05-30 (discussion).** The teal rebrand (BRAND-01/02/03) was
+> descoped — splitting the overloaded `--gd` accent/success token across ~63 sites +
+> a fresh WCAG audit was too much effort for too little value. Green stays the brand
+> accent; the rebrand is shelved (revisitable) in REQUIREMENTS.md → Future Requirements.
+> The phase now ships the admin-home label changes + the status-pill sizing fix only.
+
+**Goal:** Close the three admin-home display-label changes (FR + EN, parity proof green) and fix the proposal status-pill sizing so chips hug their text — leaving the accent color, logo green, and success green untouched.
+**Depends on:** Phase 18 (admin-home AdminNavCards + stat row whose labels COPY-01..03 edit), Phase 19 (the `/lc-references` route COPY-01 relabels)
+**Requirements:** COPY-01, COPY-02, COPY-03, COPY-04, UIFIX-01 *(BRAND-01/02/03 descoped)*
 **Success Criteria** (what must be TRUE):
 
-  1. Every surface that previously used the accent green (primary buttons, active nav items, focus rings, hero accents, CTAs) now renders `#2D7A8C` in light mode and the appropriate dark-mode variant from the same token; the Leasétic logo mark (`#6DC388`) and the "Actif" / "activé" semantic success green are visually unchanged.
-  2. Every recolored foreground/background pair meets WCAG 2.1 AA (≥4.5:1 for text) in both light and dark — confirmed by a contrast audit record committed alongside the token change.
-  3. The admin-home cards and stat labels read "Toutes les propositions", "Coefficients & Commissions", and "Dernière Modif Coef" in both FR and EN; the compile-time `_EnHasAllFrKeys` parity proof stays green; the `/[adminSegment]/lc-references` route is unchanged.
-  4. The proposal status pill ("Actif", "Brouillon", "Expirée", "Archivée") hugs its text content in all variants and both languages, with no fixed minimum width causing clipping or excess padding.
+  1. The admin-home cards and stat labels read "Toutes les propositions", "Coefficients & Commissions", and "Dernière Modif Coef" in both FR and EN; the compile-time `_EnHasAllFrKeys` parity proof stays green; the `/[adminSegment]/lc-references` route is unchanged (display label only).
+  2. The proposal status pill ("Actif", "Brouillon", "Expirée", "Archivée") — and every sibling `.chip` variant (it shares the same base) — hugs its text content in all variants and both languages, with no fixed minimum width causing clipping or excess padding.
 
 **Plans:** TBD
 **UI hint:** yes
@@ -360,7 +364,7 @@ Plans:
 | 22. Partner Types & Commission-Free Proposals | v1.4 | 5/5 | Complete   | 2026-05-29 |
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
-| 25. Teal Rebrand & Polish | v1.4 | 0/? | Not started | - |
+| 25. Admin-Home Labels & Pill Fix | v1.4 | 0/? | Not started | - |
 
 ---
 
