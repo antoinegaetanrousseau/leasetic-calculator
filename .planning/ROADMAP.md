@@ -359,7 +359,7 @@ Plans:
 | 21. Partner-Onboarding Gates | v1.3 | 2/2 | Complete | 2026-05-29 |
 | 22. Partner Types & Commission-Free Proposals | v1.4 | 5/5 | Complete   | 2026-05-29 |
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
-| 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete   | 2026-05-30 |
+| 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Teal Rebrand & Polish | v1.4 | 0/? | Not started | - |
 
 ---
