@@ -331,7 +331,9 @@ Plans:
   1. The admin-home cards and stat labels read "Toutes les propositions", "Coefficients & Commissions", and "Dernière Modif Coef" in both FR and EN; the compile-time `_EnHasAllFrKeys` parity proof stays green; the `/[adminSegment]/lc-references` route is unchanged (display label only).
   2. The proposal status pill ("Actif", "Brouillon", "Expirée", "Archivée") — and every sibling `.chip` variant (it shares the same base) — hugs its text content in all variants and both languages, with no fixed minimum width causing clipping or excess padding.
 
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 25-01-PLAN.md — Admin-home label changes (COPY-01..04): FR+EN dict edits, parity proof green
+- [ ] 25-02-PLAN.md — Status-pill hug-content fix (UIFIX-01): .list-row status track to max-content
 **UI hint:** yes
 
 ---
