@@ -3,6 +3,7 @@ import path from 'node:path';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate, formatNumber } from '@/lib/i18n/format';
 import { pdfColors, pdfFontSizes, pdfFontWeights, pdfPageMargins } from './styles';
+import { sanitizePdfNumber } from './sanitize-number';
 import { SectionLabel } from './components/section-label';
 import { KeyValueRow } from './components/key-value-row';
 
@@ -235,7 +236,7 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
         }}>
           <KeyValueRow
             keyText={t('proposal.montant.label', lang)}
-            valueText={formatCurrency(Number(inputs.amountHT), lang)}
+            valueText={sanitizePdfNumber(formatCurrency(Number(inputs.amountHT), lang))}
           />
           <KeyValueRow
             keyText={t('proposal.duree.label', lang)}
@@ -244,7 +245,7 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
           {computed.state === 'computed' && computed.coeff && (
             <KeyValueRow
               keyText={t('pdf.computed.coefficient.label', lang)}
-              valueText={`${formatNumber(Number(computed.coeff), lang, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} %`}
+              valueText={`${sanitizePdfNumber(formatNumber(Number(computed.coeff), lang, { minimumFractionDigits: 4, maximumFractionDigits: 4 }))} %`}
             />
           )}
         </View>
@@ -278,7 +279,7 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
               fontWeight: pdfFontWeights.bold,
               color: pdfColors.navy,
               letterSpacing: -0.5,
-            }}>{formatCurrency(Number(computed.loyerHT), lang)}</Text>
+            }}>{sanitizePdfNumber(formatCurrency(Number(computed.loyerHT), lang))}</Text>
           )}
           <Text style={{
             fontSize: pdfFontSizes.body,
