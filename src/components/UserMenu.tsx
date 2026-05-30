@@ -54,13 +54,20 @@ export function UserMenu({ displayName, email, lang }: UserMenuProps) {
 
   const handleLogout = async () => {
     // AUTH-18 / D-24: official client function only — never custom POST.
-    await authClient.signOut();
-    // D-04 / VIEW-03: clear session view flag so a fresh login always lands in Admin view.
-    clearView();
-    // The Sonner success toast is shown on /login via the ?logged_out=1 query
-    // param pickup in LoginForm (Plan 06-05).
-    router.push('/login?logged_out=1');
-    router.refresh();
+    // WR-05: clear the view flag in `finally` so a failed signOut (e.g. network
+    // error) cannot leave `leasetic.view` populated for the tab session. If the
+    // stale flag survived, VIEW-03's "fresh login always lands in Admin view"
+    // guarantee would be violated for an admin who had switched to agent.
+    try {
+      await authClient.signOut();
+    } finally {
+      // D-04 / VIEW-03: clear session view flag so a fresh login always lands in Admin view.
+      clearView();
+      // The Sonner success toast is shown on /login via the ?logged_out=1 query
+      // param pickup in LoginForm (Plan 06-05).
+      router.push('/login?logged_out=1');
+      router.refresh();
+    }
   };
 
   return (
