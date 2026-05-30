@@ -102,7 +102,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] **Phase 22: Partner Types & Commission-Free Proposals** — `partner_type` enum + Drizzle migration + backfill; commission-free calc variant for Agent/Commercial; UI surfaces (selector on create/edit form, commission structurally absent from wizard + preview); commission-free PDF render variant + snapshot integrity; ADMIN-09 grep-contract suite extended (completed 2026-05-29)
 - [x] **Phase 23: PDF Rendering Fixes** — Root-cause spike + fix for number/typography glyph overlap; remove "Destinataire" block; regenerate byte-determinism fixture; extend golden corpus to cover Agent/Commercial commission-free render (completed 2026-05-30)
 - [x] **Phase 24: Admin Dual-View Toggle** — Admin-only Admin/Agent view toggle in the bottom-left settings area; nav remaps between admin and agent route sets; session-only (no persistence); authorization unchanged in both views (completed 2026-05-30)
-- [ ] **Phase 25: Admin-Home Labels & Pill Fix** — Admin-home label changes (COPY); status-pill adaptive sizing fix. *(Teal rebrand BRAND-01/02/03 descoped 2026-05-30 — see REQUIREMENTS.md.)*
+- [x] **Phase 25: Admin-Home Labels & Pill Fix** — Admin-home label changes (COPY-01..04: FR+EN dictionary relabels); status-pill adaptive sizing fix (UIFIX-01: `.list-row` status track → `max-content`). *(Teal rebrand BRAND-01/02/03 descoped 2026-05-30 — see REQUIREMENTS.md.)* (completed 2026-05-30)
 
 ---
 
