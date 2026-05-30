@@ -32,8 +32,8 @@ Restore per-row management actions on the partner `/proposals` list. The `DraftA
 
 The `StatusChip` is a bare `<span className="chip chip-{variant}">`; the defect lives in the list grid + `.chip` sizing, not the component contract. v1.4's UIFIX-01 set the `/proposals` status column to `max-content`, but the home "Propositions récentes" pill is still mis-sized/non-responsive (screenshot 1).
 
-- [ ] **UIFIX-02**: The status chip on the home **"Propositions récentes"** list renders its full label (e.g. "Actif") with no clipping or vertical/horizontal misalignment, hugging its content adaptively across desktop viewport widths, in both light and dark mode.
-- [ ] **UIFIX-03**: The status chip on the **`/proposals`** table renders with the same content-hugging, responsive behavior as the home surface, correct in both light and dark mode (no fixed-width artifact).
+- [x] **UIFIX-02**: The status chip on the home **"Propositions récentes"** list renders its full label (e.g. "Actif") with no clipping or vertical/horizontal misalignment, hugging its content adaptively across desktop viewport widths, in both light and dark mode.
+- [x] **UIFIX-03**: The status chip on the **`/proposals`** table renders with the same content-hugging, responsive behavior as the home surface, correct in both light and dark mode (no fixed-width artifact).
 
 ## Future Requirements
 

@@ -402,7 +402,7 @@ Wave 2 (after 26-01):
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
-| 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete   | 2026-05-30 |
+| 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
 
 ---
 
