@@ -43,6 +43,8 @@ import { getRouteMeta, type ActiveNav } from '@/lib/route-meta';
 import { LocaleToggle } from '../LocaleToggle';
 import { ThemeToggle } from '../ThemeToggle';
 import { BrandLogo } from './BrandLogo';
+import { ViewToggle } from '../ViewToggle';
+import { subscribeView, getViewSnapshot, getServerViewSnapshot, type ViewMode } from '@/lib/view-store';
 
 // Re-exported for back-compat with existing imports (e.g. tests). The
 // canonical home is now @/lib/route-meta.
@@ -77,6 +79,13 @@ export interface RetractableSidebarProps {
    * `activeNav` is not explicitly provided.
    */
   adminSegment?: string;
+  /**
+   * Admin-only redirect target for the agent→admin view switch on non-admin
+   * routes (where adminSegment is absent). Built server-side from
+   * ADMIN_URL_SEGMENT and forwarded by Shell. Ignored when adminHrefs is
+   * present (on (admin) routes, adminHrefs.home already supplies the target).
+   */
+  adminHomeHref?: string;
 }
 
 const STORAGE_KEY = 'leasetic.sidebar.collapsed';
@@ -162,6 +171,7 @@ export function RetractableSidebar({
   theme,
   adminHrefs,
   adminSegment,
+  adminHomeHref,
 }: RetractableSidebarProps) {
   // Derive active-nav from the current pathname when not explicitly overridden.
   // usePathname() can return null outside a router context (e.g. some test
@@ -179,6 +189,24 @@ export function RetractableSidebar({
     getCollapsedSnapshot,
     getServerCollapsedSnapshot,
   );
+
+  // View store consumption (Plan 24-02).
+  const storedView = useSyncExternalStore(
+    subscribeView,
+    getViewSnapshot,
+    getServerViewSnapshot,
+  );
+  // D-02: presence of adminSegment = on an (admin) route ⇒ force Admin view regardless
+  // of the stored flag. adminSegment is only set by the (admin) layout, so its presence
+  // is the authoritative signal that we are physically on an admin route.
+  const effectiveView: ViewMode = adminSegment ? 'admin' : storedView;
+
+  // Compute the redirect target the ViewToggle should use for "switch to Admin":
+  // - On (admin) routes: adminHrefs.home is available (forwarded by the (admin) layout).
+  // - On (authed) non-admin routes: adminHomeHref is forwarded by Shell (built server-side
+  //   from ADMIN_URL_SEGMENT — the client island cannot read process.env directly).
+  // - Fallback '/' is a safe no-op (should not occur for real admins).
+  const viewToggleHome = adminHrefs?.home ?? adminHomeHref ?? '/';
 
   // Side-effect: keep <html> --shell-sidebar-current-w in sync with `collapsed`.
   // Lives in useEffect because the documentElement write is a real DOM mutation;
@@ -201,11 +229,13 @@ export function RetractableSidebar({
     window.dispatchEvent(new Event(TOGGLE_EVENT));
   }, []);
 
-  const navItems: NavItem[] = isAdmin
-    ? adminNavItems(
-        adminHrefs ?? { home: '/', coefficients: '/', partners: '/', history: '/' },
-      )
-    : partnerNavItems();
+  // VIEW-04 / C-04: nav-set decision keys off BOTH the server-derived real role (isAdmin)
+  // AND the effective view. A forged sessionStorage flag cannot give a non-admin the admin
+  // nav because isAdmin short-circuits the AND to partnerNav for non-admins (T-24-03).
+  const navItems: NavItem[] =
+    isAdmin && effectiveView === 'admin'
+      ? adminNavItems(adminHrefs ?? { home: '/', coefficients: '/', partners: '/', history: '/' })
+      : partnerNavItems();
 
   const cycleLang = () =>
     startTransition(() => {
@@ -350,6 +380,8 @@ export function RetractableSidebar({
       {/* Bottom: lang + theme toggles */}
       {collapsed ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+          {/* ViewToggle pill — first child, admin-only (C-03 gate) */}
+          {isAdmin && <ViewToggle lang={lang} adminHrefs={{ home: viewToggleHome }} collapsed />}
           <button
             type="button"
             onClick={cycleLang}
@@ -394,6 +426,8 @@ export function RetractableSidebar({
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {/* ViewToggle segmented control — first child, admin-only (C-03 gate) */}
+          {isAdmin && <ViewToggle lang={lang} adminHrefs={{ home: viewToggleHome }} fullWidth />}
           <LocaleToggle current={lang} fullWidth />
           <ThemeToggle current={theme} fullWidth />
         </div>

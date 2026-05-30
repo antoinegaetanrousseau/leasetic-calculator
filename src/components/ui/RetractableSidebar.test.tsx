@@ -10,9 +10,15 @@ vi.mock('@/lib/i18n/actions', () => ({
 vi.mock('@/lib/theme/actions', () => ({
   setTheme: vi.fn(async () => {}),
 }));
+// Mock next/navigation for ViewToggle (router.push calls on view switch)
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/',
+}));
 
 beforeEach(() => {
   window.localStorage.clear();
+  window.sessionStorage.clear();
   document.documentElement.style.removeProperty('--shell-sidebar-current-w');
 });
 
@@ -166,6 +172,75 @@ describe('RetractableSidebar', () => {
     // documentElement CSS variable also set
     expect(document.documentElement.style.getPropertyValue('--shell-sidebar-current-w'))
       .toBe('72px');
+  });
+
+  // ── Phase 24 Plan 02 — View-toggle + effectiveView tests ─────────────────
+
+  it('AC-RS-24-01: admin expanded footer renders 3 radiogroups (ViewToggle + Locale + Theme)', () => {
+    render(
+      <RetractableSidebar
+        activeNav="admin-home"
+        isAdmin={true}
+        lang="fr"
+        theme="light"
+        adminHrefs={{ home: '/x', coefficients: '/x/coefficients', partners: '/x/partners', history: '/x/history' }}
+      />,
+    );
+    const radiogroups = screen.getAllByRole('radiogroup');
+    expect(radiogroups).toHaveLength(3);
+    // First radiogroup is ViewToggle (aria-label="Vue")
+    expect(radiogroups[0]).toHaveAttribute('aria-label', 'Vue');
+  });
+
+  it('AC-RS-24-02 (C-03 gate): isAdmin=false ⇒ no ViewToggle radiogroup ("Vue" absent)', () => {
+    render(<RetractableSidebar activeNav="home" isAdmin={false} lang="fr" theme="light" />);
+    expect(screen.queryByRole('radiogroup', { name: 'Vue' })).toBeNull();
+  });
+
+  it('AC-RS-24-03 (VIEW-02 agent view): stored view=agent ⇒ 4-item partner nav; stored view=admin ⇒ 6-item admin nav', () => {
+    // Agent view: 4 items
+    window.sessionStorage.setItem('leasetic.view', 'agent');
+    const { container: c1 } = render(
+      <RetractableSidebar
+        activeNav="home"
+        isAdmin={true}
+        lang="fr"
+        theme="light"
+        adminHomeHref="/x"
+      />,
+    );
+    expect(c1.querySelectorAll('#leasetic-sidebar-nav a')).toHaveLength(4);
+    cleanup();
+
+    // Admin view: 6 items
+    window.sessionStorage.setItem('leasetic.view', 'admin');
+    const { container: c2 } = render(
+      <RetractableSidebar
+        activeNav="admin-home"
+        isAdmin={true}
+        lang="fr"
+        theme="light"
+        adminHomeHref="/x"
+        adminHrefs={{ home: '/x', coefficients: '/x/coefficients', partners: '/x/partners', history: '/x/history' }}
+      />,
+    );
+    expect(c2.querySelectorAll('#leasetic-sidebar-nav a')).toHaveLength(6);
+  });
+
+  it('AC-RS-24-04 (D-02 auto-reconcile): adminSegment present + stored view=agent ⇒ 6-item admin nav', () => {
+    window.sessionStorage.setItem('leasetic.view', 'agent');
+    const { container } = render(
+      <RetractableSidebar
+        activeNav="admin-home"
+        isAdmin={true}
+        lang="fr"
+        theme="light"
+        adminSegment="x"
+        adminHrefs={{ home: '/x', coefficients: '/x/coefficients', partners: '/x/partners', history: '/x/history' }}
+      />,
+    );
+    // adminSegment present ⇒ effectiveView='admin' ⇒ admin nav despite stored 'agent'
+    expect(container.querySelectorAll('#leasetic-sidebar-nav a')).toHaveLength(6);
   });
 
   it('AC-RS-01/AC-RS-03: clicking chevron toggles width, writes localStorage, writes --shell-sidebar-current-w', async () => {
