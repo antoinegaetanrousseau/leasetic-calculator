@@ -1,10 +1,11 @@
 ---
 phase: 24
 slug: admin-dual-view-toggle
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-30
+reviewed_at: 2026-05-30
 ---
 
 # Phase 24 — UI Design Contract: Admin Dual-View Toggle
@@ -38,19 +39,34 @@ Declared values — 8-point scale, multiples of 4 only:
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| xs | 4px | Icon gaps, segment inner gap |
-| sm | 8px | Gap between controls in collapsed footer stack |
+| xs | 4px | Icon gaps, segment inner gap, container inner padding (`p-1`) |
+| sm | 8px | Gap between controls in footer stack |
 | md | 16px | Footer divider margin-bottom |
 | lg | 24px | Footer divider margin-top |
 | xl | 32px | — |
 | 2xl | 48px | — |
 | 3xl | 64px | — |
 
-Exceptions:
+### Segment padding
 
-- Segment horizontal padding: `px-3` (12px) / `py-1.5` (6px) — matches `ThemeToggle` / `LocaleToggle` exactly.
-- Container inner padding: `p-1` (4px) on the pill wrapper — matches existing toggles.
-- Collapsed pill: `width: 36px; height: 28px` — matches the collapsed `LocaleToggle` pill geometry.
+The new `ViewToggle` segments use `py-2` (8px) vertical padding — the smallest 4px-grid-compliant
+value appropriate for 11.5px/600 uppercase text.
+
+> **Existing-component discrepancy (do not replicate):** `ThemeToggle` and `LocaleToggle` both use
+> `py-1.5` (6px), which is NOT a multiple of 4. This is a pre-existing grid violation in those
+> components. `ViewToggle` must NOT copy this value — use `py-2` (8px) instead to stay compliant.
+
+Horizontal padding is unchanged: `px-3` (12px) on each segment, matching the existing controls.
+Container inner padding: `p-1` (4px) on the pill wrapper — compliant and matching existing toggles.
+
+**Collapsed pill geometry:** `width: 36px; height: 28px` — matches the collapsed `LocaleToggle`
+pill dimensions (existing, unchanged).
+
+**Expanded segment rendered height** (ViewToggle, with `py-2`):
+11.5px (text, line-height 1) + 2×8px padding = **27.5px** content area. The wrapper adds `p-1`
+(4px) top and bottom: total wrapper height ≈ **35.5px**. This is ~4px taller than the existing
+LocaleToggle/ThemeToggle wrappers (~31.5px with `py-1.5`). Both controls remain visually coherent
+as a footer stack.
 
 ---
 
@@ -83,22 +99,51 @@ Token values (from `app/globals.css`):
 | `--ink` | `#41423d` | `#e6e9ef` |
 | `--muted` | `#6e7191` | `#8b93a8` |
 | `--surface` | `#ffffff` | `#161e2d` |
+| `--hover-overlay` | `rgba(17,44,59,0.04)` | `rgba(255,255,255,0.05)` |
+
+### Selected-segment color pattern
+
+The selected segment uses the **active-nav tint pattern** established in `RetractableSidebar.tsx`
+(lines 323-324), NOT a solid `--gd` fill:
+
+```
+background: rgba(18, 150, 87, 0.10)   /* 10% green tint over --paper */
+color:      var(--ink)
+fontWeight: 600
+```
+
+This matches the existing active nav item treatment exactly and is the only on-brand "selected"
+pattern in the app that passes WCAG AA at this text size.
+
+> **Why not solid `--gd` + white?** The pair `#129657` / `#ffffff` computes to **3.80:1**
+> (fails WCAG 2.1 AA ≥4.5:1 for 11.5px/600 text). The 10%-tint pattern yields 8.40:1 (light)
+> and 13.97:1 (dark) — both AAA. Solid `--gd` is reserved for icon fills and `.btn-green`
+> elements where text is larger or the pairing is different.
 
 ### Color contract for the `ViewToggle` control
 
-| State | Background | Foreground | Token pair | WCAG 2.1 AA contrast | Result |
-|-------|-----------|-----------|------------|----------------------|--------|
-| Selected segment — light | `--gd` `#129657` | `#ffffff` | gd / white | 7.39:1 | ✅ AAA |
-| Selected segment — dark | `--gd` `#129657` | `#ffffff` | gd / white | 7.39:1 | ✅ AAA |
-| Unselected segment — light | transparent over `--paper` `#f5f7fc` | `--muted` `#6e7191` | paper / muted | 4.51:1 | ✅ AA |
-| Unselected segment — dark | transparent over `--paper` `#0c121c` | `--muted` `#8b93a8` | paper-dark / muted-dark | 5.73:1 | ✅ AA |
-| Control wrapper — light | `--paper` `#f5f7fc` | — | — | — | n/a |
-| Control wrapper — dark | `--paper` `#0c121c` | — | — | — | n/a |
-| Collapsed pill — light | `--paper` `#f5f7fc` | `--ink` `#41423d` | paper / ink | 8.59:1 | ✅ AAA |
-| Collapsed pill — dark | `--paper` `#0c121c` | `--ink` `#e6e9ef` | paper-dark / ink-dark | 17.9:1 | ✅ AAA |
+All contrast ratios computed from W3C WCAG 2.1 relative luminance formula. Blended values
+for the tint background are composited against the actual `--paper` value per mode.
 
-> Contrast ratios computed from W3C relative luminance formula. No new tokens introduced.
-> All pairs reuse existing semantic tokens from `app/globals.css`.
+**Light mode — blended bg for selected segment:**
+`rgba(18,150,87,0.10)` over `#f5f7fc` → RGB(222, 237, 236) ≈ `#deedec`
+
+**Dark mode — blended bg for selected segment:**
+`rgba(18,150,87,0.10)` over `#0c121c` → RGB(13, 31, 34) ≈ `#0d1f22`
+
+| State | Background | Foreground | WCAG 2.1 ratio | Result |
+|-------|-----------|-----------|----------------|--------|
+| Selected segment — light | `rgba(18,150,87,0.10)` over `#f5f7fc` → `#deedec` | `--ink` `#41423d` | **8.40:1** | AAA |
+| Selected segment — dark | `rgba(18,150,87,0.10)` over `#0c121c` → `#0d1f22` | `--ink` `#e6e9ef` | **13.97:1** | AAA |
+| Unselected segment — light | transparent over `--paper` `#f5f7fc` | `--muted` `#6e7191` | 4.51:1 | AA |
+| Unselected segment — dark | transparent over `--paper` `#0c121c` | `--muted` `#8b93a8` | 5.73:1 | AA |
+| Control wrapper — light | `--paper` `#f5f7fc` | — | — | n/a |
+| Control wrapper — dark | `--paper` `#0c121c` | — | — | n/a |
+| Collapsed pill — light | `--paper` `#f5f7fc` | `--ink` `#41423d` | 8.59:1 | AAA |
+| Collapsed pill — dark | `--paper` `#0c121c` | `--ink` `#e6e9ef` | 17.9:1 | AAA |
+
+All pairs pass WCAG 2.1 AA (≥4.5:1) in both light and dark. No new tokens introduced.
+All pairs reuse existing semantic tokens from `app/globals.css`.
 
 ### 60/30/10 surface allocation (sidebar context)
 
@@ -106,16 +151,18 @@ Token values (from `app/globals.css`):
 |------|-------|--------------|-------------|
 | Dominant (60%) — sidebar bg | `--surface` | `#ffffff` | `#161e2d` |
 | Secondary (30%) — control wrapper | `--paper` | `#f5f7fc` | `#0c121c` |
-| Accent (10%) — active segment bg | `--gd` | `#129657` | `#129657` |
+| Accent (10%) — active segment tint | `rgba(18,150,87,0.10)` over `--paper` | see above | see above |
 | Destructive | `--danger` | `#dc2626` | `#dc2626` |
 
-Accent (`--gd`) reserved for: active nav items (existing), active segment fill in `ViewToggle`, active segment fill in `ThemeToggle` and `LocaleToggle` (existing pattern, unchanged).
+Accent (`--gd` tint) reserved for: active nav items (existing), active segment fill in
+`ViewToggle`, active segment fill in `ThemeToggle` and `LocaleToggle` (existing, unchanged).
 
 ---
 
 ## Visual Contract: Expanded Sidebar (260px)
 
-The `ViewToggle` control in **expanded** state is a two-segment segmented control rendered as a `div[role="radiogroup"]`, identical in structure to `LocaleToggle` and `ThemeToggle`.
+The `ViewToggle` control in **expanded** state is a two-segment segmented control rendered as a
+`div[role="radiogroup"]`, identical in structure to `LocaleToggle` and `ThemeToggle`.
 
 ### Wrapper
 
@@ -134,16 +181,18 @@ Two `button[role="radio"]` children, left-to-right: **Admin** then **Agent**.
 
 ```
 button[role="radio"]
-  className: "rounded-full px-3 py-1.5 uppercase"
+  className: "rounded-full px-3 py-2 uppercase transition-colors"
   style:
-    background: active ? var(--gd) : transparent
-    color:      active ? #ffffff   : var(--muted)
-    fontSize:   11.5px
+    background: active ? rgba(18, 150, 87, 0.10) : transparent
+    color:      active ? var(--ink)               : var(--muted)
     fontWeight: 600
+    fontSize:   11.5px
     letterSpacing: 0.04em
     flex: 1
     textAlign: center
 ```
+
+Note: `py-2` (8px) is used — NOT `py-1.5`. See Spacing section for rationale.
 
 Segment labels:
 
@@ -167,15 +216,18 @@ Segment labels:
 
 Gap between controls: `gap: 8` (existing `<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>` wrapper — add `ViewToggle` inside it, as the first child).
 
-The divider markup is unchanged. `ViewToggle` is inserted as the first item in the existing `<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>` container.
+The divider markup is unchanged. `ViewToggle` is inserted as the first item in the existing
+`<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>` container.
 
 ---
 
 ## Visual Contract: Collapsed Sidebar (72px)
 
-In **collapsed** state the footer renders a vertical stack of pill/icon buttons (`display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center'`).
+In **collapsed** state the footer renders a vertical stack of pill/icon buttons
+(`display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center'`).
 
-The `ViewToggle` collapsed affordance is a single pill button that cycles the view on click and shows the current view's initial letter.
+The `ViewToggle` collapsed affordance is a single pill button that cycles the view on click
+and shows the current view's initial letter.
 
 ```
 button[type="button"]
@@ -196,7 +248,9 @@ button[type="button"]
   Content: currentView === 'admin' ? 'A' : 'G'
 ```
 
-This matches the collapsed `LocaleToggle` pill geometry exactly (`width: 36, height: 28, borderRadius: 9999, background: var(--paper), border: 1px solid var(--border), color: var(--ink), fontSize: 11.5px, fontWeight: 600`).
+This matches the collapsed `LocaleToggle` pill geometry exactly
+(`width: 36, height: 28, borderRadius: 9999, background: var(--paper),
+border: 1px solid var(--border), color: var(--ink), fontSize: 11.5px, fontWeight: 600`).
 
 ### Ordering in the collapsed footer stack (top to bottom)
 
@@ -206,7 +260,8 @@ LocaleToggle pill (existing: shows "fr" / "en")
 ThemeToggle icon  (existing: shows Sun/Monitor/Moon)
 ```
 
-The collapsed stack renders the `ViewToggle` as the first child in the existing `<div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>` block.
+The collapsed stack renders the `ViewToggle` as the first child in the existing
+`<div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>` block.
 
 ---
 
@@ -233,11 +288,10 @@ The collapsed stack renders the `ViewToggle` as the first child in the existing 
 
 ### Focus ring
 
-Same pattern as existing footer controls: browser default `outline` is not suppressed. Use Tailwind `focus-visible:ring-2 focus-visible:ring-[var(--gd)] focus-visible:ring-offset-1` on each segment button, matching the existing ThemeToggle segment style (verify in `ThemeToggle.tsx` — if no explicit ring is applied there, do not add one to `ViewToggle`; stay consistent).
-
-> `ThemeToggle` and `LocaleToggle` currently use `transition-colors` via `className` but do not
-> add explicit focus rings (browser default). `ViewToggle` must match — no explicit ring beyond
-> browser default unless the existing toggles already have one.
+Same pattern as existing footer controls: browser default `outline` is not suppressed.
+`ThemeToggle` and `LocaleToggle` currently use `transition-colors` via `className` but do not
+add explicit focus rings (browser default). `ViewToggle` must match — no explicit ring beyond
+browser default unless the existing toggles already have one.
 
 ### Hover
 
@@ -245,22 +299,25 @@ Same pattern as existing footer controls: browser default `outline` is not suppr
 background: var(--hover-overlay)   [light: rgba(17,44,59,0.04) / dark: rgba(255,255,255,0.05)]
 ```
 
-Applied to unselected segment on hover. Selected segment retains `var(--gd)` on hover (no change).
+Applied to unselected segment on hover. Selected segment retains tint background on hover (no change).
 
 ### Transition
 
 ```
-transition-colors   (Tailwind utility, 150ms ease — same as ThemeToggle's className)
+transition-colors   (Tailwind utility, 150ms ease — same as ThemeToggle className)
 ```
 
 ### View-switch behavior (D-01, D-02 — execution, not UI)
 
 These are interaction contracts the executor must honor:
 
-1. On segment click: set `sessionStorage['leasetic.view']` to `'admin'` or `'agent'`, dispatch a custom event (mirror the `leasetic-sidebar-toggled` pattern from the collapse store), then `router.push()` to the new view's home (agent: `/`; admin: `adminHrefs.home`).
+1. On segment click: set `sessionStorage['leasetic.view']` to `'admin'` or `'agent'`, dispatch a
+   custom event (mirror the `leasetic-sidebar-toggled` pattern from the collapse store), then
+   `router.push()` to the new view's home (agent: `/`; admin: `adminHrefs.home`).
 2. Default when `sessionStorage` key absent: `'admin'`.
 3. On logout: clear `sessionStorage['leasetic.view']` (hook into the existing logout path).
-4. Auto-reconcile: when inside an `(admin)` route group, the effective view is always `'admin'` regardless of the stored flag (D-02).
+4. Auto-reconcile: when inside an `(admin)` route group, the effective view is always `'admin'`
+   regardless of the stored flag (D-02).
 
 ---
 
