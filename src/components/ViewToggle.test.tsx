@@ -62,7 +62,8 @@ describe('ViewToggle', () => {
     const agentStyle = agentBtn.getAttribute('style') ?? '';
     const adminStyle = adminBtn.getAttribute('style') ?? '';
 
-    expect(agentStyle).toContain('rgba(18, 150, 87, 0.10)');
+    // Browser normalizes 0.10 → 0.1 in computed style attribute
+    expect(agentStyle).toMatch(/rgba\(18,\s*150,\s*87,\s*0\.1\)/);
     expect(agentStyle).toContain('var(--ink)');
     expect(adminStyle).toContain('transparent');
   });
