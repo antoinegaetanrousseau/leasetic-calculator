@@ -252,7 +252,7 @@ All 19 active v1.4 requirements shipped — 4 phases (22–25), no documented pa
 See `.planning/REQUIREMENTS.md` for the full scoped list. Phase numbering continues at 26.
 
 - [ ] Active/expired proposal rows expose Archive + Delete actions on `/proposals` (no Edit)
-- [ ] Status pill renders correctly + responsively on the home "Propositions récentes" list and the `/proposals` table
+- [x] Status pill renders correctly + responsively on the home "Propositions récentes" list and the `/proposals` table — v1.5 (Phase 27, UIFIX-02/03; light + dark human-verified)
 
 ### Deferred to v1.5+
 
@@ -378,4 +378,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-30 — v1.5 (Proposal List Actions & Pill Fix) started via `/gsd-new-milestone`. Scope: restore Archive/Delete actions on active proposal rows + fix status-pill rendering on home + `/proposals`. Roadmap continues at Phase 26.*
+*Last updated: 2026-05-30 — Phase 27 (status-pill-rendering-fix) complete: home "Propositions récentes" chip moved to a trailing `max-content` track (UIFIX-02), `/proposals` re-verified post-Phase-26 (UIFIX-03), light + dark human-verified. v1.5 phases 26–27 both shipped; milestone ready for `/gsd-complete-milestone`.*
