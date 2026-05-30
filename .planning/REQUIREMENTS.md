@@ -58,17 +58,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ROWACT-01 | TBD | Pending |
-| ROWACT-02 | TBD | Pending |
-| ROWACT-03 | TBD | Pending |
-| ROWACT-04 | TBD | Pending |
-| UIFIX-02 | TBD | Pending |
-| UIFIX-03 | TBD | Pending |
+| ROWACT-01 | Phase 26 | Mapped |
+| ROWACT-02 | Phase 26 | Mapped |
+| ROWACT-03 | Phase 26 | Mapped |
+| ROWACT-04 | Phase 26 | Mapped |
+| UIFIX-02 | Phase 27 | Mapped |
+| UIFIX-03 | Phase 27 | Mapped |
 
 **Coverage:**
 - v1.5 requirements: 6 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 6 ⚠️ (filled by `/gsd-new-milestone` roadmapper)
+- Mapped to phases: 6
+- Unmapped: 0 ✓ (roadmap created 2026-05-30)
 
 ---
 *Requirements defined: 2026-05-30*

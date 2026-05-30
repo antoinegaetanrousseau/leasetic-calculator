@@ -7,6 +7,7 @@
 - ✅ **v1.2 — UX Polish + Proposal Wizard** — Phases 11-15 (shipped 2026-05-21) — see `milestones/v1.2-ROADMAP.md`
 - ✅ **v1.3 — Design Refresh + Partner-Onboarding Ready** — Phases 16-21 (shipped 2026-05-29) — see `milestones/v1.3-ROADMAP.md`
 - ✅ **v1.4 — Partner Types, Admin Dual-View & Rebrand** — Phases 22-25 (shipped 2026-05-30) — see `milestones/v1.4-ROADMAP.md`
+- 🔄 **v1.5 — Proposal List Actions & Pill Fix** — Phases 26-27 (in progress)
 
 ---
 
@@ -83,6 +84,11 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 **Full archive:** `milestones/v1.4-ROADMAP.md` · `milestones/v1.4-REQUIREMENTS.md` · `milestones/v1.4-MILESTONE-AUDIT.md` · **Summary:** `reports/MILESTONE_SUMMARY-v1.4.md`
 
 </details>
+
+### v1.5 — Proposal List Actions & Pill Fix (Phases 26-27)
+
+- [ ] **Phase 26: Active/Expired Row Actions** — Archive + Delete icon buttons on non-draft proposal rows; ADMIN-09 envelope held (19-gate grep suite stays green)
+- [ ] **Phase 27: Status-Pill Rendering Fix** — Content-hugging `.chip` sizing on home "Propositions récentes" list and `/proposals` table; light + dark verified
 
 ---
 
@@ -320,6 +326,34 @@ Plans:
 
 ---
 
+### Phase 26: Active/Expired Row Actions
+
+**Goal:** Partners can archive or delete any active or expired proposal directly from the `/proposals` row, using the same icon-button pattern already wired for draft rows — with the ADMIN-09 envelope held throughout.
+**Depends on:** Phase 25 (v1.4 complete; 19-gate grep suite baseline; `DraftActionsClient` pattern established)
+**Requirements:** ROWACT-01, ROWACT-02, ROWACT-03, ROWACT-04
+**Success Criteria** (what must be TRUE):
+
+  1. From `/proposals`, archiving an active or expired proposal via its per-row Archive icon button moves it to the Archivées view without a full-page navigation; the row disappears from the Actives list and reappears in the Archivées list.
+  2. From `/proposals`, clicking the Delete icon button on an active or expired row shows a confirmation prompt; confirming soft-deletes the proposal so it remains accessible via the Recently Deleted toggle.
+  3. Draft rows continue to show Edit + Archive + Delete unchanged; active and expired rows show only Archive + Delete (no Edit button).
+  4. `ProposalRowDto` carries no `params_snapshot` or commission data; the 19-gate grep-contract suite passes without modification.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 27: Status-Pill Rendering Fix
+
+**Goal:** The status chip ("Actif", "Brouillon", "Expirée", "Archivée") renders with content-hugging, responsive sizing on both the home "Propositions récentes" list and the `/proposals` table — in light and dark mode — closing the regression left open after v1.4's `max-content` column fix.
+**Depends on:** Phase 26 (row-actions wiring adds new layout context to `/proposals` rows; pill fix should run on the stable post-26 DOM structure to avoid churn)
+**Requirements:** UIFIX-02, UIFIX-03
+**Success Criteria** (what must be TRUE):
+
+  1. The status chip on the home "Propositions récentes" list displays its full label (e.g. "Actif") with no text clipping, no vertical misalignment, and no fixed-width artifact across desktop viewport widths in both light and dark mode.
+  2. The status chip on the `/proposals` table renders with the same content-hugging behavior as the home surface, correct in both light and dark mode; no regression introduced on draft or archived rows.
+**Plans**: TBD
+**UI hint**: yes
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -349,7 +383,9 @@ Plans:
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
+| 26. Active/Expired Row Actions | v1.5 | 0/TBD | Not started | - |
+| 27. Status-Pill Rendering Fix | v1.5 | 0/TBD | Not started | - |
 
 ---
 
-*Last updated: 2026-05-30 — v1.4 shipped (4 phases, 12 plans, 1184 tests; partner types + commission-free proposals, admin dual-view toggle, PDF fixes, admin-home polish; teal rebrand descoped). Production live at https://leasetic-matrice.vercel.app. Next: `/gsd-new-milestone` (phase numbering continues at 26).*
+*Last updated: 2026-05-30 — v1.5 roadmap created (2 phases, 26-27; 6 requirements: ROWACT-01..04 + UIFIX-02..03). Phase numbering continues from v1.4 (ended Phase 25).*

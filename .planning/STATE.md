@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Proposal List Actions & Pill Fix
 status: planning
-last_updated: "2026-05-30T16:02:22.610Z"
+last_updated: "2026-05-30T18:00:00.000Z"
 last_activity: 2026-05-30
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** v1.4 shipped & archived 2026-05-30 — ready for `/gsd-new-milestone` (phase numbering continues at 26)
+**Current focus:** v1.5 — Proposal List Actions & Pill Fix. Roadmap created 2026-05-30. Phases 26 (Row Actions) + 27 (Pill Fix). 6 requirements: ROWACT-01..04 + UIFIX-02..03.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 26 — Active/Expired Row Actions (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-30 — Milestone v1.5 started
+Status: Roadmap ready, awaiting first plan
+Last activity: 2026-05-30 — v1.5 roadmap created (2 phases, 6 requirements)
 
 ## Deferred Items
 
