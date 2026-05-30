@@ -945,6 +945,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "company_name": {
+          "name": "company_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "partner_type": {
           "name": "partner_type",
           "type": "text",

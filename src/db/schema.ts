@@ -59,6 +59,12 @@ export const users = pgTable('users', {
   createdBy: text('created_by'),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
+  // Partner company name. Captured on the admin "create partner" form
+  // (src/lib/admin/schemas.ts) and gates proposal-wizard step 1 (advance is
+  // blocked when null). Column added by migration 0005_partner_company_name
+  // (nullable — existing rows may be null). Previously read via raw query
+  // because it was missing from this typed schema; added here to close the drift.
+  companyName: text('company_name'),
   // PTYPE-01: partner type dimension — Agent / Commercial / Partenaire.
   // DEFAULT 'Partenaire' ensures existing rows stay Partenaire on migration (PTYPE-02).
   partnerType: text('partner_type').notNull().default('Partenaire'),
