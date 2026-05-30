@@ -156,7 +156,7 @@ export default async function HomePage() {
                   aria-label={`${row.clientCo} ${row.lcRef}`}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '90px 1fr auto auto',
+                    gridTemplateColumns: '1fr auto auto max-content',
                     alignItems: 'center',
                     gap: 16,
                     padding: '10px 12px',
@@ -164,10 +164,6 @@ export default async function HomePage() {
                     textDecoration: 'none',
                   }}
                 >
-                  <StatusChip
-                    variant={row.displayStatus}
-                    label={t(chipKey, lang)}
-                  />
                   <span
                     style={{
                       fontSize: '14.5px',
@@ -201,6 +197,12 @@ export default async function HomePage() {
                     }}
                   >
                     {formatCurrency(Number(row.amountHT), lang)}
+                  </span>
+                  <span style={{ justifySelf: 'start', display: 'inline-flex' }}>
+                    <StatusChip
+                      variant={row.displayStatus}
+                      label={t(chipKey, lang)}
+                    />
                   </span>
                 </Link>
               );
