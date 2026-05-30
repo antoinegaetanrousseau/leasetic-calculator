@@ -34,6 +34,13 @@ export interface ShellProps {
   activeNav?: ActiveNav;
   /** Required when isAdmin=true; used to build admin nav hrefs (UI-SPEC §11.6). */
   adminSegment?: string;
+  /**
+   * Admin-only redirect target for the agent→admin view switch on non-admin
+   * routes. Forwarded straight to RetractableSidebar; distinct from adminSegment
+   * so it does NOT trigger D-02 auto-reconcile (passing adminSegment would force
+   * effectiveView='admin' and make agent view impossible — see Plan 24-02 Task 2).
+   */
+  adminHomeHref?: string;
   children: React.ReactNode;
 }
 
@@ -45,6 +52,7 @@ export function Shell({
   email,
   activeNav,
   adminSegment,
+  adminHomeHref,
   children,
 }: ShellProps) {
   // Build admin hrefs from adminSegment (UI-SPEC §11.6). Shell reads adminSegment
@@ -77,6 +85,7 @@ export function Shell({
         theme={theme}
         adminHrefs={adminHrefs}
         adminSegment={adminSegment}
+        adminHomeHref={adminHomeHref}
       />
 
       {/* Topbar (row 1, col 2) — refactored in Plan 11-05 Task 2; no `theme` prop */}
