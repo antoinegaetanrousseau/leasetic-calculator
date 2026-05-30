@@ -56,11 +56,22 @@ export function ViewToggle({
 
   // Collapsed branch: single cycling pill (matches collapsed LocaleToggle/ThemeToggle geometry).
   if (collapsed) {
+    // WR-04: surface the CURRENT view to assistive tech (a11y parity with the
+    // expanded radiogroup, which exposes aria-checked). The collapsed pill cycles
+    // on click, so we announce the active view in aria-label and reflect it via
+    // aria-pressed (pressed === currently in Admin view). Without this a screen
+    // reader user only hears the generic "Switch view" label with no A/G state.
+    const currentLabel = t(
+      currentView === 'admin' ? 'sidebar.view.admin' : 'sidebar.view.agent',
+      lang,
+    );
     return (
       <button
         type="button"
         onClick={() => goto(currentView === 'admin' ? 'agent' : 'admin')}
-        aria-label={t('sidebar.view.cycle', lang)}
+        aria-label={`${t('sidebar.view.cycle', lang)} (${currentLabel})`}
+        aria-pressed={currentView === 'admin'}
+        title={currentLabel}
         style={{
           width: 36,
           height: 28,

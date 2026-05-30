@@ -102,7 +102,10 @@ describe('ViewToggle', () => {
     // Single button with content 'A' (admin default)
     const pill = screen.getByRole('button');
     expect(pill.textContent).toBe('A');
-    expect(pill).toHaveAttribute('aria-label', 'Changer de vue');
+    // WR-04: aria-label includes the current view, and aria-pressed reflects it
+    // (a11y parity with the expanded radiogroup's aria-checked).
+    expect(pill).toHaveAttribute('aria-label', 'Changer de vue (Admin)');
+    expect(pill).toHaveAttribute('aria-pressed', 'true');
 
     cleanup();
 
@@ -111,6 +114,8 @@ describe('ViewToggle', () => {
     render(<ViewToggle lang="fr" adminHrefs={{ home: '/x' }} collapsed />);
     const pillAgent = screen.getByRole('button');
     expect(pillAgent.textContent).toBe('G');
+    expect(pillAgent).toHaveAttribute('aria-label', 'Changer de vue (Agent)');
+    expect(pillAgent).toHaveAttribute('aria-pressed', 'false');
   });
 
   // Test 8: keyboard ArrowRight moves selection
