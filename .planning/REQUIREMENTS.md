@@ -34,7 +34,7 @@ The headline feature. Introduces a `partner_type` dimension that conditions prop
 ### PDF Rendering Fixes (PDF)
 
 - [x] **PDF-01**: Numbers and typography on the generated PDF render with no glyph overlap or artifacts — specifically the loyer figure and all monetary/numeric values — under French number formatting (thousands separators, € symbol). Root cause confirmed in a planning spike (likely the U+202F narrow-no-break-space separator or a missing glyph in the embedded font).
-- [ ] **PDF-02**: The **"Destinataire"** block beneath the "Proposition de location financière" title is removed; the layout reflows cleanly without it.
+- [x] **PDF-02**: The **"Destinataire"** block beneath the "Proposition de location financière" title is removed; the layout reflows cleanly without it.
 - [ ] **PDF-03**: The PDF byte-determinism CI gate is updated for the new layout (fixture regenerated) and remains green; the calc golden corpus is extended to cover the Agent/Commercial commission-free render.
 
 ### Teal Rebrand (BRAND)
