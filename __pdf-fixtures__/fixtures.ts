@@ -47,6 +47,25 @@ export interface PdfFixture {
   data: ProposalDocumentProps['data'];
 }
 
+/**
+ * Commission-free fixture for Agent/Commercial partner type (PTYPE-04/06).
+ * Uses the same amountHT/duration/tranche as SHARED_BASE but computes
+ * loyerHT WITHOUT the commission factor:
+ *   loyer = round2(amountHT × coeff / 100) = round2(75000 × 2.2500 / 100) = 1687.50
+ * Proof: the Partenaire loyer for the same inputs is 1771.88 (5% commission applied),
+ * so 1687.50 < 1771.88 confirms the commission factor is dropped.
+ */
+const AGENT_COMMISSION_FREE_BASE: Omit<ProposalDocumentProps['data'], 'language'> = {
+  ...SHARED_BASE,
+  computed: {
+    state: 'computed',
+    trancheKey: 't2',
+    loyerHT: '1687.50',
+    coeff: '2.2500',
+    isOnDemand: false,
+  },
+};
+
 export const pdfFixtures: ReadonlyArray<PdfFixture> = [
   {
     name: 'happy-path-fr',
@@ -55,5 +74,9 @@ export const pdfFixtures: ReadonlyArray<PdfFixture> = [
   {
     name: 'happy-path-en',
     data: { ...SHARED_BASE, language: 'en' },
+  },
+  {
+    name: 'agent-commission-free',
+    data: { ...AGENT_COMMISSION_FREE_BASE, language: 'fr' },
   },
 ];

@@ -442,13 +442,12 @@ export const dictionaries = {
     'proposal.toast.restore.error': 'Erreur lors de la restauration. Réessayez.',
     'proposal.toast.duplicate.prefilled': "Champs pré-remplis depuis la proposition d\u2019origine. Modifiez si nécessaire.",
 
-    // 7.8 PDF document copy (14 keys — used by @react-pdf/renderer only;
+    // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
     //     5 v10 keys reused per §7.9 — pdf.computed.duration.* + pdf.interests.* + pdf.computed.amount.label
     //     are NOT redeclared; consumers reference proposal.duree.* / proposal.interests.* / proposal.montant.label.)
     'pdf.tagline': 'Location financière IT',
     'pdf.title': 'Proposition de location financière',
     'pdf.ref.label': 'N°',
-    'pdf.section.recipient': 'DESTINATAIRE',
     'pdf.section.project': 'PROJET',
     'pdf.section.interests': "POINTS D\u2019INTÉRÊT IDENTIFIÉS\u202f:",
     'pdf.project.placeholder': 'Projet non précisé',
@@ -1352,12 +1351,11 @@ export const dictionaries = {
     'proposal.toast.restore.error': 'Could not restore. Please try again.',
     'proposal.toast.duplicate.prefilled': 'Fields pre-filled from source proposal. Edit if needed.',
 
-    // 7.8 PDF document copy (14 keys — used by @react-pdf/renderer only;
+    // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
     //     5 v10 keys reused per §7.9)
     'pdf.tagline': 'IT financial leasing',
     'pdf.title': 'Financial lease proposal',
     'pdf.ref.label': 'No.',
-    'pdf.section.recipient': 'RECIPIENT',
     'pdf.section.project': 'PROJECT',
     'pdf.section.interests': 'POINTS OF INTEREST IDENTIFIED:',
     'pdf.project.placeholder': 'Project not specified',

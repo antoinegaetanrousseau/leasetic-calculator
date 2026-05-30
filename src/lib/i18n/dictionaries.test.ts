@@ -185,11 +185,10 @@ const phase8Keys: DictKey[] = [
   'proposal.toast.restore.success',
   'proposal.toast.restore.error',
   'proposal.toast.duplicate.prefilled',
-  // 7.8 PDF document copy (14)
+  // 7.8 PDF document copy (13)
   'pdf.tagline',
   'pdf.title',
   'pdf.ref.label',
-  'pdf.section.recipient',
   'pdf.section.project',
   'pdf.section.interests',
   'pdf.project.placeholder',
