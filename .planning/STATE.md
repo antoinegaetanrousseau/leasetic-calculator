@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
 status: verifying
-last_updated: "2026-05-30T00:13:26.835Z"
+last_updated: "2026-05-30T11:37:51.026Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 25
