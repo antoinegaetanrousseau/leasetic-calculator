@@ -87,7 +87,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 ### v1.5 — Proposal List Actions & Pill Fix (Phases 26-27)
 
-- [ ] **Phase 26: Active/Expired Row Actions** — Archive icon button on non-draft proposal rows + Restore in Archivées (Delete descoped); ADMIN-09 envelope held (19-gate grep suite stays green)
+- [x] **Phase 26: Active/Expired Row Actions** — Archive icon button on non-draft proposal rows + Restore in Archivées (Delete descoped); ADMIN-09 envelope held (19-gate grep suite stays green) (completed 2026-05-30)
 - [ ] **Phase 27: Status-Pill Rendering Fix** — Content-hugging `.chip` sizing on home "Propositions récentes" list and `/proposals` table; light + dark verified
 
 ---
@@ -341,7 +341,7 @@ Plans:
 
 > **Scope note (planner, 2026-05-30 — D-01).** Per-row Delete on finalized rows (ROWACT-02) is descoped to Archive-only; a per-row Restore is added in the Archivees view (D-02). Plan 26-03 reconciles the Goal + criteria above and REQUIREMENTS.md at execute time. See 26-CONTEXT.md.
 
-**Plans:** 2/3 plans executed
+**Plans:** 2/3 plans complete
 
 Wave 1 (parallel):
 
@@ -397,7 +397,7 @@ Wave 2 (after 26-01):
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
-| 26. Active/Expired Row Actions | v1.5 | 2/3 | In Progress|  |
+| 26. Active/Expired Row Actions | v1.5 | 2/3 | Complete    | 2026-05-30 |
 | 27. Status-Pill Rendering Fix | v1.5 | 0/TBD | Not started | - |
 
 ---

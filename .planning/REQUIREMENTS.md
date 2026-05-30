@@ -22,11 +22,11 @@ Restore per-row management actions on the partner `/proposals` list. The `DraftA
 > and a single Archive button ships instead. A per-row Restore in the Archivées view is
 > added as a new requirement (D-02 → ROWACT-05). Authority: `26-CONTEXT.md`.
 
-- [ ] **ROWACT-01**: From the `/proposals` list, a partner can **archive** an active or expired proposal via a per-row Archive icon button, moving it to the **Archivées** filter view without a full-page navigation (the list refreshes in place).
+- [x] **ROWACT-01**: From the `/proposals` list, a partner can **archive** an active or expired proposal via a per-row Archive icon button, moving it to the **Archivées** filter view without a full-page navigation (the list refreshes in place).
 - [~] **ROWACT-02** *(descoped 2026-05-30, D-01)*: ~~per-row Delete on finalized rows~~ — superseded by ROWACT-01 Archive. For a finalized proposal the only reversible backend op is soft-delete; Archive and Delete collapse to the same operation, so a single Archive button ships instead. Hard-delete remains forbidden by 10-year PDF retention.
-- [ ] **ROWACT-03**: Active and expired rows expose **ONLY Archive** (no Edit, no Delete — finalized proposals are immutable and Delete is descoped per D-01); draft rows retain their existing **Edit + Archive + Delete** set unchanged.
-- [ ] **ROWACT-04**: The row-action wiring keeps the ADMIN-09 commission-invisibility envelope intact — `ProposalRowDto` never carries `params_snapshot`/commission, and the 19-gate grep-contract suite stays green.
-- [ ] **ROWACT-05**: From the Archivées view (`/proposals?archived=1`), a partner can **RESTORE** a soft-deleted proposal via a per-row Restore icon button, returning it to the Actives list in place (D-02).
+- [x] **ROWACT-03**: Active and expired rows expose **ONLY Archive** (no Edit, no Delete — finalized proposals are immutable and Delete is descoped per D-01); draft rows retain their existing **Edit + Archive + Delete** set unchanged.
+- [x] **ROWACT-04**: The row-action wiring keeps the ADMIN-09 commission-invisibility envelope intact — `ProposalRowDto` never carries `params_snapshot`/commission, and the 19-gate grep-contract suite stays green.
+- [x] **ROWACT-05**: From the Archivées view (`/proposals?archived=1`), a partner can **RESTORE** a soft-deleted proposal via a per-row Restore icon button, returning it to the Actives list in place (D-02).
 
 ### Status Pill Rendering (UIFIX — continues v1.4 UIFIX-01)
 
