@@ -263,7 +263,7 @@ describe('Admin Home page — Phase 18 rewrite (D-01..D-07, D-29)', () => {
     expect(tile.getAttribute('data-sublabel')).toBe('mai 2026');
   });
 
-  it('Test 5 (D-03): Dernière modif. coeffs tile shows "il y a Xj" value + date — author sublabel', async () => {
+  it('Test 5 (D-03): Dernière Modif Coef tile shows "il y a Xj" value + date — author sublabel', async () => {
     // 3 days before "now" (2026-05-24T10:00:00Z) = 2026-05-21T10:00:00Z
     const changedAt = new Date('2026-05-21T10:00:00Z');
     listCoefficientHistoryMock.mockResolvedValue({
@@ -282,7 +282,7 @@ describe('Admin Home page — Phase 18 rewrite (D-01..D-07, D-29)', () => {
       nextCursor: null,
     });
     const { container } = await renderPage();
-    const tile = within(container).getByTestId('metric-Dernière modif. coeffs');
+    const tile = within(container).getByTestId('metric-Dernière Modif Coef');
     expect(tile.getAttribute('data-value')).toBe('il y a 3j');
     // Sublabel = "{date} — {author}" with formatDate fr-FR → "21/05/2026" (numeric default)
     const sublabel = tile.getAttribute('data-sublabel') ?? '';
@@ -291,10 +291,10 @@ describe('Admin Home page — Phase 18 rewrite (D-01..D-07, D-29)', () => {
     expect(sublabel).toContain('—');
   });
 
-  it('Test 6 (D-03 empty): Dernière modif. coeffs tile shows "—" value + empty sublabel when history empty', async () => {
+  it('Test 6 (D-03 empty): Dernière Modif Coef tile shows "—" value + empty sublabel when history empty', async () => {
     listCoefficientHistoryMock.mockResolvedValue({ rows: [], hasMore: false, nextCursor: null });
     const { container } = await renderPage();
-    const tile = within(container).getByTestId('metric-Dernière modif. coeffs');
+    const tile = within(container).getByTestId('metric-Dernière Modif Coef');
     expect(tile.getAttribute('data-value')).toBe('—');
     expect(tile.getAttribute('data-sublabel')).toBe('');
   });
@@ -375,9 +375,9 @@ describe('Admin Home page — Phase 18 rewrite (D-01..D-07, D-29)', () => {
   it('Test 12: stat tile labels resolve in EN (lang=en)', async () => {
     getCurrentLangMock.mockResolvedValue('en');
     const { container } = await renderPage();
-    // EN: "Active partners" / "Proposals this month" / "Last coeff. update"
+    // EN: "Active partners" / "Proposals this month" / "Last Coef Update"
     expect(within(container).getByTestId('metric-Active partners')).not.toBeNull();
     expect(within(container).getByTestId('metric-Proposals this month')).not.toBeNull();
-    expect(within(container).getByTestId('metric-Last coeff. update')).not.toBeNull();
+    expect(within(container).getByTestId('metric-Last Coef Update')).not.toBeNull();
   });
 });

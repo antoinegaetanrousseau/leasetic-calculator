@@ -482,7 +482,7 @@ export const dictionaries = {
     'admin.home.accounts.sub': 'Gérez les comptes partenaires',
 
     // Phase 14 — Admin home AdminNavCard wiring (7 keys per UI-SPEC §6.2 + D-13..D-16)
-    'admin.nav.coefficients.title': 'Coefficients & commission',
+    'admin.nav.coefficients.title': 'Coefficients & Commissions',
     'admin.nav.coefficients.description': 'Éditez les paramètres globaux',
     'admin.nav.partners.title': 'Partenaires',
     'admin.nav.partners.description': 'Gérez les comptes partenaires',
@@ -491,11 +491,11 @@ export const dictionaries = {
     'admin.nav.open': 'Ouvrir →',
 
     // Phase 19 Plan 02 — LC Reference Dashboard (D-18, UI-SPEC §Surface 3 §i18n Keys Summary)
-    'admin.nav.lcReferences.title': 'Références LC',
+    'admin.nav.lcReferences.title': 'Toutes les propositions',
     'admin.nav.lcReferences.description': 'Voir toutes les références LC émises par les partenaires.',
 
     // Phase 19 Plan 02 — LC dashboard page (D-11..D-17, UI-SPEC §Surface 2 §i18n Keys Summary)
-    'admin.lcReferences.title': 'Références LC',
+    'admin.lcReferences.title': 'Toutes les propositions',
     'admin.lcReferences.subtitle': 'Toutes les références LC émises, tous partenaires confondus.',
     'admin.lcReferences.search.placeholder': 'Rechercher par référence, partenaire ou client…',
     'admin.lcReferences.col.reference': 'Référence',
@@ -783,7 +783,7 @@ export const dictionaries = {
     'admin.home.stats.partenairesActifs.sublabel': 'sur {0} comptes',
     'admin.home.stats.propositionsCeMois': 'Propositions ce mois',
     'admin.home.stats.propositionsCeMois.sublabel': '{0}',
-    'admin.home.stats.derniereModifCoeffs': 'Dernière modif. coeffs',
+    'admin.home.stats.derniereModifCoeffs': 'Dernière Modif Coef',
     'admin.home.stats.derniereModifCoeffs.value': 'il y a {0}j',
     'admin.home.stats.derniereModifCoeffs.sublabel': '{0} — {1}',
 
@@ -1390,7 +1390,7 @@ export const dictionaries = {
     'admin.home.accounts.sub': 'Manage partner accounts',
 
     // Phase 14 \u2014 Admin home AdminNavCard wiring (7 keys)
-    'admin.nav.coefficients.title': 'Coefficients & commission',
+    'admin.nav.coefficients.title': 'Coefficients & Commissions',
     'admin.nav.coefficients.description': 'Edit global parameters',
     'admin.nav.partners.title': 'Partners',
     'admin.nav.partners.description': 'Manage partner accounts',
@@ -1399,11 +1399,11 @@ export const dictionaries = {
     'admin.nav.open': 'Open \u2192',
 
     // Phase 19 Plan 02 — LC Reference Dashboard EN keys
-    'admin.nav.lcReferences.title': 'LC References',
+    'admin.nav.lcReferences.title': 'All proposals',
     'admin.nav.lcReferences.description': 'View all LC references issued by partners.',
 
     // Phase 19 Plan 02 — LC dashboard page EN keys
-    'admin.lcReferences.title': 'LC References',
+    'admin.lcReferences.title': 'All proposals',
     'admin.lcReferences.subtitle': 'All LC references issued across all partners.',
     'admin.lcReferences.search.placeholder': 'Search by reference, partner or client…',
     'admin.lcReferences.col.reference': 'Reference',
@@ -1666,7 +1666,7 @@ export const dictionaries = {
     'admin.home.stats.partenairesActifs.sublabel': 'of {0} accounts',
     'admin.home.stats.propositionsCeMois': 'Proposals this month',
     'admin.home.stats.propositionsCeMois.sublabel': '{0}',
-    'admin.home.stats.derniereModifCoeffs': 'Last coeff. update',
+    'admin.home.stats.derniereModifCoeffs': 'Last Coef Update',
     'admin.home.stats.derniereModifCoeffs.value': '{0}d ago',
     'admin.home.stats.derniereModifCoeffs.sublabel': '{0} — {1}',
 
