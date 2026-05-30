@@ -296,7 +296,12 @@ Wave 3:
   3. After logout and a fresh login, the admin lands in Admin view regardless of the toggle state before logout; the session-only requirement means no cookie or DB column stores the view preference.
   4. In Agent view, the admin's authorization is unchanged — they retain admin rights, and any attempt to directly navigate to an admin route still works; the toggle is a nav convenience, not a permission change.
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 24-01-PLAN.md — Session-only view-store (sessionStorage useSyncExternalStore) + 4 i18n keys (FR+EN) + logout clear (VIEW-03)
+- [ ] 24-02-PLAN.md — ViewToggle component + sidebar effectiveView nav remap + Shell/(authed)-layout redirect-target plumbing (VIEW-01/02/04)
+
 **UI hint:** yes
 
 ### Phase 25: Teal Rebrand & Polish
