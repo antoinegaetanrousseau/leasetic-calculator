@@ -2,6 +2,35 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
+## Milestone: v1.5 — Proposal List Actions & Pill Fix
+
+**Shipped:** 2026-05-30
+**Phases:** 2 (26-27) | **Plans:** 5 | **Commits:** 37 (since v1.4 tag) | **Tests:** 1184 passing
+
+### What Was Built
+Per-row Archive (active/expired) + Restore (Archivées) on the partner `/proposals` list with instant in-place refresh + toast; draft rows keep Edit + Archive + Delete; ADMIN-09 19-gate grep suite held. Status-pill rendering regression fixed on both the home "Propositions récentes" list and `/proposals` — chip now hugs content in a trailing `max-content` grid track, full label, aligned, light + dark.
+
+### What Worked
+- **Tight scope, fast close.** A two-phase UI-regression milestone shipped in a day. The pill fix was a 3-line consumer-grid change; treating it as a CSS-track defect (not a chip-component bug) — the diagnosis carried from Phase 25 D-03 — meant the component and color tokens stayed frozen.
+- **Mid-milestone descope kept things honest.** Recognizing that Archive and Delete collapse to the same soft-delete state (D-01) avoided shipping a redundant Delete button; the requirement was explicitly marked descoped rather than silently dropped, and a Restore requirement (ROWACT-05) was added to close the loop.
+- **Human-verify checkpoint did its job.** Phase 27's blocking `human-verify` task confirmed light/dark + FR/EN on both surfaces before the phase closed — exactly the kind of visual correctness a subagent can't self-assess.
+
+### What Was Inefficient
+- **Executor stream-idle interruption.** The Phase 27-01 executor applied the correct edit and passed tsc but the SSE stream truncated mid-`lint:check`, returning a partial completion signal with no commit/SUMMARY. Recovery via the orchestrator's filesystem/git spot-check fallback worked, but it cost an inline finish (re-run lint, commit, write SUMMARY) the executor should have done itself.
+- **`milestone.complete` accomplishment extraction is not milestone-scoped.** The CLI globbed every phase's SUMMARY one-liner (phases 1–27) plus parsing-noise lines (`One-liner:` / `Plan:`) into the v1.5 MILESTONES entry and miscounted "12 phases, 44 plans." Required a full manual rewrite of the entry. Worth a tooling fix or a pre-trimmed accomplishments input.
+
+### Patterns Established
+- **Trailing content-hugging chip in inline-grid rows:** `gridTemplateColumns: '… max-content'` with the chip as the last child wrapped in `justifySelf: 'start'` — now the canonical fix for chip-stretch defects, mirrored across home + `/proposals`.
+
+### Key Lessons
+- When an executor returns a truncated/partial signal, **spot-check disk + git before assuming failure** — the work is often complete-but-unsignaled. The completion-signal fallback is the right reflex, not a re-dispatch.
+- **Verify the milestone-close artifacts the CLI generates**, especially the MILESTONES entry — auto-extraction can pull cross-milestone content and bad counts.
+
+### Cost Observations
+- Model mix: orchestration on Opus; executor + reviewer + verifier on Sonnet (`executor_model`/`verifier_model: sonnet`).
+- Sessions: 1 (plan → execute → ship → close in one sitting).
+- Notable: `verifier_enabled: false` + a tiny presentational phase made inline verification (greps + human approval + VERIFICATION.md) cheaper and more reliable than spawning a verifier subagent.
+
 ## Milestone: v1.4 — Partner Types, Admin Dual-View & Rebrand
 
 **Shipped:** 2026-05-30
