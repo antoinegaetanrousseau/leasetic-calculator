@@ -2,6 +2,61 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
+## Milestone: v1.4 — Partner Types, Admin Dual-View & Rebrand
+
+**Shipped:** 2026-05-30
+**Phases:** 4 (22-25) | **Plans:** 12 | **Commits:** 129 | **Tests:** 1184 passing
+**Timeline:** 2026-05-29 → 2026-05-30 (2 days)
+
+### What Was Built
+
+A `partner_type` dimension (Agent / Commercial / Partenaire) conditioning proposal economics
+end-to-end (commission-free calc + structural commission absence for Agent/Commercial), a
+session-only Admin/Agent view toggle, PDF rendering fixes (U+202F glyph overlap + Destinataire
+removal), and admin-home label/pill polish. Teal rebrand descoped mid-milestone.
+
+### What Worked
+
+- **Convergent-evidence audit** in place of per-phase VERIFICATION.md (verifier disabled) — SUMMARY
+  frontmatter + REQUIREMENTS traceability + SECURITY/REVIEW/UAT + a spawned integration check gave
+  a defensible PASS without the verifier.
+- **`commissionPct:0` seam** kept `formula.ts` frozen while adding the commission-free variant —
+  the exception never touched the protected formula.
+- **Structural absence + grep-contract suite** (13→19 gates) turned "commission must not leak" into
+  an enforced, testable invariant rather than a review-time hope.
+- **Descoping mid-milestone** (teal rebrand) when effort/value flipped — shelved cleanly to Future
+  Requirements rather than half-shipping a token split.
+
+### What Was Inefficient
+
+- **Migration label drift** (`0005`→`0006`) + an unapplied Neon `main` migration surfaced as a
+  localhost auth failure — cost a debug cycle a tighter migrate-on-merge discipline avoids.
+- **`partnerType` session fallback re-derived in 3 places** — should have been a shared helper from
+  the first plan.
+- **Stale `deferred-items.md` lint entry** lingered after being resolved — close-time cleanup, not
+  resolution-time.
+
+### Patterns Established
+
+- Partner-type as a first-class snapshot field (`partner_type` + `commission_applied`) for PDF
+  reproducibility across type changes.
+- View state as server-derived authz + session-only client preference (toggle ≠ permission).
+- PDF-layer-scoped sanitizers that leave the shared `format.ts` / byte-determinism surface alone.
+
+### Key Lessons
+
+1. Apply migrations to the target Neon branch at merge time, not at close time — drift between the
+   committed migration file and the live DB is a silent auth-breaker.
+2. When adding a scoped exception to a frozen invariant, add the enforcing test (grep gate) in the
+   same wave, not after.
+3. Extract a shared helper for any value re-derived in ≥2 places, immediately.
+
+### Cost Observations
+
+- Model mix: balanced profile; `yolo` mode (auto-advance off).
+- 2-day milestone, 129 commits — small, focused scope executed fast.
+- Notable: Phase 22 (5 plans, 3 waves) carried most of the weight; Phases 23-25 were tight.
+
 ## Milestone: v1.1 — Hosted Web App Foundation
 
 **Shipped:** 2026-05-11

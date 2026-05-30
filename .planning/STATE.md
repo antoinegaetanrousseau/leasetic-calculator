@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Partner Types, Admin Dual-View & Rebrand
-status: executing
-last_updated: "2026-05-30T16:39:00.000Z"
-last_activity: 2026-05-30 -- Phase 25 Plan 02 complete (UIFIX-01 status-pill hug fix)
+status: shipped
+last_updated: "2026-05-30T17:30:00.000Z"
+last_activity: 2026-05-30 -- v1.4 milestone closed + archived (tag v1.4 created + pushed)
 progress:
   total_phases: 25
   completed_phases: 24
@@ -23,14 +23,26 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 25 — teal-rebrand-polish
+**Current focus:** v1.4 shipped & archived 2026-05-30 — ready for `/gsd-new-milestone` (phase numbering continues at 26)
 
 ## Current Position
 
-Phase: 25 (teal-rebrand-polish) — COMPLETE
-Plan: 2 of 2 complete — all plans done
-Status: Phase 25 complete
-Last activity: 2026-05-30 -- Phase 25 Plan 02 complete (UIFIX-01 status-pill hug fix)
+Milestone: v1.4 — SHIPPED & ARCHIVED 2026-05-30 (phases 22-25, 12 plans, 1184 tests)
+Phase: none active — milestone closed
+Status: v1.4 complete; archives in `milestones/v1.4-*` + `reports/MILESTONE_SUMMARY-v1.4.md`; tag `v1.4` pushed
+Next: `/gsd-new-milestone`
+
+## Deferred Items
+
+Items acknowledged and deferred at v1.4 milestone close on 2026-05-30. All are stale planning
+artifacts from already-shipped work — none are v1.4 functional gaps (the v1.4 audit passed 19/19).
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 22 — `22-UAT.md` (0 open scenarios; UAT #1–7 verified in audit) | partial |
+| context_question | Phase 06 — `06-CONTEXT.md` (1 open Q, v1.1-era, shipped) | open |
+| context_question | Phase 07 — `07-CONTEXT.md` (2 open Qs, v1.1-era, shipped) | open |
+| context_question | Phase 08 — `08-CONTEXT.md` (3 open Qs, v1.1-era, shipped) | open |
 
 ## Phase 22 Performance Metrics
 

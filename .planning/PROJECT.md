@@ -93,19 +93,20 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 - **Validity-selector relocation** — moving from current placement to step 3 of the wizard. Will likely require setting `proposals.validity_days` to a default (e.g. 30) at draft creation, with step 3 mutating the final value. To be confirmed during planning of the wizard phase.
 - **Tier-1 gates ordered last** so they ride the same partner-cutover communications window as the rest of partner-readiness work.
 
-## 🚧 Current Milestone: v1.4 — Partner Types, Admin Dual-View & Rebrand
+## ✅ v1.4 — Partner Types, Admin Dual-View & Rebrand — SHIPPED 2026-05-30
 
-**Started:** 2026-05-29 (post-v1.3 close, same-day scope from Antoine)
-**Source of truth:** `.planning/REQUIREMENTS.md` (defined by `/gsd-new-milestone`). Continues phase numbering from v1.3 — **first phase is Phase 22**.
+**Started:** 2026-05-29 · **Shipped:** 2026-05-30 — 2 days, 4 phases (22–25), 12 plans, 129 commits, 1184 tests passing. Archives: `milestones/v1.4-{ROADMAP,REQUIREMENTS,MILESTONE-AUDIT}.md`; summary `reports/MILESTONE_SUMMARY-v1.4.md`; tag `v1.4`.
 
-**Goal:** Differentiate proposal economics by partner type (a commission-free path for Agent/Commercial), give admins a self-service view switch between admin and agent surfaces, fix PDF rendering defects, and re-skin the app to the new teal brand — alongside targeted admin-home label and component polish.
+**Shipped scope:** a `partner_type` dimension (Agent / Commercial / Partenaire) conditioning proposal economics end-to-end — commission-free calc for Agent/Commercial with commission **structurally absent** from calc, UI, PDF, logs, and audit payloads (ADMIN-09 grep suite 13→19 gates); `params_snapshot` records `partner_type` + `commission_applied`. Session-only Admin/Agent view toggle (server-derived authz). PDF U+202F glyph-overlap fix + Destinataire-block removal + byte-determinism corpus extension. Admin-home label changes (COPY-01..04) + status-pill `max-content` sizing fix.
 
-**Target features (organized by theme):**
+**Descoped:** Teal rebrand (BRAND-01/02/03) — splitting the overloaded `--gd` accent/success token across ~63 sites + a WCAG re-audit was judged too much effort for too little value; shelved (revisitable) to Future Requirements.
+
+**Original target features (all shipped except the descoped teal rebrand):**
 
 - **Partner types & commission-free proposals** — a `partner_type` selector (`Agent` / `Commercial` / `Partenaire`) on the invite/create-partner form, backfilled to `Partenaire` for existing accounts and editable later by an admin. For `Agent` and `Commercial`, the commission is **removed from the loyer calculation entirely** (`loyer = montant HT × coefficient ÷ 100`, no `(1 + commission/100)` markup) **and** never appears in the UI or PDF. `Partenaire` keeps the v1.0-frozen formula. Requires a commission-free proposal + PDF render variant that respects (and extends) the ADMIN-09 envelope.
 - **Admin dual-view toggle** — a bottom-left settings toggle (next to the theme/locale controls), visible only to admin-level users, that switches the whole nav between admin routes (`/[adminSegment]`, `/coefficients`, `/partners`, `/lc-references`) and agent routes (`/`, `/proposals`). Admins land in **Admin** view on each login; the choice is **session-only** (not persisted across logout).
 - **PDF rendering fixes** — resolve the number/typography rendering defect on generated proposals (the loyer figure overlaps; root-cause spike in `@react-pdf/renderer` font + French thousands-separator handling), and **remove the "Destinataire" block** beneath the "Proposition de location financière" title.
-- **Teal rebrand** — replace the UI **accent green** with `#2D7A8C` at the design-token layer (light + dark). The **logo green and semantic success green stay** (the "Actif" pill and "activé" activity stay green).
+- **Teal rebrand** — ⊘ **DESCOPED 2026-05-30** (shelved to Future Requirements). Was: replace the UI accent green with `#2D7A8C` at the token layer; logo + success green untouched.
 - **Admin-home & label polish** — rename the "Références LC" card + page heading to **"Toutes les propositions"** (display label only; `/[adminSegment]/lc-references` route unchanged); "Coefficients & commission" → **"Coefficients & Commissions"**; "Dernière modif. coeffs" → **"Dernière Modif Coef"**.
 - **Status-pill sizing fix** — the proposal status pill (e.g. "Actif") renders at a fixed width; make it hug its text adaptively.
 
@@ -219,21 +220,26 @@ Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; desig
 
 All v1.3 requirements shipped — 6 phases (16–21), 35 requirements, no documented partials. Full coverage in `.planning/reports/MILESTONE_SUMMARY-v1.3.md` §4. Highlights: app-shell visual refresh + WCAG-AA diff-panel contrast, Partner Home + `/proposals` Archivées pill, 3-step wizard redesign, admin home + partners-list refresh (AccountsList→PartnersList), per-partner XLSX export, centralized LC reference dashboard (ADMIN-09 envelope 9→12 gates), Neon 3-branch split, post-deploy DB-smoke CI gate, Better Auth `trustedOrigins`, in-app self-service password change (`/parametres`), and both Tier-1 onboarding gates (admin password rotation + privacy notice).
 
-### Active (v1.4 in flight — REQ-IDs land in `.planning/REQUIREMENTS.md`)
+### Validated (shipped in v1.4)
 
-<!-- Building toward these now. Full requirements defined in REQUIREMENTS.md. -->
+All 19 active v1.4 requirements shipped — 4 phases (22–25), no documented partials; 3 descoped (BRAND-01/02/03 teal rebrand). Full coverage in `milestones/v1.4-REQUIREMENTS.md` + `milestones/v1.4-MILESTONE-AUDIT.md`. Highlights:
 
-- [ ] Partner-type selector (`Agent` / `Commercial` / `Partenaire`) on invite/create form; default `Partenaire`, admin-editable
-- [ ] Commission-free loyer calc + PDF/UI render variant for `Agent`/`Commercial` (commission removed from formula and never shown)
-- [ ] Admin dual-view toggle (admin-only, bottom-left, session-only, lands in Admin; remaps nav between admin/agent routes)
-- [ ] PDF number/typography rendering fix
-- [ ] Remove "Destinataire" block from generated PDF
-- [ ] Teal rebrand — accent green → `#2D7A8C` (token layer, light + dark; logo + success green untouched)
-- [ ] Status-pill adaptive sizing fix
-- [ ] Admin-home label changes: "Toutes les propositions" / "Coefficients & Commissions" / "Dernière Modif Coef"
+- ✓ Partner-type selector (`Agent` / `Commercial` / `Partenaire`), default `Partenaire`, admin-editable + audited — v1.4 (PTYPE-01..03)
+- ✓ Commission-free loyer calc + PDF/UI variant for Agent/Commercial; commission structurally absent (calc/UI/PDF/logs/audit) — v1.4 (PTYPE-04..06)
+- ✓ ADMIN-09 grep-contract suite extended 13→19 gates — v1.4 (PTYPE-07)
+- ✓ PDF number/typography fix (U+202F) + Destinataire-block removal + byte-determinism corpus — v1.4 (PDF-01..03)
+- ✓ Admin dual-view toggle (admin-only, session-only, server-derived authz) — v1.4 (VIEW-01..04)
+- ✓ Admin-home label changes + status-pill adaptive sizing — v1.4 (COPY-01..04, UIFIX-01)
 
-### Deferred to v1.4+
+### Active (next milestone — TBD by `/gsd-new-milestone`)
 
+<!-- Fresh REQUIREMENTS.md is generated by /gsd-new-milestone; phase numbering continues at 26. -->
+
+(none yet — planning the next milestone)
+
+### Deferred to v1.5+
+
+- [ ] Teal accent rebrand (`#2D7A8C`) — descoped from v1.4 Phase 25; needs splitting the overloaded `--gd` token into distinct accent (→ teal) vs. success (→ `#129657`) tokens, recoloring ~63 sites + hardcoded `rgba(18,150,87,…)` tints, then a fresh light+dark WCAG AA audit
 - [ ] OVH production deployment + smoke-deploy execution (September 2026 target; capability shipped in v1.1)
 - [ ] Webhook notifications to Leasétic on each proposal generation
 - [ ] Mobile-optimized layout
@@ -355,4 +361,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-29 — v1.3 (Design Refresh + Partner-Onboarding Ready) shipped (6 phases, 27 plans, 1122 tests); v1.4 (Partner Types, Admin Dual-View & Rebrand) started. Requirements being defined in REQUIREMENTS.md; roadmap continues at Phase 22.*
+*Last updated: 2026-05-30 — v1.4 (Partner Types, Admin Dual-View & Rebrand) shipped & archived (4 phases, 12 plans, 1184 tests; teal rebrand descoped). Tag `v1.4` pushed. Next: `/gsd-new-milestone` — roadmap continues at Phase 26.*
