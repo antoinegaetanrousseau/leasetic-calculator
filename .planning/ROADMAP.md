@@ -341,12 +341,12 @@ Plans:
 
 > **Scope note (planner, 2026-05-30 — D-01).** Per-row Delete on finalized rows (ROWACT-02) is descoped to Archive-only; a per-row Restore is added in the Archivees view (D-02). Plan 26-03 reconciles the Goal + criteria above and REQUIREMENTS.md at execute time. See 26-CONTEXT.md.
 
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Wave 1 (parallel):
 
 - [ ] 26-01-PLAN.md — i18n keys (FR+EN) + shared RowActionsClient (Archive for active/expired, Restore for deleted, keyed off displayStatus) — ROWACT-01/03/04
-- [ ] 26-03-PLAN.md — Doc reconciliation: REQUIREMENTS.md + ROADMAP.md to Archive-only (ROWACT-02 descoped, ROWACT-03 rewritten, ROWACT-05 Restore added)
+- [x] 26-03-PLAN.md — Doc reconciliation: REQUIREMENTS.md + ROADMAP.md to Archive-only (ROWACT-02 descoped, ROWACT-03 rewritten, ROWACT-05 Restore added)
 
 Wave 2 (after 26-01):
 
@@ -397,7 +397,7 @@ Wave 2 (after 26-01):
 | 23. PDF Rendering Fixes | v1.4 | 3/3 | Complete   | 2026-05-30 |
 | 24. Admin Dual-View Toggle | v1.4 | 2/2 | Complete    | 2026-05-30 |
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
-| 26. Active/Expired Row Actions | v1.5 | 0/3 | Not started | - |
+| 26. Active/Expired Row Actions | v1.5 | 1/3 | In Progress|  |
 | 27. Status-Pill Rendering Fix | v1.5 | 0/TBD | Not started | - |
 
 ---

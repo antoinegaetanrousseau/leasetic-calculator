@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Proposal List Actions & Pill Fix
 status: executing
-last_updated: "2026-05-30T17:18:44.674Z"
-last_activity: 2026-05-30 -- Phase 26 execution started
+last_updated: "2026-05-30T17:27:32.465Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 12
   completed_phases: 10
   total_plans: 42
-  completed_plans: 39
+  completed_plans: 40
   percent: 83
 ---
 
@@ -28,9 +28,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 26 (active-expired-row-actions) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 26
-Last activity: 2026-05-30 -- Phase 26 execution started
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-05-30
 
 ## Deferred Items
 
