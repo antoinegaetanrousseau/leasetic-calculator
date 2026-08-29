@@ -15,6 +15,7 @@ import { getSessionCookie } from 'better-auth/cookies';
  *
  * The matcher excludes:
  *  - /_next/static, /_next/image, /favicon.ico, /fonts/  — static assets
+ *  - /logo-light.svg, /logo-dark.svg, /logo-mark.svg      — public brand assets (see note below)
  *  - /api/auth/*                                          — Better Auth's internal endpoints
  *  - /healthz                                              — Phase 5 unauthenticated health check
  *
@@ -69,14 +70,22 @@ function isPublicPath(pathname: string): boolean {
  *  - _next/image   — Next.js image optimization endpoint
  *  - favicon.ico   — browser favicon request
  *  - fonts/        — self-hosted Plus Jakarta Sans (served from /public/fonts)
+ *  - logo-*.svg    — the three public brand SVGs in /public (see below)
  *  - healthz       — Phase 5 unauthenticated health check endpoint
  *  - api/auth      — Better Auth's own catch-all route handler (/api/auth/[...all])
+ *
+ * The logo exclusion fixes a real production bug: /login renders <BrandLogo>,
+ * but the SVGs it points at were themselves matched by this proxy. Signed-out
+ * visitors got a 307 to /login?next=%2Flogo-light.svg, the <img> received HTML
+ * instead of an SVG, and the login page rendered a broken image for everyone
+ * who was not already authenticated. These are unauthenticated brand assets,
+ * so they belong alongside favicon.ico and fonts/ — no session required.
  *
  * All other paths (including / and any (authed) or (admin) routes) pass through
  * to the proxy function for the cookie presence check.
  */
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|fonts/|healthz|api/auth).*)',
+    '/((?!_next/static|_next/image|favicon.ico|fonts/|logo-light\\.svg|logo-dark\\.svg|logo-mark\\.svg|healthz|api/auth).*)',
   ],
 };

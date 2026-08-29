@@ -1,76 +1,59 @@
+/**
+ * PageHero tests — rewritten in Phase 0 of the ReUI/Maia migration.
+ *
+ * The previous suite located the eyebrow by scanning every element for an
+ * inline `text-transform: uppercase` style and asserted the h1 carried
+ * `color: var(--ink)`. Both stopped being true when this component moved to
+ * Tailwind utilities, and neither described anything a reader depends on.
+ *
+ * These assert the composition contract instead: which slots render for a
+ * given set of props, their DOM order, and the heading level — all of which
+ * must hold no matter how the hero is styled.
+ */
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render, within } from '@testing-library/react';
 import { PageHero } from './PageHero';
 
 afterEach(() => cleanup());
 
+const slot = (c: HTMLElement, name: string) => c.querySelector(`[data-slot="page-hero-${name}"]`);
+
 describe('PageHero', () => {
-  it('AC-PH-01: title-only — renders <h1> with title text; no subtitle <p>; no eyebrow; no right-slot', () => {
+  it('AC-PH-01: title only — renders the h1 and nothing else', () => {
     const { container, getByRole } = render(<PageHero title="Hello" />);
-    const heading = getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Hello');
-    expect(container.querySelectorAll('p').length).toBe(0);
-    // No eyebrow: no element with letter-spacing 0.06em
-    const allElements = container.querySelectorAll('*');
-    const hasEyebrow = Array.from(allElements).some((el) => {
-      const style = (el as HTMLElement).getAttribute('style') ?? '';
-      return /letter-spacing:\s*0\.06em/.test(style);
-    });
-    expect(hasEyebrow).toBe(false);
-    // No right-slot: outer flex container has exactly 1 child (left column)
-    const outer = container.firstElementChild as HTMLElement;
-    expect(outer.children.length).toBe(1);
+    expect(getByRole('heading', { level: 1 })).toHaveTextContent('Hello');
+    expect(slot(container, 'eyebrow')).toBeNull();
+    expect(slot(container, 'subtitle')).toBeNull();
+    expect(slot(container, 'actions')).toBeNull();
   });
 
-  it('AC-PH-02: title + subtitle — <h1> present with title; <p> present with subtitle; eyebrow absent', () => {
+  it('AC-PH-02: title + subtitle — subtitle renders, eyebrow does not', () => {
     const { container, getByRole } = render(
       <PageHero title="Welcome" subtitle="Your dashboard overview" />,
     );
-    const heading = getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Welcome');
-    const paragraphs = container.querySelectorAll('p');
-    expect(paragraphs.length).toBe(1);
-    expect(paragraphs[0]).toHaveTextContent('Your dashboard overview');
-    // No eyebrow
-    const allElements = container.querySelectorAll('*');
-    const hasEyebrow = Array.from(allElements).some((el) => {
-      const style = (el as HTMLElement).getAttribute('style') ?? '';
-      return /letter-spacing:\s*0\.06em/.test(style);
-    });
-    expect(hasEyebrow).toBe(false);
+    expect(getByRole('heading', { level: 1 })).toHaveTextContent('Welcome');
+    expect(slot(container, 'subtitle')).toHaveTextContent('Your dashboard overview');
+    expect(slot(container, 'eyebrow')).toBeNull();
   });
 
-  it('AC-PH-03: title + subtitle + eyebrow — eyebrow element has uppercase + var(--gd-text) in inline style', () => {
+  it('AC-PH-03: eyebrow renders its text when supplied', () => {
     const { container } = render(
       <PageHero title="Administration" subtitle="Manage accounts" eyebrow="ADMIN" />,
     );
-    const allElements = Array.from(container.querySelectorAll('*')) as HTMLElement[];
-    const eyebrowEl = allElements.find((el) => {
-      const style = el.getAttribute('style') ?? '';
-      return (
-        /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd-text\)/.test(style)
-      );
-    });
-    expect(eyebrowEl).toBeDefined();
-    expect(eyebrowEl!.textContent).toBe('ADMIN');
+    expect(slot(container, 'eyebrow')).toHaveTextContent('ADMIN');
   });
 
-  it('AC-PH-04: title + actions — right-slot wrapper present; no subtitle <p>; no eyebrow', () => {
-    const { getByTestId, container } = render(
+  it('AC-PH-04: actions render into the right-hand slot', () => {
+    const { container, getByTestId } = render(
       <PageHero title="X" actions={<button data-testid="hero-cta">Go</button>} />,
     );
     expect(getByTestId('hero-cta')).toBeDefined();
-    expect(container.querySelectorAll('p').length).toBe(0);
-    // No eyebrow
-    const allElements = container.querySelectorAll('*');
-    const hasEyebrow = Array.from(allElements).some((el) => {
-      const style = (el as HTMLElement).getAttribute('style') ?? '';
-      return /letter-spacing:\s*0\.06em/.test(style);
-    });
-    expect(hasEyebrow).toBe(false);
+    const actions = slot(container, 'actions') as HTMLElement;
+    expect(within(actions).getByTestId('hero-cta')).toBeDefined();
+    expect(slot(container, 'subtitle')).toBeNull();
   });
 
-  it('AC-PH-05: all 4 props — DOM order is eyebrow → h1 → subtitle within left column', () => {
+  it('AC-PH-05: all four props — DOM order is eyebrow, then h1, then subtitle', () => {
     const { container } = render(
       <PageHero
         title="Administration"
@@ -79,74 +62,42 @@ describe('PageHero', () => {
         actions={<button data-testid="hero-cta-all">Go</button>}
       />,
     );
-    const outer = container.firstElementChild as HTMLElement;
-    // Left column is first child of outer flex container
-    const leftCol = outer.children[0] as HTMLElement;
-    const leftChildren = Array.from(leftCol.children) as HTMLElement[];
-    // eyebrow div is first
-    expect(leftChildren[0].tagName.toLowerCase()).not.toBe('h1');
-    const style0 = leftChildren[0].getAttribute('style') ?? '';
-    expect(style0).toMatch(/text-transform:\s*uppercase/);
-    // h1 is second
-    expect(leftChildren[1].tagName.toLowerCase()).toBe('h1');
-    // p (subtitle) is third
-    expect(leftChildren[2].tagName.toLowerCase()).toBe('p');
-    // Actions right-slot is second child of outer
-    const rightSlot = outer.children[1] as HTMLElement;
-    expect(within(rightSlot).getByTestId('hero-cta-all')).toBeDefined();
+    const main = slot(container, 'main') as HTMLElement;
+    const order = Array.from(main.children).map((el) => el.getAttribute('data-slot'));
+    expect(order).toEqual([
+      'page-hero-eyebrow',
+      'page-hero-title',
+      'page-hero-subtitle',
+    ]);
+
+    // The h1 really is an h1, not a styled div.
+    expect((main.children[1] as HTMLElement).tagName.toLowerCase()).toBe('h1');
+
+    const actions = slot(container, 'actions') as HTMLElement;
+    expect(within(actions).getByTestId('hero-cta-all')).toBeDefined();
   });
 
-  it('AC-PH-06: light wrapper — all 4 elements present; title style references var(--ink)', () => {
-    const { container, getByRole, getByTestId } = render(
-      <div data-theme="light">
-        <PageHero
-          title="Light Title"
-          subtitle="Light subtitle"
-          eyebrow="LABEL"
-          actions={<button data-testid="light-cta">Action</button>}
-        />
-      </div>,
-    );
-    const heading = getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Light Title');
-    expect(heading.getAttribute('style')).toMatch(/color:\s*var\(--ink\)/);
-    expect(container.querySelectorAll('p')[0]).toHaveTextContent('Light subtitle');
-    // Eyebrow present
-    const allElements = Array.from(container.querySelectorAll('*')) as HTMLElement[];
-    const eyebrowEl = allElements.find((el) => {
-      const style = el.getAttribute('style') ?? '';
-      return /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd-text\)/.test(style);
-    });
-    expect(eyebrowEl).toBeDefined();
-    expect(eyebrowEl!.textContent).toBe('LABEL');
-    expect(getByTestId('light-cta')).toBeDefined();
-  });
-
-  it('AC-PH-07: dark wrapper — data-theme="dark" on wrapper; all 4 elements present', () => {
-    const { container, getByRole, getByTestId } = render(
-      <div data-theme="dark">
-        <PageHero
-          title="Dark Title"
-          subtitle="Dark subtitle"
-          eyebrow="DARK"
-          actions={<button data-testid="dark-cta">Action</button>}
-        />
-      </div>,
-    );
-    const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper).toHaveAttribute('data-theme', 'dark');
-    const heading = getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Dark Title');
-    // Token references same in dark — CSS cascade resolves them, jsdom does not; test token presence
-    expect(heading.getAttribute('style')).toMatch(/color:\s*var\(--ink\)/);
-    expect(container.querySelectorAll('p')[0]).toHaveTextContent('Dark subtitle');
-    const allElements = Array.from(container.querySelectorAll('*')) as HTMLElement[];
-    const eyebrowEl = allElements.find((el) => {
-      const style = el.getAttribute('style') ?? '';
-      return /text-transform:\s*uppercase/.test(style) && /color:\s*var\(--gd-text\)/.test(style);
-    });
-    expect(eyebrowEl).toBeDefined();
-    expect(eyebrowEl!.textContent).toBe('DARK');
-    expect(getByTestId('dark-cta')).toBeDefined();
+  it('AC-PH-06: renders the same structure regardless of the surrounding theme', () => {
+    // Colour is resolved by the CSS cascade, which jsdom does not run. What we
+    // can meaningfully assert is that the theme wrapper changes nothing about
+    // the composition — the hero is theme-agnostic by construction.
+    for (const theme of ['light', 'dark'] as const) {
+      const { container, getByRole, getByTestId, unmount } = render(
+        <div data-theme={theme}>
+          <PageHero
+            title={`${theme} title`}
+            subtitle={`${theme} subtitle`}
+            eyebrow="LABEL"
+            actions={<button data-testid={`${theme}-cta`}>Action</button>}
+          />
+        </div>,
+      );
+      expect(container.firstElementChild).toHaveAttribute('data-theme', theme);
+      expect(getByRole('heading', { level: 1 })).toHaveTextContent(`${theme} title`);
+      expect(slot(container, 'subtitle')).toHaveTextContent(`${theme} subtitle`);
+      expect(slot(container, 'eyebrow')).toHaveTextContent('LABEL');
+      expect(getByTestId(`${theme}-cta`)).toBeDefined();
+      unmount();
+    }
   });
 });

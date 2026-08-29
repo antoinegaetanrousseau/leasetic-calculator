@@ -1,75 +1,88 @@
+/**
+ * MetricTile tests — rewritten in Phase 0 of the ReUI/Maia migration.
+ *
+ * The previous suite asserted inline `style="color: var(--gd)"` substrings,
+ * which broke the moment the component moved to ReUI Card + Tailwind utility
+ * classes. Colour is presentation and is now owned by the token layer, so
+ * asserting it here only re-tested the stylesheet.
+ *
+ * These tests assert what actually has to stay true across a restyle:
+ *   - the accessible pairing of label and value (role=group + aria-label)
+ *   - the semantic variant, via the stable data-variant hook
+ *   - the content contract (which slots render, and which do not)
+ *   - the valueColor override, which IS a real API and still uses inline style
+ */
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render, within } from '@testing-library/react';
 import { MetricTile, type MetricTileProps } from './MetricTile';
 
 afterEach(() => cleanup());
 
+const VARIANTS: Array<MetricTileProps['variant']> = ['month', 'total', 'drafts'];
+
 describe('MetricTile', () => {
-  it('AC-MT-01: variant=month renders label + value (with color var(--gd)) + sublabel; 3 child <div>s', () => {
+  it('AC-MT-01: renders label, value and sublabel as three content slots', () => {
     const { container } = render(
       <MetricTile variant="month" label="Ce mois-ci" value="12" sublabel="propositions" />,
     );
     const group = within(container).getByRole('group');
-    const children = group.querySelectorAll(':scope > div');
-    expect(children).toHaveLength(3);
-    // value div is the 2nd child
-    const valueDiv = children[1] as HTMLDivElement;
-    expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--gd\)/);
-    // text content for each
-    expect(group).toHaveTextContent('Ce mois-ci');
-    expect(group).toHaveTextContent('12');
-    expect(group).toHaveTextContent('propositions');
+
+    expect(group.querySelector('[data-slot="metric-label"]')).toHaveTextContent('Ce mois-ci');
+    expect(group.querySelector('[data-slot="metric-value"]')).toHaveTextContent('12');
+    expect(group.querySelector('[data-slot="metric-sublabel"]')).toHaveTextContent('propositions');
   });
 
-  it('AC-MT-02: omitting sublabel renders only 2 <div> children (label + value); "propositions" not in DOM', () => {
+  it('AC-MT-02: omitting sublabel renders no sublabel slot', () => {
     const { container } = render(<MetricTile variant="total" label="Total" value="248" />);
     const group = within(container).getByRole('group');
-    const children = group.querySelectorAll(':scope > div');
-    expect(children).toHaveLength(2);
+
+    expect(group.querySelector('[data-slot="metric-label"]')).toHaveTextContent('Total');
+    expect(group.querySelector('[data-slot="metric-value"]')).toHaveTextContent('248');
+    expect(group.querySelector('[data-slot="metric-sublabel"]')).toBeNull();
     expect(within(container).queryByText('propositions')).toBeNull();
   });
 
-  it('AC-MT-03: variant=drafts produces value <div> with style color var(--gold)', () => {
-    const { container } = render(
-      <MetricTile variant="drafts" label="Brouillons" value="3" sublabel="à compléter" />,
-    );
-    const group = within(container).getByRole('group');
-    const children = group.querySelectorAll(':scope > div');
-    const valueDiv = children[1] as HTMLDivElement;
-    expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--gold\)/);
+  it('AC-MT-03: every variant is exposed on the stable data-variant hook', () => {
+    for (const variant of VARIANTS) {
+      const { container, unmount } = render(
+        <MetricTile variant={variant} label="X" value="1" />,
+      );
+      expect(within(container).getByRole('group')).toHaveAttribute('data-variant', variant);
+      unmount();
+    }
   });
 
-  it('AC-MT-07: outer wrapper has role="group" and aria-label="{label}: {value}"', () => {
+  it('AC-MT-07: exposes role=group with the label and value paired in aria-label', () => {
     const { container } = render(<MetricTile variant="month" label="Ce mois-ci" value="12" />);
-    const group = within(container).getByRole('group');
-    expect(group).toHaveAttribute('aria-label', 'Ce mois-ci: 12');
+    expect(within(container).getByRole('group')).toHaveAttribute('aria-label', 'Ce mois-ci: 12');
   });
 
-  it('AC-MT-08: variant=total produces value <div> with style color var(--navy)', () => {
-    const { container } = render(<MetricTile variant="total" label="Total" value="248" />);
-    const group = within(container).getByRole('group');
-    const children = group.querySelectorAll(':scope > div');
-    const valueDiv = children[1] as HTMLDivElement;
-    expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--navy\)/);
+  it('AC-MT-08: aria-label pairing holds for every variant', () => {
+    for (const variant of VARIANTS) {
+      const { container, unmount } = render(
+        <MetricTile variant={variant} label="Total" value="248" />,
+      );
+      expect(within(container).getByRole('group')).toHaveAttribute('aria-label', 'Total: 248');
+      unmount();
+    }
   });
 
-  // ── Phase 18 Plan 02 Task 1 — valueColor override (D-04) ────────────────
-  // Admin Home requires ALL three stat tiles to render their value in --teal,
-  // regardless of label semantic. Variant remains required (preserves Phase 11
-  // chrome semantics + back-compat with PHOME-02 callers); valueColor is an
-  // additive override that wins when provided.
-  describe('Phase 18 valueColor prop (D-04)', () => {
-    it('AC-MT-VC-01: without valueColor, variant=month value uses default var(--gd)', () => {
+  // ── valueColor override (D-04) ──────────────────────────────────────────
+  // Admin Home renders all three tiles in --teal regardless of variant. This
+  // is a real public API, so it keeps a real assertion — the prop drives an
+  // inline style by design, which is exactly why it survives a restyle.
+  describe('valueColor prop (D-04)', () => {
+    it('AC-MT-VC-01: without valueColor, no inline colour is set on the value', () => {
       const { container } = render(
         <MetricTile variant="month" label="Partenaires actifs" value="42" />,
       );
-      const group = within(container).getByRole('group');
-      const children = group.querySelectorAll(':scope > div');
-      const valueDiv = children[1] as HTMLDivElement;
-      expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--gd\)/);
+      const value = within(container)
+        .getByRole('group')
+        .querySelector('[data-slot="metric-value"]') as HTMLElement;
+      expect(value.getAttribute('style')).toBeNull();
     });
 
-    it('AC-MT-VC-02: valueColor="var(--teal)" overrides variant default on value element', () => {
+    it('AC-MT-VC-02: valueColor sets the inline colour on the value slot', () => {
       const { container } = render(
         <MetricTile
           variant="month"
@@ -78,23 +91,21 @@ describe('MetricTile', () => {
           valueColor="var(--teal)"
         />,
       );
-      const group = within(container).getByRole('group');
-      const children = group.querySelectorAll(':scope > div');
-      const valueDiv = children[1] as HTMLDivElement;
-      expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--teal\)/);
-      // sanity — variant default not present
-      expect(valueDiv.getAttribute('style')).not.toMatch(/color:\s*var\(--gd\)(?!-text)/);
+      const value = within(container)
+        .getByRole('group')
+        .querySelector('[data-slot="metric-value"]') as HTMLElement;
+      expect(value.getAttribute('style')).toMatch(/color:\s*var\(--teal\)/);
     });
 
-    it('AC-MT-VC-03: valueColor override works on every variant (no regression)', () => {
-      const variants: Array<MetricTileProps['variant']> = ['month', 'total', 'drafts'];
-      for (const v of variants) {
+    it('AC-MT-VC-03: valueColor override works on every variant', () => {
+      for (const variant of VARIANTS) {
         const { container, unmount } = render(
-          <MetricTile variant={v} label="X" value="Y" valueColor="var(--teal)" />,
+          <MetricTile variant={variant} label="X" value="Y" valueColor="var(--teal)" />,
         );
-        const group = within(container).getByRole('group');
-        const valueDiv = group.querySelectorAll(':scope > div')[1] as HTMLDivElement;
-        expect(valueDiv.getAttribute('style')).toMatch(/color:\s*var\(--teal\)/);
+        const value = within(container)
+          .getByRole('group')
+          .querySelector('[data-slot="metric-value"]') as HTMLElement;
+        expect(value.getAttribute('style')).toMatch(/color:\s*var\(--teal\)/);
         unmount();
       }
     });

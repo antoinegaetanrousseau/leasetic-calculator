@@ -9,82 +9,57 @@
  * Server component (no state); consumers pass i18n-resolved strings.
  * Phase 11 ships zero-state primitive — Phase 14 wires it into the partner home.
  */
+import { Card } from '@/components/ui/card';
+
 export interface MetricTileProps {
   label: string;
   value: string;
   sublabel?: string;
   variant: 'month' | 'total' | 'drafts';
-  /**
-   * Override the value text color. When provided, wins over the variant's
-   * default color (VALUE_COLOR_BY_VARIANT). Typically a `var(--token)`
-   * reference.
-   *
-   * Phase 18 D-04 uses `var(--teal)` for ALL three admin home stat tiles
-   * (user-confirmed deviation from Figma gold for `Dernière modif. coeffs`;
-   * `--gold` reserved for warnings only — palette discipline). Existing
-   * Phase 11/17 partner-home callers do NOT pass this prop and keep their
-   * variant-driven defaults.
-   */
   valueColor?: string;
 }
 
-const VALUE_COLOR_BY_VARIANT: Record<MetricTileProps['variant'], string> = {
-  month: 'var(--gd)',
-  total: 'var(--navy)',
-  drafts: 'var(--gold)',
+const VALUE_COLOR_CLASSES: Record<MetricTileProps['variant'], string> = {
+  month: 'text-success', // ReUI success green
+  total: 'text-primary', // ReUI navy/primary
+  drafts: 'text-warning', // ReUI warning gold
 };
 
 export function MetricTile({ label, value, sublabel, variant, valueColor }: MetricTileProps) {
-  const resolvedValueColor = valueColor ?? VALUE_COLOR_BY_VARIANT[variant];
   return (
-    <div
+    // role="group" + aria-label are load-bearing accessibility semantics, not
+    // decoration: the tile's label and value are separate text nodes, so screen
+    // readers need the pairing announced ("Ce mois-ci: 12"). Both were dropped
+    // when this component was moved to the ReUI Card and are restored here.
+    // data-variant is the stable hook for tests — assert the semantic variant,
+    // never the colour classes, so restyling cannot break the suite.
+    <Card
       role="group"
       aria-label={`${label}: ${value}`}
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 16,
-        boxShadow: 'var(--shadow-card)',
-        padding: '18px 20px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 6,
-      }}
+      data-variant={variant}
+      className="flex flex-col gap-1.5 p-5 shadow-sm hover:shadow-md transition-shadow"
     >
       <div
-        style={{
-          fontSize: '11.8px',
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: 'var(--muted)',
-          lineHeight: 1.4,
-        }}
+        data-slot="metric-label"
+        className="text-[11.8px] font-bold tracking-[0.06em] uppercase text-muted-foreground leading-snug"
       >
         {label}
       </div>
       <div
-        style={{
-          fontSize: 24,
-          fontWeight: 600,
-          lineHeight: 1.3,
-          color: resolvedValueColor,
-        }}
+        data-slot="metric-value"
+        className={`text-2xl font-semibold leading-tight ${!valueColor ? VALUE_COLOR_CLASSES[variant] : ''}`}
+        style={valueColor ? { color: valueColor } : undefined}
       >
         {value}
       </div>
       {sublabel && (
         <div
-          style={{
-            fontSize: '12.5px',
-            fontWeight: 500,
-            color: 'var(--muted)',
-            lineHeight: 1.4,
-          }}
+          data-slot="metric-sublabel"
+          className="text-[12.5px] font-medium text-muted-foreground leading-snug"
         >
           {sublabel}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

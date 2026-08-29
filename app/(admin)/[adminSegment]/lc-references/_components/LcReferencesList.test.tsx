@@ -144,7 +144,7 @@ describe('LcReferencesList', () => {
       />,
     );
     // StatusChip renders an element with class chip-* or data-testid containing chip
-    const chip = container.querySelector('[class*="chip"]');
+    const chip = container.querySelector('[data-status]');
     expect(chip).not.toBeNull();
   });
 

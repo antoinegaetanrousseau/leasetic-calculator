@@ -107,7 +107,7 @@ describe('/proposals/[id] page.tsx — Plan 14-06 D-28 StatusChip in header', ()
     const tree = await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) });
     const { container } = render(tree);
 
-    const chip = container.querySelector('.chip.chip-active');
+    const chip = container.querySelector('[data-status="active"]');
     expect(chip).not.toBeNull();
     expect(chip!.textContent).toContain('Actif');
 
@@ -126,7 +126,7 @@ describe('/proposals/[id] page.tsx — Plan 14-06 D-28 StatusChip in header', ()
     const tree = await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) });
     const { container } = render(tree);
 
-    const chip = container.querySelector('.chip.chip-deleted');
+    const chip = container.querySelector('[data-status="deleted"]');
     expect(chip).not.toBeNull();
     expect(chip!.textContent).toContain('Supprimée');
   });
