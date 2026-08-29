@@ -6,182 +6,148 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* === Light mode: extracted verbatim from UI-SPEC §CSS Custom Properties — Light mode === */
+/* === Design tokens ======================================================
+   The app runs on the ReUI / shadcn base-maia design system. Values below are
+   the registry defaults (ui.shadcn.com/r/colors/neutral.json, the theme that
+   `baseColor: neutral` resolves to), NOT hand-picked ones.
+
+   Exactly three things are Leasetic's, by decision (2026-08-29):
+     1. the logo assets in /public,
+     2. the accent colour, applied to --primary / --sidebar-primary and the
+        focus ring, and
+     3. the large radius agreed for the LEASETIC Group Maia setup.
+
+   Everything else — neutrals, surfaces, borders, feedback hues, the sidebar
+   chrome — is ReUI's. An earlier pass wired these to the Leasetic Figma /
+   Notion design system; that was reversed here so the product reads as ReUI.
+
+   NOTE on "accent": shadcn's --accent is the neutral hover wash, NOT the brand
+   accent. The brand accent is --primary. Do not put green on --accent. */
 :root {
-  /* Brand palette — never change without design review */
-  --navy:      #112c3b;
-  --navy-dark: #0a1e2a;
-  --green:     #81c088;
-  --gd:        #129657;
-  --gd-text:   #0e7544;  /* WCAG AA text variant for --gd over light backgrounds; matches --gd in dark mode */
-  --gl:        #c8e2c8;
-  --teal:      #2d7a8c;
-  --paper:     #f5f7fc;
-  --white:     #ffffff;
+  /* ── Leasetic brand accent ─────────────────────────────────────────── */
+  --brand-accent:  #01cc72;
+  --brand-mark:    #6DC388;   /* logo mark fill */
 
-  /* === The token spine (Phase 1) ==========================================
-     --ink / --muted / --border are 55% of all CSS-variable references in the
-     product (345 of 624). They are the seam between the legacy v10 system and
-     the ReUI/shadcn layer, so each is defined ONCE here and the shadcn
-     semantic token aliases to it further down — never the reverse, and never
-     a second definition with a different meaning.
+  /* ── ReUI base-maia, light ─────────────────────────────────────────── */
+  --background:              oklch(1 0 0);
+  --foreground:              oklch(0.145 0 0);
+  --card:                    oklch(1 0 0);
+  --card-foreground:         oklch(0.145 0 0);
+  --popover:                 oklch(1 0 0);
+  --popover-foreground:      oklch(0.145 0 0);
+  --primary:                 var(--brand-accent);
+  --primary-foreground:      oklch(1 0 0);
+  --secondary:               oklch(0.97 0 0);
+  --secondary-foreground:    oklch(0.205 0 0);
+  --muted-surface:           oklch(0.97 0 0);
+  --muted-foreground:        oklch(0.556 0 0);
+  --accent:                  oklch(0.97 0 0);
+  --accent-foreground:       oklch(0.205 0 0);
+  --destructive:             oklch(0.577 0.245 27.325);
+  --border:                  oklch(0.922 0 0);
+  --input:                   oklch(0.922 0 0);
+  --ring:                    var(--brand-accent);
+  --chart-1:                 oklch(0.87 0 0);
+  --chart-2:                 oklch(0.556 0 0);
+  --chart-3:                 oklch(0.439 0 0);
+  --chart-4:                 oklch(0.371 0 0);
+  --chart-5:                 oklch(0.269 0 0);
+  --sidebar:                 oklch(0.985 0 0);
+  --sidebar-foreground:      oklch(0.145 0 0);
+  --sidebar-primary:         var(--brand-accent);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent:          oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border:          oklch(0.922 0 0);
+  --sidebar-ring:            var(--brand-accent);
 
-     --ink was #41423d (a warm grey) while the shadcn --foreground it sits
-     beside was #112C3B (the design-system navy). Light mode was therefore
-     rendering two different primary-text colours on the same screen: 39
-     legacy files on --ink, 51 ReUI files on text-foreground. Unified on the
-     DS navy, which is both the documented value and what the ReUI half
-     already rendered. src/lib/pdf/styles.ts is re-baselined to match in the
-     same commit, since it mirrors these values by hand. */
-  --ink:       #112c3b;  /* DS neutral-900 / text-primary */
+  /* Large radius — a LEASETIC Group Maia parameter agreed separately from the
+     colour system, so it survives this reset. base-maia ships 0.625rem. */
+  --radius:                  1rem;
 
-  /* Legacy v10 secondary-TEXT colour, consumed by ~148 `color: var(--muted)`
-     call sites. A shadcn init once overwrote it with shadcn's near-white
-     muted *background*, but only in light mode, which rendered every muted
-     label invisible on white while dark mode still looked correct. shadcn's
-     background sense lives in --muted-surface instead (see below). */
-  --muted:     #6e7191;
-  --border:    #d9dbe9;
+  --destructive-foreground:  var(--color-red-800);
+  --success:                 var(--color-emerald-500);
+  --success-foreground:      var(--color-emerald-900);
+  --info:                    var(--color-violet-500);
+  --info-foreground:         var(--color-violet-900);
+  --warning:                 var(--color-yellow-500);
+  --warning-foreground:      var(--color-yellow-900);
+  --invert:                  var(--color-zinc-900);
+  --invert-foreground:       var(--color-zinc-50);
 
-  /* shadcn/ReUI `bg-muted` surface — deliberately NOT --muted (see above).
-     DS neutral-50, the "sunken section" fill from the Notion Colour page. */
-  --muted-surface: #f8faff;
-  --gold:      #e08530;
-  --gold-text: #8a4e13;  /* WCAG AA text variant for --gold over light backgrounds; matches --gold in dark mode */
-  --danger:    #dc2626;
-  --brand-mark: #6DC388;
+  /* ── Legacy v10 aliases ────────────────────────────────────────────────
+     ~400 call sites still read these directly. Rather than edit them all now,
+     each one POINTS AT its ReUI equivalent, so legacy code inherits the ReUI
+     look for free and the aliases can be deleted per-file as Phases 5-7
+     migrate them.
 
-  /* Layout shell tokens.
-     The three --shell-sidebar-* variables were deleted in Phase 3: the shadcn
-     SidebarProvider owns sidebar width now (via --sidebar-width /
-     --sidebar-width-icon, set in Shell), so nothing referenced them. --topbar-h
-     stays because the proposal detail page offsets a sticky element against it
-     (`top: calc(var(--topbar-h) + 24px)`), and --footer-h sizes the shell
-     footer. */
-  --topbar-h:        64px;
-  --footer-h:        48px;
+     --muted keeps the legacy TEXT sense and maps to --muted-foreground.
+     shadcn's surface sense lives in --muted-surface above, which is what
+     `bg-muted` resolves to via the @theme block. Collapsing the two is what
+     once rendered every muted label invisible on white. */
+  --paper:          var(--background);
+  --surface:        var(--card);
+  --ink:            var(--foreground);
+  --muted:          var(--muted-foreground);
+  --white:          #ffffff;
+  --navy:           var(--foreground);
+  --navy-dark:      var(--foreground);
+  --gd:             var(--brand-accent);
+  --gd-text:        var(--brand-accent);
+  --green:          var(--brand-accent);
+  --gl:             var(--muted-surface);
+  --teal:           var(--muted-foreground);
+  --gold:           var(--warning);
+  --gold-text:      var(--warning-foreground);
+  --danger:         var(--destructive);
+  --hover-overlay:  var(--accent);
+  --shadow-card:    0 1px 2px rgb(0 0 0 / 0.04), 0 4px 12px rgb(0 0 0 / 0.05);
 
-  /* Elevation */
-  --shadow-card: 0 1px 2px rgba(17,44,59,0.04), 0 4px 12px rgba(17,44,59,0.05);
-
-  /* Themeable surfaces */
-  --surface:        #ffffff;
-  --hover-overlay:  rgba(17,44,59,0.04);
+  /* Shell metrics still referenced by the proposal detail page + shell footer. */
+  --topbar-h:       64px;
+  --footer-h:       48px;
 
   color-scheme: light;
-
-  /* === shadcn/ReUI (base-maia) semantic tokens, wired to the Leasetic DS ===
-     Source: Figma "Leasetic Design System" (WbbNz5gLlg7ZBfvM4MreNB), Foundations
-     — Colour (13:3) — plus the Documentation Hub "seven rules" (Notion, 2026-08-29):
-     rule 1 = green is the ONLY interactive signal, so --primary/--ring/--sidebar-ring
-     all resolve to brand-primary-500. Previously generic shadcn oklch grays —
-     replaced as part of the LEASETIC Group-wide ReUI+Maia migration. */
-  --background:      #ffffff;
-
-  --foreground:      var(--ink); /* neutral-900 / text-primary */
-
-  --card:      #ffffff;
-
-  --card-foreground:      var(--ink);
-
-  --popover:      #ffffff;
-
-  --popover-foreground:      var(--ink);
-
-  --primary:      #01cc72; /* brand-primary-500 */
-
-  --primary-foreground:      #ffffff;
-
-  --secondary:      #f8faff; /* neutral-50 */
-
-  --secondary-foreground:      var(--ink);
-
-  --muted-foreground:      #2a4f6e; /* text-secondary — "body copy" per Notion Colour page */
-
-  --accent:      #eef2fa; /* neutral-100 — hover/highlight wash, never a click-me signal (rule 1) */
-
-  --accent-foreground:      var(--ink);
-
-  --destructive:      #b83227; /* feedback-danger */
-
-  --input:      #eef2fa; /* surface-field — "an input or select" per Notion Colour page */
-
-  --ring:      #0b935b; /* brand-primary-700 — Notion Colour page: "a focus ring → Green 700" */
-
-  --chart-1:      #01cc72;
-
-  --chart-2:      #4a3aff;
-
-  --chart-3:      #c9931d;
-
-  --chart-4:      #0e9aa0;
-
-  --chart-5:      #e08530;
-
-  /* "Large radius" per LEASETIC Group Maia preset — base-maia ships 0.625rem;
-     bumped so --radius-lg/xl/2xl land close to the Figma DS's radius-area (16px)
-     / radius-card (24px) tokens instead of the shadcn default scale.
-
-     SURFACE DECISION (Phase 1, agreed 2026-08-29): the card surface for this
-     app is the ReUI Frame in its `ghost` variant, NOT the shadcn Card. Card
-     hardcodes `ring-1 ring-foreground/10`, so every card would carry a visible
-     ring — contradicting DS rule 4 (cards are borderless; separation is fill
-     contrast) and rule 7 (flat at rest). Frame's ghost variant drops the border
-     term and takes its radius from --frame-radius, which defaults to
-     --radius-xl and so follows the scale below. Applied from Phase 2 onward;
-     hold one surface across the whole app. */
-  --radius:      1rem;
-
-  --sidebar:      #ffffff;
-
-  --sidebar-foreground:      var(--ink);
-
-  --sidebar-primary:      #01cc72;
-
-  --sidebar-primary-foreground:      #ffffff;
-
-  --sidebar-accent:      color-mix(in oklab, #01cc72 10%, white);
-
-  --sidebar-accent-foreground:      var(--ink);
-
-  /* Rule 3/4: rhythm comes from surface fill contrast, never a chrome border. */
-  --sidebar-border:      transparent;
-
-  --sidebar-ring:      #0b935b; /* brand-primary-700 — see --ring above */
-
-  --destructive-foreground:      #ffffff;
-
-  --success:      #def6e0; /* feedback-success-bg */
-
-  --success-foreground:      #025136; /* feedback-success */
-
-  --info:      #e4f2f2; /* feedback-info-bg */
-
-  --info-foreground:      #1d4f70; /* feedback-info */
-
-  --warning:      #fdf4e1; /* feedback-warning-bg */
-
-  --warning-foreground:      #7d5307; /* feedback-warning */
-
-  --invert:      #112c3b;
-
-  --invert-foreground:      #ffffff;
 }
 
-/* === Dark mode: extracted verbatim from UI-SPEC §CSS Custom Properties — Dark mode === */
+/* === ReUI base-maia, dark. Registry defaults; the accent stays brand green,
+   which is brand-invariant across themes. The legacy aliases above resolve
+   through these automatically, so nothing needs re-aliasing here. === */
 html[data-theme="dark"] {
-  --paper:    #0c121c;
-  --surface:  #161e2d;
-  --ink:      #e6e9ef;
-  --muted:    #8b93a8;
-  --border:   #242c3e;
-  /* Dark counterpart of the shadcn `bg-muted` surface — one step up from
-     --paper so muted fills still read as raised, mirroring #f8faff on white. */
-  --muted-surface: #1b2536;
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.25);
-  --hover-overlay: rgba(255,255,255,0.05);
-  --navy:      #4a8fa8;  /* Navy lightened for dark-mode legibility on --surface dark */
-  --gd-text:   #129657;  /* Same as --gd — dark-mode contrast already AA-pass against --paper dark */
-  --gold-text: #e08530;  /* Same as --gold — dark-mode contrast already AA-pass against chip bg dark */
+  --background:              oklch(0.145 0 0);
+  --foreground:              oklch(0.985 0 0);
+  --card:                    oklch(0.205 0 0);
+  --card-foreground:         oklch(0.985 0 0);
+  --popover:                 oklch(0.205 0 0);
+  --popover-foreground:      oklch(0.985 0 0);
+  --primary:                 var(--brand-accent);
+  --primary-foreground:      oklch(0.205 0 0);
+  --secondary:               oklch(0.269 0 0);
+  --secondary-foreground:    oklch(0.985 0 0);
+  --muted-surface:           oklch(0.269 0 0);
+  --muted-foreground:        oklch(0.708 0 0);
+  --accent:                  oklch(0.269 0 0);
+  --accent-foreground:       oklch(0.985 0 0);
+  --destructive:             oklch(0.704 0.191 22.216);
+  --border:                  oklch(1 0 0 / 10%);
+  --input:                   oklch(1 0 0 / 15%);
+  --ring:                    var(--brand-accent);
+  --sidebar:                 oklch(0.205 0 0);
+  --sidebar-foreground:      oklch(0.985 0 0);
+  --sidebar-primary:         var(--brand-accent);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent:          oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border:          oklch(1 0 0 / 10%);
+  --sidebar-ring:            var(--brand-accent);
+
+  --destructive-foreground:  var(--color-red-600);
+  --success-foreground:      var(--color-emerald-600);
+  --info-foreground:         var(--color-violet-600);
+  --warning-foreground:      var(--color-yellow-600);
+  --invert:                  var(--color-zinc-700);
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 14px rgb(0 0 0 / 0.25);
   color-scheme: dark;
 }
 /* Brand palette --navy/--green/--gd/--gl/--teal/--gold/--danger preserved across themes */
@@ -645,55 +611,6 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
   --color-success-foreground:      var(--success-foreground);
   --color-success:      var(--success);
   --color-destructive-foreground:      var(--destructive-foreground);
-}
-
-/* This block used to be `.dark { ... }` — a shadcn-init leftover that never
-   applied, since this app toggles themes via `data-theme="dark"` on <html>,
-   never a `.dark` class (see the no-flash script + the other
-   `html[data-theme="dark"]` block above). Every ReUI/shadcn semantic token
-   below has therefore always rendered its LIGHT value regardless of the
-   user's theme. Fixed selector; values reuse the app's existing working
-   dark tokens (--surface/--paper/--ink/--border/--muted) plus the same
-   brand-green/danger hexes as light (green is brand-invariant across themes). */
-html[data-theme="dark"] {
-  --background:      var(--paper);
-  --foreground:      var(--ink);
-  --card:      var(--surface);
-  --card-foreground:      var(--ink);
-  --popover:      var(--surface);
-  --popover-foreground:      var(--ink);
-  --primary:      #01cc72;
-  --primary-foreground:      #ffffff;
-  --secondary:      var(--surface);
-  --secondary-foreground:      var(--ink);
-  --muted-foreground:      var(--muted);
-  --accent:      var(--surface);
-  --accent-foreground:      var(--ink);
-  --destructive:      #b83227;
-  --input:      var(--surface);
-  --ring:      #0b935b;
-  --chart-1:      #01cc72;
-  --chart-2:      #4a3aff;
-  --chart-3:      #c9931d;
-  --chart-4:      #0e9aa0;
-  --chart-5:      #e08530;
-  --sidebar:      var(--surface);
-  --sidebar-foreground:      var(--ink);
-  --sidebar-primary:      #01cc72;
-  --sidebar-primary-foreground:      #ffffff;
-  --sidebar-accent:      color-mix(in oklab, #01cc72 15%, var(--surface));
-  --sidebar-accent-foreground:      var(--ink);
-  --sidebar-border:      transparent;
-  --sidebar-ring:      #0b935b;
-  --destructive-foreground:      #ffffff;
-  --success:      var(--color-emerald-500);
-  --success-foreground:      var(--color-emerald-600);
-  --info:      var(--color-violet-500);
-  --info-foreground:      var(--color-violet-600);
-  --warning:      var(--color-yellow-500);
-  --warning-foreground:      var(--color-yellow-600);
-  --invert:      #ffffff;
-  --invert-foreground:      #112c3b;
 }
 
 @layer base {

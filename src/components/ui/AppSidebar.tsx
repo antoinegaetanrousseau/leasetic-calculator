@@ -183,7 +183,7 @@ export function AppSidebar({
             aria-expanded={!collapsed}
             aria-controls="leasetic-sidebar-nav"
             aria-label={collapsed ? t('sidebar.expand', lang) : t('sidebar.collapse', lang)}
-            className="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-[var(--muted)] transition-colors hover:text-ink"
+            className="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
           >
             {collapsed ? (
               <ChevronRight size={16} strokeWidth={1.6} />

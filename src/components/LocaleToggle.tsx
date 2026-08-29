@@ -9,7 +9,7 @@ import type { Lang } from '@/lib/i18n/dictionaries';
  * FR/EN segmented control.
  *
  * Phase 2: inline styles replaced with utilities bound to the token spine
- * (bg-paper / border-border / bg-gd / text-ink come from the @theme block in
+ * (bg-background / border-border / bg-primary come from the ReUI token layer in
  * globals.css). Appearance is unchanged.
  *
  * Deliberately NOT converted to shadcn ToggleGroup: this is a mutually
@@ -22,7 +22,7 @@ export function LocaleToggle({ current, fullWidth = false }: { current: Lang; fu
   return (
     <div
       className={cn(
-        'items-center rounded-full border border-border bg-paper p-1',
+        'items-center rounded-full border border-border bg-background p-1',
         fullWidth ? 'flex w-full' : 'inline-flex',
       )}
       role="radiogroup"
@@ -39,7 +39,7 @@ export function LocaleToggle({ current, fullWidth = false }: { current: Lang; fu
             onClick={() => startTransition(() => { void setLang(value); })}
             className={cn(
               'rounded-full px-3 py-1.5 text-[11.5px] font-semibold tracking-[0.04em] uppercase transition-colors',
-              active ? 'bg-gd text-white' : 'text-[var(--muted)] hover:text-ink',
+              active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
               fullWidth && 'flex-1 text-center',
             )}
           >

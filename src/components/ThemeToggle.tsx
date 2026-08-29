@@ -24,7 +24,7 @@ export function ThemeToggle({ current, fullWidth = false }: { current: ThemeOpti
   return (
     <div
       className={cn(
-        'items-center rounded-full border border-border bg-paper p-1',
+        'items-center rounded-full border border-border bg-background p-1',
         fullWidth ? 'flex w-full' : 'inline-flex',
       )}
       role="radiogroup"
@@ -42,7 +42,7 @@ export function ThemeToggle({ current, fullWidth = false }: { current: ThemeOpti
             onClick={() => startTransition(() => { void setTheme(value); })}
             className={cn(
               'rounded-full px-3 py-1.5 transition-colors',
-              active ? 'bg-gd text-white' : 'text-[var(--muted)] hover:text-ink',
+              active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
               fullWidth && 'inline-flex flex-1 justify-center',
             )}
           >

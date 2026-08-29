@@ -101,7 +101,7 @@ export async function Shell({
         adminHomeHref={adminHomeHref}
       />
 
-      <SidebarInset className="bg-paper">
+      <SidebarInset className="bg-background">
         <Topbar
           displayName={displayName}
           email={email}
@@ -114,13 +114,13 @@ export async function Shell({
           {children}
         </main>
 
-        <footer className="flex h-[var(--footer-h)] items-center justify-between border-t border-border px-6 text-[10.5px] text-[var(--muted)]">
+        <footer className="flex h-[var(--footer-h)] items-center justify-between border-t border-border px-6 text-[10.5px] text-muted-foreground">
           <span>{t('shell.footer.copyright', lang)}</span>
           <a
             href="https://leasetic.fr/mentions-legales"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10.5px] text-[var(--muted)] underline"
+            className="text-[10.5px] text-muted-foreground underline"
           >
             {t('shell.footer.privacy', lang)}
           </a>
