@@ -17,14 +17,28 @@
   --teal:      #2d7a8c;
   --paper:     #f5f7fc;
   --white:     #ffffff;
-  --ink:       #41423d;
-  /* --muted is the LEGACY v10 secondary-TEXT colour, consumed by ~148
-     `color: var(--muted)` call sites across app/ and src/. A shadcn init
-     previously overwrote it with oklch(0.97 0 0) — shadcn's near-white muted
-     *background* — but only in light mode, leaving the dark value below intact.
-     That rendered every muted label near-white-on-white in light mode while
-     dark mode still looked right. Restored to the committed value; shadcn's
-     background sense now lives in --muted-surface (see below). */
+
+  /* === The token spine (Phase 1) ==========================================
+     --ink / --muted / --border are 55% of all CSS-variable references in the
+     product (345 of 624). They are the seam between the legacy v10 system and
+     the ReUI/shadcn layer, so each is defined ONCE here and the shadcn
+     semantic token aliases to it further down — never the reverse, and never
+     a second definition with a different meaning.
+
+     --ink was #41423d (a warm grey) while the shadcn --foreground it sits
+     beside was #112C3B (the design-system navy). Light mode was therefore
+     rendering two different primary-text colours on the same screen: 39
+     legacy files on --ink, 51 ReUI files on text-foreground. Unified on the
+     DS navy, which is both the documented value and what the ReUI half
+     already rendered. src/lib/pdf/styles.ts is re-baselined to match in the
+     same commit, since it mirrors these values by hand. */
+  --ink:       #112c3b;  /* DS neutral-900 / text-primary */
+
+  /* Legacy v10 secondary-TEXT colour, consumed by ~148 `color: var(--muted)`
+     call sites. A shadcn init once overwrote it with shadcn's near-white
+     muted *background*, but only in light mode, which rendered every muted
+     label invisible on white while dark mode still looked correct. shadcn's
+     background sense lives in --muted-surface instead (see below). */
   --muted:     #6e7191;
   --border:    #d9dbe9;
 
@@ -49,7 +63,6 @@
   /* Themeable surfaces */
   --surface:        #ffffff;
   --hover-overlay:  rgba(17,44,59,0.04);
-  --active-pill:    rgba(18,150,87,0.12);
 
   color-scheme: light;
 
@@ -61,15 +74,15 @@
      replaced as part of the LEASETIC Group-wide ReUI+Maia migration. */
   --background:      #ffffff;
 
-  --foreground:      #112c3b; /* neutral-900 / text-primary */
+  --foreground:      var(--ink); /* neutral-900 / text-primary */
 
   --card:      #ffffff;
 
-  --card-foreground:      #112c3b;
+  --card-foreground:      var(--ink);
 
   --popover:      #ffffff;
 
-  --popover-foreground:      #112c3b;
+  --popover-foreground:      var(--ink);
 
   --primary:      #01cc72; /* brand-primary-500 */
 
@@ -77,13 +90,13 @@
 
   --secondary:      #f8faff; /* neutral-50 */
 
-  --secondary-foreground:      #112c3b;
+  --secondary-foreground:      var(--ink);
 
   --muted-foreground:      #2a4f6e; /* text-secondary — "body copy" per Notion Colour page */
 
   --accent:      #eef2fa; /* neutral-100 — hover/highlight wash, never a click-me signal (rule 1) */
 
-  --accent-foreground:      #112c3b;
+  --accent-foreground:      var(--ink);
 
   --destructive:      #b83227; /* feedback-danger */
 
@@ -103,12 +116,21 @@
 
   /* "Large radius" per LEASETIC Group Maia preset — base-maia ships 0.625rem;
      bumped so --radius-lg/xl/2xl land close to the Figma DS's radius-area (16px)
-     / radius-card (24px) tokens instead of the shadcn default scale. */
+     / radius-card (24px) tokens instead of the shadcn default scale.
+
+     SURFACE DECISION (Phase 1, agreed 2026-08-29): the card surface for this
+     app is the ReUI Frame in its `ghost` variant, NOT the shadcn Card. Card
+     hardcodes `ring-1 ring-foreground/10`, so every card would carry a visible
+     ring — contradicting DS rule 4 (cards are borderless; separation is fill
+     contrast) and rule 7 (flat at rest). Frame's ghost variant drops the border
+     term and takes its radius from --frame-radius, which defaults to
+     --radius-xl and so follows the scale below. Applied from Phase 2 onward;
+     hold one surface across the whole app. */
   --radius:      1rem;
 
   --sidebar:      #ffffff;
 
-  --sidebar-foreground:      #112c3b;
+  --sidebar-foreground:      var(--ink);
 
   --sidebar-primary:      #01cc72;
 
@@ -116,7 +138,7 @@
 
   --sidebar-accent:      color-mix(in oklab, #01cc72 10%, white);
 
-  --sidebar-accent-foreground:      #112c3b;
+  --sidebar-accent-foreground:      var(--ink);
 
   /* Rule 3/4: rhythm comes from surface fill contrast, never a chrome border. */
   --sidebar-border:      transparent;
@@ -154,7 +176,6 @@ html[data-theme="dark"] {
   --muted-surface: #1b2536;
   --shadow-card: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.25);
   --hover-overlay: rgba(255,255,255,0.05);
-  --active-pill:   rgba(18,150,87,0.22);
   --navy:      #4a8fa8;  /* Navy lightened for dark-mode legibility on --surface dark */
   --gd-text:   #129657;  /* Same as --gd — dark-mode contrast already AA-pass against --paper dark */
   --gold-text: #e08530;  /* Same as --gold — dark-mode contrast already AA-pass against chip bg dark */
@@ -470,31 +491,6 @@ input[aria-invalid="true"] {
   line-height: 1.4;
 }
 
-.chip-active {
-  background: rgba(18, 150, 87, 0.12);
-  color: var(--gd);
-}
-
-.chip-expired {
-  background: rgba(110, 113, 145, 0.12);
-  color: var(--muted);
-}
-
-.chip-draft {
-  background: rgba(224, 133, 48, 0.12);
-  color: var(--gold-text);
-}
-
-.chip-invited {
-  background: rgba(224, 133, 48, 0.12);
-  color: var(--gold-text);
-}
-
-.chip-deleted {
-  background: rgba(220, 38, 38, 0.08);
-  color: var(--danger);
-}
-
 .chip-language {
   background: rgba(45, 122, 140, 0.10);
   color: var(--teal);
@@ -562,25 +558,6 @@ input[aria-invalid="true"] {
   color: var(--ink); background: transparent;
 }
 
-.toggle-pill {
-  padding: 4px 12px;
-  border-radius: 9999px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 12.5px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: background 150ms, color 150ms;
-}
-.toggle-pill:hover { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); color: var(--ink); }
-.toggle-pill.on {
-  background: var(--surface);
-  color: var(--ink);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(17, 44, 59, 0.06);
-}
-
 /* === end Phase 8 home list === */
 
 /* === Phase 9 (09-01) admin surface primitives === */
@@ -623,21 +600,6 @@ input[aria-invalid="true"] {
   color: var(--gd);
   font-weight: 600;
 }
-
-.chip-disabled {
-  background: rgba(220, 38, 38, 0.08);
-  color: var(--danger);
-}
-
-.accounts-row td {
-  padding: 14px 14px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-  font-size: 13.5px;
-  color: var(--ink);
-}
-.accounts-row:last-child td { border-bottom: none; }
-.accounts-row:hover td { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); }
 
 /* Seed-banner — Phase 10 CUT-06 (D-10-13/14) */
 /* Yellow informational banner on coefficients page when latest global_params row is byte-equal to seedParams.coefficients (admin still on placeholder values). */

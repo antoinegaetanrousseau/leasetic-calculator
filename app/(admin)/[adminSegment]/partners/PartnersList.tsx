@@ -243,13 +243,18 @@ export function PartnersList({
                   }}
                 >
                   <span
-                    className="chip chip-type"
+                    // `className="chip chip-type"` removed: .chip-type was never
+                    // declared in any stylesheet, and every property .chip would
+                    // have contributed is overridden by the inline style below —
+                    // except line-height, which is carried over explicitly here so
+                    // the rendering is unchanged.
                     style={{
                       display: 'inline-block',
                       padding: '2px 10px',
                       borderRadius: 999,
                       fontSize: 11.5,
                       fontWeight: 600,
+                      lineHeight: 1.4,
                       letterSpacing: '0.02em',
                       background: 'var(--border)',
                       color: 'var(--ink)',
