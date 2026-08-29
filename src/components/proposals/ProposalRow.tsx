@@ -1,5 +1,6 @@
 'use client';
 
+import { cva } from 'class-variance-authority';
 import { useRouter } from 'next/navigation';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate } from '@/lib/i18n/format';
@@ -27,6 +28,32 @@ export interface ProposalRowProps {
 }
 
 /**
+ * Phase 4: ported off the v10 `.list-row` / `.is-deleted` / `.is-draft` rules.
+ *
+ * This stays a clickable grid row rather than becoming a shadcn Table row: the
+ * rows are navigational (role="button", they route on click), not tabular data
+ * under column headers, so a <table> would be the wrong semantics.
+ *
+ * The three v10 variants declared the same grid template and differed only in
+ * opacity, so `is-draft` collapses into the base and only `deleted` survives as
+ * a variant. The focus ring moves from the old teal to `ring-ring`, which is
+ * the design system's green-700 — DS rule 1 makes green the only interactive
+ * signal, and --ring was pointed at it in Phase 1.
+ */
+const rowClass = cva(
+  [
+    'grid grid-cols-[1fr_100px_130px_100px_max-content_auto] items-center gap-4',
+    'cursor-pointer rounded-lg border-b border-border p-4 text-inherit no-underline',
+    'transition-colors last:border-b-0 hover:bg-[var(--hover-overlay)]',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+  ].join(' '),
+  {
+    variants: { deleted: { true: 'opacity-70', false: '' } },
+    defaultVariants: { deleted: false },
+  },
+);
+
+/**
  * Phase 14 D-27 — chip rendering switched from the ad-hoc
  * <ValidityChip> / <DeletedChip> composition to a single <StatusChip>
  * driven by the server-derived `row.displayStatus` (one of
@@ -51,7 +78,7 @@ export function ProposalRow({
   actionsSlot = null,
 }: ProposalRowProps) {
   const router = useRouter();
-  const className = deleted ? 'list-row is-deleted' : draftMode ? 'list-row is-draft' : 'list-row';
+  const className = rowClass({ deleted });
   const ariaLabel = row.clientCo
     ? `${row.clientCo}${row.lcRef ? ` ${row.lcRef}` : ''}`
     : t('proposal.detail.title', lang).replace('{0}', row.lcRef);
@@ -59,40 +86,12 @@ export function ProposalRow({
 
   const columns = (
     <>
-      <span
-        style={{
-          fontSize: '14.5px',
-          fontWeight: 600,
-          color: 'var(--ink)',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {row.clientCo}
-      </span>
-      <span
-        style={{
-          fontSize: 13,
-          fontWeight: 500,
-          color: 'var(--ink)',
-          fontFamily: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
-        }}
-      >
-        {row.lcRef}
-      </span>
-      <span
-        style={{
-          fontSize: '14.5px',
-          fontWeight: 600,
-          color: 'var(--ink)',
-          textAlign: 'right',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
+      <span className="truncate text-[14.5px] font-semibold text-ink">{row.clientCo}</span>
+      <span className="font-mono text-[13px] font-medium text-ink">{row.lcRef}</span>
+      <span className="text-right text-[14.5px] font-semibold text-ink tabular-nums">
         {formatCurrency(Number(row.amountHT), lang)}
       </span>
-      <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--muted)' }}>
+      <span className="text-[13px] font-normal text-[var(--muted)]">
         {formatDate(new Date(row.createdAt), lang)}
       </span>
       <StatusChip variant={row.displayStatus} label={t(chipLabelKey, lang)} />
@@ -103,6 +102,8 @@ export function ProposalRow({
     return (
       <div
         className={className}
+        data-slot="proposal-row"
+        data-draft="true"
         role="button"
         tabIndex={0}
         aria-label={ariaLabel}
@@ -120,6 +121,7 @@ export function ProposalRow({
   return (
     <div
       className={className}
+      data-slot="proposal-row"
       role="button"
       tabIndex={0}
       aria-label={ariaLabel}

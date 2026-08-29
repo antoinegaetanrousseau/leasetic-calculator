@@ -416,7 +416,6 @@ input[aria-invalid="true"] {
   font-weight: 600;
 }
 
-
 /* Buttons — Phase 5 tokens; concrete classes added here for Plans 07-03/04/05 */
 .btn-green,
 .btn-navy,
@@ -487,11 +486,6 @@ input[aria-invalid="true"] {
   transition: background 150ms;
   border-bottom: 1px solid var(--border);
 }
-.list-row:last-child { border-bottom: none; }
-.list-row:hover { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); }
-.list-row:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--teal); }
-.list-row.is-deleted { opacity: 0.7; grid-template-columns: 1fr 100px 130px 100px max-content auto; }
-.list-row.is-draft  { grid-template-columns: 1fr 100px 130px 100px max-content auto; }
 
 .search-bar {
   display: flex;

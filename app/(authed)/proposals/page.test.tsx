@@ -231,8 +231,9 @@ describe('/proposals page (Phase 17 PROPS-01, D-10/D-13/D-14)', () => {
     const { container } = render(tree);
 
     // ProposalsList renders <ProposalRow> for each row; populated list has 1 row
-    // → at least one .list-row element should exist
-    const rows = container.querySelectorAll('.list-row');
+    // → at least one proposal row should exist. Phase 4 retired the v10
+    // `.list-row` class; rows now carry a data-slot hook that survives styling.
+    const rows = container.querySelectorAll('[data-slot="proposal-row"]');
     expect(rows.length).toBeGreaterThanOrEqual(1);
 
     // The ProposalRow renders the lcRef text from the mocked row
