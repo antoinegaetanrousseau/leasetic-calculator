@@ -1,5 +1,6 @@
 'use client';
 
+import { Input } from '@/components/ui/input';
 import { type ChangeEvent, type FocusEvent, useId } from 'react';
 
 export interface PhoneInputProps {
@@ -47,14 +48,13 @@ export function PhoneInput({
   };
 
   return (
-    <input
+    <Input
       id={finalId}
       type="tel"
       inputMode="numeric"
       autoComplete="tel-national"
       aria-invalid={ariaInvalid || invalid || undefined}
       aria-describedby={ariaDescribedBy}
-      className={invalid ? 'invalid' : ''}
       placeholder={placeholder}
       disabled={disabled}
       value={value}

@@ -1,5 +1,6 @@
 'use client';
 
+import { Input } from '@/components/ui/input';
 import { type ChangeEvent, type FocusEvent, useId } from 'react';
 
 export interface SirenInputProps {
@@ -47,14 +48,13 @@ export function SirenInput({
   };
 
   return (
-    <input
+    <Input
       id={finalId}
       type="text"
       inputMode="numeric"
       autoComplete="off"
       aria-invalid={ariaInvalid || invalid || undefined}
       aria-describedby={ariaDescribedBy}
-      className={invalid ? 'invalid' : ''}
       placeholder={placeholder}
       disabled={disabled}
       value={value}
