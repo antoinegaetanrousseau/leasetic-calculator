@@ -96,19 +96,15 @@ export async function Shell({
         isAdmin={isAdmin}
         lang={lang}
         theme={theme}
+        displayName={displayName}
+        email={email}
         adminHrefs={adminHrefs}
         adminSegment={adminSegment}
         adminHomeHref={adminHomeHref}
       />
 
       <SidebarInset className="bg-background">
-        <Topbar
-          displayName={displayName}
-          email={email}
-          lang={lang}
-          isAdmin={isAdmin}
-          adminSegment={adminSegment}
-        />
+        <Topbar lang={lang} isAdmin={isAdmin} adminSegment={adminSegment} />
 
         <main className="mx-auto w-full max-w-[1100px] flex-1 px-6 pt-6 pb-8">
           {children}

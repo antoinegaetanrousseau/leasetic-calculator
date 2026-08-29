@@ -27,12 +27,24 @@ vi.mock('next/navigation', () => ({
 }));
 
 /** AppSidebar reads collapse state from context, so every render needs the provider. */
-function renderSidebar(props: AppSidebarProps, { defaultOpen = true } = {}) {
+const IDENTITY = { displayName: 'Antoine Rousseau', email: 'antoine@leasetic.com' } as const;
+
+function renderSidebar(
+  props: Omit<AppSidebarProps, 'displayName' | 'email'> & Partial<AppSidebarProps>,
+  { defaultOpen = true } = {},
+) {
   return render(
     <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar {...props} />
+      <AppSidebar {...IDENTITY} {...(props as AppSidebarProps)} />
     </SidebarProvider>,
   );
+}
+
+/** The view / language / theme controls live inside the NavUser dropdown now. */
+async function openUserMenu(name = 'Menu utilisateur') {
+  await act(async () => {
+    fireEvent.click(screen.getByRole('button', { name }));
+  });
 }
 
 const ADMIN_HREFS = {
@@ -189,28 +201,34 @@ describe('AppSidebar', () => {
     });
   });
 
-  it('AC-RS-06: the expanded footer renders the Language and Theme toggles full width', () => {
+  it('AC-RS-06: the footer is the user identity card', () => {
     renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
-    const groups = screen.getAllByRole('radiogroup');
-    expect(groups.map((g) => g.getAttribute('aria-label'))).toEqual(['Language', 'Theme']);
-    for (const group of groups) {
-      expect(group.className).toContain('w-full');
-      expect(group.className).not.toContain('inline-flex');
-    }
+    const trigger = screen.getByRole('button', { name: 'Menu utilisateur' });
+    expect(trigger).toHaveTextContent('Antoine Rousseau');
   });
 
-  it('the footer toggles are not rendered in the collapsed rail', () => {
+  it('AC-RS-06b: language and theme controls live in the user menu, not loose in the footer', async () => {
+    renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
+    // Closed: no controls in the DOM.
+    expect(screen.queryByRole('radiogroup', { name: 'Language' })).toBeNull();
+    expect(screen.queryByRole('radiogroup', { name: 'Theme' })).toBeNull();
+
+    await openUserMenu();
+    expect(screen.getByRole('radiogroup', { name: 'Language' })).toBeDefined();
+    expect(screen.getByRole('radiogroup', { name: 'Theme' })).toBeDefined();
+  });
+
+  it('the identity card survives collapse, and the nav labels do not', () => {
     renderSidebar(
       { activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' },
       { defaultOpen: false },
     );
-    expect(screen.queryByRole('radiogroup', { name: 'Language' })).toBeNull();
-    expect(screen.queryByRole('radiogroup', { name: 'Theme' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Menu utilisateur' })).toBeDefined();
   });
 
   // ── View toggle (Phase 24 Plan 02) ───────────────────────────────────────
 
-  it('AC-RS-24-01: admin footer renders 3 radiogroups, ViewToggle first', () => {
+  it('AC-RS-24-01: an admin gets the view switch in the user menu', async () => {
     renderSidebar({
       activeNav: 'admin-home',
       isAdmin: true,
@@ -218,14 +236,21 @@ describe('AppSidebar', () => {
       theme: 'light',
       adminHrefs: { ...ADMIN_HREFS },
     });
+    await openUserMenu();
     const radiogroups = screen.getAllByRole('radiogroup');
-    expect(radiogroups).toHaveLength(3);
-    expect(radiogroups[0]).toHaveAttribute('aria-label', 'Vue');
+    expect(radiogroups.map((g) => g.getAttribute('aria-label'))).toEqual([
+      'Vue',
+      'Language',
+      'Theme',
+    ]);
   });
 
-  it('AC-RS-24-02 (C-03 gate): non-admins get no ViewToggle', () => {
+  it('AC-RS-24-02 (C-03 gate): non-admins get no view switch, even with the menu open', async () => {
     renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
+    await openUserMenu();
     expect(screen.queryByRole('radiogroup', { name: 'Vue' })).toBeNull();
+    // The other two are still there, so this is a gate and not a missing menu.
+    expect(screen.getByRole('radiogroup', { name: 'Theme' })).toBeDefined();
   });
 
   it('AC-RS-24-03 (VIEW-02): the stored view selects the nav set', () => {

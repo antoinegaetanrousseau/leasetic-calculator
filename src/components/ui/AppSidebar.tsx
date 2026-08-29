@@ -51,10 +51,8 @@ import {
 import { cn } from '@/lib/utils';
 import { t, type DictKey, type Lang } from '@/lib/i18n/dictionaries';
 import { getRouteMeta, type ActiveNav } from '@/lib/route-meta';
-import { LocaleToggle } from '../LocaleToggle';
-import { ThemeToggle } from '../ThemeToggle';
 import { BrandLogo } from './BrandLogo';
-import { ViewToggle } from '../ViewToggle';
+import { NavUser } from './NavUser';
 import { subscribeView, getViewSnapshot, getServerViewSnapshot, type ViewMode } from '@/lib/view-store';
 
 // Re-exported for back-compat with existing imports. Canonical home is
@@ -71,6 +69,9 @@ export interface AppSidebarProps {
   isAdmin: boolean;
   lang: Lang;
   theme: 'light' | 'dark' | 'system';
+  /** Shown in the sidebar footer identity card. */
+  displayName: string;
+  email: string;
   /**
    * Admin-only: hrefs computed server-side from `params.adminSegment` and
    * forwarded by Shell (UI-SPEC §11.6).
@@ -129,6 +130,8 @@ export function AppSidebar({
   isAdmin,
   lang,
   theme,
+  displayName,
+  email,
   adminHrefs,
   adminSegment,
   adminHomeHref,
@@ -222,23 +225,19 @@ export function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="gap-2 p-3">
-        {/* ViewToggle is admin-only (C-03) and additionally requires a resolved
-            admin home (WR-02). */}
-        {isAdmin && adminHomeResolved && (
-          <ViewToggle
-            lang={lang}
-            adminHrefs={{ home: adminHomeResolved }}
-            collapsed={collapsed}
-            fullWidth={!collapsed}
-          />
-        )}
-        {!collapsed && (
-          <>
-            <LocaleToggle current={lang} fullWidth />
-            <ThemeToggle current={theme} fullWidth />
-          </>
-        )}
+      {/* Block structure: the footer is the user identity card, and the view /
+          language / theme controls live inside its dropdown rather than loose
+          in the sidebar. C-03 and WR-02 still gate the view switch, they are
+          just enforced one level down now. */}
+      <SidebarFooter className="p-3">
+        <NavUser
+          displayName={displayName}
+          email={email}
+          lang={lang}
+          theme={theme}
+          isAdmin={isAdmin}
+          adminHomeHref={adminHomeResolved}
+        />
       </SidebarFooter>
 
       {/* The primitive's own rail: click or drag the sidebar edge to toggle. */}

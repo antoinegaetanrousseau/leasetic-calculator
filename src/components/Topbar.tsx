@@ -1,4 +1,3 @@
-import { UserMenu } from './UserMenu';
 import { TopbarTitle } from './TopbarTitle';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
@@ -7,14 +6,16 @@ import { t, type Lang } from '@/lib/i18n';
 // PHASE 16: verified visual match to Figma 9:46 on 2026-05-22 (D-16). Zero functional change.
 
 /**
- * Topbar — page title + ADMIN pill + UserMenu (UI-SPEC §6.7, Plan 11-05 D-06).
+ * Topbar — page title + ADMIN badge.
+ *
+ * User identity moved to the sidebar footer (NavUser) when the app-shell-1
+ * block structure was adopted; the block puts the account card at the bottom
+ * of the sidebar, not in the header. The topbar is now title chrome only.
  *
  * The title is rendered by the `<TopbarTitle>` client island so it can read
  * the current pathname; the rest of the topbar chrome stays server-rendered.
  */
 export interface TopbarProps {
-  displayName: string;
-  email: string;
   lang: Lang;
   isAdmin?: boolean;
   /** Forwarded to TopbarTitle so admin-tree paths resolve to admin titles. */
@@ -22,8 +23,6 @@ export interface TopbarProps {
 }
 
 export function Topbar({
-  displayName,
-  email,
   lang,
   isAdmin = false,
   adminSegment,
@@ -43,8 +42,6 @@ export function Topbar({
           {t('shell.topbar.admin.badge', lang)}
         </Badge>
       )}
-      <div className="flex-1" />
-      <UserMenu displayName={displayName} email={email} lang={lang} />
     </header>
   );
 }
