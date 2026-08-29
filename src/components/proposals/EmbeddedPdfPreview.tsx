@@ -22,20 +22,27 @@ export interface EmbeddedPdfPreviewProps {
 export function EmbeddedPdfPreview({ proposalId, lang }: EmbeddedPdfPreviewProps) {
   const src = `/api/proposals/${proposalId}/pdf`;
   return (
+    // Phase 2: `.pdf-embed-wrap` and the two inline styles ported to
+    // utilities. The 480px height and 12px radius are preserved verbatim —
+    // see ./segmented for why the radius is not moved onto the large scale.
     <div>
-      <div className="pdf-embed-wrap" title={t('proposal.detail.pdf.preview.title', lang)}>
+      <div
+        className="h-[480px] w-full overflow-hidden rounded-[12px] border border-border bg-paper"
+        title={t('proposal.detail.pdf.preview.title', lang)}
+      >
         <embed
           src={src}
           type="application/pdf"
           aria-label={t('proposal.detail.pdf.preview.aria', lang)}
+          className="h-full w-full border-0"
         />
       </div>
-      <div style={{ marginTop: 8, textAlign: 'center' }}>
+      <div className="mt-2 text-center">
         <a
           href={src}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ fontSize: 12, color: 'var(--muted)' }}
+          className="text-xs text-[var(--muted)]"
         >
           {t('proposal.detail.pdf.fallback.link', lang)}
         </a>

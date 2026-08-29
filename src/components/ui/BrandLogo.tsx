@@ -10,6 +10,8 @@
  * client-only state). Consumed by Plan 11-04 RetractableSidebar brand row
  * and Plan 15 public surfaces (login / invite / reset).
  */
+import { cn } from '@/lib/utils';
+
 export interface BrandLogoProps {
   /** Pixel width. Defaults to 190 (sidebar brand-row width per UI-SPEC §6.3). */
   width?: number;
@@ -27,12 +29,12 @@ export function BrandLogo({
   alt = '',
   className = '',
 }: BrandLogoProps) {
-  const wrapperClass = className ? `brand-logo ${className}` : 'brand-logo';
+  // `brand-logo` is retained deliberately: it is the hook for the zero-JS
+  // light/dark picker rules in globals.css, not decoration. Phase 2 only
+  // replaced the inline style with the equivalent utilities.
+  const wrapperClass = cn('brand-logo inline-block leading-none', className);
   return (
-    <span
-      className={wrapperClass}
-      style={{ display: 'inline-block', lineHeight: 0 }}
-    >
+    <span className={wrapperClass}>
       {/* eslint-disable-next-line @next/next/no-img-element -- intentional: CSS picker + zero-JS theme switch per CONTEXT D-09 */}
       <img
         className="brand-logo-light"

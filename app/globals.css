@@ -413,34 +413,6 @@ input[aria-invalid="true"] {
   font-weight: 600;
 }
 
-/* Yes/No toggle (.yn-btn / .yn-btn.on) — UI-SPEC §5 */
-.yn-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-.yn-btn {
-  padding: 0.65rem 0.5rem;
-  background: var(--surface);
-  color: var(--ink);
-  border: none;
-  border-right: 1px solid var(--border);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 150ms;
-}
-.yn-btn:last-child { border-right: none; }
-.yn-btn:hover { background: var(--hover-overlay); }
-.yn-btn.on {
-  background: var(--gd);
-  color: #ffffff;
-  font-weight: 600;
-}
 
 /* Buttons — Phase 5 tokens; concrete classes added here for Plans 07-03/04/05 */
 .btn-green,
@@ -478,37 +450,17 @@ input[aria-invalid="true"] {
   opacity: 0.6;
 }
 
-/* === Phase 8 (08-10) chip + embed primitives === */
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: 9999px;
-  font-size: 11.2px;
-  font-weight: 600;
-  line-height: 1.4;
-}
+/* === Phase 8 (08-10) chip primitives ===
+   The `.chip` base was deleted in Phase 2: StatusChip and LanguageChip both
+   moved to the ReUI Badge and nothing else referenced it. `.chip-language`
+   survives ONLY because app/(authed)/proposals/new/calcul/page.tsx borrows its
+   teal tint standalone for the tranche chip — a semantic misuse (that chip has
+   nothing to do with language) that should be resolved when the wizard is
+   migrated in Phase 5. */
 
 .chip-language {
   background: rgba(45, 122, 140, 0.10);
   color: var(--teal);
-}
-
-.pdf-embed-wrap {
-  width: 100%;
-  height: 480px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--paper);
-}
-
-.pdf-embed-wrap embed {
-  width: 100%;
-  height: 100%;
-  border: 0;
 }
 
 /* === end Phase 8 detail page === */

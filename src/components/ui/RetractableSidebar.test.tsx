@@ -124,18 +124,22 @@ describe('RetractableSidebar', () => {
     expect(chevron).toHaveAttribute('aria-expanded', 'true');
   });
 
-  it('AC-RS-06: expanded state renders 2 role="radiogroup" elements (LocaleToggle + ThemeToggle, fullWidth)', () => {
+  it('AC-RS-06: expanded state renders the Language and Theme radiogroups, both full width', () => {
     render(<RetractableSidebar activeNav="home" isAdmin={false} lang="fr" theme="light" />);
     const radiogroups = screen.getAllByRole('radiogroup');
     expect(radiogroups).toHaveLength(2);
-    // First radiogroup is Language, second is Theme — both should be fullWidth (className contains 'flex' not 'inline-flex')
-    expect(radiogroups[0].className).toContain('flex');
-    expect(radiogroups[0].className).not.toContain('inline-flex');
-    expect(radiogroups[1].className).toContain('flex');
-    expect(radiogroups[1].className).not.toContain('inline-flex');
-    // And width: 100% on the wrapper
-    expect(radiogroups[0].getAttribute('style') ?? '').toMatch(/width:\s*100%/);
-    expect(radiogroups[1].getAttribute('style') ?? '').toMatch(/width:\s*100%/);
+    expect(radiogroups.map((g) => g.getAttribute('aria-label'))).toEqual([
+      'Language',
+      'Theme',
+    ]);
+    // Phase 2: fullWidth moved from an inline `width: 100%` to the `w-full`
+    // utility when these toggles were migrated off inline styles. Assert the
+    // full-width layout contract, not the mechanism that delivers it.
+    for (const group of radiogroups) {
+      expect(group.className).toContain('w-full');
+      expect(group.className).toContain('flex');
+      expect(group.className).not.toContain('inline-flex');
+    }
   });
 
   it('AC-RS-12: outer <aside> has sticky positioning + height 100vh + var(--surface) + border-right', () => {

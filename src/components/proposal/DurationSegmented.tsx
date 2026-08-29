@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, useRef, type KeyboardEvent } from 'react';
+import { segmentedGroup, segmentedButton } from './segmented';
 
 export interface SegmentedOption<V extends number = number> {
   value: V;
@@ -30,8 +31,11 @@ export interface DurationSegmentedProps<V extends number = number> {
  * (36/48/60 mo) by Plan 07-04 and for proposal validity (15/30/60 days) by
  * Plan 07-05.
  *
- * Visual contract: .dg / .db / .db.on (added to globals.css by Plan 07-03,
- * itself ported from v10 lines 200-260 + UI-SPEC §3.2.5).
+ * Phase 2: the .dg / .db v10 classes were retired for the shared segmented
+ * chrome in ./segmented, which YesNoToggle also uses. This also fixes a latent
+ * bug — .dg hardcoded `grid-template-columns: repeat(3, 1fr)` while this
+ * component is generic over N options, so any group that was not exactly three
+ * wide laid out incorrectly.
  *
  * Accessibility (UI-SPEC §13): role=radiogroup on wrapper, role=radio +
  * aria-checked on each button. Arrow keys cycle within the group; Tab moves
@@ -71,7 +75,7 @@ export function DurationSegmented<V extends number = number>({
       role="radiogroup"
       aria-label={ariaLabel}
       aria-invalid={invalid || undefined}
-      className={'dg' + (invalid ? ' invalid' : '')}
+      className={segmentedGroup({ invalid })}
     >
       {options.map((opt, idx) => {
         const isOn = value === opt.value;
@@ -87,7 +91,7 @@ export function DurationSegmented<V extends number = number>({
             aria-label={opt.label}
             tabIndex={isOn || (value == null && idx === 0) ? 0 : -1}
             disabled={disabled}
-            className={'db' + (isOn ? ' on' : '')}
+            className={segmentedButton({ active: isOn })}
             onClick={() => !disabled && onChange(opt.value)}
             onKeyDown={(e) => onKey(e, idx)}
           >
