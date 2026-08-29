@@ -17,3 +17,4 @@ out/
 next-env.d.ts
 .vercel
 .env*.local
+.claude/settings.local.json

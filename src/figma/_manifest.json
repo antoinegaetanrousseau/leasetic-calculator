@@ -1,0 +1,104 @@
+[
+  {
+    "file": "input.figma.ts",
+    "node": "337:3292",
+    "source": "src/components/ui/input.tsx",
+    "component": "Input"
+  },
+  {
+    "file": "select.figma.ts",
+    "node": "339:3260",
+    "source": "src/components/ui/select.tsx",
+    "component": "Select"
+  },
+  {
+    "file": "select-menu.figma.ts",
+    "node": "340:3212",
+    "source": "src/components/ui/select.tsx",
+    "component": "SelectContent"
+  },
+  {
+    "file": "textarea.figma.ts",
+    "node": "340:3245",
+    "source": "src/components/ui/textarea.tsx",
+    "component": "Textarea"
+  },
+  {
+    "file": "tooltip.figma.ts",
+    "node": "341:3263",
+    "source": "src/components/ui/tooltip.tsx",
+    "component": "Tooltip"
+  },
+  {
+    "file": "avatar.figma.ts",
+    "node": "341:3264",
+    "source": "src/components/ui/avatar.tsx",
+    "component": "Avatar"
+  },
+  {
+    "file": "progress.figma.ts",
+    "node": "341:3265",
+    "source": "src/components/ui/progress.tsx",
+    "component": "Progress"
+  },
+  {
+    "file": "alert.figma.ts",
+    "node": "344:3270",
+    "source": "src/components/ui/alert.tsx",
+    "component": "Alert"
+  },
+  {
+    "file": "toast.figma.ts",
+    "node": "344:3271",
+    "source": "src/components/ui/sonner.tsx",
+    "component": "toast"
+  },
+  {
+    "file": "card.figma.ts",
+    "node": "345:3267",
+    "source": "src/components/ui/card.tsx",
+    "component": "Card"
+  },
+  {
+    "file": "stat-card.figma.ts",
+    "node": "345:3295",
+    "source": "src/components/ui/stat-card.tsx",
+    "component": "StatCard"
+  },
+  {
+    "file": "dropdown-menu.figma.ts",
+    "node": "346:3273",
+    "source": "src/components/ui/dropdown-menu.tsx",
+    "component": "DropdownMenu"
+  },
+  {
+    "file": "pagination.figma.ts",
+    "node": "346:3311",
+    "source": "src/components/ui/pagination.tsx",
+    "component": "Pagination"
+  },
+  {
+    "file": "breadcrumb.figma.ts",
+    "node": "346:3328",
+    "source": "src/components/ui/breadcrumb.tsx",
+    "component": "Breadcrumb"
+  },
+  {
+    "file": "dialog.figma.ts",
+    "node": "347:3301",
+    "source": "src/components/ui/dialog.tsx",
+    "component": "Dialog"
+  },
+  {
+    "file": "table.figma.ts",
+    "node": "348:3326",
+    "source": "src/components/ui/table.tsx",
+    "component": "Table"
+  },
+  {
+    "file": "empty-state.figma.ts",
+    "node": "347:3318",
+    "source": "src/components/ui/empty-state.tsx",
+    "component": "EmptyState"
+  }
+]

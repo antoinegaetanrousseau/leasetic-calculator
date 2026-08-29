@@ -1,25 +1,26 @@
 import './globals.css';
-import localFont from 'next/font/local';
+import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { NO_FLASH_SCRIPT } from '@/lib/theme/no-flash-script';
 import { getCurrentLang, getCurrentTheme } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 /**
- * Plus Jakarta Sans, self-hosted under public/fonts/ per UI-SPEC §Font Loading Contract.
- * variable: '--font-plus-jakarta-sans' is the CSS variable consumed by app/globals.css @theme.
- * display: 'swap' keeps text readable while the font loads.
- * CRITICAL for Phase 8: this declaration is what makes document.fonts.ready resolve;
- * downstream PDF rendering depends on it.
+ * Inter — the Leasétic Group design-system typeface (Figma DS + ReUI Maia preset).
+ * Replaced the previous self-hosted Plus Jakarta Sans; next/font/google downloads the
+ * font at build time and serves it from our own origin, so there is no runtime request
+ * to Google and the UI-SPEC §Font Loading Contract still holds.
+ *
+ * NOTE: PDF generation is deliberately NOT affected — src/lib/pdf/document.tsx registers
+ * its own font family from the TTFs in public/fonts/ and still uses Plus Jakarta Sans.
+ * Switching the PDF typeface is a separate change: it needs Inter TTFs, re-baselines the
+ * byte-determinism contract (PROP-17) and touches the glyph-coverage tests.
  */
-const plusJakartaSans = localFont({
-  src: [
-    { path: '../public/fonts/PlusJakartaSans-300.woff2', weight: '300', style: 'normal' },
-    { path: '../public/fonts/PlusJakartaSans-400.woff2', weight: '400', style: 'normal' },
-    { path: '../public/fonts/PlusJakartaSans-500.woff2', weight: '500', style: 'normal' },
-    { path: '../public/fonts/PlusJakartaSans-600.woff2', weight: '600', style: 'normal' },
-    { path: '../public/fonts/PlusJakartaSans-700.woff2', weight: '700', style: 'normal' },
-  ],
-  variable: '--font-plus-jakarta-sans',
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-inter',
   display: 'swap',
 });
 
@@ -45,15 +46,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const ssrTheme = themeCookie === 'system' ? 'light' : themeCookie;
 
   return (
-    <html lang={lang} data-theme={ssrTheme} className={plusJakartaSans.variable}>
+    <html lang={lang} data-theme={ssrTheme} className={cn('font-sans', inter.variable)}>
       <head>
         {/* Inline no-flash script — compile-time constant from src/lib/theme/no-flash-script.ts.
             Standard Next.js pattern for SSR theme bootstrap. See comment above for security analysis. */}
         <script suppressHydrationWarning dangerouslySetInnerHTML={inlineScript} />
       </head>
       <body>
-        {children}
-        <Toaster position="top-right" richColors />
+        <TooltipProvider>
+          {children}
+          <Toaster position="top-right" richColors />
+        </TooltipProvider>
       </body>
     </html>
   );
