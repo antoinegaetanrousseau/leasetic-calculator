@@ -36,3 +36,29 @@ function installStoragePolyfill(target: 'localStorage' | 'sessionStorage') {
 
 installStoragePolyfill('localStorage');
 installStoragePolyfill('sessionStorage');
+
+// Phase 3 (ReUI/Maia migration) — jsdom does not implement matchMedia, which
+// the shadcn `use-mobile` hook calls on mount. Any component built on the
+// Sidebar, Sheet or other responsive primitives therefore throws in tests
+// without this. Minimal spec-shaped stub reporting "no match", i.e. the
+// desktop branch; a test that needs the mobile branch can override
+// window.matchMedia locally. Idempotent, so a future jsdom that implements it
+// natively wins.
+if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: (query: string): MediaQueryList =>
+      ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        // Deprecated pair, still called by some libraries.
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+      }) as unknown as MediaQueryList,
+  });
+}

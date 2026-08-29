@@ -50,10 +50,13 @@
   --danger:    #dc2626;
   --brand-mark: #6DC388;
 
-  /* Layout shell tokens */
-  --shell-sidebar-w: 260px;
-  --shell-sidebar-w-collapsed: 72px;
-  --shell-sidebar-current-w: 260px;
+  /* Layout shell tokens.
+     The three --shell-sidebar-* variables were deleted in Phase 3: the shadcn
+     SidebarProvider owns sidebar width now (via --sidebar-width /
+     --sidebar-width-icon, set in Shell), so nothing referenced them. --topbar-h
+     stays because the proposal detail page offsets a sticky element against it
+     (`top: calc(var(--topbar-h) + 24px)`), and --footer-h sizes the shell
+     footer. */
   --topbar-h:        64px;
   --footer-h:        48px;
 
