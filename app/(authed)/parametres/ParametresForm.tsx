@@ -353,9 +353,8 @@ export function ParametresForm({
         onSubmit={handleSave}
         noValidate
         // `.card` supplies surface + radius 16 + shadow + 28px padding, which
-        // is what this form already had. No padding utility here: `.card` is
-        // declared unlayered in globals.css, so it beats Tailwind's layered
-        // utilities outright and a `p-*` alongside it would be inert.
+        // is what this form already had, so no padding utility is needed.
+        // (`.card` now lives in `@layer components`, so one WOULD apply.)
         className="card mt-8 w-full"
       >
         {/* Eyebrow section header */}
@@ -573,10 +572,11 @@ export function ParametresForm({
       </form>
 
       {/* ── Action footer — SEPARATE sibling card outside the form ─────────── */}
-      {/* Deliberately NOT `.card`: this footer is a tighter surface (radius 12,
-          16px padding) and `.card` would force its own 28px/16px — unlayered
-          CSS outranks the utilities, so `p-4` next to it would do nothing. */}
-      <div className="mt-6 flex w-full items-center justify-between rounded-xl border border-border bg-[var(--surface)] p-4 shadow-[var(--shadow-card)]">
+      {/* A tighter card: surface/border/shadow from `.card`, then radius 12 and
+          16px padding from utilities. That override only became possible once
+          `.card` moved into `@layer components` — while it sat unlayered these
+          two utilities were silently inert. */}
+      <div className="card mt-6 flex w-full items-center justify-between rounded-xl p-4">
         <button
           type="button"
           className="btn-out"
