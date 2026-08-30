@@ -28,7 +28,6 @@
  */
 
 import { useState } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { AlertTriangleIcon } from '@/components/ui/icons';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -79,7 +78,7 @@ export function CoefficientWarningBanner({
         marginBottom: 16,
       }}
     >
-      <HugeiconsIcon icon={AlertTriangleIcon}
+      <AlertTriangleIcon
         size={18}
         style={{
           color: 'var(--gold-text)',

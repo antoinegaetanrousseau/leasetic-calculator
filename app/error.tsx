@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { AlertTriangleIcon } from '@/components/ui/icons';
 import { LocaleToggle } from '@/components/LocaleToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -137,9 +136,8 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           textAlign: 'center',
         }}
       >
-        <HugeiconsIcon icon={AlertTriangleIcon}
+        <AlertTriangleIcon
           size={38}
-          strokeWidth={1.3}
           style={{ color: 'var(--gold)', opacity: 0.6, marginBottom: 16 }}
           aria-hidden="true"
         />

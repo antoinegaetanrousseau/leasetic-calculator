@@ -13,7 +13,6 @@ import {
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowRightIcon, RotateCcwIcon } from '@/components/ui/icons';
 import type { z } from 'zod';
 import { proposalInputSchema, type ProposalInput } from '@/lib/calc';
@@ -540,7 +539,7 @@ export function ProposalForm({ lang }: ProposalFormProps) {
             disabled={isSubmitting}
             style={{ flex: 1 }}
           >
-            <HugeiconsIcon icon={RotateCcwIcon} size={17} strokeWidth={1.6} aria-hidden="true" />
+            <RotateCcwIcon size={17} aria-hidden="true" />
             <span>{t('button.reset', lang)}</span>
           </button>
           <button
@@ -550,7 +549,7 @@ export function ProposalForm({ lang }: ProposalFormProps) {
             style={{ flex: 1 }}
           >
             <span>{t('button.generate', lang)}</span>
-            <HugeiconsIcon icon={ArrowRightIcon} size={17} strokeWidth={1.6} aria-hidden="true" />
+            <ArrowRightIcon size={17} aria-hidden="true" />
           </button>
         </div>
     </form>

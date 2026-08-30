@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { PlusIcon } from '@/components/ui/icons';
 import Link from 'next/link';
 import { requireUser } from '@/lib/auth/require';
@@ -56,7 +55,7 @@ export default async function HomePage() {
             variant="default"
             render={<Link href="/proposals/new/parametres" aria-label={t('dashboard.cta.new', lang)} />}
           >
-            <HugeiconsIcon icon={PlusIcon} className="mr-2 h-4 w-4" />
+            <PlusIcon className="mr-2 h-4 w-4" />
             {t('dashboard.cta.new', lang)}
           </Button>
         }

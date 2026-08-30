@@ -23,7 +23,6 @@
 
 import { useTransition } from 'react';
 import Link from 'next/link';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
@@ -161,9 +160,8 @@ export function WizardActionBar({
           }}
         >
           {primary.isSubmitting && (
-            <HugeiconsIcon icon={LoaderIcon}
+            <LoaderIcon
               size={16}
-              strokeWidth={2}
               aria-hidden="true"
               style={{
                 // No global `.animate-spin` utility in app/globals.css — inline

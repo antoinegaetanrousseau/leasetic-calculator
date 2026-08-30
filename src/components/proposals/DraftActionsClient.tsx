@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { ArchiveIcon, PencilIcon, TrashIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -90,7 +89,7 @@ export function DraftActionsClient({ proposalId, lang }: DraftActionsClientProps
         title={t('proposal.draft.action.edit', lang)}
         disabled={busy !== null}
       >
-        <HugeiconsIcon icon={PencilIcon} size={14} />
+        <PencilIcon size={14} />
       </button>
       <button
         type="button"
@@ -100,7 +99,7 @@ export function DraftActionsClient({ proposalId, lang }: DraftActionsClientProps
         title={t('proposal.draft.action.archive', lang)}
         disabled={busy !== null}
       >
-        <HugeiconsIcon icon={ArchiveIcon} size={14} />
+        <ArchiveIcon size={14} />
       </button>
       <button
         type="button"
@@ -110,7 +109,7 @@ export function DraftActionsClient({ proposalId, lang }: DraftActionsClientProps
         title={t('proposal.draft.action.delete', lang)}
         disabled={busy !== null}
       >
-        <HugeiconsIcon icon={TrashIcon} size={14} />
+        <TrashIcon size={14} />
       </button>
     </div>
   );

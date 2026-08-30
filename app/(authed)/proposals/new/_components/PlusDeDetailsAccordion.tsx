@@ -19,7 +19,6 @@
  */
 
 import { useState, type ReactNode } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { PlusIcon } from '@/components/ui/icons';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -84,9 +83,8 @@ export function PlusDeDetailsAccordion({
           padding: 0,
         }}
       >
-        <HugeiconsIcon icon={PlusIcon}
+        <PlusIcon
           size={16}
-          strokeWidth={2.25}
           aria-hidden="true"
           style={{
             transform: open ? 'rotate(45deg)' : 'rotate(0deg)',

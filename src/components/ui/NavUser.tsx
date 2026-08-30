@@ -24,7 +24,6 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { LogOutIcon, MoreHorizontalIcon, SettingsIcon } from '@/components/ui/icons';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -106,7 +105,7 @@ export function NavUser({
             <div className="grid min-w-0 flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
               <span className="truncate font-semibold">{displayName}</span>
             </div>
-            <HugeiconsIcon icon={MoreHorizontalIcon}
+            <MoreHorizontalIcon
               className="mr-1 ml-auto size-4 shrink-0 opacity-50 group-data-[collapsible=icon]:hidden"
               aria-hidden="true"
             />
@@ -134,7 +133,7 @@ export function NavUser({
               <DropdownMenuSeparator />
 
               <DropdownMenuItem render={<Link href="/parametres" />}>
-                <HugeiconsIcon icon={SettingsIcon} aria-hidden="true" />
+                <SettingsIcon aria-hidden="true" />
                 {t('shell.user.menu.settings', lang)}
               </DropdownMenuItem>
 
@@ -167,7 +166,7 @@ export function NavUser({
               <DropdownMenuSeparator />
 
               <DropdownMenuItem onClick={handleLogout}>
-                <HugeiconsIcon icon={LogOutIcon} aria-hidden="true" />
+                <LogOutIcon aria-hidden="true" />
                 {t('shell.user.menu.logout', lang)}
               </DropdownMenuItem>
             </DropdownMenuGroup>

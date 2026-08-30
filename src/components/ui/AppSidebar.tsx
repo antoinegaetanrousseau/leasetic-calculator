@@ -22,7 +22,6 @@
  */
 
 import { HomeIcon, PlusIcon, ProposalIcon, HelpIcon, UsersIcon, SlidersIcon } from '@/components/ui/icons';
-import { type IconSvgElement } from '@hugeicons/react';
 import { useSyncExternalStore, type ComponentType } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -87,7 +86,7 @@ export interface AppSidebarProps {
   adminHomeHref?: string;
 }
 
-type NavItem = { key: ActiveNav; icon: IconSvgElement; labelKey: DictKey; href: string };
+type NavItem = { key: ActiveNav; icon: ComponentType<{ size?: number; className?: string }>; labelKey: DictKey; href: string };
 
 /**
  * Phase 18 D-27 — Partner sidebar: exactly 4 items in order
@@ -182,9 +181,9 @@ export function AppSidebar({
             className="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
           >
             {collapsed ? (
-              <HugeiconsIcon icon={ChevronRightIcon} size={16} strokeWidth={1.6} />
+              <ChevronRightIcon size={16} />
             ) : (
-              <HugeiconsIcon icon={ChevronLeftIcon} size={16} strokeWidth={1.6} />
+              <ChevronLeftIcon size={16} />
             )}
           </button>
         </div>
@@ -206,7 +205,7 @@ export function AppSidebar({
                       tooltip={label}
                       render={<Link href={item.href} />}
                     >
-                      <HugeiconsIcon icon={item.icon} strokeWidth={1.6} />
+                      <item.icon />
                       <span>{label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

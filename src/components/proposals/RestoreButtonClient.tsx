@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { UndoIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -47,7 +46,7 @@ export function RestoreButtonClient({ proposalId, lang }: RestoreButtonClientPro
       }}
       aria-label={t('proposal.detail.action.restore', lang)}
     >
-      <HugeiconsIcon icon={UndoIcon} size={17} />
+      <UndoIcon size={17} />
       {t('proposal.detail.action.restore', lang)}
     </button>
   );

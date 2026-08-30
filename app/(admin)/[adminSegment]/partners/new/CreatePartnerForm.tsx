@@ -52,7 +52,6 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 
@@ -486,9 +485,8 @@ export function CreatePartnerForm({
             }}
           >
             {isSubmitting && (
-              <HugeiconsIcon icon={LoaderIcon}
+              <LoaderIcon
                 size={16}
-                strokeWidth={2}
                 style={{ animation: 'spin 1s linear infinite' }}
                 aria-hidden="true"
               />

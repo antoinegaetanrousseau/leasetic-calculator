@@ -2,7 +2,6 @@ import { SlidersIcon, UsersIcon, HistoryIcon, HashIcon } from '@/components/ui/i
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SectionTitle } from '@/components/ui/SectionTitle';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { PlusIcon } from '@/components/ui/icons';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
@@ -119,7 +118,7 @@ export default async function AdminHomePage({ params }: PageProps) {
               textDecoration: 'none',
             }}
           >
-            <HugeiconsIcon icon={PlusIcon} size={17} strokeWidth={1.6} aria-hidden="true" />
+            <PlusIcon size={17} aria-hidden="true" />
             <span>{t('dashboard.cta.new', lang)}</span>
           </Link>
         }

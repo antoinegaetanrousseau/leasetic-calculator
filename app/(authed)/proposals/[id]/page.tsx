@@ -2,7 +2,6 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { AlertTriangleIcon, CopyIcon, DownloadIcon } from '@/components/ui/icons';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
@@ -87,7 +86,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
             marginBottom: 16,
           }}
         >
-          <HugeiconsIcon icon={AlertTriangleIcon} size={17} style={{ color: 'var(--gold)' }} aria-hidden="true" />
+          <AlertTriangleIcon size={17} style={{ color: 'var(--gold)' }} aria-hidden="true" />
           {t('proposal.detail.deleted.banner', lang).replace(
             '{0}',
             String(
@@ -341,7 +340,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
               className="btn-green"
               style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
             >
-              <HugeiconsIcon icon={DownloadIcon} size={17} />
+              <DownloadIcon size={17} />
               {t('proposal.detail.action.download', lang)}
             </a>
 
@@ -351,7 +350,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
               className="btn-navy"
               style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
             >
-              <HugeiconsIcon icon={CopyIcon} size={17} />
+              <CopyIcon size={17} />
               {t('proposal.detail.action.duplicate', lang)}
             </Link>
 

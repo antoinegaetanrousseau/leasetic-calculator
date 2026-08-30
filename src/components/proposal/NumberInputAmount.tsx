@@ -8,7 +8,6 @@ import {
   InputGroupText,
 } from '@/components/ui/input-group';
 import { Badge } from '@/components/ui/badge';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { BarChartIcon } from '@/components/ui/icons';
 import { tKey, tLabel } from '@/lib/calc';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -98,7 +97,7 @@ export function NumberInputAmount({
       </InputGroup>
       {showBadge && trancheKey ? (
         <Badge variant="secondary" className="mt-1.5 gap-1.5 rounded-full" aria-live="polite">
-          <HugeiconsIcon icon={BarChartIcon} size={14} strokeWidth={1.6} aria-hidden="true" />
+          <BarChartIcon size={14} aria-hidden="true" />
           {t('form.tranche.label', lang).replace('{0}', t(tLabel(trancheKey), lang))}
         </Badge>
       ) : null}
