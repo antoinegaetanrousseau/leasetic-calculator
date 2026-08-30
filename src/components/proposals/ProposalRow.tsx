@@ -17,7 +17,15 @@ export interface ProposalRowProps {
    * compatibility with callers that still pass it.
    */
   nowMs?: number;
-  /** When true, render the deleted-row variant (opacity 0.7 + StatusChip 'deleted' + Restore slot). */
+  /**
+   * When true, dim the row (opacity 0.7). Callers should derive this per row
+   * from `row.displayStatus === 'deleted'`, not from a per-view flag — the
+   * archived view mixes expired and soft-deleted rows.
+   *
+   * Phase 14 narrowed this prop: the StatusChip is driven by
+   * `row.displayStatus` and RowActionsClient derives the Restore slot the same
+   * way, so opacity is all that is left here.
+   */
   deleted?: boolean;
   /** When true, render a clickable div (not a Link) with draftActionsSlot on the right. */
   draftMode?: boolean;

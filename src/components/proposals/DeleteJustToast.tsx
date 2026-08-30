@@ -9,8 +9,12 @@ export interface DeleteJustToastProps { lang: Lang; }
 
 /**
  * Mounts on the home page; reads ?deleted_just=1, fires the discoverable
- * delete-success toast (with the "Voir" action button → /?deleted=1), then
- * strips the flag from the URL.
+ * delete-success toast (with the "Voir" action button → /proposals?archived=1),
+ * then strips the flag from the URL.
+ *
+ * That action used to point at '/?deleted=1' — the v1.1 Recently Deleted view,
+ * retired in Phase 17. The root page takes no searchParams, so the flag was
+ * inert and the button went nowhere useful.
  *
  * D-8-09: keeps the URL clean post-toast; the action button remains the
  * only visual entry point to the Recently Deleted view from this flow.
@@ -30,7 +34,7 @@ export function DeleteJustToast({ lang }: DeleteJustToastProps) {
     toast.success(t('proposal.toast.delete.success', lang), {
       action: {
         label: t('proposal.toast.delete.action.view.deleted', lang),
-        onClick: () => router.push('/?deleted=1'),
+        onClick: () => router.push('/proposals?archived=1'),
       },
       duration: 6000,
     });

@@ -28,11 +28,14 @@ export interface ProposalsListProps {
 export function ProposalsList({ lang, initial }: ProposalsListProps) {
   const searchParams = useSearchParams();
   const q = searchParams.get('q') ?? '';
-  const deleted = searchParams.get('deleted') === '1';
+  // Phase 17 D-13: `archived` is the filter page.tsx actually applies. This
+  // used to read the v1.1 `deleted` param, which the page never sets — so the
+  // two disagreed and Load More paginated a different result set.
+  const archived = searchParams.get('archived') === '1';
   const draftMode = searchParams.get('drafts') === '1';
 
   // React re-mounts this component (via key={remountKey} in page.tsx) whenever
-  // q or deleted changes — so useState initial values are fresh on each navigation.
+  // q or archived changes — so useState initial values are fresh on each navigation.
   const [rows, setRows] = useState<ProposalRowDto[]>(initial.rows);
   const [hasMore, setHasMore] = useState(initial.hasMore);
   const [cursor, setCursor] = useState(initial.nextCursor);
@@ -50,7 +53,9 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
           key={row.id}
           row={row}
           lang={lang}
-          deleted={deleted}
+          // Per-row, not per-view: the archived filter returns a MIX of expired
+          // and soft-deleted rows, so only the soft-deleted ones should dim.
+          deleted={row.displayStatus === 'deleted'}
           draftMode={draftMode}
           actionsSlot={
             !draftMode ? <RowActionsClient proposalId={row.id} lang={lang} displayStatus={row.displayStatus} /> : null
@@ -64,7 +69,7 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
         <LoadMoreButton
           lang={lang}
           q={q}
-          deleted={deleted}
+          archived={archived}
           drafts={draftMode}
           cursor={cursor}
           onAppend={onAppend}

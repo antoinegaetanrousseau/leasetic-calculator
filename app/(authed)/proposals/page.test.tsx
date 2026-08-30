@@ -20,7 +20,7 @@
  * (vi.hoisted + vi.mock('next/navigation') + redirect-throws).
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 vi.mock('server-only', () => ({}));
 
@@ -30,6 +30,7 @@ const {
   getCurrentLangMock,
   buildListResponseMock,
   callOrder,
+  clientSearchParams,
 } = vi.hoisted(() => ({
   redirectMock: vi.fn((path: string) => {
     throw new Error(`NEXT_REDIRECT:${path}`);
@@ -38,11 +39,16 @@ const {
   getCurrentLangMock: vi.fn(),
   buildListResponseMock: vi.fn(),
   callOrder: [] as string[],
+  // The URL the CLIENT components see. The page is a server component and
+  // receives searchParams as a prop; ProposalsList reads the same URL through
+  // useSearchParams. Tests covering both halves must set them in step — the
+  // two disagreeing is precisely the bug Tests 10-12 pin down.
+  clientSearchParams: { current: '' },
 }));
 
 vi.mock('next/navigation', () => ({
   redirect: redirectMock,
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => new URLSearchParams(clientSearchParams.current),
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
 }));
 vi.mock('@/lib/auth/require', () => ({
@@ -103,6 +109,7 @@ beforeEach(() => {
   getCurrentLangMock.mockReset();
   buildListResponseMock.mockReset();
   callOrder.length = 0;
+  clientSearchParams.current = '';
 
   // Happy-path defaults.
   requireUserMock.mockResolvedValue({
@@ -115,6 +122,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe('/proposals page (Phase 17 PROPS-01, D-10/D-13/D-14)', () => {
@@ -312,5 +320,127 @@ describe('/proposals page (Phase 17 PROPS-01, D-10/D-13/D-14)', () => {
       // FR proposals.empty.archived = "Aucune proposition archivée pour le moment."
       expect(text).toMatch(/Aucune proposition archivée/);
     }
+  });
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Tests 10-12 — the page and the client list must agree on ONE param.
+  //
+  // ProposalsList used to read the v1.1 `deleted` flag while the page filtered
+  // on `archived`. Nothing set `deleted`, so: no archived row ever dimmed, and
+  // Load More fetched the ACTIVES page and appended active rows to an archived
+  // list. `archived` (Phase 17 D-13) returns expired OR soft-deleted rows;
+  // `deleted` returned soft-deleted only and is documented as retiring.
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** Archived view fixture — the filter returns a MIX of expired and deleted. */
+  const ARCHIVED_LIST = {
+    rows: [
+      {
+        id: 'p-expired',
+        lcRef: 'LC-2026-EXPIRED',
+        clientCo: 'Expired Co',
+        amountHT: '50000',
+        createdAt: new Date('2026-01-01T10:00:00Z').toISOString(),
+        validityDays: 30 as const,
+        language: 'fr' as const,
+        deletedAt: null,
+        displayStatus: 'expired' as const,
+      },
+      {
+        id: 'p-deleted',
+        lcRef: 'LC-2026-DELETED',
+        clientCo: 'Deleted Co',
+        amountHT: '60000',
+        createdAt: new Date('2026-02-01T10:00:00Z').toISOString(),
+        validityDays: 30 as const,
+        language: 'fr' as const,
+        deletedAt: new Date('2026-08-01T10:00:00Z').toISOString(),
+        displayStatus: 'deleted' as const,
+      },
+    ],
+    hasMore: true,
+    nextCursor: 'cursor-2',
+  };
+
+  const rowByRef = (container: HTMLElement, lcRef: string) =>
+    Array.from(
+      container.querySelectorAll<HTMLElement>('[data-slot="proposal-row"]'),
+    ).find((el) => (el.textContent ?? '').includes(lcRef));
+
+  it('Test 10 (D-13): on the archived view only soft-deleted rows dim, not expired ones', async () => {
+    buildListResponseMock.mockResolvedValue(ARCHIVED_LIST);
+    clientSearchParams.current = 'archived=1';
+
+    const tree = await ProposalsListPage({
+      searchParams: Promise.resolve({ archived: '1' }),
+    });
+    const { container } = render(tree);
+
+    // Both rows render — archived is expired ∪ soft-deleted.
+    const expired = rowByRef(container, 'LC-2026-EXPIRED');
+    const deleted = rowByRef(container, 'LC-2026-DELETED');
+    expect(expired).toBeDefined();
+    expect(deleted).toBeDefined();
+
+    // Dimming is derived per row from displayStatus, so it cannot be a
+    // per-view flag: one of these dims and the other must not.
+    expect(deleted!.className).toMatch(/\bopacity-70\b/);
+    expect(expired!.className).not.toMatch(/\bopacity-70\b/);
+  });
+
+  it('Test 11 (D-13): Load More requests the same filter the SSR render used', async () => {
+    buildListResponseMock.mockResolvedValue(ARCHIVED_LIST);
+    clientSearchParams.current = 'archived=1';
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ rows: [], hasMore: false, nextCursor: null }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const tree = await ProposalsListPage({
+      searchParams: Promise.resolve({ archived: '1' }),
+    });
+    render(tree);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Charger plus' }));
+    });
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const url = String(fetchMock.mock.calls[0][0]);
+    // The SSR render used archived:true, so the appended page must too.
+    expect(url).toContain('archived=1');
+    expect(url).toContain('cursor=cursor-2');
+    // The retired v1.1 flag must not come back — it selects a NARROWER set
+    // (soft-deleted only), so a page fetched with it would drop expired rows.
+    expect(url).not.toContain('deleted=1');
+  });
+
+  it('Test 12: the actives view sends no archived flag, so Load More stays on actives', async () => {
+    buildListResponseMock.mockResolvedValue({
+      ...POPULATED_LIST,
+      hasMore: true,
+      nextCursor: 'cursor-2',
+    });
+    clientSearchParams.current = '';
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ rows: [], hasMore: false, nextCursor: null }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const tree = await ProposalsListPage({ searchParams: Promise.resolve({}) });
+    render(tree);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Charger plus' }));
+    });
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const url = String(fetchMock.mock.calls[0][0]);
+    expect(url).not.toContain('archived=1');
+    expect(url).not.toContain('deleted=1');
   });
 });

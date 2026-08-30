@@ -30,7 +30,10 @@ export function DeleteButtonClient({ proposalId, lang }: DeleteButtonClientProps
       toast.success(t('proposal.toast.delete.success', lang), {
         action: {
           label: t('proposal.toast.delete.action.view.deleted', lang),
-          onClick: () => router.push('/?deleted=1'),
+          // The v1.1 Recently Deleted view this used to point at ('/?deleted=1')
+          // no longer exists — the root page takes no searchParams, so the flag
+          // was inert. Archivées on /proposals is its successor.
+          onClick: () => router.push('/proposals?archived=1'),
         },
         duration: 6000,
       });

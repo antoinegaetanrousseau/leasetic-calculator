@@ -9,7 +9,13 @@ import type { ListResponse } from '@/lib/api/proposals/list';
 export interface LoadMoreButtonProps {
   lang: Lang;
   q: string;
-  deleted: boolean;
+  /**
+   * Archivées filter (Phase 17 D-13). MUST match the flag the initial server
+   * render used, or the appended page comes from a different result set — this
+   * was previously the legacy `deleted` flag, which the page never set, so
+   * paginating the archived view appended active rows.
+   */
+  archived: boolean;
   drafts: boolean;
   cursor: string | null;
   onAppend: (response: ListResponse) => void;
@@ -18,7 +24,7 @@ export interface LoadMoreButtonProps {
 export function LoadMoreButton({
   lang,
   q,
-  deleted,
+  archived,
   drafts,
   cursor,
   onAppend,
@@ -32,7 +38,7 @@ export function LoadMoreButton({
       const params = new URLSearchParams();
       params.set('cursor', cursor);
       if (q) params.set('q', q);
-      if (deleted) params.set('deleted', '1');
+      if (archived) params.set('archived', '1');
       if (drafts) params.set('drafts', '1');
       const res = await fetch(`/api/proposals?${params.toString()}`);
       if (res.ok) {
