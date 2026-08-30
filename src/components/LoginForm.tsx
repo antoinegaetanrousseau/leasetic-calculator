@@ -1,5 +1,28 @@
 'use client';
 
+/**
+ * Login form.
+ *
+ * Composition adopted from the ReUI Pro block `auth-1`: centred heading over a
+ * Field/FieldGroup form, shadcn Input, and an InputGroup password field with an
+ * inline show/hide toggle. The block's own social-provider row, "Sign up" link
+ * and "Email or username" field are deliberately NOT adopted — this app is
+ * invite-only and authenticates on email plus password through Better Auth, so
+ * shipping a Google/Apple row would advertise sign-in paths that do not exist.
+ *
+ * Everything below the presentation is unchanged and load-bearing:
+ *   - AUTH-04 / D-22: the server error is ALWAYS the same generic message,
+ *     never distinguishing unknown email from wrong password from disabled
+ *     account (anti-enumeration).
+ *   - T-06-05-08: `?next=` is validated to a relative path before being used as
+ *     callbackURL, rejecting `https://evil.com`, `//evil.com`, `javascript:`.
+ *   - D-09: mount-time toasts for ?invited=1 / ?reset=1 / ?logged_out=1, then
+ *     the param is stripped so a refresh does not re-toast.
+ *
+ * `data-auth-surface` is read by AuthGridBackground, which keeps its animated
+ * cells clear of this card.
+ */
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,6 +30,16 @@ import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authClient } from '@/lib/auth/client';
 import { loginSchema, type LoginInput } from '@/lib/auth/schemas';
+import { Button } from '@/components/ui/button';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
+import { EyeIcon, EyeOffIcon } from '@/components/ui/icons';
 // Import t + Lang from dictionaries (not index.ts) — index.ts imports next/headers
 // which is Server-Component-only and cannot be bundled into a Client Component.
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -19,6 +52,7 @@ export function LoginForm({ lang }: LoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -75,163 +109,90 @@ export function LoginForm({ lang }: LoginFormProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      style={{
-        width: '100%',
-        maxWidth: 420,
-        padding: 28,
-        background: 'var(--surface)',
-        borderRadius: 16,
-        boxShadow: 'var(--shadow-card)',
-      }}
+    <section
+      data-auth-surface
+      className="card mt-6 w-full max-w-[420px]"
     >
-      {/* Card title — .ctitle style per Phase 5 UI-SPEC */}
-      <div
-        style={{
-          textTransform: 'uppercase',
-          fontSize: '11.8px',
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          color: 'var(--muted)',
-          marginBottom: 16,
-        }}
-      >
+      <h1 className="mb-5 text-center text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
         {t('auth.signin.title', lang)}
-      </div>
+      </h1>
 
-      {/* Email field */}
-      <label
-        htmlFor="login-email"
-        style={{
-          display: 'block',
-          fontSize: '11.2px',
-          fontWeight: 500,
-          color: 'var(--ink)',
-          marginBottom: 6,
-        }}
-      >
-        {t('auth.field.email', lang)}
-      </label>
-      <input
-        id="login-email"
-        type="email"
-        autoComplete="email"
-        placeholder={t('auth.field.email.placeholder', lang)}
-        aria-invalid={!!errors.email}
-        aria-describedby={errors.email ? 'login-email-error' : undefined}
-        className={errors.email ? 'invalid' : ''}
-        {...register('email')}
-        style={{
-          width: '100%',
-          padding: '10px 12px',
-          borderRadius: 12,
-          border: errors.email ? '1px solid var(--danger)' : '1px solid var(--border)',
-          background: 'var(--surface)',
-          color: 'var(--ink)',
-          marginBottom: errors.email ? 4 : 16,
-          boxSizing: 'border-box',
-        }}
-      />
-      {errors.email && (
-        <div
-          id="login-email-error"
-          role="alert"
-          style={{
-            fontSize: '11.2px',
-            fontWeight: 500,
-            color: 'var(--danger)',
-            marginBottom: 16,
-          }}
-        >
-          {t('auth.error.email.invalid', lang)}
-        </div>
-      )}
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <FieldGroup className="gap-4">
+          <Field>
+            <FieldLabel htmlFor="login-email">{t('auth.field.email', lang)}</FieldLabel>
+            <Input
+              id="login-email"
+              type="email"
+              autoComplete="email"
+              placeholder={t('auth.field.email.placeholder', lang)}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? 'login-email-error' : undefined}
+              {...register('email')}
+            />
+            {errors.email && (
+              <FieldError id="login-email-error" role="alert">
+                {t('auth.error.email.invalid', lang)}
+              </FieldError>
+            )}
+          </Field>
 
-      {/* Password field */}
-      <label
-        htmlFor="login-password"
-        style={{
-          display: 'block',
-          fontSize: '11.2px',
-          fontWeight: 500,
-          color: 'var(--ink)',
-          marginBottom: 6,
-        }}
-      >
-        {t('auth.field.password', lang)}
-      </label>
-      <input
-        id="login-password"
-        type="password"
-        autoComplete="current-password"
-        placeholder={t('auth.field.password.placeholder', lang)}
-        aria-invalid={!!errors.password}
-        {...register('password')}
-        style={{
-          width: '100%',
-          padding: '10px 12px',
-          borderRadius: 12,
-          border: '1px solid var(--border)',
-          background: 'var(--surface)',
-          color: 'var(--ink)',
-          marginBottom: 16,
-          boxSizing: 'border-box',
-        }}
-      />
+          <Field>
+            <FieldLabel htmlFor="login-password">{t('auth.field.password', lang)}</FieldLabel>
+            <InputGroup>
+              <InputGroupInput
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                placeholder={t('auth.field.password.placeholder', lang)}
+                aria-invalid={!!errors.password}
+                {...register('password')}
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  type="button"
+                  aria-label={
+                    showPassword
+                      ? t('auth.password.hide', lang)
+                      : t('auth.password.show', lang)
+                  }
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword((s) => !s)}
+                >
+                  {showPassword ? <EyeOffIcon size={17} /> : <EyeIcon size={17} />}
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+          </Field>
+        </FieldGroup>
 
-      {/* Inline server error banner (AUTH-04 / D-22: always-generic; role=alert announces it) */}
-      {serverError && (
-        <div
-          role="alert"
-          style={{
-            background: 'rgba(220,38,38,0.06)',
-            borderLeft: '1px solid var(--danger)',
-            borderRadius: 12,
-            padding: '12px 16px',
-            color: 'var(--danger)',
-            fontWeight: 500,
-            fontSize: '14.5px',
-            marginBottom: 16,
-          }}
-        >
-          {serverError}
-        </div>
-      )}
+        {/* Inline server error banner (AUTH-04 / D-22: always-generic; role=alert announces it) */}
+        {serverError && (
+          <div
+            role="alert"
+            className="mt-4 rounded-xl border-l border-destructive bg-[color-mix(in_oklab,var(--destructive)_6%,transparent)] px-4 py-3 text-[14.5px] font-medium text-destructive"
+          >
+            {serverError}
+          </div>
+        )}
 
-      {/* Submit button — .btn-green pill, full width, spinner replaces label on submit */}
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="btn-green"
-        style={{
-          width: '100%',
-          borderRadius: 9999,
-          padding: '0.6rem 1.5rem',
-          fontWeight: 600,
-          fontSize: 14,
-          color: '#fff',
-          background: 'var(--gd)',
-          border: 'none',
-          cursor: isSubmitting ? 'not-allowed' : 'pointer',
-          opacity: isSubmitting ? 0.7 : 1,
-          marginBottom: 12,
-        }}
-      >
-        {isSubmitting ? t('auth.button.signin.loading', lang) : t('auth.button.signin', lang)}
-      </button>
+        <Button type="submit" disabled={isSubmitting} className="btn-green mt-5 w-full">
+          {isSubmitting ? t('auth.button.signin.loading', lang) : t('auth.button.signin', lang)}
+        </Button>
+      </form>
 
-      {/* Forgot-password hint — 10.5px, muted, 2 lines */}
-      <div style={{ fontSize: '10.5px', color: 'var(--muted)', lineHeight: 1.5, marginTop: 8 }}>
+      {/* Forgot-password hint. Deliberately TEXT, not the block's "Forgot
+          password?" link — this app has no self-serve reset; an admin issues a
+          reset link, and the copy says so. */}
+      <p className="mt-4 mb-0 text-[10.5px] leading-normal text-muted-foreground">
         {t('auth.hint.forgot.password', lang)}
-      </div>
+      </p>
 
       {/* Privacy-policy link — D-10-17 / CUT-05. NEXT_PUBLIC_* inlined at build
           time. Fallback URLs are the canonical Leasétic privacy pages — keep
           a working link even if env var unset (defense in depth: a missing
           env var must not produce a broken link). */}
-      <div style={{ fontSize: '10.5px', color: 'var(--muted)', lineHeight: 1.5, marginTop: 4 }}>
+      <p className="mt-1 mb-0 text-[10.5px] leading-normal text-muted-foreground">
         <a
           href={
             lang === 'en'
@@ -240,11 +201,11 @@ export function LoginForm({ lang }: LoginFormProps) {
           }
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: 'var(--muted)', textDecoration: 'underline' }}
+          className="text-muted-foreground underline"
         >
           {t('login.privacy.label', lang)}
         </a>
-      </div>
-    </form>
+      </p>
+    </section>
   );
 }
