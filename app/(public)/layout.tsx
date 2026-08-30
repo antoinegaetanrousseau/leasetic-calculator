@@ -2,7 +2,6 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { LocaleToggle } from '@/components/LocaleToggle';
 import { getCurrentLang, getCurrentTheme, t } from '@/lib/i18n';
 import { BrandLogo } from '@/components/ui/BrandLogo';
-import { AuthGridBackground } from '@/components/ui/AuthGridBackground';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,15 +26,30 @@ export default async function PublicLayout({ children }: { children: React.React
   const theme = await getCurrentTheme();
 
   return (
-    <div className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-[var(--paper)] px-4 py-6">
-      {/* Animated grid backdrop, from the ReUI auth-1 block. Decorative and
-          aria-hidden; it keeps its cells clear of [data-auth-surface], which the
-          form card carries. */}
-      <AuthGridBackground cellSize={40} />
-
-      {/* Top-right toggle cluster — UI-SPEC §Login Page Layout. z-10 keeps it
-          above the backdrop. */}
-      <div className="absolute top-6 right-6 z-10 flex gap-3">
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: 'var(--paper)',
+        padding: '24px 16px',
+        position: 'relative',
+        boxSizing: 'border-box',
+      }}
+    >
+      {/* Top-right toggle cluster — position: absolute per UI-SPEC §Login Page Layout */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 24,
+          right: 24,
+          display: 'flex',
+          gap: 12,
+          zIndex: 10,
+        }}
+      >
         <LocaleToggle current={lang} />
         <ThemeToggle current={theme} />
       </div>
@@ -46,26 +60,32 @@ export default async function PublicLayout({ children }: { children: React.React
           brand-logo CSS picker (lines 543-545) hides whichever variant does
           not match html[data-theme]. Non-interactive brand anchor — NOT
           wrapped in <Link>, per UI-SPEC §6.1 AC-15-BL-06. */}
-      {/* Everything from here sits above the backdrop. */}
-      <div className="relative z-10 flex w-full flex-col items-center">
-        <BrandLogo className="public-page-logo" alt={t('sidebar.brand', lang)} />
+      <BrandLogo className="public-page-logo" alt={t('sidebar.brand', lang)} />
 
-        {/* Page content: login form / set-password form / expired-token card */}
-        {children}
+      {/* Page content: login form / set-password form / expired-token card */}
+      {children}
 
-        <footer className="mt-8 text-center text-[10.5px] leading-normal text-muted-foreground">
-          {t('shell.footer.copyright', lang)}
-          {' · '}
-          <a
-            href="https://leasetic.fr/mentions-legales"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground underline"
-          >
-            {t('shell.footer.privacy', lang)}
-          </a>
-        </footer>
-      </div>
+      {/* Footer — 10.5px, --muted, centered */}
+      <footer
+        style={{
+          marginTop: 32,
+          fontSize: '10.5px',
+          color: 'var(--muted)',
+          textAlign: 'center',
+          lineHeight: 1.5,
+        }}
+      >
+        {t('shell.footer.copyright', lang)}
+        {' · '}
+        <a
+          href="https://leasetic.fr/mentions-legales"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--muted)', textDecoration: 'underline' }}
+        >
+          {t('shell.footer.privacy', lang)}
+        </a>
+      </footer>
     </div>
   );
 }

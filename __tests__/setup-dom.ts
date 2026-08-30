@@ -62,30 +62,3 @@ if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
       }) as unknown as MediaQueryList,
   });
 }
-
-// Phase 5 (auth-1 adoption) — jsdom does not implement ResizeObserver either.
-// AuthGridBackground measures its container with one to lay the grid out, so
-// the whole public layout throws in tests without this. The stub deliberately
-// never fires its callback: jsdom has no layout engine, so any dimensions it
-// reported would be zeroes pretending to be a measurement. Components see "not
-// measured yet" instead, which is a state they already handle on first paint.
-// Idempotent, like the two above.
-if (typeof globalThis !== 'undefined' && typeof globalThis.ResizeObserver === 'undefined') {
-  class ResizeObserverStub implements ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  }
-  Object.defineProperty(globalThis, 'ResizeObserver', {
-    value: ResizeObserverStub,
-    writable: true,
-    configurable: true,
-  });
-  if (typeof window !== 'undefined') {
-    Object.defineProperty(window, 'ResizeObserver', {
-      value: ResizeObserverStub,
-      writable: true,
-      configurable: true,
-    });
-  }
-}

@@ -93,22 +93,26 @@ describe('app/(public)/layout — Phase 15 BrandLogo swap (PUB-01, PUB-02)', () 
     expect(oldHeader).toBeUndefined();
   });
 
-  it('AC-15-BL-03: preserves the pinned top-right LocaleToggle + ThemeToggle cluster', async () => {
-    const { getByTestId } = await renderPublicLayout();
+  it('AC-15-BL-03: preserves the top-right LocaleToggle + ThemeToggle cluster (position: absolute, top: 24, right: 24)', async () => {
+    const { container, getByTestId } = await renderPublicLayout();
 
-    // The cluster's position moved from inline styles to utilities when the
-    // auth-1 grid backdrop was adopted, so this asserts the arrangement rather
-    // than `top: 24px`: both toggles share one pinned wrapper, and that wrapper
-    // is stacked above the backdrop. The exact offsets are styling.
+    // Find the absolute-positioned toggle wrapper.
+    const allDivs = Array.from(container.querySelectorAll('div'));
+    const toggleWrapper = allDivs.find((d) => {
+      const s = d.getAttribute('style') ?? '';
+      return (
+        s.includes('position: absolute') &&
+        (s.includes('top: 24') || s.includes('top:24')) &&
+        (s.includes('right: 24') || s.includes('right:24'))
+      );
+    });
+    expect(toggleWrapper).toBeDefined();
+
+    // Both toggles render inside the wrapper.
     const locale = getByTestId('locale-toggle');
     const theme = getByTestId('theme-toggle');
-
-    const wrapper = locale.closest('div.absolute');
-    expect(wrapper).not.toBeNull();
-    expect(wrapper!.contains(theme)).toBe(true);
-    // z-index matters: without it the decorative grid would sit over the
-    // controls and swallow clicks.
-    expect(wrapper!.className).toMatch(/\bz-10\b/);
+    expect(toggleWrapper?.contains(locale)).toBe(true);
+    expect(toggleWrapper?.contains(theme)).toBe(true);
   });
 
   it('T-15-01: rendered DOM contains no admin/commission segments (information-disclosure gate)', async () => {
