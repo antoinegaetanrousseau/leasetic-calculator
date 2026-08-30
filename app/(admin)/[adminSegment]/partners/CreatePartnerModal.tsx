@@ -1,5 +1,7 @@
 'use client';
 
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -162,14 +164,14 @@ export function CreatePartnerModal({ lang, onClose, onCreated }: CreatePartnerMo
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           {/* Email field */}
-          <div className="fld">
-            <label htmlFor="cpm-email">
+          <Field>
+            <FieldLabel htmlFor="cpm-email">
               {t('admin.accounts.modal.email.label', lang)}
-              <span className="req" aria-hidden="true">
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
                 *
               </span>
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="cpm-email"
               type="email"
               placeholder={t('admin.accounts.modal.email.placeholder', lang)}
@@ -195,26 +197,26 @@ export function CreatePartnerModal({ lang, onClose, onCreated }: CreatePartnerMo
               {...register('email')}
             />
             {errors.email?.message && (
-              <p id="cpm-email-error" role="alert" className="error-msg">
+              <FieldError id="cpm-email-error" role="alert">
                 {t(errors.email.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
             {!errors.email && submitError === 'admin.accounts.modal.error.email.exists' && (
-              <p id="cpm-email-server-error" role="alert" className="error-msg">
+              <FieldError id="cpm-email-server-error" role="alert">
                 {t('admin.accounts.modal.error.email.exists', lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
           {/* Display name field */}
-          <div className="fld">
-            <label htmlFor="cpm-name">
+          <Field>
+            <FieldLabel htmlFor="cpm-name">
               {t('admin.accounts.modal.name.label', lang)}
-              <span className="req" aria-hidden="true">
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
                 *
               </span>
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="cpm-name"
               type="text"
               placeholder={t('admin.accounts.modal.name.placeholder', lang)}
@@ -224,15 +226,15 @@ export function CreatePartnerModal({ lang, onClose, onCreated }: CreatePartnerMo
               {...register('displayName')}
             />
             {errors.displayName?.message && (
-              <p id="cpm-name-error" role="alert" className="error-msg">
+              <FieldError id="cpm-name-error" role="alert">
                 {t(errors.displayName.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
           {/* Language segmented control */}
-          <div className="fld">
-            <label>{t('admin.accounts.modal.lang.label', lang)}</label>
+          <Field>
+            <FieldLabel>{t('admin.accounts.modal.lang.label', lang)}</FieldLabel>
             <div className="dg" role="group" aria-label={t('admin.accounts.modal.lang.label', lang)}>
               {(['fr', 'en'] as const).map((lng) => (
                 <button
@@ -251,7 +253,7 @@ export function CreatePartnerModal({ lang, onClose, onCreated }: CreatePartnerMo
                 </button>
               ))}
             </div>
-          </div>
+          </Field>
 
           {/* Action buttons */}
           <div

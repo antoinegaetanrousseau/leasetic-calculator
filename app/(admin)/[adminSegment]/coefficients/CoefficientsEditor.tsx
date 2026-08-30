@@ -1,5 +1,7 @@
 'use client';
 
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -86,7 +88,7 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
   return (
     <>
       <section className="card" style={{ marginBottom: 16 }}>
-        <div className="ctitle">
+        <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
           <span className="dot" style={{ background: 'var(--gd)' }} aria-hidden="true" />
           <span>{t('admin.coefficients.editor.title', lang)}</span>
         </div>
@@ -101,13 +103,13 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
               marginTop: 16,
             }}
           >
-            <div className="fld">
-              <label htmlFor="commission-pct">
+            <Field>
+              <FieldLabel htmlFor="commission-pct">
                 {t('admin.coefficients.commission.label', lang)}
-                <span className="req" aria-hidden="true">*</span>
-              </label>
+                <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+              </FieldLabel>
               <div className="ieu">
-                <input
+                <Input
                   id="commission-pct"
                   type="text"
                   inputMode="decimal"
@@ -122,19 +124,19 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
                 <span className="suffix">%</span>
               </div>
               {errors.commissionPct?.message && (
-                <p id="commission-pct-error" role="alert" className="error-msg">
+                <FieldError id="commission-pct-error" role="alert">
                   {t(errors.commissionPct.message as DictKey, lang)}
-                </p>
+                </FieldError>
               )}
-            </div>
+            </Field>
 
-            <div className="fld">
-              <label htmlFor="max-amount">
+            <Field>
+              <FieldLabel htmlFor="max-amount">
                 {t('admin.coefficients.max_amount.label', lang)}
-                <span className="req" aria-hidden="true">*</span>
-              </label>
+                <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+              </FieldLabel>
               <div className="ieu">
-                <input
+                <Input
                   id="max-amount"
                   type="text"
                   inputMode="decimal"
@@ -147,19 +149,19 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
                 <span className="suffix">{t('common.ht', lang)}</span>
               </div>
               {errors.maxAmount?.message && (
-                <p id="max-amount-error" role="alert" className="error-msg">
+                <FieldError id="max-amount-error" role="alert">
                   {t(errors.maxAmount.message as DictKey, lang)}
-                </p>
+                </FieldError>
               )}
-            </div>
+            </Field>
           </div>
 
           {/* Validity default field */}
-          <div className="fld" style={{ marginTop: 16 }}>
-            <label htmlFor="validity-days">
+          <Field className="mt-4">
+            <FieldLabel htmlFor="validity-days">
               {t('admin.coefficients.validity.label', lang)}
-              <span className="req" aria-hidden="true">*</span>
-            </label>
+              <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+            </FieldLabel>
             <select
               id="validity-days"
               aria-invalid={errors.validityDays ? true : undefined}
@@ -180,11 +182,11 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
               {t('admin.coefficients.validity.hint', lang)}
             </p>
             {errors.validityDays?.message && (
-              <p id="validity-days-error" role="alert" className="error-msg">
+              <FieldError id="validity-days-error" role="alert">
                 {t(errors.validityDays.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
           {/* 4×3 coefficients table — UI-SPEC §3.1.1.3 */}
           <table
@@ -266,7 +268,7 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
                             ti < TRANCHES.length - 1 ? '1px solid var(--border)' : 'none',
                         }}
                       >
-                        <input
+                        <Input
                           type="text"
                           inputMode="decimal"
                           aria-invalid={cellError ? true : undefined}
@@ -303,10 +305,10 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
           </table>
 
           {/* Note field */}
-          <div className="fld">
-            <label htmlFor="note">
+          <Field>
+            <FieldLabel htmlFor="note">
               {t('admin.coefficients.note.label', lang)}
-            </label>
+            </FieldLabel>
             <textarea
               id="note"
               placeholder={t('admin.coefficients.note.placeholder', lang)}
@@ -326,7 +328,7 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
               }}
               {...register('note')}
             />
-          </div>
+          </Field>
 
           {/* Save action row */}
           <div

@@ -353,7 +353,7 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
         {inputsIncomplete || paramsMissing ? (
           <div
             role="alert"
-            className="error-msg"
+            className="mt-1 text-[11.2px] leading-[1.4] font-medium text-destructive"
             style={{
               fontSize: 14.5,
               color: 'var(--danger)',
@@ -460,7 +460,7 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
           // state='idle' — defensive fallback, treat as incomplete.
           <div
             role="alert"
-            className="error-msg"
+            className="mt-1 text-[11.2px] leading-[1.4] font-medium text-destructive"
             style={{
               fontSize: 14.5,
               color: 'var(--danger)',

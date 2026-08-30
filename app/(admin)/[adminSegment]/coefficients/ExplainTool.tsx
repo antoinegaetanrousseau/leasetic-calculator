@@ -1,5 +1,7 @@
 'use client';
 
+import { Field, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { useMemo, useState } from 'react';
 import { computeLoyer, tKey } from '@/lib/calc';
 import { formatCurrency, formatNumber } from '@/lib/i18n/format';
@@ -51,7 +53,7 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
 
   return (
     <section className="card" style={{ marginBottom: 16 }} aria-labelledby="explain-title">
-      <div className="ctitle">
+      <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
         <span className="dot" style={{ background: 'var(--gd)' }} aria-hidden="true" />
         <span id="explain-title">{t('admin.coefficients.explain.title', lang)}</span>
       </div>
@@ -61,12 +63,12 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
 
       {/* Three input controls in a row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-        <div className="fld">
-          <label htmlFor="explain-amount">
+        <Field>
+          <FieldLabel htmlFor="explain-amount">
             {t('admin.coefficients.explain.amount.label', lang)}
-          </label>
+          </FieldLabel>
           <div className="ieu">
-            <input
+            <Input
               id="explain-amount"
               type="number"
               min={1}
@@ -84,10 +86,10 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
               {t(`admin.tranche.${tranche.slice(1)}.range` as DictKey, lang)}
             </span>
           )}
-        </div>
+        </Field>
 
-        <div className="fld">
-          <label>{t('admin.coefficients.explain.duration.label', lang)}</label>
+        <Field>
+          <FieldLabel>{t('admin.coefficients.explain.duration.label', lang)}</FieldLabel>
           <div
             className="dg"
             role="group"
@@ -105,10 +107,10 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
               </button>
             ))}
           </div>
-        </div>
+        </Field>
 
-        <div className="fld">
-          <label>{t('admin.coefficients.explain.validity.label', lang)}</label>
+        <Field>
+          <FieldLabel>{t('admin.coefficients.explain.validity.label', lang)}</FieldLabel>
           <div
             className="dg"
             role="group"
@@ -126,7 +128,7 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
               </button>
             ))}
           </div>
-        </div>
+        </Field>
       </div>
 
       {/* Output area — aria-live for screen reader updates */}

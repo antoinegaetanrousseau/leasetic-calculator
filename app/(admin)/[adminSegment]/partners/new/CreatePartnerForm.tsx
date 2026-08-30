@@ -30,13 +30,11 @@
  *   - D-15 submit spinner: "Envoi en cours…" via admin.partners.form.submit.spinner
  *   - D-15 Annuler is now a <button type="button"> (was <Link>) so D-18 confirm
  *     can fire before navigation
- *   - D-16 inline error state already shipped Phase 14 (.invalid class + aria-invalid
- *     + aria-describedby + .error-msg); the global CSS rule `input.invalid` +
- *     `input[aria-invalid="true"]` provides the red border via `border-color: var(--danger)`
- *     (see app/globals.css line 192-196). Inline error <p> text uses the .error-msg
- *     class which globally renders `color: var(--danger)` (globals.css line 164-170).
- *     Both the border and error-text tokens resolve to `var(--danger)` — defense-in-depth
- *     inline borderColor overlay below on invalid inputs satisfies the explicit-token
+ *   - D-16 inline error state (Phase 14). Phase 5 moved this onto the ReUI
+ *     Field primitives: the red border now comes from the shadcn Input's own
+ *     `aria-invalid` styling and the message from FieldError, so the v10
+ *     `.error-msg` / `input.invalid` global rules and the inline colour
+ *     overlays that backed them up are gone. aria-invalid + aria-describedby
  *     contract from 18-04 PLAN done-criteria gate.
  *   - D-17 InviteUrlModal success affordance preserved verbatim
  *   - D-18 dirty-form confirm dialog: clean form → immediate navigate;
@@ -47,6 +45,8 @@
  * ADMIN-09 (D-29 strict): no commission/rate fields rendered.
  */
 
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
@@ -171,7 +171,7 @@ export function CreatePartnerForm({
         {/* ── Form card (D-15) — 3 sections with ● bullets ───────────────── */}
         <div className="card">
           {/* ── Section 1: INFORMATIONS PERSONNELLES ─────────────────────── */}
-          <div className="ctitle" style={{ marginBottom: 16 }}>
+          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
             <span
               className="dot"
               style={{ background: 'var(--gd)' }}
@@ -180,12 +180,12 @@ export function CreatePartnerForm({
             <span>{t('partners.new.section.personal', lang)}</span>
           </div>
 
-          <div className="fld">
-            <label htmlFor="cpf-firstName">
+          <Field>
+            <FieldLabel htmlFor="cpf-firstName">
               {t('partners.new.field.firstName', lang)}
-              <span className="req" aria-hidden="true">*</span>
-            </label>
-            <input
+              <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+            </FieldLabel>
+            <Input
               id="cpf-firstName"
               type="text"
               autoComplete="given-name"
@@ -197,18 +197,18 @@ export function CreatePartnerForm({
               {...register('firstName')}
             />
             {errors.firstName?.message && (
-              <p id="cpf-firstName-error" role="alert" className="error-msg">
+              <FieldError id="cpf-firstName-error" role="alert">
                 {t(errors.firstName.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="cpf-lastName">
+          <Field>
+            <FieldLabel htmlFor="cpf-lastName">
               {t('partners.new.field.lastName', lang)}
-              <span className="req" aria-hidden="true">*</span>
-            </label>
-            <input
+              <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+            </FieldLabel>
+            <Input
               id="cpf-lastName"
               type="text"
               autoComplete="family-name"
@@ -220,18 +220,18 @@ export function CreatePartnerForm({
               {...register('lastName')}
             />
             {errors.lastName?.message && (
-              <p id="cpf-lastName-error" role="alert" className="error-msg">
+              <FieldError id="cpf-lastName-error" role="alert">
                 {t(errors.lastName.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="cpf-email">
+          <Field>
+            <FieldLabel htmlFor="cpf-email">
               {t('partners.new.field.email', lang)}
-              <span className="req" aria-hidden="true">*</span>
-            </label>
-            <input
+              <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+            </FieldLabel>
+            <Input
               id="cpf-email"
               type="email"
               autoComplete="email"
@@ -250,25 +250,22 @@ export function CreatePartnerForm({
               {...register('email')}
             />
             {errors.email?.message && (
-              <p
-                id="cpf-email-error"
-                role="alert"
-                className="error-msg"
-                // D-16 explicit color overlay — .error-msg already maps to
-                // var(--danger) via globals.css L164-170 + .fld .error-msg rule.
-                style={{ color: 'var(--danger)' }}
-              >
+              // D-16 inline error state. The explicit colour overlay that used
+              // to sit here is gone: it existed to guarantee the danger token
+              // reached the text when `.error-msg` was doing the work, and
+              // FieldError carries destructive styling itself.
+              <FieldError id="cpf-email-error" role="alert">
                 {t(errors.email.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
           {/* ── partnerType selector (PTYPE-01, D-03/D-04) ───────────────── */}
-          <div className="fld">
-            <label htmlFor="cpf-partnerType">
+          <Field>
+            <FieldLabel htmlFor="cpf-partnerType">
               {t('partners.new.field.partnerType', lang)}
-              <span className="req" aria-hidden="true">*</span>
-            </label>
+              <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+            </FieldLabel>
             <select
               id="cpf-partnerType"
               aria-invalid={errors.partnerType ? true : undefined}
@@ -289,11 +286,11 @@ export function CreatePartnerForm({
               ))}
             </select>
             {errors.partnerType?.message && (
-              <p id="cpf-partnerType-error" role="alert" className="error-msg">
+              <FieldError id="cpf-partnerType-error" role="alert">
                 {t(errors.partnerType.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
           <hr
             style={{
@@ -304,7 +301,7 @@ export function CreatePartnerForm({
           />
 
           {/* ── Section 2: INFORMATIONS SOCIÉTÉ ─────────────────────────── */}
-          <div className="ctitle" style={{ marginBottom: 16 }}>
+          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
             <span
               className="dot"
               style={{ background: 'var(--gd)' }}
@@ -313,12 +310,12 @@ export function CreatePartnerForm({
             <span>{t('partners.new.section.company', lang)}</span>
           </div>
 
-          <div className="fld">
-            <label htmlFor="cpf-companyName">
+          <Field>
+            <FieldLabel htmlFor="cpf-companyName">
               {t('partners.new.field.companyName', lang)}
-              <span className="req" aria-hidden="true">*</span>
-            </label>
-            <input
+              <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+            </FieldLabel>
+            <Input
               id="cpf-companyName"
               type="text"
               autoComplete="organization"
@@ -330,17 +327,17 @@ export function CreatePartnerForm({
               {...register('companyName')}
             />
             {errors.companyName?.message && (
-              <p id="cpf-companyName-error" role="alert" className="error-msg">
+              <FieldError id="cpf-companyName-error" role="alert">
                 {t(errors.companyName.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="cpf-siret">
+          <Field>
+            <FieldLabel htmlFor="cpf-siret">
               {t('partners.new.field.siret', lang)}
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="cpf-siret"
               type="text"
               inputMode="numeric"
@@ -353,26 +350,26 @@ export function CreatePartnerForm({
               {...register('siret')}
             />
             {errors.siret?.message && (
-              <p id="cpf-siret-error" role="alert" className="error-msg">
+              <FieldError id="cpf-siret-error" role="alert">
                 {t(errors.siret.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="cpf-phone">
+          <Field>
+            <FieldLabel htmlFor="cpf-phone">
               {t('partners.new.field.phone', lang)}
-              <span className="req" aria-hidden="true">*</span>
-            </label>
+              <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
+            </FieldLabel>
             {/*
               UI-SPEC §5.1.3 recommends reusing <PhoneInput>. We use a plain
-              <input type="tel"> here because PhoneInput consumes RHF via
+              <Input type="tel"> here because PhoneInput consumes RHF via
               Controller + formats to 10-digit FR layout — the form schema
               accepts a more permissive 6-20 char range (E.164 / international
               partners). Switching to PhoneInput would over-constrain the
               international case; keeping plain input + the schema regex.
             */}
-            <input
+            <Input
               id="cpf-phone"
               type="tel"
               inputMode="tel"
@@ -385,11 +382,11 @@ export function CreatePartnerForm({
               {...register('phone')}
             />
             {errors.phone?.message && (
-              <p id="cpf-phone-error" role="alert" className="error-msg">
+              <FieldError id="cpf-phone-error" role="alert">
                 {t(errors.phone.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
           <hr
             style={{
@@ -400,7 +397,7 @@ export function CreatePartnerForm({
           />
 
           {/* ── Section 3: MESSAGE D'INVITATION ─────────────────────────── */}
-          <div className="ctitle" style={{ marginBottom: 16 }}>
+          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
             <span
               className="dot"
               style={{ background: 'var(--gd)' }}
@@ -409,10 +406,10 @@ export function CreatePartnerForm({
             <span>{t('partners.new.section.message', lang)}</span>
           </div>
 
-          <div className="fld">
-            <label htmlFor="cpf-message">
+          <Field>
+            <FieldLabel htmlFor="cpf-message">
               {t('partners.new.field.message', lang)}
-            </label>
+            </FieldLabel>
             <textarea
               id="cpf-message"
               placeholder={t('partners.new.field.message.placeholder', lang)}
@@ -466,11 +463,11 @@ export function CreatePartnerForm({
               </span>
             </div>
             {errors.invitationMessage?.message && (
-              <p id="cpf-message-error" role="alert" className="error-msg">
+              <FieldError id="cpf-message-error" role="alert">
                 {t(errors.invitationMessage.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
         </div>
 
         {/* ── Action card (D-15) — separate .card sibling, marginTop:16 ─── */}
