@@ -1,6 +1,7 @@
 'use client';
 
-import { Sun, Moon, Monitor } from 'lucide-react';
+import { SunIcon, MonitorIcon, MoonIcon } from '@/components/ui/icons';
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react';
 import { setTheme } from '@/lib/theme/actions';
 import { startTransition } from 'react';
 import { cn } from '@/lib/utils';
@@ -15,10 +16,10 @@ type ThemeOption = 'light' | 'system' | 'dark';
  * role="radiogroup" rather than moving to shadcn ToggleGroup.
  */
 export function ThemeToggle({ current, fullWidth = false }: { current: ThemeOption; fullWidth?: boolean }) {
-  const options: { value: ThemeOption; icon: React.ComponentType<{ size: number; strokeWidth: number }>; label: string }[] = [
-    { value: 'light',  icon: Sun,     label: 'Light' },
-    { value: 'system', icon: Monitor, label: 'System' },
-    { value: 'dark',   icon: Moon,    label: 'Dark' },
+  const options: { value: ThemeOption; icon: IconSvgElement; label: string }[] = [
+    { value: 'light',  icon: SunIcon,     label: 'Light' },
+    { value: 'system', icon: MonitorIcon, label: 'System' },
+    { value: 'dark',   icon: MoonIcon,    label: 'Dark' },
   ];
 
   return (
@@ -30,7 +31,7 @@ export function ThemeToggle({ current, fullWidth = false }: { current: ThemeOpti
       role="radiogroup"
       aria-label="Theme"
     >
-      {options.map(({ value, icon: Icon, label }) => {
+      {options.map(({ value, icon, label }) => {
         const active = current === value;
         return (
           <button
@@ -46,7 +47,7 @@ export function ThemeToggle({ current, fullWidth = false }: { current: ThemeOpti
               fullWidth && 'inline-flex flex-1 justify-center',
             )}
           >
-            <Icon size={17} strokeWidth={1.6} />
+            <HugeiconsIcon icon={icon} size={17} strokeWidth={1.6} />
           </button>
         );
       })}

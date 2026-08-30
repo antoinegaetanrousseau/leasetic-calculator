@@ -15,7 +15,8 @@
  */
 import { Fragment, type CSSProperties } from 'react';
 import Link from 'next/link';
-import { Check } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { CheckIcon } from '@/components/ui/icons';
 import { type Lang } from '@/lib/i18n/dictionaries';
 
 type StepNumber = 1 | 2 | 3;
@@ -102,7 +103,7 @@ export function Stepper({ currentStep, completedSteps, lang, stepLabels, hrefFor
         const circle = (
           <span className={circleClass} style={circleStyle}>
             {state === 'done' ? (
-              <Check size={16} strokeWidth={2.5} aria-hidden="true" />
+              <HugeiconsIcon icon={CheckIcon} size={16} strokeWidth={2.5} aria-hidden="true" />
             ) : (
               String(n)
             )}

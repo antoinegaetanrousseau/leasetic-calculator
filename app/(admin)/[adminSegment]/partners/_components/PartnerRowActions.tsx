@@ -29,7 +29,8 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MoreVertical, Send, Ban, CheckCircle2, ExternalLink, Loader2, RefreshCw } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { BanIcon, CheckCircleIcon, ExternalLinkIcon, LoaderIcon, MoreVerticalIcon, RefreshIcon, SendIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import {
@@ -229,9 +230,9 @@ export function PartnerRowActions({
         }}
       >
         {busy ? (
-          <Loader2 size={16} strokeWidth={1.6} aria-hidden="true" style={{ animation: 'spin 1s linear infinite' }} />
+          <HugeiconsIcon icon={LoaderIcon} size={16} strokeWidth={1.6} aria-hidden="true" style={{ animation: 'spin 1s linear infinite' }} />
         ) : (
-          <MoreVertical size={16} strokeWidth={1.6} aria-hidden="true" />
+          <HugeiconsIcon icon={MoreVerticalIcon} size={16} strokeWidth={1.6} aria-hidden="true" />
         )}
       </button>
 
@@ -259,7 +260,7 @@ export function PartnerRowActions({
               onClick={onReissue}
               style={MENU_ITEM_STYLE}
             >
-              <Send size={14} strokeWidth={1.6} aria-hidden="true" color="var(--muted)" />
+              <HugeiconsIcon icon={SendIcon} size={14} strokeWidth={1.6} aria-hidden="true" style={{ color: 'var(--muted)' }} />
               {t('admin.partners.action.resendInvitation', lang)}
             </button>
           )}
@@ -270,7 +271,7 @@ export function PartnerRowActions({
               onClick={onDisable}
               style={MENU_ITEM_STYLE}
             >
-              <Ban size={14} strokeWidth={1.6} aria-hidden="true" color="var(--muted)" />
+              <HugeiconsIcon icon={BanIcon} size={14} strokeWidth={1.6} aria-hidden="true" style={{ color: 'var(--muted)' }} />
               {t('admin.partners.action.disableAccount', lang)}
             </button>
           )}
@@ -281,7 +282,7 @@ export function PartnerRowActions({
               onClick={onReEnable}
               style={MENU_ITEM_STYLE}
             >
-              <CheckCircle2 size={14} strokeWidth={1.6} aria-hidden="true" color="var(--gd)" />
+              <HugeiconsIcon icon={CheckCircleIcon} size={14} strokeWidth={1.6} aria-hidden="true" style={{ color: 'var(--gd)' }} />
               {t('admin.partners.action.enableAccount', lang)}
             </button>
           )}
@@ -297,7 +298,7 @@ export function PartnerRowActions({
                 onClick={() => onChangeType(targetType)}
                 style={MENU_ITEM_STYLE}
               >
-                <RefreshCw size={14} strokeWidth={1.6} aria-hidden="true" color="var(--muted)" />
+                <HugeiconsIcon icon={RefreshIcon} size={14} strokeWidth={1.6} aria-hidden="true" style={{ color: 'var(--muted)' }} />
                 {`${t('admin.partners.action.changeType', lang)} → ${targetType}`}
               </button>
             ))}
@@ -307,7 +308,7 @@ export function PartnerRowActions({
             style={MENU_ITEM_STYLE}
             onClick={() => setOpen(false)}
           >
-            <ExternalLink size={14} strokeWidth={1.6} aria-hidden="true" color="var(--muted)" />
+            <HugeiconsIcon icon={ExternalLinkIcon} size={14} strokeWidth={1.6} aria-hidden="true" style={{ color: 'var(--muted)' }} />
             {t('admin.partners.action.viewProposals', lang)}
           </Link>
         </div>

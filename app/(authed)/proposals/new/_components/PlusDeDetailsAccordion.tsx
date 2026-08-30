@@ -19,7 +19,8 @@
  */
 
 import { useState, type ReactNode } from 'react';
-import { Plus } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PlusIcon } from '@/components/ui/icons';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
 export interface PlusDeDetailsAccordionProps {
@@ -83,7 +84,7 @@ export function PlusDeDetailsAccordion({
           padding: 0,
         }}
       >
-        <Plus
+        <HugeiconsIcon icon={PlusIcon}
           size={16}
           strokeWidth={2.25}
           aria-hidden="true"

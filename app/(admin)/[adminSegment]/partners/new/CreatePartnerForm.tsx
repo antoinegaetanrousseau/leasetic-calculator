@@ -52,7 +52,8 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 
 // Import the schema + type directly from the schemas module to avoid pulling
@@ -485,7 +486,7 @@ export function CreatePartnerForm({
             }}
           >
             {isSubmitting && (
-              <Loader2
+              <HugeiconsIcon icon={LoaderIcon}
                 size={16}
                 strokeWidth={2}
                 style={{ animation: 'spin 1s linear infinite' }}

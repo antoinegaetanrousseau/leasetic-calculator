@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UserPlus, Loader2 } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { LoaderIcon, UserPlusIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import {
@@ -144,10 +145,10 @@ export function CreatePartnerModal({ lang, onClose, onCreated }: CreatePartnerMo
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <UserPlus
+          <HugeiconsIcon icon={UserPlusIcon}
             size={20}
             strokeWidth={1.6}
-            color="var(--teal)"
+            style={{ color: 'var(--teal)' }}
             aria-hidden="true"
           />
           <h2
@@ -288,7 +289,7 @@ export function CreatePartnerModal({ lang, onClose, onCreated }: CreatePartnerMo
               }}
             >
               {isSubmitting && (
-                <Loader2
+                <HugeiconsIcon icon={LoaderIcon}
                   size={16}
                   strokeWidth={1.6}
                   style={{ animation: 'spin 1s linear infinite' }}

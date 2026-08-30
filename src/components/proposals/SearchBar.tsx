@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, X } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { SearchIcon, XIcon } from '@/components/ui/icons';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import { useDebouncedValue } from '@/components/proposal/useDebouncedValue';
 
@@ -33,7 +34,7 @@ export function SearchBar({ lang }: SearchBarProps) {
 
   return (
     <div className="search-bar" role="search">
-      <Search size={17} color="var(--muted)" aria-hidden="true" />
+      <HugeiconsIcon icon={SearchIcon} size={17} style={{ color: 'var(--muted)' }} aria-hidden="true" />
       <input
         type="search"
         inputMode="search"
@@ -63,7 +64,7 @@ export function SearchBar({ lang }: SearchBarProps) {
             color: 'var(--muted)',
           }}
         >
-          <X size={14} />
+          <HugeiconsIcon icon={XIcon} size={14} />
         </button>
       )}
     </div>

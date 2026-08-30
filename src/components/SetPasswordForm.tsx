@@ -5,7 +5,8 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { EyeIcon, EyeOffIcon } from '@/components/ui/icons';
 import { setPasswordSchema, type SetPasswordInput } from '@/lib/auth/schemas';
 import { redeemToken, type RedeemKind } from '@/lib/auth/redeem';
 import {
@@ -130,9 +131,9 @@ export function SetPasswordForm({ token, kind, lang }: SetPasswordFormProps) {
           }}
         >
           {showNew ? (
-            <EyeOff size={17} strokeWidth={1.6} />
+            <HugeiconsIcon icon={EyeOffIcon} size={17} strokeWidth={1.6} />
           ) : (
-            <Eye size={17} strokeWidth={1.6} />
+            <HugeiconsIcon icon={EyeIcon} size={17} strokeWidth={1.6} />
           )}
         </button>
       </div>
@@ -239,9 +240,9 @@ export function SetPasswordForm({ token, kind, lang }: SetPasswordFormProps) {
           }}
         >
           {showConfirm ? (
-            <EyeOff size={17} strokeWidth={1.6} />
+            <HugeiconsIcon icon={EyeOffIcon} size={17} strokeWidth={1.6} />
           ) : (
-            <Eye size={17} strokeWidth={1.6} />
+            <HugeiconsIcon icon={EyeIcon} size={17} strokeWidth={1.6} />
           )}
         </button>
       </div>

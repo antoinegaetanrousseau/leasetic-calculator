@@ -23,7 +23,8 @@
 
 import { useTransition } from 'react';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -160,7 +161,7 @@ export function WizardActionBar({
           }}
         >
           {primary.isSubmitting && (
-            <Loader2
+            <HugeiconsIcon icon={LoaderIcon}
               size={16}
               strokeWidth={2}
               aria-hidden="true"

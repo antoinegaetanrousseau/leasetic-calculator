@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { Plus } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PlusIcon } from '@/components/ui/icons';
 import Link from 'next/link';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
@@ -55,7 +56,7 @@ export default async function HomePage() {
             variant="default"
             render={<Link href="/proposals/new/parametres" aria-label={t('dashboard.cta.new', lang)} />}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <HugeiconsIcon icon={PlusIcon} className="mr-2 h-4 w-4" />
             {t('dashboard.cta.new', lang)}
           </Button>
         }

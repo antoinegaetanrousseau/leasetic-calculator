@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { LoaderIcon, PlusIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import type { ListResponse } from '@/lib/api/proposals/list';
@@ -63,9 +64,9 @@ export function LoadMoreButton({
         style={{ opacity: loading ? 0.6 : 1 }}
       >
         {loading ? (
-          <Loader2 size={17} style={{ animation: 'spin 1s linear infinite' }} aria-hidden="true" />
+          <HugeiconsIcon icon={LoaderIcon} size={17} style={{ animation: 'spin 1s linear infinite' }} aria-hidden="true" />
         ) : (
-          <Plus size={17} aria-hidden="true" />
+          <HugeiconsIcon icon={PlusIcon} size={17} aria-hidden="true" />
         )}
         {loading
           ? t('proposal.list.load.more.loading', lang)

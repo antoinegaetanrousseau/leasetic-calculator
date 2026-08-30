@@ -39,7 +39,8 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { EyeIcon, EyeOffIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import {
   Field,
@@ -485,9 +486,9 @@ export function ParametresForm({
                   }
                 >
                   {showCurrent ? (
-                    <EyeOff size={17} strokeWidth={1.6} />
+                    <HugeiconsIcon icon={EyeOffIcon} size={17} strokeWidth={1.6} />
                   ) : (
-                    <Eye size={17} strokeWidth={1.6} />
+                    <HugeiconsIcon icon={EyeIcon} size={17} strokeWidth={1.6} />
                   )}
                 </InputGroupButton>
               </InputGroupAddon>
@@ -527,9 +528,9 @@ export function ParametresForm({
                   }
                 >
                   {showNew ? (
-                    <EyeOff size={17} strokeWidth={1.6} />
+                    <HugeiconsIcon icon={EyeOffIcon} size={17} strokeWidth={1.6} />
                   ) : (
-                    <Eye size={17} strokeWidth={1.6} />
+                    <HugeiconsIcon icon={EyeIcon} size={17} strokeWidth={1.6} />
                   )}
                 </InputGroupButton>
               </InputGroupAddon>

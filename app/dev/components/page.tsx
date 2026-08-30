@@ -1,5 +1,5 @@
+import { SlidersIcon, UsersIcon, HistoryIcon } from '@/components/ui/icons';
 import { notFound } from 'next/navigation';
-import { Sliders, Users, History } from 'lucide-react';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import { Stepper } from '@/components/ui/Stepper';
 import { StatusChip } from '@/components/ui/StatusChip';
@@ -88,7 +88,7 @@ export default function DevComponentsPage() {
             title="Coefficients"
             description="Gérer les paramètres financiers globaux : tranches, marges, durées."
             href="#"
-            icon={Sliders}
+            icon={SlidersIcon}
             openLabel="Ouvrir →"
           />
           <AdminNavCard
@@ -96,7 +96,7 @@ export default function DevComponentsPage() {
             title="Partenaires"
             description="Liste, invitation et désactivation des comptes partenaires."
             href="#"
-            icon={Users}
+            icon={UsersIcon}
             openLabel="Ouvrir →"
           />
           <AdminNavCard
@@ -104,7 +104,7 @@ export default function DevComponentsPage() {
             title="Historique"
             description="Journal des modifications de coefficients avec différentiel."
             href="#"
-            icon={History}
+            icon={HistoryIcon}
             openLabel="Ouvrir →"
           />
         </div>

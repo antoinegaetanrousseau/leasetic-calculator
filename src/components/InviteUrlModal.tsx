@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Copy, Check, X, AlertTriangle } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { AlertTriangleIcon, CheckIcon, CopyIcon, XIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import type { RedeemKind } from '@/lib/auth/redeem';
@@ -203,7 +204,7 @@ export function InviteUrlModal({
               flexShrink: 0,
             }}
           >
-            <X size={20} strokeWidth={1.6} />
+            <HugeiconsIcon icon={XIcon} size={20} strokeWidth={1.6} />
           </button>
         </div>
 
@@ -219,7 +220,7 @@ export function InviteUrlModal({
             gap: 12,
           }}
         >
-          <AlertTriangle
+          <HugeiconsIcon icon={AlertTriangleIcon}
             size={17}
             strokeWidth={1.6}
             aria-hidden="true"
@@ -271,12 +272,12 @@ export function InviteUrlModal({
           >
             {copied ? (
               <>
-                <Check size={17} strokeWidth={1.6} />
+                <HugeiconsIcon icon={CheckIcon} size={17} strokeWidth={1.6} />
                 {t('auth.modal.button.copied', lang)}
               </>
             ) : (
               <>
-                <Copy size={17} strokeWidth={1.6} />
+                <HugeiconsIcon icon={CopyIcon} size={17} strokeWidth={1.6} />
                 {t('auth.modal.button.copy', lang)}
               </>
             )}

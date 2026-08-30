@@ -21,19 +21,13 @@
  *     carried over unchanged. Those encode real product rules, not styling.
  */
 
+import { HomeIcon, PlusIcon, ProposalIcon, HelpIcon, UsersIcon, SlidersIcon } from '@/components/ui/icons';
+import { type IconSvgElement } from '@hugeicons/react';
 import { useSyncExternalStore, type ComponentType } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Home,
-  Plus,
-  ScrollText,
-  HelpCircle,
-  Sliders,
-  Users,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/icons';
 import {
   Sidebar,
   SidebarContent,
@@ -93,8 +87,7 @@ export interface AppSidebarProps {
   adminHomeHref?: string;
 }
 
-type LucideIcon = ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
-type NavItem = { key: ActiveNav; icon: LucideIcon; labelKey: DictKey; href: string };
+type NavItem = { key: ActiveNav; icon: IconSvgElement; labelKey: DictKey; href: string };
 
 /**
  * Phase 18 D-27 — Partner sidebar: exactly 4 items in order
@@ -102,10 +95,10 @@ type NavItem = { key: ActiveNav; icon: LucideIcon; labelKey: DictKey; href: stri
  */
 function partnerNavItems(): NavItem[] {
   return [
-    { key: 'home', icon: Home, labelKey: 'sidebar.nav.home', href: '/' },
-    { key: 'proposals-new', icon: Plus, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
-    { key: 'proposals', icon: ScrollText, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
-    { key: 'help', icon: HelpCircle, labelKey: 'sidebar.nav.help', href: '/aide' },
+    { key: 'home', icon: HomeIcon, labelKey: 'sidebar.nav.home', href: '/' },
+    { key: 'proposals-new', icon: PlusIcon, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
+    { key: 'proposals', icon: ProposalIcon, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
+    { key: 'help', icon: HelpIcon, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];
 }
 
@@ -116,12 +109,12 @@ function partnerNavItems(): NavItem[] {
  */
 function adminNavItems(hrefs: NonNullable<AppSidebarProps['adminHrefs']>): NavItem[] {
   return [
-    { key: 'admin-home', icon: Home, labelKey: 'sidebar.nav.home', href: hrefs.home },
-    { key: 'proposals-new', icon: Plus, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
-    { key: 'proposals', icon: ScrollText, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
-    { key: 'admin-partners', icon: Users, labelKey: 'sidebar.nav.adminPartners', href: hrefs.partners },
-    { key: 'admin-coefficients', icon: Sliders, labelKey: 'sidebar.nav.adminCoefficients', href: hrefs.coefficients },
-    { key: 'help', icon: HelpCircle, labelKey: 'sidebar.nav.help', href: '/aide' },
+    { key: 'admin-home', icon: HomeIcon, labelKey: 'sidebar.nav.home', href: hrefs.home },
+    { key: 'proposals-new', icon: PlusIcon, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
+    { key: 'proposals', icon: ProposalIcon, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
+    { key: 'admin-partners', icon: UsersIcon, labelKey: 'sidebar.nav.adminPartners', href: hrefs.partners },
+    { key: 'admin-coefficients', icon: SlidersIcon, labelKey: 'sidebar.nav.adminCoefficients', href: hrefs.coefficients },
+    { key: 'help', icon: HelpIcon, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];
 }
 
@@ -189,9 +182,9 @@ export function AppSidebar({
             className="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
           >
             {collapsed ? (
-              <ChevronRight size={16} strokeWidth={1.6} />
+              <HugeiconsIcon icon={ChevronRightIcon} size={16} strokeWidth={1.6} />
             ) : (
-              <ChevronLeft size={16} strokeWidth={1.6} />
+              <HugeiconsIcon icon={ChevronLeftIcon} size={16} strokeWidth={1.6} />
             )}
           </button>
         </div>
@@ -206,7 +199,6 @@ export function AppSidebar({
               {navItems.map((item) => {
                 const isActive = item.key === resolvedActiveNav;
                 const label = t(item.labelKey, lang);
-                const Icon = item.icon;
                 return (
                   <SidebarMenuItem key={item.key}>
                     <SidebarMenuButton
@@ -214,7 +206,7 @@ export function AppSidebar({
                       tooltip={label}
                       render={<Link href={item.href} />}
                     >
-                      <Icon strokeWidth={1.6} />
+                      <HugeiconsIcon icon={item.icon} strokeWidth={1.6} />
                       <span>{label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

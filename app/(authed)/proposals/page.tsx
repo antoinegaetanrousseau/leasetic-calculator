@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { Plus } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PlusIcon } from '@/components/ui/icons';
 import Link from 'next/link';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
@@ -129,7 +130,7 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
                 textDecoration: 'none',
               }}
             >
-              <Plus size={17} strokeWidth={1.6} aria-hidden="true" />
+              <HugeiconsIcon icon={PlusIcon} size={17} strokeWidth={1.6} aria-hidden="true" />
               <span>{t('dashboard.cta.new', lang)}</span>
             </Link>
           </div>

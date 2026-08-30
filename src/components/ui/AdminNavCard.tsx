@@ -1,3 +1,4 @@
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react';
 import Link from 'next/link';
 import type { ComponentType } from 'react';
 
@@ -20,7 +21,8 @@ export interface AdminNavCardProps {
   description: string;
   variant: Variant;
   href: string;
-  icon: ComponentType<{ size: number; strokeWidth: number; color?: string; 'aria-hidden'?: boolean }>;
+  /** Hugeicons icon data (from @/components/ui/icons), not a component. */
+  icon: IconSvgElement;
   openLabel: string;
 }
 
@@ -37,7 +39,7 @@ export function AdminNavCard({
   description,
   variant,
   href,
-  icon: Icon,
+  icon,
   openLabel,
 }: AdminNavCardProps) {
   const accent = ACCENT_BY_VARIANT[variant];
@@ -70,7 +72,7 @@ export function AdminNavCard({
           background: `rgba(${accent.rgb}, 0.10)`,
         }}
       >
-        <Icon size={24} strokeWidth={1.6} color={accent.token} aria-hidden={true} />
+        <HugeiconsIcon icon={icon} size={24} strokeWidth={1.6} style={{ color: accent.token }} aria-hidden={true} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.4, color: 'var(--ink)' }}>
         {title}

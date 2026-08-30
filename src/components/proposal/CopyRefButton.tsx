@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { CheckIcon, CopyIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -85,9 +86,9 @@ export function CopyRefButton({ lcRef, lang, variant = 'default' }: CopyRefButto
         }}
       >
         {copied ? (
-          <Check size={17} strokeWidth={1.6} aria-hidden="true" />
+          <HugeiconsIcon icon={CheckIcon} size={17} strokeWidth={1.6} aria-hidden="true" />
         ) : (
-          <Copy size={17} strokeWidth={1.6} aria-hidden="true" />
+          <HugeiconsIcon icon={CopyIcon} size={17} strokeWidth={1.6} aria-hidden="true" />
         )}
       </button>
     );
@@ -106,9 +107,9 @@ export function CopyRefButton({ lcRef, lang, variant = 'default' }: CopyRefButto
       }}
     >
       {copied ? (
-        <Check size={14} strokeWidth={1.6} aria-hidden="true" />
+        <HugeiconsIcon icon={CheckIcon} size={14} strokeWidth={1.6} aria-hidden="true" />
       ) : (
-        <Copy size={14} strokeWidth={1.6} aria-hidden="true" />
+        <HugeiconsIcon icon={CopyIcon} size={14} strokeWidth={1.6} aria-hidden="true" />
       )}
       <span ref={labelRef}>
         {copied ? t('button.copy.ref.copied', lang) : t('button.copy.ref', lang)}

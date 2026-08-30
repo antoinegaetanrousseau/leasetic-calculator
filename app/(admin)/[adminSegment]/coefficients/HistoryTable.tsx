@@ -17,7 +17,8 @@
 
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useState, useTransition } from 'react';
-import { Plus } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { PlusIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
 import { formatDate } from '@/lib/i18n/format';
@@ -170,7 +171,7 @@ export function HistoryTable({
                 onClick={onLoadMore}
                 disabled={isPending}
               >
-                {isPending ? <Spinner className="size-[17px]" /> : <Plus size={17} />}
+                {isPending ? <Spinner className="size-[17px]" /> : <HugeiconsIcon icon={PlusIcon} size={17} />}
                 {t('admin.coefficients.history.load_more', lang)}
               </button>
             </div>

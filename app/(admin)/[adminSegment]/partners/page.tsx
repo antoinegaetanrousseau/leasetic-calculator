@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { UserPlus } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { UserPlusIcon } from '@/components/ui/icons';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
 import { listPartnersWithLastActivity, type PartnerStatus } from '@/lib/db/queries/partners';
@@ -98,7 +99,7 @@ export default async function PartnersPage({ params, searchParams }: PageProps) 
               textDecoration: 'none',
             }}
           >
-            <UserPlus size={16} strokeWidth={1.6} aria-hidden="true" />
+            <HugeiconsIcon icon={UserPlusIcon} size={16} strokeWidth={1.6} aria-hidden="true" />
             {t('admin.partners.invite.cta', lang)}
           </Link>
         }

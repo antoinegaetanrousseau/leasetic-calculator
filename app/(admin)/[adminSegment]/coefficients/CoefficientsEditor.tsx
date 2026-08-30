@@ -12,7 +12,8 @@ import {
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Save } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { SaveIcon } from '@/components/ui/icons';
 import type { z } from 'zod';
 import { coeffEditorSchema, type CoeffEditorValues } from '@/lib/admin';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
@@ -364,7 +365,7 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
                 gap: 8,
               }}
             >
-              <Save size={17} strokeWidth={1.6} aria-hidden="true" />
+              <HugeiconsIcon icon={SaveIcon} size={17} strokeWidth={1.6} aria-hidden="true" />
               {t('admin.coefficients.save.btn', lang)}
             </button>
           </div>

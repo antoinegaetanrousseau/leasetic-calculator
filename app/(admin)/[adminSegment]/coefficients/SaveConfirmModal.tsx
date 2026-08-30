@@ -3,7 +3,8 @@
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertTriangle, Info, Loader2 } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { AlertTriangleIcon, InfoIcon, LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { adminUpdateGlobalParams } from '@/lib/admin';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -159,10 +160,10 @@ export function SaveConfirmModal({
             padding: '12px 16px',
           }}
         >
-          <AlertTriangle
+          <HugeiconsIcon icon={AlertTriangleIcon}
             size={18}
             strokeWidth={1.6}
-            color="var(--gold)"
+            style={{ color: 'var(--gold)' }}
             aria-hidden="true"
           />
           <p
@@ -201,7 +202,7 @@ export function SaveConfirmModal({
               marginTop: 4,
             }}
           >
-            <Info size={14} strokeWidth={1.6} color="var(--muted)" aria-hidden="true" />
+            <HugeiconsIcon icon={InfoIcon} size={14} strokeWidth={1.6} style={{ color: 'var(--muted)' }} aria-hidden="true" />
             <span>{t('admin.coefficients.modal.commission_note', lang)}</span>
           </div>
         )}
@@ -237,7 +238,7 @@ export function SaveConfirmModal({
             }}
           >
             {isSaving && (
-              <Loader2
+              <HugeiconsIcon icon={LoaderIcon}
                 size={16}
                 style={{ animation: 'spin 1s linear infinite' }}
                 aria-hidden="true"

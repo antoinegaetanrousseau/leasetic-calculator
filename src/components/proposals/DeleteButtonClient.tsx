@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { TrashIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -57,7 +58,7 @@ export function DeleteButtonClient({ proposalId, lang }: DeleteButtonClientProps
       }}
       aria-label={t('proposal.detail.action.delete', lang)}
     >
-      <Trash2 size={17} />
+      <HugeiconsIcon icon={TrashIcon} size={17} />
       {t('proposal.detail.action.delete', lang)}
     </button>
   );
