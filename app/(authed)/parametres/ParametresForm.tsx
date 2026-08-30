@@ -41,6 +41,20 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 import { authClient } from '@/lib/auth/client';
 import {
   changePasswordSchema,
@@ -328,38 +342,6 @@ export function ParametresForm({
     isPending ||
     (!identityForm.formState.isDirty && !passwordEitherFilled);
 
-  // ── Styles ────────────────────────────────────────────────────────────────
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '11.2px',
-    fontWeight: 500,
-    color: 'var(--ink)',
-    marginBottom: 6,
-  };
-  const inputBaseStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '10px 12px',
-    borderRadius: 12,
-    border: '1px solid var(--border)',
-    background: 'var(--surface)',
-    color: 'var(--ink)',
-    boxSizing: 'border-box',
-  };
-  const inputPasswordPadding: React.CSSProperties = {
-    paddingRight: 40,
-  };
-  const errorStyle: React.CSSProperties = {
-    fontSize: '11.2px',
-    fontWeight: 500,
-    color: 'var(--danger)',
-    marginTop: 4,
-  };
-  const fieldGroupStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-  };
-
   const identityErrors = identityForm.formState.errors;
   const passwordErrors = passwordForm.formState.errors;
 
@@ -370,62 +352,30 @@ export function ParametresForm({
         id={FORM_ID}
         onSubmit={handleSave}
         noValidate
-        style={{
-          width: '100%',
-          padding: 28,
-          background: 'var(--surface)',
-          borderRadius: 16,
-          boxShadow: 'var(--shadow-card)',
-          marginTop: 32,
-          boxSizing: 'border-box',
-        }}
+        // `.card` supplies surface + radius 16 + shadow + 28px padding, which
+        // is what this form already had. No padding utility here: `.card` is
+        // declared unlayered in globals.css, so it beats Tailwind's layered
+        // utilities outright and a `p-*` alongside it would be inert.
+        className="card mt-8 w-full"
       >
         {/* Eyebrow section header */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            marginBottom: 20,
-          }}
-        >
+        <div className="mb-5 flex items-center gap-2">
           <span
             aria-hidden="true"
-            style={{
-              display: 'inline-block',
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: 'var(--teal)',
-            }}
+            className="inline-block size-2 rounded-full bg-[var(--teal)]"
           />
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              letterSpacing: 1.5,
-              textTransform: 'uppercase',
-              color: 'var(--muted)',
-            }}
-          >
+          <span className="text-[12px] font-semibold tracking-[1.5px] text-muted-foreground uppercase">
             {t('parametres.card.eyebrow.identity', lang)}
           </span>
         </div>
 
         {/* Identity row 1 — Prénom + Nom (2-column) */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 16,
-            marginBottom: 16,
-          }}
-        >
-          <div style={fieldGroupStyle}>
-            <label htmlFor="pf-firstName" style={labelStyle}>
+        <FieldGroup className="mb-4 grid grid-cols-2 gap-4">
+          <Field>
+            <FieldLabel htmlFor="pf-firstName">
               {t('parametres.identity.firstName.label', lang)}
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="pf-firstName"
               type="text"
               autoComplete="given-name"
@@ -435,25 +385,19 @@ export function ParametresForm({
               )}
               aria-invalid={!!identityErrors.firstName}
               {...identityForm.register('firstName')}
-              style={{
-                ...inputBaseStyle,
-                ...(identityErrors.firstName
-                  ? { borderColor: 'var(--danger)' }
-                  : {}),
-              }}
             />
             {identityErrors.firstName && (
-              <p role="alert" style={errorStyle}>
+              <FieldError role="alert">
                 {t('parametres.error.required', lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div style={fieldGroupStyle}>
-            <label htmlFor="pf-lastName" style={labelStyle}>
+          <Field>
+            <FieldLabel htmlFor="pf-lastName">
               {t('parametres.identity.lastName.label', lang)}
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="pf-lastName"
               type="text"
               autoComplete="family-name"
@@ -463,31 +407,26 @@ export function ParametresForm({
               )}
               aria-invalid={!!identityErrors.lastName}
               {...identityForm.register('lastName')}
-              style={{
-                ...inputBaseStyle,
-                ...(identityErrors.lastName
-                  ? { borderColor: 'var(--danger)' }
-                  : {}),
-              }}
             />
             {identityErrors.lastName && (
-              <p role="alert" style={errorStyle}>
+              <FieldError role="alert">
                 {t('parametres.error.required', lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
-        </div>
+          </Field>
+        </FieldGroup>
 
         {/* Identity row 2 — Email (full-width). READ-ONLY per D-06d. */}
-        <div style={{ ...fieldGroupStyle, marginBottom: 16 }}>
-          <label style={labelStyle}>
+        <Field className="mb-4">
+          <FieldLabel htmlFor="pf-email">
             {t('parametres.identity.email.label', lang)}
-          </label>
+          </FieldLabel>
           {emailEditable ? (
             // Reserved for the "email editable" branch — not used in the
             // current shipped build (D-06d resolved to read-only). When the
             // resolution flips, wire identityForm.register('email') here.
-            <input
+            <Input
+              id="pf-email"
               type="email"
               autoComplete="email"
               defaultValue={initialEmail}
@@ -495,61 +434,37 @@ export function ParametresForm({
                 'parametres.identity.email.placeholder',
                 lang,
               )}
-              style={inputBaseStyle}
             />
           ) : (
             <>
+              {/* Not a disabled <Input>: the value is not editable in this
+                  build at all, so it is static text rather than a control a
+                  keyboard user can land on and find inert. */}
               <p
-                style={{
-                  margin: 0,
-                  padding: '10px 12px',
-                  borderRadius: 12,
-                  background: 'rgba(110, 113, 145, 0.06)',
-                  color: 'var(--ink)',
-                  fontSize: 14.5,
-                  border: '1px solid var(--border)',
-                }}
+                id="pf-email"
+                className="m-0 rounded-xl border border-border bg-[var(--hover-overlay)] px-3 py-2.5 text-[14.5px] text-ink"
               >
                 {initialEmail}
               </p>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: 'var(--muted)',
-                  marginTop: 6,
-                  marginBottom: 0,
-                }}
-              >
+              <p className="mt-1.5 mb-0 text-[12px] text-muted-foreground">
                 {t('parametres.identity.email.readonly.notice', lang)}
               </p>
             </>
           )}
-        </div>
+        </Field>
 
         {/* Horizontal divider (no section header after — rev 2). */}
-        <hr
-          style={{
-            border: 'none',
-            borderTop: '1px solid var(--border)',
-            margin: '24px 0',
-          }}
-        />
+        <FieldSeparator className="my-6" />
 
         {/* Password row — Ancien + Nouveau (2-column, NO confirm field). */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 16,
-          }}
-        >
+        <FieldGroup className="grid grid-cols-2 gap-4">
           {/* Ancien mot de passe */}
-          <div style={fieldGroupStyle}>
-            <label htmlFor="pf-currentPassword" style={labelStyle}>
+          <Field>
+            <FieldLabel htmlFor="pf-currentPassword">
               {t('parametres.password.current.label', lang)}
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
+            </FieldLabel>
+            <InputGroup>
+              <InputGroupInput
                 id="pf-currentPassword"
                 type={showCurrent ? 'text' : 'password'}
                 autoComplete="current-password"
@@ -559,57 +474,39 @@ export function ParametresForm({
                 )}
                 aria-invalid={!!passwordErrors.currentPassword}
                 {...passwordForm.register('currentPassword')}
-                style={{
-                  ...inputBaseStyle,
-                  ...inputPasswordPadding,
-                  ...(passwordErrors.currentPassword
-                    ? { borderColor: 'var(--danger)' }
-                    : {}),
-                }}
               />
-              <button
-                type="button"
-                onClick={() => setShowCurrent((s) => !s)}
-                aria-label={
-                  showCurrent
-                    ? t('auth.password.hide', lang)
-                    : t('auth.password.show', lang)
-                }
-                style={{
-                  position: 'absolute',
-                  right: 12,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--muted)',
-                  padding: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                {showCurrent ? (
-                  <EyeOff size={17} strokeWidth={1.6} />
-                ) : (
-                  <Eye size={17} strokeWidth={1.6} />
-                )}
-              </button>
-            </div>
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  type="button"
+                  onClick={() => setShowCurrent((s) => !s)}
+                  aria-label={
+                    showCurrent
+                      ? t('auth.password.hide', lang)
+                      : t('auth.password.show', lang)
+                  }
+                >
+                  {showCurrent ? (
+                    <EyeOff size={17} strokeWidth={1.6} />
+                  ) : (
+                    <Eye size={17} strokeWidth={1.6} />
+                  )}
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
             {passwordErrors.currentPassword && (
-              <p role="alert" style={errorStyle}>
+              <FieldError role="alert">
                 {localizePwError('currentPassword', passwordErrors.currentPassword)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
           {/* Nouveau mot de passe */}
-          <div style={fieldGroupStyle}>
-            <label htmlFor="pf-newPassword" style={labelStyle}>
+          <Field>
+            <FieldLabel htmlFor="pf-newPassword">
               {t('parametres.password.new.label', lang)}
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
+            </FieldLabel>
+            <InputGroup>
+              <InputGroupInput
                 id="pf-newPassword"
                 type={showNew ? 'text' : 'password'}
                 autoComplete="new-password"
@@ -619,112 +516,67 @@ export function ParametresForm({
                 )}
                 aria-invalid={!!passwordErrors.newPassword}
                 {...passwordForm.register('newPassword')}
-                style={{
-                  ...inputBaseStyle,
-                  ...inputPasswordPadding,
-                  ...(passwordErrors.newPassword
-                    ? { borderColor: 'var(--danger)' }
-                    : {}),
-                }}
               />
-              <button
-                type="button"
-                onClick={() => setShowNew((s) => !s)}
-                aria-label={
-                  showNew
-                    ? t('auth.password.hide', lang)
-                    : t('auth.password.show', lang)
-                }
-                style={{
-                  position: 'absolute',
-                  right: 12,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--muted)',
-                  padding: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                {showNew ? (
-                  <EyeOff size={17} strokeWidth={1.6} />
-                ) : (
-                  <Eye size={17} strokeWidth={1.6} />
-                )}
-              </button>
-            </div>
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  type="button"
+                  onClick={() => setShowNew((s) => !s)}
+                  aria-label={
+                    showNew
+                      ? t('auth.password.hide', lang)
+                      : t('auth.password.show', lang)
+                  }
+                >
+                  {showNew ? (
+                    <EyeOff size={17} strokeWidth={1.6} />
+                  ) : (
+                    <Eye size={17} strokeWidth={1.6} />
+                  )}
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
             {passwordErrors.newPassword && (
-              <p role="alert" style={errorStyle}>
+              <FieldError role="alert">
                 {localizePwError('newPassword', passwordErrors.newPassword)}
-              </p>
+              </FieldError>
             )}
-            {/* Strength meter (Plr-3) — 4-segment bar. */}
-            <div
-              style={{ display: 'flex', gap: 4, marginTop: 8 }}
-              aria-hidden="true"
-            >
+            {/* Strength meter (Plr-3) — 4-segment bar. The filled colour is
+                indexed off the score at runtime, so it stays an inline style;
+                a utility class cannot express a value that is not known until
+                render. */}
+            <div className="mt-2 flex gap-1" aria-hidden="true">
               {([0, 1, 2, 3] as const).map((i) => (
                 <div
                   key={i}
+                  className="h-1.5 flex-1 rounded-md transition-colors duration-200"
                   style={{
-                    flex: 1,
-                    height: 6,
-                    borderRadius: 6,
                     background:
                       i < strength
                         ? STRENGTH_COLORS[strength]
                         : 'var(--border)',
-                    transition: 'background 0.2s ease',
                   }}
                 />
               ))}
             </div>
-            <div
-              style={{
-                fontSize: 10.5,
-                color: 'var(--muted)',
-                marginTop: 4,
-                minHeight: '1.4em',
-              }}
-            >
+            <div className="mt-1 min-h-[1.4em] text-[10.5px] text-muted-foreground">
               {newPwd
                 ? t(STRENGTH_KEYS[strength], lang)
                 : t('parametres.password.new.hint', lang)}
             </div>
-          </div>
-        </div>
+          </Field>
+        </FieldGroup>
 
         {/* Session-invalidation notice (D-08 + Plr-7 rev 2) — below pw row. */}
-        <p
-          style={{
-            color: 'var(--muted)',
-            fontSize: 13,
-            marginTop: 20,
-            marginBottom: 0,
-          }}
-        >
+        <p className="mt-5 mb-0 text-[13px] text-muted-foreground">
           {t('parametres.password.session.notice', lang)}
         </p>
       </form>
 
       {/* ── Action footer — SEPARATE sibling card outside the form ─────────── */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          padding: 16,
-          background: 'var(--surface)',
-          borderRadius: 12,
-          boxShadow: 'var(--shadow-card)',
-          marginTop: 24,
-          boxSizing: 'border-box',
-        }}
-      >
+      {/* Deliberately NOT `.card`: this footer is a tighter surface (radius 12,
+          16px padding) and `.card` would force its own 28px/16px — unlayered
+          CSS outranks the utilities, so `p-4` next to it would do nothing. */}
+      <div className="mt-6 flex w-full items-center justify-between rounded-xl border border-border bg-[var(--surface)] p-4 shadow-[var(--shadow-card)]">
         <button
           type="button"
           className="btn-out"
@@ -733,16 +585,15 @@ export function ParametresForm({
         >
           {t('parametres.action.cancel', lang)}
         </button>
+        {/* No inline opacity/cursor: globals.css already gives .btn-green
+            :disabled `pointer-events: none; opacity: .6`, so the inline pair
+            was restating a rule that was already there. */}
         <button
           type="submit"
           form={FORM_ID}
           className="btn-green"
           disabled={saveDisabled}
           aria-disabled={saveDisabled || undefined}
-          style={{
-            opacity: saveDisabled ? 0.6 : 1,
-            cursor: saveDisabled ? 'not-allowed' : 'pointer',
-          }}
         >
           {isPending
             ? t('parametres.action.saving', lang)
