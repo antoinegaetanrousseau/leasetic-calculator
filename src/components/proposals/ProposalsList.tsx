@@ -1,9 +1,19 @@
 'use client';
 
+/**
+ * Phase 5 of the ReUI/Maia migration.
+ *
+ * The three empty-state branches that used to live here were unreachable:
+ * app/(authed)/proposals/page.tsx short-circuits on `initial.rows.length === 0`
+ * and renders its own empty state, so this component only ever mounts with at
+ * least one row — and `rows` only ever appends. They carried 5 of this file's
+ * 6 inline styles between them. The live empty state on that page is the one
+ * now built from the shadcn Empty primitive.
+ */
+
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { FileText, SearchX, Trash2 } from 'lucide-react';
-import { t, type Lang } from '@/lib/i18n/dictionaries';
+import type { Lang } from '@/lib/i18n/dictionaries';
 import type { ListResponse, ProposalRowDto } from '@/lib/api/proposals/list';
 import { ProposalRow } from './ProposalRow';
 import { LoadMoreButton } from './LoadMoreButton';
@@ -33,58 +43,6 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
     setCursor(response.nextCursor);
   };
 
-  if (rows.length === 0) {
-    // Empty states per UI-SPEC §3.1.6
-    if (q.length > 0) {
-      return (
-        <EmptyBlock
-          icon={
-            <SearchX
-              size={38}
-              strokeWidth={1.3}
-              color="var(--muted)"
-              style={{ opacity: 0.4 }}
-            />
-          }
-          title={t('proposal.search.empty.title', lang)}
-          body={t('proposal.search.empty.body', lang)}
-        />
-      );
-    }
-    if (deleted) {
-      return (
-        <EmptyBlock
-          icon={
-            <Trash2
-              size={38}
-              strokeWidth={1.3}
-              color="var(--muted)"
-              style={{ opacity: 0.4 }}
-            />
-          }
-          title={t('proposal.deleted.empty.title', lang)}
-          body={t('proposal.deleted.empty.body', lang)}
-        />
-      );
-    }
-    // New-partner empty-state (Phase 7 PROP-04 — preserved):
-    // q="" + deleted=false + rows=[] means truly no proposals for this account.
-    return (
-      <EmptyBlock
-        icon={
-          <FileText
-            size={38}
-            strokeWidth={1.3}
-            color="var(--muted)"
-            style={{ opacity: 0.4 }}
-          />
-        }
-        title={t('dashboard.empty.title', lang)}
-        body={t('dashboard.empty.body', lang)}
-      />
-    );
-  }
-
   return (
     <div>
       {rows.map((row) => (
@@ -112,37 +70,6 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
           onAppend={onAppend}
         />
       )}
-    </div>
-  );
-}
-
-function EmptyBlock({
-  icon,
-  title,
-  body,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-}) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '40px 16px',
-        textAlign: 'center',
-        gap: 12,
-      }}
-    >
-      {icon}
-      <h2 style={{ fontSize: 16.5, fontWeight: 600, color: 'var(--ink)', margin: 0 }}>
-        {title}
-      </h2>
-      <p style={{ fontSize: 14.5, color: 'var(--muted)', maxWidth: 480, margin: 0 }}>
-        {body}
-      </p>
     </div>
   );
 }
