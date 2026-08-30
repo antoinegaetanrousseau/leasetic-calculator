@@ -171,7 +171,7 @@ export function AppSidebar({
             <img src="/logo-mark.svg" alt="" width={28} height={28} />
           ) : (
             <>
-              <BrandLogo width={190} height={32} alt={t('sidebar.brand', lang)} />
+              <BrandLogo width={190} alt={t('sidebar.brand', lang)} />
               <div className="flex-1" />
             </>
           )}

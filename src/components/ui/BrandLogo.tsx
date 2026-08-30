@@ -12,10 +12,22 @@
  */
 import { cn } from '@/lib/utils';
 
+/**
+ * Intrinsic aspect of the lockup assets in /public (862×200).
+ *
+ * Height derives from this rather than being passed alongside width at every
+ * call site. When the official lockups were swapped in (2026-08-30) the ratio
+ * went 1192×200 → 862×200, and the callers passing a matching 190×32 pair
+ * silently became wrong: the browser letterboxes an <img> whose box disagrees
+ * with the viewBox, so the logo shrank inside a 190px slot of dead space.
+ * Swapping the asset again means changing this one number.
+ */
+const LOCKUP_ASPECT = 862 / 200;
+
 export interface BrandLogoProps {
   /** Pixel width. Defaults to 190 (sidebar brand-row width per UI-SPEC §6.3). */
   width?: number;
-  /** Pixel height. Defaults to 32 (1192×200 viewBox aspect at w=190 ≈ h=31.9). */
+  /** Pixel height. Derived from `width` via the asset aspect unless set. */
   height?: number;
   /** Required for non-decorative usage. If omitted, both <img> render alt="". */
   alt?: string;
@@ -25,10 +37,11 @@ export interface BrandLogoProps {
 
 export function BrandLogo({
   width = 190,
-  height = 32,
+  height,
   alt = '',
   className = '',
 }: BrandLogoProps) {
+  const resolvedHeight = height ?? Math.round(width / LOCKUP_ASPECT);
   // `brand-logo` is retained deliberately: it is the hook for the zero-JS
   // light/dark picker rules in globals.css, not decoration. Phase 2 only
   // replaced the inline style with the equivalent utilities.
@@ -41,7 +54,7 @@ export function BrandLogo({
         src="/logo-light.svg"
         alt={alt}
         width={width}
-        height={height}
+        height={resolvedHeight}
       />
       {/* eslint-disable-next-line @next/next/no-img-element -- intentional: CSS picker + zero-JS theme switch per CONTEXT D-09 */}
       <img
@@ -49,7 +62,7 @@ export function BrandLogo({
         src="/logo-dark.svg"
         alt={alt}
         width={width}
-        height={height}
+        height={resolvedHeight}
       />
     </span>
   );
