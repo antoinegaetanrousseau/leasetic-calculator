@@ -45,6 +45,7 @@
  * ADMIN-09 (D-29 strict): no commission/rate fields rendered.
  */
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useRef, useState } from 'react';
@@ -171,14 +172,7 @@ export function CreatePartnerForm({
         {/* ── Form card (D-15) — 3 sections with ● bullets ───────────────── */}
         <div className="card">
           {/* ── Section 1: INFORMATIONS PERSONNELLES ─────────────────────── */}
-          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-            <span
-              className="dot"
-              style={{ background: 'var(--gd)' }}
-              aria-hidden="true"
-            />
-            <span>{t('partners.new.section.personal', lang)}</span>
-          </div>
+          <SectionTitle>{t('partners.new.section.personal', lang)}</SectionTitle>
 
           <Field>
             <FieldLabel htmlFor="cpf-firstName">
@@ -301,14 +295,7 @@ export function CreatePartnerForm({
           />
 
           {/* ── Section 2: INFORMATIONS SOCIÉTÉ ─────────────────────────── */}
-          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-            <span
-              className="dot"
-              style={{ background: 'var(--gd)' }}
-              aria-hidden="true"
-            />
-            <span>{t('partners.new.section.company', lang)}</span>
-          </div>
+          <SectionTitle>{t('partners.new.section.company', lang)}</SectionTitle>
 
           <Field>
             <FieldLabel htmlFor="cpf-companyName">
@@ -397,14 +384,7 @@ export function CreatePartnerForm({
           />
 
           {/* ── Section 3: MESSAGE D'INVITATION ─────────────────────────── */}
-          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-            <span
-              className="dot"
-              style={{ background: 'var(--gd)' }}
-              aria-hidden="true"
-            />
-            <span>{t('partners.new.section.message', lang)}</span>
-          </div>
+          <SectionTitle>{t('partners.new.section.message', lang)}</SectionTitle>
 
           <Field>
             <FieldLabel htmlFor="cpf-message">

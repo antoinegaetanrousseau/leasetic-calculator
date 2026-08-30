@@ -1,5 +1,6 @@
 'use client';
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, Info, Loader2 } from 'lucide-react';
@@ -176,10 +177,7 @@ export function SaveConfirmModal({
           </p>
         </div>
 
-        <div className="ctitle" style={{ marginTop: 8 }}>
-          <span className="dot" style={{ background: 'var(--gd)' }} aria-hidden="true" />
-          <span>{t('admin.coefficients.modal.changes', lang)}</span>
-        </div>
+        <SectionTitle className="mt-2">{t('admin.coefficients.modal.changes', lang)}</SectionTitle>
 
         {pairs.length === 0 ? (
           <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0 }}>

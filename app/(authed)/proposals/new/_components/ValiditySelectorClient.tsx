@@ -21,6 +21,7 @@
  *     `draft.inputs.validityDays` via the Phase 12 D-22 full-replace
  *     semantics and does NOT redirect (the inversion vs. saveAsDraft).
  */
+import { segmentedGroupClass, segmentedItemClass } from '@/components/ui/segmented';
 import { useState, useTransition } from 'react';
 
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -61,7 +62,7 @@ export function ValiditySelectorClient({
 
   return (
     <div
-      className="dg"
+      className={segmentedGroupClass}
       role="group"
       aria-label={t('proposal.validity.ariaLabel', lang)}
       data-testid="validity-selector"
@@ -72,7 +73,7 @@ export function ValiditySelectorClient({
           <button
             key={days}
             type="button"
-            className={`db${isActive ? ' on' : ''}`}
+            className={segmentedItemClass(isActive)}
             onClick={() => handleChange(days)}
             aria-pressed={isActive}
           >

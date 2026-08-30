@@ -133,10 +133,14 @@ describe('CoefficientHistorySidebar (server component) — Plan 18-05 D-21/D-22'
     expect(section!.getAttribute('aria-label')).toBe(
       'Historique des coefficients',
     );
-    const ctitle = section!.querySelector('.ctitle');
-    expect(ctitle).not.toBeNull();
-    expect(ctitle!.querySelector('.dot')).not.toBeNull();
-    expect(ctitle!.textContent).toContain('HISTORIQUE');
+    // Phase 5: `.ctitle` / `.dot` became <SectionTitle>; the header chrome
+    // this test guards is unchanged, only the class names are.
+    const header = section!.querySelector('[data-slot="section-title"]');
+    expect(header).not.toBeNull();
+    expect(
+      header!.querySelector('[data-slot="section-title-bullet"]'),
+    ).not.toBeNull();
+    expect(header!.textContent).toContain('HISTORIQUE');
   });
 
   it('T8 (META — D-22): sidebar source contains NO CoefficientDiffPanel reference', () => {

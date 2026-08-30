@@ -97,26 +97,24 @@ describe('ValiditySelectorClient', () => {
     );
   });
 
-  it('AC-VSC-06: container has data-testid="validity-selector"; buttons use .db class; active button has .db.on', () => {
+  it('AC-VSC-06: container keeps its test hook and exactly one segment reads as selected', () => {
     const { container } = render(
       <ValiditySelectorClient draftId="d-1" defaultValidity={30} lang="fr" />,
     );
     const wrapper = container.querySelector('[data-testid="validity-selector"]');
     expect(wrapper).not.toBeNull();
-    expect(wrapper!.classList.contains('dg')).toBe(true);
 
     const btn15 = screen.getByRole('button', { name: /15j/i });
     const btn30 = screen.getByRole('button', { name: /30j/i });
     const btn60 = screen.getByRole('button', { name: /60j/i });
 
-    // All buttons carry the .db base class.
-    expect(btn15.classList.contains('db')).toBe(true);
-    expect(btn30.classList.contains('db')).toBe(true);
-    expect(btn60.classList.contains('db')).toBe(true);
-
-    // Only the active button (30j default) has .on.
-    expect(btn30.classList.contains('on')).toBe(true);
-    expect(btn15.classList.contains('on')).toBe(false);
-    expect(btn60.classList.contains('on')).toBe(false);
+    // Phase 5 retired the .dg/.db/.on classes for the shared segmented chrome.
+    // Selection was only ever *styled* by `.on`; what conveys it is
+    // aria-pressed, already covered by AC-VSC-01..04. The invariant worth
+    // keeping here is that the group is single-select.
+    const pressed = [btn15, btn30, btn60].filter(
+      (b) => b.getAttribute('aria-pressed') === 'true',
+    );
+    expect(pressed).toEqual([btn30]);
   });
 });

@@ -1,5 +1,6 @@
 'use client';
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useState, useRef, type ReactNode } from 'react';
@@ -212,14 +213,7 @@ export function ProposalForm({ lang }: ProposalFormProps) {
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
         {/* ── Card 1: Partenaire ─────────────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
-          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-            <span
-              className="dot"
-              style={{ background: 'var(--gd)' }}
-              aria-hidden="true"
-            />
-            <span>{t('form.partner.section', lang)}</span>
-          </div>
+          <SectionTitle>{t('form.partner.section', lang)}</SectionTitle>
 
           <Field>
             <FieldLabel htmlFor="partner-co">
@@ -278,14 +272,7 @@ export function ProposalForm({ lang }: ProposalFormProps) {
 
         {/* ── Card 2: Client destinataire ─────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
-          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-            <span
-              className="dot"
-              style={{ background: 'var(--teal)' }}
-              aria-hidden="true"
-            />
-            <span>{t('form.client.section', lang)}</span>
-          </div>
+          <SectionTitle accent="teal">{t('form.client.section', lang)}</SectionTitle>
 
           <Field>
             <FieldLabel htmlFor="client-co">
@@ -406,14 +393,7 @@ export function ProposalForm({ lang }: ProposalFormProps) {
 
         {/* ── Card 3: Intérêts exprimés ───────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
-          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-            <span
-              className="dot"
-              style={{ background: 'var(--gold)' }}
-              aria-hidden="true"
-            />
-            <span>{t('form.interests.section', lang)}</span>
-          </div>
+          <SectionTitle accent="teal">{t('form.interests.section', lang)}</SectionTitle>
           <p
             style={{
               fontSize: '11.2px',
@@ -461,14 +441,7 @@ export function ProposalForm({ lang }: ProposalFormProps) {
 
         {/* ── Card 4: Paramètres du projet ────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
-          <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-            <span
-              className="dot"
-              style={{ background: 'var(--gold)' }}
-              aria-hidden="true"
-            />
-            <span>{t('form.project.section', lang)}</span>
-          </div>
+          <SectionTitle accent="teal">{t('form.project.section', lang)}</SectionTitle>
 
           <Field>
             <FieldLabel htmlFor="amount">

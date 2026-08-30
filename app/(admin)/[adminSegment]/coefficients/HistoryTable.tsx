@@ -15,6 +15,7 @@
  * the short cells in PartnersList and wrong for free text.
  */
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useState, useTransition } from 'react';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -88,10 +89,7 @@ export function HistoryTable({
 
   return (
     <section className="card mt-6">
-      <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-        <span className="dot" style={{ background: 'var(--gd)' }} aria-hidden="true" />
-        <span>{t('admin.coefficients.history.title', lang)}</span>
-      </div>
+      <SectionTitle>{t('admin.coefficients.history.title', lang)}</SectionTitle>
 
       {rows.length === 0 ? (
         <Empty className="p-8">

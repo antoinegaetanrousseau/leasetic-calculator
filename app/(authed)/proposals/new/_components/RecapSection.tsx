@@ -23,6 +23,7 @@
  * Locked in 13-UI-SPEC.md §5.4.
  */
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
@@ -76,14 +77,7 @@ export function RecapSection({
           src/components/proposal/ProposalForm.tsx:213-219. The .dot's
           `background: var(--gd)` is the canonical accent treatment.
         */}
-        <div className="ctitle">
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{sectionTitle}</span>
-        </div>
+        <SectionTitle>{sectionTitle}</SectionTitle>
         {modifierLink && (
           <Link
             href={modifierLink.href}

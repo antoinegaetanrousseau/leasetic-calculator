@@ -33,6 +33,7 @@
  * (D-12 — see plan 13-04 for the surfaced row label).
  */
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useFormContext, Controller } from 'react-hook-form';
@@ -77,14 +78,7 @@ export function ParametresFormCard({
       {/* D-05: ONE .card containing both sections separated by an hr divider */}
       <section className="card">
         {/* ── Section 1: INFORMATIONS CLIENT ─────────────────────────────── */}
-        <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('wizard.section.informations.client', lang)}</span>
-        </div>
+        <SectionTitle>{t('wizard.section.informations.client', lang)}</SectionTitle>
 
         {/* clientCo — wizard-scoped label "Nom du client" per UI-SPEC §6.3 */}
         <Field>
@@ -182,14 +176,7 @@ export function ParametresFormCard({
         />
 
         {/* ── Section 2: DÉTAILS DU PROJET ──────────────────────────────── */}
-        <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('wizard.section.details.projet', lang)}</span>
-        </div>
+        <SectionTitle>{t('wizard.section.details.projet', lang)}</SectionTitle>
 
         {/* partnerRef — reuses v1.1 form.project.ref */}
         <Field>
@@ -278,14 +265,7 @@ export function ParametresFormCard({
         />
 
         {/* ── Section 3: INFORMATIONS COMPLÉMENTAIRES ───────────────────── */}
-        <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('wizard.section.details.complementaires', lang)}</span>
-        </div>
+        <SectionTitle>{t('wizard.section.details.complementaires', lang)}</SectionTitle>
 
         {/* clientRole */}
         <Field>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Sliders, Users, History, Hash, Plus } from 'lucide-react';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
@@ -207,10 +208,9 @@ export default async function AdminHomePage({ params }: PageProps) {
             marginBottom: 16,
           }}
         >
-          <div className="ctitle">
-            <span className="dot"></span>
+          <SectionTitle className="mb-0">
             {t('admin.home.activity.title', lang)}
-          </div>
+          </SectionTitle>
           <Link
             href={`/${adminSegment}/history`}
             style={{

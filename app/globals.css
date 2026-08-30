@@ -226,30 +226,6 @@ html[data-theme="dark"] [data-pdf-surface] {
   box-shadow: var(--shadow-card);
 }
 
-/* Section title row — UI-SPEC §3.2.2 */
-.ctitle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-transform: uppercase;
-  font-size: 11.8px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  margin-bottom: 16px;
-}
-/* Standalone, deliberately NOT `.ctitle .dot`. Phase 5 replaced `.ctitle` with
-   utilities in six files, which silently collapsed every bullet inside them to
-   zero size because the rule was descendant-scoped. The bullet does not depend
-   on its container, so neither should its rule. */
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: var(--primary);
-  flex-shrink: 0;
-}
-
 /* The `.fld` form system is retired — Phase 5 moved all 44 of its call sites
    onto the ReUI Field primitives, so `.fld` and its descendant input chrome
    are gone.
@@ -267,94 +243,13 @@ input:not([data-slot="input"])[aria-invalid="true"] {
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--destructive) 12%, transparent);
 }
 
-/* Currency-input addon ("75 000 [€ HT]") — UI-SPEC §3.2.5 */
-.ieu {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: border-color 150ms, box-shadow 150ms;
-}
-.ieu:focus-within {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.12);
-}
-.ieu.invalid,
-.ieu[aria-invalid="true"] {
-  border-color: var(--danger) !important;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
-}
-.ieu input {
-  flex: 1;
-  border: none !important;
-  border-radius: 0 !important;
-  padding-right: 1rem;
-  background: transparent;
-  outline: none;
-}
-.ieu input:focus {
-  box-shadow: none !important;          /* parent .ieu:focus-within owns the ring */
-}
-.ieu .suffix {
-  padding: 0.65rem 0.9rem;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-}
-
-/* Tranche badge (auto-shown below amount) — UI-SPEC §3.2.5 */
-.tbadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  background: rgba(45, 122, 140, 0.08);
-  color: var(--teal);
-  font-size: 11.2px;
-  font-weight: 600;
-}
-
-/* Duration / Validity segmented (.dg .db / .db.on) — UI-SPEC §3.2.5 */
-.dg {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: border-color 150ms, box-shadow 150ms;
-}
-.dg.invalid,
-.dg[aria-invalid="true"] {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
-}
-.dg .db {
-  padding: 0.65rem 0.5rem;
-  background: var(--surface);
-  color: var(--ink);
-  border: none;
-  border-right: 1px solid var(--border);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 150ms;
-}
-.dg .db:last-child { border-right: none; }
-.dg .db:hover { background: var(--hover-overlay); }
-.dg .db.on {
-  background: var(--gd);
-  color: #ffffff;
-  font-weight: 600;
-}
+/* Phase 5 retired, with all call sites migrated:
+     .ctitle + .dot  → <SectionTitle>            (19 copies of the same markup)
+     .ieu + .suffix  → InputGroup + InputGroupText
+     .tbadge         → <Badge>
+     .dg + .db + .on → segmented.ts chrome
+   Their `.invalid` variants went with them; the ReUI primitives style
+   aria-invalid themselves. */
 
 /* Buttons — Phase 5 tokens; concrete classes added here for Plans 07-03/04/05 */
 .btn-green,

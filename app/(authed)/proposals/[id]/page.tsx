@@ -1,3 +1,4 @@
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -173,14 +174,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
         <div>
           {/* Inputs card — UI-SPEC §3.2.3 — 15 rows */}
           <section className="card" style={{ marginBottom: 16 }}>
-            <div className="ctitle">
-              <span
-                className="dot"
-                style={{ background: 'var(--teal)' }}
-                aria-hidden="true"
-              />
-              <span>{t('proposal.detail.section.inputs', lang)}</span>
-            </div>
+            <SectionTitle accent="teal">{t('proposal.detail.section.inputs', lang)}</SectionTitle>
             <dl
               style={{
                 display: 'grid',
@@ -219,14 +213,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
 
           {/* Computed card — UI-SPEC §3.2.4 */}
           <section className="card">
-            <div className="ctitle">
-              <span
-                className="dot"
-                style={{ background: 'var(--gold)' }}
-                aria-hidden="true"
-              />
-              <span>{t('proposal.detail.section.computed', lang)}</span>
-            </div>
+            <SectionTitle accent="teal">{t('proposal.detail.section.computed', lang)}</SectionTitle>
             <dl
               style={{
                 display: 'grid',
@@ -328,9 +315,10 @@ export default async function ProposalDetailPage({ params }: PageProps) {
           }}
         >
           <section className="card">
-            <div className="ctitle">
-              <span>{t('proposal.detail.pdf.preview.title', lang)}</span>
-            </div>
+            {/* No bullet here — this header never had one. */}
+            <SectionTitle bullet={false}>
+              {t('proposal.detail.pdf.preview.title', lang)}
+            </SectionTitle>
             <div style={{ marginTop: 16 }}>
               <EmbeddedPdfPreview proposalId={proposal.id} lang={lang} />
             </div>

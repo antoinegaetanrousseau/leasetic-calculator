@@ -5,7 +5,12 @@ import { RecapSection } from './RecapSection';
 afterEach(() => cleanup());
 
 describe('RecapSection', () => {
-  it('AC-RS-01: renders <section class="card"> with .ctitle header containing sectionTitle', () => {
+  // Phase 5: the header is <SectionTitle> now, so `.ctitle` / `.dot` and the
+  // inline `background: var(--gd)` are gone. What has to hold is that the
+  // section still carries a header naming it, and that the bullet is present
+  // and stays decorative — the accent colour is the component's business and
+  // is asserted once, in SectionTitle.test.tsx.
+  it('AC-RS-01: renders a card section with a header containing sectionTitle', () => {
     const { container } = render(
       <RecapSection
         sectionTitle="PARAMÈTRES SAISIS"
@@ -14,22 +19,21 @@ describe('RecapSection', () => {
     );
     const section = container.querySelector('section.card');
     expect(section).not.toBeNull();
-    const ctitle = container.querySelector('.ctitle');
-    expect(ctitle).not.toBeNull();
-    expect(ctitle!.textContent).toContain('PARAMÈTRES SAISIS');
+    const header = container.querySelector('[data-slot="section-title"]');
+    expect(header).not.toBeNull();
+    expect(header!.textContent).toContain('PARAMÈTRES SAISIS');
   });
 
-  it('AC-RS-02: renders .dot glyph with background: var(--gd) (existing .ctitle .dot rule)', () => {
+  it('AC-RS-02: the header bullet renders and is hidden from assistive tech', () => {
     const { container } = render(
       <RecapSection
         sectionTitle="CLIENT"
         rows={[{ label: 'Nom', value: 'Acme Corp' }]}
       />,
     );
-    const dot = container.querySelector('.dot');
-    expect(dot).not.toBeNull();
-    const style = dot!.getAttribute('style') ?? '';
-    expect(style).toMatch(/background:\s*var\(--gd\)/);
+    const bullet = container.querySelector('[data-slot="section-title-bullet"]');
+    expect(bullet).not.toBeNull();
+    expect(bullet!.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('AC-RS-03: omits ← Modifier link when modifierLink prop is undefined', () => {

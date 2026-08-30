@@ -1,7 +1,14 @@
 'use client';
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -88,10 +95,7 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
   return (
     <>
       <section className="card" style={{ marginBottom: 16 }}>
-        <div className="mb-4 flex items-center gap-2 text-[11.8px] font-bold tracking-[0.06em] text-muted-foreground uppercase">
-          <span className="dot" style={{ background: 'var(--gd)' }} aria-hidden="true" />
-          <span>{t('admin.coefficients.editor.title', lang)}</span>
-        </div>
+        <SectionTitle>{t('admin.coefficients.editor.title', lang)}</SectionTitle>
 
         <form onSubmit={handleSubmit(onOpenConfirm)} noValidate>
           {/* Commission + max amount row */}
@@ -108,8 +112,8 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
                 {t('admin.coefficients.commission.label', lang)}
                 <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
               </FieldLabel>
-              <div className="ieu">
-                <Input
+              <InputGroup>
+                <InputGroupInput
                   id="commission-pct"
                   type="text"
                   inputMode="decimal"
@@ -118,11 +122,12 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
                   aria-describedby={
                     errors.commissionPct ? 'commission-pct-error' : undefined
                   }
-                  className={errors.commissionPct ? 'invalid' : ''}
                   {...register('commissionPct')}
                 />
-                <span className="suffix">%</span>
-              </div>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>%</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
               {errors.commissionPct?.message && (
                 <FieldError id="commission-pct-error" role="alert">
                   {t(errors.commissionPct.message as DictKey, lang)}
@@ -135,19 +140,20 @@ export function CoefficientsEditor({ lang, latestParams }: CoefficientsEditorPro
                 {t('admin.coefficients.max_amount.label', lang)}
                 <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
               </FieldLabel>
-              <div className="ieu">
-                <Input
+              <InputGroup>
+                <InputGroupInput
                   id="max-amount"
                   type="text"
                   inputMode="decimal"
                   placeholder="500000"
                   aria-invalid={errors.maxAmount ? true : undefined}
                   aria-describedby={errors.maxAmount ? 'max-amount-error' : undefined}
-                  className={errors.maxAmount ? 'invalid' : ''}
                   {...register('maxAmount')}
                 />
-                <span className="suffix">{t('common.ht', lang)}</span>
-              </div>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>{t('common.ht', lang)}</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
               {errors.maxAmount?.message && (
                 <FieldError id="max-amount-error" role="alert">
                   {t(errors.maxAmount.message as DictKey, lang)}

@@ -1,5 +1,6 @@
 'use client';
 
+import { segmentedGroupClass, segmentedItemClass } from '@/components/ui/segmented';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useEffect, useRef, useState } from 'react';
@@ -235,12 +236,12 @@ export function CreatePartnerModal({ lang, onClose, onCreated }: CreatePartnerMo
           {/* Language segmented control */}
           <Field>
             <FieldLabel>{t('admin.accounts.modal.lang.label', lang)}</FieldLabel>
-            <div className="dg" role="group" aria-label={t('admin.accounts.modal.lang.label', lang)}>
+            <div className={segmentedGroupClass} role="group" aria-label={t('admin.accounts.modal.lang.label', lang)}>
               {(['fr', 'en'] as const).map((lng) => (
                 <button
                   key={lng}
                   type="button"
-                  className={`db${language === lng ? ' on' : ''}`}
+                  className={segmentedItemClass(language === lng)}
                   onClick={() =>
                     setValue('language', lng, {
                       shouldDirty: true,
