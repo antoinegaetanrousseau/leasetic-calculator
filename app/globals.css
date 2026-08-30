@@ -61,9 +61,14 @@
   --sidebar-border:          oklch(0.922 0 0);
   --sidebar-ring:            var(--brand-accent);
 
-  /* Large radius — a LEASETIC Group Maia parameter agreed separately from the
-     colour system, so it survives this reset. base-maia ships 0.625rem. */
-  --radius:                  1rem;
+  /* base-maia's own default. This drives the WHOLE radius scale through the
+     multipliers in `@theme inline` below (×0.6 up to ×2.6), which are tuned
+     for this value. It was previously 1rem, chasing a "large radius" brand
+     parameter — that inflated every step by 60%, so `rounded-4xl` became
+     41.6px and every Input and InputGroup rendered as a pill. Change this
+     number and the entire scale moves with it; do not raise it without
+     re-checking the top of the scale against a real form. */
+  --radius:                  0.625rem;
 
   --destructive-foreground:  var(--color-red-800);
   --success:                 var(--color-emerald-500);
@@ -175,12 +180,12 @@ html[data-theme="dark"] {
   /* Font family registered by next/font/google (Inter, set in layout.tsx) */
   --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
 
-  /* Border radius scale from UI-SPEC §Border Radius Scale */
-  --radius-md:  6px;
-  --radius-lg:  8px;
-  --radius-xl:  12px;
-  --radius-2xl: 16px;
-  /* rounded-full (9999px) is Tailwind v4 default */
+  /* The UI-SPEC radius scale that used to be declared here (md 6 / lg 8 /
+     xl 12 / 2xl 16) is GONE. It never applied: `@theme inline` at the bottom
+     of this file redeclares the same four names off `--radius`, and that is
+     what Tailwind builds its utilities from. Two competing scales meant
+     `rounded-2xl` read as 16px here and rendered at 28.8px. One scale now —
+     `--radius` above is the single knob. */
 }
 
 /* === Body base styles (UI-SPEC §Typography: 14.5px / 400 / 1.55) === */
@@ -251,11 +256,15 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
    `className="card px-6 py-10"` silently rendered at .card's own 28px, and a
    `p-0` meant to sit a table flush inside a card did nothing at all. */
 @layer components {
-  /* Card chrome — UI-SPEC §3.2.2 */
+  /* Card chrome — UI-SPEC §3.2.2.
+     The radius tracks the token rather than a literal: shadcn's own Card is
+     `rounded-2xl`, and while this said 16px the two disagreed — three metric
+     tiles at the Card radius sat above a section card at 16px on the home
+     page, which is exactly the mismatch that got reported. */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-2xl);
     padding: 28px;
     box-shadow: var(--shadow-card);
   }
@@ -334,7 +343,7 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
     align-items: center;
     gap: 8px;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     padding: 0 12px;
     background: var(--surface);
     transition: border-color 150ms, box-shadow 150ms;
@@ -397,7 +406,7 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
   .seed-banner {
     background: var(--gold);
     color: var(--navy);
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     padding: 12px 20px;
     font-size: 13.5px;
     font-weight: 500;
