@@ -26,7 +26,10 @@
 :root {
   /* ── Leasetic brand accent ─────────────────────────────────────────── */
   --brand-accent:  #01cc72;
-  --brand-mark:    #6DC388;   /* logo mark fill */
+  /* `--brand-mark: #6DC388` removed here (and `--color-brand-mark` below): it
+     described the old placeholder propeller's fill. The official mark is on
+     #01CC72, the same accent as the lockups, so the token held a colour that
+     no longer appears in any asset — and nothing ever read it. */
 
   /* ── ReUI base-maia, light ─────────────────────────────────────────── */
   --background:              oklch(1 0 0);
@@ -175,7 +178,6 @@ html[data-theme="dark"] {
   --color-gl:        var(--gl);
   --color-gold:      var(--gold);
   --color-navy-dark: var(--navy-dark);
-  --color-brand-mark: var(--brand-mark);
 
   /* Font family registered by next/font/google (Inter, set in layout.tsx) */
   --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
