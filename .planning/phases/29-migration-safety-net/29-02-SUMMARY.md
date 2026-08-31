@@ -126,6 +126,30 @@ What IS confirmed, and what is not:
 
 **Recommendation:** if this residual risk needs closing later, run the ISOLATION-PROBE-29 write-and-check manually (create a uniquely-named local partner, confirm it is absent from the production `/[adminSegment]/partners` list, then delete it) — a low-cost, few-minute check that would upgrade this from "isolation follows from architecture" to "isolation empirically confirmed."
 
+### Addendum — 2026-08-31: probe attempted, blocked, risk formally accepted
+
+The probe above was subsequently **attempted and found blocked**, then the risk was formally
+accepted. Recording the outcome here so this file and `29-SECURITY.md` do not drift apart.
+
+The attempt failed at login: `[Better Auth]: Invalid password` (×4 in the dev server log). This is
+not an infrastructure fault — Better Auth reached the `development` database and rejected the
+credential. The cause is the third bullet above cashing in earlier than expected: because the
+branch is a copy-on-write fork snapshot taken 2026-05-27, its Better Auth credential hashes are
+frozen at that date, so any password rotated since is rejected. The accepted stale-data trade-off
+therefore also froze the ability to authenticate against the branch — a consequence worth noting
+if option (a) is ever revisited.
+
+Given the block, the corresponding threat **T-29-06** was consciously re-classified in
+`29-SECURITY.md` from `mitigate` to `accept` by the plan owner, with the accepted basis (Neon's
+documented copy-on-write branch isolation plus the two verified endpoint facts) and the residual
+risk recorded in that file's Accepted Risks Log. Phase 29 security status is now
+`threats_open: 0` — but T-29-06 is closed **by acceptance, not by evidence**. The truth quoted at
+the top of this section remains empirically unproven.
+
+**Upgrade path, unchanged and still cheap:** restore a `development`-branch login (`grant-admin.ts`
+issues an invitation URL so a password can be set directly against that branch), then run the
+probe. That would move T-29-06 from accepted-risk to empirically-closed.
+
 ## Next Phase Readiness
 
 - `INFRA-05` is closed for the scope it actually covers — local *runtime* data isolation via endpoint separation, enforced on demand by `check:local-db-branch`. It is NOT closed on the stronger claim of an empirically-verified write-isolation proof; see the section above.

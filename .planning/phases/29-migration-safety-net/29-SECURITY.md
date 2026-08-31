@@ -1,10 +1,10 @@
 ---
 phase: 29
 slug: migration-safety-net
-status: open_threats
-threats_open: 1
+status: secured
+threats_open: 0
 threats_total: 10
-threats_closed: 9
+threats_closed: 10
 asvs_level: 1
 created: 2026-08-31
 ---
@@ -29,7 +29,7 @@ created: 2026-08-31
 | T-29-04 | Information disclosure | mitigate | **CLOSED** | `grep -n 'DATABASE_URL\|process.env\|\$DATABASE' scripts/check-migration-journal-sync.sh scripts/check-db-smoke-filter.sh` → no matches. Neither guard reads any env var; both operate on working-tree files (`ci.yml`, `_journal.json`, `drizzle/*.sql`) only. |
 | T-29-SC | Tampering | accept | **CLOSED** (recorded below) | `git diff b42c9c3~1 HEAD -- package.json` shows only `scripts` block entries added (`check:migration-journal-sync`, `check:db-smoke-filter`, `check:local-db-branch`); no `dependencies`/`devDependencies` changes. All three guard scripts grepped for install commands (`npm install`, `pip install`, `cargo install`, `apt-get`, `brew install`) — none found. Acceptance recorded in the Accepted Risks Log below. |
 | T-29-05 | Tampering | mitigate | **CLOSED** | `scripts/check-local-db-branch.sh` exits 1 when the host resolves to `ep-icy-boat-alx5o1tz-pooler...` — reproduced live with a synthetic `.env.local` in an isolated scratch directory (never touching the real file): produced `ERROR: local DATABASE_URL → Neon main branch (...) — PRODUCTION`, exit 1. Live run of `npm run check:local-db-branch` against the real (unopened) `.env.local` confirms current state resolves to the `development` endpoint: `OK: local DATABASE_URL → Neon development branch (ep-polished-band-alphc576-pooler...)`, exit 0. |
-| T-29-06 | Information disclosure | mitigate | **OPEN — mitigation not completed** | Plan text explicitly requires isolation to be "proven by the ISOLATION-PROBE-29 write test rather than asserted." That probe was **not run** — deliberately skipped by the user per 29-02-SUMMARY.md's "IMPORTANT — Unverified Truth / Residual Risk" section. What is verified: `check:local-db-branch` confirms endpoint separation (development ≠ production hostname). What is **not** verified: that a local write is actually invisible from the production deployment. Endpoint separation is a necessary but not sufficient condition for the declared mitigation, which the plan author specifically wrote to require empirical proof, not architectural inference. See "Open" table below. |
+| T-29-06 | Information disclosure | ~~mitigate~~ → **accept** (re-classified 2026-08-31) | **CLOSED** (recorded below) | Originally `mitigate`, requiring the ISOLATION-PROBE-29 empirical write test. That probe was never run: first deliberately skipped, then **blocked** — the `development` branch is a fork snapshot taken 2026-05-27, so its credential hashes are frozen at that date and login fails (`[Better Auth]: Invalid password`, ×4). Consciously re-classified to `accept` by the plan owner, per the remedy path this file itself specified. What remains verified: `check:local-db-branch` confirms endpoint separation (development ≠ production hostname), and the guard fails closed on the production endpoint. What remains unproven: that a local write is empirically invisible from the production deployment. Rationale recorded in the Accepted Risks Log below. |
 | T-29-07 | Information disclosure | mitigate | **CLOSED** | Re-verified against the CURRENT script state (post `bbc7e70`/`213f09e` fixes), not the pre-fix version. Live credential-leak probe run in an isolated scratch dir with a synthetic secret (`SUPERSECRET123`, `neondb_owner`, full `postgres://...` string) piped through the script pointed at the production hostname: output contained zero occurrences of the password, username, or `postgres://` scheme — only the bare hostname and static messaging. `grep -n 'source \|^\. \|mapfile\|readarray'` across the script → no matches, confirming it never sources `.env.local`. |
 | T-29-08 | Elevation of privilege | mitigate | **CLOSED** | `.env.example:35-38` restates Phase 20 locked rule 3 inline at the repoint point ("Pointing local dev at `development` does NOT create a local migration path... migrations fan out ONLY via `db-migrate.yml`"). `grep -n "db:migrate" .env.example scripts/check-local-db-branch.sh` → no matches for a literal local invocation (the only workflow reference is `db-migrate.yml`, which does not match the `db:migrate` pattern). |
 | T-29-09 | Repudiation | accept | **CLOSED** (recorded below) | Same evidence as T-29-03 — `db-migrate.yml` confirmed as the sole fan-out path, byte-identical to HEAD, single `db:migrate` invocation total across `ci.yml`. Acceptance recorded in the Accepted Risks Log below. |
@@ -40,11 +40,16 @@ created: 2026-08-31
 
 ## Open
 
-| Threat ID | Category | Mitigation Expected | Files Searched | Why Still Open |
-|-----------|----------|---------------------|-----------------|-----------------|
-| T-29-06 | Information disclosure | ISOLATION-PROBE-29 empirical write-then-check test: create a uniquely named local partner, confirm it is absent from the production partners list, delete it | `.planning/phases/29-migration-safety-net/29-02-PLAN.md` (Task 2 `<how-to-verify>` step 5), `.planning/phases/29-migration-safety-net/29-02-SUMMARY.md` ("IMPORTANT — Unverified Truth / Residual Risk" section) | The plan's own mitigation-plan text deliberately specifies proof-by-write-test over proof-by-architecture-assertion. The write test was skipped by explicit user decision. Endpoint separation (confirmed) narrows the threat surface but does not satisfy the disposition as declared — Neon's copy-on-write branch isolation is asserted platform behavior, not observed in this phase. |
+**None.** T-29-06 was the sole open threat; it was consciously re-classified from `mitigate` to
+`accept` on 2026-08-31 via the second remedy path this section originally offered (see the
+Accepted Risks Log below). The re-classification was an explicit plan-owner decision, not silent
+inheritance of CLOSED status from the adjacent endpoint-separation evidence.
 
-**Remedy:** Run the ISOLATION-PROBE-29 write-and-check manually (per 29-02-SUMMARY.md's own recommendation) — create a uniquely-named local partner, confirm absence from the production `/[adminSegment]/partners` list, then delete it — and record the result in a follow-up SUMMARY addendum or a new phase note. Alternatively, formally downgrade T-29-06's disposition to `accept` with a written justification in this file's Accepted Risks Log (Neon's documented branch-isolation architecture as the accepted basis), which would require conscious re-classification by the plan owner, not silent inheritance from the mitigate disposition as originally declared.
+**Superseded remedy (retained for audit trail):** the original first-choice remedy was to run the
+ISOLATION-PROBE-29 write-and-check manually — create a uniquely-named local partner, confirm
+absence from the production `/[adminSegment]/partners` list, then delete it. That path remains
+open to anyone who later restores a working `development`-branch login, and doing so would upgrade
+T-29-06 from accepted-risk to empirically-closed. It is not required for the current disposition.
 
 ---
 
@@ -55,6 +60,7 @@ created: 2026-08-31
 | T-29-03 | Ad-hoc migration application outside `db-migrate.yml` remains structurally possible (anyone with local `DATABASE_URL_MAIN` and shell access could run `db:migrate` by hand) but is unchanged risk carried forward from Phase 20 locked rule 3, which keeps an audit trail via GitHub Actions run history and a required-reviewer gate for `branch=main`. This plan introduces no new invocation path; the single-invocation count was independently re-verified. | Phase 29 plan author (pre-existing Phase 20 acceptance, restated) | 2026-08-31 |
 | T-29-09 | Same rationale as T-29-03 — `db-migrate.yml` remains the single fan-out path with its audit trail intact. | Phase 29 plan author (pre-existing Phase 20 acceptance, restated) | 2026-08-31 |
 | T-29-SC | No package manager installs introduced by either plan; both guards use only bash builtins + coreutils/grep/sed/awk, verified via package.json diff and script content grep. Supply-chain risk from this phase is nil by construction. | Phase 29 plan author | 2026-08-31 |
+| T-29-06 | **Re-classified from `mitigate` to `accept`.** The declared mitigation required the ISOLATION-PROBE-29 empirical write test; that test could not be performed. It was first skipped by choice, then became *blocked*: the `development` branch is a copy-on-write fork snapshot taken 2026-05-27, so its Better Auth credential hashes are frozen at that date and current passwords are rejected (`[Better Auth]: Invalid password`, ×4 in the dev server log). This is a direct downstream consequence of the separately-accepted stale-fork-snapshot decision in 29-02 (option (a)). **Accepted basis:** Neon's documented copy-on-write branch isolation, plus two independently verified facts — the local `DATABASE_URL` resolves to `ep-polished-band-alphc576-pooler…` (development), and `check:local-db-branch` fails closed on the production endpoint (exercised with a synthetic production hostname → exit 1). **Residual risk:** isolation is inferred from platform architecture rather than observed end-to-end; a defect in Neon's branch isolation would not have been caught by this phase. **Cheap upgrade path:** restore a `development`-branch login (`grant-admin.ts` issues an invitation URL) and run the probe, which would move this from accepted to empirically closed. | Antoine (plan owner) — explicit re-classification decision, 2026-08-31 | 2026-08-31 |
 
 ---
 
@@ -79,9 +85,21 @@ Per audit instructions, the CURRENT state of the guard scripts was audited, not 
 
 ## Summary
 
-**Closed:** 9/10 | **Open:** 1/10 (BLOCKER)
+**Closed:** 10/10 | **Open:** 0/10 | **Accepted risks:** 4 (T-29-03, T-29-06, T-29-09, T-29-SC)
 
-Phase 29 should **not** be considered fully secured until T-29-06 is resolved — either by running the ISOLATION-PROBE-29 empirical write test the plan itself specified, or by a conscious, documented re-classification of the disposition from `mitigate` to `accept` with an explicit rationale added to the Accepted Risks Log above. Endpoint separation is real and independently confirmed; the specific empirical claim the plan required is not.
+Phase 29 is secured. T-29-06 — the sole blocker at first audit — was resolved on 2026-08-31 by the
+second of the two remedy paths this document originally specified: a conscious, documented
+re-classification from `mitigate` to `accept` by the plan owner, with rationale in the Accepted
+Risks Log above. It was **not** closed on evidence, and this distinction is deliberate: endpoint
+separation is real and independently confirmed, but the empirical write-isolation claim the plan
+originally demanded remains unproven and is now carried as an accepted risk rather than a
+satisfied mitigation.
+
+Nine of the ten threats are closed on verification rather than acceptance of that kind — every
+`mitigate` threat was exercised with a synthetic negative-case probe (dead pattern, orphan file,
+dangling journal entry, production hostname, missing userinfo) and confirmed to fail closed with
+no credential leakage. The three other accept-disposition threats (T-29-03, T-29-09 repudiation;
+T-29-SC supply chain) are unchanged risks carried forward from Phase 20 or nil-by-construction.
 
 All other 9 threats (including the two accept-disposition repudiation threats and the supply-chain accept) are verified CLOSED against live command output, not documentation or intent — every `mitigate` threat was exercised with a synthetic negative-case probe (dead pattern, orphan file, dangling journal entry, production hostname, missing userinfo) and confirmed to fail closed with no credential leakage.
 
