@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: executing
-last_updated: "2026-08-31T14:25:55.752Z"
+status: verifying
+last_updated: "2026-08-31T16:43:56.487Z"
 last_activity: 2026-08-31
 progress:
   total_phases: 18
-  completed_phases: 12
+  completed_phases: 13
   total_plans: 46
-  completed_plans: 45
-  percent: 67
+  completed_plans: 46
+  percent: 72
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 29 (migration-safety-net) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-31
 
 ## Deferred Items
@@ -384,6 +384,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 24-admin-dual-view-toggle P01 | 2min | 2 tasks | 4 files |
 | Phase 24-admin-dual-view-toggle P02 | ~5min | 3 tasks | 6 files |
 | Phase 29 P01 | ~5min (continuation) | 3 tasks | 5 files |
+| Phase 29 P02 | ~10min | 2 tasks | 1 files |
 
 ## Decisions
 
@@ -438,3 +439,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: effectiveView = adminSegment ? admin : storedView — D-02 auto-reconcile: admin route presence overrides stored agent flag
 - [Phase ?]: adminHomeHref forwarded server-side from ADMIN_URL_SEGMENT — not adminSegment, to preserve D-02 isolation
 - [Phase 29]: Task 3 ci.yml/runbook edits (paths-filter fix, journal-parity gate, anti-rot guard wiring) verified against plan spec and committed as-is after Bash-tool-outage interruption — On-disk edits from interrupted prior executor matched Task 3 acceptance criteria exactly; no corrections needed
+- [Phase 29]: ISOLATION-PROBE-29 (empirical local-write-invisible-in-production check) skipped by user; write isolation follows from Neon branch/endpoint separation but was not empirically verified in Phase 29 — User chose to skip Task 2 step 5 of 29-02-PLAN.md
+- [Phase 29]: development branch stale fork-snapshot data (forked from main 2026-05-27) accepted as local test data — no purge — Antoine option (a): accept, no follow-up item, no Neon Reset from parent
