@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Proposal List Actions & Pill Fix
-status: Awaiting next milestone
-last_updated: "2026-05-30T21:24:31.590Z"
-last_activity: 2026-05-30 — Milestone v1.5 completed and archived
+milestone: v1.6
+milestone_name: CRM Foundation
+status: planning
+last_updated: "2026-08-31T09:12:32.249Z"
+last_activity: 2026-08-31
 progress:
-  total_phases: 12
-  completed_phases: 12
-  total_plans: 44
-  completed_plans: 44
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State — Matrice Commerciale
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: Milestone v1.5 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-30 — Milestone v1.5 completed and archived
+Status: Defining requirements
+Last activity: 2026-08-31 — Milestone v1.6 started
 
 ## Deferred Items
 
