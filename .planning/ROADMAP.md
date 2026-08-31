@@ -388,6 +388,7 @@ Wave 2 (after 26-01):
 
   1. The status chip on the home "Propositions récentes" list displays its full label (e.g. "Actif") with no text clipping, no vertical misalignment, and no fixed-width artifact across desktop viewport widths in both light and dark mode.
   2. The status chip on the `/proposals` table renders with the same content-hugging behavior as the home surface, correct in both light and dark mode; no regression introduced on draft or archived rows.
+
 **Plans**: 2 plans
 
 - [x] 27-01-PLAN.md — Home "Propositions récentes" recent-list row: reorder to trailing content-hugging chip (UIFIX-02)
@@ -422,6 +423,7 @@ Wave 2 (after 26-01):
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 29-01-PLAN.md — Fix the `db-smoke` path filter, add the journal/SQL parity gate that makes it actually fail, and add the anti-rot guard (INFRA-06; carries INFRA-04 for traceability, zero work)
 - [x] 29-02-PLAN.md — Mandate the Neon `development` branch in `.env.example`, add `check:local-db-branch`, and repoint `.env.local` off production (INFRA-05; blocking checkpoint)
 
@@ -439,16 +441,29 @@ Plans:
   5. A user with the new `sales` role logs in, holds client relationships, and reaches the same pipeline/client-book surfaces a partner reaches — with zero change in what existing `partner` and `admin` accounts can see or do, and the ADMIN-09 commission-invisibility envelope intact.
 
 **Plans:** 9 plans in 5 waves
-
 Plans:
+**Wave 1**
+
 - [ ] 30-01-PLAN.md — Schema + migration: companies / client_relationships / contacts, nullable proposals FK, role CHECK widening + sales backfill (wave 1)
 - [ ] 30-02-PLAN.md — UI foundations: clients.* / admin.companies.* i18n, SearchBar placeholder props, BuildingIcon + PhoneIcon, sidebar and route-meta entries (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 30-03-PLAN.md — Role widening across every access gate and admin partner-management query; partnerType-driven role derivation (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 30-04-PLAN.md — Owner-scoped registry queries + admin company queries + cross-tenant isolation tests (wave 3)
 - [ ] 30-05-PLAN.md — CRM server actions: create-client with silent SIREN dedup, contact create/update/delete (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 30-06-PLAN.md — /clients client book on DataGrid table machinery + CreateClientDialog (wave 4)
 - [ ] 30-07-PLAN.md — /clients/[id] detail with Contacts editor and Propositions card (wave 4)
 - [ ] 30-08-PLAN.md — Admin /[adminSegment]/companies list, company detail with Relations table, admin relationship detail (wave 4)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 30-09-PLAN.md — CRM-05 proposal-to-relationship wiring in the wizard + phase human verification (wave 5)
 
 **UI hint:** yes
