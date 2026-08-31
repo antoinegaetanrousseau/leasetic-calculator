@@ -92,15 +92,18 @@ primitive touched by this phase:
 | Body / row primary text | 14.5px, 400 (body copy) / 600 (row emphasis: names) | 400 / 600 | 1.55 | `app/globals.css` `body` rule; `PartnersList.tsx` name cell (`font-semibold`) |
 | Small / secondary / muted metadata | 13px | 400 | 1.4 | `table-chrome.ts` `tableCellClass`, `PageHero` subtitle |
 
-**Two weights in active use for this phase's new surfaces: 400 (regular) and 600/700 (semibold/
-bold, used interchangeably as "emphasis" — Tailwind's `font-semibold`/`font-bold` map to the same
-Inter 600/700 files already loaded).** This is narrower than the old spec's "three weights,
-never collapse" note: Inter is loaded at five weights (300/400/500/600/700) for latitude
-elsewhere in the app, but nothing this phase touches reads 300 or 500. **Declare 2 in-scope
-weights for Phase 30 (400, 700), reusing 600 only where an existing primitive already hard-codes
-it (`PartnersList` row-name `font-semibold`)** — do not introduce a new 500-weight use in new
-Phase 30 code. This satisfies the GSD 2-weight default without a fight; the "richer scale"
-exception from the old spec is not needed at Inter's weights, only at spacing's finer step.
+**Three weights are genuinely in active use across Phase 30's new surfaces: 400 (regular),
+600 (semibold — row/name emphasis), and 700 (bold — page/section titles).** This is not
+underselling the old spec's "three weights, never collapse" note — it is confirmed by this
+spec's own surface contract, which applies `font-semibold` (600) directly in **new** components:
+`ClientsGrid`'s CLIENT column and `ContactRow`'s name field both use it, exactly like the
+existing `PartnersList` row-name cell and `ProposalRow.tsx` already do elsewhere in the app. This
+is not a problem to fix — 600 is already loaded (Inter ships 300/400/500/600/700) and already in
+broad use, and the operator's D-B decision explicitly ratified the 3-weight system
+**project-wide**, not just for the old spacing scale. **Declare 3 in-scope weights for Phase 30:
+400 (body/muted text), 600 (row/field emphasis), 700 (page titles, section eyebrows).** Nothing
+this phase touches reads 300 or 500 — that is the one real narrowing versus the app's full
+5-weight font load, not a reduction to 2 weights.
 
 ---
 
@@ -155,7 +158,7 @@ carve out. Links use `text-primary` (sparingly, e.g. "Voir la fiche société �
 | Field: contact role | Label **"Fonction"**, optional, placeholder **"Ex. Directeur achats"** |
 | Field: contact phone | Label **"Téléphone"**, optional |
 | Field: contact email | Label **"Email"**, optional, validated as email format when present |
-| Error — SIREN format invalid | **"Le SIREN doit contenir exactement 9 chiffres."** (matches existing `error.field.siren.invalid` tone: "SIREN invalide (9 chiffres requis).") |
+| Error — SIREN format invalid | Reuse existing key **`error.field.siren.invalid`**: *"SIREN invalide (9 chiffres requis)."* — do not mint a new string; this dictionary already has the exact validation message, same reuse discipline applied to the adjacent email-error key below. |
 | Error — contact email format invalid | Reuse existing key **`error.field.email.invalid`**: *"Format d'email invalide."* — do not write a new string, the dictionary already has this exact validation message. |
 | Error — generic save failure | Toast: **"Une erreur est survenue. Réessayez."** (matches existing `admin.accounts.toast.create.error` / `proposal.toast.*.error` tone) |
 | Destructive action: delete contact | **New pattern for this phase — see Component Inventory:** shadcn `AlertDialog` (not `window.confirm()`). Title: **"Supprimer ce contact ?"** Description: **"Cette action est définitive et retirera {name} de la fiche client."** Cancel: **"Annuler"**. Confirm (destructive button): **"Supprimer"**. Toast on success: **"Contact supprimé."** |
@@ -173,7 +176,7 @@ carve out. Links use `text-primary` (sparingly, e.g. "Voir la fiche société �
 | Registry | Blocks Used | Safety Gate |
 |----------|-------------|-------------|
 | shadcn official (`base-maia` style, `baseColor: neutral`) | `table`, `dialog`, `alert-dialog`, `field`, `input`, `select`, `badge`, `item`, `dropdown-menu`, `avatar`, `skeleton`, `separator` — all already present under `src/components/ui/`, installed before this phase. No new `shadcn add` invocation required. | not required — pre-existing installation, audited implicitly by every test suite already exercising these primitives elsewhere in the app |
-| `@reui` (licensed, `REUI_LICENSE_KEY`) | `Frame`* / `DataGrid` + `DataGridTable` + `DataGridColumnHeader` (`src/components/reui/data-grid/*`) — already vendored, already audited in `docs/design/reui-blocks-audit.md` (2026-08-31, "view passed" via that audit's own read of the source). This phase adopts the DataGrid **table/column/header machinery only** (see Surface 2 below) — it does **not** adopt `Frame` as chrome (Card is this phase's surface, see decision below) and does **not** adopt `DataGridPagination`, `Filters`, or the bulk-owner-assignment mechanics from `solution-crm-3` as-is. | `view passed — no flags — 2026-08-31` (carried from `reui-blocks-audit.md`, which is the developer's own recorded read of this exact source before this phase started) |
+| `@reui` (licensed, `REUI_LICENSE_KEY`) | `Frame`* / `DataGrid` + `DataGridTable` + `DataGridColumnHeader` (`src/components/reui/data-grid/*`) — already vendored, already audited in `docs/design/reui-blocks-audit.md` (2026-08-31, "view passed" via that audit's own read of the source). This phase adopts the DataGrid **table/column/header machinery only** (see Surface 2 below) — it does **not** adopt `Frame` as chrome (Card is this phase's surface, see decision below) and does **not** adopt `DataGridPagination`, `Filters`, or the bulk-owner-assignment mechanics from `solution-crm-3` as-is. | `source-safety view passed — no malicious/vulnerable code — 2026-08-31` (carried from `reui-blocks-audit.md`, the developer's own recorded read of this exact source); **this is a source-safety verdict only** — the same audit document has a full section ("2. The ReUI DataGrid cannot drive this app's lists") documenting a real *architectural* finding (page-index vs. this app's cursor-based lists), which is not a safety flag and is not waved away by this gate. It is separately and explicitly mitigated in the DataGrid decision under Surface 1 below. |
 | `@reui` `solution-crm-3` (the vendored contacts-directory block) | **Reference only — not installed as a dependency of any new file.** Its `columns.tsx`/`contacts-grid.tsx`/`contact-detail-sheet.tsx` are read for structure (grid composition, `AlertDialog` delete pattern, `Sheet` chrome) but every new Phase 30 file is planner-authored against the app's real data, not a copy of this block's mock-data file (`data.tsx`, `OWNERS`/`CONTACTS` arrays). | not applicable — no new registry fetch; block was already vendored 2026-08-31 per the phase-30 kickoff instructions, and its **ownership model is inverted before reuse** (see Critical Adaptation below) |
 
 *`Frame` is available but **not used** by this phase — see the Surface Consistency decision under Surface 2.
@@ -246,16 +249,27 @@ inside Shell's `<main>`, exactly like `/proposals` and `/proposals/[id]` already
 
 ### 1. Client book — `/clients` (CRM-07)
 
+**Focal point:** the client table itself — the CLIENT column (company name) is the primary
+visual anchor a partner scans first; the "Nouveau client" CTA and search box are secondary,
+top-of-page affordances, not competing focal points.
+
 Composition (server component page):
 
 1. `<PageHero title={t('clients.page.title')} subtitle={t('clients.page.subtitle')}
    actions={<Dialog>…<Button>Nouveau client</Button>…</Dialog>} />` — subtitle: **"Retrouvez vos
    clients et les propositions que vous leur avez faites."**
-2. `<SearchBar lang={lang} />` — reused verbatim, zero changes. Placeholder key
-   `clients.search.placeholder` = **"Rechercher un client…"**. It already renders
-   `autoComplete="off"` (confirmed in `SearchBar.tsx`) — this is the existing default, not a new
-   affordance added for CRM-02, but it is exactly the property A-5 depends on; no change needed,
-   just confirmed compatible.
+2. `<SearchBar lang={lang} placeholderKey="clients.search.placeholder"
+   ariaKey="clients.search.aria" />`. **Not a zero-change reuse — `SearchBar.tsx` currently
+   hardcodes `t('proposal.search.placeholder', lang)` and `t('proposal.search.aria', lang)` with
+   no override prop**, so reusing it unmodified would render the proposals-list copy
+   ("Rechercher par client ou référence…") on the client book. This phase adds two **optional**
+   props — `placeholderKey` / `ariaKey` (both `DictKey`), each defaulting to the current
+   `proposal.search.placeholder` / `proposal.search.aria` keys so every existing call site
+   (`/proposals`) is byte-identical and unaffected — and the client book passes the new
+   `clients.search.placeholder` = **"Rechercher un client…"** / `clients.search.aria` keys. The
+   clear-button label (`proposal.search.clear`) is reused as-is; it is generic enough not to need
+   a client-specific variant. `SearchBar` already renders `autoComplete="off"` (confirmed in
+   `SearchBar.tsx`) — unaffected by this widening, and exactly the property A-5 depends on.
 3. The list itself — **see the DataGrid decision below.**
 
 **DataGrid decision (resolves the documented blocker head-on — REQUIREMENTS.md:121,
@@ -282,6 +296,14 @@ knowing a total count the server never computes), **this phase splits the block'
 - **Do NOT adopt:** row selection (`DataGridTableRowSelect`/`RowSelectAll`) or the bulk
   owner-assignment bar. See the Critical Adaptation section above — this is the load-bearing
   inversion.
+- **Sort + "Charger plus" interaction (previously unresolved — fixed here):** a column sort is
+  server-side, not client-side re-ordering of already-loaded rows. Clicking a sortable header
+  (CLIENT, DERNIÈRE ACTIVITÉ) pushes the sort key/direction into the server query alongside `q`
+  and **resets the cursor to page 1** — the exact same reset `SearchBar` already performs when the
+  query changes (`next.delete('cursor')` in `SearchBar.tsx`). "Charger plus" always requests the
+  next page *for the currently active sort*, so appended rows arrive already in the correct
+  order; the client never re-sorts a mixed-order list in place, and there is no client-side
+  sorting of a partial dataset at any point.
 
 **Surface consistency decision: Card, not Frame.** `docs/design/reui-blocks-audit.md` frames this
 as an open per-block choice ("no blanket rule… each block is previewed and judged on its own").
@@ -312,12 +334,15 @@ exists on this page. Typing a company name that exists globally but is held only
 partner returns the plain "Aucun résultat…" empty state, with zero UI signal that a record
 exists anywhere.
 
-Empty states use shadcn `Empty`/`EmptyTitle`/`EmptyDescription` (`src/components/ui/empty.tsx`,
-already installed, not yet adopted anywhere in the app — first real consumer) rather than a
-hand-rolled `.card px-6 py-10/12 text-center` block: it is the design-system-correct primitive
-for exactly this state and was installed by the migration specifically to replace ad hoc
-empty-state markup. Icon: the new `BuildingIcon` (zero-clients) / existing `SearchIcon` at empty
-size (search-yields-nothing) — see Component Inventory.
+Empty states use shadcn `Empty`/`EmptyDescription` (`src/components/ui/empty.tsx`) — **already
+a working pattern in this app**, not a new one: `app/(authed)/proposals/page.tsx`
+(`<Empty className="px-5 py-10"><EmptyDescription className="text-[14.5px]">…`) and
+`app/(admin)/[adminSegment]/coefficients/HistoryTable.tsx` (`<Empty className="p-8">
+<EmptyDescription>…`) both already ship it, both using `EmptyDescription` alone with no
+`EmptyTitle`. This lowers implementation risk — Phase 30 follows the exact precedent (`Empty` +
+`EmptyDescription`, `EmptyTitle` only if a two-line empty state proves necessary) rather than
+introducing new empty-state markup. Icon: the new `BuildingIcon` (zero-clients) / existing
+`SearchIcon` at empty size (search-yields-nothing) — see Component Inventory.
 
 ### 2. Create-client flow (feeds CRM-01 + CRM-07's "+ Nouveau client")
 
@@ -347,6 +372,12 @@ On success: dialog closes, toast **"Client créé."**, redirect to `/clients/{re
 
 ### 3. Client detail — `/clients/[id]` (CRM-06, CRM-04)
 
+**Focal point:** the Propositions card — CRM-06's stated purpose is "see every proposal made for
+this client on one page," so Propositions is the primary reason a partner opens this page.
+Contacts is real, frequently-used content but secondary; it is placed first in reading order
+(top card) because it is shorter and orients the reader ("who am I dealing with"), not because it
+outranks Propositions in importance.
+
 Renders directly inside `Shell`'s capped `<main>` (no nested `maxWidth` override), single-column,
 `max-width: 720px` (Assumption A-2, re-confirmed against the current proposal detail page: its
 right column exists *specifically* to host the PDF preview object via `EmbeddedPdfPreview`,
@@ -366,7 +397,14 @@ no competing second section needing a different tint):
 - List of contact rows: name (`font-semibold`), role (13px muted), phone + email (13px muted,
   icon-prefixed — new `PhoneIcon` + existing `MailIcon`, both `size={14}`)
 - Each row: edit (existing `PencilIcon`) + delete (existing `TrashIcon`, `hover:text-destructive`)
-  icon-buttons, right-aligned, matching `PartnerRowActions`' icon-button sizing
+  icon-buttons, right-aligned, matching `PartnerRowActions`' icon-button sizing. **Both carry an
+  explicit `aria-label`** (e.g. `aria-label={t('clients.contact.action.edit', lang)}` /
+  `aria-label={t('clients.contact.action.delete', lang)}`, interpolated with the contact's name)
+  — icon-only buttons with no visible text have no accessible name otherwise. This is not
+  optional: `PartnerRowActions.tsx` already sets the precedent
+  (`aria-label={t('admin.partners.action.viewProposals', lang)}` on its own icon-only trigger,
+  confirmed at that file's button element) — `ContactRow`'s two icon-buttons follow the same
+  rule, not a looser one.
 - "+ Ajouter un contact" — `<Button variant="outline">` below the list (secondary tier; the one
   page-level `--primary` CTA for this surface lives in the header area if/when one is added —
   for Phase 30 there is no header-level CTA on this page, so this remains the page's only accent-
@@ -421,6 +459,12 @@ only after that check passes — there is no code path where another partner's c
 queried and then hidden client-side; they are never fetched.
 
 ### 4. Admin company view — `/[adminSegment]/companies` + `/[adminSegment]/companies/[id]` (CRM-03)
+
+**Focal point:** the "Relations" table on the detail page — CRM-03's entire reason to exist is
+"see every relationship on a company, including which partner holds each," so that table, not
+the company header above it, is what an admin actually came to read. On the list page, the
+RELATIONS count column is the focal data point that distinguishes this from a plain company
+directory.
 
 Must **visually distinguish itself from the partner view.** Distinguishing elements (reusing
 existing admin-surface conventions — confirmed `PartnersList`'s own list page carries **no**
@@ -502,10 +546,10 @@ this table's `PartnerRow`-adjacent DTO should mirror).
 |---|---|---|
 | `PageHero` | Reuse, no change | Client book header, admin companies list/detail headers |
 | `StatusChip` | Reuse, no change | Proposal rows on client detail (existing variants only) |
-| `SearchBar` | Reuse, no change | Client book search — already `autoComplete="off"` |
+| `SearchBar` | Widen — add optional `placeholderKey`/`ariaKey` props (default to current `proposal.search.*` keys; existing call sites unaffected) | Client book search — already `autoComplete="off"` |
 | `SectionTitle` | Reuse, no change | Contacts / Propositions section headers on client detail |
 | `ProposalRow` | Reuse, no change | Rendered inside the client detail Propositions card |
-| shadcn `Empty`/`EmptyTitle`/`EmptyDescription` (`src/components/ui/empty.tsx`) | **First adoption** | All four Phase 30 empty states (client book × 2, client detail × 2) |
+| shadcn `Empty`/`EmptyDescription` (`src/components/ui/empty.tsx`) | Reuse existing pattern — already shipped in `app/(authed)/proposals/page.tsx` and `app/(admin)/[adminSegment]/coefficients/HistoryTable.tsx` (both `Empty` + `EmptyDescription`, no `EmptyTitle`) | All four Phase 30 empty states (client book × 2, client detail × 2) |
 | shadcn `Dialog` (`src/components/ui/dialog.tsx`) | **First real-app adoption** (currently only used by vendored blocks) | Create-client dialog, contact add/edit dialog |
 | shadcn `AlertDialog` (`src/components/ui/alert-dialog.tsx`) | **First real-app adoption** | Delete-contact confirm |
 | ReUI `DataGrid`/`DataGridTable`/`DataGridColumnHeader` (`src/components/reui/data-grid/*`) | **First real-app adoption of the table machinery, without `Frame` or `DataGridPagination`** | Client book only (see DataGrid decision, Surface 1) |
@@ -534,17 +578,17 @@ Representative keys (non-exhaustive — planner fills in the rest per the Copywr
 
 ```
 clients.page.title / clients.page.subtitle / clients.cta.new
-clients.search.placeholder
+clients.search.placeholder / clients.search.aria
 clients.col.company / clients.col.siren / clients.col.proposals / clients.col.lastActivity
 clients.empty.zero.title / clients.empty.search.title
 clients.detail.section.contacts / clients.detail.section.proposals
 clients.detail.empty.proposals.title / clients.detail.empty.contacts.title
 clients.contact.cta.add / clients.contact.cta.edit
 clients.contact.field.name / .role / .phone / .email
+clients.contact.action.edit / clients.contact.action.delete
 clients.contact.confirm.delete.title / .description / .cancel / .confirm
 clients.contact.toast.deleted
 clients.modal.create.title / .field.name / .field.siren / .field.siren.helper / .submit
-clients.modal.error.siren.invalid
 admin.companies.page.title / admin.companies.page.subtitle
 admin.companies.col.company / .siren / .relations / .lastActivity
 admin.companies.detail.section.relations
@@ -553,8 +597,9 @@ admin.companies.relation.type.partner / admin.companies.relation.type.sales
 sidebar.nav.clients / sidebar.nav.adminCompanies
 ```
 
-Reused, not re-declared: `error.field.email.invalid`, `admin.accounts.toast.create.error`,
-`proposal.toast.duplicate.prefilled` (as the model for the wizard-prefill copy pattern).
+Reused, not re-declared: `error.field.email.invalid`, `error.field.siren.invalid`,
+`admin.accounts.toast.create.error`, `proposal.toast.duplicate.prefilled` (as the model for the
+wizard-prefill copy pattern).
 
 ---
 
