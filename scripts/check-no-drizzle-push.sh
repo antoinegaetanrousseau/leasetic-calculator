@@ -7,21 +7,59 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-# Search package.json, shell scripts, GitHub Actions workflows, README, and source files.
-# Skip node_modules, .next (build outputs), .planning/ + docs/ (documentation that
-# discusses the rule itself — Phase 20 adds docs/operations/neon-branch-routing.md
-# which mentions the prohibition in a 'Locked rules' section),
-# drizzle.config.ts (has a comment explaining the prohibition), and this script itself.
-matches=$(
-  grep -rEn \
-    --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
-    --include='*.md' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.mjs' --include='*.cjs' \
-    --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=drizzle \
-    --exclude-dir=.planning --exclude-dir=docs \
-    --exclude='check-no-drizzle-push.sh' --exclude='drizzle.config.ts' --exclude='migrate.ts' \
-    "drizzle-kit push" . 2>/dev/null \
-  || true
+# ---------------------------------------------------------------------------
+# Scope: GIT-TRACKED FILES ONLY.
+#
+# This guard previously walked the filesystem with `grep -r . --exclude-dir=...`.
+# That is unsound: the exclusion list can only name directories someone thought of
+# in advance, so ANY untracked local file that merely *mentions* the forbidden
+# phrase trips the guard. In practice `.remember/` (the `remember` Claude Code
+# plugin's notes, gitignored via `.remember/.gitignore`) did exactly that — an
+# agent note reading "drizzle-kit push forbidden" failed the local run while CI,
+# which never sees the file, passed.
+#
+# That is the worst failure mode a guard can have: untrustworthy precisely when a
+# developer runs it before pushing, which trains people to ignore it. Enumerating
+# more agent/tooling dirs (.agents, .claude, .cursor, .opencode, ...) only defers
+# the problem to the next tool someone installs.
+#
+# Scoping to `git ls-files` inverts the default: only content that is actually
+# committed — or staged, which `git ls-files` also reports — can fail the guard.
+# Untracked scratch content can never trip it, and no exclusion list needs
+# maintaining as tooling changes. node_modules/ and .next/ fall out for free
+# (gitignored); the pathspecs below still exclude tracked paths that legitimately
+# DISCUSS the prohibition rather than invoke it.
+# ---------------------------------------------------------------------------
+
+# Tracked paths that legitimately mention 'drizzle-kit push' in prose:
+#   .planning/, docs/  — planning artifacts and operations runbooks citing the rule
+#   drizzle/           — generated SQL
+#   drizzle.config.ts  — header comment explaining the prohibition
+#   scripts/migrate.ts — migration runner referencing what it is NOT
+#   this script        — the pattern literal itself
+readarray -t files < <(
+  git ls-files -- \
+    '*.json' '*.sh' '*.yml' '*.yaml' '*.md' '*.ts' '*.tsx' '*.js' '*.mjs' '*.cjs' \
+    ':(exclude).planning/**' \
+    ':(exclude)docs/**' \
+    ':(exclude)drizzle/**' \
+    ':(exclude)drizzle.config.ts' \
+    ':(exclude)scripts/migrate.ts' \
+    ':(exclude)scripts/check-no-drizzle-push.sh' \
+    2>/dev/null || true
 )
+
+if [ "${#files[@]}" -eq 0 ]; then
+  # Either not a git work tree (tarball export, detached build context) or the
+  # pathspecs matched nothing. Fail loudly rather than pass vacuously: a guard
+  # that silently inspects zero files is indistinguishable from a passing one.
+  echo "ERROR: guard could not enumerate git-tracked files to scan."
+  echo "This guard requires a git work tree (it scopes to 'git ls-files' by design)."
+  echo "If you are running from a source export rather than a clone, run it from a clone."
+  exit 1
+fi
+
+matches=$(grep -En "drizzle-kit push" -- "${files[@]}" 2>/dev/null || true)
 
 if [ -n "$matches" ]; then
   echo "ERROR: 'drizzle-kit push' detected. Push is forbidden in this codebase."
@@ -33,5 +71,5 @@ if [ -n "$matches" ]; then
   exit 1
 fi
 
-echo "OK: no 'drizzle-kit push' invocations found."
+echo "OK: no 'drizzle-kit push' invocations found (${#files[@]} tracked files scanned)."
 exit 0
