@@ -69,18 +69,22 @@ if [ -z "$host" ]; then
   exit 1
 fi
 
+# Matched against the full hostnames in docs/operations/neon-branch-routing.md
+# (not a prefix wildcard) so a lookalike host that merely shares an endpoint-ID
+# prefix but resolves to an unrelated domain is rejected as unrecognised
+# rather than misclassified as a known branch.
 case "$host" in
-  ep-polished-band-alphc576-pooler*)
+  ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech)
     echo "OK: local DATABASE_URL → Neon development branch ($host)"
     exit 0
     ;;
-  ep-delicate-night-als4ogpc-pooler*)
+  ep-delicate-night-als4ogpc-pooler.c-3.eu-central-1.aws.neon.tech)
     echo "WARN: local DATABASE_URL → Neon preview branch ($host)."
     echo "  Isolated from production, but not the intended local target."
     echo "  Expected: ep-polished-band-alphc576-pooler (development branch)."
     exit 0
     ;;
-  ep-icy-boat-alx5o1tz-pooler*)
+  ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech)
     echo "ERROR: local DATABASE_URL → Neon main branch ($host) — PRODUCTION."
     echo "  Local dev must NEVER read or write production."
     echo "  Fix: Neon Console → project leasetic-matrice → branch development →"
