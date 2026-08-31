@@ -537,7 +537,7 @@ Plans:
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
 | 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
-| 29. Migration Safety Net | v1.6 | 2/2 | Complete   | 2026-08-31 |
+| 29. Migration Safety Net | v1.6 | 2/2 | Complete    | 2026-08-31 |
 | 30. Company & Contact Registry | v1.6 | TBD | Not started | - |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | TBD | Not started | - |
 | 32. HubSpot Import | v1.6 | TBD | Not started | - |

@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: verifying
-last_updated: "2026-08-31T16:43:56.487Z"
+status: ready_to_plan
+last_updated: 2026-08-31T16:52:19.644Z
 last_activity: 2026-08-31
 progress:
   total_phases: 18
   completed_phases: 13
   total_plans: 46
-  completed_plans: 46
+  completed_plans: 128
   percent: 72
+stopped_at: Phase 29 complete (2/2) — ready to discuss Phase 30
 ---
 
 # State — Matrice Commerciale
@@ -23,13 +24,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 29 — migration-safety-net
+**Current focus:** Phase 30 — company & contact registry
 
 ## Current Position
 
-Phase: 29 (migration-safety-net) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
+Phase: 30
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-08-31
 
 ## Deferred Items
