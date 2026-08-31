@@ -30,13 +30,28 @@ Second gap: the app never learns what happened next. Statuses are `draft | activ
 
 ### Environment Isolation & Migration Safety (INFRA — continues v1.1 INFRA-01..03)
 
-Sequenced **first** and deliberately so. All three Vercel scopes currently resolve to the production `main` pooled endpoint (`ep-icy-boat-alx5o1tz-pooler…`), which is why `db:migrate` can never be run locally and why every migration is gated behind a manual GitHub Action. v1.6 is migration-dense and includes an **irreversible fuzzy backfill** against real partner data. This is the safety net for that.
+> **Corrected 2026-08-31, before planning.** This category was originally written from the
+> v1.3 carry-forward inventory (dated 2026-05-21), which stated that all three Vercel scopes
+> still pointed at the production pooled endpoint. **That note was stale.** Phase 20 (INFRA-01,
+> shipped 2026-05-27 — six days after the carry-forward was written) built the full three-branch
+> split, the per-branch migration fan-out, and a `db-smoke` CI job. Verified against
+> `.github/workflows/ci.yml`, `.github/workflows/db-migrate.yml` and
+> `docs/operations/neon-branch-routing.md`, not against the planning note.
+>
+> The category is rewritten below to describe what is **actually** missing. It is much smaller
+> than originally scoped, and it is **no longer a hard gate** on the rest of v1.6 — the safety
+> net exists; one part of it is miswired.
 
-Prior evidence this matters: Phase 12 shipped a SQL migration with no `drizzle/meta/_journal.json` entry; production ran un-applied for ~24 hours until Phase 13's wizard hit the missing column.
+Still sequenced first, but now because it is small and because the miswiring below should not be
+live while phases 30-34 add eight migrations, not because the isolation is absent.
 
-- [ ] **INFRA-04**: The `preview` and `development` Vercel scopes resolve to their own Neon branches, so neither reads or writes the production database.
-- [ ] **INFRA-05**: A developer can apply migrations locally against the development branch without touching production data — retiring the standing "never run `db:migrate` locally" rule.
-- [ ] **INFRA-06**: Any PR touching `drizzle/*.sql` runs a real-Postgres smoke that **fails** when a migration is unapplied or its `_journal.json` entry is missing.
+Prior evidence this matters: Phase 12 shipped a SQL migration with no `drizzle/meta/_journal.json`
+entry; production ran un-applied for ~24 hours until Phase 13's wizard hit the missing column.
+**INFRA-06 below exists because the gate built to catch that is currently blind to it.**
+
+- [x] **INFRA-04** *(already satisfied — Phase 20 / INFRA-01, 2026-05-27)*: The `preview` and `development` Vercel scopes resolve to their own Neon branches (`br-noisy-frost-alyzvg2s` / `br-tiny-hat-alk1dent`), each with its own pooled endpoint, and `db-migrate.yml` routes per-branch via `DATABASE_URL_MAIN` / `_PREVIEW` / `_DEVELOPMENT`. No work required; retained for traceability.
+- [ ] **INFRA-05**: Local development reads and writes the Neon `development` branch, not production. `.env.local` currently points at `ep-icy-boat-alx5o1tz-pooler` — the `main` branch. **Phase 20's locked rule 3 is NOT relaxed**: migrations still fan out only via `db-migrate.yml`, never `npm run db:migrate` against a real branch. The requirement is data isolation for local *runtime*, not a local migration path.
+- [ ] **INFRA-06**: The `db-smoke` gate actually fires on this repo's migration files. Its `dorny/paths-filter` pattern is `drizzle/migrations/*.sql`, a directory that **does not exist** — every migration lives at `drizzle/*.sql`. Today the job only triggers via its second pattern, `drizzle/meta/_journal.json`, so a migration committed *without* a journal entry — the exact Phase 12 regression — matches neither pattern and the gate passes green without running. Fix the pattern and add a check that fails if the filter stops matching real migration paths.
 
 ### Company & Contact Registry (CRM)
 

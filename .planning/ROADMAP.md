@@ -104,7 +104,7 @@ private per-partner relationships — so the extranet can become the CRM that re
 `proposals.inputs` stays immutable throughout; the CRM is strictly additive. Phase numbering
 continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on PR #6 landing.
 
-- [ ] **Phase 29: Migration Safety Net** — Neon 3-branch split (preview/development stop resolving to production) + post-deploy DB-smoke CI gate on any PR touching `drizzle/*.sql`; hard prerequisite for every migration-bearing phase below
+- [ ] **Phase 29: Migration Safety Net** — repair the `db-smoke` path filter so the gate fires on this repo's real migration paths (currently blind to the Phase 12 regression), and point local dev at the Neon `development` branch. Rescoped 2026-08-31: the 3-branch split already shipped in Phase 20; **not** a prerequisite for the phases below
 - [ ] **Phase 30: Company & Contact Registry** — `companies` (global) + `client_relationships` (private, per-partner) + `contacts` (scoped to relationship) schema and surfaces; `proposals` gains a nullable FK; new `sales` role added alongside `partner`/`admin`
 - [ ] **Phase 31: Reconciliation Engine & Proposal Extraction** — dry-run-first dedup engine (SIREN auto-merge, name-normalized flagging, human-resolution UI) exercised against existing `proposals.inputs`
 - [ ] **Phase 32: HubSpot Import** — reuses the Phase 31 engine against the HubSpot `.xlsx` export; contact-owner mapped to a Leasétic sales-role user; idempotent re-import via provenance IDs. **Design partially blocked** — see open dependency note below.
@@ -399,22 +399,32 @@ Wave 2 (after 26-01):
 
 ### Phase 29: Migration Safety Net
 
-**Goal:** The database environment is safe for migration-dense work — non-production Vercel scopes never touch production data, and CI catches an unapplied or malformed migration before it merges.
-**Depends on:** Phase 27 (v1.5 complete). Hard prerequisite for every other v1.6 phase — all of Phase 30-34 add migrations, and Phase 31/32 perform an irreversible fuzzy backfill against real partner data.
-**Requirements:** INFRA-04, INFRA-05, INFRA-06
+> **Rescoped 2026-08-31, before planning.** The original scope assumed the Neon split did not
+> exist, per the v1.3 carry-forward (2026-05-21). That note was stale: Phase 20 shipped the
+> full split on 2026-05-27. Verified against `ci.yml`, `db-migrate.yml` and
+> `docs/operations/neon-branch-routing.md`. INFRA-04 is already satisfied; what remains is a
+> **miswired CI path filter** and a **local env pointing at production**.
+>
+> **No longer a hard gate.** The isolation exists. Phases 30-34 are not blocked by this phase —
+> though the filter bug should be fixed before eight new migrations land.
+
+**Goal:** The migration safety net Phase 20 built actually fires — the `db-smoke` gate matches this repo's real migration paths, and local development stops reading production data.
+**Depends on:** Phase 27 (v1.5 complete). No downstream phase is blocked by this one.
+**Requirements:** INFRA-04 *(already satisfied, Phase 20)*, INFRA-05, INFRA-06
 **Success Criteria** (what must be TRUE):
 
-  1. The `preview` Vercel deployment and local `development`-scope work resolve to their own dedicated Neon branches; a query run against either scope returns zero production partner rows.
-  2. A developer runs `db:migrate` locally against the development branch without touching production data — retiring the standing "never run `db:migrate` locally" rule.
-  3. Opening a PR that touches `drizzle/*.sql` with a missing or malformed `_journal.json`/snapshot entry causes the CI DB-smoke step to fail and blocks merge.
-  4. Opening a PR with a correctly generated migration passes the same DB-smoke step against a real Postgres instance.
+  1. A PR that adds a migration at `drizzle/NNNN_*.sql` **without** a matching `drizzle/meta/_journal.json` entry causes the `db-smoke` job to run and fail — the exact Phase 12 regression, which today passes green because the job's path filter (`drizzle/migrations/*.sql`) matches a directory that does not exist.
+  2. A PR with a correctly generated migration still triggers `db-smoke` and passes it against a real Postgres instance.
+  3. A check fails if the `db-smoke` path filter ever stops matching the directory migrations actually live in — so this cannot silently rot again.
+  4. Local development reads and writes the Neon `development` branch; a query run locally returns zero production partner rows.
+  5. Phase 20's locked rule 3 is **unchanged** — migrations still fan out only via `db-migrate.yml`; no local `db:migrate` path is introduced.
 
 **Plans:** TBD
 
 ### Phase 30: Company & Contact Registry
 
 **Goal:** Client data has its own life — a shared company registry with private per-partner relationships and contacts — and a `sales` role exists so internal Commercial users hold relationships exactly as partners do.
-**Depends on:** Phase 29 (Neon safety net + DB-smoke CI must be live before this phase's migrations ship)
+**Depends on:** Phase 29 recommended-but-not-blocking (the Neon isolation already exists from Phase 20; Phase 29 only repairs the CI filter)
 **Requirements:** CRM-01, CRM-02, CRM-03, CRM-04, CRM-05, CRM-06, CRM-07, CRM-08, ROLE-01, ROLE-02, ROLE-03
 **Success Criteria** (what must be TRUE):
 
@@ -532,4 +542,4 @@ Wave 2 (after 26-01):
 
 ---
 
-*Last updated: 2026-08-31 — v1.6 ROADMAP created: 6 phases (29-34), 31/31 requirements mapped, 100% coverage. Phase 29 (Neon 3-branch split + DB-smoke CI) is the hard prerequisite for all migration-bearing phases below it. Phase 32 (HubSpot Import) has an open dependency on the unreadable `.xlsx` export file gating detailed design only. Next: `/gsd-plan-phase 29`.*
+*Last updated: 2026-08-31 — v1.6 ROADMAP created: 6 phases (29-34), 31/31 requirements mapped, 100% coverage. Phase 29 RESCOPED 2026-08-31 — the Neon 3-branch split already shipped in Phase 20 (the v1.3 carry-forward that claimed otherwise was stale); Phase 29 is now a small CI-filter repair and is NOT a blocking prerequisite. Phase 32 (HubSpot Import) has an open dependency on the unreadable `.xlsx` export file gating detailed design only. Next: `/gsd-plan-phase 29`.*
