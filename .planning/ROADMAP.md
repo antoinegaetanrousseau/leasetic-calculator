@@ -438,7 +438,19 @@ Plans:
   4. A contact (name, role, phone, email) is created and edited on a relationship, not on the company, and is invisible to anyone who is not that relationship's owner or an admin.
   5. A user with the new `sales` role logs in, holds client relationships, and reaches the same pipeline/client-book surfaces a partner reaches — with zero change in what existing `partner` and `admin` accounts can see or do, and the ADMIN-09 commission-invisibility envelope intact.
 
-**Plans:** TBD
+**Plans:** 9 plans in 5 waves
+
+Plans:
+- [ ] 30-01-PLAN.md — Schema + migration: companies / client_relationships / contacts, nullable proposals FK, role CHECK widening + sales backfill (wave 1)
+- [ ] 30-02-PLAN.md — UI foundations: clients.* / admin.companies.* i18n, SearchBar placeholder props, BuildingIcon + PhoneIcon, sidebar and route-meta entries (wave 1)
+- [ ] 30-03-PLAN.md — Role widening across every access gate and admin partner-management query; partnerType-driven role derivation (wave 2)
+- [ ] 30-04-PLAN.md — Owner-scoped registry queries + admin company queries + cross-tenant isolation tests (wave 3)
+- [ ] 30-05-PLAN.md — CRM server actions: create-client with silent SIREN dedup, contact create/update/delete (wave 3)
+- [ ] 30-06-PLAN.md — /clients client book on DataGrid table machinery + CreateClientDialog (wave 4)
+- [ ] 30-07-PLAN.md — /clients/[id] detail with Contacts editor and Propositions card (wave 4)
+- [ ] 30-08-PLAN.md — Admin /[adminSegment]/companies list, company detail with Relations table, admin relationship detail (wave 4)
+- [ ] 30-09-PLAN.md — CRM-05 proposal-to-relationship wiring in the wizard + phase human verification (wave 5)
+
 **UI hint:** yes
 
 ### Phase 31: Reconciliation Engine & Proposal Extraction
