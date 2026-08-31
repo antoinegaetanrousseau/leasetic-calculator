@@ -17,6 +17,7 @@
     "check:seed-sql": "tsx scripts/build-seed-sql.ts --check",
     "check:no-vercel-imports": "bash scripts/check-no-vercel-only-imports.sh",
     "check:no-drizzle-push": "bash scripts/check-no-drizzle-push.sh",
+    "check:migration-journal-sync": "bash scripts/check-migration-journal-sync.sh",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:migrate:dry-run": "tsx scripts/migrate.ts --dry-run",
     "db:backfill:coefficient-history": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-coefficient-history.ts",
