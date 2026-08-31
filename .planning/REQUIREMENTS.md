@@ -124,8 +124,38 @@ Answers "who do I chase this week" — and captures the two lead-qualification s
 
 ## Traceability
 
-*(Filled by the roadmapper — every REQ-ID maps to exactly one phase.)*
+Every v1.6 REQ-ID maps to exactly one phase. Coverage: 31/31 (100%).
 
 | REQ-ID | Phase |
 |---|---|
-| — | — |
+| INFRA-04 | Phase 29 — Migration Safety Net |
+| INFRA-05 | Phase 29 — Migration Safety Net |
+| INFRA-06 | Phase 29 — Migration Safety Net |
+| CRM-01 | Phase 30 — Company & Contact Registry |
+| CRM-02 | Phase 30 — Company & Contact Registry |
+| CRM-03 | Phase 30 — Company & Contact Registry |
+| CRM-04 | Phase 30 — Company & Contact Registry |
+| CRM-05 | Phase 30 — Company & Contact Registry |
+| CRM-06 | Phase 30 — Company & Contact Registry |
+| CRM-07 | Phase 30 — Company & Contact Registry |
+| CRM-08 | Phase 30 — Company & Contact Registry |
+| IMPORT-01 | Phase 31 — Reconciliation Engine & Proposal Extraction |
+| IMPORT-02 | Phase 32 — HubSpot Import (design partially blocked — see open dependency) |
+| IMPORT-03 | Phase 31 — Reconciliation Engine & Proposal Extraction |
+| IMPORT-04 | Phase 31 — Reconciliation Engine & Proposal Extraction |
+| IMPORT-05 | Phase 31 — Reconciliation Engine & Proposal Extraction |
+| IMPORT-06 | Phase 31 — Reconciliation Engine & Proposal Extraction |
+| IMPORT-07 | Phase 32 — HubSpot Import (design partially blocked — see open dependency) |
+| ROLE-01 | Phase 30 — Company & Contact Registry |
+| ROLE-02 | Phase 30 — Company & Contact Registry |
+| ROLE-03 | Phase 30 — Company & Contact Registry |
+| PIPE-01 | Phase 33 — Pipeline |
+| PIPE-02 | Phase 33 — Pipeline |
+| PIPE-03 | Phase 33 — Pipeline |
+| PIPE-04 | Phase 33 — Pipeline |
+| PIPE-05 | Phase 33 — Pipeline |
+| ACTV-01 | Phase 34 — Activity & Follow-Up |
+| ACTV-02 | Phase 34 — Activity & Follow-Up |
+| ACTV-03 | Phase 34 — Activity & Follow-Up |
+| ACTV-04 | Phase 34 — Activity & Follow-Up |
+| ACTV-05 | Phase 34 — Activity & Follow-Up |

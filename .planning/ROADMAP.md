@@ -8,6 +8,7 @@
 - ✅ **v1.3 — Design Refresh + Partner-Onboarding Ready** — Phases 16-21 (shipped 2026-05-29) — see `milestones/v1.3-ROADMAP.md`
 - ✅ **v1.4 — Partner Types, Admin Dual-View & Rebrand** — Phases 22-25 (shipped 2026-05-30) — see `milestones/v1.4-ROADMAP.md`
 - ✅ **v1.5 — Proposal List Actions & Pill Fix** — Phases 26-27 (shipped 2026-05-30) — see `milestones/v1.5-ROADMAP.md`
+- 🚧 **v1.6 — CRM Foundation** — Phases 29-34 (in progress, started 2026-08-31) — CRM registry, two-source reconciliation, pipeline, activity
 
 ---
 
@@ -93,6 +94,24 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 **Shipped:** 2026-05-30 · **Plans:** 5 · **Requirements:** 6/6 active (ROWACT-02 descoped) · **Tests:** 1184 passing
 **Full archive:** `milestones/v1.5-ROADMAP.md` · `milestones/v1.5-REQUIREMENTS.md`
+
+</details>
+
+### 🚧 v1.6 — CRM Foundation (Phases 29-34) — IN PROGRESS
+
+Client data gets its own life independent of proposals — a shared company registry with
+private per-partner relationships — so the extranet can become the CRM that replaces HubSpot.
+`proposals.inputs` stays immutable throughout; the CRM is strictly additive. Phase numbering
+continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on PR #6 landing.
+
+- [ ] **Phase 29: Migration Safety Net** — Neon 3-branch split (preview/development stop resolving to production) + post-deploy DB-smoke CI gate on any PR touching `drizzle/*.sql`; hard prerequisite for every migration-bearing phase below
+- [ ] **Phase 30: Company & Contact Registry** — `companies` (global) + `client_relationships` (private, per-partner) + `contacts` (scoped to relationship) schema and surfaces; `proposals` gains a nullable FK; new `sales` role added alongside `partner`/`admin`
+- [ ] **Phase 31: Reconciliation Engine & Proposal Extraction** — dry-run-first dedup engine (SIREN auto-merge, name-normalized flagging, human-resolution UI) exercised against existing `proposals.inputs`
+- [ ] **Phase 32: HubSpot Import** — reuses the Phase 31 engine against the HubSpot `.xlsx` export; contact-owner mapped to a Leasétic sales-role user; idempotent re-import via provenance IDs. **Design partially blocked** — see open dependency note below.
+- [ ] **Phase 33: Pipeline** — partner-advanced stage on the relationship (late stages system-owned), won/lost/unanswered outcome on the proposal, SIREN-gated win
+- [ ] **Phase 34: Activity & Follow-Up** — unified timeline (manual notes + system events), next-action date, "who to chase" list
+
+**Open dependency:** IMPORT-02's detailed design (Phase 32) is blocked on the HubSpot export file (`hubspot-crm-exports-tous-les-contacts-2026-08-31.xlsx`) being readable — macOS TCC currently blocks `~/Downloads`. This gates Phase 32's detailed planning only, not the milestone or any other phase.
 
 </details>
 
@@ -378,6 +397,101 @@ Wave 2 (after 26-01):
 
 ---
 
+### Phase 29: Migration Safety Net
+
+**Goal:** The database environment is safe for migration-dense work — non-production Vercel scopes never touch production data, and CI catches an unapplied or malformed migration before it merges.
+**Depends on:** Phase 27 (v1.5 complete). Hard prerequisite for every other v1.6 phase — all of Phase 30-34 add migrations, and Phase 31/32 perform an irreversible fuzzy backfill against real partner data.
+**Requirements:** INFRA-04, INFRA-05, INFRA-06
+**Success Criteria** (what must be TRUE):
+
+  1. The `preview` Vercel deployment and local `development`-scope work resolve to their own dedicated Neon branches; a query run against either scope returns zero production partner rows.
+  2. A developer runs `db:migrate` locally against the development branch without touching production data — retiring the standing "never run `db:migrate` locally" rule.
+  3. Opening a PR that touches `drizzle/*.sql` with a missing or malformed `_journal.json`/snapshot entry causes the CI DB-smoke step to fail and blocks merge.
+  4. Opening a PR with a correctly generated migration passes the same DB-smoke step against a real Postgres instance.
+
+**Plans:** TBD
+
+### Phase 30: Company & Contact Registry
+
+**Goal:** Client data has its own life — a shared company registry with private per-partner relationships and contacts — and a `sales` role exists so internal Commercial users hold relationships exactly as partners do.
+**Depends on:** Phase 29 (Neon safety net + DB-smoke CI must be live before this phase's migrations ship)
+**Requirements:** CRM-01, CRM-02, CRM-03, CRM-04, CRM-05, CRM-06, CRM-07, CRM-08, ROLE-01, ROLE-02, ROLE-03
+**Success Criteria** (what must be TRUE):
+
+  1. A company record exists independent of any proposal, identified by an optional SIREN (nullable UNIQUE) and a versioned `name_normalized` column; two proposals for the same client can be linked to the same company.
+  2. A partner opens a client and sees every proposal they have made for that client on one page; a different partner holding a relationship with the same company sees only their own relationship — never the other partner's contacts, notes, or proposals.
+  3. An admin viewing a company sees every relationship attached to it, including which partner (or sales/house owner) holds each one.
+  4. A contact (name, role, phone, email) is created and edited on a relationship, not on the company, and is invisible to anyone who is not that relationship's owner or an admin.
+  5. A user with the new `sales` role logs in, holds client relationships, and reaches the same pipeline/client-book surfaces a partner reaches — with zero change in what existing `partner` and `admin` accounts can see or do, and the ADMIN-09 commission-invisibility envelope intact.
+
+**Plans:** TBD
+**UI hint:** yes
+
+### Phase 31: Reconciliation Engine & Proposal Extraction
+
+**Goal:** Every client already implied by existing proposals becomes a real company + relationship record, built on a reusable dedup engine that a human resolves ambiguity through once, at import — not fuzzy logic re-derived forever after — and that never writes without a prior dry run.
+**Depends on:** Phase 30 (companies/client_relationships/contacts schema must exist to import into)
+**Requirements:** IMPORT-01, IMPORT-03, IMPORT-04, IMPORT-05, IMPORT-06
+**Success Criteria** (what must be TRUE):
+
+  1. Running the import in dry-run mode against existing proposals produces a full report of every company/relationship it would create, merge, or flag — with zero rows written to the database.
+  2. Running the same import for real extracts a company + relationship for every distinct client found in `proposals.inputs` and links each source proposal to the relationship it produced, without altering any proposal's `inputs` JSONB.
+  3. Two extracted clients that share a SIREN are merged into one company automatically, with no human step required.
+  4. Two extracted clients that match only on `name_normalized` — no SIREN on one or both — are NOT silently merged; they appear in a human review queue instead.
+  5. A human opens the review queue and, for each flagged pair, either merges the two into one company or marks them permanently separate; the decision is durable and is never re-flagged on a later run.
+
+**Plans:** TBD
+**UI hint:** yes
+
+### Phase 32: HubSpot Import
+
+**Goal:** The HubSpot export becomes companies, contacts, and relationships in the registry — reusing Phase 31's dry-run/dedup/review engine — with each HubSpot contact-owner mapped to a Leasétic sales-role user, and safe to re-run without creating duplicates.
+**Depends on:** Phase 31 (reconciliation engine + dry-run/review-queue infrastructure), Phase 30 (`sales` role for contact-owner mapping)
+**Requirements:** IMPORT-02, IMPORT-07
+**Success Criteria** (what must be TRUE):
+
+  1. Running the HubSpot import in dry-run mode produces a report of what it would create, merge, and flag from the `.xlsx` export, without writing anything.
+  2. Running the import for real creates companies, contacts, and "house" relationships owned by the mapped Leasétic sales-role user for every HubSpot record, applying the same SIREN-auto-merge / name-flag / human-review rules as Phase 31.
+  3. Every imported company/contact carries its HubSpot provenance ID (`hubspot_company_id` / `hubspot_contact_id`); re-running the import against the same export creates zero duplicate companies, contacts, or relationships.
+
+**Plans:** TBD
+
+> **Open dependency (blocks detailed design, not the phase or milestone).** The HubSpot export (`hubspot-crm-exports-tous-les-contacts-2026-08-31.xlsx`, ~2.9 MB) is not yet readable — macOS blocks `~/Downloads` at the TCC level. Its column inventory determines how much of IMPORT-02 can be automatic versus human-resolved. This phase can be scaffolded (engine reuse, role mapping, provenance columns) at `/gsd-plan-phase 32` time, but the mapping/column-level plan detail cannot be finalized until the file is readable.
+
+### Phase 33: Pipeline
+
+**Goal:** Every relationship has a place in a partner-advanced pipeline, and every proposal records whether it converted — giving a real per-quote conversion rate without ever blocking a partner from quoting a prospect who has no paperwork yet.
+**Depends on:** Phase 30 (relationships must exist to carry a stage); benefits from Phase 31/32 having populated real relationships, but is not schema-blocked by them
+**Requirements:** PIPE-01, PIPE-02, PIPE-03, PIPE-04, PIPE-05
+**Success Criteria** (what must be TRUE):
+
+  1. A relationship's owner (partner or sales) advances their relationship through the early pipeline stages themselves.
+  2. The late stages (`signé`, `débloqué`) are visible on the relationship but are NOT hand-editable — the UI communicates they are system-owned, reserved for a later contract-tool integration.
+  3. A partner marks a proposal `won`, `lost`, or `unanswered` with a date and an optional reason; a per-quote conversion rate can be computed from this data.
+  4. Marking a deal `won` is blocked unless the company has a SIREN on file; quoting or advancing early pipeline stages is never blocked by a missing SIREN.
+  5. A partner opens their pipeline view and sees their own relationships grouped by stage; they never see another partner's relationships.
+
+**Plans:** TBD
+**UI hint:** yes
+
+### Phase 34: Activity & Follow-Up
+
+**Goal:** A relationship's full history — manual notes and system events together — is visible in one place, and a partner can see who needs to be chased this week.
+**Depends on:** Phase 33 (system events include pipeline stage changes, so the pipeline must exist to generate them)
+**Requirements:** ACTV-01, ACTV-02, ACTV-03, ACTV-04, ACTV-05
+**Success Criteria** (what must be TRUE):
+
+  1. Opening a relationship shows a single chronological timeline mixing manual notes and system events — no separate tabs for the two.
+  2. A stage change or a new proposal automatically appends a timestamped, attributed system event to the relevant relationship's timeline with no user action required.
+  3. A user adds a dated note to a relationship and sees it appear in the timeline immediately.
+  4. A user sets or edits a next-action date on a relationship.
+  5. A user opens a "who to chase" list and sees relationships ordered by next-action date and staleness, scoped to relationships they own.
+
+**Plans:** TBD
+**UI hint:** yes
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -409,7 +523,13 @@ Wave 2 (after 26-01):
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
 | 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
+| 29. Migration Safety Net | v1.6 | TBD | Not started | - |
+| 30. Company & Contact Registry | v1.6 | TBD | Not started | - |
+| 31. Reconciliation Engine & Proposal Extraction | v1.6 | TBD | Not started | - |
+| 32. HubSpot Import | v1.6 | TBD | Not started | - |
+| 33. Pipeline | v1.6 | TBD | Not started | - |
+| 34. Activity & Follow-Up | v1.6 | TBD | Not started | - |
 
 ---
 
-*Last updated: 2026-05-30 — Phase 26 Archive-only descope (D-01) reconciled: Goal/criteria updated to Archive + Restore; Delete criterion replaced with Restore; ROWACT-02 descoped; v1.5 bullet updated.*
+*Last updated: 2026-08-31 — v1.6 ROADMAP created: 6 phases (29-34), 31/31 requirements mapped, 100% coverage. Phase 29 (Neon 3-branch split + DB-smoke CI) is the hard prerequisite for all migration-bearing phases below it. Phase 32 (HubSpot Import) has an open dependency on the unreadable `.xlsx` export file gating detailed design only. Next: `/gsd-plan-phase 29`.*

@@ -6,7 +6,7 @@ status: planning
 last_updated: "2026-08-31T09:12:32.249Z"
 last_activity: 2026-08-31
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 29 — Migration Safety Net (roadmap complete, not yet planned)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-08-31 — Milestone v1.6 started
+Status: Roadmap complete — ready for `/gsd-plan-phase 29`
+Last activity: 2026-08-31 — v1.6 ROADMAP created: 6 phases (29-34), 31/31 requirements mapped (100% coverage). Phase 29 (Neon 3-branch split + DB-smoke CI) is the hard prerequisite for all migration-bearing phases. Phase 32 (HubSpot Import) has an open dependency on the unreadable `.xlsx` export file.
 
 ## Deferred Items
 
