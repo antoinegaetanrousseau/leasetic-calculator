@@ -136,3 +136,12 @@ What IS confirmed, and what is not:
 ---
 *Phase: 29-migration-safety-net*
 *Completed: 2026-08-31*
+
+## Self-Check: PASSED
+
+All claimed files found on disk (`scripts/check-local-db-branch.sh`, this SUMMARY.md,
+`.gitignore` pattern `.env.local.bak*`) and all three commits (`9044a9d`, `a9b170e`,
+`49bb2f5`) found in git log. Honesty caveat stands: this PASSED status covers claims
+actually made in the SUMMARY (files exist, commits exist, guard output matches) — it
+does NOT assert that the end-to-end write-isolation truth was empirically verified,
+which the SUMMARY explicitly records as skipped.
