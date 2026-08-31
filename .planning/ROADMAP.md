@@ -419,10 +419,10 @@ Wave 2 (after 26-01):
   4. Local development reads and writes the Neon `development` branch; a query run locally returns zero production partner rows.
   5. Phase 20's locked rule 3 is **unchanged** — migrations still fan out only via `db-migrate.yml`; no local `db:migrate` path is introduced.
 
-**Plans:** 2 plans in 2 waves
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 29-01-PLAN.md — Fix the `db-smoke` path filter, add the journal/SQL parity gate that makes it actually fail, and add the anti-rot guard (INFRA-06; carries INFRA-04 for traceability, zero work)
+- [x] 29-01-PLAN.md — Fix the `db-smoke` path filter, add the journal/SQL parity gate that makes it actually fail, and add the anti-rot guard (INFRA-06; carries INFRA-04 for traceability, zero work)
 - [ ] 29-02-PLAN.md — Mandate the Neon `development` branch in `.env.example`, add `check:local-db-branch`, and repoint `.env.local` off production (INFRA-05; blocking checkpoint)
 
 ### Phase 30: Company & Contact Registry
@@ -537,7 +537,7 @@ Plans:
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
 | 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
-| 29. Migration Safety Net | v1.6 | TBD | Not started | - |
+| 29. Migration Safety Net | v1.6 | 1/2 | In Progress|  |
 | 30. Company & Contact Registry | v1.6 | TBD | Not started | - |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | TBD | Not started | - |
 | 32. HubSpot Import | v1.6 | TBD | Not started | - |
