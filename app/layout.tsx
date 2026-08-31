@@ -45,7 +45,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const ssrTheme = themeCookie === 'system' ? 'light' : themeCookie;
 
   return (
-    <html lang={lang} data-theme={ssrTheme} className={plusJakartaSans.variable}>
+    // suppressHydrationWarning: layer 2 (NO_FLASH_SCRIPT) deliberately rewrites
+    // data-theme on this element before hydration, so when the cookie is absent or
+    // 'system' the DOM legitimately disagrees with the 'light' SSR fallback above.
+    // React cannot patch attribute mismatches, so without this it logs a hydration
+    // error on every load for a difference the design intends. Scoped to <html>'s own
+    // attributes only — it does not suppress mismatches in any child.
+    <html
+      lang={lang}
+      data-theme={ssrTheme}
+      className={plusJakartaSans.variable}
+      suppressHydrationWarning
+    >
       <head>
         {/* Inline no-flash script — compile-time constant from src/lib/theme/no-flash-script.ts.
             Standard Next.js pattern for SSR theme bootstrap. See comment above for security analysis. */}
