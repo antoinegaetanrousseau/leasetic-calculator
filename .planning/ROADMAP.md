@@ -419,7 +419,11 @@ Wave 2 (after 26-01):
   4. Local development reads and writes the Neon `development` branch; a query run locally returns zero production partner rows.
   5. Phase 20's locked rule 3 is **unchanged** — migrations still fan out only via `db-migrate.yml`; no local `db:migrate` path is introduced.
 
-**Plans:** TBD
+**Plans:** 2 plans in 2 waves
+
+Plans:
+- [ ] 29-01-PLAN.md — Fix the `db-smoke` path filter, add the journal/SQL parity gate that makes it actually fail, and add the anti-rot guard (INFRA-06; carries INFRA-04 for traceability, zero work)
+- [ ] 29-02-PLAN.md — Mandate the Neon `development` branch in `.env.example`, add `check:local-db-branch`, and repoint `.env.local` off production (INFRA-05; blocking checkpoint)
 
 ### Phase 30: Company & Contact Registry
 
