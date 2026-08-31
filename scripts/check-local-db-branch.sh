@@ -47,6 +47,20 @@ if [ -z "$value" ]; then
   exit 1
 fi
 
+# A pooled Neon connection string always has a user:pass@ segment. Guard the
+# split explicitly rather than silently falling through to a misleading
+# "unrecognised host" error (e.g. reporting the URL scheme as the hostname)
+# when that segment is missing entirely.
+case "$value" in
+  *@*) ;;
+  *)
+    echo "ERROR: DATABASE_URL has no user@host segment (missing credentials)."
+    echo "  Expected a pooled connection string like"
+    echo "  postgres://user:pass@ep-<endpoint>-pooler.<region>.aws.neon.tech/db."
+    exit 1
+    ;;
+esac
+
 # Derive the hostname: the substring between '@' and the following '/' or ':'.
 host=$(printf '%s' "$value" | sed -E 's#^[^@]*@##; s#[/:].*$##')
 
