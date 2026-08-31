@@ -19,7 +19,7 @@
  */
 
 import { useState, type ReactNode } from 'react';
-import { Plus } from 'lucide-react';
+import { PlusIcon } from '@/components/ui/icons';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
 export interface PlusDeDetailsAccordionProps {
@@ -83,9 +83,8 @@ export function PlusDeDetailsAccordion({
           padding: 0,
         }}
       >
-        <Plus
+        <PlusIcon
           size={16}
-          strokeWidth={2.25}
           aria-hidden="true"
           style={{
             transform: open ? 'rotate(45deg)' : 'rotate(0deg)',

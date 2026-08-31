@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react';
+import { TrashIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -30,7 +30,10 @@ export function DeleteButtonClient({ proposalId, lang }: DeleteButtonClientProps
       toast.success(t('proposal.toast.delete.success', lang), {
         action: {
           label: t('proposal.toast.delete.action.view.deleted', lang),
-          onClick: () => router.push('/?deleted=1'),
+          // The v1.1 Recently Deleted view this used to point at ('/?deleted=1')
+          // no longer exists — the root page takes no searchParams, so the flag
+          // was inert. Archivées on /proposals is its successor.
+          onClick: () => router.push('/proposals?archived=1'),
         },
         duration: 6000,
       });
@@ -54,7 +57,7 @@ export function DeleteButtonClient({ proposalId, lang }: DeleteButtonClientProps
       }}
       aria-label={t('proposal.detail.action.delete', lang)}
     >
-      <Trash2 size={17} />
+      <TrashIcon size={17} />
       {t('proposal.detail.action.delete', lang)}
     </button>
   );

@@ -1,58 +1,72 @@
+/**
+ * StatusChip tests — rewritten in Phase 0 of the ReUI/Maia migration.
+ *
+ * The previous suite asserted the `.chip` / `.chip-*` class names from the v10
+ * stylesheet. This component had already been migrated to the ReUI Badge with
+ * Tailwind tints, so those assertions were testing a stylesheet that no longer
+ * styles it — the single largest cause of the red suite inherited by Phase 0.
+ *
+ * These assert the semantic status via the stable data-status hook, the label
+ * passthrough, and the non-interactivity contract.
+ */
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
-import { StatusChip } from './StatusChip';
+import { cleanup, render, screen, within } from '@testing-library/react';
+import { StatusChip, type StatusChipProps } from './StatusChip';
 
 afterEach(() => cleanup());
 
+const VARIANTS: Array<StatusChipProps['variant']> = [
+  'active',
+  'draft',
+  'expired',
+  'deleted',
+  'disabled',
+  'invited',
+];
+
 describe('StatusChip', () => {
-  it('AC-SC-01: variant=active renders <span class="chip chip-active">{label}</span>', () => {
-    const { container } = render(<StatusChip variant="active" label="Active" />);
-    const chip = container.querySelector('span');
-    expect(chip).not.toBeNull();
-    expect(chip).toHaveClass('chip');
-    expect(chip).toHaveClass('chip-active');
-    expect(chip).toHaveTextContent('Active');
+  it.each([
+    ['active', 'Active'],
+    ['draft', 'Brouillon'],
+    ['expired', 'Expirée'],
+    ['disabled', 'Désactivé'],
+    ['invited', 'invité.e'],
+    ['deleted', 'Supprimée'],
+  ] as Array<[StatusChipProps['variant'], string]>)(
+    'variant=%s exposes data-status and renders the supplied label',
+    (variant, label) => {
+      const { container } = render(<StatusChip variant={variant} label={label} />);
+      const chip = container.querySelector(`[data-status="${variant}"]`);
+      expect(chip).not.toBeNull();
+      expect(chip).toHaveTextContent(label);
+    },
+  );
+
+  it('renders exactly one chip per instance, for every variant', () => {
+    for (const variant of VARIANTS) {
+      const { container, unmount } = render(<StatusChip variant={variant} label="X" />);
+      expect(container.querySelectorAll('[data-status]')).toHaveLength(1);
+      unmount();
+    }
   });
 
-  it('AC-SC-02: variant=draft renders <span class="chip chip-draft">{label}</span> (gold tint via .chip-draft from Plan 11-01)', () => {
-    const { container } = render(<StatusChip variant="draft" label="Brouillon" />);
-    const chip = container.querySelector('span');
-    expect(chip).not.toBeNull();
-    expect(chip).toHaveClass('chip');
-    expect(chip).toHaveClass('chip-draft');
-    expect(chip).toHaveTextContent('Brouillon');
-  });
-
-  it('AC-SC-03: variant=expired renders <span class="chip chip-expired">{label}</span> (muted-gray, post Plan 11-01 rewrite)', () => {
-    const { container } = render(<StatusChip variant="expired" label="Expirée" />);
-    const chip = container.querySelector('span');
-    expect(chip).not.toBeNull();
-    expect(chip).toHaveClass('chip');
-    expect(chip).toHaveClass('chip-expired');
-    expect(chip).toHaveTextContent('Expirée');
-  });
-
-  it('AC-SC-04: variant=disabled renders <span class="chip chip-disabled">{label}</span>', () => {
-    const { container } = render(<StatusChip variant="disabled" label="Désactivé" />);
-    const chip = container.querySelector('span');
-    expect(chip).not.toBeNull();
-    expect(chip).toHaveClass('chip');
-    expect(chip).toHaveClass('chip-disabled');
-    expect(chip).toHaveTextContent('Désactivé');
-  });
-
-  it('AC-SC-08: variant=invited renders <span class="chip chip-invited">{label}</span> (gold tint, Phase 14)', () => {
-    const { container } = render(<StatusChip variant="invited" label="invité.e" />);
-    const chip = container.querySelector('span');
-    expect(chip).not.toBeNull();
-    expect(chip).toHaveClass('chip');
-    expect(chip).toHaveClass('chip-invited');
-    expect(chip).toHaveTextContent('invité.e');
-  });
-
-  it('AC-SC-06: rendered chip is non-interactive (no role=button, no role=link)', () => {
+  it('AC-SC-06: the chip is non-interactive — no button or link role', () => {
     render(<StatusChip variant="active" label="Active" />);
     expect(screen.queryAllByRole('button')).toEqual([]);
     expect(screen.queryAllByRole('link')).toEqual([]);
+  });
+
+  it('owns no i18n strings — the label is passed through verbatim', () => {
+    const { container } = render(<StatusChip variant="active" label="Totally Custom Label" />);
+    expect(within(container).getByText('Totally Custom Label')).toBeDefined();
+  });
+
+  it('accepts a caller className without dropping the status hook', () => {
+    const { container } = render(
+      <StatusChip variant="draft" label="Brouillon" className="ml-2" />,
+    );
+    const chip = container.querySelector('[data-status="draft"]');
+    expect(chip).not.toBeNull();
+    expect(chip).toHaveClass('ml-2');
   });
 });

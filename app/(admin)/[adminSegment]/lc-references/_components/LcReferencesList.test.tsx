@@ -91,7 +91,7 @@ describe('LcReferencesList', () => {
     expect(texts).toContain('Créée le');
   });
 
-  it('Test 3: Référence cell uses fontFamily containing "monospace"', () => {
+  it('Test 3: Référence renders in a monospace face so LC codes align', () => {
     const { container } = render(
       <LcReferencesList
         rows={[makeRow({ lcRef: 'LC-2026-099' })]}
@@ -101,20 +101,17 @@ describe('LcReferencesList', () => {
         currentQ=""
       />,
     );
-    // Find the cell that contains the lcRef text
-    const cells = container.querySelectorAll('td');
-    const refCell = Array.from(cells).find((td) => td.textContent?.includes('LC-2026-099'));
+    const refCell = Array.from(container.querySelectorAll('td')).find((td) =>
+      td.textContent?.includes('LC-2026-099'),
+    );
     expect(refCell).not.toBeNull();
-    // Check inline style or child element has monospace
-    const monoEl = refCell?.querySelector('[style*="monospace"]') ?? refCell;
-    const style = (monoEl as HTMLElement | undefined)?.style?.fontFamily ?? '';
-    // Either the td or a child span should have monospace
-    const allEls = [refCell, ...Array.from(refCell?.querySelectorAll('*') ?? [])];
-    const hasMonospace = allEls.some((el) => {
-      const s = (el as HTMLElement).style?.fontFamily ?? '';
-      return s.includes('monospace');
-    });
-    expect(hasMonospace || style.includes('monospace')).toBe(true);
+    // Phase 4 moved this from an inline `fontFamily: 'monospace'` to the
+    // `font-mono` utility when the table adopted the shadcn Table primitives.
+    // Same intent, different mechanism.
+    const mono = [refCell!, ...Array.from(refCell!.querySelectorAll('*'))].some((el) =>
+      String((el as HTMLElement).className ?? '').includes('font-mono'),
+    );
+    expect(mono).toBe(true);
   });
 
   it('Test 4: Montant HT cell uses formatCurrency — shows € symbol', () => {
@@ -144,7 +141,7 @@ describe('LcReferencesList', () => {
       />,
     );
     // StatusChip renders an element with class chip-* or data-testid containing chip
-    const chip = container.querySelector('[class*="chip"]');
+    const chip = container.querySelector('[data-status]');
     expect(chip).not.toBeNull();
   });
 

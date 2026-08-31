@@ -107,12 +107,14 @@ describe('/proposals/[id] page.tsx — Plan 14-06 D-28 StatusChip in header', ()
     const tree = await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) });
     const { container } = render(tree);
 
-    const chip = container.querySelector('.chip.chip-active');
+    const chip = container.querySelector('[data-status="active"]');
     expect(chip).not.toBeNull();
     expect(chip!.textContent).toContain('Actif');
 
-    // LanguageChip still present as a sibling (UI-SPEC §5.8).
-    const languageChip = container.querySelector('.chip-language, .chip.chip-language');
+    // LanguageChip still present as a sibling (UI-SPEC §5.8). Phase 2 moved it
+    // onto the ReUI Badge, so it is identified by its data-language hook rather
+    // than the retired .chip-language class.
+    const languageChip = container.querySelector('[data-language]');
     expect(languageChip).not.toBeNull();
   });
 
@@ -126,7 +128,7 @@ describe('/proposals/[id] page.tsx — Plan 14-06 D-28 StatusChip in header', ()
     const tree = await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) });
     const { container } = render(tree);
 
-    const chip = container.querySelector('.chip.chip-deleted');
+    const chip = container.querySelector('[data-status="deleted"]');
     expect(chip).not.toBeNull();
     expect(chip!.textContent).toContain('Supprimée');
   });

@@ -1,7 +1,8 @@
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Download, Copy as CopyIcon, AlertTriangle } from 'lucide-react';
+import { AlertTriangleIcon, CopyIcon, DownloadIcon } from '@/components/ui/icons';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
 import type { Lang, DictKey } from '@/lib/i18n/dictionaries';
@@ -85,7 +86,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
             marginBottom: 16,
           }}
         >
-          <AlertTriangle size={17} color="var(--gold)" aria-hidden="true" />
+          <AlertTriangleIcon size={17} style={{ color: 'var(--gold)' }} aria-hidden="true" />
           {t('proposal.detail.deleted.banner', lang).replace(
             '{0}',
             String(
@@ -173,14 +174,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
         <div>
           {/* Inputs card — UI-SPEC §3.2.3 — 15 rows */}
           <section className="card" style={{ marginBottom: 16 }}>
-            <div className="ctitle">
-              <span
-                className="dot"
-                style={{ background: 'var(--teal)' }}
-                aria-hidden="true"
-              />
-              <span>{t('proposal.detail.section.inputs', lang)}</span>
-            </div>
+            <SectionTitle accent="teal">{t('proposal.detail.section.inputs', lang)}</SectionTitle>
             <dl
               style={{
                 display: 'grid',
@@ -219,14 +213,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
 
           {/* Computed card — UI-SPEC §3.2.4 */}
           <section className="card">
-            <div className="ctitle">
-              <span
-                className="dot"
-                style={{ background: 'var(--gold)' }}
-                aria-hidden="true"
-              />
-              <span>{t('proposal.detail.section.computed', lang)}</span>
-            </div>
+            <SectionTitle accent="teal">{t('proposal.detail.section.computed', lang)}</SectionTitle>
             <dl
               style={{
                 display: 'grid',
@@ -328,9 +315,10 @@ export default async function ProposalDetailPage({ params }: PageProps) {
           }}
         >
           <section className="card">
-            <div className="ctitle">
-              <span>{t('proposal.detail.pdf.preview.title', lang)}</span>
-            </div>
+            {/* No bullet here — this header never had one. */}
+            <SectionTitle bullet={false}>
+              {t('proposal.detail.pdf.preview.title', lang)}
+            </SectionTitle>
             <div style={{ marginTop: 16 }}>
               <EmbeddedPdfPreview proposalId={proposal.id} lang={lang} />
             </div>
@@ -352,7 +340,7 @@ export default async function ProposalDetailPage({ params }: PageProps) {
               className="btn-green"
               style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
             >
-              <Download size={17} />
+              <DownloadIcon size={17} />
               {t('proposal.detail.action.download', lang)}
             </a>
 

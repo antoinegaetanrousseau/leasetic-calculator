@@ -1,5 +1,15 @@
 'use client';
 
+import { segmentedGroupClass, segmentedItemClass } from '@/components/ui/segmented';
+import { SectionTitle } from '@/components/ui/SectionTitle';
+import { Badge } from '@/components/ui/badge';
+import { Field, FieldLabel } from '@/components/ui/field';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group';
 import { useMemo, useState } from 'react';
 import { computeLoyer, tKey } from '@/lib/calc';
 import { formatCurrency, formatNumber } from '@/lib/i18n/format';
@@ -51,22 +61,19 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
 
   return (
     <section className="card" style={{ marginBottom: 16 }} aria-labelledby="explain-title">
-      <div className="ctitle">
-        <span className="dot" style={{ background: 'var(--gd)' }} aria-hidden="true" />
-        <span id="explain-title">{t('admin.coefficients.explain.title', lang)}</span>
-      </div>
+      <SectionTitle>{t('admin.coefficients.explain.title', lang)}</SectionTitle>
       <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4, marginBottom: 16 }}>
         {t('admin.coefficients.explain.sub', lang)}
       </p>
 
       {/* Three input controls in a row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-        <div className="fld">
-          <label htmlFor="explain-amount">
+        <Field>
+          <FieldLabel htmlFor="explain-amount">
             {t('admin.coefficients.explain.amount.label', lang)}
-          </label>
-          <div className="ieu">
-            <input
+          </FieldLabel>
+          <InputGroup>
+            <InputGroupInput
               id="explain-amount"
               type="number"
               min={1}
@@ -74,22 +81,24 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
               value={amountHTRaw}
               onChange={(e) => setAmountHTRaw(e.currentTarget.value)}
             />
-            <span className="suffix">{t('common.ht', lang)}</span>
-          </div>
+            <InputGroupAddon align="inline-end">
+              <InputGroupText>{t('common.ht', lang)}</InputGroupText>
+            </InputGroupAddon>
+          </InputGroup>
           {tranche && (
-            <span
-              className="tbadge"
-              style={{ marginTop: 6, display: 'inline-block' }}
+            <Badge
+              variant="secondary"
+              className="mt-1.5 self-start rounded-full border-transparent bg-[color-mix(in_oklab,var(--teal)_8%,transparent)] text-[11.2px] font-semibold text-teal"
             >
               {t(`admin.tranche.${tranche.slice(1)}.range` as DictKey, lang)}
-            </span>
+            </Badge>
           )}
-        </div>
+        </Field>
 
-        <div className="fld">
-          <label>{t('admin.coefficients.explain.duration.label', lang)}</label>
+        <Field>
+          <FieldLabel>{t('admin.coefficients.explain.duration.label', lang)}</FieldLabel>
           <div
-            className="dg"
+            className={segmentedGroupClass}
             role="group"
             aria-label={t('admin.coefficients.explain.duration.label', lang)}
           >
@@ -97,7 +106,7 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
               <button
                 key={d}
                 type="button"
-                className={`db${durationMonths === d ? ' on' : ''}`}
+                className={segmentedItemClass(durationMonths === d)}
                 onClick={() => setDurationMonths(d)}
                 aria-pressed={durationMonths === d}
               >
@@ -105,12 +114,12 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
               </button>
             ))}
           </div>
-        </div>
+        </Field>
 
-        <div className="fld">
-          <label>{t('admin.coefficients.explain.validity.label', lang)}</label>
+        <Field>
+          <FieldLabel>{t('admin.coefficients.explain.validity.label', lang)}</FieldLabel>
           <div
-            className="dg"
+            className={segmentedGroupClass}
             role="group"
             aria-label={t('admin.coefficients.explain.validity.label', lang)}
           >
@@ -118,7 +127,7 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
               <button
                 key={v}
                 type="button"
-                className={`db${validityDays === v ? ' on' : ''}`}
+                className={segmentedItemClass(validityDays === v)}
                 onClick={() => setValidityDays(v)}
                 aria-pressed={validityDays === v}
               >
@@ -126,7 +135,7 @@ export function ExplainTool({ lang, latestParams }: ExplainToolProps) {
               </button>
             ))}
           </div>
-        </div>
+        </Field>
       </div>
 
       {/* Output area — aria-live for screen reader updates */}

@@ -1,59 +1,161 @@
 @import 'tailwindcss';
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 /* === Tailwind v4 dark variant — maps to data-theme=dark per UI-SPEC === */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* === Light mode: extracted verbatim from UI-SPEC §CSS Custom Properties — Light mode === */
+/* === Design tokens ======================================================
+   The app runs on the ReUI / shadcn base-maia design system. Values below are
+   the registry defaults (ui.shadcn.com/r/colors/neutral.json, the theme that
+   `baseColor: neutral` resolves to), NOT hand-picked ones.
+
+   Exactly three things are Leasetic's, by decision (2026-08-29):
+     1. the logo assets in /public,
+     2. the accent colour, applied to --primary / --sidebar-primary and the
+        focus ring, and
+     3. the large radius agreed for the LEASETIC Group Maia setup.
+
+   Everything else — neutrals, surfaces, borders, feedback hues, the sidebar
+   chrome — is ReUI's. An earlier pass wired these to the Leasetic Figma /
+   Notion design system; that was reversed here so the product reads as ReUI.
+
+   NOTE on "accent": shadcn's --accent is the neutral hover wash, NOT the brand
+   accent. The brand accent is --primary. Do not put green on --accent. */
 :root {
-  /* Brand palette — never change without design review */
-  --navy:      #112c3b;
-  --navy-dark: #0a1e2a;
-  --green:     #81c088;
-  --gd:        #129657;
-  --gd-text:   #0e7544;  /* WCAG AA text variant for --gd over light backgrounds; matches --gd in dark mode */
-  --gl:        #c8e2c8;
-  --teal:      #2d7a8c;
-  --paper:     #f5f7fc;
-  --white:     #ffffff;
-  --ink:       #41423d;
-  --muted:     #6e7191;
-  --border:    #d9dbe9;
-  --gold:      #e08530;
-  --gold-text: #8a4e13;  /* WCAG AA text variant for --gold over light backgrounds; matches --gold in dark mode */
-  --danger:    #dc2626;
-  --brand-mark: #6DC388;
+  /* ── Leasetic brand accent ─────────────────────────────────────────── */
+  --brand-accent:  #01cc72;
+  /* `--brand-mark: #6DC388` removed here (and `--color-brand-mark` below): it
+     described the old placeholder propeller's fill. The official mark is on
+     #01CC72, the same accent as the lockups, so the token held a colour that
+     no longer appears in any asset — and nothing ever read it. */
 
-  /* Layout shell tokens */
-  --shell-sidebar-w: 260px;
-  --shell-sidebar-w-collapsed: 72px;
-  --shell-sidebar-current-w: 260px;
-  --topbar-h:        64px;
-  --footer-h:        48px;
+  /* ── ReUI base-maia, light ─────────────────────────────────────────── */
+  --background:              oklch(1 0 0);
+  --foreground:              oklch(0.145 0 0);
+  --card:                    oklch(1 0 0);
+  --card-foreground:         oklch(0.145 0 0);
+  --popover:                 oklch(1 0 0);
+  --popover-foreground:      oklch(0.145 0 0);
+  --primary:                 var(--brand-accent);
+  --primary-foreground:      oklch(1 0 0);
+  --secondary:               oklch(0.97 0 0);
+  --secondary-foreground:    oklch(0.205 0 0);
+  --muted-surface:           oklch(0.97 0 0);
+  --muted-foreground:        oklch(0.556 0 0);
+  --accent:                  oklch(0.97 0 0);
+  --accent-foreground:       oklch(0.205 0 0);
+  --destructive:             oklch(0.577 0.245 27.325);
+  --border:                  oklch(0.922 0 0);
+  --input:                   oklch(0.922 0 0);
+  --ring:                    var(--brand-accent);
+  --chart-1:                 oklch(0.87 0 0);
+  --chart-2:                 oklch(0.556 0 0);
+  --chart-3:                 oklch(0.439 0 0);
+  --chart-4:                 oklch(0.371 0 0);
+  --chart-5:                 oklch(0.269 0 0);
+  --sidebar:                 oklch(0.985 0 0);
+  --sidebar-foreground:      oklch(0.145 0 0);
+  --sidebar-primary:         var(--brand-accent);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent:          oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border:          oklch(0.922 0 0);
+  --sidebar-ring:            var(--brand-accent);
 
-  /* Elevation */
-  --shadow-card: 0 1px 2px rgba(17,44,59,0.04), 0 4px 12px rgba(17,44,59,0.05);
+  /* base-maia's own default. This drives the WHOLE radius scale through the
+     multipliers in `@theme inline` below (×0.6 up to ×2.6), which are tuned
+     for this value. It was previously 1rem, chasing a "large radius" brand
+     parameter — that inflated every step by 60%, so `rounded-4xl` became
+     41.6px and every Input and InputGroup rendered as a pill. Change this
+     number and the entire scale moves with it; do not raise it without
+     re-checking the top of the scale against a real form. */
+  --radius:                  0.625rem;
 
-  /* Themeable surfaces */
-  --surface:        #ffffff;
-  --hover-overlay:  rgba(17,44,59,0.04);
-  --active-pill:    rgba(18,150,87,0.12);
+  --destructive-foreground:  var(--color-red-800);
+  --success:                 var(--color-emerald-500);
+  --success-foreground:      var(--color-emerald-900);
+  --info:                    var(--color-violet-500);
+  --info-foreground:         var(--color-violet-900);
+  --warning:                 var(--color-yellow-500);
+  --warning-foreground:      var(--color-yellow-900);
+  --invert:                  var(--color-zinc-900);
+  --invert-foreground:       var(--color-zinc-50);
+
+  /* ── Legacy v10 aliases ────────────────────────────────────────────────
+     ~400 call sites still read these directly. Rather than edit them all now,
+     each one POINTS AT its ReUI equivalent, so legacy code inherits the ReUI
+     look for free and the aliases can be deleted per-file as Phases 5-7
+     migrate them.
+
+     --muted keeps the legacy TEXT sense and maps to --muted-foreground.
+     shadcn's surface sense lives in --muted-surface above, which is what
+     `bg-muted` resolves to via the @theme block. Collapsing the two is what
+     once rendered every muted label invisible on white. */
+  --paper:          var(--background);
+  --surface:        var(--card);
+  --ink:            var(--foreground);
+  --muted:          var(--muted-foreground);
+  --white:          #ffffff;
+  --navy:           var(--foreground);
+  --navy-dark:      var(--foreground);
+  --gd:             var(--brand-accent);
+  --gd-text:        var(--brand-accent);
+  --green:          var(--brand-accent);
+  --gl:             var(--muted-surface);
+  --teal:           var(--muted-foreground);
+  --gold:           var(--warning);
+  --gold-text:      var(--warning-foreground);
+  --danger:         var(--destructive);
+  --hover-overlay:  var(--accent);
+  --shadow-card:    0 1px 2px rgb(0 0 0 / 0.04), 0 4px 12px rgb(0 0 0 / 0.05);
+
+  /* Shell metrics still referenced by the proposal detail page + shell footer. */
+  --topbar-h:       64px;
+  --footer-h:       48px;
 
   color-scheme: light;
 }
 
-/* === Dark mode: extracted verbatim from UI-SPEC §CSS Custom Properties — Dark mode === */
+/* === ReUI base-maia, dark. Registry defaults; the accent stays brand green,
+   which is brand-invariant across themes. The legacy aliases above resolve
+   through these automatically, so nothing needs re-aliasing here. === */
 html[data-theme="dark"] {
-  --paper:    #0c121c;
-  --surface:  #161e2d;
-  --ink:      #e6e9ef;
-  --muted:    #8b93a8;
-  --border:   #242c3e;
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.25);
-  --hover-overlay: rgba(255,255,255,0.05);
-  --active-pill:   rgba(18,150,87,0.22);
-  --navy:      #4a8fa8;  /* Navy lightened for dark-mode legibility on --surface dark */
-  --gd-text:   #129657;  /* Same as --gd — dark-mode contrast already AA-pass against --paper dark */
-  --gold-text: #e08530;  /* Same as --gold — dark-mode contrast already AA-pass against chip bg dark */
+  --background:              oklch(0.145 0 0);
+  --foreground:              oklch(0.985 0 0);
+  --card:                    oklch(0.205 0 0);
+  --card-foreground:         oklch(0.985 0 0);
+  --popover:                 oklch(0.205 0 0);
+  --popover-foreground:      oklch(0.985 0 0);
+  --primary:                 var(--brand-accent);
+  --primary-foreground:      oklch(0.205 0 0);
+  --secondary:               oklch(0.269 0 0);
+  --secondary-foreground:    oklch(0.985 0 0);
+  --muted-surface:           oklch(0.269 0 0);
+  --muted-foreground:        oklch(0.708 0 0);
+  --accent:                  oklch(0.269 0 0);
+  --accent-foreground:       oklch(0.985 0 0);
+  --destructive:             oklch(0.704 0.191 22.216);
+  --border:                  oklch(1 0 0 / 10%);
+  --input:                   oklch(1 0 0 / 15%);
+  --ring:                    var(--brand-accent);
+  --sidebar:                 oklch(0.205 0 0);
+  --sidebar-foreground:      oklch(0.985 0 0);
+  --sidebar-primary:         var(--brand-accent);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent:          oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border:          oklch(1 0 0 / 10%);
+  --sidebar-ring:            var(--brand-accent);
+
+  --destructive-foreground:  var(--color-red-600);
+  --success-foreground:      var(--color-emerald-600);
+  --info-foreground:         var(--color-violet-600);
+  --warning-foreground:      var(--color-yellow-600);
+  --invert:                  var(--color-zinc-700);
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 14px rgb(0 0 0 / 0.25);
   color-scheme: dark;
 }
 /* Brand palette --navy/--green/--gd/--gl/--teal/--gold/--danger preserved across themes */
@@ -67,23 +169,25 @@ html[data-theme="dark"] {
   --color-teal:      var(--teal);
   --color-danger:    var(--danger);
   --color-ink:       var(--ink);
-  --color-muted:     var(--muted);
+  /* `bg-muted` (71 shadcn/ReUI call sites) needs the SURFACE sense, not the
+     legacy text grey. `text-muted` has 0 call sites, so this mapping is safe;
+     legacy code reaches the text colour via `color: var(--muted)` directly. */
+  --color-muted:     var(--muted-surface);
   --color-border:    var(--border);
   --color-green:     var(--green);
   --color-gl:        var(--gl);
   --color-gold:      var(--gold);
   --color-navy-dark: var(--navy-dark);
-  --color-brand-mark: var(--brand-mark);
 
-  /* Font family registered by next/font/local (set in layout.tsx) */
-  --font-sans: var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', system-ui, sans-serif;
+  /* Font family registered by next/font/google (Inter, set in layout.tsx) */
+  --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
 
-  /* Border radius scale from UI-SPEC §Border Radius Scale */
-  --radius-md:  6px;
-  --radius-lg:  8px;
-  --radius-xl:  12px;
-  --radius-2xl: 16px;
-  /* rounded-full (9999px) is Tailwind v4 default */
+  /* The UI-SPEC radius scale that used to be declared here (md 6 / lg 8 /
+     xl 12 / 2xl 16) is GONE. It never applied: `@theme inline` at the bottom
+     of this file redeclares the same four names off `--radius`, and that is
+     what Tailwind builds its utilities from. Two competing scales meant
+     `rounded-2xl` read as 16px here and rendered at 28.8px. One scale now —
+     `--radius` above is the single knob. */
 }
 
 /* === Body base styles (UI-SPEC §Typography: 14.5px / 400 / 1.55) === */
@@ -120,455 +224,288 @@ html[data-theme="dark"] [data-pdf-surface] {
    Tokens (--surface, --gd, --teal, --danger, etc.) are defined above; this
    block uses var(--*) exclusively — NO new token declarations introduced. */
 
-/* Card chrome — UI-SPEC §3.2.2 */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px;
-  box-shadow: var(--shadow-card);
+/* Deliberately OUTSIDE `@layer components`, both of them.
+
+   The invalid-state rule is an error affordance that must win over whatever a
+   caller puts on the element, and the brand-logo rules are the zero-JS theme
+   picker — layered, a stray display utility on either <img> would unhide both
+   logos at once. Unlayered keeps them authoritative. */
+/* The `.fld` form system is retired — Phase 5 moved all 44 of its call sites
+   onto the ReUI Field primitives, so `.fld` and its descendant input chrome
+   are gone.
+
+   This invalid-state rule survives, scoped. Four files still render bare
+   <input> elements (ParametresForm, LoginForm, SetPasswordForm, SearchBar) and
+   would otherwise lose their error affordance on the auth surfaces. The
+   `:not([data-slot="input"])` guard keeps it off shadcn inputs, which style
+   aria-invalid themselves — without it this unlayered rule outranks their
+   utility classes and the design system loses control of its own error state.
+   Delete this entirely once those four are migrated. */
+input:not([data-slot="input"]).invalid,
+input:not([data-slot="input"])[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--destructive) 12%, transparent);
 }
 
-/* Section title row — UI-SPEC §3.2.2 */
-.ctitle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-transform: uppercase;
-  font-size: 11.8px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  margin-bottom: 16px;
-}
-.ctitle .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: var(--gd);
-  flex-shrink: 0;
-}
-
-/* Field row (.fld + .fld label + .fld input wrapper) — UI-SPEC §3.2.3 */
-.fld {
-  margin-bottom: 12px;
-}
-.fld + .fld { margin-top: 12px; }
-.fld > label {
-  display: block;
-  font-size: 11.2px;
-  font-weight: 500;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-.fld .req { color: var(--danger); margin-left: 2px; }
-.fld .error-msg {
-  font-size: 11.2px;
-  font-weight: 500;
-  color: var(--danger);
-  line-height: 1.4;
-  margin-top: 4px;
-}
-
-/* Input chrome — UI-SPEC §3.2.4 */
-.fld input[type="text"],
-.fld input[type="email"],
-.fld input[type="tel"],
-.fld input[type="number"] {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.65rem 0.9rem;
-  font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--ink);
-  background: var(--surface);
-  outline: none;
-  transition: border-color 150ms, box-shadow 150ms;
-}
-.fld input:focus {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.12);
-}
-input.invalid,
-input[aria-invalid="true"] {
-  border-color: var(--danger) !important;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
-}
-
-/* Currency-input addon ("75 000 [€ HT]") — UI-SPEC §3.2.5 */
-.ieu {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: border-color 150ms, box-shadow 150ms;
-}
-.ieu:focus-within {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.12);
-}
-.ieu.invalid,
-.ieu[aria-invalid="true"] {
-  border-color: var(--danger) !important;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
-}
-.ieu input {
-  flex: 1;
-  border: none !important;
-  border-radius: 0 !important;
-  padding-right: 1rem;
-  background: transparent;
-  outline: none;
-}
-.ieu input:focus {
-  box-shadow: none !important;          /* parent .ieu:focus-within owns the ring */
-}
-.ieu .suffix {
-  padding: 0.65rem 0.9rem;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-}
-
-/* Tranche badge (auto-shown below amount) — UI-SPEC §3.2.5 */
-.tbadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  background: rgba(45, 122, 140, 0.08);
-  color: var(--teal);
-  font-size: 11.2px;
-  font-weight: 600;
-}
-
-/* Duration / Validity segmented (.dg .db / .db.on) — UI-SPEC §3.2.5 */
-.dg {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: border-color 150ms, box-shadow 150ms;
-}
-.dg.invalid,
-.dg[aria-invalid="true"] {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
-}
-.dg .db {
-  padding: 0.65rem 0.5rem;
-  background: var(--surface);
-  color: var(--ink);
-  border: none;
-  border-right: 1px solid var(--border);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 150ms;
-}
-.dg .db:last-child { border-right: none; }
-.dg .db:hover { background: var(--hover-overlay); }
-.dg .db.on {
-  background: var(--gd);
-  color: #ffffff;
-  font-weight: 600;
-}
-
-/* Yes/No toggle (.yn-btn / .yn-btn.on) — UI-SPEC §5 */
-.yn-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-.yn-btn {
-  padding: 0.65rem 0.5rem;
-  background: var(--surface);
-  color: var(--ink);
-  border: none;
-  border-right: 1px solid var(--border);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 150ms;
-}
-.yn-btn:last-child { border-right: none; }
-.yn-btn:hover { background: var(--hover-overlay); }
-.yn-btn.on {
-  background: var(--gd);
-  color: #ffffff;
-  font-weight: 600;
-}
-
-/* Buttons — Phase 5 tokens; concrete classes added here for Plans 07-03/04/05 */
-.btn-green,
-.btn-navy,
-.btn-out {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0.6rem 1.5rem;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background 150ms, color 150ms, box-shadow 150ms;
-}
-.btn-green       { background: var(--gd);  color: #ffffff; }
-.btn-green:hover { background: #0d7d49; }
-.btn-navy        { background: var(--navy); color: #ffffff; }
-.btn-navy:hover  { background: var(--navy-dark); }
-.btn-out         { background: transparent; color: var(--ink); border: 1px solid var(--border); }
-.btn-out:hover   { background: var(--hover-overlay); }
-.btn-green:focus-visible,
-.btn-navy:focus-visible,
-.btn-out:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
-}
-.btn-green:disabled,
-.btn-navy:disabled,
-.btn-out:disabled {
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-/* === Phase 8 (08-10) chip + embed primitives === */
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: 9999px;
-  font-size: 11.2px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.chip-active {
-  background: rgba(18, 150, 87, 0.12);
-  color: var(--gd);
-}
-
-.chip-expired {
-  background: rgba(110, 113, 145, 0.12);
-  color: var(--muted);
-}
-
-.chip-draft {
-  background: rgba(224, 133, 48, 0.12);
-  color: var(--gold-text);
-}
-
-.chip-invited {
-  background: rgba(224, 133, 48, 0.12);
-  color: var(--gold-text);
-}
-
-.chip-deleted {
-  background: rgba(220, 38, 38, 0.08);
-  color: var(--danger);
-}
-
-.chip-language {
-  background: rgba(45, 122, 140, 0.10);
-  color: var(--teal);
-}
-
-.pdf-embed-wrap {
-  width: 100%;
-  height: 480px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--paper);
-}
-
-.pdf-embed-wrap embed {
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-/* === end Phase 8 detail page === */
-
-/* === Phase 8 (08-11) home list primitives === */
-
-.list-row {
-  display: grid;
-  /* 6th `auto` track holds the right-aligned row-action slot (Archive/Restore).
-     Active/expired rows now render an actionsSlot (Phase 26); without this track
-     the extra child wrapped onto a new implicit grid row (icon dropped below).
-     Drafts (.is-draft) and deleted (.is-deleted) already declare the same track. */
-  grid-template-columns: 1fr 100px 130px 100px max-content auto;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 16px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  transition: background 150ms;
-  border-bottom: 1px solid var(--border);
-}
-.list-row:last-child { border-bottom: none; }
-.list-row:hover { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); }
-.list-row:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--teal); }
-.list-row.is-deleted { opacity: 0.7; grid-template-columns: 1fr 100px 130px 100px max-content auto; }
-.list-row.is-draft  { grid-template-columns: 1fr 100px 130px 100px max-content auto; }
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0 12px;
-  background: var(--surface);
-  transition: border-color 150ms, box-shadow 150ms;
-}
-.search-bar:focus-within {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.12);
-}
-.search-bar input {
-  flex: 1; border: none; outline: none;
-  padding: 0.65rem 0; font-size: 14px;
-  color: var(--ink); background: transparent;
-}
-
-.toggle-pill {
-  padding: 4px 12px;
-  border-radius: 9999px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 12.5px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: background 150ms, color 150ms;
-}
-.toggle-pill:hover { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); color: var(--ink); }
-.toggle-pill.on {
-  background: var(--surface);
-  color: var(--ink);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(17, 44, 59, 0.06);
-}
-
-/* === end Phase 8 home list === */
-
-/* === Phase 9 (09-01) admin surface primitives === */
-
-.admin-nav-card {
-  cursor: pointer;
-  text-decoration: none;
-  transition: box-shadow 150ms, border-color 150ms;
-  display: block;
-}
-.admin-nav-card:hover {
-  border-color: var(--teal);
-  box-shadow: 0 2px 8px rgba(45, 122, 140, 0.12);
-}
-.admin-nav-card:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
-}
-
-.history-diff-item {
-  display: block;
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--ink);
-  font-family: ui-monospace, 'Cascadia Code', monospace;
-  margin-bottom: 2px;
-}
-.history-diff-item code {
-  font-size: 11.5px;
-  color: var(--teal);
-  background: rgba(45, 122, 140, 0.07);
-  border-radius: 3px;
-  padding: 1px 4px;
-}
-.history-diff-item .old-val {
-  color: var(--danger);
-  text-decoration: line-through;
-}
-.history-diff-item .new-val {
-  color: var(--gd);
-  font-weight: 600;
-}
-
-.chip-disabled {
-  background: rgba(220, 38, 38, 0.08);
-  color: var(--danger);
-}
-
-.accounts-row td {
-  padding: 14px 14px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-  font-size: 13.5px;
-  color: var(--ink);
-}
-.accounts-row:last-child td { border-bottom: none; }
-.accounts-row:hover td { background: var(--hover-overlay, rgba(0, 0, 0, 0.03)); }
-
-/* Seed-banner — Phase 10 CUT-06 (D-10-13/14) */
-/* Yellow informational banner on coefficients page when latest global_params row is byte-equal to seedParams.coefficients (admin still on placeholder values). */
-.seed-banner {
-  background: var(--gold);
-  color: var(--navy);
-  border-radius: 12px;
-  padding: 12px 20px;
-  font-size: 13.5px;
-  font-weight: 500;
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-html[data-theme="dark"] .seed-banner {
-  background: rgba(224, 133, 48, 0.18);
-  color: var(--ink);
-}
-
-/* === end Phase 9 admin surface === */
 /* === Phase 11 brand-logo theme picker (UI-SPEC §6.1, D-09) === */
 html[data-theme="light"] .brand-logo-dark  { display: none; }
 html[data-theme="dark"]  .brand-logo-light { display: none; }
 
-/* === Phase 11 Stepper focus ring (UI-SPEC §6.2 — matches .btn-green:focus-visible pattern) === */
-.stepper-circle:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
-}
+/* These are widget chrome, so they live in `@layer components` and Tailwind's
+   utilities — which land in the later `@layer utilities` — override them
+   normally. They used to sit unlayered, which put them in the last cascade
+   origin and let them beat every utility regardless of specificity: a
+   `className="card px-6 py-10"` silently rendered at .card's own 28px, and a
+   `p-0` meant to sit a table flush inside a card did nothing at all. */
+@layer components {
+  /* Card chrome — UI-SPEC §3.2.2.
+     The radius tracks the token rather than a literal: shadcn's own Card is
+     `rounded-2xl`, and while this said 16px the two disagreed — three metric
+     tiles at the Card radius sat above a section card at 16px on the home
+     page, which is exactly the mismatch that got reported. */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    padding: 28px;
+    box-shadow: var(--shadow-card);
+  }
 
-/* === Phase 15 public-page logo sizing (PUB-01, PUB-02 — UI-SPEC §6.3, D-08) === */
-.public-page-logo {
-  width: clamp(140px, 50vw, 200px);
-  height: auto;
-  display: inline-block;
-  margin-bottom: 16px;
-}
-.public-page-logo img {
-  width: 100%;
-  height: auto;
-  display: block;
+
+  /* Phase 5 retired, with all call sites migrated:
+       .ctitle + .dot  → <SectionTitle>            (19 copies of the same markup)
+       .ieu + .suffix  → InputGroup + InputGroupText
+       .tbadge         → <Badge>
+       .dg + .db + .on → segmented.ts chrome
+     Their `.invalid` variants went with them; the ReUI primitives style
+     aria-invalid themselves. */
+
+  /* Buttons — Phase 5 tokens; concrete classes added here for Plans 07-03/04/05 */
+  .btn-green,
+  .btn-navy,
+  .btn-out {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0.6rem 1.5rem;
+    border-radius: 9999px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 150ms, color 150ms, box-shadow 150ms;
+  }
+  .btn-green       { background: var(--gd);  color: #ffffff; }
+  .btn-green:hover { background: #0d7d49; }
+  .btn-navy        { background: var(--navy); color: #ffffff; }
+  .btn-navy:hover  { background: var(--navy-dark); }
+  .btn-out         { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+  .btn-out:hover   { background: var(--hover-overlay); }
+  .btn-green:focus-visible,
+  .btn-navy:focus-visible,
+  .btn-out:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+  }
+  .btn-green:disabled,
+  .btn-navy:disabled,
+  .btn-out:disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* === Phase 8 (08-10) chip primitives ===
+     The `.chip` base was deleted in Phase 2: StatusChip and LanguageChip both
+     moved to the ReUI Badge and nothing else referenced it. `.chip-language`
+     survives ONLY because app/(authed)/proposals/new/calcul/page.tsx borrows its
+     teal tint standalone for the tranche chip — a semantic misuse (that chip has
+     nothing to do with language) that should be resolved when the wizard is
+     migrated in Phase 5. */
+
+  .chip-language {
+    background: rgba(45, 122, 140, 0.10);
+    color: var(--teal);
+  }
+
+  /* === end Phase 8 detail page === */
+
+  /* === Phase 8 (08-11) home list primitives === */
+
+  /* `.list-row` (with its .is-draft / .is-deleted variants) removed: Phase 4
+     ported ProposalRow onto a cva-driven grid and nothing builds the class any
+     more — only two comments still name it.
+
+     `.stepper-circle` further down looks just as dead to a class scan but is
+     NOT: Stepper.tsx concatenates it. Grep before deleting anything here. */
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 0 12px;
+    background: var(--surface);
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+  .search-bar:focus-within {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.12);
+  }
+  .search-bar input {
+    flex: 1; border: none; outline: none;
+    padding: 0.65rem 0; font-size: 14px;
+    color: var(--ink); background: transparent;
+  }
+
+  /* === end Phase 8 home list === */
+
+  /* === Phase 9 (09-01) admin surface primitives === */
+
+  .admin-nav-card {
+    cursor: pointer;
+    text-decoration: none;
+    transition: box-shadow 150ms, border-color 150ms;
+    display: block;
+  }
+  .admin-nav-card:hover {
+    border-color: var(--teal);
+    box-shadow: 0 2px 8px rgba(45, 122, 140, 0.12);
+  }
+  .admin-nav-card:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+  }
+
+  .history-diff-item {
+    display: block;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink);
+    font-family: ui-monospace, 'Cascadia Code', monospace;
+    margin-bottom: 2px;
+  }
+  .history-diff-item code {
+    font-size: 11.5px;
+    color: var(--teal);
+    background: rgba(45, 122, 140, 0.07);
+    border-radius: 3px;
+    padding: 1px 4px;
+  }
+  .history-diff-item .old-val {
+    color: var(--danger);
+    text-decoration: line-through;
+  }
+  .history-diff-item .new-val {
+    color: var(--gd);
+    font-weight: 600;
+  }
+
+  /* Seed-banner — Phase 10 CUT-06 (D-10-13/14) */
+  /* Yellow informational banner on coefficients page when latest global_params row is byte-equal to seedParams.coefficients (admin still on placeholder values). */
+  .seed-banner {
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: var(--radius-xl);
+    padding: 12px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  html[data-theme="dark"] .seed-banner {
+    background: rgba(224, 133, 48, 0.18);
+    color: var(--ink);
+  }
+
+  /* === end Phase 9 admin surface === */
+
+  /* === Phase 11 Stepper focus ring (UI-SPEC §6.2 — matches .btn-green:focus-visible pattern) === */
+  .stepper-circle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+  }
+
+  /* === Phase 15 public-page logo sizing (PUB-01, PUB-02 — UI-SPEC §6.3, D-08) === */
+  .public-page-logo {
+    width: clamp(140px, 50vw, 200px);
+    height: auto;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  .public-page-logo img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @theme inline {
+    /* Both resolve to Inter, registered by next/font/google in app/layout.tsx.
+       shadcn init originally emitted a self-referential `--font-sans: var(--font-sans)`
+       here, which is circular and invalidates the property — re-check after any init. */
+    --font-heading:      var(--font-inter), 'Inter', system-ui, sans-serif;
+    --font-sans:         var(--font-inter), 'Inter', system-ui, sans-serif;
+    --color-sidebar-ring:      var(--sidebar-ring);
+    --color-sidebar-border:      var(--sidebar-border);
+    --color-sidebar-accent-foreground:      var(--sidebar-accent-foreground);
+    --color-sidebar-accent:      var(--sidebar-accent);
+    --color-sidebar-primary-foreground:      var(--sidebar-primary-foreground);
+    --color-sidebar-primary:      var(--sidebar-primary);
+    --color-sidebar-foreground:      var(--sidebar-foreground);
+    --color-sidebar:      var(--sidebar);
+    --color-chart-5:      var(--chart-5);
+    --color-chart-4:      var(--chart-4);
+    --color-chart-3:      var(--chart-3);
+    --color-chart-2:      var(--chart-2);
+    --color-chart-1:      var(--chart-1);
+    --color-ring:      var(--ring);
+    --color-input:      var(--input);
+    --color-border:      var(--border);
+    --color-destructive:      var(--destructive);
+    --color-accent-foreground:      var(--accent-foreground);
+    --color-accent:      var(--accent);
+    --color-muted-foreground:      var(--muted-foreground);
+    /* Surface sense — see the matching note in the @theme block above. */
+    --color-muted:      var(--muted-surface);
+    --color-secondary-foreground:      var(--secondary-foreground);
+    --color-secondary:      var(--secondary);
+    --color-primary-foreground:      var(--primary-foreground);
+    --color-primary:      var(--primary);
+    --color-popover-foreground:      var(--popover-foreground);
+    --color-popover:      var(--popover);
+    --color-card-foreground:      var(--card-foreground);
+    --color-card:      var(--card);
+    --color-foreground:      var(--foreground);
+    --color-background:      var(--background);
+    --radius-sm:      calc(var(--radius) * 0.6);
+    --radius-md:      calc(var(--radius) * 0.8);
+    --radius-lg:      var(--radius);
+    --radius-xl:      calc(var(--radius) * 1.4);
+    --radius-2xl:      calc(var(--radius) * 1.8);
+    --radius-3xl:      calc(var(--radius) * 2.2);
+    --radius-4xl:      calc(var(--radius) * 2.6);
+    --color-invert-foreground:      var(--invert-foreground);
+    --color-invert:      var(--invert);
+    --color-warning-foreground:      var(--warning-foreground);
+    --color-warning:      var(--warning);
+    --color-info-foreground:      var(--info-foreground);
+    --color-info:      var(--info);
+    --color-success-foreground:      var(--success-foreground);
+    --color-success:      var(--success);
+    --color-destructive-foreground:      var(--destructive-foreground);
+  }
+
+  @layer base {
+    * {
+      @apply border-border outline-ring/50;
+    }
+    body {
+      @apply bg-background text-foreground;
+    }
+    html {
+      @apply font-sans;
+    }
+  }
 }

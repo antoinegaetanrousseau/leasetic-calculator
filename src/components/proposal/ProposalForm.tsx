@@ -1,5 +1,8 @@
 'use client';
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { useState, useRef, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -10,7 +13,7 @@ import {
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { RotateCcw, ArrowRight } from 'lucide-react';
+import { ArrowRightIcon, RotateCcwIcon } from '@/components/ui/icons';
 import type { z } from 'zod';
 import { proposalInputSchema, type ProposalInput } from '@/lib/calc';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
@@ -210,23 +213,16 @@ export function ProposalForm({ lang }: ProposalFormProps) {
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
         {/* ── Card 1: Partenaire ─────────────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
-          <div className="ctitle">
-            <span
-              className="dot"
-              style={{ background: 'var(--gd)' }}
-              aria-hidden="true"
-            />
-            <span>{t('form.partner.section', lang)}</span>
-          </div>
+          <SectionTitle>{t('form.partner.section', lang)}</SectionTitle>
 
-          <div className="fld">
-            <label htmlFor="partner-co">
+          <Field>
+            <FieldLabel htmlFor="partner-co">
               {t('form.partner.co', lang)}
-              <span className="req" aria-hidden="true">
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
                 *
               </span>
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="partner-co"
               type="text"
               placeholder={t('form.partner.co.placeholder', lang)}
@@ -241,20 +237,20 @@ export function ProposalForm({ lang }: ProposalFormProps) {
               }}
             />
             {errors.partnerCo && (
-              <p id="partner-co-error" role="alert" className="error-msg">
+              <FieldError id="partner-co-error" role="alert">
                 {t(errors.partnerCo.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="partner-name">
+          <Field>
+            <FieldLabel htmlFor="partner-name">
               {t('form.partner.name', lang)}
-              <span className="req" aria-hidden="true">
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
                 *
               </span>
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="partner-name"
               type="text"
               placeholder={t('form.partner.name.placeholder', lang)}
@@ -267,32 +263,25 @@ export function ProposalForm({ lang }: ProposalFormProps) {
               {...register('partnerName')}
             />
             {errors.partnerName && (
-              <p id="partner-name-error" role="alert" className="error-msg">
+              <FieldError id="partner-name-error" role="alert">
                 {t(errors.partnerName.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
         </section>
 
         {/* ── Card 2: Client destinataire ─────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
-          <div className="ctitle">
-            <span
-              className="dot"
-              style={{ background: 'var(--teal)' }}
-              aria-hidden="true"
-            />
-            <span>{t('form.client.section', lang)}</span>
-          </div>
+          <SectionTitle accent="teal">{t('form.client.section', lang)}</SectionTitle>
 
-          <div className="fld">
-            <label htmlFor="client-co">
+          <Field>
+            <FieldLabel htmlFor="client-co">
               {t('form.client.co', lang)}
-              <span className="req" aria-hidden="true">
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
                 *
               </span>
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="client-co"
               type="text"
               placeholder={t('form.client.co.placeholder', lang)}
@@ -303,34 +292,34 @@ export function ProposalForm({ lang }: ProposalFormProps) {
               {...register('clientCo')}
             />
             {errors.clientCo && (
-              <p id="client-co-error" role="alert" className="error-msg">
+              <FieldError id="client-co-error" role="alert">
                 {t(errors.clientCo.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="client-name">{t('form.client.name', lang)}</label>
-            <input
+          <Field>
+            <FieldLabel htmlFor="client-name">{t('form.client.name', lang)}</FieldLabel>
+            <Input
               id="client-name"
               type="text"
               placeholder={t('form.client.name.placeholder', lang)}
               {...register('clientName')}
             />
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="client-role">{t('form.client.role', lang)}</label>
-            <input
+          <Field>
+            <FieldLabel htmlFor="client-role">{t('form.client.role', lang)}</FieldLabel>
+            <Input
               id="client-role"
               type="text"
               placeholder={t('form.client.role.placeholder', lang)}
               {...register('clientRole')}
             />
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="client-tel">{t('form.client.tel', lang)}</label>
+          <Field>
+            <FieldLabel htmlFor="client-tel">{t('form.client.tel', lang)}</FieldLabel>
             <Controller
               name="clientTel"
               control={control}
@@ -349,15 +338,15 @@ export function ProposalForm({ lang }: ProposalFormProps) {
               )}
             />
             {errors.clientTel && (
-              <p id="client-tel-error" role="alert" className="error-msg">
+              <FieldError id="client-tel-error" role="alert">
                 {t('error.field.phone.invalid', lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="client-email">{t('form.client.email', lang)}</label>
-            <input
+          <Field>
+            <FieldLabel htmlFor="client-email">{t('form.client.email', lang)}</FieldLabel>
+            <Input
               id="client-email"
               type="email"
               placeholder={t('form.client.email.placeholder', lang)}
@@ -369,14 +358,14 @@ export function ProposalForm({ lang }: ProposalFormProps) {
               {...register('clientEmail')}
             />
             {errors.clientEmail && (
-              <p id="client-email-error" role="alert" className="error-msg">
+              <FieldError id="client-email-error" role="alert">
                 {t('error.field.email.invalid', lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="client-siren">{t('form.client.siren', lang)}</label>
+          <Field>
+            <FieldLabel htmlFor="client-siren">{t('form.client.siren', lang)}</FieldLabel>
             <Controller
               name="clientSiren"
               control={control}
@@ -395,23 +384,16 @@ export function ProposalForm({ lang }: ProposalFormProps) {
               )}
             />
             {errors.clientSiren && (
-              <p id="client-siren-error" role="alert" className="error-msg">
+              <FieldError id="client-siren-error" role="alert">
                 {t('error.field.siren.invalid', lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
         </section>
 
         {/* ── Card 3: Intérêts exprimés ───────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
-          <div className="ctitle">
-            <span
-              className="dot"
-              style={{ background: 'var(--gold)' }}
-              aria-hidden="true"
-            />
-            <span>{t('form.interests.section', lang)}</span>
-          </div>
+          <SectionTitle accent="teal">{t('form.interests.section', lang)}</SectionTitle>
           <p
             style={{
               fontSize: '11.2px',
@@ -423,8 +405,8 @@ export function ProposalForm({ lang }: ProposalFormProps) {
             {t('form.interests.intro', lang)}
           </p>
 
-          <div className="fld">
-            <label>{t('form.interests.slb', lang)}</label>
+          <Field>
+            <FieldLabel>{t('form.interests.slb', lang)}</FieldLabel>
             <Controller
               name="slb"
               control={control}
@@ -438,9 +420,9 @@ export function ProposalForm({ lang }: ProposalFormProps) {
                 />
               )}
             />
-          </div>
-          <div className="fld">
-            <label>{t('form.interests.eval', lang)}</label>
+          </Field>
+          <Field>
+            <FieldLabel>{t('form.interests.eval', lang)}</FieldLabel>
             <Controller
               name="evalParc"
               control={control}
@@ -454,27 +436,20 @@ export function ProposalForm({ lang }: ProposalFormProps) {
                 />
               )}
             />
-          </div>
+          </Field>
         </section>
 
         {/* ── Card 4: Paramètres du projet ────────────────────────────────── */}
         <section className="card" style={{ marginBottom: 16 }}>
-          <div className="ctitle">
-            <span
-              className="dot"
-              style={{ background: 'var(--gold)' }}
-              aria-hidden="true"
-            />
-            <span>{t('form.project.section', lang)}</span>
-          </div>
+          <SectionTitle accent="teal">{t('form.project.section', lang)}</SectionTitle>
 
-          <div className="fld">
-            <label htmlFor="amount">
+          <Field>
+            <FieldLabel htmlFor="amount">
               {t('form.project.amount', lang)}
-              <span className="req" aria-hidden="true">
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
                 *
               </span>
-            </label>
+            </FieldLabel>
             <Controller
               name="amountHT"
               control={control}
@@ -493,19 +468,19 @@ export function ProposalForm({ lang }: ProposalFormProps) {
               )}
             />
             {errors.amountHT && (
-              <p id="amount-error" role="alert" className="error-msg">
+              <FieldError id="amount-error" role="alert">
                 {t(errors.amountHT.message as DictKey, lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label>
+          <Field>
+            <FieldLabel>
               {t('form.project.duration', lang)}
-              <span className="req" aria-hidden="true">
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
                 *
               </span>
-            </label>
+            </FieldLabel>
             <Controller
               name="durationMonths"
               control={control}
@@ -528,31 +503,31 @@ export function ProposalForm({ lang }: ProposalFormProps) {
               )}
             />
             {errors.durationMonths && (
-              <p role="alert" className="error-msg">
+              <FieldError role="alert">
                 {t('error.field.duration.required', lang)}
-              </p>
+              </FieldError>
             )}
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="project-desc">{t('form.project.desc', lang)}</label>
-            <input
+          <Field>
+            <FieldLabel htmlFor="project-desc">{t('form.project.desc', lang)}</FieldLabel>
+            <Input
               id="project-desc"
               type="text"
               placeholder={t('form.project.desc.placeholder', lang)}
               {...register('projectDesc')}
             />
-          </div>
+          </Field>
 
-          <div className="fld">
-            <label htmlFor="partner-ref">{t('form.project.ref', lang)}</label>
-            <input
+          <Field>
+            <FieldLabel htmlFor="partner-ref">{t('form.project.ref', lang)}</FieldLabel>
+            <Input
               id="partner-ref"
               type="text"
               placeholder={t('form.project.ref.placeholder', lang)}
               {...register('partnerRef')}
             />
-          </div>
+          </Field>
         </section>
 
         {/* ── Action row ─────────────────────────────────────────────────── */}
@@ -564,7 +539,7 @@ export function ProposalForm({ lang }: ProposalFormProps) {
             disabled={isSubmitting}
             style={{ flex: 1 }}
           >
-            <RotateCcw size={17} strokeWidth={1.6} aria-hidden="true" />
+            <RotateCcwIcon size={17} aria-hidden="true" />
             <span>{t('button.reset', lang)}</span>
           </button>
           <button
@@ -574,7 +549,7 @@ export function ProposalForm({ lang }: ProposalFormProps) {
             style={{ flex: 1 }}
           >
             <span>{t('button.generate', lang)}</span>
-            <ArrowRight size={17} strokeWidth={1.6} aria-hidden="true" />
+            <ArrowRightIcon size={17} aria-hidden="true" />
           </button>
         </div>
     </form>

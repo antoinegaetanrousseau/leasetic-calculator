@@ -11,11 +11,24 @@
  *
  * 6 columns: Référence / Partenaire / Client / Montant HT / Statut / Créée le
  */
-import React from 'react';
 import Link from 'next/link';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import { formatDate, formatCurrency } from '@/lib/i18n/format';
 import { StatusChip } from '@/components/ui/StatusChip';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  tableHeadClass,
+  tableCellClass,
+  tableCellNumericClass,
+} from '@/components/ui/table-chrome';
+import { cn } from '@/lib/utils';
 import type { LcReferenceRow } from '@/lib/db/queries/lc-references';
 
 export interface LcReferencesListProps {
@@ -28,27 +41,9 @@ export interface LcReferencesListProps {
   currentQ?: string;
 }
 
-// ── Verbatim from PartnersList.tsx (Phase 18 Plan 03) ──────────────────────────
-const TH_BASE_STYLE: React.CSSProperties = {
-  fontSize: '11.2px',
-  fontWeight: 700,
-  color: 'var(--muted)',
-  textTransform: 'uppercase',
-  letterSpacing: '0.04em',
-  textAlign: 'left',
-  padding: '12px 20px',
-  borderBottom: '1px solid var(--border)',
-  background: 'transparent',
-};
-
-const TD_BASE_STYLE: React.CSSProperties = {
-  padding: '16px 20px',
-  borderBottom: '1px solid var(--border)',
-  fontSize: 13,
-  color: 'var(--muted)',
-  verticalAlign: 'middle',
-};
-// ── End verbatim ───────────────────────────────────────────────────────────────
+// Phase 4: the TH_BASE_STYLE / TD_BASE_STYLE inline objects that used to live
+// here (copied verbatim from PartnersList) are now the shared classes in
+// @/components/ui/table-chrome, applied through the shadcn Table primitives.
 
 /** Map DisplayStatus → StatusChip variant. All 4 LC variants are supported. */
 function chipVariant(
@@ -79,19 +74,14 @@ export function LcReferencesList({
     if (hasActiveSearch) {
       // Search-empty: "Aucune référence ne correspond à votre recherche." + clear link
       return (
-        <section className="card" style={{ textAlign: 'center', padding: '40px 24px' }}>
-          <p style={{ color: 'var(--muted)', fontSize: '14.5px', margin: 0 }}>
+        <section className="card px-6 py-10 text-center">
+          <p className="m-0 text-[14.5px] text-[var(--muted)]">
             {t('admin.lcReferences.empty.search', lang)}
           </p>
-          <p style={{ marginTop: 16 }}>
+          <p className="mt-4">
             <Link
               href={`/${adminSegment}/lc-references`}
-              style={{
-                color: 'var(--teal)',
-                fontSize: '12.5px',
-                fontWeight: 500,
-                textDecoration: 'none',
-              }}
+              className="text-[12.5px] font-medium text-teal no-underline"
             >
               {t('admin.lcReferences.empty.search.clear', lang)}
             </Link>
@@ -102,19 +92,11 @@ export function LcReferencesList({
 
     // First-run: "Aucune référence LC pour le moment."
     return (
-      <section className="card" style={{ textAlign: 'center', padding: '48px 24px' }}>
-        <p style={{ color: 'var(--muted)', fontSize: '14.5px', margin: 0 }}>
+      <section className="card px-6 py-12 text-center">
+        <p className="m-0 text-[14.5px] text-[var(--muted)]">
           {t('admin.lcReferences.empty.firstRun', lang)}
         </p>
-        <p
-          style={{
-            color: 'var(--muted)',
-            fontSize: '13px',
-            marginTop: 12,
-            marginBottom: 0,
-            lineHeight: 1.55,
-          }}
-        >
+        <p className="mt-3 mb-0 text-[13px] leading-[1.55] text-[var(--muted)]">
           {t('admin.lcReferences.empty.firstRun.body', lang)}
         </p>
       </section>
@@ -123,115 +105,66 @@ export function LcReferencesList({
 
   // ── Table ──────────────────────────────────────────────────────────────────────
   return (
-    <section className="card" style={{ padding: 0, overflow: 'hidden' }}>
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          tableLayout: 'auto',
-        }}
-      >
-        <thead>
-          <tr>
-            {/* Col 1 — RÉFÉRENCE (monospace) */}
-            <th scope="col" style={TH_BASE_STYLE}>
+    <section className="card overflow-hidden p-0">
+      {/* D-13: rows are read-only — no row link, no onClick, no cursor:pointer.
+          TableBody clears the last row's border, which is what the old
+          per-row `lastBorder` bookkeeping was doing by hand. */}
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
+            <TableHead scope="col" className={tableHeadClass}>
               {t('admin.lcReferences.col.reference', lang)}
-            </th>
-            {/* Col 2 — PARTENAIRE */}
-            <th scope="col" style={TH_BASE_STYLE}>
+            </TableHead>
+            <TableHead scope="col" className={tableHeadClass}>
               {t('admin.lcReferences.col.partner', lang)}
-            </th>
-            {/* Col 3 — CLIENT */}
-            <th scope="col" style={TH_BASE_STYLE}>
+            </TableHead>
+            <TableHead scope="col" className={tableHeadClass}>
               {t('admin.lcReferences.col.client', lang)}
-            </th>
-            {/* Col 4 — MONTANT HT */}
-            <th scope="col" style={{ ...TH_BASE_STYLE, textAlign: 'right', width: 140 }}>
+            </TableHead>
+            <TableHead scope="col" className={cn(tableHeadClass, 'w-[140px] text-right')}>
               {t('admin.lcReferences.col.amountHt', lang)}
-            </th>
-            {/* Col 5 — STATUT */}
-            <th scope="col" style={{ ...TH_BASE_STYLE, width: 110, textAlign: 'center' }}>
+            </TableHead>
+            <TableHead scope="col" className={cn(tableHeadClass, 'w-[110px] text-center')}>
               {t('admin.lcReferences.col.status', lang)}
-            </th>
-            {/* Col 6 — CRÉÉE LE */}
-            <th scope="col" style={{ ...TH_BASE_STYLE, width: 140 }}>
+            </TableHead>
+            <TableHead scope="col" className={cn(tableHeadClass, 'w-[140px]')}>
               {t('admin.lcReferences.col.createdAt', lang)}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, idx) => {
-            const lastBorder = idx === rows.length - 1 ? 'none' : '1px solid var(--border)';
-            return (
-              <tr key={row.id}>
-                {/* Col 1 — RÉFÉRENCE (monospace font, D-13 read-only: no link) */}
-                <td style={{ ...TD_BASE_STYLE, borderBottom: lastBorder }}>
-                  <span
-                    style={{
-                      fontFamily: 'monospace',
-                      fontSize: '13px',
-                      color: 'var(--ink)',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {row.lcRef}
-                  </span>
-                </td>
-                {/* Col 2 — PARTENAIRE */}
-                <td style={{ ...TD_BASE_STYLE, borderBottom: lastBorder }}>
-                  {row.partnerName}
-                </td>
-                {/* Col 3 — CLIENT */}
-                <td style={{ ...TD_BASE_STYLE, borderBottom: lastBorder }}>
-                  {row.clientName || '—'}
-                </td>
-                {/* Col 4 — MONTANT HT (currency-formatted, right-aligned) */}
-                <td
-                  style={{
-                    ...TD_BASE_STYLE,
-                    borderBottom: lastBorder,
-                    textAlign: 'right',
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  {formatCurrency(row.amountHt, lang)}
-                </td>
-                {/* Col 5 — STATUT (StatusChip, centered) */}
-                <td
-                  style={{
-                    ...TD_BASE_STYLE,
-                    borderBottom: lastBorder,
-                    textAlign: 'center',
-                  }}
-                >
-                  <StatusChip
-                    variant={chipVariant(row.displayStatus)}
-                    label={chipLabel(row.displayStatus, lang)}
-                  />
-                </td>
-                {/* Col 6 — CRÉÉE LE */}
-                <td style={{ ...TD_BASE_STYLE, borderBottom: lastBorder }}>
-                  {formatRowDate(row.createdAt, lang)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.id}>
+              <TableCell className={tableCellClass}>
+                <span className="font-mono text-[13px] font-medium text-ink">{row.lcRef}</span>
+              </TableCell>
+              <TableCell className={tableCellClass}>{row.partnerName}</TableCell>
+              <TableCell className={tableCellClass}>{row.clientName || '—'}</TableCell>
+              <TableCell className={tableCellNumericClass}>
+                {formatCurrency(row.amountHt, lang)}
+              </TableCell>
+              <TableCell className={cn(tableCellClass, 'text-center')}>
+                <StatusChip
+                  variant={chipVariant(row.displayStatus)}
+                  label={chipLabel(row.displayStatus, lang)}
+                />
+              </TableCell>
+              <TableCell className={tableCellClass}>
+                {formatRowDate(row.createdAt, lang)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-      {/* Cursor pagination — mirrors PartnersList footer chrome */}
+      {/* Cursor pagination — deliberately preserved. The list is paged by an
+          opaque cursor server-side, which stays correct while rows are being
+          created underneath it; a page-index grid would not. */}
       {nextCursor && (
-        <div style={{ padding: '16px 20px', textAlign: 'center' }}>
+        <div className="px-5 py-4 text-center">
           <Link
             href={`/${adminSegment}/lc-references?cursor=${encodeURIComponent(nextCursor)}${currentQ ? `&q=${encodeURIComponent(currentQ)}` : ''}`}
-            className="btn-out"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              textDecoration: 'none',
-              fontSize: 13,
-            }}
+            className="btn-out inline-flex items-center gap-2 text-[13px] no-underline"
           >
             {t('proposal.list.load.more', lang)}
           </Link>

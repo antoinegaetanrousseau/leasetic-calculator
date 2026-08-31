@@ -1,6 +1,8 @@
+import { SlidersIcon, UsersIcon, HistoryIcon, HashIcon } from '@/components/ui/icons';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Sliders, Users, History, Hash, Plus } from 'lucide-react';
+import { SectionTitle } from '@/components/ui/SectionTitle';
+import { PlusIcon } from '@/components/ui/icons';
 import { requireAdmin } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
 import { AdminNavCard } from '@/components/ui/AdminNavCard';
@@ -116,7 +118,7 @@ export default async function AdminHomePage({ params }: PageProps) {
               textDecoration: 'none',
             }}
           >
-            <Plus size={17} strokeWidth={1.6} aria-hidden="true" />
+            <PlusIcon size={17} aria-hidden="true" />
             <span>{t('dashboard.cta.new', lang)}</span>
           </Link>
         }
@@ -168,7 +170,7 @@ export default async function AdminHomePage({ params }: PageProps) {
           title={t('admin.nav.coefficients.title', lang)}
           description={t('admin.nav.coefficients.description', lang)}
           href={`/${adminSegment}/coefficients`}
-          icon={Sliders}
+          icon={SlidersIcon}
           openLabel={t('admin.nav.open', lang)}
         />
         <AdminNavCard
@@ -176,7 +178,7 @@ export default async function AdminHomePage({ params }: PageProps) {
           title={t('admin.nav.partners.title', lang)}
           description={t('admin.nav.partners.description', lang)}
           href={`/${adminSegment}/partners`}
-          icon={Users}
+          icon={UsersIcon}
           openLabel={t('admin.nav.open', lang)}
         />
         <AdminNavCard
@@ -184,7 +186,7 @@ export default async function AdminHomePage({ params }: PageProps) {
           title={t('admin.nav.history.title', lang)}
           description={t('admin.nav.history.description', lang)}
           href={`/${adminSegment}/history`}
-          icon={History}
+          icon={HistoryIcon}
           openLabel={t('admin.nav.open', lang)}
         />
         <AdminNavCard
@@ -192,7 +194,7 @@ export default async function AdminHomePage({ params }: PageProps) {
           title={t('admin.nav.lcReferences.title', lang)}
           description={t('admin.nav.lcReferences.description', lang)}
           href={`/${adminSegment}/lc-references`}
-          icon={Hash}
+          icon={HashIcon}
           openLabel={t('admin.nav.open', lang)}
         />
       </div>
@@ -207,10 +209,9 @@ export default async function AdminHomePage({ params }: PageProps) {
             marginBottom: 16,
           }}
         >
-          <div className="ctitle">
-            <span className="dot"></span>
+          <SectionTitle className="mb-0">
             {t('admin.home.activity.title', lang)}
-          </div>
+          </SectionTitle>
           <Link
             href={`/${adminSegment}/history`}
             style={{

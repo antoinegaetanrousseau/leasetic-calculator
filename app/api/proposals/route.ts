@@ -79,13 +79,19 @@ export async function GET(req: NextRequest) {
   const url = req.nextUrl;
   const q = url.searchParams.get('q') ?? undefined;
   const cursor = url.searchParams.get('cursor');
+  // `archived` (Phase 17 D-13) is the live filter: expired OR soft-deleted
+  // within the 30-day window. `deleted` is the v1.1 Partner Home toggle it
+  // replaced — soft-deleted only — kept here so old links keep resolving.
+  // Without `archived` the Load More button on /proposals?archived=1 fetched
+  // the ACTIVES page and appended active rows to an archived list.
+  const archived = url.searchParams.get('archived') === '1';
   const deleted = url.searchParams.get('deleted') === '1';
   const drafts = url.searchParams.get('drafts') === '1';
   const limitParam = url.searchParams.get('limit');
   const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 20, 1), 50) : 20;
 
   const response = await buildListResponse({
-    userId, q, cursorEncoded: cursor, deleted, drafts, limit,
+    userId, q, cursorEncoded: cursor, archived, deleted, drafts, limit,
   });
 
   return NextResponse.json(response, {

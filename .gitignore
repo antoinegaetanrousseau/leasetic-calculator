@@ -18,3 +18,4 @@ next-env.d.ts
 .vercel
 .env*.local
 .env.local.bak*
+.claude/settings.local.json

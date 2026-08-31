@@ -33,6 +33,9 @@
  * (D-12 — see plan 13-04 for the surfaced row label).
  */
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { z } from 'zod';
 import { proposalInputSchema } from '@/lib/calc';
@@ -75,24 +78,17 @@ export function ParametresFormCard({
       {/* D-05: ONE .card containing both sections separated by an hr divider */}
       <section className="card">
         {/* ── Section 1: INFORMATIONS CLIENT ─────────────────────────────── */}
-        <div className="ctitle">
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('wizard.section.informations.client', lang)}</span>
-        </div>
+        <SectionTitle>{t('wizard.section.informations.client', lang)}</SectionTitle>
 
         {/* clientCo — wizard-scoped label "Nom du client" per UI-SPEC §6.3 */}
-        <div className="fld">
-          <label htmlFor="client-co">
+        <Field>
+          <FieldLabel htmlFor="client-co">
             {t('wizard.field.client.co.label', lang)}
-            <span className="req" aria-hidden="true">
+            <span className="ml-0.5 text-destructive" aria-hidden="true">
               *
             </span>
-          </label>
-          <input
+          </FieldLabel>
+          <Input
             id="client-co"
             type="text"
             placeholder={t('form.client.co.placeholder', lang)}
@@ -103,29 +99,29 @@ export function ParametresFormCard({
             {...register('clientCo')}
           />
           {errors.clientCo && (
-            <p id="client-co-error" role="alert" className="error-msg">
+            <FieldError id="client-co-error" role="alert">
               {t(errors.clientCo.message as DictKey, lang)}
-            </p>
+            </FieldError>
           )}
-        </div>
+        </Field>
 
         {/* clientName — wizard-scoped "Personne de contact" per UI-SPEC §6.3 */}
-        <div className="fld">
-          <label htmlFor="client-name">
+        <Field>
+          <FieldLabel htmlFor="client-name">
             {t('wizard.field.client.name.label', lang)}
-          </label>
-          <input
+          </FieldLabel>
+          <Input
             id="client-name"
             type="text"
             placeholder={t('form.client.name.placeholder', lang)}
             {...register('clientName')}
           />
-        </div>
+        </Field>
 
         {/* clientEmail — reuses v1.1 form.client.email key */}
-        <div className="fld">
-          <label htmlFor="client-email">{t('form.client.email', lang)}</label>
-          <input
+        <Field>
+          <FieldLabel htmlFor="client-email">{t('form.client.email', lang)}</FieldLabel>
+          <Input
             id="client-email"
             type="email"
             placeholder={t('form.client.email.placeholder', lang)}
@@ -137,15 +133,15 @@ export function ParametresFormCard({
             {...register('clientEmail')}
           />
           {errors.clientEmail && (
-            <p id="client-email-error" role="alert" className="error-msg">
+            <FieldError id="client-email-error" role="alert">
               {t('error.field.email.invalid', lang)}
-            </p>
+            </FieldError>
           )}
-        </div>
+        </Field>
 
         {/* clientTel — reuses v1.1 form.client.tel key */}
-        <div className="fld">
-          <label htmlFor="client-tel">{t('form.client.tel', lang)}</label>
+        <Field>
+          <FieldLabel htmlFor="client-tel">{t('form.client.tel', lang)}</FieldLabel>
           <Controller
             name="clientTel"
             control={control}
@@ -164,11 +160,11 @@ export function ParametresFormCard({
             )}
           />
           {errors.clientTel && (
-            <p id="client-tel-error" role="alert" className="error-msg">
+            <FieldError id="client-tel-error" role="alert">
               {t('error.field.phone.invalid', lang)}
-            </p>
+            </FieldError>
           )}
-        </div>
+        </Field>
 
         {/* D-05: 24px divider between the two sections inside the single .card */}
         <hr
@@ -180,34 +176,27 @@ export function ParametresFormCard({
         />
 
         {/* ── Section 2: DÉTAILS DU PROJET ──────────────────────────────── */}
-        <div className="ctitle">
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('wizard.section.details.projet', lang)}</span>
-        </div>
+        <SectionTitle>{t('wizard.section.details.projet', lang)}</SectionTitle>
 
         {/* partnerRef — reuses v1.1 form.project.ref */}
-        <div className="fld">
-          <label htmlFor="partner-ref">{t('form.project.ref', lang)}</label>
-          <input
+        <Field>
+          <FieldLabel htmlFor="partner-ref">{t('form.project.ref', lang)}</FieldLabel>
+          <Input
             id="partner-ref"
             type="text"
             placeholder={t('form.project.ref.placeholder', lang)}
             {...register('partnerRef')}
           />
-        </div>
+        </Field>
 
         {/* amountHT — Controller-bound NumberInputAmount (v1.1 component) */}
-        <div className="fld">
-          <label htmlFor="amount">
+        <Field>
+          <FieldLabel htmlFor="amount">
             {t('form.project.amount', lang)}
-            <span className="req" aria-hidden="true">
+            <span className="ml-0.5 text-destructive" aria-hidden="true">
               *
             </span>
-          </label>
+          </FieldLabel>
           <Controller
             name="amountHT"
             control={control}
@@ -226,20 +215,20 @@ export function ParametresFormCard({
             )}
           />
           {errors.amountHT && (
-            <p id="amount-error" role="alert" className="error-msg">
+            <FieldError id="amount-error" role="alert">
               {t(errors.amountHT.message as DictKey, lang)}
-            </p>
+            </FieldError>
           )}
-        </div>
+        </Field>
 
         {/* durationMonths — DurationSegmented with 36/48/60 (D-13 unchanged) */}
-        <div className="fld">
-          <label>
+        <Field>
+          <FieldLabel>
             {t('form.project.duration', lang)}
-            <span className="req" aria-hidden="true">
+            <span className="ml-0.5 text-destructive" aria-hidden="true">
               *
             </span>
-          </label>
+          </FieldLabel>
           <Controller
             name="durationMonths"
             control={control}
@@ -262,11 +251,11 @@ export function ParametresFormCard({
             )}
           />
           {errors.durationMonths && (
-            <p role="alert" className="error-msg">
+            <FieldError role="alert">
               {t('error.field.duration.required', lang)}
-            </p>
+            </FieldError>
           )}
-        </div>
+        </Field>
         <hr
           style={{
             border: 'none',
@@ -276,29 +265,22 @@ export function ParametresFormCard({
         />
 
         {/* ── Section 3: INFORMATIONS COMPLÉMENTAIRES ───────────────────── */}
-        <div className="ctitle">
-          <span
-            className="dot"
-            style={{ background: 'var(--gd)' }}
-            aria-hidden="true"
-          />
-          <span>{t('wizard.section.details.complementaires', lang)}</span>
-        </div>
+        <SectionTitle>{t('wizard.section.details.complementaires', lang)}</SectionTitle>
 
         {/* clientRole */}
-        <div className="fld">
-          <label htmlFor="client-role">{t('form.client.role', lang)}</label>
-          <input
+        <Field>
+          <FieldLabel htmlFor="client-role">{t('form.client.role', lang)}</FieldLabel>
+          <Input
             id="client-role"
             type="text"
             placeholder={t('form.client.role.placeholder', lang)}
             {...register('clientRole')}
           />
-        </div>
+        </Field>
 
         {/* clientSiren — Controller-bound SirenInput */}
-        <div className="fld">
-          <label htmlFor="client-siren">{t('form.client.siren', lang)}</label>
+        <Field>
+          <FieldLabel htmlFor="client-siren">{t('form.client.siren', lang)}</FieldLabel>
           <Controller
             name="clientSiren"
             control={control}
@@ -317,26 +299,26 @@ export function ParametresFormCard({
             )}
           />
           {errors.clientSiren && (
-            <p id="client-siren-error" role="alert" className="error-msg">
+            <FieldError id="client-siren-error" role="alert">
               {t('error.field.siren.invalid', lang)}
-            </p>
+            </FieldError>
           )}
-        </div>
+        </Field>
 
         {/* projectDesc */}
-        <div className="fld">
-          <label htmlFor="project-desc">{t('form.project.desc', lang)}</label>
-          <input
+        <Field>
+          <FieldLabel htmlFor="project-desc">{t('form.project.desc', lang)}</FieldLabel>
+          <Input
             id="project-desc"
             type="text"
             placeholder={t('form.project.desc.placeholder', lang)}
             {...register('projectDesc')}
           />
-        </div>
+        </Field>
 
         {/* slb — YesNoToggle */}
-        <div className="fld">
-          <label>{t('form.interests.slb', lang)}</label>
+        <Field>
+          <FieldLabel>{t('form.interests.slb', lang)}</FieldLabel>
           <Controller
             name="slb"
             control={control}
@@ -350,11 +332,11 @@ export function ParametresFormCard({
               />
             )}
           />
-        </div>
+        </Field>
 
         {/* evalParc — YesNoToggle */}
-        <div className="fld">
-          <label>{t('form.interests.eval', lang)}</label>
+        <Field>
+          <FieldLabel>{t('form.interests.eval', lang)}</FieldLabel>
           <Controller
             name="evalParc"
             control={control}
@@ -368,7 +350,7 @@ export function ParametresFormCard({
               />
             )}
           />
-        </div>
+        </Field>
       </section>
     </>
   );

@@ -20,7 +20,8 @@ export interface AdminNavCardProps {
   description: string;
   variant: Variant;
   href: string;
-  icon: ComponentType<{ size: number; strokeWidth: number; color?: string; 'aria-hidden'?: boolean }>;
+  /** Icon component from @/components/ui/icons. */
+  icon: ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>;
   openLabel: string;
 }
 
@@ -70,7 +71,7 @@ export function AdminNavCard({
           background: `rgba(${accent.rgb}, 0.10)`,
         }}
       >
-        <Icon size={24} strokeWidth={1.6} color={accent.token} aria-hidden={true} />
+        <Icon size={24} style={{ color: accent.token }} aria-hidden={true} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.4, color: 'var(--ink)' }}>
         {title}

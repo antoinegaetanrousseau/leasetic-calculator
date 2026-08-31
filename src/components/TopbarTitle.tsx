@@ -14,22 +14,15 @@ export interface TopbarTitleProps {
  * Topbar page-title island — reads the current pathname client-side and looks
  * up the i18n title key via getRouteMeta. Lives inside the (server) Topbar so
  * the rest of the topbar chrome (ADMIN pill, UserMenu) stays server-rendered.
+ *
+ * Phase 2: inline style replaced with utilities. `truncate` is the exact
+ * equivalent of the previous overflow/text-overflow/white-space trio.
  */
 export function TopbarTitle({ lang, adminSegment }: TopbarTitleProps) {
   const pathname = usePathname() ?? '/';
   const { titleKey } = getRouteMeta(pathname, adminSegment);
   return (
-    <span
-      style={{
-        fontSize: '16.5px',
-        fontWeight: 600,
-        color: 'var(--ink)',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        maxWidth: '60%',
-      }}
-    >
+    <span className="max-w-[60%] truncate text-[16.5px] font-semibold text-ink">
       {t(titleKey, lang)}
     </span>
   );

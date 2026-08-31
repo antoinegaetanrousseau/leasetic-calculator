@@ -115,13 +115,13 @@ describe('/aide landing — HELP-01 (D-25)', () => {
     expect(cta).not.toBeNull();
     expect(cta?.textContent).toContain('Lire le guide');
 
-    // The Card 1 icon should carry color var(--gd-text) — lucide renders an <svg>
-    // with the color prop forwarded to the stroke attribute. We sample any svg
-    // whose parent is the same .card as the CTA link.
+    // The Card 1 icon carries color var(--gd-text). Hugeicons always renders
+    // stroke="currentColor" and takes its colour from CSS, so this asserts the
+    // inline style rather than lucide's old stroke attribute.
     const card1 = cta!.closest('.card') as HTMLElement;
     const svg = card1.querySelector('svg');
     expect(svg).not.toBeNull();
-    expect(svg?.getAttribute('stroke')).toBe('var(--gd-text)');
+    expect(svg?.getAttribute('style')).toContain('color: var(--gd-text)');
   });
 
   it('Test 4 — Card 2 (Créer une proposition, disabled): title + body + Bientôt disponible badge, opacity 0.7', async () => {
@@ -162,7 +162,7 @@ describe('/aide landing — HELP-01 (D-25)', () => {
     // Card 3 icon stroke also var(--gd-text)
     const card3 = mailto!.closest('.card') as HTMLElement;
     const svg = card3.querySelector('svg');
-    expect(svg?.getAttribute('stroke')).toBe('var(--gd-text)');
+    expect(svg?.getAttribute('style')).toContain('color: var(--gd-text)');
   });
 
   it('Test 6: <main> has max-width 1040px', async () => {
@@ -194,6 +194,6 @@ describe('/aide landing — HELP-01 (D-25)', () => {
     expect(card2.textContent).toContain('Bientôt disponible');
     // Card 2 icon should be muted (FileText with color var(--muted))
     const svg = card2.querySelector('svg');
-    expect(svg?.getAttribute('stroke')).toBe('var(--muted)');
+    expect(svg?.getAttribute('style')).toContain('color: var(--muted)');
   });
 });

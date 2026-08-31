@@ -1,7 +1,14 @@
 'use client';
 
 import { type ChangeEvent, type FocusEvent, useId } from 'react';
-import { BarChart3 } from 'lucide-react';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group';
+import { Badge } from '@/components/ui/badge';
+import { BarChartIcon } from '@/components/ui/icons';
 import { tKey, tLabel } from '@/lib/calc';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -65,8 +72,12 @@ export function NumberInputAmount({
 
   return (
     <>
-      <div className={'ieu' + (invalid ? ' invalid' : '')}>
-        <input
+      {/* Phase 5: the v10 `.ieu` currency composite is now an InputGroup with a
+          trailing addon. The old rule set had to fight `.fld input` with
+          !important to strip the inner input's own border; InputGroup owns that
+          seam natively, so the override is gone. */}
+      <InputGroup aria-invalid={ariaInvalid || invalid || undefined}>
+        <InputGroupInput
           id={finalId}
           type="text"
           inputMode="numeric"
@@ -80,18 +91,15 @@ export function NumberInputAmount({
           onChange={onInput}
           onBlur={onBlur}
         />
-        <span className="suffix">{t('common.ht', lang)}</span>
-      </div>
+        <InputGroupAddon align="inline-end">
+          <InputGroupText>{t('common.ht', lang)}</InputGroupText>
+        </InputGroupAddon>
+      </InputGroup>
       {showBadge && trancheKey ? (
-        <div className="tbadge" aria-live="polite">
-          <BarChart3 size={14} strokeWidth={1.6} aria-hidden="true" />
-          <span>
-            {t('form.tranche.label', lang).replace(
-              '{0}',
-              t(tLabel(trancheKey), lang)
-            )}
-          </span>
-        </div>
+        <Badge variant="secondary" className="mt-1.5 gap-1.5 rounded-full" aria-live="polite">
+          <BarChartIcon size={14} aria-hidden="true" />
+          {t('form.tranche.label', lang).replace('{0}', t(tLabel(trancheKey), lang))}
+        </Badge>
       ) : null}
     </>
   );

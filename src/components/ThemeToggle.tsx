@@ -1,30 +1,33 @@
 'use client';
 
-import { Sun, Moon, Monitor } from 'lucide-react';
+import type { ComponentType } from 'react';
+import { SunIcon, MonitorIcon, MoonIcon } from '@/components/ui/icons';
 import { setTheme } from '@/lib/theme/actions';
 import { startTransition } from 'react';
+import { cn } from '@/lib/utils';
 
 type ThemeOption = 'light' | 'system' | 'dark';
 
+/**
+ * Light / system / dark segmented control.
+ *
+ * Phase 2: inline styles replaced with utilities bound to the token spine.
+ * Appearance is unchanged. See LocaleToggle for why this keeps
+ * role="radiogroup" rather than moving to shadcn ToggleGroup.
+ */
 export function ThemeToggle({ current, fullWidth = false }: { current: ThemeOption; fullWidth?: boolean }) {
-  const options: { value: ThemeOption; icon: React.ComponentType<{ size: number; strokeWidth: number }>; label: string }[] = [
-    { value: 'light',  icon: Sun,     label: 'Light' },
-    { value: 'system', icon: Monitor, label: 'System' },
-    { value: 'dark',   icon: Moon,    label: 'Dark' },
+  const options: { value: ThemeOption; icon: ComponentType<{ size?: number }>; label: string }[] = [
+    { value: 'light',  icon: SunIcon,     label: 'Light' },
+    { value: 'system', icon: MonitorIcon, label: 'System' },
+    { value: 'dark',   icon: MoonIcon,    label: 'Dark' },
   ];
 
   return (
     <div
-      className={
-        fullWidth
-          ? "flex items-center rounded-full border p-1"
-          : "inline-flex items-center rounded-full border p-1"
-      }
-      style={{
-        background: 'var(--paper)',
-        borderColor: 'var(--border)',
-        ...(fullWidth ? { width: '100%' } : {}),
-      }}
+      className={cn(
+        'items-center rounded-full border border-border bg-background p-1',
+        fullWidth ? 'flex w-full' : 'inline-flex',
+      )}
       role="radiogroup"
       aria-label="Theme"
     >
@@ -38,14 +41,13 @@ export function ThemeToggle({ current, fullWidth = false }: { current: ThemeOpti
             aria-checked={active}
             aria-label={label}
             onClick={() => startTransition(() => { void setTheme(value); })}
-            className="rounded-full px-3 py-1.5 transition-colors"
-            style={{
-              background: active ? 'var(--gd)' : 'transparent',
-              color: active ? '#ffffff' : 'var(--muted)',
-              ...(fullWidth ? { flex: 1, justifyContent: 'center' as const, display: 'inline-flex' as const } : {}),
-            }}
+            className={cn(
+              'rounded-full px-3 py-1.5 transition-colors',
+              active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+              fullWidth && 'inline-flex flex-1 justify-center',
+            )}
           >
-            <Icon size={17} strokeWidth={1.6} />
+            <Icon size={17} />
           </button>
         );
       })}

@@ -1,8 +1,9 @@
 'use client';
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertTriangle, Info, Loader2 } from 'lucide-react';
+import { AlertTriangleIcon, InfoIcon, LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { adminUpdateGlobalParams } from '@/lib/admin';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -158,10 +159,9 @@ export function SaveConfirmModal({
             padding: '12px 16px',
           }}
         >
-          <AlertTriangle
+          <AlertTriangleIcon
             size={18}
-            strokeWidth={1.6}
-            color="var(--gold)"
+            style={{ color: 'var(--gold)' }}
             aria-hidden="true"
           />
           <p
@@ -176,10 +176,7 @@ export function SaveConfirmModal({
           </p>
         </div>
 
-        <div className="ctitle" style={{ marginTop: 8 }}>
-          <span className="dot" style={{ background: 'var(--gd)' }} aria-hidden="true" />
-          <span>{t('admin.coefficients.modal.changes', lang)}</span>
-        </div>
+        <SectionTitle className="mt-2">{t('admin.coefficients.modal.changes', lang)}</SectionTitle>
 
         {pairs.length === 0 ? (
           <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0 }}>
@@ -203,7 +200,7 @@ export function SaveConfirmModal({
               marginTop: 4,
             }}
           >
-            <Info size={14} strokeWidth={1.6} color="var(--muted)" aria-hidden="true" />
+            <InfoIcon size={14} style={{ color: 'var(--muted)' }} aria-hidden="true" />
             <span>{t('admin.coefficients.modal.commission_note', lang)}</span>
           </div>
         )}
@@ -239,7 +236,7 @@ export function SaveConfirmModal({
             }}
           >
             {isSaving && (
-              <Loader2
+              <LoaderIcon
                 size={16}
                 style={{ animation: 'spin 1s linear infinite' }}
                 aria-hidden="true"

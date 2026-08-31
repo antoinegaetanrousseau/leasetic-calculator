@@ -1,10 +1,39 @@
 'use client';
 
+/**
+ * Coefficient history table.
+ *
+ * Phase 5 of the ReUI/Maia migration: the hand-rolled <table> with 15 inline
+ * style objects is now the shadcn Table primitives, sharing the admin table
+ * chrome in @/components/ui/table-chrome with PartnersList and
+ * LcReferencesList. This table previously carried its own metrics (11.8px
+ * headers on 0.06em tracking, 12px/14px padding); adopting the shared chrome
+ * moves it onto the same 11.2px / 0.04em / px-5 rhythm as the other two.
+ *
+ * Note the explicit `whitespace-normal` on the changes and note cells: the
+ * primitive's TableCell defaults to `whitespace-nowrap`, which is right for
+ * the short cells in PartnersList and wrong for free text.
+ */
+
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useState, useTransition } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
+import { PlusIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
 import { formatDate } from '@/lib/i18n/format';
+import { Button } from '@/components/ui/button';
+import { Empty, EmptyDescription } from '@/components/ui/empty';
+import { Spinner } from '@/components/ui/spinner';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { tableHeadClass, tableCellClass } from '@/components/ui/table-chrome';
+import { cn } from '@/lib/utils';
 import type { GlobalParamsCursor, GlobalParamsHistoryRow } from '@/lib/db/queries/global-params';
 import { HistoryDiff, computeDiffPairs } from './HistoryDiff';
 import { loadMoreHistory } from './history-load-more.action';
@@ -18,6 +47,8 @@ export interface HistoryTableProps {
 
 // UI-SPEC §3.1.3.2: cap visible diff items at 4 + "+ N autres"
 const COLLAPSE_AFTER = 4;
+
+const HISTORY_COLUMNS = ['date', 'admin', 'changes', 'note'] as const;
 
 export function HistoryTable({
   lang,
@@ -57,63 +88,36 @@ export function HistoryTable({
   };
 
   return (
-    <section className="card" style={{ marginTop: 24 }}>
-      <div className="ctitle">
-        <span className="dot" style={{ background: 'var(--gd)' }} aria-hidden="true" />
-        <span>{t('admin.coefficients.history.title', lang)}</span>
-      </div>
+    <section className="card mt-6">
+      <SectionTitle>{t('admin.coefficients.history.title', lang)}</SectionTitle>
 
       {rows.length === 0 ? (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '32px 16px',
-            color: 'var(--muted)',
-            fontSize: 14,
-          }}
-        >
-          {t('admin.coefficients.history.empty', lang)}
-        </div>
+        <Empty className="p-8">
+          <EmptyDescription>
+            {t('admin.coefficients.history.empty', lang)}
+          </EmptyDescription>
+        </Empty>
       ) : (
         <>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16 }}>
-            <thead>
-              <tr>
-                {(['date', 'admin', 'changes', 'note'] as const).map((col) => (
-                  <th
-                    key={col}
-                    scope="col"
-                    style={{
-                      fontSize: 11.8,
-                      fontWeight: 700,
-                      color: 'var(--muted)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      padding: '12px 14px',
-                      borderBottom: '2px solid var(--border)',
-                      textAlign: 'left',
-                    }}
-                  >
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                {HISTORY_COLUMNS.map((col) => (
+                  <TableHead key={col} scope="col" className={tableHeadClass}>
                     {t(`admin.coefficients.history.col.${col}` as DictKey, lang)}
-                  </th>
+                  </TableHead>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {rows.map((row, idx) => {
                 // sorted desc → previous in time = next in array
                 const prevRow = rows[idx + 1] ?? null;
                 const pairs = computeDiffPairs(prevRow, row);
                 const isExpanded = expandedRows.has(row.id);
                 return (
-                  <tr
-                    key={row.id}
-                    style={{
-                      borderBottom: '1px solid var(--border)',
-                      verticalAlign: 'top',
-                    }}
-                  >
-                    <td style={{ padding: '14px 12px', fontSize: 13, color: 'var(--ink)' }}>
+                  <TableRow key={row.id} className="align-top">
+                    <TableCell className={cn(tableCellClass, 'text-ink')}>
                       {formatDate(new Date(row.effectiveFrom), lang, {
                         year: 'numeric',
                         month: 'short',
@@ -121,31 +125,24 @@ export function HistoryTable({
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
-                    </td>
-                    <td style={{ padding: '14px 12px', fontSize: 13, color: 'var(--ink)' }}>
+                    </TableCell>
+                    <TableCell className={cn(tableCellClass, 'text-ink')}>
                       {/* WR-05: render displayName ?? email from the LEFT JOIN in listGlobalParamsHistory. */}
                       {row.createdByDisplay ?? '—'}
-                    </td>
-                    <td style={{ padding: '14px 12px' }}>
+                    </TableCell>
+                    <TableCell className={cn(tableCellClass, 'whitespace-normal')}>
                       <HistoryDiff
                         pairs={pairs}
                         collapseAfter={isExpanded ? null : COLLAPSE_AFTER}
                         moreLabelTemplate={t('admin.coefficients.history.more', lang)}
                       />
                       {pairs.length > COLLAPSE_AFTER && (
-                        <button
+                        <Button
                           type="button"
+                          variant="link"
                           onClick={() => toggleExpand(row.id)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: 'var(--teal)',
-                            fontSize: 11.5,
-                            padding: 0,
-                            marginTop: 4,
-                            textDecoration: 'underline',
-                          }}
+                          aria-expanded={isExpanded}
+                          className="mt-1 h-auto p-0 text-[11.5px] text-teal underline"
                         >
                           {isExpanded
                             ? t('admin.coefficients.history.col.changes', lang)
@@ -153,47 +150,33 @@ export function HistoryTable({
                                 '{0}',
                                 String(pairs.length - COLLAPSE_AFTER),
                               )}
-                        </button>
+                        </Button>
                       )}
-                    </td>
-                    <td
-                      style={{
-                        padding: '14px 12px',
-                        fontSize: 13,
-                        color: 'var(--muted)',
-                        fontStyle: 'italic',
-                      }}
-                    >
+                    </TableCell>
+                    <TableCell className={cn(tableCellClass, 'whitespace-normal italic')}>
                       {row.note ?? '—'}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
 
           {hasMore && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+            <div className="mt-4 flex justify-center">
               <button
                 type="button"
-                className="btn-out"
+                className="btn-out inline-flex items-center gap-2"
                 onClick={onLoadMore}
                 disabled={isPending}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
               >
-                {isPending ? (
-                  <Loader2 size={17} style={{ animation: 'spin 1s linear infinite' }} />
-                ) : (
-                  <Plus size={17} />
-                )}
+                {isPending ? <Spinner className="size-[17px]" /> : <PlusIcon size={17} />}
                 {t('admin.coefficients.history.load_more', lang)}
               </button>
             </div>
           )}
           {!hasMore && rows.length > 20 && (
-            <div
-              style={{ textAlign: 'center', marginTop: 16, fontSize: 12, color: 'var(--muted)' }}
-            >
+            <div className="mt-4 text-center text-[12px] text-[var(--muted)]">
               {t('admin.coefficients.history.end', lang)}
             </div>
           )}
