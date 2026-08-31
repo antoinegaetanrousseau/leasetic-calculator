@@ -32,7 +32,7 @@ fi
 
 # Extract tag values from the journal without jq (not a declared dependency).
 # Journal entries look like:  "tag": "0004_phase12_drafts_and_history",
-tags=$(grep -o '"tag"[[:space:]]*:[[:space:]]*"[^"]*"' "$JOURNAL" | sed -E 's/.*"tag"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/')
+tags=$(grep -o '"tag"[[:space:]]*:[[:space:]]*"[^"]*"' "$JOURNAL" | sed -E 's/.*"tag"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/' || true)
 
 orphans=""
 orphan_count=0
