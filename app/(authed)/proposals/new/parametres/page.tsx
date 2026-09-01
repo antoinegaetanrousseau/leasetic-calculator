@@ -22,6 +22,19 @@
  *         partnerCo; redirect to ?draft_id=<new_id>&duplicate=1 so the
  *         <DuplicatePrefillToast> can fire client-side on first render.
  *   D-26  ?draft_id= wins over ?duplicate= when both are present.
+ *   D-30  (Phase 30 Plan 09 / CRM-05) ?clientRelationshipId=<id> on the mint
+ *         branch (no ?draft_id= present — D-26 means ?draft_id= always wins,
+ *         so an existing draft is never re-linked): ownership-validated via
+ *         getClientRelationshipForOwner(id, session.user.id). A null result
+ *         (not found, not owned, or malformed — all three collapse to the
+ *         same outcome) is handled identically to "no param at all": no
+ *         error page, no notFound(), no toast — the wizard proceeds as an
+ *         ordinary unlinked draft (T-30-09-01/05, CRM-02 non-leakage). A
+ *         valid, owned id is threaded into createDraft's clientRelationshipId
+ *         and prefills clientCo/clientSiren from the company plus
+ *         clientName/clientRole/clientTel/clientEmail from the relationship's
+ *         first contact (editable starting point, not a locked value — same
+ *         "prefilled, edit if needed" contract as the D-25 duplicate flow).
  *
  * ADMIN-09 step-1 surface invariant (D-12 + threat T-13-03-I-ADMIN-09):
  * this page renders NO partner-only-visible parameter identifier anywhere.
@@ -46,6 +59,10 @@ import {
   getProposalById,
 } from '@/lib/db/queries/proposals';
 import { getLatestGlobalParams } from '@/lib/db/queries/global-params';
+import {
+  getClientRelationshipForOwner,
+  listContactsForRelationship,
+} from '@/lib/db/queries/client-relationships';
 import { PageHero } from '@/components/ui/PageHero';
 import { Stepper } from '@/components/ui/Stepper';
 import type { ProposalInput } from '@/lib/calc';
@@ -60,7 +77,11 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: Promise<{ duplicate?: string; draft_id?: string }>;
+  searchParams: Promise<{
+    duplicate?: string;
+    draft_id?: string;
+    clientRelationshipId?: string;
+  }>;
 }
 
 export default async function ParametresStep1Page({
@@ -105,11 +126,69 @@ export default async function ParametresStep1Page({
     // inflate the BROUILLONS metric on the partner home page.
     await deleteEmptyDraftsByUser(session.user.id);
 
+    // D-30 (CRM-05): optional ?clientRelationshipId=. Ownership-validated;
+    // a null result (not found, not owned, or malformed — all three
+    // collapse identically per getClientRelationshipForOwner's own D-18
+    // contract) degrades to an ordinary unlinked draft. Never a client-error
+    // status, never a distinguishing signal to the caller (T-30-09-01).
+    let validatedRelationshipId: string | undefined;
+    let relationshipPrefill: Partial<ProposalInput> | undefined;
+    if (sp.clientRelationshipId) {
+      try {
+        const relationship = await getClientRelationshipForOwner(
+          sp.clientRelationshipId,
+          session.user.id,
+        );
+        if (relationship) {
+          validatedRelationshipId = relationship.relationshipId;
+          const contacts = await listContactsForRelationship(
+            relationship.relationshipId,
+            session.user.id,
+          );
+          const firstContact = contacts[0];
+          relationshipPrefill = {
+            clientCo: relationship.companyName,
+            ...(relationship.siren ? { clientSiren: relationship.siren } : {}),
+            ...(firstContact
+              ? {
+                  clientName: firstContact.name,
+                  ...(firstContact.role ? { clientRole: firstContact.role } : {}),
+                  ...(firstContact.phone ? { clientTel: firstContact.phone } : {}),
+                  ...(firstContact.email ? { clientEmail: firstContact.email } : {}),
+                }
+              : {}),
+          };
+        }
+      } catch {
+        // Malformed id (e.g. not a valid UUID, rejected by Postgres at the
+        // query layer) — degrade identically to the not-owned/not-found
+        // case: stays unlinked, no prefill, no error surfaced (T-30-09-05).
+      }
+    }
+
     // D-02: mint a fresh draft.
     const newDraft = await createDraft({
       userId: session.user.id,
       language: lang,
+      clientRelationshipId: validatedRelationshipId,
     });
+
+    // D-30: prefill the freshly-minted draft from the validated relationship.
+    // These are editable starting points, not locked values (same contract
+    // as the D-25 duplicate prefill below) — the partner can change anything
+    // before finalizing.
+    if (relationshipPrefill) {
+      await updateDraft(newDraft.id, session.user.id, {
+        inputs: {
+          ...relationshipPrefill,
+          // Session-derived attribution always wins — never trust a stored
+          // or prefilled value for these two fields (D-07 discipline).
+          partnerName,
+          partnerCo,
+          validityDays: defaultValidityDays,
+        },
+      });
+    }
 
     // D-25: optional same-user duplicate prefill.
     if (sp.duplicate) {

@@ -27,6 +27,8 @@ const {
   persistAccordionOpenMock,
   saveAsDraftMock,
   saveAndAdvanceMock,
+  getClientRelationshipForOwnerMock,
+  listContactsForRelationshipMock,
 } = vi.hoisted(() => ({
   redirectMock: vi.fn((path: string) => {
     throw new Error(`NEXT_REDIRECT:${path}`);
@@ -41,6 +43,8 @@ const {
   persistAccordionOpenMock: vi.fn(),
   saveAsDraftMock: vi.fn(),
   saveAndAdvanceMock: vi.fn(),
+  getClientRelationshipForOwnerMock: vi.fn(),
+  listContactsForRelationshipMock: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -72,6 +76,12 @@ vi.mock('@/lib/db/queries/proposals', () => ({
 vi.mock('@/lib/db/queries/global-params', () => ({
   getLatestGlobalParams: getLatestGlobalParamsMock,
 }));
+vi.mock('@/lib/db/queries/client-relationships', () => ({
+  getClientRelationshipForOwner: (...args: unknown[]) =>
+    getClientRelationshipForOwnerMock(...args),
+  listContactsForRelationship: (...args: unknown[]) =>
+    listContactsForRelationshipMock(...args),
+}));
 vi.mock('@/(authed)/proposals/new/_actions/persistAccordionOpen.action', () => ({
   persistAccordionOpenAction: (...args: unknown[]) =>
     persistAccordionOpenMock(...args),
@@ -101,6 +111,10 @@ beforeEach(() => {
   persistAccordionOpenMock.mockReset();
   saveAsDraftMock.mockReset();
   saveAndAdvanceMock.mockReset();
+  getClientRelationshipForOwnerMock.mockReset();
+  listContactsForRelationshipMock.mockReset();
+  getClientRelationshipForOwnerMock.mockResolvedValue(null);
+  listContactsForRelationshipMock.mockResolvedValue([]);
 
   // Default happy path: a logged-in user with a draft owned by them.
   requireUserMock.mockResolvedValue({
@@ -306,6 +320,157 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
       'input[name="clientCo"]',
     ) as HTMLInputElement;
     expect(clientCo.value).toBe('OwnedDraftCo');
+  });
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // D-30 (Phase 30 Plan 09 / CRM-05): ?clientRelationshipId= ownership
+  // validation + prefill + silent-degradation.
+  // ──────────────────────────────────────────────────────────────────────────
+  it('Test 14: ?clientRelationshipId=<owned> with no ?draft_id= mints a draft carrying that id and redirects to ?draft_id=…', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue({
+      relationshipId: 'rel-1',
+      companyId: 'co-1',
+      companyName: 'Acme Corp',
+      siren: '123456789',
+      createdAt: new Date(),
+    });
+    await expect(
+      ParametresStep1Page({
+        searchParams: Promise.resolve({ clientRelationshipId: 'rel-1' }),
+      }),
+    ).rejects.toThrow(/NEXT_REDIRECT:\/proposals\/new\/parametres\?draft_id=new-draft-1/);
+    expect(getClientRelationshipForOwnerMock).toHaveBeenCalledWith('rel-1', USER_ID);
+    expect(createDraftMock).toHaveBeenCalledWith({
+      userId: USER_ID,
+      language: 'fr',
+      clientRelationshipId: 'rel-1',
+    });
+  });
+
+  it('Test 15: the minted draft is prefilled with clientCo/clientSiren from the company and clientName/clientRole/clientTel/clientEmail from the first contact', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue({
+      relationshipId: 'rel-1',
+      companyId: 'co-1',
+      companyName: 'Acme Corp',
+      siren: '123456789',
+      createdAt: new Date(),
+    });
+    listContactsForRelationshipMock.mockResolvedValue([
+      {
+        id: 'contact-1',
+        name: 'Jean Dupont',
+        role: 'Acheteur',
+        phone: '0601020304',
+        email: 'jean@acme.fr',
+      },
+    ]);
+    await expect(
+      ParametresStep1Page({
+        searchParams: Promise.resolve({ clientRelationshipId: 'rel-1' }),
+      }),
+    ).rejects.toThrow(/NEXT_REDIRECT/);
+    expect(listContactsForRelationshipMock).toHaveBeenCalledWith('rel-1', USER_ID);
+    expect(updateDraftMock).toHaveBeenCalledTimes(1);
+    const [, , payload] = updateDraftMock.mock.calls[0] as [
+      string,
+      string,
+      { inputs: Record<string, unknown> },
+    ];
+    expect(payload.inputs.clientCo).toBe('Acme Corp');
+    expect(payload.inputs.clientSiren).toBe('123456789');
+    expect(payload.inputs.clientName).toBe('Jean Dupont');
+    expect(payload.inputs.clientRole).toBe('Acheteur');
+    expect(payload.inputs.clientTel).toBe('0601020304');
+    expect(payload.inputs.clientEmail).toBe('jean@acme.fr');
+    // These remain editable starting points, not locked — session values
+    // still win for partner attribution (D-07 discipline unaffected).
+    expect(payload.inputs.partnerName).toBe('Alice Partner');
+    expect(payload.inputs.partnerCo).toBe('Acme Leasing');
+  });
+
+  it('Test 15b: with a relationship that has zero contacts, prefills only clientCo/clientSiren — no updateDraft crash, no contact fields written', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue({
+      relationshipId: 'rel-2',
+      companyId: 'co-2',
+      companyName: 'Beta SARL',
+      siren: null,
+      createdAt: new Date(),
+    });
+    listContactsForRelationshipMock.mockResolvedValue([]);
+    await expect(
+      ParametresStep1Page({
+        searchParams: Promise.resolve({ clientRelationshipId: 'rel-2' }),
+      }),
+    ).rejects.toThrow(/NEXT_REDIRECT/);
+    expect(updateDraftMock).toHaveBeenCalledTimes(1);
+    const [, , payload] = updateDraftMock.mock.calls[0] as [
+      string,
+      string,
+      { inputs: Record<string, unknown> },
+    ];
+    expect(payload.inputs.clientCo).toBe('Beta SARL');
+    expect(payload.inputs.clientSiren).toBeUndefined();
+    expect(payload.inputs.clientName).toBeUndefined();
+  });
+
+  it('Test 16: ?clientRelationshipId=<not owned> silently drops the param and mints a normal unlinked draft — no error page, no 404, no toast', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue(null);
+    await expect(
+      ParametresStep1Page({
+        searchParams: Promise.resolve({ clientRelationshipId: 'rel-not-owned' }),
+      }),
+    ).rejects.toThrow(/NEXT_REDIRECT:\/proposals\/new\/parametres\?draft_id=new-draft-1/);
+    expect(createDraftMock).toHaveBeenCalledWith({
+      userId: USER_ID,
+      language: 'fr',
+      clientRelationshipId: undefined,
+    });
+    expect(updateDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('Test 17: ?clientRelationshipId=<malformed> behaves identically to the not-owned case (the query layer rejecting an invalid UUID is caught, not surfaced)', async () => {
+    getClientRelationshipForOwnerMock.mockRejectedValue(
+      new Error('invalid input syntax for type uuid: "not-a-uuid"'),
+    );
+    await expect(
+      ParametresStep1Page({
+        searchParams: Promise.resolve({ clientRelationshipId: 'not-a-uuid' }),
+      }),
+    ).rejects.toThrow(/NEXT_REDIRECT:\/proposals\/new\/parametres\?draft_id=new-draft-1/);
+    expect(createDraftMock).toHaveBeenCalledWith({
+      userId: USER_ID,
+      language: 'fr',
+      clientRelationshipId: undefined,
+    });
+    expect(updateDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('Test 18: entering the wizard with no ?clientRelationshipId= mints a draft whose clientRelationshipId is undefined', async () => {
+    await expect(
+      ParametresStep1Page({ searchParams: Promise.resolve({}) }),
+    ).rejects.toThrow(/NEXT_REDIRECT/);
+    expect(getClientRelationshipForOwnerMock).not.toHaveBeenCalled();
+    expect(createDraftMock).toHaveBeenCalledWith({
+      userId: USER_ID,
+      language: 'fr',
+      clientRelationshipId: undefined,
+    });
+  });
+
+  it('Test 19: ?draft_id= still wins over ?clientRelationshipId= — an existing draft is never re-linked', async () => {
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      inputs: { clientCo: 'ExistingDraftCo', _completedSteps: [] },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1', clientRelationshipId: 'rel-1' }),
+    });
+    render(tree);
+    expect(createDraftMock).not.toHaveBeenCalled();
+    expect(getClientRelationshipForOwnerMock).not.toHaveBeenCalled();
   });
 
   // ──────────────────────────────────────────────────────────────────────────
