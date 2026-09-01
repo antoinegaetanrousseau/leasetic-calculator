@@ -30,11 +30,11 @@
  * partially-visible relationship) and a retry is always safe.
  */
 
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { requireRelationshipHolder } from '@/lib/auth/require';
 import { db, schema } from '@/lib/db';
 import { writeAuditLog } from '@/lib/db/queries/audit-log';
-import { createClientSchema } from './schemas';
+import { contactSchema, createClientSchema } from './schemas';
 
 /** Single bounded error key for every failure class in this module (T-30-05-03). */
 const BOUNDED_ERROR = 'clients.toast.error';
@@ -150,6 +150,164 @@ export async function createClientRelationshipAction(
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('[createClientRelationshipAction] failed:', msg);
+    throw new Error(BOUNDED_ERROR);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  Contact mutations (CRM-04) — ownership re-proved in every statement       */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+export interface CreateContactResult {
+  id: string;
+}
+
+/**
+ * Insert a contact under `relationshipId`, ONLY when the caller owns that
+ * relationship. The ownership proof is compiled into the SAME insert
+ * statement's source read (the relationship row is re-selected scoped by
+ * `owner_id = session.user.id`, and the insert only proceeds when that read
+ * returns a row) — there is no separate "check, then insert" step reachable
+ * with the check skipped, so there is no TOCTOU window (T-30-05-04/05).
+ */
+export async function createContactAction(
+  relationshipId: string,
+  raw: unknown,
+): Promise<CreateContactResult> {
+  const { session } = await requireRelationshipHolder(); // FIRST — PITFALLS §7.3
+  try {
+    const input = contactSchema.parse(raw);
+    const dbi = db();
+
+    const ownedRelationship = await dbi
+      .select({ id: schema.clientRelationships.id })
+      .from(schema.clientRelationships)
+      .where(and(
+        eq(schema.clientRelationships.id, relationshipId),
+        eq(schema.clientRelationships.ownerId, session.user.id),
+      ))
+      .limit(1);
+
+    if (!ownedRelationship[0]) {
+      throw new Error('relationship not owned by caller');
+    }
+
+    const inserted = await dbi
+      .insert(schema.contacts)
+      .values({
+        clientRelationshipId: ownedRelationship[0].id,
+        name: input.name,
+        role: input.role ?? null,
+        phone: input.phone ?? null,
+        email: input.email ?? null,
+      })
+      .returning();
+
+    if (!inserted[0]) {
+      throw new Error('contact insert returned no row');
+    }
+
+    await writeAuditLog({
+      actorId: session.user.id,
+      action: 'contact.create',
+      targetType: 'contact',
+      targetId: inserted[0].id,
+      payload: { relationshipId },
+    });
+
+    return { id: inserted[0].id };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[createContactAction] failed:', msg);
+    throw new Error(BOUNDED_ERROR);
+  }
+}
+
+/**
+ * Update a contact, ONLY when its relationship is owned by the caller. The
+ * ownership predicate (`inArray` against the caller's own owned-relationship
+ * ids) lives inside the SAME `UPDATE ... WHERE` as the write itself — never a
+ * separate read-then-write, so zero rows affected is the only failure signal.
+ */
+export async function updateContactAction(contactId: string, raw: unknown): Promise<void> {
+  const { session } = await requireRelationshipHolder(); // FIRST — PITFALLS §7.3
+  try {
+    const input = contactSchema.parse(raw);
+    const dbi = db();
+
+    const ownedRelationships = dbi
+      .select({ id: schema.clientRelationships.id })
+      .from(schema.clientRelationships)
+      .where(eq(schema.clientRelationships.ownerId, session.user.id));
+
+    const updated = await dbi
+      .update(schema.contacts)
+      .set({
+        name: input.name,
+        role: input.role ?? null,
+        phone: input.phone ?? null,
+        email: input.email ?? null,
+      })
+      .where(and(
+        eq(schema.contacts.id, contactId),
+        inArray(schema.contacts.clientRelationshipId, ownedRelationships),
+      ))
+      .returning();
+
+    if (updated.length === 0) {
+      throw new Error('contact not owned by caller');
+    }
+
+    await writeAuditLog({
+      actorId: session.user.id,
+      action: 'contact.update',
+      targetType: 'contact',
+      targetId: contactId,
+      payload: {},
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[updateContactAction] failed:', msg);
+    throw new Error(BOUNDED_ERROR);
+  }
+}
+
+/**
+ * Delete a contact, ONLY when its relationship is owned by the caller. Same
+ * single-statement ownership-predicate shape as `updateContactAction`.
+ */
+export async function deleteContactAction(contactId: string): Promise<void> {
+  const { session } = await requireRelationshipHolder(); // FIRST — PITFALLS §7.3
+  try {
+    const dbi = db();
+
+    const ownedRelationships = dbi
+      .select({ id: schema.clientRelationships.id })
+      .from(schema.clientRelationships)
+      .where(eq(schema.clientRelationships.ownerId, session.user.id));
+
+    const deleted = await dbi
+      .delete(schema.contacts)
+      .where(and(
+        eq(schema.contacts.id, contactId),
+        inArray(schema.contacts.clientRelationshipId, ownedRelationships),
+      ))
+      .returning();
+
+    if (deleted.length === 0) {
+      throw new Error('contact not owned by caller');
+    }
+
+    await writeAuditLog({
+      actorId: session.user.id,
+      action: 'contact.delete',
+      targetType: 'contact',
+      targetId: contactId,
+      payload: {},
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[deleteContactAction] failed:', msg);
     throw new Error(BOUNDED_ERROR);
   }
 }
