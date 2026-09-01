@@ -5,9 +5,9 @@ describe('i18n dictionary parity', () => {
   const frKeys = Object.keys(dictionaries.fr);
   const enKeys = Object.keys(dictionaries.en);
 
-  it('has at least 220 keys per language (5 legacy + 166 v10 + 60 Phase 6, with ±5 v10 dedup tolerance)', () => {
-    expect(frKeys.length).toBeGreaterThanOrEqual(220);
-    expect(enKeys.length).toBeGreaterThanOrEqual(220);
+  it('has at least 790 keys per language (raised in Phase 30 for the clients.* / admin.companies.* namespaces)', () => {
+    expect(frKeys.length).toBeGreaterThanOrEqual(790);
+    expect(enKeys.length).toBeGreaterThanOrEqual(790);
   });
 
   it('every FR key exists in EN', () => {
@@ -397,5 +397,55 @@ describe('Phase 13 wizard i18n delta (Plan 13-01)', () => {
         expect(t(key, 'en')).toContain('{1}');
       });
     }
+  });
+});
+
+// ── Phase 30 — Company & Contact Registry (Plan 30-02) ───────────────────────
+//
+// New `clients.*` / `admin.companies.*` namespaces per 30-UI-SPEC.md's
+// Copywriting Contract + i18n Key Plan. The compile-time `_EnHasAllFrKeys`
+// guard in dictionaries.ts catches FR↔EN drift; this suite adds runtime
+// exact-value assertions for the locked copy plus the CRM-02 non-leakage
+// requirement on the search-empty-state string.
+
+describe('Phase 30 CRM registry i18n keys (Plan 30-02)', () => {
+  it('clients.page.title — FR exact', () => {
+    expect(t('clients.page.title', 'fr')).toBe('Clients');
+  });
+  it('clients.page.title — EN exact', () => {
+    expect(t('clients.page.title', 'en')).toBe('Clients');
+  });
+  it('clients.empty.search.title — FR exact and does not leak that a matching record exists elsewhere (CRM-02)', () => {
+    const fr = t('clients.empty.search.title', 'fr');
+    expect(fr).toBe('Aucun résultat ne correspond à votre recherche.');
+    expect(fr.toLowerCase()).not.toMatch(/autre partenaire|un autre|déjà|existe/);
+  });
+  it('clients.empty.search.title — EN exact', () => {
+    expect(t('clients.empty.search.title', 'en')).toBe('No results match your search.');
+  });
+  it('admin.companies.relation.type.sales — FR exact', () => {
+    expect(t('admin.companies.relation.type.sales', 'fr')).toBe('Interne');
+  });
+  it('admin.companies.relation.type.sales — EN exact', () => {
+    expect(t('admin.companies.relation.type.sales', 'en')).toBe('In-house');
+  });
+  it('sidebar.nav.clients — FR exact', () => {
+    expect(t('sidebar.nav.clients', 'fr')).toBe('Clients');
+  });
+  it('sidebar.nav.clients — EN exact', () => {
+    expect(t('sidebar.nav.clients', 'en')).toBe('Clients');
+  });
+
+  it('no Phase 30 key duplicates the existing error.field.siren.invalid / error.field.email.invalid messages', () => {
+    // Reuse discipline (UI-SPEC Copywriting Contract): Phase 30 must not mint
+    // a second SIREN/email validation string — it reuses the existing keys.
+    const fr = dictionaries.fr as Record<string, string>;
+    const sirenInvalid = fr['error.field.siren.invalid'];
+    const emailInvalid = fr['error.field.email.invalid'];
+    const crmValues = Object.entries(fr)
+      .filter(([k]) => k.startsWith('clients.') || k.startsWith('admin.companies.'))
+      .map(([, v]) => v);
+    expect(crmValues).not.toContain(sirenInvalid);
+    expect(crmValues).not.toContain(emailInvalid);
   });
 });
