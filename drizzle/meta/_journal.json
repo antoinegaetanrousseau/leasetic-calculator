@@ -50,6 +50,13 @@
       "when": 1780091522195,
       "tag": "0006_workable_yellow_claw",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788254781751,
+      "tag": "0007_phase30_crm_registry",
+      "breakpoints": true
     }
   ]
 }
