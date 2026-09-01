@@ -23,6 +23,9 @@
  * coefficient_history sentence references "modified coefficients" generically.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 vi.mock('server-only', () => ({}));
 
@@ -215,6 +218,27 @@ describe('getRecentAdminActivity (D-05)', () => {
       expect(arg).not.toMatch(/^\d+(\.\d+)?$/);
       expect(arg.toLowerCase()).not.toContain('commission');
     }
+  });
+
+  it('Phase 30 Plan 03 (ROLE-03) — partner-status source rows for a "sales" user still surface in the merged feed', async () => {
+    const t0 = new Date('2026-05-20T10:00:00Z');
+    mockState.selectResults.push([]); // source (a): empty
+    mockState.selectResults.push([
+      { id: 'u-sales', updatedAt: t0, name: 'Sales Person', email: 'sales@x.com', deletedAt: null, lastLoginAt: t0 },
+    ]);
+    const rows = await getRecentAdminActivity({ limit: 5 });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.source).toBe('partner_status');
+    expect(rows[0]!.sentenceArgs).toContain('Sales Person');
+  });
+
+  it('Phase 30 Plan 03 (ROLE-03) — the partner-status role predicate is widened to IN (partner, sales), never a plain equality on "partner"', () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const src = readFileSync(join(here, 'admin-activity.ts'), 'utf8');
+    expect(src).toContain("inArray(schema.users.role, ['partner', 'sales'])");
+    expect(src).not.toContain("eq(schema.users.role, 'partner')");
+    // ROLE-03 — 'admin' must never join the predicate.
+    expect(src).not.toMatch(/inArray\(schema\.users\.role,\s*\[[^\]]*'admin'[^\]]*\]\)/);
   });
 
   it('exports ActivityRow type-shape compatibly (smoke test — TS compiles)', () => {

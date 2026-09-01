@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, desc, eq, gte, isNotNull, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, isNotNull, or, sql } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 
 /**
@@ -121,7 +121,10 @@ export async function getRecentAdminActivity(args?: { limit?: number }): Promise
     .from(schema.users)
     .where(
       and(
-        eq(schema.users.role, 'partner'),
+        // ROLE-03 / T-30-03-04: widened from role='partner' so Commercial
+        // accounts backfilled to 'sales' (Plan 30-01) still appear in the
+        // admin activity feed. 'admin' is deliberately excluded.
+        inArray(schema.users.role, ['partner', 'sales']),
         gte(schema.users.updatedAt, windowStart),
         // Only surface rows that look like a status transition occurred —
         // either soft-deleted (inactive) or have logged in (active).

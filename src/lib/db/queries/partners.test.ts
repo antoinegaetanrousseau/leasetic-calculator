@@ -84,6 +84,9 @@ vi.mock('@/lib/db', async () => {
   };
 });
 
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { listPartnersWithLastActivity, type PartnerRow } from './partners';
 
 // Helper: synthesize a raw query-builder row (post-LEFT-JOIN aggregate).
@@ -96,6 +99,7 @@ function makeRawRow(overrides: Partial<{
   lastLoginAt: Date | null;
   createdAt: Date;
   lastActivityAt: Date | null;
+  role: string;
 }> = {}) {
   return {
     id: 'p-1',
@@ -106,6 +110,7 @@ function makeRawRow(overrides: Partial<{
     lastLoginAt: new Date('2026-05-10T10:00:00Z'),
     createdAt: new Date('2026-04-01T12:00:00Z'),
     lastActivityAt: new Date('2026-05-12T09:00:00Z'),
+    role: 'partner',
     ...overrides,
   };
 }
@@ -277,5 +282,40 @@ describe('PartnerRow contract', () => {
     })];
     const result = await listPartnersWithLastActivity({});
     expect(result.rows[0].status).toBe('inactive');
+  });
+});
+
+describe('Phase 30 Plan 03 — ROLE-03: Commercial accounts stay visible after backfill', () => {
+  it('returns rows for a user whose role is "sales" (no longer silently dropped)', async () => {
+    mockState.selectResult = [makeRawRow({ id: 'p-sales', role: 'sales' })];
+    const result = await listPartnersWithLastActivity({});
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0].id).toBe('p-sales');
+  });
+
+  it('derives isInternal=true for role="sales" and isInternal=false for role="partner"', async () => {
+    mockState.selectResult = [
+      makeRawRow({ id: 'p-sales', role: 'sales' }),
+      makeRawRow({ id: 'p-partner', role: 'partner' }),
+    ];
+    const result = await listPartnersWithLastActivity({});
+    const sales = result.rows.find((r) => r.id === 'p-sales')!;
+    const partner = result.rows.find((r) => r.id === 'p-partner')!;
+    expect(sales.isInternal).toBe(true);
+    expect(partner.isInternal).toBe(false);
+  });
+
+  it('T-30-03-04 — the base role predicate is IN (partner, sales), never a plain equality on "partner"', () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const src = readFileSync(join(here, 'partners.ts'), 'utf8');
+    expect(src).toContain("inArray(schema.users.role, ['partner', 'sales'])");
+    expect(src).not.toContain("eq(schema.users.role, 'partner')");
+  });
+
+  it("ROLE-03 — 'admin' is never included in the role predicate (admins never appear as partners)", () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const src = readFileSync(join(here, 'partners.ts'), 'utf8');
+    // Only the intended two-member array should follow the role predicate.
+    expect(src).not.toMatch(/inArray\(schema\.users\.role,\s*\[[^\]]*'admin'[^\]]*\]\)/);
   });
 });

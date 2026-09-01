@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, desc, eq, ilike, isNotNull, isNull, ne, or, sql } from 'drizzle-orm';
+import { and, desc, eq, ilike, inArray, isNotNull, isNull, ne, or, sql } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 
 /**
@@ -30,6 +30,17 @@ import { db, schema } from '@/lib/db';
  *     status='invited' branches; the 'inactive' branch flips the predicate.
  *   - ADMIN-09 — no commission projection (no `users.commission_pct` exists;
  *     commission lives on `global_params`). 9-gate grep contract trivially honored.
+ *
+ * Phase 30 Plan 03 (ROLE-03 / T-30-03-04): the base role predicate is
+ * `role IN ('partner', 'sales')`, NOT `role = 'partner'`. Once the 30-01
+ * backfill moves Commercial accounts to `sales`, this listing MUST keep
+ * showing them — an admin losing visibility of a previously-visible account
+ * is exactly what ROLE-03 forbids. `role` itself is projected below as an
+ * access classification (which auth gate the account uses), the same
+ * reasoning already applied to `partnerType` — it is NOT a rate or
+ * commission field, so the ADMIN-09 envelope is unaffected. `'admin'` is
+ * deliberately excluded from the predicate: this listing must never surface
+ * admin accounts as partners.
  */
 
 export type PartnerStatus = 'active' | 'invited' | 'inactive';
@@ -50,6 +61,13 @@ export interface PartnerRow {
    * No commission_pct field exists on users; 9-gate grep contract trivially honored.
    */
   partnerType: 'Agent' | 'Commercial' | 'Partenaire';
+  /**
+   * Phase 30 Plan 03 (ROLE-03) — true when the underlying users.role is
+   * 'sales' (an internal Commercial account), false for 'partner'. This is
+   * an access classification derived from `role`, NOT a commission/rate
+   * value — ADMIN-09 unaffected.
+   */
+  isInternal: boolean;
 }
 
 export interface ListPartnersArgs {
@@ -146,7 +164,7 @@ export async function listPartnersWithLastActivity(
     : undefined;
 
   const where = and(
-    eq(schema.users.role, 'partner'),
+    inArray(schema.users.role, ['partner', 'sales']),
     statusPredicate,
     searchPredicate,
     cursorPredicate,
@@ -168,6 +186,9 @@ export async function listPartnersWithLastActivity(
       // PTYPE-01 / D-07: project partner_type for at-a-glance badge.
       // ADMIN-09: business-classification enum — NOT a commission/rate field.
       partnerType: schema.users.partnerType,
+      // ROLE-03 / T-30-03-04: project role to derive isInternal — an access
+      // classification, NOT a rate/commission field (ADMIN-09 unaffected).
+      role: schema.users.role,
       lastActivityAt:
         sql<Date | null>`MAX(${schema.proposals.createdAt})`.as('last_activity_at'),
     })
@@ -189,6 +210,7 @@ export async function listPartnersWithLastActivity(
       schema.users.lastLoginAt,
       schema.users.createdAt,
       schema.users.partnerType,
+      schema.users.role,
     )
     .orderBy(desc(schema.users.createdAt), desc(schema.users.id))
     .limit(fetchCount);
@@ -221,6 +243,9 @@ export async function listPartnersWithLastActivity(
       // PTYPE-01 / D-07: the DB column has DEFAULT 'Partenaire' NOT NULL so
       // the value is always one of the three enum members.
       partnerType: (r.partnerType ?? 'Partenaire') as 'Agent' | 'Commercial' | 'Partenaire',
+      // ROLE-03: internal (Commercial-turned-sales) accounts flagged for the
+      // admin listing UI — derived from the same `role` predicate above.
+      isInternal: r.role === 'sales',
     };
   });
 

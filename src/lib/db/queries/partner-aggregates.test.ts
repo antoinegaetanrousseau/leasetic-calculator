@@ -20,6 +20,9 @@
  * .select()/.from()/.where() to enforce the contract without a real DB.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 vi.mock('server-only', () => ({}));
 
@@ -121,6 +124,18 @@ describe('getTotalPartnerAccountCount (D-01)', () => {
     mockState.selectResult = [{ count: 0 }];
     const n = await getTotalPartnerAccountCount();
     expect(n).toBe(0);
+  });
+});
+
+describe('Phase 30 Plan 03 (ROLE-03) — active/total tiles count "sales" rows too', () => {
+  it('the active-count and total-count predicates are widened to IN (partner, sales), never a plain equality on "partner"', () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const src = readFileSync(join(here, 'partner-aggregates.ts'), 'utf8');
+    const occurrences = src.match(/inArray\(schema\.users\.role, \['partner', 'sales'\]\)/g) ?? [];
+    expect(occurrences.length).toBe(2);
+    expect(src).not.toContain("eq(schema.users.role, 'partner')");
+    // ROLE-03 — 'admin' must never join the predicate.
+    expect(src).not.toMatch(/inArray\(schema\.users\.role,\s*\[[^\]]*'admin'[^\]]*\]\)/);
   });
 });
 

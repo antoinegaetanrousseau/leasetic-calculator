@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, count, eq, isNotNull, isNull } from 'drizzle-orm';
+import { and, count, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 
 /**
@@ -44,8 +44,11 @@ import { db, schema } from '@/lib/db';
  */
 export async function getActivePartnerCount(): Promise<number> {
   const dbi = db();
+  // ROLE-03 / T-30-03-04: widened from role='partner' so Commercial
+  // accounts backfilled to 'sales' (Plan 30-01) still count toward this
+  // tile. 'admin' is deliberately excluded.
   const where = and(
-    eq(schema.users.role, 'partner'),
+    inArray(schema.users.role, ['partner', 'sales']),
     isNull(schema.users.deletedAt),
     isNotNull(schema.users.lastLoginAt),
   );
@@ -67,8 +70,9 @@ export async function getActivePartnerCount(): Promise<number> {
  */
 export async function getTotalPartnerAccountCount(): Promise<number> {
   const dbi = db();
+  // ROLE-03: widened from role='partner' — see getActivePartnerCount above.
   const where = and(
-    eq(schema.users.role, 'partner'),
+    inArray(schema.users.role, ['partner', 'sales']),
     isNull(schema.users.deletedAt),
   );
   const rows = await dbi
