@@ -25,6 +25,17 @@ const nextConfig: NextConfig = {
   // before concluding a config change did not work: Turbopack caches the failed
   // resolution and keeps replaying it against the new config.
   outputFileTracingRoot: path.join(__dirname),
+  // Next 16 prints every Server Function invocation to the dev terminal WITH ITS
+  // ARGUMENTS, e.g.
+  //   └─ ƒ redeemToken("<token>", "reset", "<password>", "<password>") in 455ms
+  // That put plaintext passwords — and client contact names, phones and emails
+  // from the CRM actions — into terminal scrollback, shared screens and any piped
+  // log file. Turning the trace off is the only supported control; it is
+  // per-invocation logging, not error reporting, so thrown errors and the
+  // request lines are still logged.
+  logging: {
+    serverFunctions: false,
+  },
   // Pin generateBuildId to git SHA for OVH parity (per STACK.md §1)
   generateBuildId: async () => process.env.GIT_COMMIT_SHA ?? 'dev-build',
   async redirects() {
