@@ -52,6 +52,17 @@ describe('getRouteMeta — partner tree (no adminSegment)', () => {
       activeNav: 'home',
     });
   });
+
+  it('returns clients for /clients (list) and /clients/[id] (detail) — Plan 30-02', () => {
+    expect(getRouteMeta('/clients')).toEqual({
+      titleKey: 'sidebar.nav.clients',
+      activeNav: 'clients',
+    });
+    expect(getRouteMeta('/clients/abc-123')).toEqual({
+      titleKey: 'sidebar.nav.clients',
+      activeNav: 'clients',
+    });
+  });
 });
 
 describe('getRouteMeta — admin tree (with adminSegment)', () => {
@@ -86,6 +97,13 @@ describe('getRouteMeta — admin tree (with adminSegment)', () => {
     expect(getRouteMeta(`/${seg}/history`, seg)).toEqual({
       titleKey: 'sidebar.nav.adminHistory',
       activeNav: 'admin-history',
+    });
+  });
+
+  it('returns admin-companies for /<seg>/companies (Plan 30-02)', () => {
+    expect(getRouteMeta(`/${seg}/companies`, seg)).toEqual({
+      titleKey: 'sidebar.nav.adminCompanies',
+      activeNav: 'admin-companies',
     });
   });
 

@@ -21,7 +21,7 @@
  *     carried over unchanged. Those encode real product rules, not styling.
  */
 
-import { HomeIcon, PlusIcon, ProposalIcon, HelpIcon, UsersIcon, SlidersIcon } from '@/components/ui/icons';
+import { HomeIcon, PlusIcon, ProposalIcon, HelpIcon, UsersIcon, SlidersIcon, BuildingIcon } from '@/components/ui/icons';
 import { useSyncExternalStore, type ComponentType } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -73,6 +73,7 @@ export interface AppSidebarProps {
     home: string;
     coefficients: string;
     partners: string;
+    companies: string;
     history: string;
   };
   /**
@@ -89,22 +90,25 @@ export interface AppSidebarProps {
 type NavItem = { key: ActiveNav; icon: ComponentType<{ size?: number; className?: string }>; labelKey: DictKey; href: string };
 
 /**
- * Phase 18 D-27 — Partner sidebar: exactly 4 items in order
- *   [Accueil, Nouvelle proposition, Propositions, Aide]
+ * Phase 18 D-27, widened by Phase 30 Plan 02 — Partner sidebar: exactly 5
+ * items in order [Accueil, Nouvelle proposition, Propositions, Clients, Aide].
+ * Every non-admin role reaches this same array — isAdmin===false is the only
+ * gate (ROLE-02 is satisfied by construction, not by a role-specific branch).
  */
 function partnerNavItems(): NavItem[] {
   return [
     { key: 'home', icon: HomeIcon, labelKey: 'sidebar.nav.home', href: '/' },
     { key: 'proposals-new', icon: PlusIcon, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
     { key: 'proposals', icon: ProposalIcon, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
+    { key: 'clients', icon: BuildingIcon, labelKey: 'sidebar.nav.clients', href: '/clients' },
     { key: 'help', icon: HelpIcon, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];
 }
 
 /**
- * Phase 18 D-27 — Admin sidebar: exactly 6 items in order
- *   [Accueil, Nouvelle proposition, Propositions, Partenaires, Coefficients, Aide]
- * Historique is deliberately NOT in the sidebar.
+ * Phase 18 D-27, widened by Phase 30 Plan 02 — Admin sidebar: exactly 7 items
+ * in order [Accueil, Nouvelle proposition, Propositions, Partenaires,
+ * Sociétés, Coefficients, Aide]. Historique is deliberately NOT in the sidebar.
  */
 function adminNavItems(hrefs: NonNullable<AppSidebarProps['adminHrefs']>): NavItem[] {
   return [
@@ -112,6 +116,7 @@ function adminNavItems(hrefs: NonNullable<AppSidebarProps['adminHrefs']>): NavIt
     { key: 'proposals-new', icon: PlusIcon, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
     { key: 'proposals', icon: ProposalIcon, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
     { key: 'admin-partners', icon: UsersIcon, labelKey: 'sidebar.nav.adminPartners', href: hrefs.partners },
+    { key: 'admin-companies', icon: BuildingIcon, labelKey: 'sidebar.nav.adminCompanies', href: hrefs.companies },
     { key: 'admin-coefficients', icon: SlidersIcon, labelKey: 'sidebar.nav.adminCoefficients', href: hrefs.coefficients },
     { key: 'help', icon: HelpIcon, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];

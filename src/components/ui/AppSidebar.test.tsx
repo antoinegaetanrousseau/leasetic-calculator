@@ -51,6 +51,7 @@ const ADMIN_HREFS = {
   home: '/x',
   coefficients: '/x/coefficients',
   partners: '/x/partners',
+  companies: '/x/companies',
   history: '/x/history',
 } as const;
 
@@ -70,15 +71,16 @@ afterEach(() => {
 describe('AppSidebar', () => {
   // ── Per-role nav contract (Phase 18 D-27) ────────────────────────────────
 
-  it('AC-RS-04: partner nav renders exactly 4 items in FR order', () => {
+  it('AC-RS-04: partner nav renders exactly 5 items in FR order (Plan 30-02 adds Clients)', () => {
     const { container } = renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
 
     const links = navLinksIn(container);
-    expect(links).toHaveLength(4);
+    expect(links).toHaveLength(5);
     expect(Array.from(links).map((l) => l.textContent)).toEqual([
       'Accueil',
       'Nouvelle proposition',
       'Propositions',
+      'Clients',
       'Aide',
     ]);
     // Active item is exposed via the primitive's data-active hook. base-ui
@@ -88,7 +90,7 @@ describe('AppSidebar', () => {
     expect(Array.from(links).filter((l) => l.hasAttribute('data-active'))).toHaveLength(1);
   });
 
-  it('Phase 18 D-27: admin nav renders exactly 6 items, correct hrefs, no Historique', () => {
+  it('Phase 18 D-27, widened by Plan 30-02: admin nav renders exactly 7 items, correct hrefs, no Historique', () => {
     const { container } = renderSidebar({
       activeNav: 'admin-coefficients',
       isAdmin: true,
@@ -98,12 +100,13 @@ describe('AppSidebar', () => {
     });
 
     const links = navLinksIn(container);
-    expect(links).toHaveLength(6);
+    expect(links).toHaveLength(7);
     expect(Array.from(links).map((l) => l.textContent)).toEqual([
       'Accueil',
       'Nouvelle proposition',
       'Propositions',
       'Partenaires',
+      'Sociétés',
       'Coefficients',
       'Aide',
     ]);
@@ -111,18 +114,19 @@ describe('AppSidebar', () => {
     // Historique is deliberately absent from the admin sidebar (D-27).
     expect(Array.from(links).some((l) => (l.textContent ?? '').includes('Historique'))).toBe(false);
 
-    // Admin home + partners + coefficients use the forwarded segment hrefs;
-    // new / proposals / help stay on their canonical routes.
+    // Admin home + partners + companies + coefficients use the forwarded
+    // segment hrefs; new / proposals / help stay on their canonical routes.
     expect(Array.from(links).map((l) => l.getAttribute('href'))).toEqual([
       '/x',
       '/proposals/new/parametres',
       '/proposals',
       '/x/partners',
+      '/x/companies',
       '/x/coefficients',
       '/aide',
     ]);
 
-    expect(links[4]).toHaveAttribute('data-active');
+    expect(links[5]).toHaveAttribute('data-active');
     expect(Array.from(links).filter((l) => l.hasAttribute('data-active'))).toHaveLength(1);
   });
 
@@ -132,6 +136,7 @@ describe('AppSidebar', () => {
       'Home',
       'New proposal',
       'Proposals',
+      'Clients',
       'Help',
     ]);
   });
@@ -164,7 +169,7 @@ describe('AppSidebar', () => {
     // Nav items remain present and reachable — the primitive hides their labels
     // visually in icon mode rather than unmounting them, which keeps the links
     // available to assistive tech.
-    expect(navLinksIn(container)).toHaveLength(4);
+    expect(navLinksIn(container)).toHaveLength(5);
   });
 
   it('AC-RS-01/03: toggling flips collapse state and the control swaps affordance', async () => {
@@ -258,7 +263,7 @@ describe('AppSidebar', () => {
     const { container: agent } = renderSidebar({
       activeNav: 'home', isAdmin: true, lang: 'fr', theme: 'light', adminHomeHref: '/x',
     });
-    expect(navLinksIn(agent)).toHaveLength(4);
+    expect(navLinksIn(agent)).toHaveLength(5);
     cleanup();
 
     window.sessionStorage.setItem('leasetic.view', 'admin');
@@ -266,7 +271,7 @@ describe('AppSidebar', () => {
       activeNav: 'admin-home', isAdmin: true, lang: 'fr', theme: 'light',
       adminHomeHref: '/x', adminHrefs: { ...ADMIN_HREFS },
     });
-    expect(navLinksIn(admin)).toHaveLength(6);
+    expect(navLinksIn(admin)).toHaveLength(7);
   });
 
   it('AC-RS-24-04 (D-02 auto-reconcile): adminSegment forces the admin nav', () => {
@@ -275,6 +280,6 @@ describe('AppSidebar', () => {
       activeNav: 'admin-home', isAdmin: true, lang: 'fr', theme: 'light',
       adminSegment: 'x', adminHrefs: { ...ADMIN_HREFS },
     });
-    expect(navLinksIn(container)).toHaveLength(6);
+    expect(navLinksIn(container)).toHaveLength(7);
   });
 });

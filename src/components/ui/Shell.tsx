@@ -66,6 +66,7 @@ export async function Shell({
           home: `/${adminSegment}`,
           coefficients: `/${adminSegment}/coefficients`,
           partners: `/${adminSegment}/partners`,
+          companies: `/${adminSegment}/companies`,
           history: `/${adminSegment}/history`,
         }
       : undefined;

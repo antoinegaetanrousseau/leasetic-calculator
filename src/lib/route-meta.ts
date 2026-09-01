@@ -10,11 +10,13 @@ export type ActiveNav =
   | 'home'
   | 'proposals-new'
   | 'proposals'
+  | 'clients'
   | 'history'
   | 'help'
   | 'admin-home'
   | 'admin-coefficients'
   | 'admin-partners'
+  | 'admin-companies'
   | 'admin-history';
 
 export interface RouteMeta {
@@ -43,6 +45,9 @@ export function getRouteMeta(pathname: string, adminSegment?: string): RouteMeta
       if (tail.startsWith('/partners')) {
         return { titleKey: 'sidebar.nav.adminPartners', activeNav: 'admin-partners' };
       }
+      if (tail.startsWith('/companies')) {
+        return { titleKey: 'sidebar.nav.adminCompanies', activeNav: 'admin-companies' };
+      }
       if (tail.startsWith('/history')) {
         return { titleKey: 'sidebar.nav.adminHistory', activeNav: 'admin-history' };
       }
@@ -56,6 +61,9 @@ export function getRouteMeta(pathname: string, adminSegment?: string): RouteMeta
   }
   if (pathname.startsWith('/proposals')) {
     return { titleKey: 'sidebar.nav.proposals', activeNav: 'proposals' };
+  }
+  if (pathname.startsWith('/clients')) {
+    return { titleKey: 'sidebar.nav.clients', activeNav: 'clients' };
   }
   if (pathname.startsWith('/aide')) {
     return { titleKey: 'sidebar.nav.help', activeNav: 'help' };
