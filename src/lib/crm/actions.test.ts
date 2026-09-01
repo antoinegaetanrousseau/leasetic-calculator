@@ -88,6 +88,14 @@ vi.mock('@/lib/db', async () => {
         mockState.calls.push({ kind: 'onConflictDoNothing', payload: cfg });
         return builder;
       },
+      // `INSERT ... SELECT` — the ownership-proving form used by
+      // createContactAction. Recorded as its own kind so a test can assert that
+      // the ownership predicate rides INSIDE the insert rather than arriving as a
+      // separate check-then-act SELECT (T-30-05-05).
+      select: (sub: unknown) => {
+        mockState.calls.push({ kind: 'insert-select', payload: sub });
+        return builder;
+      },
       returning: () => {
         mockState.calls.push({ kind: 'returning' });
         return Promise.resolve(nextResult());
@@ -300,7 +308,9 @@ describe('createClientRelationshipAction', () => {
 describe('createContactAction', () => {
   it('inserts a contact only when the caller owns the relationship', async () => {
     const contactRow = { id: 'contact-1', name: 'Jean', role: null, phone: null, email: null };
-    mockState.resultQueue = [[{ id: 'rel-1' }], [contactRow]];
+    // ONE result: the INSERT ... SELECT returns the inserted row. There is no
+    // separate ownership lookup to queue a result for.
+    mockState.resultQueue = [[contactRow]];
 
     const result = await createContactAction('rel-1', { name: 'Jean' });
 
@@ -310,11 +320,33 @@ describe('createContactAction', () => {
     );
   });
 
-  it('throws the bounded error and inserts nothing for a relationship owned by someone else', async () => {
-    mockState.resultQueue = [[]]; // ownership lookup finds nothing
+  it('proves ownership INSIDE the insert — no separate check-then-act read (T-30-05-05)', async () => {
+    const contactRow = { id: 'contact-1', name: 'Jean', role: null, phone: null, email: null };
+    mockState.resultQueue = [[contactRow]];
+
+    await createContactAction('rel-1', { name: 'Jean' });
+
+    // The write is an INSERT ... SELECT, so the ownership predicate cannot be
+    // separated from the write by any window.
+    expect(mockState.calls.some((c) => c.kind === 'insert-select')).toBe(true);
+    // And the value-literal form must NOT be used — that is the shape that
+    // required a preceding standalone ownership SELECT.
+    expect(mockState.calls.some((c) => c.kind === 'values')).toBe(false);
+
+    // Regression guard for the original defect: this action previously issued a
+    // standalone `SELECT ... FROM client_relationships` and only then INSERTed,
+    // leaving a real TOCTOU window. Nothing may run before the insert.
+    const insertIdx = mockState.calls.findIndex((c) => c.kind === 'insert');
+    expect(insertIdx).toBe(0);
+  });
+
+  it('throws the bounded error and inserts no row for a relationship owned by someone else', async () => {
+    // The INSERT ... SELECT runs, its SELECT matches no owned relationship, so
+    // zero rows come back. Zero rows is the ONLY failure signal — deliberately
+    // identical for "not owned" and "does not exist".
+    mockState.resultQueue = [[]];
 
     await expect(createContactAction('rel-other', { name: 'Jean' })).rejects.toThrow('clients.toast.error');
-    expect(mockState.calls.some((c) => c.kind === 'insert')).toBe(false);
     expect(writeAuditLogMock).not.toHaveBeenCalled();
   });
 

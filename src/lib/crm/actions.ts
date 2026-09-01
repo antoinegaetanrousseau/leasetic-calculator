@@ -30,7 +30,7 @@
  * partially-visible relationship) and a retry is always safe.
  */
 
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { requireRelationshipHolder } from '@/lib/auth/require';
 import { db, schema } from '@/lib/db';
 import { writeAuditLog } from '@/lib/db/queries/audit-log';
@@ -179,32 +179,40 @@ export async function createContactAction(
     const input = contactSchema.parse(raw);
     const dbi = db();
 
-    const ownedRelationship = await dbi
-      .select({ id: schema.clientRelationships.id })
-      .from(schema.clientRelationships)
-      .where(and(
-        eq(schema.clientRelationships.id, relationshipId),
-        eq(schema.clientRelationships.ownerId, session.user.id),
-      ))
-      .limit(1);
-
-    if (!ownedRelationship[0]) {
-      throw new Error('relationship not owned by caller');
-    }
-
+    // Ownership is proved INSIDE the INSERT via `INSERT ... SELECT`: the source
+    // row is the caller's own relationship, so a relationship the caller does not
+    // own selects zero rows and inserts nothing. Zero rows returned is the only
+    // failure signal (T-30-05-04 / T-30-05-05, and the sibling UPDATE/DELETE do
+    // the same thing with `inArray`).
+    //
+    // Do NOT reintroduce a standalone ownership SELECT followed by a separate
+    // INSERT. That is what this code used to do, and it left a real TOCTOU window
+    // between the two statements — the exact pattern 30-05-PLAN.md forbids
+    // ("the read and the write must be one statement"). It was invisible in
+    // testing because the mock simply queued two results.
     const inserted = await dbi
       .insert(schema.contacts)
-      .values({
-        clientRelationshipId: ownedRelationship[0].id,
-        name: input.name,
-        role: input.role ?? null,
-        phone: input.phone ?? null,
-        email: input.email ?? null,
-      })
+      .select(
+        dbi
+          .select({
+            clientRelationshipId: schema.clientRelationships.id,
+            name: sql<string>`${input.name}`.as('name'),
+            role: sql<string | null>`${input.role ?? null}`.as('role'),
+            phone: sql<string | null>`${input.phone ?? null}`.as('phone'),
+            email: sql<string | null>`${input.email ?? null}`.as('email'),
+          })
+          .from(schema.clientRelationships)
+          .where(and(
+            eq(schema.clientRelationships.id, relationshipId),
+            eq(schema.clientRelationships.ownerId, session.user.id),
+          )),
+      )
       .returning();
 
     if (!inserted[0]) {
-      throw new Error('contact insert returned no row');
+      // Either the relationship does not exist or the caller does not own it —
+      // deliberately indistinguishable, and collapsed into BOUNDED_ERROR below.
+      throw new Error('relationship not owned by caller');
     }
 
     await writeAuditLog({
