@@ -99,7 +99,9 @@ export function CreateClientDialog({ lang }: CreateClientDialogProps) {
           <Field>
             <FieldLabel htmlFor="create-client-name">
               {t('clients.modal.create.field.name', lang)}
-              <span className="text-destructive">*</span>
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
+                *
+              </span>
             </FieldLabel>
             <Input
               id="create-client-name"
