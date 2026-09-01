@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-01T09:58:34.213Z"
+last_updated: "2026-09-01T10:25:01.850Z"
 last_activity: 2026-09-01
 progress:
   total_phases: 18
   completed_phases: 13
   total_plans: 55
-  completed_plans: 48
+  completed_plans: 49
   percent: 72
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 30 (company-contact-registry) — EXECUTING
-Plan: 3 of 9
+Plan: 4 of 9
 Status: Ready to execute
 Last activity: 2026-09-01
 
@@ -387,6 +387,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 29 P02 | ~10min | 2 tasks | 1 files |
 | Phase 30 P01 | 12min | 3 tasks | 8 files |
 | Phase 30 P02 | 16min | 3 tasks | 12 files |
+| Phase 30 P03 | 21min | 3 tasks | 15 files |
 
 ## Decisions
 
@@ -448,3 +449,6 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 30]: SearchBar optional placeholderKey/ariaKey DictKey props default to current proposal.search.* keys — new surfaces override copy with zero edits to existing call sites (30-02)
 - [Phase 30]: BuildingIcon/PhoneIcon hand-authored with real SVG strokes (1.5px) rather than Iconly's filled-evenodd double-contour technique — no licensed source exists for these glyphs (30-02, A-7)
 - [Phase 30]: clients.* (partner-facing) vs admin.companies.* (admin-facing) i18n namespace split mirrors the CRM-01/02 shared-vs-private data model split from Plan 30-01
+- [Phase 30]: Widened src/lib/api/proposals/list.ts's _callerRole type to include 'sales' (Rule 3 fix, out of plan scope) since the admin-scoping check only compares === 'admin'
+- [Phase 30]: Every eq(schema.users.role, 'partner') predicate widened to inArray(schema.users.role, ['partner','sales']) so Commercial accounts stay visible to admin surfaces after the Plan 30-01 backfill (ROLE-03)
+- [Phase 30]: roleForPartnerType() derives 'sales' only for 'Commercial' and is guarded in adminCreateInvitation + adminUpdatePartnerType against ever demoting an existing 'admin' row

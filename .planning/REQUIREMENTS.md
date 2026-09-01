@@ -86,7 +86,7 @@ The master-data layer. A `company` is a global fact; a `client_relationship` is 
 
 - [x] **ROLE-01**: A `sales` role exists alongside `partner` and `admin`, with the CHECK constraint and every access gate updated together.
 - [x] **ROLE-02**: Internal `Commercial` users hold client relationships exactly as partners do, so imported HubSpot contacts have an owner and the sales team gets the pipeline surfaces without a separate build.
-- [ ] **ROLE-03**: Existing partner and admin access is unchanged by the role addition — no partner gains visibility, no admin loses it, and the ADMIN-09 commission-invisibility envelope stays intact.
+- [x] **ROLE-03**: Existing partner and admin access is unchanged by the role addition — no partner gains visibility, no admin loses it, and the ADMIN-09 commission-invisibility envelope stays intact.
 
 ### Pipeline (PIPE)
 
