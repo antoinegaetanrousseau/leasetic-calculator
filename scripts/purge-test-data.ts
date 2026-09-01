@@ -40,7 +40,7 @@
  * Note: invoked via `tsx -r ./scripts/_preload-mock-server-only.cjs`
  * (see package.json scripts section registered in 10-01).
  */
-import 'dotenv/config';
+import './_load-env';
 import { writeAuditLog } from '../src/lib/db/queries';
 import { storage } from '../src/lib/storage';
 

@@ -23,7 +23,7 @@
  *   - Before any write, `SELECT count(*) FROM users WHERE partner_type IS NULL`.
  *     If 0, log "Already backfilled" and exit 0. Safe to re-run.
  */
-import 'dotenv/config';
+import './_load-env';
 
 const REQUIRED_CONFIRM_VALUE = 'YES';
 

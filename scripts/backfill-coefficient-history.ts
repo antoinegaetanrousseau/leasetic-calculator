@@ -38,7 +38,7 @@
  *   - Subsequent rows: `before = previous row's snapshot` → semicolon-joined
  *     FR diff, e.g. `"Commission: 5.0000% → 5.5000%"`.
  */
-import 'dotenv/config';
+import './_load-env';
 
 const REQUIRED_CONFIRM_VALUE = 'YES';
 

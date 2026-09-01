@@ -27,7 +27,7 @@
  * allow importing from src/lib/db/queries (which carries 'server-only') outside
  * the Next.js server context. The same pattern is used by pdf:update-fixture.
  */
-import 'dotenv/config';
+import './_load-env';
 import {
   listPurgeCandidates,
 } from '../src/lib/db/queries';

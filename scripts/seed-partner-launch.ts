@@ -36,7 +36,7 @@
  *   - User exists AND deletedAt IS NOT NULL                 → REFUSE (re-enable via grant-admin/admin UI first)
  *   - User does not exist                                   → create users + accounts row
  */
-import 'dotenv/config';
+import './_load-env';
 import { eq } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';
 

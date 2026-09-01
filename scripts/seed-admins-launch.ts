@@ -38,7 +38,7 @@
  *   - If user exists with role=partner → promote to admin (don't touch password)
  *   - If user does not exist → create user + accounts row
  */
-import 'dotenv/config';
+import './_load-env';
 import { eq } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';
 

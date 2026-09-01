@@ -17,7 +17,7 @@
  * Per BOOT-10 + STATE.md locked decision: this script is the ONLY path through which
  * migrations apply to production. `drizzle-kit push` is forbidden in this codebase.
  */
-import 'dotenv/config';
+import './_load-env';
 import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import postgres from 'postgres';
