@@ -67,3 +67,14 @@ export type {
   ContactListRow,
   RelationshipProposalRow,
 } from './client-relationships';
+
+// Phase 30 Plan 04 — admin-only company & relationship registry (CRM-03).
+export {
+  listCompaniesForAdmin,
+  getCompanyForAdmin,
+  listRelationshipsForCompany,
+  getRelationshipForAdmin,
+  listContactsForRelationshipAdmin,
+  listProposalsForRelationshipAdmin,
+} from './companies';
+export type { AdminCompanyRow, AdminRelationshipRow } from './companies';
