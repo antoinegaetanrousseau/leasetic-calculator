@@ -257,6 +257,22 @@ describe('createDraft', () => {
     await createDraft({ userId: 'u1', language: 'fr' });
     expect(mockWriteAuditLog).not.toHaveBeenCalled();
   });
+
+  // ── CRM-05 (Phase 30 Plan 09) — optional clientRelationshipId at creation ──
+
+  it('CRM-05: with no clientRelationshipId, inserts clientRelationshipId=undefined (yields NULL column)', async () => {
+    await createDraft({ userId: 'u1', language: 'fr' });
+    const ins = calls.find((c) => c.kind === 'insert.values');
+    const payload = ins!.payload as Record<string, unknown>;
+    expect(payload.clientRelationshipId).toBeUndefined();
+  });
+
+  it('CRM-05: with clientRelationshipId supplied, inserts that value verbatim', async () => {
+    await createDraft({ userId: 'u1', language: 'fr', clientRelationshipId: 'rel-123' });
+    const ins = calls.find((c) => c.kind === 'insert.values');
+    const payload = ins!.payload as Record<string, unknown>;
+    expect(payload.clientRelationshipId).toBe('rel-123');
+  });
 });
 
 describe('updateDraft', () => {
@@ -272,6 +288,16 @@ describe('updateDraft', () => {
     mockState.returningResult = [];
     const result = await updateDraft('p1', 'u1', { inputs: {} });
     expect(result).toBeNull();
+  });
+
+  // ── CRM-05 (Phase 30 Plan 09) — updateDraft never touches clientRelationshipId ──
+
+  it('CRM-05: the UPDATE set-object contains no clientRelationshipId key — the link is set once at creation, never at updateDraft', async () => {
+    mockState.returningResult = [{ id: 'p1', userId: 'u1', inputs: { a: 1 } }];
+    await updateDraft('p1', 'u1', { inputs: { a: 1 } });
+    const setCall = calls.find((c) => c.kind === 'update.set');
+    const payload = setCall!.payload as Record<string, unknown>;
+    expect('clientRelationshipId' in payload).toBe(false);
   });
 });
 
@@ -338,6 +364,36 @@ describe('finalizeDraft', () => {
     mockState.returningResult = [];
     const result = await finalizeDraft('p1', 'u-other', finalArgs);
     expect(result).toBeNull();
+  });
+
+  // ── CRM-05 (Phase 30 Plan 09) — snapshot-integrity regression guards ──────
+  //
+  // These two assertions are the load-bearing CRM-05 regression tests: they
+  // introspect the object passed to `.set(...)` by finalizeDraft and assert
+  // it contains no `inputs` key and no `clientRelationshipId` key. If a
+  // future edit starts re-serializing `inputs` (or moving/clearing the FK)
+  // at finalization time, THESE assertions fail here — not silently, months
+  // later, when a previously generated PDF no longer matches its stored
+  // snapshot. Confirmed to actually catch this: temporarily added
+  // `inputs: {}` to finalizeDraft's `.set(...)` object, re-ran this file,
+  // observed both of the tests below go red, then reverted (see 30-09-SUMMARY.md).
+
+  it('CRM-05: finalizeDraft UPDATE set-object contains no "inputs" key (snapshot-integrity regression guard)', async () => {
+    mockState.findFirstResult = DRAFT_ROW;
+    mockState.returningResult = [{ id: 'p1', userId: 'u1', lcRef: 'LC-2026-042' }];
+    await finalizeDraft('p1', 'u1', finalArgs);
+    const setCall = calls.find((c) => c.kind === 'update.set');
+    const payload = setCall!.payload as Record<string, unknown>;
+    expect('inputs' in payload).toBe(false);
+  });
+
+  it('CRM-05: finalizeDraft UPDATE set-object contains no "clientRelationshipId" key — finalize never sets or clears the link', async () => {
+    mockState.findFirstResult = DRAFT_ROW;
+    mockState.returningResult = [{ id: 'p1', userId: 'u1', lcRef: 'LC-2026-042' }];
+    await finalizeDraft('p1', 'u1', finalArgs);
+    const setCall = calls.find((c) => c.kind === 'update.set');
+    const payload = setCall!.payload as Record<string, unknown>;
+    expect('clientRelationshipId' in payload).toBe(false);
   });
 });
 
