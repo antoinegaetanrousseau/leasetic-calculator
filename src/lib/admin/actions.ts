@@ -176,6 +176,18 @@ export async function adminReEnableUser(userId: string): Promise<void> {
   }
 }
 
+/**
+ * Phase 30 Plan 03 (ROLE-01/02) — derive the CRM access role from a
+ * partnerType classification. Returns 'sales' ONLY for 'Commercial'; every
+ * other partnerType stays 'partner'. This function must NEVER return
+ * 'admin' — T-30-03-02 elevation-of-privilege mitigation. It runs
+ * server-side, inside requireAdmin()-gated code, and never accepts a
+ * client-supplied role field.
+ */
+function roleForPartnerType(partnerType: 'Agent' | 'Commercial' | 'Partenaire'): 'partner' | 'sales' {
+  return partnerType === 'Commercial' ? 'sales' : 'partner';
+}
+
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  adminUpdatePartnerType (PTYPE-03 + D-02 + D-08 + ADMIN-09)                 */
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -199,10 +211,11 @@ export async function adminUpdatePartnerType(
   // T-22-03-E: admin gate FIRST — PITFALLS §7.3 privilege-escalation mitigation.
   const { session } = await requireAdmin();
   try {
-    // Read current type to capture before-value for audit and no-op check.
+    // Read current type + role to capture before-value for audit, the no-op
+    // check, and the ROLE-03 admin-protection guard below.
     const userRow = await db().query.users.findFirst({
       where: eq(schema.users.id, userId),
-      columns: { partnerType: true },
+      columns: { partnerType: true, role: true },
     });
     if (!userRow) {
       throw new Error('admin.partners.error.type_change');
@@ -212,9 +225,16 @@ export async function adminUpdatePartnerType(
     // D-02 no-op guard: skip write + audit when the type is unchanged.
     if (previousType === newType) return;
 
+    // Phase 30 Plan 03 (ROLE-01/02) — partnerType -> role is a single
+    // invariant that must move together. T-30-03-03: never write a derived
+    // role for a row whose current role is 'admin' — re-typing an admin
+    // must never demote them.
+    const roleUpdate =
+      userRow.role !== 'admin' ? { role: roleForPartnerType(newType) } : {};
+
     await db()
       .update(schema.users)
-      .set({ partnerType: newType })
+      .set({ partnerType: newType, ...roleUpdate })
       .where(eq(schema.users.id, userId));
 
     // D-09-09b: ADMIN-09 redaction — partner_type is a business-classification
@@ -304,14 +324,26 @@ export async function adminCreateInvitation(
     const result = await createInvitation(args.email, args.displayName);
 
     // Look up the userId we just created/re-enabled to fix the language pref + write audit.
+    // Phase 30 Plan 03 — role is also read here so the partnerType -> role
+    // derivation below can apply the ROLE-03 admin-protection guard.
     const lowered = args.email.toLowerCase();
     const userRow = await db().query.users.findFirst({
       where: eq(schema.users.email, lowered),
-      columns: { id: true },
+      columns: { id: true, role: true },
     });
     if (!userRow) {
       throw new Error('admin.accounts.error.create');
     }
+
+    // Phase 30 Plan 03 (ROLE-01/02): derive role from partnerType. Only
+    // written when partnerType was actually submitted AND the existing role
+    // is not 'admin' — T-30-03-03: re-inviting an admin must never demote
+    // them. This is the single source of the 'sales' value; createInvitation
+    // (src/lib/auth/actions.ts) always inserts new rows as 'partner'.
+    const roleUpdate =
+      args.partnerType && userRow.role !== 'admin'
+        ? { role: roleForPartnerType(args.partnerType) }
+        : {};
 
     // Set the partner's language preference and partner_type (createInvitation does not set them).
     // PTYPE-01: partnerType is persisted here exactly as language is — via UPDATE users SET.
@@ -321,6 +353,7 @@ export async function adminCreateInvitation(
       .set({
         language: args.language,
         ...(args.partnerType ? { partnerType: args.partnerType } : {}),
+        ...roleUpdate,
       })
       .where(eq(schema.users.id, userRow.id));
 
@@ -345,6 +378,9 @@ export async function adminCreateInvitation(
         email: lowered,
         displayName: args.displayName,
         language: args.language,
+        // Phase 30 Plan 03 — trace the derived role when one was written
+        // (access classification, not a rate/commission value).
+        ...('role' in roleUpdate ? { role: roleUpdate.role } : {}),
         ...profilePart,
       },
       // D-09-09b: ADMIN-09 redaction — this payload intentionally excludes financial rate fields.
