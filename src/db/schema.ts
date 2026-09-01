@@ -69,7 +69,9 @@ export const users = pgTable('users', {
   // DEFAULT 'Partenaire' ensures existing rows stay Partenaire on migration (PTYPE-02).
   partnerType: text('partner_type').notNull().default('Partenaire'),
 }, (table) => [
-  check('users_role_check', sql`${table.role} IN ('partner', 'admin')`),
+  // ROLE-01: widened from ('partner', 'admin') to add 'sales' (Phase 30 CRM registry —
+  // internal Commercial staff need role-gated access, see drizzle/0007_phase30_crm_registry.sql).
+  check('users_role_check', sql`${table.role} IN ('partner', 'admin', 'sales')`),
   check('users_partner_type_check', sql`${table.partnerType} IN ('Agent', 'Commercial', 'Partenaire')`),
 ]);
 
@@ -247,6 +249,13 @@ export const proposals = pgTable('proposals', {
   duplicatedFromId: uuid('duplicated_from_id'),
 
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+
+  // CRM-05 (Phase 30): nullable link to the client relationship this proposal was made
+  // for. Additive only — never touches inputs/paramsSnapshot/computed/schemaVersion, so
+  // the immutable snapshot invariant (DATA-01..04) is untouched. clientRelationships is
+  // declared later in this file; the callback form resolves the forward reference.
+  clientRelationshipId: uuid('client_relationship_id')
+    .references(() => clientRelationships.id, { onDelete: 'set null' }),
 }, (table) => [
   // D-A2: language whitelist enforced at the DB.
   check('proposals_language_check', sql`${table.language} IN ('fr', 'en')`),
@@ -275,6 +284,9 @@ export const proposals = pgTable('proposals', {
   index('proposals_deleted_at_idx')
     .on(table.deletedAt)
     .where(sql`${table.deletedAt} IS NOT NULL`),
+  // CRM-06: "every proposal for this client" cursor query.
+  index('proposals_client_relationship_id_created_at_idx')
+    .on(table.clientRelationshipId, sql`${table.createdAt} DESC`),
 ]);
 
 /**
@@ -335,6 +347,96 @@ export const coefficientHistory = pgTable('coefficient_history', {
   index('coefficient_history_changed_at_idx').on(sql`${table.changedAt} DESC`),
 ]);
 
+// ── Phase 30 CRM registry tables ─────────────────────────────────────────────
+// Company & Contact Registry (CRM-01..08, ROLE-01..03) per
+// .planning/phases/30-company-contact-registry/30-01-PLAN.md.
+//
+// companies: a global fact, independent of any proposal or partner.
+// clientRelationships: private per-owner binding of a company to a user — this
+//   split is what makes the registry channel-conflict safe (CRM-02).
+// contacts: hang off a relationship, never off a company (CRM-04) — a contact's
+//   phone/email is the owning partner's asset, not a fact about the company.
+
+/**
+ * Global company registry (CRM-01). `nameNormalized` is a STORED generated
+ * column driven by the versioned SQL function `leasetic_normalize_company_name`
+ * (drizzle/0007_phase30_crm_registry.sql) — normalization rules live in the
+ * migration, never in application code, so they can't drift.
+ */
+export const companies = pgTable('companies', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull(),
+  nameNormalized: text('name_normalized')
+    .notNull()
+    .generatedAlwaysAs(sql`leasetic_normalize_company_name(name)`),
+  siren: text('siren').unique(),
+  // CRM-08 external-reference columns (unused this milestone; seams for IMPORT-02/07).
+  contractToolCustomerId: text('contract_tool_customer_id'),
+  syncedAt: timestamp('synced_at', { withTimezone: true }),
+  hubspotCompanyId: text('hubspot_company_id'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  check('companies_siren_check', sql`${table.siren} IS NULL OR ${table.siren} ~ '^[0-9]{9}$'`),
+  index('companies_name_normalized_idx').on(table.nameNormalized),
+  // Admin cursor list (CRM-03).
+  index('companies_created_at_id_idx')
+    .on(sql`${table.createdAt} DESC`, sql`${table.id} DESC`),
+  uniqueIndex('companies_hubspot_company_id_uq')
+    .on(table.hubspotCompanyId)
+    .where(sql`${table.hubspotCompanyId} IS NOT NULL`),
+]);
+
+/**
+ * Private per-owner binding of a company to a user (CRM-02). A partner or
+ * sales user (ROLE-02) can hold at most one relationship per company —
+ * enforced by the `(company_id, owner_id)` unique index, which is also what
+ * makes the create-client action idempotent.
+ */
+export const clientRelationships = pgTable('client_relationships', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  companyId: uuid('company_id').notNull().references(() => companies.id, { onDelete: 'restrict' }),
+  // text, not uuid — users.id is Better Auth text.
+  ownerId: text('owner_id').notNull().references(() => users.id, { onDelete: 'restrict' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('client_relationships_company_id_owner_id_uq').on(table.companyId, table.ownerId),
+  // CRM-07 cursor index — a partner's own client book.
+  index('client_relationships_owner_id_created_at_id_idx')
+    .on(table.ownerId, sql`${table.createdAt} DESC`, sql`${table.id} DESC`),
+  // CRM-03 admin lookup — every relationship on a company.
+  index('client_relationships_company_id_idx').on(table.companyId),
+]);
+
+/**
+ * A person at a client relationship (CRM-04) — never a company-level fact.
+ * FKs to `client_relationships` only; there is deliberately no `company_id`
+ * column, so a contact is structurally unreachable from the shared company
+ * record (T-30-01-03).
+ */
+export const contacts = pgTable('contacts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  clientRelationshipId: uuid('client_relationship_id')
+    .notNull()
+    .references(() => clientRelationships.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  role: text('role'),
+  phone: text('phone'),
+  email: text('email'),
+  // CRM-08 external-reference columns (unused this milestone).
+  hubspotContactId: text('hubspot_contact_id'),
+  syncedAt: timestamp('synced_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('contacts_client_relationship_id_created_at_idx')
+    .on(table.clientRelationshipId, sql`${table.createdAt} DESC`),
+  uniqueIndex('contacts_hubspot_contact_id_uq')
+    .on(table.hubspotContactId)
+    .where(sql`${table.hubspotContactId} IS NOT NULL`),
+]);
+
 // Type exports for Phase 8 tables.
 export type GlobalParamsRow = typeof globalParams.$inferSelect;
 export type NewGlobalParamsRow = typeof globalParams.$inferInsert;
@@ -346,3 +448,11 @@ export type NewAuditLogRow = typeof auditLog.$inferInsert;
 // Type exports for Phase 12 tables.
 export type CoefficientHistoryRow = typeof coefficientHistory.$inferSelect;
 export type NewCoefficientHistoryRow = typeof coefficientHistory.$inferInsert;
+
+// Type exports for Phase 30 CRM registry tables.
+export type CompanyRow = typeof companies.$inferSelect;
+export type NewCompanyRow = typeof companies.$inferInsert;
+export type ClientRelationshipRow = typeof clientRelationships.$inferSelect;
+export type NewClientRelationshipRow = typeof clientRelationships.$inferInsert;
+export type ContactRow = typeof contacts.$inferSelect;
+export type NewContactRow = typeof contacts.$inferInsert;
