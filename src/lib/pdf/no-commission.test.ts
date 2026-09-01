@@ -714,6 +714,7 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
       '0004_phase12_drafts_and_history.sql', // Phase 12 — drafts + coefficient_history
       '0005_partner_company_name.sql',    // users.company_name column (applied to prod 2026-05-25; restored to match DB journal during migration-history reconcile)
       '0006_workable_yellow_claw.sql',    // Phase 22 — users.partner_type column + CHECK (renumbered from 0005 to resolve the 0005 collision)
+      '0007_phase30_crm_registry.sql',    // Phase 30 — companies/client_relationships/contacts + proposals.client_relationship_id FK + users.role widened to 'sales'; no commission-related column added
     ]);
     const sqlFiles = files.filter((f) => f.endsWith('.sql'));
     const unexpected = sqlFiles.filter((f) => !KNOWN_MIGRATIONS.has(f));
