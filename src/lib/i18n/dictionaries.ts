@@ -1003,6 +1003,10 @@ export const dictionaries = {
     'admin.companies.col.relations': 'RELATIONS',
     'admin.companies.col.lastActivity': 'DERNIÈRE ACTIVITÉ',
     'admin.companies.empty.zero.title': 'Aucune relation active pour cette société.',
+    // Plan 30-08: list-level empty states (distinct from the per-company
+    // zero-relationships state above, which uses .empty.zero.title).
+    'admin.companies.list.empty.zero': 'Aucune société pour le moment.',
+    'admin.companies.list.empty.search': 'Aucun résultat ne correspond à votre recherche.',
     'admin.companies.detail.section.relations': 'Relations',
     'admin.companies.relation.col.owner': 'TITULAIRE',
     'admin.companies.relation.col.type': 'TYPE',
@@ -1942,6 +1946,8 @@ export const dictionaries = {
     'admin.companies.col.relations': 'RELATIONS',
     'admin.companies.col.lastActivity': 'LAST ACTIVITY',
     'admin.companies.empty.zero.title': 'No active relationship for this company.',
+    'admin.companies.list.empty.zero': 'No companies yet.',
+    'admin.companies.list.empty.search': 'No results match your search.',
     'admin.companies.detail.section.relations': 'Relations',
     'admin.companies.relation.col.owner': 'OWNER',
     'admin.companies.relation.col.type': 'TYPE',
