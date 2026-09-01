@@ -70,7 +70,10 @@ describe('CompaniesList — Task 1', () => {
     const html = renderToString(
       <CompaniesList rows={[]} nextCursor={null} lang="fr" adminSegment="admin-secret" />,
     );
-    expect(html).toContain('Aucune société pour le moment.');
+    expect(html).toContain('Aucune société enregistrée.');
+    expect(html).toContain(
+      'Les sociétés apparaîtront ici dès que vos partenaires créeront leurs clients.',
+    );
   });
 
   it('Test 5: zero rows, active filter → search-empty state (distinct copy)', () => {
@@ -84,7 +87,7 @@ describe('CompaniesList — Task 1', () => {
       />,
     );
     expect(html).toContain('Aucun résultat ne correspond à votre recherche.');
-    expect(html).not.toContain('Aucune société pour le moment.');
+    expect(html).not.toContain('Aucune société enregistrée.');
   });
 
   it('Test 6: row navigates to the company detail route (stretched-link)', () => {

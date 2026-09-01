@@ -959,7 +959,9 @@ export const dictionaries = {
     'clients.col.siren': 'SIREN',
     'clients.col.proposals': 'PROPOSITIONS',
     'clients.col.lastActivity': 'DERNIÈRE ACTIVITÉ',
-    'clients.empty.zero.title': 'Aucun client pour le moment.',
+    'clients.empty.zero.title': 'Votre portefeuille client démarre ici.',
+    'clients.empty.zero.body':
+      'Aucun client pour le moment — créez le premier et construisons votre pipeline commercial.',
     'clients.empty.search.title': 'Aucun résultat ne correspond à votre recherche.',
     'clients.detail.section.contacts': 'Contacts',
     'clients.detail.section.proposals': 'Propositions',
@@ -1005,7 +1007,9 @@ export const dictionaries = {
     'admin.companies.empty.zero.title': 'Aucune relation active pour cette société.',
     // Plan 30-08: list-level empty states (distinct from the per-company
     // zero-relationships state above, which uses .empty.zero.title).
-    'admin.companies.list.empty.zero': 'Aucune société pour le moment.',
+    'admin.companies.list.empty.zero': 'Aucune société enregistrée.',
+    'admin.companies.list.empty.zero.body':
+      'Les sociétés apparaîtront ici dès que vos partenaires créeront leurs clients.',
     'admin.companies.list.empty.search': 'Aucun résultat ne correspond à votre recherche.',
     'admin.companies.detail.section.relations': 'Relations',
     'admin.companies.relation.col.owner': 'TITULAIRE',
@@ -1902,7 +1906,9 @@ export const dictionaries = {
     'clients.col.siren': 'SIREN',
     'clients.col.proposals': 'PROPOSALS',
     'clients.col.lastActivity': 'LAST ACTIVITY',
-    'clients.empty.zero.title': 'No clients yet.',
+    'clients.empty.zero.title': 'Your client book starts here.',
+    'clients.empty.zero.body':
+      "No clients yet — create your first one and let's build your sales pipeline.",
     'clients.empty.search.title': 'No results match your search.',
     'clients.detail.section.contacts': 'Contacts',
     'clients.detail.section.proposals': 'Proposals',
@@ -1946,7 +1952,9 @@ export const dictionaries = {
     'admin.companies.col.relations': 'RELATIONS',
     'admin.companies.col.lastActivity': 'LAST ACTIVITY',
     'admin.companies.empty.zero.title': 'No active relationship for this company.',
-    'admin.companies.list.empty.zero': 'No companies yet.',
+    'admin.companies.list.empty.zero': 'No companies on record.',
+    'admin.companies.list.empty.zero.body':
+      'Companies will appear here as soon as your partners create their clients.',
     'admin.companies.list.empty.search': 'No results match your search.',
     'admin.companies.detail.section.relations': 'Relations',
     'admin.companies.relation.col.owner': 'OWNER',

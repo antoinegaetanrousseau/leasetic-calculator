@@ -30,7 +30,14 @@ import {
 } from '@/components/reui/data-grid/data-grid';
 import { DataGridTable } from '@/components/reui/data-grid/data-grid-table';
 import { DataGridColumnHeader } from '@/components/reui/data-grid/data-grid-column-header';
-import { Empty, EmptyContent, EmptyDescription, EmptyMedia } from '@/components/ui/empty';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import { BuildingIcon, SearchIcon } from '@/components/ui/icons';
 import { formatDate } from '@/lib/i18n/format';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -197,13 +204,19 @@ export function ClientsGrid({ rows, nextCursor, lang, q, sort, dir }: ClientsGri
     }
     return (
       <section className="card overflow-hidden p-0">
-        <Empty className="px-5 py-10">
-          <EmptyMedia variant="icon">
-            <BuildingIcon size={20} aria-hidden="true" />
-          </EmptyMedia>
-          <EmptyDescription className="text-[14.5px]">
-            {t('clients.empty.zero.title', lang)}
-          </EmptyDescription>
+        {/* First-run state. A partner or sales user landing here has no client book
+            yet, so this is the one place in the app that has to invite the work
+            rather than just report its absence — title + body + the create CTA. */}
+        <Empty className="px-5 py-12">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <BuildingIcon size={20} aria-hidden="true" />
+            </EmptyMedia>
+            <EmptyTitle>{t('clients.empty.zero.title', lang)}</EmptyTitle>
+            <EmptyDescription className="text-[14.5px]">
+              {t('clients.empty.zero.body', lang)}
+            </EmptyDescription>
+          </EmptyHeader>
           <EmptyContent>
             <CreateClientDialog lang={lang} />
           </EmptyContent>

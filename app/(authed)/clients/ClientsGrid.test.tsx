@@ -130,9 +130,14 @@ describe('ClientsGrid (Plan 30-06 Task 2)', () => {
     expect(params.get('q')).toBe('dupont');
   });
 
-  it('Test 6: rows.length === 0, no q → zero-state title + "Nouveau client" CTA', () => {
+  it('Test 6: rows.length === 0, no q → first-run title + body + "Nouveau client" CTA', () => {
     render(<ClientsGrid rows={[]} nextCursor={null} lang="fr" />);
-    expect(screen.getByText('Aucun client pour le moment.')).toBeInTheDocument();
+    expect(screen.getByText('Votre portefeuille client démarre ici.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Aucun client pour le moment — créez le premier et construisons votre pipeline commercial.',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Nouveau client' })).toBeInTheDocument();
   });
 

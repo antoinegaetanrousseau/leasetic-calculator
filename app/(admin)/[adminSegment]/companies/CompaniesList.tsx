@@ -68,10 +68,16 @@ export function CompaniesList({
         </section>
       );
     }
+    // Neutral by design: an admin oversees the registry rather than building a
+    // book, and cannot create a client relationship, so this state explains where
+    // the rows will come from instead of inviting an action it cannot offer.
     return (
       <section className="card px-6 py-12 text-center">
-        <p className="m-0 text-[14.5px] text-[var(--muted)]">
+        <p className="m-0 text-[15px] font-semibold text-[var(--ink)]">
           {t('admin.companies.list.empty.zero', lang)}
+        </p>
+        <p className="mx-auto mt-2 mb-0 max-w-sm text-[14.5px] text-[var(--muted)]">
+          {t('admin.companies.list.empty.zero.body', lang)}
         </p>
       </section>
     );
