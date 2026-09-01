@@ -7,6 +7,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { getTableColumns } from 'drizzle-orm';
+import { getTableConfig, PgDialect } from 'drizzle-orm/pg-core';
 import {
   companies, clientRelationships, contacts, proposals, users,
 } from './schema';
@@ -53,5 +54,67 @@ describe('Phase 30 CRM registry schema shape', () => {
     const columns = getTableColumns(clientRelationships);
     expect(columns).toHaveProperty('companyId');
     expect(columns).toHaveProperty('ownerId');
+  });
+});
+
+describe('CRM-08 external-reference columns', () => {
+  // Renders a Drizzle partial-index `where` SQL fragment to text without a DB
+  // connection, so the assertion below can inspect the actual predicate
+  // rather than merely checking that some predicate is present.
+  const pgDialect = new PgDialect();
+
+  it('companies carries contract_tool_customer_id, hubspot_company_id and synced_at as nullable columns with the correct snake_case DB names', () => {
+    const columns = getTableColumns(companies);
+    expect(columns.contractToolCustomerId.name).toBe('contract_tool_customer_id');
+    expect(columns.contractToolCustomerId.notNull).toBe(false);
+    expect(columns.hubspotCompanyId.name).toBe('hubspot_company_id');
+    expect(columns.hubspotCompanyId.notNull).toBe(false);
+    expect(columns.syncedAt.name).toBe('synced_at');
+    expect(columns.syncedAt.notNull).toBe(false);
+  });
+
+  it('contacts carries hubspot_contact_id and synced_at as nullable columns with the correct snake_case DB names', () => {
+    const columns = getTableColumns(contacts);
+    expect(columns.hubspotContactId.name).toBe('hubspot_contact_id');
+    expect(columns.hubspotContactId.notNull).toBe(false);
+    expect(columns.syncedAt.name).toBe('synced_at');
+    expect(columns.syncedAt.notNull).toBe(false);
+  });
+
+  it('synced_at exists on both companies and contacts, not just one', () => {
+    expect(getTableColumns(companies)).toHaveProperty('syncedAt');
+    expect(getTableColumns(contacts)).toHaveProperty('syncedAt');
+  });
+
+  it('companies_hubspot_company_id_uq is a partial unique index guarding only non-null hubspot_company_id rows', () => {
+    const { indexes } = getTableConfig(companies);
+    const idx = indexes.find((i) => i.config.name === 'companies_hubspot_company_id_uq');
+    if (!idx) throw new Error('companies_hubspot_company_id_uq index must exist');
+
+    expect(idx.config.unique).toBe(true);
+    if (!idx.config.where) {
+      throw new Error(
+        'companies_hubspot_company_id_uq must be partial (WHERE hubspot_company_id IS NOT NULL); '
+        + 'a plain unique index would reject legitimate NULL rows before any import runs',
+      );
+    }
+    const { sql: whereSql } = pgDialect.sqlToQuery(idx.config.where);
+    expect(whereSql).toMatch(/"hubspot_company_id"\s+IS NOT NULL/i);
+  });
+
+  it('contacts_hubspot_contact_id_uq is a partial unique index guarding only non-null hubspot_contact_id rows', () => {
+    const { indexes } = getTableConfig(contacts);
+    const idx = indexes.find((i) => i.config.name === 'contacts_hubspot_contact_id_uq');
+    if (!idx) throw new Error('contacts_hubspot_contact_id_uq index must exist');
+
+    expect(idx.config.unique).toBe(true);
+    if (!idx.config.where) {
+      throw new Error(
+        'contacts_hubspot_contact_id_uq must be partial (WHERE hubspot_contact_id IS NOT NULL); '
+        + 'a plain unique index would reject legitimate NULL rows before any import runs',
+      );
+    }
+    const { sql: whereSql } = pgDialect.sqlToQuery(idx.config.where);
+    expect(whereSql).toMatch(/"hubspot_contact_id"\s+IS NOT NULL/i);
   });
 });
