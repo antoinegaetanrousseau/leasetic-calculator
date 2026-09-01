@@ -70,6 +70,8 @@ export { SunIcon } from '../icons/SunIcon';
 export { MoonIcon } from '../icons/MoonIcon';
 export { MonitorIcon } from '../icons/MonitorIcon';
 export { ExternalLinkIcon } from '../icons/ExternalLinkIcon';
+export { BuildingIcon } from '../icons/BuildingIcon';
+export { PhoneIcon } from '../icons/PhoneIcon';
 
 /**
  * A bare tick. Iconly's Essential set only ships it inside a square, which is
