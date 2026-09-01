@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-01T09:38:11.103Z"
+last_updated: "2026-09-01T09:58:34.213Z"
 last_activity: 2026-09-01
 progress:
   total_phases: 18
   completed_phases: 13
   total_plans: 55
-  completed_plans: 47
+  completed_plans: 48
   percent: 72
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 30 (company-contact-registry) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Ready to execute
 Last activity: 2026-09-01
 
@@ -386,6 +386,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 29 P01 | ~5min (continuation) | 3 tasks | 5 files |
 | Phase 29 P02 | ~10min | 2 tasks | 1 files |
 | Phase 30 P01 | 12min | 3 tasks | 8 files |
+| Phase 30 P02 | 16min | 3 tasks | 12 files |
 
 ## Decisions
 
@@ -444,3 +445,6 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 29]: development branch stale fork-snapshot data (forked from main 2026-05-27) accepted as local test data — no purge — Antoine option (a): accept, no follow-up item, no Neon Reset from parent
 - [Phase 30]: Normalization function deletes periods before collapsing non-alnum runs, so abbreviated legal forms like 'S.A.S.' join into 'sas' before the space-bounded legal-form regex strips them — CRM-01 requires the four spec test cases to pass; the literal plan recipe left isolated s/a/s letters
 - [Phase 30]: 0007_phase30_crm_registry.sql added to no-commission.test.ts KNOWN_MIGRATIONS allowlist after review — Confirms it introduces no commission-related column (ADMIN-09 discipline)
+- [Phase 30]: SearchBar optional placeholderKey/ariaKey DictKey props default to current proposal.search.* keys — new surfaces override copy with zero edits to existing call sites (30-02)
+- [Phase 30]: BuildingIcon/PhoneIcon hand-authored with real SVG strokes (1.5px) rather than Iconly's filled-evenodd double-contour technique — no licensed source exists for these glyphs (30-02, A-7)
+- [Phase 30]: clients.* (partner-facing) vs admin.companies.* (admin-facing) i18n namespace split mirrors the CRM-01/02 shared-vs-private data model split from Plan 30-01

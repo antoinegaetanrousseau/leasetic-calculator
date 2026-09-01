@@ -137,6 +137,12 @@ None — no external service configuration required.
 - FOUND commit `a6ce886` in `git log --oneline --all`
 - CONFIRMED: `npm run typecheck`, `npm run lint:check`, `npm test` (1237 passed / 10 skipped), `npm run check:no-drizzle-push`, `npm run check:migration-journal-sync`, `npm run build` all exit 0
 
+## Self-Check: PASSED (re-verified post-commit)
+
+All file/string/commit claims above were independently re-checked against
+the working tree and `git log --oneline --all` after the plan-metadata
+commit; all FOUND, no discrepancies.
+
 ---
 *Phase: 30-company-contact-registry*
 *Completed: 2026-09-01*

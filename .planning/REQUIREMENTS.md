@@ -63,7 +63,7 @@ The master-data layer. A `company` is a global fact; a `client_relationship` is 
 - [x] **CRM-04**: A contact belongs to a **relationship**, not to the company, and carries name, role, phone and email. (A person at ACME is arguably a fact about ACME; the mobile number a partner worked to get is that partner's asset.)
 - [x] **CRM-05**: A proposal links to a client relationship via a nullable FK **without altering its `inputs` snapshot**. The JSONB remains byte-identical; the snapshot invariant is preserved.
 - [ ] **CRM-06**: A partner can open a client and see every proposal they have made for that client on one page.
-- [ ] **CRM-07**: A partner can browse and search their own client book.
+- [x] **CRM-07**: A partner can browse and search their own client book.
 - [x] **CRM-08**: Companies and contacts carry external-reference columns — `contract_tool_customer_id`, `synced_at`, `hubspot_company_id`, `hubspot_contact_id` — unused this milestone. Adding them now is one column pair; adding them later is a migration plus a backfill.
 
 ### Two-Source Reconciliation (IMPORT)
@@ -85,7 +85,7 @@ The master-data layer. A `company` is a global fact; a `client_relationship` is 
 `users.partner_type` already carries `'Commercial'` — an internal salesperson, not a channel partner — but `users.role` (the thing that actually gates access) is `CHECK IN ('partner','admin')` and knows nothing about it. Decided **now**, while there are only two roles to migrate: adding a third later means auditing every `requireUser` / `requireAdmin` call site and every partner-scoped query.
 
 - [x] **ROLE-01**: A `sales` role exists alongside `partner` and `admin`, with the CHECK constraint and every access gate updated together.
-- [ ] **ROLE-02**: Internal `Commercial` users hold client relationships exactly as partners do, so imported HubSpot contacts have an owner and the sales team gets the pipeline surfaces without a separate build.
+- [x] **ROLE-02**: Internal `Commercial` users hold client relationships exactly as partners do, so imported HubSpot contacts have an owner and the sales team gets the pipeline surfaces without a separate build.
 - [ ] **ROLE-03**: Existing partner and admin access is unchanged by the role addition — no partner gains visibility, no admin loses it, and the ADMIN-09 commission-invisibility envelope stays intact.
 
 ### Pipeline (PIPE)
