@@ -30,7 +30,14 @@ import { eq } from 'drizzle-orm';
 import { auth } from './index';
 import { db, schema } from '@/lib/db';
 
-export type Role = 'partner' | 'admin';
+export type Role = 'partner' | 'admin' | 'sales';
+
+/**
+ * Every value the DB CHECK constraint (`users_role_check`, src/db/schema.ts)
+ * allows. `requireUser()` resolves against this allowlist and falls closed to
+ * the least-privileged role ('partner') on anything else — see T-30-03-01.
+ */
+const KNOWN_ROLES = ['partner', 'admin', 'sales'] as const;
 
 export interface RequireUserResult {
   session: NonNullable<Awaited<ReturnType<ReturnType<typeof auth>['api']['getSession']>>>;
@@ -58,10 +65,15 @@ export async function requireUser(): Promise<RequireUserResult> {
   if (!user || user.deletedAt !== null) {
     redirect('/api/auth/sign-out?redirect=/login');
   }
-  return {
-    session,
-    role: (user.role === 'admin' ? 'admin' : 'partner') as Role,
-  };
+  // T-30-03-01 — allowlist pass-through, fail-closed to 'partner' (never
+  // 'admin') on a value the CHECK constraint hasn't caught up to yet. The
+  // role always comes from this per-request DB read, never from the
+  // cookie-cached session (AUTH-16).
+  const role = (KNOWN_ROLES as readonly string[]).includes(user.role)
+    ? (user.role as Role)
+    : 'partner';
+
+  return { session, role };
 }
 
 /**
@@ -77,4 +89,24 @@ export async function requireAdmin(): Promise<{ session: RequireUserResult['sess
     notFound();
   }
   return { session };
+}
+
+/**
+ * Require an authenticated relationship holder — 'partner' or 'sales'. This is
+ * the gate for the `/clients` tree (30-UI-SPEC.md §0 route map: access
+ * `partner`, `sales`). Calls requireUser() first, then refuses 'admin' with a
+ * 404 (D-18 — same URL-secrecy rationale as requireAdmin()).
+ *
+ * Admins reach relationship data through the separate, requireAdmin()-gated
+ * `/[adminSegment]/companies` tree instead — the two views are deliberately
+ * different surfaces, not the same page with a role branch.
+ *
+ * Returns { session, role } on success.
+ */
+export async function requireRelationshipHolder(): Promise<RequireUserResult> {
+  const { session, role } = await requireUser();
+  if (role === 'admin') {
+    notFound();
+  }
+  return { session, role };
 }

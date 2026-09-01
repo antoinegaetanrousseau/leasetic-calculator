@@ -78,7 +78,7 @@ export interface BuildListParams {
    * (fail-closed). MUST be derived from `session.user.role` at the SSR
    * layer — NEVER from request params. See D-11 + T-18-01-01.
    */
-  _callerRole?: 'admin' | 'partner';
+  _callerRole?: 'admin' | 'partner' | 'sales';
   /** Brouillons filter — show non-phantom drafts instead of active proposals. */
   drafts?: boolean;
 }
