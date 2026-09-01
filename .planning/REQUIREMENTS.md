@@ -58,11 +58,11 @@ entry; production ran un-applied for ~24 hours until Phase 13's wizard hit the m
 The master-data layer. A `company` is a global fact; a `client_relationship` is private to the partner who holds it. This split is what makes the registry **channel-conflict safe** — Partner A must never learn that Partner B is working the same end client, while Leasétic sees every relationship on a company (duplicate-deal risk is exactly the thing that turns into a dispute at signature).
 
 - [x] **CRM-01**: A company exists as a first-class record carrying name, normalized name, and optional SIREN. `siren` is nullable UNIQUE; `name_normalized` (lowercased, accents stripped, legal forms SARL/SAS/SA removed, whitespace collapsed) is a stored column so the rules are versioned in migrations rather than drifting in application code.
-- [ ] **CRM-02**: A partner holds a private relationship with a company. No partner can see, query, or infer another partner's relationships.
-- [ ] **CRM-03**: An admin can see every relationship attached to a company, including which partners hold them.
+- [x] **CRM-02**: A partner holds a private relationship with a company. No partner can see, query, or infer another partner's relationships.
+- [x] **CRM-03**: An admin can see every relationship attached to a company, including which partners hold them.
 - [x] **CRM-04**: A contact belongs to a **relationship**, not to the company, and carries name, role, phone and email. (A person at ACME is arguably a fact about ACME; the mobile number a partner worked to get is that partner's asset.)
 - [x] **CRM-05**: A proposal links to a client relationship via a nullable FK **without altering its `inputs` snapshot**. The JSONB remains byte-identical; the snapshot invariant is preserved.
-- [ ] **CRM-06**: A partner can open a client and see every proposal they have made for that client on one page.
+- [x] **CRM-06**: A partner can open a client and see every proposal they have made for that client on one page.
 - [x] **CRM-07**: A partner can browse and search their own client book.
 - [x] **CRM-08**: Companies and contacts carry external-reference columns — `contract_tool_customer_id`, `synced_at`, `hubspot_company_id`, `hubspot_contact_id` — unused this milestone. Adding them now is one column pair; adding them later is a migration plus a backfill.
 

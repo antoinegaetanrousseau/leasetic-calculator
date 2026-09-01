@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-01T10:25:01.850Z"
+last_updated: "2026-09-01T10:54:39.065Z"
 last_activity: 2026-09-01
 progress:
   total_phases: 18
   completed_phases: 13
   total_plans: 55
-  completed_plans: 49
+  completed_plans: 50
   percent: 72
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 30 (company-contact-registry) — EXECUTING
-Plan: 4 of 9
+Plan: 5 of 9
 Status: Ready to execute
 Last activity: 2026-09-01
 
@@ -388,6 +388,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 30 P01 | 12min | 3 tasks | 8 files |
 | Phase 30 P02 | 16min | 3 tasks | 12 files |
 | Phase 30 P03 | 21min | 3 tasks | 15 files |
+| Phase 30 P04 | ~20min | 3 tasks | 6 files |
 
 ## Decisions
 
@@ -452,3 +453,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 30]: Widened src/lib/api/proposals/list.ts's _callerRole type to include 'sales' (Rule 3 fix, out of plan scope) since the admin-scoping check only compares === 'admin'
 - [Phase 30]: Every eq(schema.users.role, 'partner') predicate widened to inArray(schema.users.role, ['partner','sales']) so Commercial accounts stay visible to admin surfaces after the Plan 30-01 backfill (ROLE-03)
 - [Phase 30]: roleForPartnerType() derives 'sales' only for 'Commercial' and is guarded in adminCreateInvitation + adminUpdatePartnerType against ever demoting an existing 'admin' row
+- [Phase 30]: listProposalsForRelationship scopes ownership via proposals.user_id = ownerId (not a join to client_relationships.owner_id) — defense in depth, matches plan 30-04 spec
+- [Phase 30]: Ran the CRM-02/CRM-03 real-Postgres isolation suite against the Neon development branch (confirmed via check:local-db-branch, not production); all seeded test rows verified deleted afterward
