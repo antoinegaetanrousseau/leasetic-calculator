@@ -105,7 +105,7 @@ private per-partner relationships — so the extranet can become the CRM that re
 continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on PR #6 landing.
 
 - [x] **Phase 29: Migration Safety Net** — repair the `db-smoke` path filter so the gate fires on this repo's real migration paths (currently blind to the Phase 12 regression), and point local dev at the Neon `development` branch. Rescoped 2026-08-31: the 3-branch split already shipped in Phase 20; **not** a prerequisite for the phases below (completed 2026-08-31)
-- [ ] **Phase 30: Company & Contact Registry** — `companies` (global) + `client_relationships` (private, per-partner) + `contacts` (scoped to relationship) schema and surfaces; `proposals` gains a nullable FK; new `sales` role added alongside `partner`/`admin`
+- [x] **Phase 30: Company & Contact Registry** — `companies` (global) + `client_relationships` (private, per-partner) + `contacts` (scoped to relationship) schema and surfaces; `proposals` gains a nullable FK; new `sales` role added alongside `partner`/`admin` (completed 2026-09-02)
 - [ ] **Phase 31: Reconciliation Engine & Proposal Extraction** — dry-run-first dedup engine (SIREN auto-merge, name-normalized flagging, human-resolution UI) exercised against existing `proposals.inputs`
 - [ ] **Phase 32: HubSpot Import** — reuses the Phase 31 engine against the HubSpot `.xlsx` export; contact-owner mapped to a Leasétic sales-role user; idempotent re-import via provenance IDs. **Design partially blocked** — see open dependency note below.
 - [ ] **Phase 33: Pipeline** — partner-advanced stage on the relationship (late stages system-owned), won/lost/unanswered outcome on the proposal, SIREN-gated win
@@ -565,7 +565,7 @@ Plans:
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
 | 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
 | 29. Migration Safety Net | v1.6 | 2/2 | Complete    | 2026-08-31 |
-| 30. Company & Contact Registry | v1.6 | 8/9 | In Progress|  |
+| 30. Company & Contact Registry | v1.6 | 9/9 | Complete    | 2026-09-02 |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | TBD | Not started | - |
 | 32. HubSpot Import | v1.6 | TBD | Not started | - |
 | 33. Pipeline | v1.6 | TBD | Not started | - |
