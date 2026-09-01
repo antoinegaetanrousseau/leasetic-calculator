@@ -49,3 +49,21 @@ export type { PartnerWithCount } from './users';
 
 export { writeAuditLog } from './audit-log';
 export type { AuditAction, AuditTargetType, WriteAuditLogArgs } from './audit-log';
+
+// Phase 30 Plan 04 — owner-scoped client-relationship registry (CRM-02/04/06/07).
+export {
+  listClientBook,
+  getClientRelationshipForOwner,
+  listContactsForRelationship,
+  listProposalsForRelationship,
+} from './client-relationships';
+export type {
+  ClientBookRow,
+  ClientBookSort,
+  ClientBookDir,
+  ListClientBookArgs,
+  ListClientBookResult,
+  ClientRelationshipDetail,
+  ContactListRow,
+  RelationshipProposalRow,
+} from './client-relationships';
