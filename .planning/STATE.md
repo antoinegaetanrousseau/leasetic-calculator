@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-01T12:13:36.396Z"
+last_updated: "2026-09-01T12:39:31.149Z"
 last_activity: 2026-09-01
 progress:
   total_phases: 18
   completed_phases: 13
   total_plans: 55
-  completed_plans: 53
+  completed_plans: 54
   percent: 72
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 30 (company-contact-registry) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Status: Ready to execute
 Last activity: 2026-09-01
 
@@ -392,6 +392,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 30 P05 | ~20min | 3 tasks | 5 files |
 | Phase 30 P06 | 55min | 3 tasks | 6 files |
 | Phase 30 P07 | 45min | 3 tasks | 9 files |
+| Phase 30 P08 | ~35min | 3 tasks | 11 files |
 
 ## Decisions
 
@@ -464,3 +465,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 30]: CreateClientDialog uses z.input<createClientSchema> as the RHF form-values type (not the exported z.infer output type) plus a Controller-bound SirenInput, matching ParametresFormCard.tsx's precedent for the same optional+transform siren field
 - [Phase 30-07]: Client-detail Propositions row reuses plan 30-04's ADMIN-09-narrow row shape unmodified (amountHT=computedClientMonthly, no expiry derivation) rather than widening the query. — Threat model T-30-07-06 explicitly cites the existing narrow shape as the ADMIN-09 mitigation; widening it would work against the plan's own stated security reasoning.
 - [Phase 30-07]: ContactFormDialog's required-field asterisk follows the codebase's ml-0.5/aria-hidden accessible convention, not the plan's narrower literal grep gate. — The plan's own correction note flags 30-06's grep-driven markup regression (reverted in 5b223b2) as wrong; the substantive requirement is verified by a real test instead.
+- [Phase 30]: Admin company detail header uses PageHero's actions slot for the inline SIREN chip, satisfying the 'SIREN inline beside it' instruction without forking PageHero
+- [Phase 30]: Deferred: /proposals/[id] has no admin-bypass in its ownership check — logged in phase 30 deferred-items.md as a Phase 33/34 candidate, does not block CRM-03

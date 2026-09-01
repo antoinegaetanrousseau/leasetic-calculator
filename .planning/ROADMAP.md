@@ -440,7 +440,7 @@ Plans:
   4. A contact (name, role, phone, email) is created and edited on a relationship, not on the company, and is invisible to anyone who is not that relationship's owner or an admin.
   5. A user with the new `sales` role logs in, holds client relationships, and reaches the same pipeline/client-book surfaces a partner reaches — with zero change in what existing `partner` and `admin` accounts can see or do, and the ADMIN-09 commission-invisibility envelope intact.
 
-**Plans:** 7/9 plans executed
+**Plans:** 8/9 plans executed
 Plans:
 **Wave 1**
 
@@ -460,7 +460,7 @@ Plans:
 
 - [x] 30-06-PLAN.md — /clients client book on DataGrid table machinery + CreateClientDialog (wave 4)
 - [x] 30-07-PLAN.md — /clients/[id] detail with Contacts editor and Propositions card (wave 4)
-- [ ] 30-08-PLAN.md — Admin /[adminSegment]/companies list, company detail with Relations table, admin relationship detail (wave 4)
+- [x] 30-08-PLAN.md — Admin /[adminSegment]/companies list, company detail with Relations table, admin relationship detail (wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -565,7 +565,7 @@ Plans:
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
 | 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
 | 29. Migration Safety Net | v1.6 | 2/2 | Complete    | 2026-08-31 |
-| 30. Company & Contact Registry | v1.6 | 7/9 | In Progress|  |
+| 30. Company & Contact Registry | v1.6 | 8/9 | In Progress|  |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | TBD | Not started | - |
 | 32. HubSpot Import | v1.6 | TBD | Not started | - |
 | 33. Pipeline | v1.6 | TBD | Not started | - |
