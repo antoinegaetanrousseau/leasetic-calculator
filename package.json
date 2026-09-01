@@ -23,7 +23,6 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:migrate:dry-run": "tsx scripts/migrate.ts --dry-run",
     "db:backfill:coefficient-history": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-coefficient-history.ts",
-    "db:backfill:partner-company-name": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-partner-company-name.ts",
     "db:backfill:partner-type": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-partner-type.ts",
     "grant:admin": "tsx scripts/grant-admin.ts",
     "pdf:update-fixture": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/update-pdf-fixture.ts",
