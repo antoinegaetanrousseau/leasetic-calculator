@@ -440,7 +440,7 @@ Plans:
   4. A contact (name, role, phone, email) is created and edited on a relationship, not on the company, and is invisible to anyone who is not that relationship's owner or an admin.
   5. A user with the new `sales` role logs in, holds client relationships, and reaches the same pipeline/client-book surfaces a partner reaches — with zero change in what existing `partner` and `admin` accounts can see or do, and the ADMIN-09 commission-invisibility envelope intact.
 
-**Plans:** 4/9 plans executed
+**Plans:** 5/9 plans executed
 Plans:
 **Wave 1**
 
@@ -454,7 +454,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 30-04-PLAN.md — Owner-scoped registry queries + admin company queries + cross-tenant isolation tests (wave 3)
-- [ ] 30-05-PLAN.md — CRM server actions: create-client with silent SIREN dedup, contact create/update/delete (wave 3)
+- [x] 30-05-PLAN.md — CRM server actions: create-client with silent SIREN dedup, contact create/update/delete (wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -565,7 +565,7 @@ Plans:
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
 | 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
 | 29. Migration Safety Net | v1.6 | 2/2 | Complete    | 2026-08-31 |
-| 30. Company & Contact Registry | v1.6 | 4/9 | In Progress|  |
+| 30. Company & Contact Registry | v1.6 | 5/9 | In Progress|  |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | TBD | Not started | - |
 | 32. HubSpot Import | v1.6 | TBD | Not started | - |
 | 33. Pipeline | v1.6 | TBD | Not started | - |
