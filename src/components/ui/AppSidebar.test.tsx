@@ -263,7 +263,9 @@ describe('AppSidebar', () => {
     const { container: agent } = renderSidebar({
       activeNav: 'home', isAdmin: true, lang: 'fr', theme: 'light', adminHomeHref: '/x',
     });
-    expect(navLinksIn(agent)).toHaveLength(5);
+    // 4, not 5: an admin in Agent view gets the partner nav MINUS Clients.
+    // See the Agent-view regression test below for why.
+    expect(navLinksIn(agent)).toHaveLength(4);
     cleanup();
 
     window.sessionStorage.setItem('leasetic.view', 'admin');
@@ -281,5 +283,35 @@ describe('AppSidebar', () => {
       adminSegment: 'x', adminHrefs: { ...ADMIN_HREFS },
     });
     expect(navLinksIn(container)).toHaveLength(7);
+  });
+  /**
+   * Regression — found in Phase 30 UAT.
+   *
+   * partnerNavItems() is rendered for two different populations: every non-admin
+   * role, AND an admin who has flipped to Agent view (Phase 24 Plan 02). Plan
+   * 30-02 added Clients to that array assuming only the first population saw it.
+   *
+   * /clients is gated by requireRelationshipHolder(), which notFound()s on
+   * role === 'admin' irrespective of view — so an admin in Agent view was being
+   * handed a nav link that could only ever 404.
+   */
+  it('Agent view: an admin is not offered the Clients link that would 404 for them', () => {
+    window.sessionStorage.setItem('leasetic.view', 'agent');
+    const { container } = renderSidebar({
+      activeNav: 'home', isAdmin: true, lang: 'fr', theme: 'light', adminHomeHref: '/x',
+    });
+    const hrefs = Array.from(navLinksIn(container)).map((a) => a.getAttribute('href'));
+    expect(hrefs).not.toContain('/clients');
+    expect(hrefs).toEqual(['/', '/proposals/new/parametres', '/proposals', '/aide']);
+  });
+
+  it('Agent view: a non-admin still gets Clients (ROLE-02 — sales sees what partner sees)', () => {
+    window.sessionStorage.setItem('leasetic.view', 'agent');
+    const { container } = renderSidebar({
+      activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light',
+    });
+    const hrefs = Array.from(navLinksIn(container)).map((a) => a.getAttribute('href'));
+    expect(hrefs).toContain('/clients');
+    expect(navLinksIn(container)).toHaveLength(5);
   });
 });

@@ -90,17 +90,32 @@ export interface AppSidebarProps {
 type NavItem = { key: ActiveNav; icon: ComponentType<{ size?: number; className?: string }>; labelKey: DictKey; href: string };
 
 /**
- * Phase 18 D-27, widened by Phase 30 Plan 02 — Partner sidebar: exactly 5
- * items in order [Accueil, Nouvelle proposition, Propositions, Clients, Aide].
- * Every non-admin role reaches this same array — isAdmin===false is the only
- * gate (ROLE-02 is satisfied by construction, not by a role-specific branch).
+ * Phase 18 D-27, widened by Phase 30 Plan 02 — Partner sidebar: 5 items in order
+ * [Accueil, Nouvelle proposition, Propositions, Clients, Aide].
+ *
+ * Every non-admin role reaches this same array, so ROLE-02 is satisfied by
+ * construction rather than by a role-specific branch: a `sales` user gets the
+ * identical nav a `partner` does, Clients included.
+ *
+ * `isAdmin` is NOT a role branch here — it exists because this array is also what
+ * an ADMIN sees while in Agent view (Phase 24 Plan 02's view toggle). Plan 30-02
+ * added Clients on the assumption that only non-admins ever render this array,
+ * which the dual-view toggle had already made untrue. /clients is gated by
+ * requireRelationshipHolder(), which notFound()s on role === 'admin' regardless of
+ * view, so leaving Clients in would hand every admin a link that always 404s.
+ *
+ * The gate is deliberately not relaxed instead: an admin holds no client
+ * relationships, so /clients would be empty for them by construction. Their
+ * equivalent surface is Sociétés (admin-companies) in Admin view.
  */
-function partnerNavItems(): NavItem[] {
+function partnerNavItems(isAdmin: boolean): NavItem[] {
   return [
     { key: 'home', icon: HomeIcon, labelKey: 'sidebar.nav.home', href: '/' },
     { key: 'proposals-new', icon: PlusIcon, labelKey: 'sidebar.nav.proposalsNew', href: '/proposals/new/parametres' },
     { key: 'proposals', icon: ProposalIcon, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
-    { key: 'clients', icon: BuildingIcon, labelKey: 'sidebar.nav.clients', href: '/clients' },
+    ...(isAdmin
+      ? []
+      : [{ key: 'clients' as const, icon: BuildingIcon, labelKey: 'sidebar.nav.clients' as DictKey, href: '/clients' }]),
     { key: 'help', icon: HelpIcon, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];
 }
@@ -157,7 +172,7 @@ export function AppSidebar({
   const navItems: NavItem[] =
     isAdmin && effectiveView === 'admin' && adminHrefs
       ? adminNavItems(adminHrefs)
-      : partnerNavItems();
+      : partnerNavItems(isAdmin);
 
   return (
     <Sidebar collapsible="icon" aria-label={t('sidebar.brand', lang)}>
