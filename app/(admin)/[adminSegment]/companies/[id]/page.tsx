@@ -27,7 +27,8 @@ interface PageProps {
  *
  * Order of operations:
  *   1. requireAdmin() — FIRST, before any data access (AUTH-15/PITFALLS §7.3).
- *   2. getCompanyForAdmin(id) -> null => notFound() (D-18: 404 not 403).
+ *   2. getCompanyForAdmin(id) -> null => notFound() (D-18: a 404, never a
+ *      client-error status that would confirm the id exists).
  *   3. ONLY THEN listRelationshipsForCompany(id) — every relationship on
  *      this company, together with the holder's identity (CRM-03).
  *

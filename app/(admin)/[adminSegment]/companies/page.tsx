@@ -36,7 +36,8 @@ interface PageProps {
  * SECURITY:
  *   - requireAdmin() called here as defense in depth (AUTH-15) even though
  *     the parent `(admin)/[adminSegment]/layout.tsx` already gated
- *     (T-30-08-01). notFound() not 403 (D-18).
+ *     (T-30-08-01). notFound(), never a client-error status that would
+ *     confirm existence (D-18).
  *   - Renders directly inside Shell's capped `<main>` — no nested
  *     custom width-capping wrapper (30-UI-SPEC.md §0 Container convention).
  */
