@@ -1,7 +1,6 @@
 'use server';
 
 import { eq, and, isNull, gt, sql } from 'drizzle-orm';
-import { auth } from './index';
 import { hashToken } from './tokens';
 import { setPasswordSchema } from './schemas';
 import { db, schema } from '@/lib/db';
@@ -125,9 +124,18 @@ export async function redeemToken(
         .set({ sessionVersion: sql`${schema.users.sessionVersion} + 1` })
         .where(eq(schema.users.id, user.id));
 
-      // Belt-and-suspenders: also revoke DB session rows via Better Auth's admin plugin
-      // so any active sessions are immediately invalidated (not just after cookieCache TTL).
-      await auth().api.revokeUserSessions({ body: { userId: user.id } });
+      // Belt-and-suspenders: also delete DB session rows so any active session is
+      // invalidated immediately, not just after the 5-min cookieCache TTL.
+      //
+      // Deliberately a direct DELETE, NOT `auth().api.revokeUserSessions(...)`:
+      // that is Better Auth's ADMIN-plugin endpoint and requires an authenticated
+      // admin caller. This route lives in app/(public)/reset/[token], so whoever
+      // redeems a reset link is by definition signed out — the call threw
+      // `APIError: UNAUTHORIZED` every single time. Because it ran after the
+      // password write, the token burn and the sessionVersion bump had all
+      // committed, the catch below reported `server_error` and the user was told
+      // the reset failed when it had in fact succeeded — and their token was spent.
+      await db().delete(schema.sessions).where(eq(schema.sessions.userId, user.id));
     }
 
     return { ok: true };
