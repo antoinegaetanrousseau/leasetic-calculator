@@ -175,28 +175,68 @@ a surface's accent budget.
 
 ---
 
-## UIC-04 — `--radius` is pinned; `.card` derives its radius from the token
+## UIC-04 — Two disjoint radius tiers: an explicit per-step control scale, and a named container token
 
 **Status:** Locked (documented incident)
-**Recorded in:** `app/globals.css` (the token) and `app/globals.css` (`.card`);
-restated as LOCKED in `31-UI-SPEC.md` § Container Radius
+**Recorded in:** `app/globals.css` (control-tier declarations and the `--radius-container*`
+ladder), `app/globals.css` (`.card`); originally restated as LOCKED in `31-UI-SPEC.md`
+§ Container Radius; revised by Phase `31.1-app-shell-refresh` (`31.1-01-PLAN.md`,
+`31.1-04-PLAN.md`) per `31.1-CONTEXT.md` D-01/D-02/D-03.
 
-**Rule.** `--radius: 0.625rem`. This single value drives the entire derived scale
-(`--radius-sm` … `--radius-4xl`) through the `@theme inline` multiplier block
-(`app/globals.css`: `--radius-xl = ×1.4`, `--radius-2xl = ×1.8`).
+**The incident this rule exists to prevent.** `--radius` was previously `1rem`, chasing a "large
+radius" brand parameter. Every derived step inflated by 60% at once — `rounded-4xl` hit 41.6px
+and every `Input`/`InputGroup` rendered as a pill. UIC-04 was Locked at that point specifically to
+stop `--radius` (or the `@theme inline` derivation that read it) from being touched without
+re-checking the whole scale against a real form.
+**The multiplier clause is superseded, not merely worked around.** `--radius-sm` … `--radius-4xl`
+are no longer `calc(var(--radius) * n)` expressions — Phase 31.1 replaced that `@theme inline`
+derivation with **seven standalone px declarations**. No step derives from `--radius`, and
+no step derives from any other step. `--radius: 0.625rem` is still declared (`shadcn add`
+regeneration and `sidebar.tsx`'s local `[--radius:var(--radius-xl)]` rebind both expect the token
+to exist) but it **drives nothing in the scale any more**. This is what makes the original pill
+incident structurally impossible rather than merely avoided: raising `--radius` today cannot
+inflate any control corner, because no control corner reads it.
 
-**Do not change `--radius` or the multiplier block** without re-checking the top of the scale
-against a real form. The in-file comment records why: it was previously `1rem`, chasing a
-"large radius" brand parameter, which inflated every step by 60% — `rounded-4xl` became 41.6px
-and every `Input`/`InputGroup` rendered as a pill.
+**Control tier — the real, measured value is 26px, not 8px.** `Button`, `Input`, `Select`,
+`Badge`, `Toggle`, `Tabs`, `Tooltip`, `InputGroup`, `ButtonGroup`, `Progress`, `Combobox` and the
+ReUI `Badge`/`Cascader` all reach `--radius-4xl` (= **26px**) through the `rounded-4xl` utility;
+`calendar.tsx` reads `var(--radius-4xl)` as its `--cell-radius`. `--radius-3xl` (22px) is the
+other load-bearing step (`toggle-group.tsx`'s four directional corners). ROADMAP criterion 4's
+"8px" describes **Colibris's** controls, not Leasétic's — the binding requirement for Phase 31.1
+was "keeps its current corner," which is what shipped (zero visual change to any control). A
+future phase reading "controls are 8px" here would make a wrong edit; the real number is 26px.
 
-**`.card` tracks the token, never a literal.** `.card` is `border-radius: var(--radius-2xl)`
-(= 18px) with `padding: 28px`. The in-file comment records why this too was a fix: `.card` once
-declared a literal 16px while shadcn's own `Card` was `rounded-2xl`, and three metric tiles sat
-above a section card at a visibly different radius on the home page.
+**Container tier — a separate namespace, sharing zero variables with the control tier.**
+`--radius-container-xs|sm|md|lg|xl` = 12/16/24/32/40px, with `--radius-container` aliasing
+`--radius-container-sm` (= **16px**). Container surfaces read `--radius-container` via the
+`rounded-container` utility; control primitives never do, and the reverse never happens either —
+the two tiers are structurally disjoint, not merely conventionally separate. What reads it: `.card`
+(the shadcn `Card` root), `Dialog`, `AlertDialog`, `Popover`, and Phase 31's `PairReviewCard` (plus
+its `MergeDialog`/`KeepSeparateDialog`).
 
-> Container radius **across** the app is currently split and is a live open item, not a settled
-> rule — see [Open Items](#open-items). UIC-04 governs `--radius` and `.card` specifically.
+**`.card` still tracks a token, never a literal** — that clause of the original rule stands
+verbatim. Only the token changed: `.card` moved from `var(--radius-2xl)` (18px) to
+`var(--radius-container)` (16px), closing OPEN-A. The in-file comment still records the original
+fix this clause prevents: `.card` once declared a literal 16px while shadcn's own `Card` was
+`rounded-2xl`, and three metric tiles sat above a section card at a visibly different radius on
+the home page.
+
+**Named exceptions, kept deliberately outside both tiers:**
+- `src/components/proposals/EmbeddedPdfPreview.tsx`'s `rounded-[12px]` — frames the PDF page
+  surface governed by the Phase 5/8 print invariant (`app/globals.css:214-218`), not a shell
+  container. Not subject to `--radius-container`.
+- Control-attached menu surfaces (select content, dropdown menus, combobox, cascader) stay on the
+  control tier by design — they are chrome attached to a control, not an independent container.
+
+**How to re-verify this rule.** `tests/radius-scale.test.ts` (7 assertions) pins the token-layer
+contract: no step derives from `--radius`, the control tier sits at 22px/26px, the four named
+primitives and the calendar still reach `--radius-4xl`, and the container ladder stays a separate
+namespace. `tests/container-radius.test.ts` (5 assertions) pins the component layer: no container
+surface carries a raw px literal outside its documented allow-list, the four container primitives
+and `PairReviewCard` read `rounded-container`, the two review dialogs no longer override the
+radius, and the control and container tiers stay disjoint. These two suites replace "re-check the
+top of the scale against a real form" as the verification instruction — run them, not a manual
+form inspection.
 
 ---
 
@@ -319,32 +359,32 @@ These are **live, deliberate open questions**. They are recorded here so a check
 report them as violations and a planner does not "settle" them ahead of the phase that owns them.
 **None of the below is a rule.**
 
-### OPEN-A — Container radius is split (18px vs 24px), pending the app-shell refresh phase
+### OPEN-A — RESOLVED (`31.1-app-shell-refresh`, 2026-09-02): container radius unified at 16px
 
-Two container radii currently ship side by side:
+**Was:** two container radii shipped side by side — Phase 30's `.card` at 18px (token-derived,
+`--radius-2xl`) and Phase 31's pair-review card + its two dialogs at a literal `rounded-[24px]`,
+matching the vendored `app-shell-1` block. Both values were explicitly parked pending this phase.
 
-| Surface | Radius | Kind |
+**Resolved:** Phase `31.1-app-shell-refresh` (Plans 31.1-01 and 31.1-04) declared a single named
+`--radius-container` token (16px, aliasing `--radius-container-sm` from a 12/16/24/32/40 ladder)
+and back-applied it to every container surface: `.card`, `Card`, `Dialog`, `AlertDialog`,
+`Popover`, and Phase 31's `PairReviewCard` + `MergeDialog` + `KeepSeparateDialog`. The 18px token
+and the 24px literal both converged on 16px; the literal is gone entirely — zero `rounded-[24px]`
+occurrences remain outside `components/blocks/` (verified, `tests/container-radius.test.ts`
+assertion 1). See UIC-04 above for the full rule text this closure now lives under.
+
+The historical table is kept for provenance:
+
+| Surface | Radius (before) | Kind (before) |
 |---|---|---|
 | Phase 30 `.card` (client book, client detail, admin companies) | 18px (`--radius-2xl`) | Token-derived |
-| Phase 31 pair-review card + its two new dialogs | `rounded-[24px]` | Literal, decoupled from `--radius` |
-
-The 24px literal matches the vendored `app-shell-1` block
-(`src/components/blocks/app-shell-1/components/app-shell.tsx`) and was a locked
-orchestrator decision for Phase 31. **Controls are explicitly not part of it** — buttons, badges,
-radio items and inputs inside those dialogs keep their `--radius`-derived shadcn defaults.
-
-This is a **deliberate, documented, short-term inconsistency**, not a defect. The two container
-radii will visibly differ until the deferred **app-shell refresh phase** (`31.1-app-shell-refresh`)
-formalizes a named container-radius token and back-applies it. Do not "fix" the divergence
-mid-phase, and do not promote either value to a project-wide rule here — that naming is the later
-phase's job. Both values remain subject to UIC-04: neither may be achieved by changing `--radius`.
-
+| Phase 31 pair-review card + its two dialogs | `rounded-[24px]` | Literal, decoupled from `--radius` |
 ### OPEN-B — `D-B` has no origin record in the repo
 
 The decision ID `D-B`, which UIC-01 and UIC-02 are attributed to, is referenced only inside
 `30-UI-SPEC.md` and is defined nowhere. Its ratification date is therefore unrecoverable from the
 repo. If the operator's original decision record surfaces, add its date and text to UIC-01 and
-UIC-02 and remove this item.
+UIC-02 and remove this item. **Unchanged by Phase `31.1-app-shell-refresh`.**
 
 ### OPEN-D — Is the ratified weight exception three weights or four?
 
@@ -361,11 +401,33 @@ Until this is settled: **do not flag a surface for using 500**, and do not cite 
 that 500 is unavailable. The three-weight exception to the two-weight review threshold stands
 either way — this question is about the exact count, not about whether the exception exists.
 
-### OPEN-C — Deferred app-shell directives
 
-Carried by Phase 31's research session and explicitly deferred to `31.1-app-shell-refresh`:
-breadcrumbs in the shell header, convergence toward the vendored `app-shell-1` sidebar block,
-shrinking the brand logo, and fixing the collapsed-sidebar layout. Not conventions; not in force.
+### OPEN-C — RESOLVED (`31.1-app-shell-refresh`, 2026-09-02): deferred app-shell directives delivered
+**Was:** breadcrumbs in the shell header, convergence toward the vendored `app-shell-1` sidebar
+block, shrinking the brand logo, and fixing the collapsed-sidebar layout — carried by Phase 31's
+research session and explicitly deferred to this phase.
+
+**Resolved:** all four directives shipped. Breadcrumbs render in the shell header (`getRouteMeta`,
+FR/EN, current page as non-link text — Plan 31.1-02/03). The sidebar's in-file chevron is deleted;
+the header `SidebarTrigger` is now the shell's sole collapse control, focusable and FR/EN-labelled
+(Plan 31.1-03/06). The brand lockup shrank 190px → 120px in a 252px sidebar (Plan 31.1-06). The
+collapsed rail is fixed: the mark badge and nav icons share a single 33.5px centring axis by
+construction (Plan 31.1-06, D-09).
+
+**What was deliberately *not* adopted from `app-shell-1`, and why** — this is the durable half of
+the closure, worth recording so a future reader does not re-derive it by copying the vendored
+block wholesale:
+- **Sidebar widths via `className`.** `app-shell-1/components/app-shell.tsx:28` sets
+  `--sidebar-width`/`--sidebar-width-icon` through an arbitrary-property `className`. This is a
+  latent bug: `SidebarProvider` spreads its own inline `style`, which outranks a `className` on
+  the same custom property, so the vendored pattern can silently fail to apply. `Shell.tsx`
+  documents this and keeps the widths in `SidebarProvider`'s own inline `style` instead (252px /
+  68px, Plan 31.1-06 D-11).
+- **`SidebarRailToggle`.** The vendored block's rail toggle carries `tabIndex={-1}` and a
+  hardcoded English label ("Toggle Sidebar") with no i18n. Leasétic's `SidebarRail` keeps the same
+  `tabIndex={-1}`/`aria-hidden` posture (excluding it from the accessibility tree by design) but
+  the shell's one real collapse control is the header `SidebarTrigger`, which is properly
+  FR/EN-labelled — the vendored toggle's English-only label was never adopted anywhere reachable.
 
 ---
 
@@ -375,9 +437,11 @@ shrinking the brand logo, and fixing the collapsed-sidebar layout. Not conventio
 |---|---|
 | `.planning/phases/30-company-contact-registry/30-UI-SPEC.md` | UIC-01 … UIC-10 (origin), OPEN-B |
 | `.planning/phases/31-reconciliation-engine-proposal-extraction/31-UI-SPEC.md` | Verbatim reuse evidence; OPEN-A, OPEN-C |
-| `app/globals.css` | UIC-04 (`--radius` incident, `.card` rule, multiplier block) |
+| `app/globals.css` | UIC-04 (`--radius` incident, `.card` rule, explicit per-step scale, `--radius-container` ladder), UIC-03 dark addendum |
 | `app/layout.tsx` | UIC-02 (Inter weight load) |
 | `src/components/ui/icons.tsx` | UIC-07 (two-tier vocabulary) |
+| `.planning/phases/31.1-app-shell-refresh/31.1-UI-SPEC.md` | UIC-04 revision (D-01/D-02/D-03), UIC-03 dark addendum (D-13), OPEN-A/OPEN-C closure |
+| `.planning/phases/31.1-app-shell-refresh/31.1-CONTEXT.md` | D-01…D-13 decision record for the app-shell-refresh phase |
 
 Phase UI-SPECs remain the historical record of each phase's own contract. This file records only
 what was ratified or established as applying **beyond** the phase that first wrote it down.
