@@ -1030,6 +1030,12 @@ export const dictionaries = {
     'admin.reconciliation.reason.bothMissing': 'SIREN absent des deux côtés',
     'admin.reconciliation.action.merge': 'Fusionner',
     'admin.reconciliation.action.keepSeparate': 'Marquer séparées',
+    // Not in the UI-SPEC's i18n Key Plan list — added per Rule 2 (bilingual
+    // correctness is a correctness requirement here, not a style choice):
+    // the counts line's words ("relations · contacts · propositions") differ
+    // in English ("proposals", matching admin.companies.relation.col.proposals'
+    // EN value), so they cannot be a shared French-only literal.
+    'admin.reconciliation.card.counts': '{r} relations · {c} contacts · {p} propositions',
     'admin.reconciliation.compound.warning':
       '{owner} détient une relation avec les deux sociétés. La fusion combinera aussi ces deux relations (contacts et propositions compris).',
     'admin.reconciliation.merge.title': 'Fusionner ces deux sociétés ?',
@@ -2005,6 +2011,7 @@ export const dictionaries = {
     'admin.reconciliation.reason.bothMissing': 'Missing SIREN on both sides',
     'admin.reconciliation.action.merge': 'Merge',
     'admin.reconciliation.action.keepSeparate': 'Keep separate',
+    'admin.reconciliation.card.counts': '{r} relations · {c} contacts · {p} proposals',
     'admin.reconciliation.compound.warning':
       '{owner} holds a relationship with both companies. Merging will also combine those two relationships (contacts and proposals included).',
     'admin.reconciliation.merge.title': 'Merge these two companies?',
