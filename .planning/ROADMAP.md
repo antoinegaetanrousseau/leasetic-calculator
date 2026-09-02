@@ -481,7 +481,18 @@ Plans:
   4. Two extracted clients that match only on `name_normalized` — no SIREN on one or both — are NOT silently merged; they appear in a human review queue instead.
   5. A human opens the review queue and, for each flagged pair, either merges the two into one company or marks them permanently separate; the decision is durable and is never re-flagged on a later run.
 
-**Plans:** TBD
+**Plans:** 8 plans
+
+Plans:
+- [ ] 31-01-PLAN.md — Schema: provenance column, company_pair_decisions table, migration 0008, audit vocabulary
+- [ ] 31-02-PLAN.md — Reconciliation engine core: source abstraction, candidate derivation, SIREN/name matching, pair keys
+- [ ] 31-03-PLAN.md — Merge & keep-separate write layer: admin reads, the non-transactional D-12 merge, server actions
+- [ ] 31-04-PLAN.md — Dry-run report (Markdown + JSON) and drift comparison
+- [ ] 31-05-PLAN.md — Apply layer: idempotent non-transactional writes, provenance, widened single-writer gate
+- [ ] 31-06-PLAN.md — Admin pair-review queue UI at /[adminSegment]/companies/review
+- [ ] 31-07-PLAN.md — Run orchestrator, zero-write proof, CLI script and npm wiring
+- [ ] 31-08-PLAN.md — Operator runbook and the phase success-criteria checkpoint
+
 **UI hint:** yes
 
 ### Phase 31.1: App Shell Refresh (INSERTED)
