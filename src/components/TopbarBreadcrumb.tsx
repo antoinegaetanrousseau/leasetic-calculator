@@ -21,11 +21,12 @@ export interface TopbarBreadcrumbProps {
 }
 
 /**
- * Topbar breadcrumb island (D-04/D-06) — replaces the former `TopbarTitle`.
+ * Topbar breadcrumb island (D-04/D-06) — replaces the topbar's former
+ * page-title island.
  *
  * A server component cannot read the current pathname in the App Router, and
- * `Topbar.tsx` is server-rendered — this island exists for exactly the same
- * reason `TopbarTitle` did: `usePathname()` requires a client boundary. It
+ * `Topbar.tsx` is server-rendered — this island exists for the same reason
+ * its predecessor did: `usePathname()` requires a client boundary. It
  * reads the pathname, resolves `RouteMeta.breadcrumb` via `getRouteMeta`
  * (Phase 31.1 Plan 02), and renders the trail through the shadcn `Breadcrumb`
  * primitive. The trail is never empty, never exceeds 2 segments, and its last
