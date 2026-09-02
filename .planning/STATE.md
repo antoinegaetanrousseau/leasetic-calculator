@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T07:55:15.120Z"
-last_activity: 2026-09-02 -- Phase 31 planning complete
+last_updated: "2026-09-02T08:18:17.509Z"
+last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 14
   total_plans: 63
-  completed_plans: 55
+  completed_plans: 56
   percent: 74
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 30 — company-contact-registry
+**Current focus:** Phase 31 — reconciliation-engine-proposal-extraction
 
 ## Current Position
 
-Phase: 30 (company-contact-registry) — EXECUTING
-Plan: 9 of 9
+Phase: 31 (reconciliation-engine-proposal-extraction) — EXECUTING
+Plan: 2 of 8
 Status: Ready to execute
-Last activity: 2026-09-02 -- Phase 31 planning complete
+Last activity: 2026-09-02
 
 ## Deferred Items
 
@@ -397,6 +397,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 30 P06 | 55min | 3 tasks | 6 files |
 | Phase 30 P07 | 45min | 3 tasks | 9 files |
 | Phase 30 P08 | ~35min | 3 tasks | 11 files |
+| Phase 31 P01 | ~10min | 3 tasks | 6 files |
 
 ## Decisions
 
@@ -471,3 +472,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 30-07]: ContactFormDialog's required-field asterisk follows the codebase's ml-0.5/aria-hidden accessible convention, not the plan's narrower literal grep gate. — The plan's own correction note flags 30-06's grep-driven markup regression (reverted in 5b223b2) as wrong; the substantive requirement is verified by a real test instead.
 - [Phase 30]: Admin company detail header uses PageHero's actions slot for the inline SIREN chip, satisfying the 'SIREN inline beside it' instruction without forking PageHero
 - [Phase 30]: Deferred: /proposals/[id] has no admin-bypass in its ownership check — logged in phase 30 deferred-items.md as a Phase 33/34 candidate, does not block CRM-03
+- [Phase 31-01]: D-10 pair key refined to unordered side-identity-key pairs (siren:<9digits> or owner:<ownerId>|name:<name_normalized>), not the literal normalized-name pair, to avoid degenerate (x,x) self-pairs
+- [Phase 31-01]: Provenance source column added to companies, client_relationships AND contacts (not contacts-only) — undoing a bad extraction means deleting companies/relationships too, and adding the column now is one ALTER vs a lossy migration+backfill later

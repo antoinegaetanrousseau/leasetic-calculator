@@ -72,11 +72,11 @@ The master-data layer. A `company` is a global fact; a `client_relationship` is 
 
 > **Open dependency.** The HubSpot export (`hubspot-crm-exports-tous-les-contacts-2026-08-31.xlsx`, ~2.9 MB) is not yet readable — macOS blocks `~/Downloads` at the TCC level, not the Claude sandbox. Its column inventory determines how much of IMPORT-03/04 can be automatic versus human-resolved. **IMPORT-02's detailed design is pending that file**; the rest of the category is unaffected.
 
-- [ ] **IMPORT-01**: Client data in existing proposals is extracted into companies and per-partner relationships, and each proposal is linked to the relationship it produced.
+- [x] **IMPORT-01**: Client data in existing proposals is extracted into companies and per-partner relationships, and each proposal is linked to the relationship it produced.
 - [ ] **IMPORT-02**: The HubSpot export is imported into companies, contacts and relationships, with HubSpot's contact-owner mapped to a Leasétic user ("house relationships" for internal `Commercial` staff).
 - [ ] **IMPORT-03**: Records matching on SIREN are merged automatically.
-- [ ] **IMPORT-04**: Records matching only on `name_normalized` — no SIREN on one or both sides — are flagged for human review rather than silently merged.
-- [ ] **IMPORT-05**: A human can resolve each flagged pair in the UI: merge into one company, or keep them separate permanently.
+- [x] **IMPORT-04**: Records matching only on `name_normalized` — no SIREN on one or both sides — are flagged for human review rather than silently merged.
+- [x] **IMPORT-05**: A human can resolve each flagged pair in the UI: merge into one company, or keep them separate permanently.
 - [ ] **IMPORT-06**: The import runs in **dry-run mode**, producing a full report of what it would create, merge and flag, without writing anything.
 - [ ] **IMPORT-07**: Re-running the import creates no duplicates — provenance IDs (`hubspot_company_id` / `hubspot_contact_id`) make it idempotent.
 
