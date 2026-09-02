@@ -13,8 +13,8 @@ re-derive the 3-weight typography exception from that sibling phase's document i
 report it as a fresh violation of the generic two-weight design-review threshold.
 
 **This file is the canonical source.** A phase UI-SPEC should now *cite* a rule ID here
-(e.g. "3 weights per UIC-02") rather than re-argue it. A UI checker that finds a phase using
-three font weights, a 12px/20px/28px spacing step, or a `rounded-[24px]` container should read
+(e.g. "4 weights per UIC-02") rather than re-argue it. A UI checker that finds a phase using
+four font weights, a 12px/20px/28px spacing step, or a `rounded-[24px]` container should read
 this file first and only flag a deviation *from what is written here*.
 
 Rules are stated as they were actually ratified. Where a rule's provenance is incomplete in the
@@ -74,40 +74,43 @@ in the GSD default set.
 
 ---
 
-## UIC-02 — Typography: three font weights (400 / 600 / 700)
+## UIC-02 — Typography: four font weights (400 / 500 / 600 / 700)
 
 **Status:** Ratified exception (`D-B`), **project-wide by explicit operator scope**
 **Ratified:** date not recorded in-repo — see provenance note below
 **Recorded in:** `30-UI-SPEC.md` § Typography (2026-09-01)
 **Also applied by:** `31-UI-SPEC.md` § Typography
+**Amended:** 2026-09-03 — operator decision: the count is **four**, not three (closes OPEN-D)
 
-**Rule.** Three weights are in active, sanctioned use. This is a ratified exception to the
+**Rule.** Four weights are in active, sanctioned use. This is a ratified exception to the
 usual two-weight design-review threshold, and it is **project-wide** — not scoped to the phase
 whose spec happens to record it.
 
 | Weight | Role |
 |---|---|
 | 400 | Body copy, muted/secondary metadata |
+| 500 | Interactive control labels — carried by every `Button` via `button.tsx`'s base class, and set deliberately on some product labels (`font-medium`) |
 | 600 | Row and field emphasis — names, primary table-column values (`font-semibold`) |
 | 700 | Page titles (`PageHero`), section eyebrows, table column headers |
 
-**Rationale.** All three are already loaded and already in broad use: `PartnersList`'s name cell
-and `ProposalRow` use 600; `PageHero` and `SectionTitle` use 700; the `body` rule uses 400.
+**Rationale.** All four are already loaded and already in broad use: the `body` rule uses 400;
+every `Button` renders 500 through `button.tsx`'s base class; row and field emphasis uses 600;
+page titles, section eyebrows and column headers use 700.
 Collapsing to two weights would mean editing shipped, working surfaces to satisfy a generic
 threshold, not fixing a defect.
 
 **Font load vs. sanctioned weights.** `app/layout.tsx` loads Inter at
-`['300','400','500','600','700']`. UIC-02 sanctions 400 / 600 / 700 for a spec to declare.
-**300 is loaded and genuinely unused** (zero occurrences in product code).
+`['300','400','500','600','700']`. UIC-02 sanctions 400 / 500 / 600 / 700 for a spec to declare.
+**300 is loaded and unused.** Re-derive rather than trusting this line: grep the source tree
+(`app/` and `src/`) for `font-light` / `font-normal` / `font-medium` / `font-semibold` /
+`font-bold` — `font-light` is the only one that returns nothing. A loaded-but-unrendered weight
+is wasted font payload, but trimming the `weight:` array is a code change, not a rule.
 
-> **Correction (2026-09-02).** This record previously said "300 and 500 are loaded but unused."
-> **The claim about 500 is false.** `font-medium` (500) is used widely in product
-> code, including the base class string of `button.tsx` — so *every button in the app* renders
-> at 500 — and it is also set deliberately on product labels (`MergeDialog.tsx`,
-> `PartnersList.tsx`, `CompanyRelationsTable.tsx`). Do not cite UIC-02 as authority for
-> "500 is unused," and do not flag a surface for rendering 500. Whether the ratified exception
-> should therefore read *four* weights (400/500/600/700) rather than three is unresolved — see
-> [OPEN-D](#open-items).
+> **Resolution (2026-09-03, operator decision).** OPEN-D is closed: the exception is **four**
+> weights. An earlier version of this record said three, and separately claimed "300 and 500 are
+> loaded but unused" — the claim about 500 was false. 500 renders on *every button in the app*
+> via `button.tsx`'s base class, and is also set deliberately on product labels. Do not flag a
+> surface for rendering 500, and never cite UIC-02 as authority for "500 is unused."
 
 > **Provenance note (unresolved).** `30-UI-SPEC.md` attributes UIC-01 and UIC-02 to "the
 > operator's D-B decision", but **no record defining `D-B` exists anywhere in this repository** —
@@ -434,21 +437,19 @@ The decision ID `D-B`, which UIC-01 and UIC-02 are attributed to, is referenced 
 repo. If the operator's original decision record surfaces, add its date and text to UIC-01 and
 UIC-02 and remove this item. **Unchanged by Phase `31.1-app-shell-refresh`.**
 
-### OPEN-D — Is the ratified weight exception three weights or four?
+### OPEN-D — RESOLVED (operator decision, 2026-09-03): the exception is four weights
 
-UIC-02 records **three** (400 / 600 / 700), inherited from `30-UI-SPEC.md`. But weight **500**
-ships pervasively (every `Button` carries it via `button.tsx`'s base
-class), and is set deliberately on some product labels rather than only inherited from primitive
-chrome. Two readings, unresolved pending an operator decision:
+**Was:** UIC-02 recorded **three** weights (400 / 600 / 700), inherited from `30-UI-SPEC.md`, while
+weight **500** shipped pervasively — every `Button` carries it via `button.tsx`'s base class, and
+it is set deliberately on some product labels rather than only inherited from primitive chrome.
+Two readings were open: that Phase 30's prose understated the exception, or that 500 was arriving
+only through shadcn defaults and a hand-written `font-medium` was drift to correct.
 
-1. The exception is really **four weights** (400/500/600/700) and Phase 30's prose understated it.
-2. The exception is **three declarable weights**, with 500 arriving through shadcn primitive
-   defaults — in which case a hand-written `font-medium` on a product label is drift to correct.
-
-Until this is settled: **do not flag a surface for using 500**, and do not cite UIC-02 as evidence
-that 500 is unavailable. The three-weight exception to the two-weight review threshold stands
-either way — this question is about the exact count, not about whether the exception exists.
-
+**Resolved:** the first reading. The operator ruled the exception is **four weights
+(400 / 500 / 600 / 700)**; Phase 30's prose understated it. A hand-written `font-medium` on a
+product label is sanctioned, not drift. UIC-02 above carries the amended rule and its table row
+for 500. Weight **300** remains loaded and unrendered — an unused font payload, not a sanctioned
+weight, and not drift for a surface to fix.
 
 ### OPEN-C — RESOLVED (`31.1-app-shell-refresh`, 2026-09-02): deferred app-shell directives delivered
 **Was:** breadcrumbs in the shell header, convergence toward the vendored `app-shell-1` sidebar

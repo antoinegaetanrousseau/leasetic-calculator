@@ -132,11 +132,15 @@ exception, not a spacing exception.
 
 ## Typography
 
-**Three font weights (400 / 600 / 700) — per [`UIC-02`](../../codebase/UI-CONVENTIONS.md), a ratified project-wide
+**Four font weights (400 / 500 / 600 / 700) — per [`UIC-02`](../../codebase/UI-CONVENTIONS.md), a ratified project-wide
 exception to the two-weight design-review threshold. This is not a Phase 31 declaration to
 re-derive or re-approve: it is inherited, already-ratified, and applies project-wide.**
-No new sizes; no new weights. Weights 300 and 500 are loaded by `app/layout.tsx` but remain
-unused and out of bounds, per UIC-02.
+No new sizes; no new weights. Weight 500 is sanctioned — every `Button` on this surface renders
+it via `button.tsx`'s base class. Weight 300 is loaded by `app/layout.tsx` but never rendered.
+
+> **Amended 2026-09-03.** This section previously read "three font weights (400 / 600 / 700)" and
+> claimed weights 300 **and 500** were "unused and out of bounds". The claim about 500 was false.
+> OPEN-D closed in favour of four weights by operator decision — see UIC-02.
 
 | Role | Size | Weight | Line Height | Usage on this surface |
 |------|------|--------|-------------|-------------------|
