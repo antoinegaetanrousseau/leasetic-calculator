@@ -30,7 +30,16 @@
  * Run:
  *   npm run db:seed:reconciliation-fixtures -- --dry-run   # print, write nothing
  *   npm run db:seed:reconciliation-fixtures                # insert (idempotent)
- *   npm run db:seed:reconciliation-fixtures -- --remove    # delete the fixtures
+ *   npm run db:seed:reconciliation-fixtures -- --remove --dry-run  # preview the revert
+ *   npm run db:seed:reconciliation-fixtures -- --remove    # FULL REVERT (see below)
+ *
+ * --remove is a FULL REVERT, not just a fixture delete. It removes the fixture
+ * proposals AND every CRM row the import derived from them — companies,
+ * relationships, contacts and pending pair decisions carrying
+ * source='proposal_extraction'. Deleting only the proposals would orphan those
+ * rows, leaving a half-state that reads like genuine registry data. It refuses
+ * to run if a partner has hand-added a contact to an extraction-created
+ * relationship, since the FK cascade would take that real data with it.
  *
  * Idempotency:
  *   Every fixture carries an `idempotency_key` prefixed with FIXTURE_PREFIX. Insert
@@ -217,9 +226,6 @@ function fail(message: string): never {
 async function main(): Promise<void> {
   const dryRun = process.argv.includes('--dry-run');
   const remove = process.argv.includes('--remove');
-  if (dryRun && remove) {
-    fail('--dry-run and --remove are mutually exclusive.');
-  }
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -251,11 +257,62 @@ async function main(): Promise<void> {
   const sql = neon(databaseUrl);
 
   if (remove) {
-    const deleted = await sql`
-      delete from proposals
-      where idempotency_key like ${FIXTURE_PREFIX + '%'}
-      returning id`;
-    console.log('[seed-fixtures] removed ' + String(deleted.length) + ' fixture proposal(s).');
+    // FULL REVERT, not just the fixture proposals.
+    //
+    // Deleting only the fixtures would leave every CRM row the import derived
+    // from them — companies, relationships, contacts, pending pairs — orphaned
+    // with no source proposal. That half-state is worse than either extreme: it
+    // looks like real registry data to the next person who opens the database.
+    //
+    // FK rules (verified against the live schema) do most of the work:
+    //   contacts.client_relationship_id  -> ON DELETE CASCADE
+    //   proposals.client_relationship_id -> ON DELETE SET NULL
+    //   client_relationships.company_id  -> ON DELETE RESTRICT  (order matters)
+    //   company_pair_decisions.company_*  -> ON DELETE SET NULL (so delete explicitly,
+    //                                        or they linger with nulled references)
+    //
+    // Guard first: CASCADE on contacts would also take any contact a partner
+    // added by hand to an extraction-created relationship. That is real data and
+    // must not disappear silently.
+    const handEntered = (await sql`
+      select count(*)::int as n from contacts c
+      join client_relationships r on r.id = c.client_relationship_id
+      where r.source = 'proposal_extraction'
+        and c.source is distinct from 'proposal_extraction'`) as Array<{ n: number }>;
+    if (handEntered[0].n > 0) {
+      fail(
+        String(handEntered[0].n) +
+          ' hand-entered contact(s) live on extraction-created relationships and would be ' +
+          'destroyed by the cascade. Refusing to revert. Move or delete them deliberately first.',
+      );
+    }
+
+    if (dryRun) {
+      const preview = (await sql`select
+        (select count(*)::int from company_pair_decisions) as pair_decisions,
+        (select count(*)::int from client_relationships where source='proposal_extraction') as relationships,
+        (select count(*)::int from contacts where source='proposal_extraction') as contacts_cascaded,
+        (select count(*)::int from companies where source='proposal_extraction') as companies,
+        (select count(*)::int from proposals where idempotency_key like ${FIXTURE_PREFIX + '%'}) as fixture_proposals,
+        (select count(*)::int from proposals p join client_relationships r on r.id=p.client_relationship_id where r.source='proposal_extraction') as links_to_null`) as Array<
+        Record<string, number>
+      >;
+      console.log('[seed-fixtures] DRY RUN — would delete:');
+      console.log('  ' + JSON.stringify(preview[0], null, 2).replace(/\n/g, '\n  '));
+      return;
+    }
+
+    const pairs = await sql`delete from company_pair_decisions returning id`;
+    // Cascades extraction contacts; SET NULLs every proposal link, fixture or not.
+    const rels = await sql`delete from client_relationships where source = 'proposal_extraction' returning id`;
+    const cos = await sql`delete from companies where source = 'proposal_extraction' returning id`;
+    const props = await sql`delete from proposals where idempotency_key like ${FIXTURE_PREFIX + '%'} returning id`;
+
+    console.log('[seed-fixtures] full revert complete:');
+    console.log('  pair decisions deleted:  ' + String(pairs.length));
+    console.log('  relationships deleted:   ' + String(rels.length) + ' (contacts cascaded, proposal links nulled)');
+    console.log('  companies deleted:       ' + String(cos.length));
+    console.log('  fixture proposals:       ' + String(props.length));
     return;
   }
 
