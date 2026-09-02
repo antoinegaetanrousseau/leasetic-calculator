@@ -57,6 +57,13 @@
       "when": 1788254781751,
       "tag": "0007_phase30_crm_registry",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788336690418,
+      "tag": "0008_phase31_reconciliation",
+      "breakpoints": true
     }
   ]
 }
