@@ -106,6 +106,28 @@ Exceptions: none beyond the two column-width literals above.
 
 ---
 
+## Visual Hierarchy
+
+**The board is the primary anchor of `/pipeline`.** Stated explicitly because the composition
+implies it but the type scale argues against it: the conversion-rate `MetricTile` renders its
+value at 30px, larger than any text on the board itself, so on size alone it reads as the page's
+subject. It is not — it is a summary *of* the board.
+
+Reading order, in priority:
+
+1. **The board** — the working surface. A partner comes here to move deals, not to read a number.
+2. **The conversion-rate tile** — the reason to keep the board current (D-11). It sits above the
+   board and is deliberately quiet in colour: per § Color it uses no accent, so its prominence
+   comes from size and position alone rather than from competing with the one accent-filled
+   control on the surface.
+3. **Lane headers with their count badges** — orientation within the board.
+4. **Cards** — the units of work.
+
+**Consequence for the executor:** if the tile ever gains accent fill, an icon, or a second metric,
+it starts competing with the board for the eye and this hierarchy inverts. The two-element cap in
+D-11 is what keeps that from happening; treat a request to enrich the tile as a hierarchy change,
+not a decoration.
+
 ## Typography
 
 Four font weights (400 / 500 / 600 / 700) — per [`UIC-02`](../../codebase/UI-CONVENTIONS.md), a
@@ -172,7 +194,8 @@ be `bg-primary`); `--sidebar-primary` (zero call sites in the tree, confirmed in
 and unchanged); `--gd`/`--gd-text`/`--green` (appear in no primitive this surface renders).
 
 **Correction anticipated, stated up front rather than discovered later (the exact mistake
-`31-UI-SPEC.md`'s Color section made four times, corrected here in one pass):** outcome badges
+the feedback-vs-accent conflation recorded project-wide in `UI-CONVENTIONS.md`'s UIC-03 —
+the false claim that `StatusChip variant="active"` was an accent use):** outcome badges
 use `--success`/`--destructive`/`--muted`, **none of which alias `--brand-accent`** — `--success`
 is `var(--color-emerald-500)`, a separate feedback token, not the brand accent under another
 name. This is the identical distinction `UIC-03` itself already records for `StatusChip
@@ -229,12 +252,12 @@ the accent budget.
 | Won dialog — SIREN gate banner (D-08) | **"Cette société n'a pas de SIREN enregistré. Ajoutez-en un pour confirmer."** | **"This company has no SIREN on file. Add one to confirm."** |
 | Won dialog — SIREN field | **"SIREN"** | **"SIREN"** |
 | Won dialog — SIREN helper | **"9 chiffres, sans espaces."** | **"9 digits, no spaces."** |
-| Won dialog — submit (no SIREN gate hit) | **"Confirmer"** | **"Confirm"** |
+| Won dialog — submit (no SIREN gate hit) | **"Marquer gagné"** | **"Mark won"** |
 | Won dialog — submit (SIREN gate active) | **"Enregistrer le SIREN et confirmer"** | **"Save SIREN and confirm"** |
 | Won dialog — success toast | **"Proposition marquée comme gagnée."** | **"Proposal marked as won."** |
 | Lost dialog — title | **"Marquer cette proposition comme perdue ?"** | **"Mark this proposal as lost?"** |
 | Lost dialog — date field | **"Date"** | **"Date"** |
-| Lost dialog — submit | **"Confirmer"** | **"Confirm"** |
+| Lost dialog — submit | **"Marquer perdu"** | **"Mark lost"** |
 | Lost dialog — success toast | **"Proposition marquée comme perdue."** | **"Proposal marked as lost."** |
 | Dialog — cancel (both) | **"Annuler"** | **"Cancel"** |
 | Outcome badge — won | **"Gagné"** | **"Won"** |
@@ -530,7 +553,7 @@ a separate fact from outcome — both render, side by side, never merged into on
 2. Fields: **Date de signature** (date input, defaults to today, required) + **Motif
    (facultatif)** (short text, optional).
 3. `DialogFooter`: `DialogClose` "Annuler" (`variant="outline"`) + `Button type="submit"` (default
-   variant — the one accent-filled control on this whole phase's surface, per § Color) "Confirmer".
+   variant — the one accent-filled control on this whole phase's surface, per § Color) "Marquer gagné".
 4. **Submit calls a server action** (e.g. `markProposalWonAction(proposalId, { date, reason })`)
    which performs the SIREN check server-side **and** relies on the DB CHECK constraint (D-07,
    belt-and-braces).
@@ -553,7 +576,7 @@ used for its own Merge flow):
 
 1. `DialogTitle`: "Marquer cette proposition comme perdue ?"
 2. Fields: **Date** (defaults to today, required) + **Motif (facultatif)** (optional).
-3. `DialogFooter`: `DialogClose` "Annuler" + `Button type="submit" variant="outline"` "Confirmer"
+3. `DialogFooter`: `DialogClose` "Annuler" + `Button type="submit" variant="outline"` "Marquer perdu"
    — **deliberately not `variant="default"`, and not `variant="destructive"` either.** Marking a
    proposal lost deletes nothing (unlike Phase 31's Merge, which does — hence that dialog's
    `destructive` confirm), so the destructive token doesn't apply; but this also isn't the
