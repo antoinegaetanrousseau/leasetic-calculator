@@ -110,7 +110,7 @@ export function MergeDialog({ pair, open, onOpenChange, lang }: MergeDialogProps
 
         {pair && (
           <form onSubmit={onSubmit} noValidate aria-busy={isSubmitting || undefined}>
-            <DialogDescription className="text-sm text-muted-foreground">
+            <DialogDescription>
               {t('admin.reconciliation.merge.description', lang)
                 .replace('{companyA}', pair.sideA.name)
                 .replace('{companyB}', pair.sideB.name)}

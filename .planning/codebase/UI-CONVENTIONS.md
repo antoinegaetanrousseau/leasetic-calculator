@@ -111,7 +111,7 @@ threshold, not fixing a defect.
 
 > **Provenance note (unresolved).** `30-UI-SPEC.md` attributes UIC-01 and UIC-02 to "the
 > operator's D-B decision", but **no record defining `D-B` exists anywhere in this repository** —
-> it appears only at `30-UI-SPEC.md` lines 51, 82, and 102, and not in the file's own superseded
+> it appears only inside `30-UI-SPEC.md`, is defined nowhere, and is absent from that file's own superseded
 > first version (`ed3e587`, 2026-08-31). The unrelated `D-B1`/`D-B2`/`D-B3` identifiers in Phase 8
 > are persistence decisions and are **not** the same series. The ratification itself is not in
 > doubt — the spec records it, and Phase 31 relied on it — but its date and defining text are not
