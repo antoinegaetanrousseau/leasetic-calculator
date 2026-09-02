@@ -51,10 +51,11 @@ function AlertDialogContent({
         data-size={size}
         className={cn(
           // Phase 31.1-04 (D-01/OPEN-A): container surfaces read `--radius-container`,
-          // not the control tier. This used to be `rounded-4xl`, coupling a destructive
-          // confirm dialog's corner to Input/Button/Select's — deliberately broken here.
-          // The `rounded-full` on AlertDialogMedia's icon slot is untouched (it's not a
-          // container radius, it's a circular icon badge).
+          // not the control tier `--radius-4xl`. This root previously read the
+          // control-tier token directly, coupling a destructive confirm dialog's corner
+          // to Input/Button/Select's — deliberately broken here. The `rounded-full` on
+          // AlertDialogMedia's icon slot is untouched (it's not a container radius, it's
+          // a circular icon badge).
           "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-6 rounded-container bg-popover p-6 text-popover-foreground ring-1 ring-foreground/5 duration-100 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
