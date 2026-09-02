@@ -14,15 +14,20 @@ These deliberately depart from generic design-review defaults. They are already 
 apply project-wide; a phase spec that uses them is **inheriting**, not newly declaring.
 
 - **UIC-02 — three font weights (400 / 600 / 700).** This is a ratified exception to the usual
-  two-weight threshold. Weights 300 and 500 are loaded by `app/layout.tsx` but are unused and out
-  of bounds. A review rule that blocks on "more than 2 font weights" **does not apply here.**
+  two-weight threshold. A review rule that blocks on "more than 2 font weights" **does not apply
+  here.** Weight 300 is loaded but unused. Weight **500 is widely used** (every `Button` carries
+  it) — do not flag it; whether the exception should read four weights is open (OPEN-D).
 - **UIC-01 — 4px-multiple spacing scale**, finer than the `{4,8,16,24,32,48,64}` default (it also
-  uses 12 / 20 / 28px). Every value is still a strict multiple of 4.
+  uses 12 / 20 / 28px). It is a rule for new and edited code, **not** a description of the current
+  tree — sub-grid literals still ship in places and are drift to correct, not proof the rule is
+  dead. Icon optical nudges (`mt-0.5`) are outside its scope.
 - **UIC-03 — one accent** (`--primary` = `#01cc72`) on a 60/30/10 budget with an explicit
   per-surface reserve list. A phase may declare a *stricter* budget; not a looser one.
 
 ### Open items — record, do not "fix"
 
+- **OPEN-D — three ratified weights or four?** 500 ships pervasively; UIC-02 records three. Do
+  not flag a surface for using 500 while this is unsettled.
 - **OPEN-A — container radius is split** (Phase 30 `.card` at token-derived 18px; Phase 31 queue
   cards at literal `rounded-[24px]`). Deliberate and deferred to the app-shell refresh phase,
   which will formalize a container-radius token. Do not converge them mid-phase.

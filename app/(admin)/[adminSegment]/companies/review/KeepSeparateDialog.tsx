@@ -16,9 +16,9 @@
  * default variant of its own; it forwards straight to `Button`, whose own
  * default is `variant="default"` (bg-primary). Leaving the prop unset would
  * render this confirm button on `--primary`, directly violating the SAME
- * document's Color section ("this surface's accent budget stays at zero...
- * every interactive element is either `variant="outline"`... or the
- * destructive-red submit variant, reserved for the merge confirm only").
+ * document's Color section, which reserves --primary for exactly one use on
+ * this surface (the company-name link hover) and requires every button to be
+ * `variant="outline"` or the destructive-red merge-confirm variant.
  * `variant="outline"` is set explicitly below to satisfy that zero-accent
  * contract, which is the unambiguous, load-bearing instruction here — see
  * 31-06-SUMMARY.md.

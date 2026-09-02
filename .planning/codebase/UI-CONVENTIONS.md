@@ -42,8 +42,15 @@ repo, that is recorded rather than smoothed over — see UIC-02's provenance not
 
 **Rule.** Spacing uses Tailwind's own 4px-step utility scale directly at every call site. This
 includes the 12px / 20px / 28px steps, which the generic GSD default scale
-`{4, 8, 16, 24, 32, 48, 64}` omits. Every value in use divides evenly by 4; no non-4px-multiple
-literal exists on any surface audited.
+`{4, 8, 16, 24, 32, 48, 64}` omits. Every value the rule sanctions divides evenly by 4.
+
+> **Correction (2026-09-02).** This record previously asserted that "no non-4px-multiple literal
+> exists on any surface audited." **That is false.** Roughly 57 sub-grid literals ship in product
+> code today — `py-2.5` (10px) and `gap-1.5` (6px) in `ParametresForm.tsx`, `PartnersList.tsx` and
+> others. UIC-01 is a **rule for new and edited code**, not a description of the current tree.
+> Treat existing sub-grid literals as drift to correct when touching the surface, not as evidence
+> the rule does not hold. Optical nudges (`mt-0.5` on an icon, to center it against a text line)
+> are a separate category and are not governed by this rule.
 
 | Step | Value | Representative usage |
 |---|---|---|
@@ -90,9 +97,17 @@ Collapsing to two weights would mean editing shipped, working surfaces to satisf
 threshold, not fixing a defect.
 
 **Font load vs. sanctioned weights.** `app/layout.tsx:20-25` loads Inter at
-`['300','400','500','600','700']`. Only 400 / 600 / 700 are sanctioned for use. **300 and 500 are
-loaded but unused** — that narrowing is the real constraint, and it is the opposite of a
-violation. Do not read the 5-weight font load as license to use 300 or 500.
+`['300','400','500','600','700']`. UIC-02 sanctions 400 / 600 / 700 for a spec to declare.
+**300 is loaded and genuinely unused** (zero occurrences in product code).
+
+> **Correction (2026-09-02).** This record previously said "300 and 500 are loaded but unused."
+> **The claim about 500 is false.** `font-medium` (500) appears about **69 times in product
+> code**, including the base class string of `button.tsx` — so *every button in the app* renders
+> at 500 — and it is also set deliberately on product labels (`MergeDialog.tsx:132`,
+> `PartnersList.tsx:95`, `CompanyRelationsTable.tsx:120`). Do not cite UIC-02 as authority for
+> "500 is unused," and do not flag a surface for rendering 500. Whether the ratified exception
+> should therefore read *four* weights (400/500/600/700) rather than three is unresolved — see
+> [OPEN-D](#open-items).
 
 > **Provenance note (unresolved).** `30-UI-SPEC.md` attributes UIC-01 and UIC-02 to "the
 > operator's D-B decision", but **no record defining `D-B` exists anywhere in this repository** —
@@ -313,6 +328,21 @@ The decision ID `D-B`, which UIC-01 and UIC-02 are attributed to, is referenced 
 `30-UI-SPEC.md` and is defined nowhere. Its ratification date is therefore unrecoverable from the
 repo. If the operator's original decision record surfaces, add its date and text to UIC-01 and
 UIC-02 and remove this item.
+
+### OPEN-D — Is the ratified weight exception three weights or four?
+
+UIC-02 records **three** (400 / 600 / 700), inherited from `30-UI-SPEC.md`. But weight **500**
+ships pervasively (~69 product-code occurrences; every `Button` carries it via `button.tsx`'s base
+class), and is set deliberately on some product labels rather than only inherited from primitive
+chrome. Two readings, unresolved pending an operator decision:
+
+1. The exception is really **four weights** (400/500/600/700) and Phase 30's prose understated it.
+2. The exception is **three declarable weights**, with 500 arriving through shadcn primitive
+   defaults — in which case a hand-written `font-medium` on a product label is drift to correct.
+
+Until this is settled: **do not flag a surface for using 500**, and do not cite UIC-02 as evidence
+that 500 is unavailable. The three-weight exception to the two-weight review threshold stands
+either way — this question is about the exact count, not about whether the exception exists.
 
 ### OPEN-C — Deferred app-shell directives
 

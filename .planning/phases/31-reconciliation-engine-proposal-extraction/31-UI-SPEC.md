@@ -145,6 +145,12 @@ unused and out of bounds, per UIC-02.
 | Reason label / compound warning | 13px | 400 | 1.4 | Muted or destructive-tinted, never bold |
 | Secondary counts (relations · contacts · propositions) | 13px | 400 | 1.4 | `text-muted-foreground` |
 | Empty/success-state title | inherits `EmptyTitle` default (matches Phase 30's `Empty` usage — no new size introduced) | — | — | — |
+| Owner-type badge | 11.5px | 600 | — | **Inherited primitive chrome, not a new declaration** — the class string is byte-identical to `CompaniesList.tsx:127` and `CompanyRelationsTable.tsx:99` |
+| Merge-dialog description | 14px (`text-sm`) | 400 | — | **Inherited** — shadcn `DialogDescription` default (`MergeDialog.tsx:113`) |
+
+The last two rows are recorded for completeness: they ship on this surface but are inherited
+chrome rather than Phase 31 declarations, so "no new sizes" still holds. Counting only sizes this
+phase *chooses*, the declared scale is 30 / 14.5 / 13 — three sizes, within the four-size cap.
 
 ---
 
@@ -159,17 +165,26 @@ introduces zero new color tokens and, deliberately, near-zero new accent (`--pri
 |------|-------|-------|
 | Dominant (60%) | `--background` | Page background |
 | Secondary (30%) | `--card` | Pair-review cards, dialog panels |
-| Accent (10%) | `--primary` | **Not used anywhere on this surface.** There is no page-level CTA — pairs are system-generated, nothing is created by hand — and both confirm-dialog actions are deliberately kept off accent (see below). This keeps the surface's accent budget at literally zero rather than inventing a use to "spend" it. |
+| Accent (10%) | `--primary` | **Exactly one use: the company-name link's `hover:text-primary` on `PairReviewCard`** (§ Pair card composition; shipped at `PairReviewCard.tsx:73`). There is no page-level CTA — pairs are system-generated, nothing is created by hand — and both confirm-dialog actions are deliberately kept off accent (see below). Nothing else on this surface reads `--primary`. |
 | Destructive | `--destructive` | The **Merge** confirm submit button only (`Button variant="destructive"` inside the merge `Dialog`) — merging deletes the loser company (D-12), so it earns the same destructive treatment `DeleteContactDialog` already established. |
 | Neutral badge | `--border`/`--foreground` via `Badge variant="secondary"` | Owner-type badge per side ("Partenaire" / "Interne") — reused verbatim from `admin.companies.relation.type.*`, same chrome, same tokens, no new badge variant |
 | Muted / secondary text | `--muted-foreground` | SIREN values, counts, reason label |
 
-**Accent reserved for:** nothing on this surface. Every interactive element is either
+**Accent reserved for (explicit list, one item):** the company-name link's hover state
+(`hover:text-primary`) on each side of a pair card. Every *button* on this surface is either
 `Button variant="outline"` (row triggers, keep-separate confirm, cancel actions) or
-`Button variant="destructive"` (merge confirm only). This is a stricter budget than Phase 30's
-list of accent-eligible elements, not a looser one — there is no dialog-level "one accent use"
-carve-out here the way Phase 30's create-client dialog had one, because nothing here is a create
-action.
+`Button variant="destructive"` (merge confirm only) — the link is the one interactive element
+that is not a Button, and it is the one accent use. This is still a stricter budget than Phase
+30's list of accent-eligible elements, which UIC-03 permits: there is no dialog-level "one accent
+use" carve-out here the way Phase 30's create-client dialog had one, because nothing here is a
+create action.
+
+> **Correction (2026-09-02).** An earlier revision of this section claimed the accent budget was
+> "literally zero" and that the reserve list was empty. That contradicted this same document's
+> pair-card composition, which specifies `hover:text-primary` on the company-name link, and it
+> shipped that way. The budget is **one**, not zero. Source comments in
+> `PairReviewList.tsx` and `KeepSeparateDialog.tsx` that quote the old "zero accent" wording are
+> corrected alongside this.
 
 ---
 
@@ -325,6 +340,11 @@ existing `.card` class):
 **Empty / success state.** This queue drains to empty **by design** — reaching zero is the
 success condition, not a first-run gap. Do not reuse Phase 30's "nothing here yet + CTA" tone.
 
+**Shape deviation from [UIC-05](../../codebase/UI-CONVENTIONS.md), stated deliberately:** this is
+the two-line case UIC-05 reserves `EmptyTitle` for. A success state has to say *that* the queue
+cleared and *why that is good*; collapsing both into a lone `EmptyDescription` would read as an
+absence of data rather than a completed job.
+
 ```
 <Empty className="px-5 py-12">
   <EmptyMedia><CheckCircleIcon size={32} /* default/muted styling, NOT --success emerald or
@@ -436,10 +456,13 @@ admin.reconciliation.keepSeparate.title / .keepSeparate.description / .keepSepar
 admin.reconciliation.keepSeparate.toast.success
 admin.reconciliation.toast.error
 admin.reconciliation.empty.title / .empty.body
+admin.reconciliation.card.counts
 sidebar.nav.adminReconciliation
 ```
 
-Reused, not re-declared: `admin.companies.relation.type.partner`, `admin.companies.relation.type.sales`
+Reused, not re-declared: `proposal.list.load.more` (the "Charger plus" pagination label — generic
+enough not to need a reconciliation-specific variant, same reuse discipline as Phase 30's
+`proposal.search.clear`), `admin.companies.relation.type.partner`, `admin.companies.relation.type.sales`
 (owner-type badge — verbatim, same tokens, same copy).
 
 ---

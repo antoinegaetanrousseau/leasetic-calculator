@@ -117,7 +117,7 @@ export function MergeDialog({ pair, open, onOpenChange, lang }: MergeDialogProps
             </p>
 
             {pair.compoundMergeWarning && (
-              <p className="mt-3 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2.5 text-[13px] text-destructive">
+              <p className="mt-3 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-3 text-[13px] text-destructive">
                 <AlertTriangleIcon size={16} className="mt-0.5 shrink-0" />
                 <span>
                   {t('admin.reconciliation.compound.warning', lang).replace(
