@@ -32,6 +32,7 @@ import './_load-env';
  *      source mismatch / unaccepted drift)
  */
 import { createHash } from 'node:crypto';
+import { resolveNeonTarget } from './_neon-target';
 
 const REQUIRED_CONFIRM_VALUE = 'YES';
 
@@ -57,21 +58,26 @@ async function main(): Promise<void> {
     process.exit(2);
   }
   const hostname = url.hostname;
-  const isNeonProd = hostname.endsWith('.neon.tech');
+  // The confirmation gate stays as broad as it ever was — ANY Neon host requires
+  // RECONCILE_CONFIRM for a write. Only the wording changed: it used to say
+  // "Production Neon DB detected" for every branch, including `development`,
+  // which trained the operator to dismiss the one warning that matters.
+  const target = resolveNeonTarget(hostname);
 
-  if (isNeonProd && mode === 'apply') {
+  if (target.isNeon && mode === 'apply') {
     if (process.env.RECONCILE_CONFIRM !== REQUIRED_CONFIRM_VALUE) {
       console.error(
-        `[reconcile] FATAL: Production Neon DB detected (${hostname}). ` +
+        `[reconcile] FATAL: about to WRITE to ${target.label} (${hostname}). ` +
           `Re-run with RECONCILE_CONFIRM=YES to confirm.`,
       );
       process.exit(2);
     }
-    console.log(`[reconcile] Production Neon (${hostname}) — RECONCILE_CONFIRM satisfied.`);
-  } else if (isNeonProd) {
-    console.log(`[reconcile] Production Neon (${hostname}) — dry run, no confirmation required (writes nothing).`);
+    const emphasis = target.isProductionSeverity ? ' *** PRODUCTION WRITE ***' : '';
+    console.log(`[reconcile] writing to ${target.label} (${hostname}) — RECONCILE_CONFIRM satisfied.${emphasis}`);
+  } else if (target.isNeon) {
+    console.log(`[reconcile] ${target.label} (${hostname}) — dry run, writes nothing.`);
   } else {
-    console.log(`[reconcile] Non-prod DB (${hostname}).`);
+    console.log(`[reconcile] ${target.label} (${hostname}).`);
   }
 
   // Only hostname + database name are hashed, and only hostname is ever
