@@ -481,7 +481,7 @@ Plans:
   4. Two extracted clients that match only on `name_normalized` — no SIREN on one or both — are NOT silently merged; they appear in a human review queue instead.
   5. A human opens the review queue and, for each flagged pair, either merges the two into one company or marks them permanently separate; the decision is durable and is never re-flagged on a later run.
 
-**Plans:** 1/8 plans executed
+**Plans:** 2/8 plans executed
 Plans:
 **Wave 1**
 
@@ -489,7 +489,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 31-02-PLAN.md — Reconciliation engine core: source abstraction, candidate derivation, SIREN/name matching, pair keys
+- [x] 31-02-PLAN.md — Reconciliation engine core: source abstraction, candidate derivation, SIREN/name matching, pair keys
 - [ ] 31-03-PLAN.md — Merge & keep-separate write layer: admin reads, the non-transactional D-12 merge, server actions
 
 **Wave 3** *(blocked on Wave 2 completion)*
@@ -607,7 +607,7 @@ Plans:
 | 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
 | 29. Migration Safety Net | v1.6 | 2/2 | Complete    | 2026-08-31 |
 | 30. Company & Contact Registry | v1.6 | 9/9 | Complete    | 2026-09-02 |
-| 31. Reconciliation Engine & Proposal Extraction | v1.6 | 1/8 | In Progress|  |
+| 31. Reconciliation Engine & Proposal Extraction | v1.6 | 2/8 | In Progress|  |
 | 32. HubSpot Import | v1.6 | TBD | Not started | - |
 | 33. Pipeline | v1.6 | TBD | Not started | - |
 | 34. Activity & Follow-Up | v1.6 | TBD | Not started | - |

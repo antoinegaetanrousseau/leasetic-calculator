@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T08:18:17.509Z"
+last_updated: "2026-09-02T08:44:10.231Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 14
   total_plans: 63
-  completed_plans: 56
+  completed_plans: 57
   percent: 74
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 31 (reconciliation-engine-proposal-extraction) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-09-02
 
@@ -398,6 +398,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 30 P07 | 45min | 3 tasks | 9 files |
 | Phase 30 P08 | ~35min | 3 tasks | 11 files |
 | Phase 31 P01 | ~10min | 3 tasks | 6 files |
+| Phase 31 P02 | ~22min | 3 tasks | 10 files |
 
 ## Decisions
 
@@ -474,3 +475,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 30]: Deferred: /proposals/[id] has no admin-bypass in its ownership check — logged in phase 30 deferred-items.md as a Phase 33/34 candidate, does not block CRM-03
 - [Phase 31-01]: D-10 pair key refined to unordered side-identity-key pairs (siren:<9digits> or owner:<ownerId>|name:<name_normalized>), not the literal normalized-name pair, to avoid degenerate (x,x) self-pairs
 - [Phase 31-01]: Provenance source column added to companies, client_relationships AND contacts (not contacts-only) — undoing a bad extraction means deleting companies/relationships too, and adding the column now is one ALTER vs a lossy migration+backfill later
+- [Phase 31]: OQ-1/OQ-2/OQ-3 resolved in 31-02: global one-pass matching, most-frequent-spelling canonical naming with deterministic tie-breaks, owner-scoped idempotent re-run reuse — See 31-02-SUMMARY.md key-decisions for full reasoning
+- [Phase 31]: SIREN-less existing-company reuse is owner-scoped (not a bare name_normalized lookup) to avoid cross-owner silent merging while still satisfying OQ-1 idempotency — 31-02 engine.ts implementation decision

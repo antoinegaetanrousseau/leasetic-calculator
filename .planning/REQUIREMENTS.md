@@ -74,7 +74,7 @@ The master-data layer. A `company` is a global fact; a `client_relationship` is 
 
 - [x] **IMPORT-01**: Client data in existing proposals is extracted into companies and per-partner relationships, and each proposal is linked to the relationship it produced.
 - [ ] **IMPORT-02**: The HubSpot export is imported into companies, contacts and relationships, with HubSpot's contact-owner mapped to a Leasétic user ("house relationships" for internal `Commercial` staff).
-- [ ] **IMPORT-03**: Records matching on SIREN are merged automatically.
+- [x] **IMPORT-03**: Records matching on SIREN are merged automatically.
 - [x] **IMPORT-04**: Records matching only on `name_normalized` — no SIREN on one or both sides — are flagged for human review rather than silently merged.
 - [x] **IMPORT-05**: A human can resolve each flagged pair in the UI: merge into one company, or keep them separate permanently.
 - [ ] **IMPORT-06**: The import runs in **dry-run mode**, producing a full report of what it would create, merge and flag, without writing anything.
