@@ -78,7 +78,7 @@ function PairSideColumn({
       {side.owners.length > 0 && (
         <div className="flex flex-col gap-1">
           {side.owners.map((owner) => (
-            <div key={owner.ownerId} className="flex items-center gap-1.5 text-[13px]">
+            <div key={owner.ownerId} className="flex items-center gap-2 text-[13px]">
               <span className="text-foreground">{owner.ownerDisplayName}</span>
               <Badge
                 variant="secondary"
@@ -114,7 +114,7 @@ export function PairReviewCard({
       </div>
 
       {pair.compoundMergeWarning && (
-        <div className="mt-4 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2.5 text-[13px] text-destructive">
+        <div className="mt-4 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-3 text-[13px] text-destructive">
           <AlertTriangleIcon size={16} className="mt-0.5 shrink-0" />
           <span>
             {t('admin.reconciliation.compound.warning', lang).replace(
