@@ -130,3 +130,7 @@ None - no external service configuration required. `npm run db:migrate` was deli
 ---
 *Phase: 31-reconciliation-engine-proposal-extraction*
 *Completed: 2026-09-02*
+
+## Self-Check: PASSED
+
+All created/modified files verified present on disk; all 5 commit hashes (`9712a51`, `9f09ed0`, `606efe4`, `05c7c78`, `4e29885`) verified present in git log.
