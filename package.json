@@ -24,6 +24,8 @@
     "db:migrate:dry-run": "tsx scripts/migrate.ts --dry-run",
     "db:backfill:coefficient-history": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-coefficient-history.ts",
     "db:backfill:partner-type": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-partner-type.ts",
+    "db:reconcile:dry-run": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/reconcile-proposals.ts --dry-run",
+    "db:reconcile": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/reconcile-proposals.ts",
     "grant:admin": "tsx scripts/grant-admin.ts",
     "pdf:update-fixture": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/update-pdf-fixture.ts",
     "purge:soft-deleted": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/purge-soft-deleted.ts",
