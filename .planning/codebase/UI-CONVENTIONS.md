@@ -173,6 +173,54 @@ pre-migration call sites keep working. **New code reads the shadcn tokens direct
 claim; `--gd` aliases `--brand-accent`, so it *is* the accent under an old name and counts against
 a surface's accent budget.
 
+**Dark-mode addendum (added by Phase `31.1-app-shell-refresh`, D-13, 2026-09-02).** The accent is
+**unchanged** — `--primary`/`--sidebar-primary` stay `var(--brand-accent)` = `#01cc72` in both
+themes. Colibris's own dark-mode accent is a `#009999` teal; that color is **not adopted anywhere**
+in this codebase, and `tests/dark-palette.test.ts` enforces it as a standing assertion (any future
+introduction of `#009999` fails the build).
+
+Four shell-surface roles carry values sampled from **one operator-supplied screenshot** of
+Colibris's dark theme, at `~a shade` confidence — close, not pixel-measured:
+
+| Role | Token(s) | Value |
+|---|---|---|
+| Page/content background | `--background` | `#161616` |
+| Elevated card surface | `--card` / `--sidebar` | `#1e1e1e` / `#161616` (sidebar shares `--background`; Colibris separates it with a border, not a fill step) |
+| Card/sidebar edge | `--border` / `--sidebar-border` | `oklch(1 0 0 / 8%)` |
+| Secondary text | `--muted-foreground` | `oklch(0.65 0 0)` |
+
+The canonical record of the sampling session is `31.1-UI-SPEC.md` § Dark Mode; `app/globals.css`'s
+`html[data-theme="dark"]` block carries the same values with inline provenance comments.
+
+**Three surfaces remain unsampled and are deliberately unchanged**, not silently filled:
+
+- **`--popover`/`--popover-foreground`** (dialog/popover elevation) — no dialog was open in the
+  available screenshot.
+- **`--input`** (input fill) — no form was visible in the screenshot.
+- **`--sidebar-accent`** (sidebar hover/active-item treatment) — no hovered/active nav row was
+  visible in the screenshot; this value predates Phase 31.1 entirely and is not a Colibris-parity
+  claim either way.
+
+Closure path for each: a second, targeted Colibris screenshot covering that surface, sampled and
+back-applied the same way as the four roles above. `tests/dark-palette.test.ts` pins all three
+gap tokens' current values as a hard equality assertion — a later fill must consciously edit that
+test, not land as a silent side effect of an unrelated change. Record, do not invent — same
+register as the [Open Items](#open-items) section.
+
+**Collapsed-sidebar brand badge fill.** The collapsed rail's mark badge uses `bg-sidebar-accent`,
+not `--sidebar-primary` (the accent token) — `logo-mark.svg`'s glyph is itself `#01CC72`, the same
+color `--sidebar-primary` resolves to, so a primary-filled badge would render the mark invisible
+(green mark on a green badge). This is the kind of finding a future phase would otherwise
+rediscover by shipping a blank badge; recorded here so it isn't re-derived.
+
+**Shell dimensions (tracked separately from UIC-01's spacing scale).** Sidebar width is **252px**
+expanded / **68px** collapsed; header height (`--topbar-h`) is **52px**; the brand lockup is
+**120px**, roughly 47% of the expanded sidebar's width — matching Colibris's own proportion. These
+four values must stay set in `SidebarProvider`'s inline `style` (`Shell.tsx`), not a `className`:
+`SidebarProvider` spreads its own inline style, which outranks an arbitrary-property `className`
+targeting the same custom property — the vendored `app-shell-1` block has this latent bug;
+Leasétic's `Shell.tsx` documents it and avoids it.
+
 ---
 
 ## UIC-04 — Two disjoint radius tiers: an explicit per-step control scale, and a named container token
