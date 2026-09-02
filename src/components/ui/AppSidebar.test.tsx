@@ -165,50 +165,45 @@ describe('AppSidebar', () => {
   });
 
   // ── Collapse contract ────────────────────────────────────────────────────
+  //
+  // Phase 31.1 (D-07) moved the shell's collapse control into the header —
+  // AppSidebar no longer renders one. Its accessible name, focusability and
+  // single-control-in-the-shell guarantee are now covered by
+  // src/components/Topbar.test.tsx, not here. What remains valid here is how
+  // the sidebar itself *renders* each collapse state, driven through
+  // renderSidebar's defaultOpen seed or the SidebarProvider's own Cmd/Ctrl+B
+  // shortcut — never a click on a sidebar-local control, because there isn't
+  // one anymore.
 
-  it('AC-RS-11: collapse control is focusable and translated (FR)', () => {
-    renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
-    const toggle = screen.getByRole('button', { name: 'Réduire le menu' });
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  });
-
-  it('AC-RS-11 (EN): collapse control uses the English label', () => {
-    renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'en', theme: 'light' });
-    const toggle = screen.getByRole('button', { name: 'Collapse menu' });
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  });
-
-  it('AC-RS-07: starting collapsed renders the icon rail and offers expand', () => {
+  it('AC-RS-07: starting collapsed renders the icon rail', () => {
     const { container } = renderSidebar(
       { activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' },
       { defaultOpen: false },
     );
 
     expect(container.querySelector('[data-state="collapsed"]')).not.toBeNull();
-    expect(screen.getByRole('button', { name: 'Déployer le menu' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
     // Nav items remain present and reachable — the primitive hides their labels
     // visually in icon mode rather than unmounting them, which keeps the links
     // available to assistive tech.
     expect(navLinksIn(container)).toHaveLength(5);
   });
 
-  it('AC-RS-01/03: toggling flips collapse state and the control swaps affordance', async () => {
+  it('AC-RS-01/03: toggling via the providers own keyboard shortcut flips collapse state', async () => {
     const { container } = renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
 
     expect(container.querySelector('[data-state="expanded"]')).not.toBeNull();
 
+    // SidebarProvider itself listens for Cmd/Ctrl+B and calls toggleSidebar —
+    // a provider-level driver, not a click on any AppSidebar-rendered element.
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Réduire le menu' }));
+      fireEvent.keyDown(window, { key: 'b', metaKey: true });
     });
     await waitFor(() => {
       expect(container.querySelector('[data-state="collapsed"]')).not.toBeNull();
     });
 
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Déployer le menu' }));
+      fireEvent.keyDown(window, { key: 'b', metaKey: true });
     });
     await waitFor(() => {
       expect(container.querySelector('[data-state="expanded"]')).not.toBeNull();
@@ -219,7 +214,7 @@ describe('AppSidebar', () => {
     renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
 
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Réduire le menu' }));
+      fireEvent.keyDown(window, { key: 'b', metaKey: true });
     });
 
     // SidebarProvider writes `sidebar_state`; Shell reads it server-side to seed
@@ -227,6 +222,72 @@ describe('AppSidebar', () => {
     await waitFor(() => {
       expect(document.cookie).toContain('sidebar_state=false');
     });
+  });
+
+  // ── Collapsed badge + centring (D-09) ────────────────────────────────────
+
+  it('collapsed rail renders exactly one mark badge and no collapse-related button', () => {
+    const { container } = renderSidebar(
+      { activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' },
+      { defaultOpen: false },
+    );
+
+    const marks = container.querySelectorAll('img[src="/logo-mark.svg"]');
+    expect(marks).toHaveLength(1);
+
+    // No button anywhere in the sidebar carries a collapse-related accessible
+    // name — that control lives in the header now (Topbar.test.tsx), and
+    // ROADMAP criterion 2 forbids a second one sharing its name. (The user
+    // menu's own dropdown trigger legitimately has an unrelated
+    // aria-expanded, so name is the right axis to assert on here, not the
+    // attribute's mere presence.)
+    expect(
+      screen.queryByRole('button', { name: /réduire|déployer|collapse|expand/i }),
+    ).toBeNull();
+  });
+
+  it('the collapsed badge is a centred, neutral-fill 32px square around an 18px glyph', () => {
+    const { container } = renderSidebar(
+      { activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' },
+      { defaultOpen: false },
+    );
+
+    const mark = container.querySelector('img[src="/logo-mark.svg"]');
+    expect(mark).toHaveAttribute('width', '18');
+    expect(mark).toHaveAttribute('height', '18');
+
+    const badge = mark?.closest('span');
+    expect(badge).toHaveClass('size-8', 'rounded-[9px]', 'bg-sidebar-accent');
+    // Not the sidebar's primary-accent fill — that token is the same #01CC72
+    // as the mark itself, which would render it invisible.
+    expect(badge).not.toHaveClass('bg-sidebar-primary');
+
+    // The header's content-box wrapper centres this single fixed-width child
+    // (D-09 Correction 2) rather than leaving it at the box's left edge.
+    expect(badge?.parentElement).toHaveClass('justify-center');
+  });
+
+  it('collapsed nav icons carry the same centring class as the header badge', () => {
+    const { container } = renderSidebar(
+      { activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' },
+      { defaultOpen: false },
+    );
+
+    for (const link of Array.from(navLinksIn(container))) {
+      expect(link).toHaveClass('group-data-[collapsible=icon]:mx-auto');
+    }
+  });
+
+  it('D-10: the expanded lockup renders at 120px, not the old 190px', () => {
+    const { container } = renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
+    const logo = container.querySelector('img.brand-logo-light');
+    expect(logo).toHaveAttribute('width', '120');
+  });
+
+  it('D-12: the nav stays a single group, and its label carries the eyebrow treatment', () => {
+    renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
+    const label = screen.getByText('Navigation');
+    expect(label).toHaveClass('text-[11px]', 'uppercase', 'tracking-[0.55px]');
   });
 
   it('AC-RS-06: the footer is the user identity card', () => {

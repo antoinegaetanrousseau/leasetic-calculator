@@ -90,6 +90,11 @@ const CONTROL_DETAIL_FILES = [
   'src/components/ui/checkbox.tsx', // checkbox square, 6px
   'src/components/reui/phone-input.tsx', // flag-icon corner, 5px
   'src/components/reui/cascader/cascader-item.tsx', // checkbox square, 4px
+  // Collapsed-sidebar mark badge, 9px — Plan 31.1-06 (D-09). Colibris's
+  // measured structure for the collapsed rail's logo mark, a fixed 32x32
+  // control-detail chrome around a static asset, not a container surface
+  // (cards/dialogs/panels). Deliberately decoupled from --radius-container.
+  'src/components/ui/AppSidebar.tsx', // collapsed mark badge, 9px
 ];
 const CONTROL_DETAIL_DIRS = [
   'src/components/reui/gantt', // drag-handle diamonds, 1-2px
