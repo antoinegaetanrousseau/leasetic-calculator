@@ -161,3 +161,7 @@ None — no external service configuration required. The checkpoint verification
 ---
 *Phase: 31-reconciliation-engine-proposal-extraction*
 *Completed: 2026-09-02*
+
+## Self-Check: PASSED
+
+31-08-SUMMARY.md verified present on disk; all 5 referenced commit hashes (`e710ef3`, `de0222f`, `dd41167`, `9eaac52`, `3f58014`) verified present in git log.

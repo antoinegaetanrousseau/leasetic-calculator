@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: executing
-last_updated: "2026-09-02T10:28:55.626Z"
+status: verifying
+last_updated: "2026-09-02T15:53:53.625Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
-  completed_phases: 14
+  completed_phases: 15
   total_plans: 63
-  completed_plans: 62
-  percent: 74
+  completed_plans: 63
+  percent: 79
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 31 (reconciliation-engine-proposal-extraction) — EXECUTING
 Plan: 8 of 8
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-02
 
 ## Deferred Items
@@ -404,6 +404,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31 P05 | 30min | 3 tasks | 4 files |
 | Phase 31 P06 | ~22min | 3 tasks | 14 files |
 | Phase 31 P07 | 15min | 3 tasks | 5 files |
+| Phase 31 P08 | ~25min | 2 tasks | 5 files |
 
 ## Decisions
 
@@ -493,3 +494,6 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31-06]: Added admin.reconciliation.card.counts dictionary key (fr/en), not in the UI-SPEC's i18n Key Plan — the counts line's words differ in English (proposals vs propositions), so bilingual correctness required a key the plan's literal list omitted
 - [Phase 31-06]: KeepSeparateDialog confirm uses explicit variant=outline — the UI-SPEC's claim about AlertDialogAction's own default variant does not match alert-dialog.tsx's actual code; outline was set explicitly to honor the same document's zero-accent-budget Color section
 - [Phase 31]: run.ts's counts field is read back from the just-written dry-run report via readLatestDryRunReport() rather than exporting report.ts's internal computeCounts(), keeping the plan's file changes scoped to files_modified
+- [Phase 31]: Checkpoint verification for 31-08 was performed against seeded fixtures (scripts/seed-reconciliation-fixtures.ts), not the development branch's organic data — The branch's 4 eligible proposals all carried well-formed SIRENs and unambiguous names — exactly the condition under which criteria 3, 4 and 5 (SIREN merge, name-flag, durable resolution) have nothing to reconcile and would pass vacuously
+- [Phase 31]: Criterion 5's first durability re-run (pairsFlagged: 0) was rejected as vacuous evidence; client_relationship_id was nulled on fixture proposals only to force re-derivation before the real result was recorded — Every fixture proposal was already linked, so the engine never reached the pairing stage at all (skipped as already_linked) — a green result for the wrong reason
+- [Phase 31]: Phase 31's access/non-leakage check (D-11/CRM-02) is recorded PARTIAL, not PASS, in 31-08-SUMMARY.md — The authenticated-partner 404 case is operator-attested only, not agent-verified (the agent has no partner credentials); the logged-out case was agent-verified as a non-divergent 307 redirect, satisfying the underlying non-leakage property even though the checkpoint's original 404 expectation was imprecise pre-auth
