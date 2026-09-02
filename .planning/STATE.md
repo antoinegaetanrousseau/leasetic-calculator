@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T09:50:18.091Z"
+last_updated: "2026-09-02T10:15:28.705Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 14
   total_plans: 63
-  completed_plans: 60
+  completed_plans: 61
   percent: 74
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 31 (reconciliation-engine-proposal-extraction) — EXECUTING
-Plan: 6 of 8
+Plan: 7 of 8
 Status: Ready to execute
 Last activity: 2026-09-02
 
@@ -402,6 +402,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31 P03 | 22min | 3 tasks | 8 files |
 | Phase 31 P04 | ~10min | 2 tasks | 5 files |
 | Phase 31 P05 | 30min | 3 tasks | 4 files |
+| Phase 31 P06 | ~22min | 3 tasks | 14 files |
 
 ## Decisions
 
@@ -486,3 +487,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31]: computeDrift's input adds a caller-supplied freshFingerprint field alongside stored/fresh, since ReconciliationPlan carries no fingerprint of its own — 31-04, D-15
 - [Phase ?]: Fixed engine.ts relationshipKey to companyKey|ownerId — the bare company key would have collided across owners sharing one company after a cross-owner SIREN merge (31-05)
 - [Phase ?]: apply.ts writes audit rows directly via the injected dbi (batched per stage), bypassing writeAuditLog's memoized db() singleton, to preserve full unit-testability of the dbi-parameterized writer (31-05)
+- [Phase 31-06]: D-16 vs 31-UI-SPEC.md route divergence resolved in the UI-SPEC's favor: /[adminSegment]/companies/review nested in the existing companies tree, not a new top-level segment
+- [Phase 31-06]: route-meta.ts's /companies/review tail match registered strictly before /companies (load-bearing ordering, regression-tested)
+- [Phase 31-06]: Added admin.reconciliation.card.counts dictionary key (fr/en), not in the UI-SPEC's i18n Key Plan — the counts line's words differ in English (proposals vs propositions), so bilingual correctness required a key the plan's literal list omitted
+- [Phase 31-06]: KeepSeparateDialog confirm uses explicit variant=outline — the UI-SPEC's claim about AlertDialogAction's own default variant does not match alert-dialog.tsx's actual code; outline was set explicitly to honor the same document's zero-accent-budget Color section
