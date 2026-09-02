@@ -525,7 +525,7 @@ Plans:
   6. The sidebar brand lockup occupies roughly the same share of sidebar width as Colibris's (~47%, i.e. ~120px in a 252px sidebar), and the sidebar width variables are still set where `SidebarProvider`'s inline style cannot outrank them.
   7. Dark mode renders on a palette **sampled from Colibris's own dark theme** — page background, elevated surface, border and muted text each traceable to a measured value rather than an invented one — while the print/PDF surface still forces white in dark mode (`app/globals.css:214`, established Phase 5 / enforced Phase 8) and no-flash theme restoration still works.
 
-**Plans:** 5/7 plans executed
+**Plans:** 6/7 plans executed
 Plans:
 **Wave 1**
 
@@ -540,7 +540,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 31.1-06-PLAN.md — Sidebar: chevron removed, centred collapsed badge, 252/68px, 120px lockup (wave 3)
+- [x] 31.1-06-PLAN.md — Sidebar: chevron removed, centred collapsed badge, 252/68px, 120px lockup (wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 

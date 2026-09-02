@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T20:37:35.873Z"
+last_updated: "2026-09-02T20:52:07.064Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 15
   total_plans: 70
-  completed_plans: 68
+  completed_plans: 69
   percent: 79
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 31.1 (app-shell-refresh) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-09-02
 
@@ -410,6 +410,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31.1 P03 | 4min | 3 tasks | 4 files |
 | Phase 31.1 P04 | ~14min | 3 tasks | 8 files |
 | Phase 31.1 P05 | ~5min | 2 tasks | 2 files |
+| Phase 31.1 P06 | 6min | 3 tasks | 4 files |
 
 ## Decisions
 
@@ -513,3 +514,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31.1]: 31.1-04: segmented.ts's rounded-[12px] is a control-tier literal, out of D-01/D-02 scope — allow-listed in tests/container-radius.test.ts, not retired
 - [Phase 31.1-05]: Left --popover, --input and --sidebar-accent unchanged (DARK-GAP-01/02/03) — no invented dark-mode value ships for the three surfaces the single Colibris screenshot could not answer
 - [Phase 31.1-05]: tests/dark-palette.test.ts pins the three unsampled gap tokens' current values as a hard equality assertion so a future silent fill fails loudly
+- [Phase ?]: 31.1-06: SidebarHeader's p-3 left unchanged — justify-center/mx-auto centre each child within its own box regardless of differing insets (D-09 Correction 2).
+- [Phase ?]: 31.1-06: Collapsed sidebar badge fill is bg-sidebar-accent, not bg-sidebar-primary — the mark asset is #01CC72 and the primary token resolves to the same green, which would render the mark invisible.
