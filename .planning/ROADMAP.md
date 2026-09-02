@@ -117,7 +117,6 @@ continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on 
 
 - [ ] **Phase 35: Sales Motivation** — momentum, streaks and badges built on Phase 34's event timeline; own-book only, no cross-partner comparison
 
-
 </details>
 
 ---
@@ -587,7 +586,31 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
   4. Marking a deal `won` is blocked unless the company has a SIREN on file; quoting or advancing early pipeline stages is never blocked by a missing SIREN.
   5. A partner opens their pipeline view and sees their own relationships grouped by stage; they never see another partner's relationships.
 
-**Plans:** TBD
+**Plans:** 9 plans
+**Wave 1**
+
+- [ ] 33-01-PLAN.md — Schema, stage vocabulary, migration 0009 with the SIREN-gate triggers, and the full pipeline.* dictionary
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 33-02-PLAN.md — Apply migration 0009 to the Neon development branch via db-migrate.yml
+- [ ] 33-03-PLAN.md — Owner-scoped board query, conversion-rate aggregate, and the derived `unanswered` rule
+- [ ] 33-04-PLAN.md — Server actions: stage advance, outcome capture, the SIREN gate, and the audit vocabulary
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 33-05-PLAN.md — Conversion-rate copy, pipeline card and lane header, drag-refusal CSS, sidebar and breadcrumb
+- [ ] 33-06-PLAN.md — Proposal outcome capture on /clients/[id] with D-08's inline SIREN dialog
+- [ ] 33-08-PLAN.md — Integration proofs: the SIREN-gate triggers and the conversion-rate formula on real Postgres
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 33-07-PLAN.md — The kanban board and the mobile stage-picker list
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 33-09-PLAN.md — The /pipeline route, its access boundary, and phase acceptance
+
 **UI hint:** yes
 
 ### Phase 34: Activity & Follow-Up
@@ -626,7 +649,6 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
 > **Why this is not in v1.6.** Raised during Phase 33's discussion (2026-09-02) as motivational treatment for the pipeline board. Momentum turned out to require stage-change history with actor and timestamp — which *is* ACTV-02, and belongs to Phase 34 — so building it inside Phase 33 would have duplicated Phase 34's work or shipped against data that did not exist. Deferred deliberately so it lands on that foundation. See `.planning/phases/33-pipeline/33-CONTEXT.md` Deferred Ideas and `33-DISCUSSION-LOG.md` § Motivation.
 
 ---
-
 
 ## Progress
 
