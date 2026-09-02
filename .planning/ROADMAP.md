@@ -8,7 +8,8 @@
 - ✅ **v1.3 — Design Refresh + Partner-Onboarding Ready** — Phases 16-21 (shipped 2026-05-29) — see `milestones/v1.3-ROADMAP.md`
 - ✅ **v1.4 — Partner Types, Admin Dual-View & Rebrand** — Phases 22-25 (shipped 2026-05-30) — see `milestones/v1.4-ROADMAP.md`
 - ✅ **v1.5 — Proposal List Actions & Pill Fix** — Phases 26-27 (shipped 2026-05-30) — see `milestones/v1.5-ROADMAP.md`
-- 🚧 **v1.6 — CRM Foundation** — Phases 29-34 (in progress, started 2026-08-31) — CRM registry, two-source reconciliation, pipeline, activity
+- 🚧 **v1.6 — CRM Foundation** — Phases 29-34 (in progress, started 2026-08-31) — CRM registry, proposal reconciliation, pipeline, activity
+- 📋 **v1.7 — Sales Motivation** — Phase 35+ (not started) — gamification built on v1.6's activity timeline; own-book only by construction (CRM-02)
 
 ---
 
@@ -107,11 +108,15 @@ continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on 
 - [x] **Phase 29: Migration Safety Net** — repair the `db-smoke` path filter so the gate fires on this repo's real migration paths (currently blind to the Phase 12 regression), and point local dev at the Neon `development` branch. Rescoped 2026-08-31: the 3-branch split already shipped in Phase 20; **not** a prerequisite for the phases below (completed 2026-08-31)
 - [x] **Phase 30: Company & Contact Registry** — `companies` (global) + `client_relationships` (private, per-partner) + `contacts` (scoped to relationship) schema and surfaces; `proposals` gains a nullable FK; new `sales` role added alongside `partner`/`admin` (completed 2026-09-02)
 - [x] **Phase 31: Reconciliation Engine & Proposal Extraction** — dry-run-first dedup engine (SIREN auto-merge, name-normalized flagging, human-resolution UI) exercised against existing `proposals.inputs` (completed 2026-09-02)
-- [ ] **Phase 32: HubSpot Import** — reuses the Phase 31 engine against the HubSpot `.xlsx` export; contact-owner mapped to a Leasétic sales-role user; idempotent re-import via provenance IDs. **Design partially blocked** — see open dependency note below.
+- [x] **Phase 31.1: App Shell Refresh** (INSERTED) — shell converged on the sibling Colibris product: header breadcrumbs, header-owned collapse control, 120px lockup, and a two-tier radius scale that decouples containers from controls (executed 2026-09-02; dark-mode verification pending)
+- ~~**Phase 32: HubSpot Import**~~ — **REMOVED 2026-09-02** by operator decision; IMPORT-02/IMPORT-07 dropped with it. The number is retained, not reused — see Phase Details.
 - [ ] **Phase 33: Pipeline** — partner-advanced stage on the relationship (late stages system-owned), won/lost/unanswered outcome on the proposal, SIREN-gated win
 - [ ] **Phase 34: Activity & Follow-Up** — unified timeline (manual notes + system events), next-action date, "who to chase" list
 
-**Open dependency:** IMPORT-02's detailed design (Phase 32) is blocked on the HubSpot export file (`hubspot-crm-exports-tous-les-contacts-2026-08-31.xlsx`) being readable — macOS TCC currently blocks `~/Downloads`. This gates Phase 32's detailed planning only, not the milestone or any other phase.
+### 📋 v1.7 — Sales Motivation (Phase 35+) — NOT STARTED
+
+- [ ] **Phase 35: Sales Motivation** — momentum, streaks and badges built on Phase 34's event timeline; own-book only, no cross-partner comparison
+
 
 </details>
 
@@ -601,7 +606,27 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
 **Plans:** TBD
 **UI hint:** yes
 
+### Phase 35: Sales Motivation
+
+**Milestone:** v1.7 — Sales Motivation
+**Goal:** A partner sees their own book gaining momentum — what moved and when, streaks of sustained activity, and badges for milestones reached — so the pipeline is something they want to keep current rather than a form they have to maintain.
+**Depends on:** Phase 34 (ACTV-02's system events with actor and timestamp are what momentum is computed from), Phase 33 (stages to move between, conversion rate to build on)
+**Requirements:** TBD — no `GAME-*` requirements exist yet; they should be written before planning
+**Success Criteria** (what must be TRUE):
+
+  1. A partner sees what moved in their book over a recent window — stage advances and proposals sent — derived from Phase 34's recorded system events rather than from a parallel event store built here.
+  2. Streaks reflect sustained own-book activity, and a partner can see what would break the current one.
+  3. Badges are awarded from own-book milestones, and the criteria for each are visible rather than guessed at.
+  4. **No cross-partner comparison is possible, including by inference.** No leaderboard, ranking, peer benchmark or team aggregate. A partner learns nothing about another partner's book from any surface in this phase — counts and wording included, per the inference standard in `30-SECURITY.md`.
+  5. A partner who never engages with any of it is not penalised: their pipeline, conversion rate and chase list behave exactly as they did before this phase.
+
+**Plans:** TBD
+**UI hint:** yes
+
+> **Why this is not in v1.6.** Raised during Phase 33's discussion (2026-09-02) as motivational treatment for the pipeline board. Momentum turned out to require stage-change history with actor and timestamp — which *is* ACTV-02, and belongs to Phase 34 — so building it inside Phase 33 would have duplicated Phase 34's work or shipped against data that did not exist. Deferred deliberately so it lands on that foundation. See `.planning/phases/33-pipeline/33-CONTEXT.md` Deferred Ideas and `33-DISCUSSION-LOG.md` § Motivation.
+
 ---
+
 
 ## Progress
 
@@ -638,6 +663,7 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
 | 30. Company & Contact Registry | v1.6 | 9/9 | Complete    | 2026-09-02 |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | 8/8 | Complete   | 2026-09-02 |
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
+| 35. Sales Motivation | v1.7 | TBD | Not started | - |
 | 33. Pipeline | v1.6 | TBD | Not started | - |
 | 34. Activity & Follow-Up | v1.6 | TBD | Not started | - |
 
