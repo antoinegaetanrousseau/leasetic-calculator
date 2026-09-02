@@ -411,6 +411,12 @@ export async function planReconciliation(args: {
 
     for (const [ownerId, ownerRows] of rowsByOwner) {
       const sourceRowIds = ownerRows.map((r) => r.row.sourceRowId);
+      // Plan 05 fix: relationshipKey must disambiguate by owner, not just by
+      // company side key — a cross-owner SIREN merge (criterion 3) can put
+      // TWO owners' relationships under the SAME company, and a plain
+      // sideKey would collide, misattributing one owner's contacts/proposal
+      // links to another owner's relationship in apply.ts.
+      const relationshipKey = `${u.sideKey}|${ownerId}`;
       const existingRelationshipId = u.existingCompanyId
         ? relByCompanyOwner.get(`${u.existingCompanyId}|${ownerId}`) ?? null
         : null;
@@ -458,7 +464,7 @@ export async function planReconciliation(args: {
             continue;
           }
           plannedContacts.push({
-            relationshipKey: u.sideKey,
+            relationshipKey: relationshipKey,
             name: acc.name,
             role: acc.role,
             phone: acc.phone,
@@ -468,7 +474,7 @@ export async function planReconciliation(args: {
           });
         } else {
           plannedContacts.push({
-            relationshipKey: u.sideKey,
+            relationshipKey: relationshipKey,
             name: acc.name,
             role: acc.role,
             phone: acc.phone,
@@ -482,7 +488,7 @@ export async function planReconciliation(args: {
   }
 
   const links = plannedRelationships
-    .flatMap((r) => r.sourceRowIds.map((sourceRowId) => ({ sourceRowId, relationshipKey: r.companyKey })))
+    .flatMap((r) => r.sourceRowIds.map((sourceRowId) => ({ sourceRowId, relationshipKey: `${r.companyKey}|${r.ownerId}` })))
     .sort((a, b) => a.sourceRowId.localeCompare(b.sourceRowId));
 
   plannedCompanies.sort((a, b) => a.key.localeCompare(b.key));
