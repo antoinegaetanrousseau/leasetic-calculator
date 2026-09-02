@@ -28,6 +28,10 @@ const config = [
       'out/**',
       '.remember/**',
       'coverage/**',
+      // Agent git-worktree scratch space: full duplicate copies of this repo.
+      // Ignored via .git/info/exclude (a local, untracked file), so ESLint's
+      // flat config cannot pick it up from .gitignore — it must be listed here.
+      '.claude/**',
     ],
   },
   {
