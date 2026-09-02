@@ -209,7 +209,9 @@ export function AppSidebar({
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>{t('sidebar.eyebrow.navigation', lang)}</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[11px] uppercase tracking-[0.55px]">
+            {t('sidebar.eyebrow.navigation', lang)}
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             {/* id retained: it is the stable hook the sidebar suite queries. */}
             <SidebarMenu id="leasetic-sidebar-nav">

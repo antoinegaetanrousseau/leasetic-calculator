@@ -82,14 +82,17 @@ export async function Shell({
       defaultOpen={defaultOpen}
       // These MUST go through `style`, not className. SidebarProvider sets
       // --sidebar-width / --sidebar-width-icon as an inline style and spreads
-      // the incoming `style` after its defaults, so an arbitrary-property class
-      // like `[--sidebar-width:260px]` is silently outranked by that inline
-      // style and the sidebar keeps shadcn's 16rem/3rem. (The shipped
-      // app-shell-1 block sets them via className and has the same latent bug.)
+      // the incoming `style` after its defaults, so a Tailwind arbitrary-
+      // property utility (bracket syntax) targeting the same custom property
+      // is silently outranked by that inline style and the sidebar keeps
+      // shadcn's 16rem/3rem. (The shipped app-shell-1 block sets them via
+      // className and has the same latent bug.)
+      // Phase 31.1 (D-11) set these to Colibris's measured 252/68 — the
+      // values still live here for the same reason recorded above.
       style={
         {
-          '--sidebar-width': '260px',
-          '--sidebar-width-icon': '72px',
+          '--sidebar-width': '252px',
+          '--sidebar-width-icon': '68px',
         } as React.CSSProperties
       }
     >
