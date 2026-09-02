@@ -169,46 +169,59 @@ introduces zero new color tokens and, deliberately, near-zero new accent (`--pri
 |------|-------|-------|
 | Dominant (60%) | `--background` | Page background |
 | Secondary (30%) | `--card` | Pair-review cards, dialog panels |
-| Accent (10%) | `--primary` (and `--ring`, which aliases the same `--brand-accent`) | **Three uses, enumerated below.** There is no page-level CTA — pairs are system-generated, nothing is created by hand — and no control uses `Button variant="default"`. |
+| Accent (10%) | `--primary`, `--ring` and `--sidebar-ring` — all three alias `--brand-accent` | **Four uses, enumerated below.** There is no page-level CTA — pairs are system-generated, nothing is created by hand — and no control uses `Button variant="default"`. |
 | Destructive | `--destructive` | The **Merge** confirm submit button only (`Button variant="destructive"` inside the merge `Dialog`) — merging deletes the loser company (D-12), so it earns the same destructive treatment `DeleteContactDialog` already established. |
 | Neutral badge | `--border`/`--foreground` via `Badge variant="secondary"` | Owner-type badge per side ("Partenaire" / "Interne") — reused verbatim from `admin.companies.relation.type.*`, same chrome, same tokens, no new badge variant |
 | Muted / secondary text | `--muted-foreground` | SIREN values, counts, reason label |
 
-**Accent reserved for (exhaustive list, three items).** Derived by resolving every token that
-aliases `--brand-accent` (`--primary`, `--ring`, `--sidebar-primary`) through each primitive this
-surface renders — not by reading this phase's own files:
+**Accent reserved for (exhaustive list, four items).** Derived by asking `app/globals.css` which
+tokens alias `--brand-accent` — the answer is seven (`--primary`, `--ring`, `--sidebar-primary`,
+`--sidebar-ring`, `--gd`, `--gd-text`, `--green`) — then grepping each for utilities in every
+primitive this surface renders, the shell included, plus the global `@layer base` rule:
 
 1. **Focus ring and focused-control border** — `focus-visible:ring-ring/50` +
    `focus-visible:border-ring`, in the base class of `button.tsx` and `radio-group.tsx`.
-   `--ring` aliases `--brand-accent`, so this is the accent. It renders on **every** control here
-   on keyboard focus: both row triggers per pair card, the merge dialog's cancel and its default
-   close "X", both survivor radios, and both keep-separate actions. The merge confirm is the one
-   exception — `variant="destructive"` overrides it to `ring-destructive`. This is the most
-   widespread accent render on the surface.
-2. **`RadioGroupItem` checked indicator** — `data-checked:bg-primary` / `data-checked:border-primary`
-   from `radio-group.tsx`. A survivor is always pre-selected (A-3), so a filled accent swatch
-   renders on every merge-dialog open.
-3. **Company-name link hover** — `hover:text-primary` on each side of a pair card. The only one of
-   the three written in this phase's own code.
+   `--ring` aliases `--brand-accent`. Renders on keyboard focus on both row triggers per pair
+   card, the merge dialog's cancel and its default close "X", both survivor radios, and both
+   keep-separate actions. The merge confirm is the exception — `variant="destructive"` overrides
+   it to `ring-destructive`. This is the most widespread accent render here.
+2. **Sidebar nav focus ring** — the "Réconciliation" entry this phase adds renders through
+   `SidebarMenuButton`, whose base class is `ring-sidebar-ring … focus-visible:ring-2`.
+   `--sidebar-ring` aliases `--brand-accent` too, so tabbing to the nav entry paints a 2px accent
+   ring. **This is shell chrome, but it is chrome this phase adds**, so it belongs on this list.
+3. **`RadioGroupItem` checked indicator** — `data-checked:bg-primary` /
+   `data-checked:border-primary`. A survivor is always pre-selected (A-3), so a filled accent
+   swatch renders on every merge-dialog open.
+4. **Company-name link hover** — `hover:text-primary` on each side of a pair card. The only one of
+   the four written in this phase's own code.
 
-**Verified not to render accent here**, so deliberately absent from the list: `Button`/`Badge`
-`bg-primary` (needs `variant="default"`; this surface uses only `outline`, `secondary`,
-`destructive` and the dialog's built-in `ghost` close); `PageHero`'s `text-primary` eyebrow (the
-eyebrow is conditional and this page passes only title and subtitle); and `EmptyDescription`'s
-`[&>a:hover]:text-primary` (needs an anchor inside it; this empty state is plain text).
+**Also accent-derived, surface-wide:** `app/globals.css`'s base layer applies
+`outline-ring/50` to every element, so any element whose focus outline is drawn by the browser
+default — the two company-name links carry no focus classes of their own — takes its outline color
+from the accent. Not a per-element choice and not something this phase can scope, recorded so the
+next reader does not re-discover it as a defect.
 
-Every *Button* on this surface is `variant="outline"` (row triggers, keep-separate confirm and
-cancel, merge cancel), `variant="destructive"` (merge confirm only), or the `variant="ghost"`
-close button `DialogContent` renders by default. UIC-03 no longer carries a project-wide
-enumeration to compare against — each surface declares its own list, and this is that list. There is no dialog-level "one accent use"
-carve-out here the way Phase 30's create-client dialog had one, because nothing here is a create
-action.
+**Verified not to render accent here**, so deliberately absent: `Button`/`Badge` `bg-primary`
+(needs `variant="default"`; this surface uses only `outline`, `secondary`, `destructive` and the
+dialog's built-in `ghost` close); `PageHero`'s `text-primary` eyebrow (conditional, and this page
+passes only title and subtitle); `EmptyDescription`'s `[&>a:hover]:text-primary` (needs an anchor;
+this empty state is plain text); `--sidebar-primary` (**zero call sites anywhere in the tree**);
+and `--gd` / `--gd-text` / `--green`, which appear in no primitive this surface renders.
 
-> **Correction (2026-09-02) — this section was wrong three times.** It claimed, in order: a
-> "literally zero" budget with an empty list; then "exactly one use" (missing the checked radio);
-> then "two uses" (missing the focus ring, the most widespread of the three). Each revision
-> enumerated `--primary` by reading the phase's own files. **That method does not work.** The
-> check that closes it is mechanical: resolve every token aliasing `--brand-accent` and grep the
+Every *Button* here is `variant="outline"` (row triggers, keep-separate confirm and cancel, merge
+cancel), `variant="destructive"` (merge confirm only), or the `variant="ghost"` close button
+`DialogContent` renders by default. UIC-03 requires each surface to declare its own exhaustive
+list; this is that list.
+
+> **Correction (2026-09-02) — this section was wrong four times.** In order: a "literally zero"
+> budget with an empty list; "exactly one use" (missing the checked radio); "two uses" (missing
+> the focus ring); "three uses" (missing the sidebar ring, because the derivation named three
+> accent-aliased tokens *from memory* while `globals.css` defines seven). Each failure came from
+> asserting the token set instead of querying it. **Run the query.** `grep -o -- "--[a-z-]*: *
+> var(--brand-accent)" app/globals.css` is the first step, not an optional check on it, and the
+> sweep has to include the shell primitives and the global `@layer base` rule — not only the
+> components this phase wrote.
+
 > accent utilities out of each primitive the surface actually renders, then eliminate the ones
 > whose variant or condition does not occur here. The list above was produced that way.
 

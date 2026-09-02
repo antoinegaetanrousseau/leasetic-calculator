@@ -50,8 +50,9 @@ export function PairReviewList({ rows, nextCursor, lang, adminSegment }: PairRev
       <Empty className="px-5 py-12">
         <EmptyMedia variant="icon">
           {/* Default/muted styling — NOT --success emerald, NOT --primary accent.
-              The surface's only accent use is the company-name link hover in
-              PairReviewCard; this icon is not it (31-UI-SPEC.md § Color). */}
+              This icon is not one of the four accent uses § Color reserves
+              (31-UI-SPEC.md); those are focus rings, the sidebar nav ring, the
+              checked survivor radio, and the company-name link hover. */}
           <CheckCircleIcon size={32} />
         </EmptyMedia>
         <EmptyTitle>{t('admin.reconciliation.empty.title', lang)}</EmptyTitle>
