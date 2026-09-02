@@ -66,19 +66,17 @@ The master-data layer. A `company` is a global fact; a `client_relationship` is 
 - [x] **CRM-07**: A partner can browse and search their own client book.
 - [x] **CRM-08**: Companies and contacts carry external-reference columns — `contract_tool_customer_id`, `synced_at`, `hubspot_company_id`, `hubspot_contact_id` — unused this milestone. Adding them now is one column pair; adding them later is a migration plus a backfill.
 
-### Two-Source Reconciliation (IMPORT)
+### Proposal Reconciliation (IMPORT)
 
-**The riskiest work in this milestone.** Two populations with three incompatible identity schemes must become one registry: `proposals.inputs` keys clients on company name with optional SIREN; the HubSpot export keys on people and email; the future contract tool keys on the company as a legal entity. Matching happens **once**, at import, with a human resolving ambiguity — rather than being re-derived by fuzzy logic forever after.
+**The riskiest work in this milestone.** `proposals.inputs` keys clients on company name with an optional SIREN, and that population must become a real registry. Matching happens **once**, at import, with a human resolving ambiguity — rather than being re-derived by fuzzy logic forever after.
 
-> **Open dependency.** The HubSpot export (`hubspot-crm-exports-tous-les-contacts-2026-08-31.xlsx`, ~2.9 MB) is not yet readable — macOS blocks `~/Downloads` at the TCC level, not the Claude sandbox. Its column inventory determines how much of IMPORT-03/04 can be automatic versus human-resolved. **IMPORT-02's detailed design is pending that file**; the rest of the category is unaffected.
+> **Scope change (2026-09-02).** The HubSpot import was dropped and IMPORT-02 / IMPORT-07 removed with it — see ROADMAP.md § "Phase 32 — REMOVED". This category is now single-source. The contract tool remains a future third identity scheme, which is why CRM-08's external-reference columns still ship.
 
 - [x] **IMPORT-01**: Client data in existing proposals is extracted into companies and per-partner relationships, and each proposal is linked to the relationship it produced.
-- [ ] **IMPORT-02**: The HubSpot export is imported into companies, contacts and relationships, with HubSpot's contact-owner mapped to a Leasétic user ("house relationships" for internal `Commercial` staff).
 - [x] **IMPORT-03**: Records matching on SIREN are merged automatically.
 - [x] **IMPORT-04**: Records matching only on `name_normalized` — no SIREN on one or both sides — are flagged for human review rather than silently merged.
 - [x] **IMPORT-05**: A human can resolve each flagged pair in the UI: merge into one company, or keep them separate permanently.
 - [x] **IMPORT-06**: The import runs in **dry-run mode**, producing a full report of what it would create, merge and flag, without writing anything.
-- [ ] **IMPORT-07**: Re-running the import creates no duplicates — provenance IDs (`hubspot_company_id` / `hubspot_contact_id`) make it idempotent.
 
 ### Sales-Team Access (ROLE)
 
@@ -116,7 +114,7 @@ Answers "who do I chase this week" — and captures the two lead-qualification s
 |---|---|---|
 | Contract-tool integration — win-event handoff | v1.7+ | The seams ship in v1.6 (CRM-08, PIPE-02, PIPE-05); the integration needs the in-house app's customer schema, which is unseen. |
 | Contract-tool inbound status feedback | v1.7+ | Drives PIPE-02's system-owned stages. Retires the pipeline-rot risk. |
-| HubSpot retirement | v1.7+ | Only after the registry and pipeline prove out in real use. Import (IMPORT-02) is not retirement. |
+| HubSpot retirement | v1.7+ | Only after the registry and pipeline prove out in real use. The HubSpot *import* was dropped from v1.6 (see ROADMAP.md § "Phase 32 — REMOVED"); retirement is a separate question. |
 | Sales-team reporting & cross-book dashboards | v1.7+ | ROLE-01..03 ship the access model; reporting is a separate surface. |
 | List/table architecture decision (cursor vs page-index) | folded into v1.6 | ReUI `DataGrid` is page-index; every list here is cursor-based. Decided at the point it blocks a CRM list, per the agreed "vertical slices" sequencing — not up front. |
 | Playwright browser coverage | folded into v1.6 | 1213 Vitest tests were green while a duplicate radius scale shipped across five commits. Added when it becomes the thing blocking, not before. |
@@ -155,12 +153,10 @@ Every v1.6 REQ-ID maps to exactly one phase. Coverage: 31/31 (100%).
 | CRM-07 | Phase 30 — Company & Contact Registry |
 | CRM-08 | Phase 30 — Company & Contact Registry |
 | IMPORT-01 | Phase 31 — Reconciliation Engine & Proposal Extraction |
-| IMPORT-02 | Phase 32 — HubSpot Import (design partially blocked — see open dependency) |
 | IMPORT-03 | Phase 31 — Reconciliation Engine & Proposal Extraction |
 | IMPORT-04 | Phase 31 — Reconciliation Engine & Proposal Extraction |
 | IMPORT-05 | Phase 31 — Reconciliation Engine & Proposal Extraction |
 | IMPORT-06 | Phase 31 — Reconciliation Engine & Proposal Extraction |
-| IMPORT-07 | Phase 32 — HubSpot Import (design partially blocked — see open dependency) |
 | ROLE-01 | Phase 30 — Company & Contact Registry |
 | ROLE-02 | Phase 30 — Company & Contact Registry |
 | ROLE-03 | Phase 30 — Company & Contact Registry |

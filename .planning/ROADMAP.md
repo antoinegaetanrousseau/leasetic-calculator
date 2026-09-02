@@ -548,20 +548,26 @@ Plans:
 
 **UI hint:** yes
 
-### Phase 32: HubSpot Import
+### Phase 32: HubSpot Import — REMOVED (2026-09-02)
 
-**Goal:** The HubSpot export becomes companies, contacts, and relationships in the registry — reusing Phase 31's dry-run/dedup/review engine — with each HubSpot contact-owner mapped to a Leasétic sales-role user, and safe to re-run without creating duplicates.
-**Depends on:** Phase 31 (reconciliation engine + dry-run/review-queue infrastructure), Phase 30 (`sales` role for contact-owner mapping)
-**Requirements:** IMPORT-02, IMPORT-07
-**Success Criteria** (what must be TRUE):
+**Status:** Removed by operator decision. Not deferred, not renumbered.
 
-  1. Running the HubSpot import in dry-run mode produces a report of what it would create, merge, and flag from the `.xlsx` export, without writing anything.
-  2. Running the import for real creates companies, contacts, and "house" relationships owned by the mapped Leasétic sales-role user for every HubSpot record, applying the same SIREN-auto-merge / name-flag / human-review rules as Phase 31.
-  3. Every imported company/contact carries its HubSpot provenance ID (`hubspot_company_id` / `hubspot_contact_id`); re-running the import against the same export creates zero duplicate companies, contacts, or relationships.
+**Was:** the HubSpot `.xlsx` export imported into companies, contacts and relationships, reusing
+Phase 31's dry-run/dedup/review engine, with contact-owners mapped to `sales`-role users and
+provenance IDs making re-runs idempotent. Covered IMPORT-02 and IMPORT-07, both of which have been
+dropped from `REQUIREMENTS.md`.
 
-**Plans:** TBD
+**Why the number is retained rather than reused.** Thirteen documents written before this decision
+refer to "Phase 32" meaning the HubSpot import — including Phase 31's CONTEXT, PLANs, SUMMARYs and
+VERIFICATION, where the reconciliation engine's source-agnostic design is justified *by* this phase
+existing. Renumbering 33→32 would silently repoint every one of those references at Pipeline.
+Phases 33 and 34 therefore keep their numbers and this slot stays empty.
 
-> **Open dependency (blocks detailed design, not the phase or milestone).** The HubSpot export (`hubspot-crm-exports-tous-les-contacts-2026-08-31.xlsx`, ~2.9 MB) is not yet readable — macOS blocks `~/Downloads` at the TCC level. Its column inventory determines how much of IMPORT-02 can be automatic versus human-resolved. This phase can be scaffolded (engine reuse, role mapping, provenance columns) at `/gsd-plan-phase 32` time, but the mapping/column-level plan detail cannot be finalized until the file is readable.
+**What survives it.** Phase 31's engine is source-agnostic by construction and Phase 30's
+`hubspot_company_id` / `hubspot_contact_id` columns (CRM-08) still ship — so a future HubSpot
+import remains cheap to add. Note the constraint Phase 31's verification recorded: `apply.ts`
+hardcodes `source: 'proposal_extraction'` at several call sites, so a second source needs the
+*write* layer modified, not merely a new `ReconciliationSource`.
 
 ### Phase 33: Pipeline
 
@@ -631,7 +637,7 @@ Plans:
 | 29. Migration Safety Net | v1.6 | 2/2 | Complete    | 2026-08-31 |
 | 30. Company & Contact Registry | v1.6 | 9/9 | Complete    | 2026-09-02 |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | 8/8 | Complete   | 2026-09-02 |
-| 32. HubSpot Import | v1.6 | TBD | Not started | - |
+| 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
 | 33. Pipeline | v1.6 | TBD | Not started | - |
 | 34. Activity & Follow-Up | v1.6 | TBD | Not started | - |
 
