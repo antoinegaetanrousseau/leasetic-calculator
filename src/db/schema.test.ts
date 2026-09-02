@@ -6,10 +6,13 @@
  * task 3), not by reading the source file as text.
  */
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { getTableColumns } from 'drizzle-orm';
 import { getTableConfig, PgDialect } from 'drizzle-orm/pg-core';
 import {
-  companies, clientRelationships, contacts, proposals, users,
+  companies, clientRelationships, contacts, proposals, users, companyPairDecisions,
 } from './schema';
 
 describe('Phase 30 CRM registry schema shape', () => {
@@ -116,5 +119,54 @@ describe('CRM-08 external-reference columns', () => {
     }
     const { sql: whereSql } = pgDialect.sqlToQuery(idx.config.where);
     expect(whereSql).toMatch(/"hubspot_contact_id"\s+IS NOT NULL/i);
+  });
+});
+
+describe('Phase 31 — reconciliation schema (D-08/D-09/D-10)', () => {
+  it('companies, clientRelationships and contacts each expose a source column (D-08)', () => {
+    expect(getTableColumns(companies)).toHaveProperty('source');
+    expect(getTableColumns(clientRelationships)).toHaveProperty('source');
+    expect(getTableColumns(contacts)).toHaveProperty('source');
+  });
+
+  it('companyPairDecisions exposes the full D-09/D-10 column set', () => {
+    const columns = getTableColumns(companyPairDecisions);
+    expect(columns).toHaveProperty('sideAKey');
+    expect(columns).toHaveProperty('sideBKey');
+    expect(columns).toHaveProperty('nameNormalized');
+    expect(columns).toHaveProperty('reason');
+    expect(columns).toHaveProperty('companyAId');
+    expect(columns).toHaveProperty('companyBId');
+    expect(columns).toHaveProperty('verdict');
+    expect(columns).toHaveProperty('survivorCompanyId');
+    expect(columns).toHaveProperty('decidedBy');
+    expect(columns).toHaveProperty('decidedAt');
+    expect(columns).toHaveProperty('firstFlaggedAt');
+  });
+
+  it('companyPairDecisions has no companyIdA/companyIdB-only identity — the D-10 pair key is side_a_key/side_b_key, not company ids', () => {
+    const columns = getTableColumns(companyPairDecisions);
+    expect(columns).not.toHaveProperty('companyIdA');
+    expect(columns).not.toHaveProperty('companyIdB');
+    expect(columns.sideAKey.name).toBe('side_a_key');
+    expect(columns.sideBKey.name).toBe('side_b_key');
+    expect(columns.sideAKey.notNull).toBe(true);
+    expect(columns.sideBKey.notNull).toBe(true);
+  });
+
+  describe('migration source guard (drizzle/0008_phase31_reconciliation.sql)', () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const migrationPath = join(here, '..', '..', 'drizzle', '0008_phase31_reconciliation.sql');
+    const migrationSql = readFileSync(migrationPath, 'utf8');
+
+    it('hand-completes the D-10 unordered-pair unique index via LEAST/GREATEST', () => {
+      expect(migrationSql).toMatch(/GREATEST\(/);
+      expect(migrationSql).toMatch(/company_pair_decisions_pair_uq/);
+    });
+
+    it('is additive only — never DROP TABLE, never touches the immutable proposals snapshot columns (CRM-05, ARCHITECTURE §2.5 Option A)', () => {
+      expect(migrationSql).not.toMatch(/DROP TABLE/i);
+      expect(migrationSql).not.toMatch(/proposals["\s]*\bDROP\b/i);
+    });
   });
 });
