@@ -19,6 +19,14 @@ created: 2026-09-01
 > `src/components/blocks/solution-crm-{1..6}`, and `app/globals.css` is a different file with
 > different token names. Assumption **A-1 (ReUI absent) is retired** — every section below is
 > re-derived from the current `HEAD` of `planning/v1.6-crm-foundation`, not carried forward.
+>
+> **Project-wide conventions now live in
+> [`.planning/codebase/UI-CONVENTIONS.md`](../../codebase/UI-CONVENTIONS.md).** The Spacing,
+> Typography and Color sections below ratified rules that apply beyond this phase; they were
+> extracted to that canonical file on 2026-09-02 so later phases can cite a rule ID instead of
+> re-deriving it from this document. **The prose here is unchanged and remains the historical
+> record of Phase 30's own contract.** Where the two differ in future, `UI-CONVENTIONS.md` is
+> operative.
 
 **Requirements covered:** CRM-01..08, ROLE-01..03.
 **Language:** All user-visible copy below is French (product default), matching
@@ -47,6 +55,8 @@ against the post-merge codebase, not carried forward from the old hand-rolled sy
 ---
 
 ## Spacing Scale
+
+> Canonical: **UIC-01** in [`UI-CONVENTIONS.md`](../../codebase/UI-CONVENTIONS.md).
 
 **D-B ratified exception, re-derived.** `app/globals.css` and the shadcn/base-maia primitives do
 not use named spacing tokens — Tailwind's own 4px-step utility scale (`p-1`=4px, `p-2`=8px, `p-3`=
@@ -79,6 +89,9 @@ entirely by the single `--radius: 0.625rem` token via the `@theme inline` multip
 
 ## Typography
 
+> Canonical: **UIC-02** in [`UI-CONVENTIONS.md`](../../codebase/UI-CONVENTIONS.md) —
+> including a note that `D-B`'s own origin record is missing from the repo.
+
 **D-B ratified exception, re-derived against Inter + base-maia.** The prior spec's 4-size/
 3-weight table was measured against Plus Jakarta Sans and the old hand-rolled `body` rule; both
 are gone. Re-measured against the current `app/globals.css` `body` rule and every shadcn/ReUI
@@ -108,6 +121,8 @@ this phase touches reads 300 or 500 — that is the one real narrowing versus th
 ---
 
 ## Color
+
+> Canonical: **UIC-03** in [`UI-CONVENTIONS.md`](../../codebase/UI-CONVENTIONS.md).
 
 All values are CSS custom properties from `app/globals.css`. **Do not reintroduce `--paper`,
 `--surface`, `--gd`, `--teal`, `--gold`, `--danger` as if they were primary tokens** — they are
