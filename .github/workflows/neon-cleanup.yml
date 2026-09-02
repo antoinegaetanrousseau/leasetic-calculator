@@ -1,0 +1,66 @@
+name: Neon preview branch cleanup
+
+# Runs when a git branch is deleted on GitHub.
+#
+# The Vercel-managed Neon integration creates a Neon branch named
+# `preview/<git-branch>` for every preview deployment and only removes it when
+# Vercel drops the deployment (6-month retention by default). The Neon project
+# is capped at 10 branches. When the cap is hit, every Vercel preview fails
+# with "Resource provisioning failed" before the build starts, and CI's
+# db-smoke job fails with "branches limit exceeded" (2026-09-03 incident).
+#
+# This workflow deletes the matching Neon branch as soon as its git branch is
+# gone, so the cap is never reached through normal branch churn.
+#
+# Security note: `github.event.ref` is only controllable by collaborators who
+# can delete branches, and it flows through an env: var (no inline shell
+# interpolation) per this repo's workflow convention (see db-migrate.yml).
+
+on:
+  delete
+
+permissions:
+  contents: read
+
+concurrency:
+  group: neon-cleanup-${{ github.event.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: Delete preview/<branch> Neon branch
+    # Tag deletions also fire `delete`; only branches have Neon previews.
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Neon CLI
+        # Same major as the neondatabase/*-branch-action steps in ci.yml.
+        run: npm i -g neonctl@v2
+
+      - name: Delete Neon branch if it exists
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          GIT_BRANCH: ${{ github.event.ref }}
+        run: |
+          set -euo pipefail
+          if [ -z "$GIT_BRANCH" ]; then
+            echo "Empty branch name in event payload — nothing to do."
+            exit 0
+          fi
+          target="preview/${GIT_BRANCH}"
+          # The `preview/` prefix guarantees we never touch the three routing
+          # branches (main, development, preview) — their names have no slash.
+          if neonctl branches list --project-id "$NEON_PROJECT_ID" -o json \
+               | jq -e --arg n "$target" '.[] | select(.name == $n)' > /dev/null; then
+            neonctl branches delete "$target" --project-id "$NEON_PROJECT_ID"
+            echo "Deleted Neon branch: $target"
+          else
+            echo "No Neon branch named '$target' — nothing to do."
+          fi
