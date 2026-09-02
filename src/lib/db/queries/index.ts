@@ -78,3 +78,12 @@ export {
   listProposalsForRelationshipAdmin,
 } from './companies';
 export type { AdminCompanyRow, AdminRelationshipRow } from './companies';
+
+// Phase 31 Plan 03 — admin-only reconciliation review queue (IMPORT-04/05, D-11).
+export { listPendingPairsForAdmin, getPendingPairForAdmin } from './reconciliation';
+export type {
+  AdminPairSide,
+  AdminPendingPairRow,
+  ListPendingPairsArgs,
+  ListPendingPairsResult,
+} from './reconciliation';
