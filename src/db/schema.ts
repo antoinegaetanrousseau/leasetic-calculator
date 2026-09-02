@@ -376,6 +376,11 @@ export const companies = pgTable('companies', {
   hubspotCompanyId: text('hubspot_company_id'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  // Phase 31 (D-08) — provenance marker. NULL means "entered by a human". Lets a bad
+  // bulk import be surgically undone (delete every row carrying its source value)
+  // without touching human-entered data. See the Phase 31 block below for the
+  // companyPairDecisions table this column feeds into.
+  source: text('source'),
 }, (table) => [
   check('companies_siren_check', sql`${table.siren} IS NULL OR ${table.siren} ~ '^[0-9]{9}$'`),
   index('companies_name_normalized_idx').on(table.nameNormalized),
@@ -385,6 +390,7 @@ export const companies = pgTable('companies', {
   uniqueIndex('companies_hubspot_company_id_uq')
     .on(table.hubspotCompanyId)
     .where(sql`${table.hubspotCompanyId} IS NOT NULL`),
+  check('companies_source_check', sql`${table.source} IS NULL OR ${table.source} IN ('proposal_extraction','hubspot_import')`),
 ]);
 
 /**
@@ -400,6 +406,8 @@ export const clientRelationships = pgTable('client_relationships', {
   ownerId: text('owner_id').notNull().references(() => users.id, { onDelete: 'restrict' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  // Phase 31 (D-08) — provenance marker, same contract as companies.source below.
+  source: text('source'),
 }, (table) => [
   uniqueIndex('client_relationships_company_id_owner_id_uq').on(table.companyId, table.ownerId),
   // CRM-07 cursor index — a partner's own client book.
@@ -407,6 +415,7 @@ export const clientRelationships = pgTable('client_relationships', {
     .on(table.ownerId, sql`${table.createdAt} DESC`, sql`${table.id} DESC`),
   // CRM-03 admin lookup — every relationship on a company.
   index('client_relationships_company_id_idx').on(table.companyId),
+  check('client_relationships_source_check', sql`${table.source} IS NULL OR ${table.source} IN ('proposal_extraction','hubspot_import')`),
 ]);
 
 /**
@@ -429,12 +438,66 @@ export const contacts = pgTable('contacts', {
   syncedAt: timestamp('synced_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  // Phase 31 (D-08) — provenance marker, same contract as companies.source above.
+  source: text('source'),
 }, (table) => [
   index('contacts_client_relationship_id_created_at_idx')
     .on(table.clientRelationshipId, sql`${table.createdAt} DESC`),
   uniqueIndex('contacts_hubspot_contact_id_uq')
     .on(table.hubspotContactId)
     .where(sql`${table.hubspotContactId} IS NOT NULL`),
+  check('contacts_source_check', sql`${table.source} IS NULL OR ${table.source} IN ('proposal_extraction','hubspot_import')`),
+]);
+
+// ── Phase 31 reconciliation engine (IMPORT-01..06) ──────────────────────────
+// Provenance (D-08) is added directly on companies/clientRelationships/contacts
+// above (the `source` column + its per-table CHECK). This block adds the other
+// Phase 31 schema fact: the pair-decision table (D-09/D-10).
+//
+// D-10 refinement (recorded in 31-01-SUMMARY.md): the pair is NOT keyed on the
+// literal normalized-name pair — two candidates that "match only on
+// name_normalized" share the SAME name_normalized, which would degenerate to
+// (x, x). The key is instead an unordered pair of per-side identity keys
+// (`side_a_key` / `side_b_key`), each computable before any company row exists:
+//   - `siren:<9 digits>` when the side carries a valid SIREN
+//   - `owner:<ownerId>|name:<name_normalized>` otherwise
+// `name_normalized` is still stored as its own column for D-10 lineage/readability.
+export const companyPairDecisions = pgTable('company_pair_decisions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  sideAKey: text('side_a_key').notNull(),
+  sideBKey: text('side_b_key').notNull(),
+  nameNormalized: text('name_normalized').notNull(),
+  // 'differing' | 'one_missing' | 'both_missing' — maps 1:1 onto the UI-SPEC
+  // reason strings admin.reconciliation.reason.differing/.oneMissing/.bothMissing.
+  reason: text('reason').notNull(),
+  // Nullable + ON DELETE SET NULL: D-12's merge deletes the loser company, and
+  // the decision row must survive that deletion intact (not cascade-deleted).
+  companyAId: uuid('company_a_id').references(() => companies.id, { onDelete: 'set null' }),
+  companyBId: uuid('company_b_id').references(() => companies.id, { onDelete: 'set null' }),
+  // NULL = pending (the flagged-but-undecided state).
+  verdict: text('verdict'),
+  survivorCompanyId: uuid('survivor_company_id').references(() => companies.id, { onDelete: 'set null' }),
+  decidedBy: text('decided_by').references(() => users.id, { onDelete: 'restrict' }),
+  decidedAt: timestamp('decided_at', { withTimezone: true }),
+  // FIFO ordering key the review queue reads (UI-SPEC §1: oldest-flagged-first).
+  firstFlaggedAt: timestamp('first_flagged_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  check('company_pair_decisions_reason_check', sql`${table.reason} IN ('differing','one_missing','both_missing')`),
+  check('company_pair_decisions_verdict_check', sql`${table.verdict} IS NULL OR ${table.verdict} IN ('merged','kept_separate')`),
+  // A half-written resolution (verdict set without decided_by/decided_at, or
+  // vice versa) is structurally impossible.
+  check(
+    'company_pair_decisions_resolution_check',
+    sql`(${table.verdict} IS NULL AND ${table.decidedBy} IS NULL AND ${table.decidedAt} IS NULL) OR (${table.verdict} IS NOT NULL AND ${table.decidedBy} IS NOT NULL AND ${table.decidedAt} IS NOT NULL)`,
+  ),
+  index('company_pair_decisions_pending_idx').on(table.firstFlaggedAt, table.id),
+  // D-10 unordered-pair uniqueness (so (A,B) and (B,A) collide) cannot be
+  // expressed as a Drizzle uniqueIndex — drizzle-kit cannot generate a
+  // LEAST/GREATEST expression index from a schema definition. The unique
+  // index `company_pair_decisions_pair_uq` is hand-written in
+  // drizzle/0008_phase31_reconciliation.sql (Task 2).
 ]);
 
 // Type exports for Phase 8 tables.
@@ -456,3 +519,7 @@ export type ClientRelationshipRow = typeof clientRelationships.$inferSelect;
 export type NewClientRelationshipRow = typeof clientRelationships.$inferInsert;
 export type ContactRow = typeof contacts.$inferSelect;
 export type NewContactRow = typeof contacts.$inferInsert;
+
+// Type exports for Phase 31 reconciliation engine tables.
+export type CompanyPairDecisionRow = typeof companyPairDecisions.$inferSelect;
+export type NewCompanyPairDecisionRow = typeof companyPairDecisions.$inferInsert;

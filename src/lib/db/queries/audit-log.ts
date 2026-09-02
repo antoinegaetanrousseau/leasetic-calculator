@@ -32,9 +32,21 @@ export type AuditAction =
   | 'client_relationship.create'
   | 'contact.create'
   | 'contact.update'
-  | 'contact.delete';
+  | 'contact.delete'
+  // ── Phase 31 — Reconciliation engine (IMPORT-01..06) ────────────────────────
+  // Payloads carry ids and the caller-submitted verdict only, never business
+  // data (ADMIN-09). The three '.extract' actions are written with
+  // actorId: null (system-initiated CLI script — per the existing convention
+  // documented at the WriteAuditLogArgs.actorId line below).
+  | 'company.extract'
+  | 'client_relationship.extract'
+  | 'contact.extract'
+  | 'company_pair.flag'
+  | 'company.merge'
+  | 'client_relationship.merge'
+  | 'company_pair.keep_separate';
 
-export type AuditTargetType = 'proposal' | 'user' | 'global_params' | 'client_relationship' | 'contact';
+export type AuditTargetType = 'proposal' | 'user' | 'global_params' | 'client_relationship' | 'contact' | 'company' | 'company_pair';
 
 export interface WriteAuditLogArgs {
   actorId: string | null;        // null when system-initiated (e.g., 'proposal.purge' via cron)
