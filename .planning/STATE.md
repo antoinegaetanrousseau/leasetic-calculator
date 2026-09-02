@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T20:01:10.143Z"
+last_updated: "2026-09-02T20:12:33.399Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 15
   total_plans: 70
-  completed_plans: 65
+  completed_plans: 66
   percent: 79
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 31.1 (app-shell-refresh) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-09-02
 
@@ -407,6 +407,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31 P08 | ~25min | 2 tasks | 5 files |
 | Phase 31.1 P01 | ~9min | 3 tasks | 2 files |
 | Phase 31.1 P02 | 4min | 3 tasks | 3 files |
+| Phase 31.1 P03 | 4min | 3 tasks | 4 files |
 
 ## Decisions
 
@@ -503,3 +504,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31.1-01]: Declared the Colibris container ladder under its own --radius-container* namespace rather than mapping it onto --radius-sm...2xl, avoiding a silent move of ~90 unaudited rounded-2xl/rounded-md call sites
 - [Phase 31.1-01]: Leasetic's real control-tier corner is 26px (--radius-4xl), not the ROADMAP criterion 4's 8px which describes Colibris — recorded for Plan 31.1-07's UIC-04 rewrite
 - [Phase 31.1-02]: Breadcrumb leaves render dictionary labels, not live entity names, on every detail route (D-06 Trail-depth decision) — keeps getRouteMeta a pure pathname function with no data access. — Plumbing an entity name into the shell header, which renders on every page, would be an unscoped information-disclosure surface and would require a new server-to-shell data path the phase boundary forbids.
+- [Phase 31.1]: BreadcrumbLink uses render={<Link href={seg.href} />} (next/link), matching the existing AppSidebar.tsx/NavUser.tsx pattern, for client-side breadcrumb navigation
+- [Phase 31.1]: SidebarTrigger's call-site aria-label supersedes (not replaces) the primitive's hardcoded English sr-only span via prop-spread order — the header collapse control is now focusable and FR/EN-labelled at every viewport width, the precondition Plan 31.1-06 needs before removing the in-sidebar chevron
