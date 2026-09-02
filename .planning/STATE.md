@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T09:10:09.287Z"
+last_updated: "2026-09-02T09:23:12.244Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 14
   total_plans: 63
-  completed_plans: 58
+  completed_plans: 59
   percent: 74
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 31 (reconciliation-engine-proposal-extraction) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 Status: Ready to execute
 Last activity: 2026-09-02
 
@@ -400,6 +400,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31 P01 | ~10min | 3 tasks | 6 files |
 | Phase 31 P02 | ~22min | 3 tasks | 10 files |
 | Phase 31 P03 | 22min | 3 tasks | 8 files |
+| Phase 31 P04 | ~10min | 2 tasks | 5 files |
 
 ## Decisions
 
@@ -480,3 +481,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31]: SIREN-less existing-company reuse is owner-scoped (not a bare name_normalized lookup) to avoid cross-owner silent merging while still satisfying OQ-1 idempotency — 31-02 engine.ts implementation decision
 - [Phase 31]: Step 4's pair-decision repoint excludes the current pair's own row (ne(id, pairId)) so a mid-crash retry can recover the loser company id; ON DELETE SET NULL becomes the completed signal
 - [Phase 31]: Survivor-membership validation uses a pre-claim SELECT (safe: caller-fixed input, not concurrently-mutated data) — the concurrent-admin race guard stays exclusively the claim's isNull(verdict) precondition
+- [Phase 31]: envelope.generatedAt mirrors plan.generatedAt (not the file-write moment) so drift.ts's ageMs compares like-for-like — 31-04, D-15
+- [Phase 31]: computeDrift's input adds a caller-supplied freshFingerprint field alongside stored/fresh, since ReconciliationPlan carries no fingerprint of its own — 31-04, D-15

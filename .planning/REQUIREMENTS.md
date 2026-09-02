@@ -77,7 +77,7 @@ The master-data layer. A `company` is a global fact; a `client_relationship` is 
 - [x] **IMPORT-03**: Records matching on SIREN are merged automatically.
 - [x] **IMPORT-04**: Records matching only on `name_normalized` — no SIREN on one or both sides — are flagged for human review rather than silently merged.
 - [x] **IMPORT-05**: A human can resolve each flagged pair in the UI: merge into one company, or keep them separate permanently.
-- [ ] **IMPORT-06**: The import runs in **dry-run mode**, producing a full report of what it would create, merge and flag, without writing anything.
+- [x] **IMPORT-06**: The import runs in **dry-run mode**, producing a full report of what it would create, merge and flag, without writing anything.
 - [ ] **IMPORT-07**: Re-running the import creates no duplicates — provenance IDs (`hubspot_company_id` / `hubspot_contact_id`) make it idempotent.
 
 ### Sales-Team Access (ROLE)
