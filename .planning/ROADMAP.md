@@ -482,15 +482,28 @@ Plans:
   5. A human opens the review queue and, for each flagged pair, either merges the two into one company or marks them permanently separate; the decision is durable and is never re-flagged on a later run.
 
 **Plans:** 8 plans
-
 Plans:
+**Wave 1**
+
 - [ ] 31-01-PLAN.md — Schema: provenance column, company_pair_decisions table, migration 0008, audit vocabulary
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 31-02-PLAN.md — Reconciliation engine core: source abstraction, candidate derivation, SIREN/name matching, pair keys
 - [ ] 31-03-PLAN.md — Merge & keep-separate write layer: admin reads, the non-transactional D-12 merge, server actions
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 31-04-PLAN.md — Dry-run report (Markdown + JSON) and drift comparison
 - [ ] 31-05-PLAN.md — Apply layer: idempotent non-transactional writes, provenance, widened single-writer gate
 - [ ] 31-06-PLAN.md — Admin pair-review queue UI at /[adminSegment]/companies/review
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 31-07-PLAN.md — Run orchestrator, zero-write proof, CLI script and npm wiring
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 31-08-PLAN.md — Operator runbook and the phase success-criteria checkpoint
 
 **UI hint:** yes
