@@ -525,11 +525,11 @@ Plans:
   6. The sidebar brand lockup occupies roughly the same share of sidebar width as Colibris's (~47%, i.e. ~120px in a 252px sidebar), and the sidebar width variables are still set where `SidebarProvider`'s inline style cannot outrank them.
   7. Dark mode renders on a palette **sampled from Colibris's own dark theme** — page background, elevated surface, border and muted text each traceable to a measured value rather than an invented one — while the print/PDF surface still forces white in dark mode (`app/globals.css:214`, established Phase 5 / enforced Phase 8) and no-flash theme restoration still works.
 
-**Plans:** 7 plans
+**Plans:** 1/7 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 31.1-01-PLAN.md — Radius scale mechanism: explicit per-step scale, `--radius-container`, `--topbar-h` 52px (wave 1)
+- [x] 31.1-01-PLAN.md — Radius scale mechanism: explicit per-step scale, `--radius-container`, `--topbar-h` 52px (wave 1)
 - [ ] 31.1-02-PLAN.md — Breadcrumb data layer: `getRouteMeta` trail + 5 FR/EN keys (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T19:22:47.742Z"
-last_activity: 2026-09-02 -- Phase 31.1 planning complete
+last_updated: "2026-09-02T19:51:59.854Z"
+last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 15
   total_plans: 70
-  completed_plans: 63
+  completed_plans: 64
   percent: 79
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 31 — reconciliation-engine-proposal-extraction
+**Current focus:** Phase 31.1 — app-shell-refresh
 
 ## Current Position
 
-Phase: 31 (reconciliation-engine-proposal-extraction) — EXECUTING
-Plan: 8 of 8
+Phase: 31.1 (app-shell-refresh) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-09-02 -- Phase 31.1 planning complete
+Last activity: 2026-09-02
 
 ## Deferred Items
 
@@ -405,6 +405,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31 P06 | ~22min | 3 tasks | 14 files |
 | Phase 31 P07 | 15min | 3 tasks | 5 files |
 | Phase 31 P08 | ~25min | 2 tasks | 5 files |
+| Phase 31.1 P01 | ~9min | 3 tasks | 2 files |
 
 ## Decisions
 
@@ -497,3 +498,6 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31]: Checkpoint verification for 31-08 was performed against seeded fixtures (scripts/seed-reconciliation-fixtures.ts), not the development branch's organic data — The branch's 4 eligible proposals all carried well-formed SIRENs and unambiguous names — exactly the condition under which criteria 3, 4 and 5 (SIREN merge, name-flag, durable resolution) have nothing to reconcile and would pass vacuously
 - [Phase 31]: Criterion 5's first durability re-run (pairsFlagged: 0) was rejected as vacuous evidence; client_relationship_id was nulled on fixture proposals only to force re-derivation before the real result was recorded — Every fixture proposal was already linked, so the engine never reached the pairing stage at all (skipped as already_linked) — a green result for the wrong reason
 - [Phase 31]: Phase 31's access/non-leakage check (D-11/CRM-02) is recorded PARTIAL, not PASS, in 31-08-SUMMARY.md — The authenticated-partner 404 case is operator-attested only, not agent-verified (the agent has no partner credentials); the logged-out case was agent-verified as a non-divergent 307 redirect, satisfying the underlying non-leakage property even though the checkpoint's original 404 expectation was imprecise pre-auth
+- [Phase 31.1-01]: Froze --radius-sm...4xl at current computed px values (6/8/10/14/18/22/26) instead of retiring the multiplier scale, per 31.1-CONTEXT.md's Discretion grant — zero visual change on day one
+- [Phase 31.1-01]: Declared the Colibris container ladder under its own --radius-container* namespace rather than mapping it onto --radius-sm...2xl, avoiding a silent move of ~90 unaudited rounded-2xl/rounded-md call sites
+- [Phase 31.1-01]: Leasetic's real control-tier corner is 26px (--radius-4xl), not the ROADMAP criterion 4's 8px which describes Colibris — recorded for Plan 31.1-07's UIC-04 rewrite
