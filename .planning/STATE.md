@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T19:51:59.854Z"
+last_updated: "2026-09-02T20:01:10.143Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 15
   total_plans: 70
-  completed_plans: 64
+  completed_plans: 65
   percent: 79
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 31.1 (app-shell-refresh) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-09-02
 
@@ -406,6 +406,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31 P07 | 15min | 3 tasks | 5 files |
 | Phase 31 P08 | ~25min | 2 tasks | 5 files |
 | Phase 31.1 P01 | ~9min | 3 tasks | 2 files |
+| Phase 31.1 P02 | 4min | 3 tasks | 3 files |
 
 ## Decisions
 
@@ -501,3 +502,4 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31.1-01]: Froze --radius-sm...4xl at current computed px values (6/8/10/14/18/22/26) instead of retiring the multiplier scale, per 31.1-CONTEXT.md's Discretion grant — zero visual change on day one
 - [Phase 31.1-01]: Declared the Colibris container ladder under its own --radius-container* namespace rather than mapping it onto --radius-sm...2xl, avoiding a silent move of ~90 unaudited rounded-2xl/rounded-md call sites
 - [Phase 31.1-01]: Leasetic's real control-tier corner is 26px (--radius-4xl), not the ROADMAP criterion 4's 8px which describes Colibris — recorded for Plan 31.1-07's UIC-04 rewrite
+- [Phase 31.1-02]: Breadcrumb leaves render dictionary labels, not live entity names, on every detail route (D-06 Trail-depth decision) — keeps getRouteMeta a pure pathname function with no data access. — Plumbing an entity name into the shell header, which renders on every page, would be an unscoped information-disclosure surface and would require a new server-to-shell data path the phase boundary forbids.
