@@ -512,18 +512,29 @@ Plans:
 
 **Goal:** The application shell converges on **Colibris** (`https://colibris-eosin.vercel.app`) — a sibling product on the same ReUI `base-maia` system, serving the same teams under the same group — so the two read as one family: breadcrumbs where the page title sits today, the collapse control in the header, a brand lockup proportioned like Colibris's, and a radius scale declared step-by-step so container surfaces can be generous without dragging inputs back into the pill shape that got the large radius reverted the first time.
 **Depends on:** Phase 30 (`.card` at the token-derived radius) and Phase 31 (its review-queue cards carry the interim `rounded-[24px]` literal this phase converges); no schema dependency — this is presentation only
-**Requirements:** TBD
+**Requirements:** SHELL-C1 … SHELL-C7 — minted from the seven success criteria below (REQUIREMENTS.md carries no SHELL-3x IDs; each plan's `requirements` field traces to these)
 **Success Criteria** (what must be TRUE):
 
   1. Collapsing the sidebar no longer stacks the brand mark above a chevron: the collapsed rail shows the mark alone, and the collapse/expand control lives in the shell header at every width.
   2. The collapse/expand control remains focusable and FR/EN-labelled — keyboard users can still collapse the sidebar, and no two controls announce the same accessible name to a screen reader.
   3. Every authenticated page renders a breadcrumb trail in the shell header, derived from `getRouteMeta`, in the viewer's language, with the current page as non-link text.
   4. Container surfaces (cards, panels, sheets, dialogs) render at a **named token**, never a per-file literal, and every Input, Button and Select keeps its current 8px corner — the radius scale is declared as explicit per-step values rather than multiples of a single token, so the top of the scale cannot inflate the bottom.
+     *(Planning correction, 2026-09-02, grep-verified: Leasétic's controls do not read `--radius` and are not 8px today — `Button`/`Input`/`Select`/`Badge` reach `--radius-4xl` via the `rounded-4xl` utility. "8px" describes Colibris. The binding half of this criterion is **keeps its current corner**, and Plan 31.1-01 pins that value explicitly.)*
   5. Phase 30's `.card` and Phase 31's review-queue cards render at the same radius; no surface is left on a hardcoded `rounded-[24px]`.
   6. The sidebar brand lockup occupies roughly the same share of sidebar width as Colibris's (~47%, i.e. ~120px in a 252px sidebar), and the sidebar width variables are still set where `SidebarProvider`'s inline style cannot outrank them.
   7. Dark mode renders on a palette **sampled from Colibris's own dark theme** — page background, elevated surface, border and muted text each traceable to a measured value rather than an invented one — while the print/PDF surface still forces white in dark mode (`app/globals.css:214`, established Phase 5 / enforced Phase 8) and no-flash theme restoration still works.
 
-**Plans:** TBD
+**Plans:** 7 plans
+
+Plans:
+- [ ] 31.1-01-PLAN.md — Radius scale mechanism: explicit per-step scale, `--radius-container`, `--topbar-h` 52px (wave 1)
+- [ ] 31.1-02-PLAN.md — Breadcrumb data layer: `getRouteMeta` trail + 5 FR/EN keys (wave 1)
+- [ ] 31.1-03-PLAN.md — Header: labelled `SidebarTrigger`, breadcrumb, `TopbarTitle` deleted (wave 2)
+- [ ] 31.1-04-PLAN.md — Container radius back-application; `rounded-[24px]` retired (wave 2)
+- [ ] 31.1-05-PLAN.md — Dark palette: 6 sampled declarations + PDF/no-flash invariant gates (wave 2)
+- [ ] 31.1-06-PLAN.md — Sidebar: chevron removed, centred collapsed badge, 252/68px, 120px lockup (wave 3)
+- [ ] 31.1-07-PLAN.md — UIC-04/UIC-03 revision, OPEN-A/OPEN-C closure, phase acceptance checkpoint (wave 4)
+
 **UI hint:** yes
 
 ### Phase 32: HubSpot Import
