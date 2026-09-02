@@ -397,7 +397,7 @@ describe('applyReconciliationPlan — never touches a transaction', () => {
     expect(mock.transactionSpy).not.toHaveBeenCalled();
   });
 
-  it('grep source guard: no .transaction( call anywhere in apply.ts', async () => {
+  it('grep source guard: no transaction call anywhere in apply.ts', async () => {
     const { readFileSync } = await import('node:fs');
     const { fileURLToPath } = await import('node:url');
     const { dirname, join } = await import('node:path');
