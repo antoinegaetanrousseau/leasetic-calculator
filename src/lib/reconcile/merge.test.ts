@@ -399,7 +399,7 @@ describe('recordKeepSeparate', () => {
 });
 
 describe('source guards', () => {
-  it('never issues a .transaction( call anywhere in the module source', async () => {
+  it('never issues a transaction call anywhere in the module source', async () => {
     const { readFileSync } = await import('node:fs');
     const { fileURLToPath } = await import('node:url');
     const { dirname, join } = await import('node:path');
