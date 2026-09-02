@@ -161,7 +161,7 @@ base class.
 ## Color
 
 Per [`UIC-03`](../../codebase/UI-CONVENTIONS.md) — same tokens, same 60/30/10 discipline, same explicit accent reserve
-list. UIC-03 permits a phase to declare a **stricter** accent budget than the baseline, which is
+list. UIC-03 requires each surface to declare its own exhaustive reserve list, which is
 what this surface does. **This surface
 introduces zero new color tokens and, deliberately, near-zero new accent (`--primary`) usage:**
 
@@ -199,8 +199,8 @@ eyebrow is conditional and this page passes only title and subtitle); and `Empty
 
 Every *Button* on this surface is `variant="outline"` (row triggers, keep-separate confirm and
 cancel, merge cancel), `variant="destructive"` (merge confirm only), or the `variant="ghost"`
-close button `DialogContent` renders by default. This is still a stricter budget than Phase 30's
-list of accent-eligible elements, which UIC-03 permits: there is no dialog-level "one accent use"
+close button `DialogContent` renders by default. UIC-03 no longer carries a project-wide
+enumeration to compare against — each surface declares its own list, and this is that list. There is no dialog-level "one accent use"
 carve-out here the way Phase 30's create-client dialog had one, because nothing here is a create
 action.
 
@@ -427,7 +427,7 @@ pattern but **not destructive-colored**, because nothing is deleted; the permane
   `AlertDialogAction` passes no variant of its own (`alert-dialog.tsx:142-145`), so it falls
   through to `Button`'s default variant (`button.tsx:35`), which is `bg-primary
   text-primary-foreground` (`button.tsx:11`). Omitting the override therefore ships a
-  `--primary`-filled button, which is not one of the two reserved accent uses in § Color. (The
+  `--primary`-filled button, which is not one of the reserved accent uses in § Color. (The
   `variant = "outline"` default at `alert-dialog.tsx:157` belongs to **`AlertDialogCancel`**,
   not to `AlertDialogAction` — an earlier revision of this spec cited it for the wrong component
   and concluded, wrongly, that no override was needed.) No `variant="destructive"` either: this

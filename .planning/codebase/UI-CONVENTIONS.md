@@ -120,7 +120,7 @@ threshold, not fixing a defect.
 
 ---
 
-## UIC-03 — Color: one accent, 60/30/10, explicit reserve list
+## UIC-03 — Color: one accent, 60/30/10, per-surface reserve list
 
 **Status:** Ratified exception — single surviving brand color
 **Ratified:** 2026-08-29 (explicit decision, cited in `30-UI-SPEC.md` § Color)
@@ -136,25 +136,42 @@ threshold, not fixing a defect.
 | Accent | `--primary` = `--brand-accent` (`#01cc72`) | 10% |
 
 `--primary` is the **one** brand color that survived the ReUI/base-maia migration, by the
-2026-08-29 decision. The accent budget is enforced by an **explicit reserve list per surface** —
-never the phrase "all interactive elements":
+2026-08-29 decision.
 
-- the single primary page-level CTA per surface,
-- `StatusChip variant="active"`,
-- `SectionTitle`'s default bullet,
-- the sidebar's active-item indicator.
+**Every surface declares its own accent reserve list, and that list must be exhaustive.** Never
+the phrase "all interactive elements." A phase may declare a **stricter** budget than another's;
+it may not declare a looser one without a recorded reason. Buttons that are not the reserved
+accent use take `Button variant="outline"` or `variant="ghost"`.
 
-Every other button — secondary actions, cancel, filter clears, row overflow triggers — uses
-`Button variant="outline"` or `variant="ghost"`. A phase may declare a **stricter** budget than
-this (Phase 31 did: near-zero `--primary`, because nothing on that surface is a create action);
-it may not declare a looser one without a recorded reason.
+> **This record deliberately does not enumerate a project-wide reserve list.** It carried one from
+> 2026-09-01 to 2026-09-02 — four items, of which **two were false**: `StatusChip
+> variant="active"` is `bg-success/15` (the emerald feedback token, not the brand accent), and the
+> sidebar's active-item indicator is `data-active:bg-sidebar-accent`, a neutral grey. The list was
+> transcribed from phase prose and never checked against the code, and a Phase 31 spec then
+> described itself as "stricter than" a baseline that did not exist. An accent list is a
+> per-surface, code-review artifact — it goes stale the moment a primitive changes, and it is
+> exactly the kind of claim this file should not make.
 
-**Legacy aliases are not primary tokens.** `--paper`, `--surface`, `--gd`, `--teal`, `--gold`,
-`--danger` are kept only so pre-migration call sites keep working; they resolve to the
-shadcn/ReUI tokens. **New code reads the shadcn tokens directly** (`bg-background`,
-`text-foreground`, `bg-card`, `text-muted-foreground`, `bg-primary`, `text-destructive`,
-`bg-success/15 text-success-foreground`). Note `--teal` now aliases `--muted-foreground` — it is
-not a second brand color post-migration, so there is no second-accent carve-out to claim.
+**How to derive a surface's reserve list** (do this mechanically; reading the phase's own files
+does not work, because most accent arrives through primitive chrome):
+
+1. Ask `app/globals.css` — not memory — which tokens alias `--brand-accent`. There are several
+   beyond `--primary`, including ring and sidebar tokens, and the set changes.
+2. For each primitive the surface renders, grep that component for utilities built on those
+   tokens (`bg-`, `text-`, `border-`, `ring-`).
+3. Eliminate the ones whose variant or condition does not occur on this surface, and check the
+   global `@layer base` rules, which apply without appearing in any component.
+
+A Phase 31 reserve list derived this way is in `31-UI-SPEC.md` § Color, along with a record of the
+four attempts it took to get right.
+
+**Legacy aliases.** `--paper`, `--surface`, `--teal`, `--gold`, `--danger` are kept only so
+pre-migration call sites keep working. **New code reads the shadcn tokens directly**
+(`bg-background`, `text-foreground`, `bg-card`, `text-muted-foreground`, `bg-primary`,
+`text-destructive`, `bg-success/15 text-success-foreground`). Two worth knowing: `--teal` aliases
+`--muted-foreground`, so it is not a second brand color and there is no second-accent carve-out to
+claim; `--gd` aliases `--brand-accent`, so it *is* the accent under an old name and counts against
+a surface's accent budget.
 
 ---
 
@@ -217,9 +234,9 @@ deliberately uses a different tone. Match the meaning, not the template.
 - shadcn `AlertDialog` (`src/components/ui/alert-dialog.tsx`) for destructive confirmation —
   **not** `window.confirm()`.
 
-**This is forward-only.** Existing `window.confirm()` and hand-rolled dialog call sites
-(`DeleteButtonClient`, `PartnerRowActions`, `CreatePartnerForm`'s dirty-form confirm,
-`CreatePartnerModal`) are **unchanged and out of scope**. The coexistence of both patterns is
+**This is forward-only.** The `window.confirm()` and hand-rolled dialog call sites that predate
+this convention are **unchanged and out of scope** (grep for them rather than trusting a list
+here — an earlier revision named four and there are more). The coexistence of both patterns is
 expected and is **not** an inconsistency for a checker to flag or a planner to "fix" mid-phase.
 Migrating them is its own future scope.
 
