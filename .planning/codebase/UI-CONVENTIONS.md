@@ -38,19 +38,20 @@ repo, that is recorded rather than smoothed over — see UIC-02's provenance not
 **Status:** Ratified exception (`D-B`)
 **Ratified:** date not recorded in-repo — see UIC-02 provenance note
 **Recorded in:** `30-UI-SPEC.md` § Spacing Scale (2026-09-01)
-**Reused verbatim by:** `31-UI-SPEC.md` § Spacing Scale ("Reused verbatim from `30-UI-SPEC.md`")
+**Also applied by:** `31-UI-SPEC.md` § Spacing Scale
 
 **Rule.** Spacing uses Tailwind's own 4px-step utility scale directly at every call site. This
 includes the 12px / 20px / 28px steps, which the generic GSD default scale
 `{4, 8, 16, 24, 32, 48, 64}` omits. Every value the rule sanctions divides evenly by 4.
 
 > **Correction (2026-09-02).** This record previously asserted that "no non-4px-multiple literal
-> exists on any surface audited." **That is false.** Roughly 57 sub-grid literals ship in product
-> code today — `py-2.5` (10px) and `gap-1.5` (6px) in `ParametresForm.tsx`, `PartnersList.tsx` and
-> others. UIC-01 is a **rule for new and edited code**, not a description of the current tree.
-> Treat existing sub-grid literals as drift to correct when touching the surface, not as evidence
-> the rule does not hold. Optical nudges (`mt-0.5` on an icon, to center it against a text line)
-> are a separate category and are not governed by this rule.
+> exists on any surface audited." **That is false** — sub-grid literals do ship in product code
+> today. UIC-01 is a **rule for new and edited code**, not a description of the current tree.
+> Treat an existing sub-grid literal as drift to correct when you touch that surface, not as
+> evidence the rule does not hold. Optical nudges (a 2px `mt-0.5` centering an icon against a text
+> line) are a separate category and are not governed by this rule. To find current drift, search
+> the tree rather than trusting a count written here — any number recorded in this file would go
+> stale on the next edit.
 
 | Step | Value | Representative usage |
 |---|---|---|
@@ -78,8 +79,7 @@ in the GSD default set.
 **Status:** Ratified exception (`D-B`), **project-wide by explicit operator scope**
 **Ratified:** date not recorded in-repo — see provenance note below
 **Recorded in:** `30-UI-SPEC.md` § Typography (2026-09-01)
-**Reused verbatim by:** `31-UI-SPEC.md` § Typography ("Reused verbatim from `30-UI-SPEC.md`'s
-ratified 3-weight system (400 / 600 / 700)")
+**Also applied by:** `31-UI-SPEC.md` § Typography
 
 **Rule.** Three weights are in active, sanctioned use. This is a ratified exception to the
 usual two-weight design-review threshold, and it is **project-wide** — not scoped to the phase
@@ -96,15 +96,15 @@ and `ProposalRow` use 600; `PageHero` and `SectionTitle` use 700; the `body` rul
 Collapsing to two weights would mean editing shipped, working surfaces to satisfy a generic
 threshold, not fixing a defect.
 
-**Font load vs. sanctioned weights.** `app/layout.tsx:20-25` loads Inter at
+**Font load vs. sanctioned weights.** `app/layout.tsx` loads Inter at
 `['300','400','500','600','700']`. UIC-02 sanctions 400 / 600 / 700 for a spec to declare.
 **300 is loaded and genuinely unused** (zero occurrences in product code).
 
 > **Correction (2026-09-02).** This record previously said "300 and 500 are loaded but unused."
-> **The claim about 500 is false.** `font-medium` (500) appears about **69 times in product
-> code**, including the base class string of `button.tsx` — so *every button in the app* renders
-> at 500 — and it is also set deliberately on product labels (`MergeDialog.tsx:132`,
-> `PartnersList.tsx:95`, `CompanyRelationsTable.tsx:120`). Do not cite UIC-02 as authority for
+> **The claim about 500 is false.** `font-medium` (500) is used widely in product
+> code, including the base class string of `button.tsx` — so *every button in the app* renders
+> at 500 — and it is also set deliberately on product labels (`MergeDialog.tsx`,
+> `PartnersList.tsx`, `CompanyRelationsTable.tsx`). Do not cite UIC-02 as authority for
 > "500 is unused," and do not flag a surface for rendering 500. Whether the ratified exception
 > should therefore read *four* weights (400/500/600/700) rather than three is unresolved — see
 > [OPEN-D](#open-items).
@@ -125,7 +125,7 @@ threshold, not fixing a defect.
 **Status:** Ratified exception — single surviving brand color
 **Ratified:** 2026-08-29 (explicit decision, cited in `30-UI-SPEC.md` § Color)
 **Recorded in:** `30-UI-SPEC.md` § Color (2026-09-01)
-**Reused verbatim by:** `31-UI-SPEC.md` § Color ("same tokens, same 60/30/10 discipline")
+**Also applied by:** `31-UI-SPEC.md` § Color
 
 **Rule.**
 
@@ -150,7 +150,7 @@ this (Phase 31 did: near-zero `--primary`, because nothing on that surface is a 
 it may not declare a looser one without a recorded reason.
 
 **Legacy aliases are not primary tokens.** `--paper`, `--surface`, `--gd`, `--teal`, `--gold`,
-`--danger` are kept only so ~400 pre-migration call sites keep working; they resolve to the
+`--danger` are kept only so pre-migration call sites keep working; they resolve to the
 shadcn/ReUI tokens. **New code reads the shadcn tokens directly** (`bg-background`,
 `text-foreground`, `bg-card`, `text-muted-foreground`, `bg-primary`, `text-destructive`,
 `bg-success/15 text-success-foreground`). Note `--teal` now aliases `--muted-foreground` — it is
@@ -161,12 +161,12 @@ not a second brand color post-migration, so there is no second-accent carve-out 
 ## UIC-04 — `--radius` is pinned; `.card` derives its radius from the token
 
 **Status:** Locked (documented incident)
-**Recorded in:** `app/globals.css:66-74` (the token) and `app/globals.css:260-272` (`.card`);
+**Recorded in:** `app/globals.css` (the token) and `app/globals.css` (`.card`);
 restated as LOCKED in `31-UI-SPEC.md` § Container Radius
 
 **Rule.** `--radius: 0.625rem`. This single value drives the entire derived scale
 (`--radius-sm` … `--radius-4xl`) through the `@theme inline` multiplier block
-(`app/globals.css:484-485`: `--radius-xl = ×1.4`, `--radius-2xl = ×1.8`).
+(`app/globals.css`: `--radius-xl = ×1.4`, `--radius-2xl = ×1.8`).
 
 **Do not change `--radius` or the multiplier block** without re-checking the top of the scale
 against a real form. The in-file comment records why: it was previously `1rem`, chasing a
@@ -271,7 +271,7 @@ information")
 **Reused by:** `31-UI-SPEC.md` ("Container convention (unchanged from Phase 30)")
 
 **Rule.** New pages render directly inside `Shell`'s `<main>`
-(`Shell.tsx:109` — `max-w-[1100px] px-6 pt-6 pb-8`). Do **not** add a nested `<main>` or a
+(`Shell.tsx` — `max-w-[1100px] px-6 pt-6 pb-8`). Do **not** add a nested `<main>` or a
 per-page `maxWidth` override.
 
 `app/(admin)/[adminSegment]/partners/page.tsx`'s `<main style={{maxWidth:1280}}>` is a
@@ -312,7 +312,7 @@ Two container radii currently ship side by side:
 | Phase 31 pair-review card + its two new dialogs | `rounded-[24px]` | Literal, decoupled from `--radius` |
 
 The 24px literal matches the vendored `app-shell-1` block
-(`src/components/blocks/app-shell-1/components/app-shell.tsx:60-64`) and was a locked
+(`src/components/blocks/app-shell-1/components/app-shell.tsx`) and was a locked
 orchestrator decision for Phase 31. **Controls are explicitly not part of it** — buttons, badges,
 radio items and inputs inside those dialogs keep their `--radius`-derived shadcn defaults.
 
@@ -332,7 +332,7 @@ UIC-02 and remove this item.
 ### OPEN-D — Is the ratified weight exception three weights or four?
 
 UIC-02 records **three** (400 / 600 / 700), inherited from `30-UI-SPEC.md`. But weight **500**
-ships pervasively (~69 product-code occurrences; every `Button` carries it via `button.tsx`'s base
+ships pervasively (every `Button` carries it via `button.tsx`'s base
 class), and is set deliberately on some product labels rather than only inherited from primitive
 chrome. Two readings, unresolved pending an operator decision:
 

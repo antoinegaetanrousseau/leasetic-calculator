@@ -146,11 +146,14 @@ unused and out of bounds, per UIC-02.
 | Secondary counts (relations · contacts · propositions) | 13px | 400 | 1.4 | `text-muted-foreground` |
 | Empty/success-state title | inherits `EmptyTitle` default (matches Phase 30's `Empty` usage — no new size introduced) | — | — | — |
 | Owner-type badge | 11.5px | 600 | — | **Inherited primitive chrome, not a new declaration** — the class string is byte-identical to `CompaniesList.tsx:127` and `CompanyRelationsTable.tsx:99` |
-| Merge-dialog description | 14px (`text-sm`) | 400 | — | **Inherited** — shadcn `DialogDescription` default (`MergeDialog.tsx:113`) |
+| Merge-dialog description | 14px (`text-sm`) | 400 | — | A Phase 31 declaration (a hand-written `text-sm`, now carried by `DialogDescription`) |
 
-The last two rows are recorded for completeness: they ship on this surface but are inherited
-chrome rather than Phase 31 declarations, so "no new sizes" still holds. Counting only sizes this
-phase *chooses*, the declared scale is 30 / 14.5 / 13 — three sizes, within the four-size cap.
+The declared scale is **30 / 14.5 / 14 / 13 — four sizes**, within the four-size cap. The
+11.5px owner badge is excluded from that count as inherited chrome: its class string is
+byte-identical to the badge in the admin companies list and relations table. The 14px row is
+**not** inherited — it is a hand-written `text-sm` this phase introduced, and an earlier revision
+wrongly justified it as a shadcn default. Note 14 and 14.5 sit adjacent; they are distinguished by
+weight and color rather than size, which is deliberate but leaves no size headroom.
 
 ---
 
@@ -165,26 +168,33 @@ introduces zero new color tokens and, deliberately, near-zero new accent (`--pri
 |------|-------|-------|
 | Dominant (60%) | `--background` | Page background |
 | Secondary (30%) | `--card` | Pair-review cards, dialog panels |
-| Accent (10%) | `--primary` | **Exactly one use: the company-name link's `hover:text-primary` on `PairReviewCard`** (§ Pair card composition; shipped at `PairReviewCard.tsx:73`). There is no page-level CTA — pairs are system-generated, nothing is created by hand — and both confirm-dialog actions are deliberately kept off accent (see below). Nothing else on this surface reads `--primary`. |
+| Accent (10%) | `--primary` | **Two uses, both listed below.** There is no page-level CTA — pairs are system-generated, nothing is created by hand — and both confirm-dialog *buttons* are deliberately kept off accent (see below). |
 | Destructive | `--destructive` | The **Merge** confirm submit button only (`Button variant="destructive"` inside the merge `Dialog`) — merging deletes the loser company (D-12), so it earns the same destructive treatment `DeleteContactDialog` already established. |
 | Neutral badge | `--border`/`--foreground` via `Badge variant="secondary"` | Owner-type badge per side ("Partenaire" / "Interne") — reused verbatim from `admin.companies.relation.type.*`, same chrome, same tokens, no new badge variant |
 | Muted / secondary text | `--muted-foreground` | SIREN values, counts, reason label |
 
-**Accent reserved for (explicit list, one item):** the company-name link's hover state
-(`hover:text-primary`) on each side of a pair card. Every *button* on this surface is either
-`Button variant="outline"` (row triggers, keep-separate confirm, cancel actions) or
-`Button variant="destructive"` (merge confirm only) — the link is the one interactive element
-that is not a Button, and it is the one accent use. This is still a stricter budget than Phase
-30's list of accent-eligible elements, which UIC-03 permits: there is no dialog-level "one accent
-use" carve-out here the way Phase 30's create-client dialog had one, because nothing here is a
-create action.
+**Accent reserved for (explicit list, two items):**
 
-> **Correction (2026-09-02).** An earlier revision of this section claimed the accent budget was
-> "literally zero" and that the reserve list was empty. That contradicted this same document's
-> pair-card composition, which specifies `hover:text-primary` on the company-name link, and it
-> shipped that way. The budget is **one**, not zero. Source comments in
-> `PairReviewList.tsx` and `KeepSeparateDialog.tsx` that quote the old "zero accent" wording are
-> corrected alongside this.
+1. **`RadioGroupItem` checked indicator** in the merge dialog's survivor picker — a solid
+   `data-checked:bg-primary` swatch from `radio-group.tsx`. A survivor is always pre-selected
+   (A-3), so this renders on every open. It is inherited primitive chrome, not a per-surface
+   choice, and it is the **most prominent** accent element here.
+2. **Company-name link hover** (`hover:text-primary`) on each side of a pair card.
+
+Every *button* on this surface is either `Button variant="outline"` (row triggers, keep-separate
+confirm, cancel actions) or `Button variant="destructive"` (merge confirm only). This is still a
+stricter budget than Phase 30's list of accent-eligible elements, which UIC-03 permits: there is
+no dialog-level "one accent use" carve-out here the way Phase 30's create-client dialog had one,
+because nothing here is a create action.
+
+> **Correction (2026-09-02).** This section has now been wrong twice in the same direction. It
+> first claimed the accent budget was "literally zero" with an empty reserve list, contradicting
+> this document's own pair-card composition (`hover:text-primary` on the company-name link, which
+> shipped). The fix then said "exactly one use — nothing else reads `--primary`", which missed the
+> checked radio in the merge dialog — a filled swatch, louder than a hover state. The budget is
+> **two**. The lesson for anyone editing this table: a reserve list is only useful if it is
+> exhaustive, and inherited primitive chrome counts.
+
 
 ---
 
@@ -348,7 +358,7 @@ absence of data rather than a completed job.
 ```
 <Empty className="px-5 py-12">
   <EmptyMedia><CheckCircleIcon size={32} /* default/muted styling, NOT --success emerald or
-    --primary accent — see Color section: this surface stays at zero accent usage */ /></EmptyMedia>
+    --primary accent — see Color section: this surface's accent is reserved (see § Color) */ /></EmptyMedia>
   <EmptyTitle>{t('admin.reconciliation.empty.title', lang)}</EmptyTitle>
   <EmptyDescription>{t('admin.reconciliation.empty.body', lang)}</EmptyDescription>
 </Empty>
@@ -399,7 +409,7 @@ pattern but **not destructive-colored**, because nothing is deleted; the permane
   `AlertDialogAction` passes no variant of its own (`alert-dialog.tsx:142-145`), so it falls
   through to `Button`'s default variant (`button.tsx:35`), which is `bg-primary
   text-primary-foreground` (`button.tsx:11`). Omitting the override therefore ships a
-  `--primary`-filled button and breaks this surface's zero-accent budget. (The
+  `--primary`-filled button, which is not one of the two reserved accent uses in § Color. (The
   `variant = "outline"` default at `alert-dialog.tsx:157` belongs to **`AlertDialogCancel`**,
   not to `AlertDialogAction` — an earlier revision of this spec cited it for the wrong component
   and concluded, wrongly, that no override was needed.) No `variant="destructive"` either: this

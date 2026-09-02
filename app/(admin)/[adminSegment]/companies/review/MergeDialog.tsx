@@ -21,7 +21,7 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { AlertTriangleIcon } from '@/components/ui/icons';
@@ -61,7 +61,7 @@ function SurvivorOption({ side, lang }: { side: AdminPairSide; lang: Lang }) {
   return (
     <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3">
       <RadioGroupItem value={side.companyId} className="mt-0.5" />
-      <span className="flex flex-col gap-0.5">
+      <span className="flex flex-col gap-1">
         <span className="text-[14.5px] font-semibold text-foreground">{side.name}</span>
         <span className="text-[13px] text-muted-foreground">{side.siren ?? '—'}</span>
         <span className="text-[13px] text-muted-foreground">{pairSideCountsLine(side, lang)}</span>
@@ -110,11 +110,11 @@ export function MergeDialog({ pair, open, onOpenChange, lang }: MergeDialogProps
 
         {pair && (
           <form onSubmit={onSubmit} noValidate aria-busy={isSubmitting || undefined}>
-            <p className="text-sm text-muted-foreground">
+            <DialogDescription className="text-sm text-muted-foreground">
               {t('admin.reconciliation.merge.description', lang)
                 .replace('{companyA}', pair.sideA.name)
                 .replace('{companyB}', pair.sideB.name)}
-            </p>
+            </DialogDescription>
 
             {pair.compoundMergeWarning && (
               <p className="mt-3 flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-3 text-[13px] text-destructive">

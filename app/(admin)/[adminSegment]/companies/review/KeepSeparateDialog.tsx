@@ -19,7 +19,7 @@
  * document's Color section, which reserves --primary for exactly one use on
  * this surface (the company-name link hover) and requires every button to be
  * `variant="outline"` or the destructive-red merge-confirm variant.
- * `variant="outline"` is set explicitly below to satisfy that zero-accent
+ * `variant="outline"` is set explicitly below to satisfy that reserved-accent
  * contract, which is the unambiguous, load-bearing instruction here — see
  * 31-06-SUMMARY.md.
  *
