@@ -64,13 +64,19 @@
   --sidebar-border:          oklch(0.922 0 0);
   --sidebar-ring:            var(--brand-accent);
 
-  /* base-maia's own default. This drives the WHOLE radius scale through the
-     multipliers in `@theme inline` below (×0.6 up to ×2.6), which are tuned
-     for this value. It was previously 1rem, chasing a "large radius" brand
-     parameter — that inflated every step by 60%, so `rounded-4xl` became
-     41.6px and every Input and InputGroup rendered as a pill. Change this
-     number and the entire scale moves with it; do not raise it without
-     re-checking the top of the scale against a real form. */
+  /* base-maia's own default. It was previously 1rem, chasing a "large radius"
+     brand parameter — that inflated every step of the (then-derived) scale by
+     60%, so `rounded-4xl` became 41.6px and every Input and InputGroup
+     rendered as a pill. That is the incident `--radius-sm…4xl` below are now
+     declared standalone to make structurally impossible (see the comment
+     above those declarations, `@theme inline` in this file, Phase 31.1 /
+     `31.1-01-PLAN.md`). Kept declared here because a `shadcn add`
+     regeneration expects the token, and `src/components/ui/sidebar.tsx`
+     locally re-binds it via `[--radius:var(--radius-xl)]` for its own
+     subtree. It drives nothing else: no step of the scale reads
+     `var(--radius)` any more, and no other file in the repo reads it either
+     — the 1rem pill incident can no longer be reproduced through this
+     token. */
   --radius:                  0.625rem;
 
   --destructive-foreground:  var(--color-red-800);
@@ -478,13 +484,48 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
     --color-card:      var(--card);
     --color-foreground:      var(--foreground);
     --color-background:      var(--background);
-    --radius-sm:      calc(var(--radius) * 0.6);
-    --radius-md:      calc(var(--radius) * 0.8);
-    --radius-lg:      var(--radius);
-    --radius-xl:      calc(var(--radius) * 1.4);
-    --radius-2xl:      calc(var(--radius) * 1.8);
-    --radius-3xl:      calc(var(--radius) * 2.2);
-    --radius-4xl:      calc(var(--radius) * 2.6);
+    /* Phase 31.1 (`31.1-01-PLAN.md`) replaced the old `--radius`-multiplied
+       calc() mechanism with the seven px values below, frozen at exactly
+       what each step computed to beforehand — nothing on any surface changes
+       corner on this edit. Why this had to happen:
+       (a) the old mechanism derived every step from one token, so raising
+           `--radius` to chase a "large radius" brand parameter inflated all
+           seven steps at once — `app/globals.css:67-79` records the incident:
+           `rounded-4xl` hit 41.6px and every Input/InputGroup rendered as a
+           pill. Declaring each step standalone makes that class of regression
+           structurally impossible, not merely currently avoided.
+       (b) `--radius-4xl` (26px) is base-maia's CONTROL tier — Button, Input,
+           Select, Badge and 12 other primitives reach it through the
+           `rounded-4xl` utility, and `src/components/ui/calendar.tsx` reads
+           it directly as `--cell-radius`. It is load-bearing and must not be
+           retired or re-pointed; `--radius-3xl` (22px) is load-bearing the
+           same way for `toggle-group.tsx`'s directional corners.
+       (c) container surfaces (`.card` and friends) read `--radius-container`
+           below instead — a deliberately SEPARATE variable with no shared
+           ancestor token, so raising a container radius can never reach the
+           control tier again. This is `tests/radius-scale.test.ts`'s gate. */
+    --radius-sm:      6px;
+    --radius-md:      8px;
+    --radius-lg:      10px;
+    --radius-xl:      14px;
+    --radius-2xl:      18px;
+    --radius-3xl:      22px;
+    --radius-4xl:      26px;
+
+    /* Colibris-measured container-radius ladder (D-01/D-02, Phase 31.1).
+       Declared under its own `--radius-container*` names specifically so it
+       shares no variable with the control tier above — that separation is
+       the structural property that makes the UIC-04 pill incident
+       impossible to recur via a container-radius change. `--radius-container`
+       is the semantic role token surfaces should read (16px, D-01); the
+       five `-xs…-xl` steps exist for callers that need a different point on
+       the ladder (e.g. a larger dialog or a smaller chip). */
+    --radius-container-xs:      12px;
+    --radius-container-sm:      16px;
+    --radius-container-md:      24px;
+    --radius-container-lg:      32px;
+    --radius-container-xl:      40px;
+    --radius-container:      var(--radius-container-sm);
     --color-invert-foreground:      var(--invert-foreground);
     --color-invert:      var(--invert);
     --color-warning-foreground:      var(--warning-foreground);
