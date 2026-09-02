@@ -520,19 +520,30 @@ Plans:
   3. Every authenticated page renders a breadcrumb trail in the shell header, derived from `getRouteMeta`, in the viewer's language, with the current page as non-link text.
   4. Container surfaces (cards, panels, sheets, dialogs) render at a **named token**, never a per-file literal, and every Input, Button and Select keeps its current 8px corner — the radius scale is declared as explicit per-step values rather than multiples of a single token, so the top of the scale cannot inflate the bottom.
      *(Planning correction, 2026-09-02, grep-verified: Leasétic's controls do not read `--radius` and are not 8px today — `Button`/`Input`/`Select`/`Badge` reach `--radius-4xl` via the `rounded-4xl` utility. "8px" describes Colibris. The binding half of this criterion is **keeps its current corner**, and Plan 31.1-01 pins that value explicitly.)*
+
   5. Phase 30's `.card` and Phase 31's review-queue cards render at the same radius; no surface is left on a hardcoded `rounded-[24px]`.
   6. The sidebar brand lockup occupies roughly the same share of sidebar width as Colibris's (~47%, i.e. ~120px in a 252px sidebar), and the sidebar width variables are still set where `SidebarProvider`'s inline style cannot outrank them.
   7. Dark mode renders on a palette **sampled from Colibris's own dark theme** — page background, elevated surface, border and muted text each traceable to a measured value rather than an invented one — while the print/PDF surface still forces white in dark mode (`app/globals.css:214`, established Phase 5 / enforced Phase 8) and no-flash theme restoration still works.
 
 **Plans:** 7 plans
-
 Plans:
+**Wave 1**
+
 - [ ] 31.1-01-PLAN.md — Radius scale mechanism: explicit per-step scale, `--radius-container`, `--topbar-h` 52px (wave 1)
 - [ ] 31.1-02-PLAN.md — Breadcrumb data layer: `getRouteMeta` trail + 5 FR/EN keys (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 31.1-03-PLAN.md — Header: labelled `SidebarTrigger`, breadcrumb, `TopbarTitle` deleted (wave 2)
 - [ ] 31.1-04-PLAN.md — Container radius back-application; `rounded-[24px]` retired (wave 2)
 - [ ] 31.1-05-PLAN.md — Dark palette: 6 sampled declarations + PDF/no-flash invariant gates (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 31.1-06-PLAN.md — Sidebar: chevron removed, centred collapsed badge, 252/68px, 120px lockup (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 31.1-07-PLAN.md — UIC-04/UIC-03 revision, OPEN-A/OPEN-C closure, phase acceptance checkpoint (wave 4)
 
 **UI hint:** yes

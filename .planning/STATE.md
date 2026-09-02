@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: verifying
-last_updated: "2026-09-02T15:53:53.625Z"
-last_activity: 2026-09-02
+status: executing
+last_updated: "2026-09-02T19:22:47.742Z"
+last_activity: 2026-09-02 -- Phase 31.1 planning complete
 progress:
   total_phases: 19
   completed_phases: 15
-  total_plans: 63
+  total_plans: 70
   completed_plans: 63
   percent: 79
 ---
@@ -29,8 +29,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 31 (reconciliation-engine-proposal-extraction) — EXECUTING
 Plan: 8 of 8
-Status: Phase complete — ready for verification
-Last activity: 2026-09-02
+Status: Ready to execute
+Last activity: 2026-09-02 -- Phase 31.1 planning complete
 
 ## Deferred Items
 
