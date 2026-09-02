@@ -38,6 +38,10 @@ const config = [
       'src/hooks/use-mobile.ts',
       'src/hooks/use-file-upload.ts',
       'src/hooks/use-copy-to-clipboard.ts',
+      // Agent git-worktree scratch space: full duplicate copies of this repo.
+      // Ignored via .git/info/exclude (a local, untracked file), so ESLint's
+      // flat config cannot pick it up from .gitignore — it must be listed here.
+      '.claude/**',
     ],
   },
   {
