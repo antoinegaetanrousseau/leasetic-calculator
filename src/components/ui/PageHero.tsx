@@ -10,57 +10,38 @@ export interface PageHeroProps {
 }
 
 export function PageHero({ title, subtitle, eyebrow, actions }: PageHeroProps) {
+  // data-slot follows the shadcn convention already used across this codebase
+  // (see select.tsx, sidebar.tsx). It gives tests and consumers a stable hook
+  // that survives restyling — the previous suite identified the eyebrow by
+  // searching for an inline `text-transform: uppercase` style, which stopped
+  // existing the moment this moved to Tailwind utilities.
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 32,
-      }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div data-slot="page-hero" className="flex justify-between items-start mb-8">
+      <div data-slot="page-hero-main" className="flex flex-col">
         {eyebrow && (
           <div
-            style={{
-              fontSize: '11.8px',
-              fontWeight: 700,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: 'var(--gd-text)',
-              marginBottom: 8,
-            }}
+            data-slot="page-hero-eyebrow"
+            className="text-[11.8px] font-bold tracking-[0.06em] uppercase text-primary mb-2"
           >
             {eyebrow}
           </div>
         )}
         <h1
-          style={{
-            fontSize: 32,
-            fontWeight: 700,
-            lineHeight: 1.2,
-            color: 'var(--ink)',
-            margin: 0,
-          }}
+          data-slot="page-hero-title"
+          className="text-3xl font-bold leading-tight text-foreground m-0"
         >
           {title}
         </h1>
         {subtitle && (
           <p
-            style={{
-              fontSize: '14.5px',
-              fontWeight: 400,
-              lineHeight: 1.55,
-              color: 'var(--muted)',
-              marginTop: 8,
-              marginBottom: 0,
-            }}
+            data-slot="page-hero-subtitle"
+            className="text-[14.5px] font-normal leading-relaxed text-muted-foreground mt-2 mb-0"
           >
             {subtitle}
           </p>
         )}
       </div>
-      {actions && <div>{actions}</div>}
+      {actions && <div data-slot="page-hero-actions">{actions}</div>}
     </div>
   );
 }

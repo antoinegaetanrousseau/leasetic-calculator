@@ -33,22 +33,39 @@ describe('BrandLogo', () => {
     expect(imgs[1]).toHaveAttribute('src', '/logo-dark.svg');
   });
 
-  it('UI-SPEC §6.1: default dimensions are width=190 height=32 on both <img>', () => {
+  // The lockup assets are 862×200. Height is DERIVED from width, so the <img>
+  // box always matches the viewBox — a mismatch makes the browser letterbox the
+  // logo inside a slot of dead space rather than fail visibly. These assert the
+  // ratio holds, not two hard-coded numbers, so swapping the asset is one edit.
+  const ASPECT = 862 / 200;
+
+  it('UI-SPEC §6.1: default height derives from width at the asset aspect', () => {
     const { container } = render(<BrandLogo />);
     const imgs = container.querySelectorAll('img');
-    expect(imgs[0]).toHaveAttribute('width', '190');
-    expect(imgs[0]).toHaveAttribute('height', '32');
-    expect(imgs[1]).toHaveAttribute('width', '190');
-    expect(imgs[1]).toHaveAttribute('height', '32');
+    const expected = String(Math.round(190 / ASPECT));
+    for (const img of imgs) {
+      expect(img).toHaveAttribute('width', '190');
+      expect(img).toHaveAttribute('height', expected);
+    }
   });
 
-  it('UI-SPEC §6.1: custom width/height props propagate to both <img>', () => {
+  it('UI-SPEC §6.1: a custom width re-derives the height, preserving the aspect', () => {
+    const { container } = render(<BrandLogo width={120} />);
+    const imgs = container.querySelectorAll('img');
+    const expected = String(Math.round(120 / ASPECT));
+    for (const img of imgs) {
+      expect(img).toHaveAttribute('width', '120');
+      expect(img).toHaveAttribute('height', expected);
+    }
+  });
+
+  it('UI-SPEC §6.1: an explicit height still overrides the derived one', () => {
     const { container } = render(<BrandLogo width={120} height={20} />);
     const imgs = container.querySelectorAll('img');
-    expect(imgs[0]).toHaveAttribute('width', '120');
-    expect(imgs[0]).toHaveAttribute('height', '20');
-    expect(imgs[1]).toHaveAttribute('width', '120');
-    expect(imgs[1]).toHaveAttribute('height', '20');
+    for (const img of imgs) {
+      expect(img).toHaveAttribute('width', '120');
+      expect(img).toHaveAttribute('height', '20');
+    }
   });
 
   it('UI-SPEC §6.1: className prop is appended to outer span className (alongside brand-logo)', () => {

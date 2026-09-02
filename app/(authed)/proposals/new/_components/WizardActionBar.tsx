@@ -23,7 +23,7 @@
 
 import { useTransition } from 'react';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -160,9 +160,8 @@ export function WizardActionBar({
           }}
         >
           {primary.isSubmitting && (
-            <Loader2
+            <LoaderIcon
               size={16}
-              strokeWidth={2}
               aria-hidden="true"
               style={{
                 // No global `.animate-spin` utility in app/globals.css — inline

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Archive, Undo2 } from 'lucide-react';
+import { ArchiveIcon, UndoIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import { type DisplayStatus } from '@/lib/db/queries';
@@ -70,7 +70,7 @@ export function RowActionsClient({ proposalId, lang, displayStatus }: RowActions
           title={t('proposal.detail.action.restore', lang)}
           disabled={busy}
         >
-          <Undo2 size={14} />
+          <UndoIcon size={14} />
         </button>
       </div>
     );
@@ -115,7 +115,7 @@ export function RowActionsClient({ proposalId, lang, displayStatus }: RowActions
         title={t('proposal.row.action.archive', lang)}
         disabled={busy}
       >
-        <Archive size={14} />
+        <ArchiveIcon size={14} />
       </button>
     </div>
   );

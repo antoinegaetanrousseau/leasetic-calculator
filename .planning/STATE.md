@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Proposal List Actions & Pill Fix
-status: Awaiting next milestone
-last_updated: "2026-05-30T21:24:31.590Z"
-last_activity: 2026-05-30 — Milestone v1.5 completed and archived
+milestone: v1.6
+milestone_name: CRM Foundation
+status: verifying
+last_updated: "2026-09-02T21:16:27.120Z"
+last_activity: 2026-09-02
 progress:
-  total_phases: 12
-  completed_phases: 12
-  total_plans: 44
-  completed_plans: 44
-  percent: 100
+  total_phases: 19
+  completed_phases: 16
+  total_plans: 70
+  completed_plans: 70
+  percent: 84
 ---
 
 # State — Matrice Commerciale
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Milestone complete
+**Current focus:** Phase 31.1 — app-shell-refresh
 
 ## Current Position
 
-Phase: Milestone v1.5 complete
-Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-30 — Milestone v1.5 completed and archived
+Phase: 31.1 (app-shell-refresh) — EXECUTING
+Plan: 7 of 7
+Status: Phase complete — ready for verification
+Last activity: 2026-09-02
 
 ## Deferred Items
 
@@ -119,6 +119,10 @@ v1.1 ████████████████████ 6/6 phases com
 ⚠ **`FINAL-TEST-v11.md` master ship-gate runbook was never executed.** v10 is a prepared-but-undistributed prototype. v1.1 supersedes it; v10 will be retired at v1.1 launch (CUT-01) without ever reaching production partners. The runbook can be skipped — partners go straight from v9 → v1.1.
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 31.1 inserted after Phase 31: App Shell Refresh — sidebar converges on the vendored app-shell-1 block (fixed edge toggle, fixes the collapsed-rail logo/chevron stack), breadcrumbs in the shell header via getRouteMeta, BrandLogo 190px -> ~140px, and a named container-radius token that closes the 18px/24px seam Phase 31 opened. Split out of /gsd-ui-phase 31 by operator decision so a global visual refresh stays out of the milestone's riskiest data-migration phase (Phase 16 / Phase 28 precedent).
 
 ### Locked architectural decisions (carried into v1.1 planning)
 
@@ -383,6 +387,31 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 23-pdf-rendering-fixes P03 | ~8min | 3 tasks | 3 files |
 | Phase 24-admin-dual-view-toggle P01 | 2min | 2 tasks | 4 files |
 | Phase 24-admin-dual-view-toggle P02 | ~5min | 3 tasks | 6 files |
+| Phase 29 P01 | ~5min (continuation) | 3 tasks | 5 files |
+| Phase 29 P02 | ~10min | 2 tasks | 1 files |
+| Phase 30 P01 | 12min | 3 tasks | 8 files |
+| Phase 30 P02 | 16min | 3 tasks | 12 files |
+| Phase 30 P03 | 21min | 3 tasks | 15 files |
+| Phase 30 P04 | ~20min | 3 tasks | 6 files |
+| Phase 30 P05 | ~20min | 3 tasks | 5 files |
+| Phase 30 P06 | 55min | 3 tasks | 6 files |
+| Phase 30 P07 | 45min | 3 tasks | 9 files |
+| Phase 30 P08 | ~35min | 3 tasks | 11 files |
+| Phase 31 P01 | ~10min | 3 tasks | 6 files |
+| Phase 31 P02 | ~22min | 3 tasks | 10 files |
+| Phase 31 P03 | 22min | 3 tasks | 8 files |
+| Phase 31 P04 | ~10min | 2 tasks | 5 files |
+| Phase 31 P05 | 30min | 3 tasks | 4 files |
+| Phase 31 P06 | ~22min | 3 tasks | 14 files |
+| Phase 31 P07 | 15min | 3 tasks | 5 files |
+| Phase 31 P08 | ~25min | 2 tasks | 5 files |
+| Phase 31.1 P01 | ~9min | 3 tasks | 2 files |
+| Phase 31.1 P02 | 4min | 3 tasks | 3 files |
+| Phase 31.1 P03 | 4min | 3 tasks | 4 files |
+| Phase 31.1 P04 | ~14min | 3 tasks | 8 files |
+| Phase 31.1 P05 | ~5min | 2 tasks | 2 files |
+| Phase 31.1 P06 | 6min | 3 tasks | 4 files |
+| Phase 31.1 P07 | ~60min | 3 tasks | 2 files |
 
 ## Decisions
 
@@ -436,3 +465,57 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: TDD RED/GREEN for ViewToggle — test-first with 9 behavior cases before implementation
 - [Phase ?]: effectiveView = adminSegment ? admin : storedView — D-02 auto-reconcile: admin route presence overrides stored agent flag
 - [Phase ?]: adminHomeHref forwarded server-side from ADMIN_URL_SEGMENT — not adminSegment, to preserve D-02 isolation
+- [Phase 29]: Task 3 ci.yml/runbook edits (paths-filter fix, journal-parity gate, anti-rot guard wiring) verified against plan spec and committed as-is after Bash-tool-outage interruption — On-disk edits from interrupted prior executor matched Task 3 acceptance criteria exactly; no corrections needed
+- [Phase 29]: ISOLATION-PROBE-29 (empirical local-write-invisible-in-production check) skipped by user; write isolation follows from Neon branch/endpoint separation but was not empirically verified in Phase 29 — User chose to skip Task 2 step 5 of 29-02-PLAN.md
+- [Phase 29]: development branch stale fork-snapshot data (forked from main 2026-05-27) accepted as local test data — no purge — Antoine option (a): accept, no follow-up item, no Neon Reset from parent
+- [Phase 30]: Normalization function deletes periods before collapsing non-alnum runs, so abbreviated legal forms like 'S.A.S.' join into 'sas' before the space-bounded legal-form regex strips them — CRM-01 requires the four spec test cases to pass; the literal plan recipe left isolated s/a/s letters
+- [Phase 30]: 0007_phase30_crm_registry.sql added to no-commission.test.ts KNOWN_MIGRATIONS allowlist after review — Confirms it introduces no commission-related column (ADMIN-09 discipline)
+- [Phase 30]: SearchBar optional placeholderKey/ariaKey DictKey props default to current proposal.search.* keys — new surfaces override copy with zero edits to existing call sites (30-02)
+- [Phase 30]: BuildingIcon/PhoneIcon hand-authored with real SVG strokes (1.5px) rather than Iconly's filled-evenodd double-contour technique — no licensed source exists for these glyphs (30-02, A-7)
+- [Phase 30]: clients.* (partner-facing) vs admin.companies.* (admin-facing) i18n namespace split mirrors the CRM-01/02 shared-vs-private data model split from Plan 30-01
+- [Phase 30]: Widened src/lib/api/proposals/list.ts's _callerRole type to include 'sales' (Rule 3 fix, out of plan scope) since the admin-scoping check only compares === 'admin'
+- [Phase 30]: Every eq(schema.users.role, 'partner') predicate widened to inArray(schema.users.role, ['partner','sales']) so Commercial accounts stay visible to admin surfaces after the Plan 30-01 backfill (ROLE-03)
+- [Phase 30]: roleForPartnerType() derives 'sales' only for 'Commercial' and is guarded in adminCreateInvitation + adminUpdatePartnerType against ever demoting an existing 'admin' row
+- [Phase 30]: listProposalsForRelationship scopes ownership via proposals.user_id = ownerId (not a join to client_relationships.owner_id) — defense in depth, matches plan 30-04 spec
+- [Phase 30]: Ran the CRM-02/CRM-03 real-Postgres isolation suite against the Neon development branch (confirmed via check:local-db-branch, not production); all seeded test rows verified deleted afterward
+- [Phase 30]: CRM writes avoid db().transaction() — this project's neon-http Postgres driver throws at runtime on .transaction(); use ON CONFLICT DO NOTHING + re-select for idempotent multi-step writes instead (30-05)
+- [Phase 30]: ClientsGrid neutralizes DataGrid's default row-pagination row model (controlled pageSize = rows.length) instead of authoring a leaner TanStack feature bundle, since DataGridPagination itself is never rendered
+- [Phase 30]: Server-side sort on /clients collapses DataGridColumnHeader's built-in asc/desc/clear 3-way cycle into a 2-way URL toggle — no unsorted state exists on this surface
+- [Phase 30]: CreateClientDialog uses z.input<createClientSchema> as the RHF form-values type (not the exported z.infer output type) plus a Controller-bound SirenInput, matching ParametresFormCard.tsx's precedent for the same optional+transform siren field
+- [Phase 30-07]: Client-detail Propositions row reuses plan 30-04's ADMIN-09-narrow row shape unmodified (amountHT=computedClientMonthly, no expiry derivation) rather than widening the query. — Threat model T-30-07-06 explicitly cites the existing narrow shape as the ADMIN-09 mitigation; widening it would work against the plan's own stated security reasoning.
+- [Phase 30-07]: ContactFormDialog's required-field asterisk follows the codebase's ml-0.5/aria-hidden accessible convention, not the plan's narrower literal grep gate. — The plan's own correction note flags 30-06's grep-driven markup regression (reverted in 5b223b2) as wrong; the substantive requirement is verified by a real test instead.
+- [Phase 30]: Admin company detail header uses PageHero's actions slot for the inline SIREN chip, satisfying the 'SIREN inline beside it' instruction without forking PageHero
+- [Phase 30]: Deferred: /proposals/[id] has no admin-bypass in its ownership check — logged in phase 30 deferred-items.md as a Phase 33/34 candidate, does not block CRM-03
+- [Phase 31-01]: D-10 pair key refined to unordered side-identity-key pairs (siren:<9digits> or owner:<ownerId>|name:<name_normalized>), not the literal normalized-name pair, to avoid degenerate (x,x) self-pairs
+- [Phase 31-01]: Provenance source column added to companies, client_relationships AND contacts (not contacts-only) — undoing a bad extraction means deleting companies/relationships too, and adding the column now is one ALTER vs a lossy migration+backfill later
+- [Phase 31]: OQ-1/OQ-2/OQ-3 resolved in 31-02: global one-pass matching, most-frequent-spelling canonical naming with deterministic tie-breaks, owner-scoped idempotent re-run reuse — See 31-02-SUMMARY.md key-decisions for full reasoning
+- [Phase 31]: SIREN-less existing-company reuse is owner-scoped (not a bare name_normalized lookup) to avoid cross-owner silent merging while still satisfying OQ-1 idempotency — 31-02 engine.ts implementation decision
+- [Phase 31]: Step 4's pair-decision repoint excludes the current pair's own row (ne(id, pairId)) so a mid-crash retry can recover the loser company id; ON DELETE SET NULL becomes the completed signal
+- [Phase 31]: Survivor-membership validation uses a pre-claim SELECT (safe: caller-fixed input, not concurrently-mutated data) — the concurrent-admin race guard stays exclusively the claim's isNull(verdict) precondition
+- [Phase 31]: envelope.generatedAt mirrors plan.generatedAt (not the file-write moment) so drift.ts's ageMs compares like-for-like — 31-04, D-15
+- [Phase 31]: computeDrift's input adds a caller-supplied freshFingerprint field alongside stored/fresh, since ReconciliationPlan carries no fingerprint of its own — 31-04, D-15
+- [Phase ?]: Fixed engine.ts relationshipKey to companyKey|ownerId — the bare company key would have collided across owners sharing one company after a cross-owner SIREN merge (31-05)
+- [Phase ?]: apply.ts writes audit rows directly via the injected dbi (batched per stage), bypassing writeAuditLog's memoized db() singleton, to preserve full unit-testability of the dbi-parameterized writer (31-05)
+- [Phase 31-06]: D-16 vs 31-UI-SPEC.md route divergence resolved in the UI-SPEC's favor: /[adminSegment]/companies/review nested in the existing companies tree, not a new top-level segment
+- [Phase 31-06]: route-meta.ts's /companies/review tail match registered strictly before /companies (load-bearing ordering, regression-tested)
+- [Phase 31-06]: Added admin.reconciliation.card.counts dictionary key (fr/en), not in the UI-SPEC's i18n Key Plan — the counts line's words differ in English (proposals vs propositions), so bilingual correctness required a key the plan's literal list omitted
+- [Phase 31-06]: KeepSeparateDialog confirm uses explicit variant=outline — the UI-SPEC's claim about AlertDialogAction's own default variant does not match alert-dialog.tsx's actual code; outline was set explicitly to honor the same document's zero-accent-budget Color section
+- [Phase 31]: run.ts's counts field is read back from the just-written dry-run report via readLatestDryRunReport() rather than exporting report.ts's internal computeCounts(), keeping the plan's file changes scoped to files_modified
+- [Phase 31]: Checkpoint verification for 31-08 was performed against seeded fixtures (scripts/seed-reconciliation-fixtures.ts), not the development branch's organic data — The branch's 4 eligible proposals all carried well-formed SIRENs and unambiguous names — exactly the condition under which criteria 3, 4 and 5 (SIREN merge, name-flag, durable resolution) have nothing to reconcile and would pass vacuously
+- [Phase 31]: Criterion 5's first durability re-run (pairsFlagged: 0) was rejected as vacuous evidence; client_relationship_id was nulled on fixture proposals only to force re-derivation before the real result was recorded — Every fixture proposal was already linked, so the engine never reached the pairing stage at all (skipped as already_linked) — a green result for the wrong reason
+- [Phase 31]: Phase 31's access/non-leakage check (D-11/CRM-02) is recorded PARTIAL, not PASS, in 31-08-SUMMARY.md — The authenticated-partner 404 case is operator-attested only, not agent-verified (the agent has no partner credentials); the logged-out case was agent-verified as a non-divergent 307 redirect, satisfying the underlying non-leakage property even though the checkpoint's original 404 expectation was imprecise pre-auth
+- [Phase 31.1-01]: Froze --radius-sm...4xl at current computed px values (6/8/10/14/18/22/26) instead of retiring the multiplier scale, per 31.1-CONTEXT.md's Discretion grant — zero visual change on day one
+- [Phase 31.1-01]: Declared the Colibris container ladder under its own --radius-container* namespace rather than mapping it onto --radius-sm...2xl, avoiding a silent move of ~90 unaudited rounded-2xl/rounded-md call sites
+- [Phase 31.1-01]: Leasetic's real control-tier corner is 26px (--radius-4xl), not the ROADMAP criterion 4's 8px which describes Colibris — recorded for Plan 31.1-07's UIC-04 rewrite
+- [Phase 31.1-02]: Breadcrumb leaves render dictionary labels, not live entity names, on every detail route (D-06 Trail-depth decision) — keeps getRouteMeta a pure pathname function with no data access. — Plumbing an entity name into the shell header, which renders on every page, would be an unscoped information-disclosure surface and would require a new server-to-shell data path the phase boundary forbids.
+- [Phase 31.1]: BreadcrumbLink uses render={<Link href={seg.href} />} (next/link), matching the existing AppSidebar.tsx/NavUser.tsx pattern, for client-side breadcrumb navigation
+- [Phase 31.1]: SidebarTrigger's call-site aria-label supersedes (not replaces) the primitive's hardcoded English sr-only span via prop-spread order — the header collapse control is now focusable and FR/EN-labelled at every viewport width, the precondition Plan 31.1-06 needs before removing the in-sidebar chevron
+- [Phase 31.1]: 31.1-04: rounded-container confirmed as the Tailwind utility for --radius-container (16px); used across card/dialog/alert-dialog/popover and the review-queue surfaces
+- [Phase 31.1]: 31.1-04: MergeDialog/KeepSeparateDialog rounded-[24px] overrides deleted, not replaced — the primitive supplies the radius
+- [Phase 31.1]: 31.1-04: segmented.ts's rounded-[12px] is a control-tier literal, out of D-01/D-02 scope — allow-listed in tests/container-radius.test.ts, not retired
+- [Phase 31.1-05]: Left --popover, --input and --sidebar-accent unchanged (DARK-GAP-01/02/03) — no invented dark-mode value ships for the three surfaces the single Colibris screenshot could not answer
+- [Phase 31.1-05]: tests/dark-palette.test.ts pins the three unsampled gap tokens' current values as a hard equality assertion so a future silent fill fails loudly
+- [Phase ?]: 31.1-06: SidebarHeader's p-3 left unchanged — justify-center/mx-auto centre each child within its own box regardless of differing insets (D-09 Correction 2).
+- [Phase ?]: 31.1-06: Collapsed sidebar badge fill is bg-sidebar-accent, not bg-sidebar-primary — the mark asset is #01CC72 and the primary token resolves to the same green, which would render the mark invisible.
+- [Phase 31.1]: Dark-mode gaps (DARK-GAP-01/02/03) accepted as-is; no values invented, closure path recorded in UI-CONVENTIONS.md
+- [Phase 31.1]: CLAUDE.md Open Items corrected per operator-approved text (OPEN-A closed, --radius drives nothing in the scale)

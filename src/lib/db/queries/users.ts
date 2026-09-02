@@ -60,7 +60,10 @@ export async function listPartnersWithCounts(): Promise<PartnerWithCount[]> {
       )`.as('proposals_count'),
     })
     .from(schema.users)
-    .where(eq(schema.users.role, 'partner'))
+    // ROLE-03 / T-30-03-04: widened from role='partner' so Commercial
+    // accounts backfilled to 'sales' (Plan 30-01) stay visible on this
+    // admin listing. 'admin' is deliberately excluded.
+    .where(inArray(schema.users.role, ['partner', 'sales']))
     .orderBy(desc(schema.users.createdAt));
 
   // Derive hasUnredeemedInvite per user via a follow-up SELECT using inArray.
@@ -130,7 +133,8 @@ export async function listInvitedPartners(): Promise<InvitedPartnerRow[]> {
     .from(schema.users)
     .where(
       and(
-        eq(schema.users.role, 'partner'),
+        // ROLE-03: widened from role='partner' — see listPartnersWithCounts above.
+        inArray(schema.users.role, ['partner', 'sales']),
         isNull(schema.users.deletedAt),
         isNull(schema.users.lastLoginAt),
       ),

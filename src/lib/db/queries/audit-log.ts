@@ -25,9 +25,28 @@ export type AuditAction =
   // ── Phase 22 — Partner Types (PTYPE-03 / D-02) ──────────────────────────────
   // before/after record the SPECIFIC type string, never a boolean (D-02).
   // ADMIN-09: partner_type is a business-classification field, NOT a commission/rate value.
-  | 'user.partner_type_change';
+  | 'user.partner_type_change'
+  // ── Phase 30 — Company & Contact Registry write layer (CRM-01/02/04) ───────
+  // Payloads carry only ids and caller-submitted values — never commission
+  // data, never the pre-existing/new-company distinction (T-30-05-02/07).
+  | 'client_relationship.create'
+  | 'contact.create'
+  | 'contact.update'
+  | 'contact.delete'
+  // ── Phase 31 — Reconciliation engine (IMPORT-01..06) ────────────────────────
+  // Payloads carry ids and the caller-submitted verdict only, never business
+  // data (ADMIN-09). The three '.extract' actions are written with
+  // actorId: null (system-initiated CLI script — per the existing convention
+  // documented at the WriteAuditLogArgs.actorId line below).
+  | 'company.extract'
+  | 'client_relationship.extract'
+  | 'contact.extract'
+  | 'company_pair.flag'
+  | 'company.merge'
+  | 'client_relationship.merge'
+  | 'company_pair.keep_separate';
 
-export type AuditTargetType = 'proposal' | 'user' | 'global_params';
+export type AuditTargetType = 'proposal' | 'user' | 'global_params' | 'client_relationship' | 'contact' | 'company' | 'company_pair';
 
 export interface WriteAuditLogArgs {
   actorId: string | null;        // null when system-initiated (e.g., 'proposal.purge' via cron)

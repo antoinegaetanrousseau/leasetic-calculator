@@ -18,6 +18,9 @@
  *   - Test 4: invitationMessage IS persisted to the audit log when provided.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 vi.mock('server-only', () => ({}));
 
@@ -36,6 +39,7 @@ const {
     query: { users: { findFirst: findFirstMock } },
     update: updateMock,
     _findFirstMock: findFirstMock,
+    _setMock: setMock,
   };
   return {
     requireAdminMock: vi.fn(),
@@ -72,7 +76,7 @@ vi.mock('drizzle-orm', () => ({
   sql: (strings: TemplateStringsArray, ...values: unknown[]) => ({ _sql: { strings, values } }),
 }));
 
-import { adminCreateInvitation } from './actions';
+import { adminCreateInvitation, adminUpdatePartnerType } from './actions';
 
 const ADMIN_SESSION = { user: { id: 'admin-1', email: 'admin@example.com' } } as never;
 
@@ -91,8 +95,19 @@ beforeEach(() => {
   const inst = dbMock();
   (inst as unknown as { _findFirstMock: ReturnType<typeof vi.fn> })._findFirstMock.mockResolvedValue({
     id: 'user-1',
+    role: 'partner',
   });
+  (inst as unknown as { _setMock: ReturnType<typeof vi.fn> })._setMock.mockClear();
 });
+
+/** Test-only accessor for the hoisted db mock's findFirst/set spies. */
+function dbSpies() {
+  const inst = dbMock();
+  return inst as unknown as {
+    _findFirstMock: ReturnType<typeof vi.fn>;
+    _setMock: ReturnType<typeof vi.fn>;
+  };
+}
 
 afterEach(() => vi.clearAllMocks());
 
@@ -194,5 +209,120 @@ describe('adminCreateInvitation — Phase 14 extended args', () => {
       const profile = (c.payload as { profile?: Record<string, unknown> }).profile!;
       expect(profile.invitationMessage).toBe('Custom welcome message here.');
     }
+  });
+});
+
+describe('Phase 30 Plan 03 (ROLE-01/02) — adminCreateInvitation derives role from partnerType', () => {
+  it('partnerType "Commercial" writes role: "sales"', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-2', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'commercial@example.com',
+      displayName: 'Commercial User',
+      language: 'fr',
+      partnerType: 'Commercial',
+    });
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.role).toBe('sales');
+  });
+
+  it.each(['Agent', 'Partenaire'] as const)(
+    'partnerType %s writes role: "partner"',
+    async (partnerType) => {
+      dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-3', role: 'partner' });
+      await adminCreateInvitation({
+        email: `${partnerType.toLowerCase()}@example.com`,
+        displayName: 'Some User',
+        language: 'fr',
+        partnerType,
+      });
+      const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+      expect(setCall.role).toBe('partner');
+    },
+  );
+
+  it('partnerType omitted leaves role untouched (no role key in the .set() payload)', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-4', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'legacy2@example.com',
+      displayName: 'Legacy User',
+      language: 'en',
+    });
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect('role' in setCall).toBe(false);
+  });
+
+  it('never overwrites an existing "admin" row\'s role, even when partnerType is "Commercial"', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'admin-user', role: 'admin' });
+    await adminCreateInvitation({
+      email: 'admin-reinvite@example.com',
+      displayName: 'Admin User',
+      language: 'fr',
+      partnerType: 'Commercial',
+    });
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect('role' in setCall).toBe(false);
+  });
+
+  it('records the derived role in the user.create audit payload when written', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-5', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'audited@example.com',
+      displayName: 'Audited User',
+      language: 'fr',
+      partnerType: 'Commercial',
+    });
+    const userCreateCall = writeAuditLogMock.mock.calls
+      .map((c) => c[0])
+      .find((c) => c.action === 'user.create');
+    expect((userCreateCall!.payload as { role?: string }).role).toBe('sales');
+    // ADMIN-09 — no commission/rate field anywhere in the payload.
+    const payloadStr = JSON.stringify(userCreateCall!.payload);
+    expect(payloadStr.toLowerCase()).not.toContain('commission');
+  });
+
+  it('never writes role: "admin" anywhere in adminCreateInvitation (grep-level contract)', () => {
+    const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'actions.ts'), 'utf8');
+    expect(src).not.toMatch(/role:\s*'admin'/);
+  });
+});
+
+describe('Phase 30 Plan 03 (ROLE-01/02) — adminUpdatePartnerType moves role with partnerType', () => {
+  it('moving a user to "Commercial" sets role: "sales" alongside partnerType', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ partnerType: 'Agent', role: 'partner' });
+    await adminUpdatePartnerType('user-1', 'Commercial');
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.partnerType).toBe('Commercial');
+    expect(setCall.role).toBe('sales');
+  });
+
+  it('moving a user away from "Commercial" sets role: "partner"', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ partnerType: 'Commercial', role: 'sales' });
+    await adminUpdatePartnerType('user-1', 'Agent');
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.partnerType).toBe('Agent');
+    expect(setCall.role).toBe('partner');
+  });
+
+  it('never demotes an existing "admin" row\'s role, even when moved to "Commercial"', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ partnerType: 'Agent', role: 'admin' });
+    await adminUpdatePartnerType('admin-user', 'Commercial');
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.partnerType).toBe('Commercial');
+    expect('role' in setCall).toBe(false);
+  });
+
+  it('no-op guard (same type) skips the write entirely — no role key to inspect', async () => {
+    dbSpies()._setMock.mockClear();
+    dbSpies()._findFirstMock.mockResolvedValue({ partnerType: 'Agent', role: 'partner' });
+    await adminUpdatePartnerType('user-1', 'Agent');
+    expect(dbSpies()._setMock).not.toHaveBeenCalled();
+  });
+
+  it('does not include a commission/rate field in the audit payload', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ partnerType: 'Agent', role: 'partner' });
+    await adminUpdatePartnerType('user-1', 'Commercial');
+    const call = writeAuditLogMock.mock.calls.at(-1)![0];
+    const payloadStr = JSON.stringify(call.payload);
+    expect(payloadStr.toLowerCase()).not.toContain('commission');
   });
 });

@@ -24,6 +24,7 @@
  * gated surface. listCoefficientHistory({ limit: 5 }) is read-only.
  */
 
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import Link from 'next/link';
 import { listCoefficientHistory } from '@/lib/db/queries/coefficient-history';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -48,14 +49,7 @@ export async function CoefficientHistorySidebar({
       aria-label={t('coefficients.history.aria.label', lang)}
       style={{ padding: 28 }}
     >
-      <div className="ctitle" style={{ marginBottom: 16 }}>
-        <span
-          className="dot"
-          style={{ background: 'var(--gd)' }}
-          aria-hidden="true"
-        />
-        <span>{t('coefficients.history.title', lang)}</span>
-      </div>
+      <SectionTitle className="mb-4">{t('coefficients.history.title', lang)}</SectionTitle>
 
       {rows.length === 0 ? (
         <p

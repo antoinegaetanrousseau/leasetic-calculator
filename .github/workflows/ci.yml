@@ -47,6 +47,9 @@ jobs:
       - name: Defense-in-depth grep -- no-drizzle-push invocations
         run: npm run check:no-drizzle-push
 
+      - name: Defense-in-depth -- db-smoke path filter matches real migrations (INFRA-06)
+        run: npm run check:db-smoke-filter
+
       - name: Defense-in-depth -- seed SQL in sync with seedParams (D-D1)
         run: npm run check:seed-sql
 
@@ -85,9 +88,12 @@ jobs:
         id: filter
         uses: dorny/paths-filter@v3
         with:
+          # Migrations live at the top level of drizzle/ as NNNN_*.sql -- there is no nested
+          # subdirectory for them. A defense-in-depth guard in the build-test job enforces
+          # this filter stays accurate on every PR.
           filters: |
             schema:
-              - 'drizzle/migrations/*.sql'
+              - 'drizzle/*.sql'
               - 'drizzle/meta/_journal.json'
 
       - name: Setup Node.js
@@ -100,6 +106,10 @@ jobs:
       - name: Install dependencies
         if: steps.filter.outputs.schema == 'true'
         run: npm ci
+
+      - name: Migration journal parity (INFRA-06 / Phase 12 regression)
+        if: steps.filter.outputs.schema == 'true'
+        run: npm run check:migration-journal-sync
 
       - name: Create ephemeral Neon branch
         if: steps.filter.outputs.schema == 'true'

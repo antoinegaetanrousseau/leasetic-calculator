@@ -26,9 +26,9 @@
  * Phase 14 Test 5/6 (h1 text === "Administration" / "Manage…") still hold —
  * PageHero h1 props are asserted via the PageHero mock's data-attrs.
  */
+import { SlidersIcon, UsersIcon, HistoryIcon, HashIcon } from '@/components/ui/icons';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, within } from '@testing-library/react';
-import { Sliders, Users, History, Hash } from 'lucide-react';
 import type { ActivityRow } from '@/lib/db/queries/admin-activity';
 
 vi.mock('server-only', () => ({}));
@@ -319,10 +319,10 @@ describe('Admin Home page — Phase 18 rewrite (D-01..D-07, D-29)', () => {
     // Icons preserved + new Hash icon
     const calls = adminNavCardMock.mock.calls.map(([p]) => p);
     const byVariant = Object.fromEntries(calls.map((p) => [p.variant, p]));
-    expect(byVariant.coefficients.icon).toBe(Sliders);
-    expect(byVariant.partners.icon).toBe(Users);
-    expect(byVariant.history.icon).toBe(History);
-    expect(byVariant['lc-references'].icon).toBe(Hash);
+    expect(byVariant.coefficients.icon).toBe(SlidersIcon);
+    expect(byVariant.partners.icon).toBe(UsersIcon);
+    expect(byVariant.history.icon).toBe(HistoryIcon);
+    expect(byVariant['lc-references'].icon).toBe(HashIcon);
   });
 
   it('Test 8: Recent activity card renders header ACTIVITÉ RÉCENTE + Voir tout link → /<seg>/history', async () => {

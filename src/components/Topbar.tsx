@@ -1,68 +1,67 @@
-import { UserMenu } from './UserMenu';
-import { TopbarTitle } from './TopbarTitle';
+import { TopbarBreadcrumb } from './TopbarBreadcrumb';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Badge } from '@/components/ui/badge';
 import { t, type Lang } from '@/lib/i18n';
 
 // PHASE 16: verified visual match to Figma 9:46 on 2026-05-22 (D-16). Zero functional change.
 
 /**
- * Topbar — page title + ADMIN pill + UserMenu (UI-SPEC §6.7, Plan 11-05 D-06).
+ * Topbar — collapse control + breadcrumb + ADMIN badge.
  *
- * The title is rendered by the `<TopbarTitle>` client island so it can read
- * the current pathname; the rest of the topbar chrome stays server-rendered.
+ * User identity moved to the sidebar footer (NavUser) when the app-shell-1
+ * block structure was adopted; the block puts the account card at the bottom
+ * of the sidebar, not in the header. Phase 31.1 (D-04) removed the last of
+ * the title chrome too: the topbar is now navigation chrome only — the
+ * breadcrumb trail plus the sidebar collapse control — and the page title
+ * lives in `PageHero`, in the content area.
+ *
+ * The breadcrumb is rendered by the `<TopbarBreadcrumb>` client island so it
+ * can read the current pathname; the rest of the topbar chrome stays
+ * server-rendered.
  */
 export interface TopbarProps {
-  displayName: string;
-  email: string;
   lang: Lang;
   isAdmin?: boolean;
-  /** Forwarded to TopbarTitle so admin-tree paths resolve to admin titles. */
+  /** Forwarded to TopbarBreadcrumb so admin-tree paths resolve to admin trails. */
   adminSegment?: string;
 }
 
 export function Topbar({
-  displayName,
-  email,
   lang,
   isAdmin = false,
   adminSegment,
 }: TopbarProps) {
   return (
-    <header
-      style={{
-        gridRow: '1',
-        gridColumn: '2',
-        background: 'var(--surface)',
-        borderBottom: '1px solid var(--border)',
-        height: 'var(--topbar-h)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '0 24px',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-      }}
-    >
-      <TopbarTitle lang={lang} adminSegment={adminSegment} />
+    // Phase 3: the gridRow/gridColumn placement is gone with the CSS grid that
+    // needed it — SidebarInset is a flex column now. The height stays bound to
+    // --topbar-h because the proposal detail page offsets a sticky element
+    // against it (`top: calc(var(--topbar-h) + 24px)`).
+    <header className="sticky top-0 z-100 flex h-[var(--topbar-h)] items-center gap-3 border-b border-border bg-background px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        {/* Phase 31.1 (D-07): the single, focusable, FR/EN-labelled collapse
+            control for the whole shell — rendered at every width, not just
+            below md. SidebarRail cannot serve as it: the primitive hardcodes
+            tabIndex={-1} and an English "Toggle Sidebar" label, which would
+            cost keyboard users the control and drop FR/EN in a bilingual
+            product (the same reasoning that used to live on the in-sidebar
+            chevron this control replaces — AppSidebar.tsx, until Plan
+            31.1-06 removes it). The aria-label below supersedes — it does
+            not remove — the primitive's own sr-only English span. */}
+        <SidebarTrigger
+          className="-ml-1"
+          aria-label={t('shell.topbar.toggleSidebar', lang)}
+        />
+        <TopbarBreadcrumb lang={lang} adminSegment={adminSegment} />
+      </div>
       {isAdmin && (
-        <span
-          style={{
-            fontSize: '9px',
-            fontWeight: 700,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            padding: '2px 8px',
-            borderRadius: 9999,
-            background: 'var(--navy)',
-            color: '#ffffff',
-          }}
+        <Badge
+          variant="secondary"
+          className="ml-auto"
           aria-label={t('shell.topbar.admin.badge', lang)}
         >
           {t('shell.topbar.admin.badge', lang)}
-        </span>
+        </Badge>
       )}
-      <div style={{ flex: 1 }} />
-      <UserMenu displayName={displayName} email={email} lang={lang} />
     </header>
   );
 }

@@ -1,0 +1,29 @@
+import * as React from "react";
+
+export interface MoreHorizontalIconProps extends React.SVGProps<SVGSVGElement> {
+  /** Rendered width and height. Defaults to 24. */
+  size?: number | string;
+}
+
+/** More Circle (Iconly #514) */
+export function MoreHorizontalIcon({ size = 24, ...props }: MoreHorizontalIconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden={props["aria-label"] ? undefined : true}
+      {...props}
+    >
+      <g id="more-horizontal-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+      <g id="more-horizontal-2" transform="translate(2.000000, 2.000000)" fill="currentColor">
+      <path d="M10,0 C15.514,0 20,4.486 20,10 C20,15.514 15.514,20 10,20 C4.486,20 0,15.514 0,10 C0,4.486 4.486,0 10,0 Z M10,1.5 C5.313,1.5 1.5,5.313 1.5,10 C1.5,14.687 5.313,18.5 10,18.5 C14.687,18.5 18.5,14.687 18.5,10 C18.5,5.313 14.687,1.5 10,1.5 Z M13.9482,9.0137 C14.5012,9.0137 14.9482,9.4607 14.9482,10.0137 C14.9482,10.5667 14.5012,11.0137 13.9482,11.0137 C13.3952,11.0137 12.9432,10.5667 12.9432,10.0137 C12.9432,9.4607 13.3862,9.0137 13.9382,9.0137 L13.9482,9.0137 Z M9.9385,9.0137 C10.4915,9.0137 10.9385,9.4607 10.9385,10.0137 C10.9385,10.5667 10.4915,11.0137 9.9385,11.0137 C9.3855,11.0137 8.9345,10.5667 8.9345,10.0137 C8.9345,9.4607 9.3765,9.0137 9.9295,9.0137 L9.9385,9.0137 Z M5.9297,9.0137 C6.4827,9.0137 6.9297,9.4607 6.9297,10.0137 C6.9297,10.5667 6.4827,11.0137 5.9297,11.0137 C5.3767,11.0137 4.9247,10.5667 4.9247,10.0137 C4.9247,9.4607 5.3677,9.0137 5.9207,9.0137 L5.9297,9.0137 Z" id="more-horizontal-3"></path>
+      </g>
+      </g>
+    </svg>
+  );
+}
+
+export default MoreHorizontalIcon;

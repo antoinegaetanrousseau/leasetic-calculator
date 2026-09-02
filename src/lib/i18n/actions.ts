@@ -40,5 +40,7 @@ export async function setLang(lang: Lang) {
     console.error('[setLang] DB persistence failed:', e);
   }
 
-  revalidatePath('/');
+  // 'layout' scope — same reasoning as setTheme: `lang` is an attribute on
+  // <html> in the root layout, so page-scoped revalidation leaves it stale.
+  revalidatePath('/', 'layout');
 }

@@ -39,5 +39,11 @@ export async function setTheme(theme: Theme) {
     console.error('[setTheme] DB persistence failed:', e);
   }
 
-  revalidatePath('/');
+  // 'layout' scope, not the default 'page' scope. The theme is expressed as
+  // `data-theme` on <html> in the ROOT layout, so a page-scoped revalidation
+  // re-renders the page while leaving the attribute stale — the cookie flipped
+  // but the UI kept the old theme until a manual reload. 'layout' also means a
+  // user toggling the theme from /proposals or an admin route gets it applied
+  // there, instead of only on '/'.
+  revalidatePath('/', 'layout');
 }

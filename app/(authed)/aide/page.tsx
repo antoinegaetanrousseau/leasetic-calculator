@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, FileText, Mail } from 'lucide-react';
+import { BookOpenIcon, FileTextIcon, MailIcon } from '@/components/ui/icons';
 import { getCurrentLang, t } from '@/lib/i18n';
 import { PageHero } from '@/components/ui/PageHero';
 
@@ -86,7 +86,7 @@ export default async function AidePage() {
       >
         {/* Card 1 — Commencer ici (active, links to starter article) */}
         <div className="card" style={{ padding: cardPadding }}>
-          <BookOpen size={24} color="var(--gd-text)" strokeWidth={1.6} />
+          <BookOpenIcon size={24} style={{ color: 'var(--gd-text)' }} />
           <h3 style={titleStyle}>{t('aide.landing.card.commencerIci.title', lang)}</h3>
           <p style={bodyStyle}>{t('aide.landing.card.commencerIci.body', lang)}</p>
           <Link href="/aide/commencer-ici" style={ctaLinkStyle}>
@@ -96,7 +96,7 @@ export default async function AidePage() {
 
         {/* Card 2 — Créer une proposition (DISABLED, Bientôt disponible) */}
         <div className="card" style={{ padding: cardPadding, opacity: 0.7 }}>
-          <FileText size={24} color="var(--muted)" strokeWidth={1.6} />
+          <FileTextIcon size={24} style={{ color: 'var(--muted)' }} />
           <h3 style={titleStyle}>{t('aide.landing.card.creerProposition.title', lang)}</h3>
           <p style={bodyStyle}>{t('aide.landing.card.creerProposition.body', lang)}</p>
           <span style={badgeStyle}>
@@ -106,7 +106,7 @@ export default async function AidePage() {
 
         {/* Card 3 — Contact (mailto SUPPORT_EMAIL) */}
         <div className="card" style={{ padding: cardPadding }}>
-          <Mail size={24} color="var(--gd-text)" strokeWidth={1.6} />
+          <MailIcon size={24} style={{ color: 'var(--gd-text)' }} />
           <h3 style={titleStyle}>{t('aide.landing.card.contact.title', lang)}</h3>
           <p style={bodyStyle}>{t('aide.landing.card.contact.body', lang)}</p>
           <a href={`mailto:${SUPPORT_EMAIL}`} style={ctaLinkStyle}>

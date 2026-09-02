@@ -53,7 +53,7 @@
  * Note: invoked via `tsx -r ./scripts/_preload-mock-server-only.cjs`
  * (preload registered in package.json smoke:ovh script).
  */
-import 'dotenv/config';
+import './_load-env';
 import { createHash, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';

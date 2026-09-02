@@ -1,23 +1,28 @@
 /**
- * Shell — composes RetractableSidebar + Topbar + main + footer in a 2-col / 3-row
- * CSS grid (UI-SPEC §6.7, COMP-02 integration).
+ * Shell — composes AppSidebar + Topbar + main + footer (Phase 3 of the
+ * ReUI/Maia migration).
  *
- * Server component: no `'use client'`. The only client island it renders is
- * `<RetractableSidebar>` (Plan 11-04), which owns its own collapse state and
- * mutates `--shell-sidebar-current-w` on the documentElement at runtime.
+ * Server component. Previously this was a hand-built 2-col / 3-row CSS grid
+ * whose first column tracked `--shell-sidebar-current-w`, a variable the
+ * client sidebar mutated on documentElement from an effect. The shadcn
+ * SidebarProvider owns that layout now, so the grid, the width variables and
+ * the effect are all gone.
  *
- * Three integration moves from the v1.1 inline layout body:
- *   1. `<aside>` block → `<RetractableSidebar adminHrefs ... />`
- *   2. grid-template-columns: var(--shell-sidebar-w) → var(--shell-sidebar-current-w)
- *   3. `<Topbar>` invocation no longer passes `theme` (dropped from TopbarProps in Plan 11-05 Task 2)
+ * The one genuinely new behaviour: `defaultOpen` is read from the
+ * `sidebar_state` cookie HERE, on the server. The old implementation kept
+ * collapse state in localStorage, which the server cannot see, so a collapsed
+ * user always got one frame of expanded sidebar before the effect corrected it
+ * — a shift the old UI-SPEC documented and accepted. Reading the cookie
+ * server-side removes it.
  *
- * adminHrefs construction: required because RetractableSidebar is a client component
- * and cannot read process.env.ADMIN_URL_SEGMENT directly. The (admin) layout
- * resolves `params.adminSegment` server-side and forwards it via prop; Shell
- * builds the 4 admin nav hrefs and passes them through (UI-SPEC §11.6).
+ * adminHrefs construction is unchanged: AppSidebar is a client component and
+ * cannot read process.env.ADMIN_URL_SEGMENT, so Shell resolves the four admin
+ * nav hrefs and forwards them (UI-SPEC §11.6).
  */
+import { cookies } from 'next/headers';
 import { Topbar } from '@/components/Topbar';
-import { RetractableSidebar } from '@/components/ui/RetractableSidebar';
+import { AppSidebar } from '@/components/ui/AppSidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import type { ActiveNav } from '@/lib/route-meta';
 import { t, type Lang } from '@/lib/i18n';
 
@@ -29,22 +34,22 @@ export interface ShellProps {
   email: string;
   /**
    * Optional override for sidebar active-nav highlighting. When omitted,
-   * RetractableSidebar derives it from the current pathname via getRouteMeta.
+   * AppSidebar derives it from the current pathname via getRouteMeta.
    */
   activeNav?: ActiveNav;
   /** Required when isAdmin=true; used to build admin nav hrefs (UI-SPEC §11.6). */
   adminSegment?: string;
   /**
    * Admin-only redirect target for the agent→admin view switch on non-admin
-   * routes. Forwarded straight to RetractableSidebar; distinct from adminSegment
-   * so it does NOT trigger D-02 auto-reconcile (passing adminSegment would force
-   * effectiveView='admin' and make agent view impossible — see Plan 24-02 Task 2).
+   * routes. Distinct from adminSegment so it does NOT trigger the D-02
+   * auto-reconcile (passing adminSegment would force effectiveView='admin' and
+   * make agent view impossible — see Plan 24-02 Task 2).
    */
   adminHomeHref?: string;
   children: React.ReactNode;
 }
 
-export function Shell({
+export async function Shell({
   isAdmin,
   lang,
   theme,
@@ -55,89 +60,73 @@ export function Shell({
   adminHomeHref,
   children,
 }: ShellProps) {
-  // Build admin hrefs from adminSegment (UI-SPEC §11.6). Shell reads adminSegment
-  // server-side; RetractableSidebar (client component) cannot read process.env
-  // directly, so Shell forwards a resolved map.
   const adminHrefs =
     isAdmin && adminSegment
       ? {
           home: `/${adminSegment}`,
           coefficients: `/${adminSegment}/coefficients`,
           partners: `/${adminSegment}/partners`,
+          companies: `/${adminSegment}/companies`,
+          reconciliation: `/${adminSegment}/companies/review`,
           history: `/${adminSegment}/history`,
         }
       : undefined;
 
+  // SidebarProvider writes `sidebar_state` on every toggle; reading it here is
+  // what makes the collapsed state survive a reload without a visible shift.
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get('sidebar_state')?.value !== 'false';
+
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'var(--shell-sidebar-current-w) 1fr',
-        gridTemplateRows: 'var(--topbar-h) 1fr var(--footer-h)',
-        minHeight: '100vh',
-      }}
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      // These MUST go through `style`, not className. SidebarProvider sets
+      // --sidebar-width / --sidebar-width-icon as an inline style and spreads
+      // the incoming `style` after its defaults, so a Tailwind arbitrary-
+      // property utility (bracket syntax) targeting the same custom property
+      // is silently outranked by that inline style and the sidebar keeps
+      // shadcn's 16rem/3rem. (The shipped app-shell-1 block sets them via
+      // className and has the same latent bug.)
+      // Phase 31.1 (D-11) set these to Colibris's measured 252/68 — the
+      // values still live here for the same reason recorded above.
+      style={
+        {
+          '--sidebar-width': '252px',
+          '--sidebar-width-icon': '68px',
+        } as React.CSSProperties
+      }
     >
-      {/* Sidebar (rows 1-3, col 1) — client island; owns collapse state + width var */}
-      <RetractableSidebar
+      <AppSidebar
         activeNav={activeNav}
         isAdmin={isAdmin}
         lang={lang}
         theme={theme}
+        displayName={displayName}
+        email={email}
         adminHrefs={adminHrefs}
         adminSegment={adminSegment}
         adminHomeHref={adminHomeHref}
       />
 
-      {/* Topbar (row 1, col 2) — refactored in Plan 11-05 Task 2; no `theme` prop */}
-      <Topbar
-        displayName={displayName}
-        email={email}
-        lang={lang}
-        isAdmin={isAdmin}
-        adminSegment={adminSegment}
-      />
+      <SidebarInset className="bg-background">
+        <Topbar lang={lang} isAdmin={isAdmin} adminSegment={adminSegment} />
 
-      {/* Main content (row 2, col 2) */}
-      <main
-        style={{
-          gridRow: '2',
-          gridColumn: '2',
-          background: 'var(--paper)',
-          padding: '1.5rem 1.5rem 2rem',
-          maxWidth: '1100px',
-          width: '100%',
-          margin: '0 auto',
-        }}
-      >
-        {children}
-      </main>
+        <main className="mx-auto w-full max-w-[1100px] flex-1 px-6 pt-6 pb-8">
+          {children}
+        </main>
 
-      {/* Footer (row 3, col 2) */}
-      <footer
-        style={{
-          gridRow: '3',
-          gridColumn: '2',
-          background: 'var(--paper)',
-          borderTop: '1px solid var(--border)',
-          height: 'var(--footer-h)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 24px',
-          fontSize: '10.5px',
-          color: 'var(--muted)',
-        }}
-      >
-        <span>{t('shell.footer.copyright', lang)}</span>
-        <a
-          href="https://leasetic.fr/mentions-legales"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: 'var(--muted)', textDecoration: 'underline', fontSize: '10.5px' }}
-        >
-          {t('shell.footer.privacy', lang)}
-        </a>
-      </footer>
-    </div>
+        <footer className="flex h-[var(--footer-h)] items-center justify-between border-t border-border px-6 text-[10.5px] text-muted-foreground">
+          <span>{t('shell.footer.copyright', lang)}</span>
+          <a
+            href="https://leasetic.fr/mentions-legales"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10.5px] text-muted-foreground underline"
+          >
+            {t('shell.footer.privacy', lang)}
+          </a>
+        </footer>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

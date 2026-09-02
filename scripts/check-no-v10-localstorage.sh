@@ -32,9 +32,29 @@ PATTERNS=(
   "lt_partner"
 )
 
-# Intentionally narrow: only where production code lives.
-# Does NOT scan .planning/, docs/, drizzle/, node_modules/, .next/, dist/.
-SEARCH_PATHS=("src" "app")
+# ---------------------------------------------------------------------------
+# Scope: GIT-TRACKED FILES ONLY, under src/ and app/ — where production code lives.
+#
+# Consistent with scripts/check-no-drizzle-push.sh — see the long rationale there.
+# In short: a filesystem walk can be tripped by any untracked local file (agent
+# scratch, local experiments) that merely mentions a forbidden string, failing
+# locally while CI passes. Scoping to `git ls-files` means only committed-or-staged
+# content can fail the guard, and the .planning//docs//drizzle//node_modules//.next//
+# dist/ exclusions come for free (either gitignored, or outside the src|app pathspec).
+# ---------------------------------------------------------------------------
+readarray -t FILES < <(
+  git ls-files -- \
+    'src/*.ts' 'src/*.tsx' 'src/*.js' 'src/*.mjs' 'src/*.cjs' \
+    'app/*.ts' 'app/*.tsx' 'app/*.js' 'app/*.mjs' 'app/*.cjs' \
+    2>/dev/null || true
+)
+
+if [ "${#FILES[@]}" -eq 0 ]; then
+  # Fail loudly rather than pass vacuously.
+  echo "ERROR: guard could not enumerate git-tracked files under src/ and app/."
+  echo "This guard requires a git work tree (it scopes to 'git ls-files' by design)."
+  exit 1
+fi
 
 fail=0
 
@@ -42,13 +62,7 @@ for p in "${PATTERNS[@]}"; do
   # -F (fixed strings): all five v10 key patterns are literals, not regexes.
   # -E (extended regex) was previously combined here but is mutually exclusive
   # with -F and caused platform-dependent behavior (GNU grep vs BSD grep).
-  matches=$(
-    grep -rnF \
-      --include='*.ts' --include='*.tsx' --include='*.js' --include='*.mjs' --include='*.cjs' \
-      --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=drizzle --exclude-dir=dist \
-      "$p" "${SEARCH_PATHS[@]}" 2>/dev/null \
-    || true
-  )
+  matches=$(grep -Fn "$p" -- "${FILES[@]}" 2>/dev/null || true)
   if [ -n "$matches" ]; then
     echo "ERROR: v10 localStorage key '$p' found in app/ or src/:"
     echo "$matches"

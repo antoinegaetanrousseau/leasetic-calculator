@@ -1,6 +1,6 @@
+import { SlidersIcon, UsersIcon, HistoryIcon, HashIcon } from '@/components/ui/icons';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render, within } from '@testing-library/react';
-import { Sliders, Users, History } from 'lucide-react';
 import { AdminNavCard } from './AdminNavCard';
 
 afterEach(() => cleanup());
@@ -13,7 +13,7 @@ describe('AdminNavCard', () => {
         title="Coefficients"
         description="Ajuster les coefficients"
         href="/admin-segment/coefficients"
-        icon={Sliders}
+        icon={SlidersIcon}
         openLabel="Ouvrir →"
       />,
     );
@@ -29,7 +29,7 @@ describe('AdminNavCard', () => {
         title="Coefficients"
         description="..."
         href="/x"
-        icon={Sliders}
+        icon={SlidersIcon}
         openLabel="Ouvrir →"
       />,
     );
@@ -38,8 +38,8 @@ describe('AdminNavCard', () => {
     expect(iconSquare.getAttribute('style')).toMatch(/background:\s*rgba\(18,\s*150,\s*87,\s*0\.10?\)/);
     const svg = iconSquare.querySelector('svg');
     expect(svg).not.toBeNull();
-    // lucide-react passes `color` prop onto the SVG's stroke attribute
-    expect(svg).toHaveAttribute('stroke', 'var(--gd)');
+    // Hugeicons renders stroke="currentColor"; the accent lives in CSS color.
+    expect(svg?.getAttribute('style')).toContain('color: var(--gd)');
   });
 
   it('AC-AC-03: variant=partners icon-square bg rgba(45, 122, 140, 0.10), icon color var(--teal)', () => {
@@ -49,7 +49,7 @@ describe('AdminNavCard', () => {
         title="Partenaires"
         description="..."
         href="/x"
-        icon={Users}
+        icon={UsersIcon}
         openLabel="Ouvrir →"
       />,
     );
@@ -57,7 +57,7 @@ describe('AdminNavCard', () => {
     const iconSquare = link.querySelector(':scope > div') as HTMLDivElement;
     expect(iconSquare.getAttribute('style')).toMatch(/background:\s*rgba\(45,\s*122,\s*140,\s*0\.10?\)/);
     const svg = iconSquare.querySelector('svg');
-    expect(svg).toHaveAttribute('stroke', 'var(--teal)');
+    expect(svg?.getAttribute('style')).toContain('color: var(--teal)');
   });
 
   it('AC-AC-04: variant=history icon-square bg rgba(17, 44, 59, 0.10), icon color var(--navy)', () => {
@@ -67,7 +67,7 @@ describe('AdminNavCard', () => {
         title="Historique"
         description="..."
         href="/x"
-        icon={History}
+        icon={HistoryIcon}
         openLabel="Ouvrir →"
       />,
     );
@@ -75,7 +75,7 @@ describe('AdminNavCard', () => {
     const iconSquare = link.querySelector(':scope > div') as HTMLDivElement;
     expect(iconSquare.getAttribute('style')).toMatch(/background:\s*rgba\(17,\s*44,\s*59,\s*0\.10?\)/);
     const svg = iconSquare.querySelector('svg');
-    expect(svg).toHaveAttribute('stroke', 'var(--navy)');
+    expect(svg?.getAttribute('style')).toContain('color: var(--navy)');
   });
 
   it('AC-AC-07: CTA <div> text content includes Unicode → glyph (U+2192)', () => {
@@ -85,7 +85,7 @@ describe('AdminNavCard', () => {
         title="Partenaires"
         description="Gérer les partenaires"
         href="/x"
-        icon={Users}
+        icon={UsersIcon}
         openLabel="Ouvrir →"
       />,
     );
@@ -100,7 +100,7 @@ describe('AdminNavCard', () => {
         title="Partenaires"
         description="Gérer les partenaires"
         href="/x"
-        icon={Users}
+        icon={UsersIcon}
         openLabel="Ouvrir →"
       />,
     );
@@ -118,7 +118,7 @@ describe('AdminNavCard', () => {
         title="Coefficients"
         description="Ajuster"
         href="/x"
-        icon={Sliders}
+        icon={SlidersIcon}
         openLabel="Ouvrir →"
       />,
     );

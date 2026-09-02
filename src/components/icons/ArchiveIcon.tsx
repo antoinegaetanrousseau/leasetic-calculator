@@ -1,0 +1,29 @@
+import * as React from "react";
+
+export interface ArchiveIconProps extends React.SVGProps<SVGSVGElement> {
+  /** Rendered width and height. Defaults to 24. */
+  size?: number | string;
+}
+
+/** Folder (Iconly #500) */
+export function ArchiveIcon({ size = 24, ...props }: ArchiveIconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden={props["aria-label"] ? undefined : true}
+      {...props}
+    >
+      <g id="archive-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+      <g id="archive-2" transform="translate(2.000000, 2.000000)" fill="currentColor">
+      <path d="M7.6426,9.59232693e-14 C8.5936,0.001 9.4996,0.455 10.0676,1.214 L10.9786,2.426 C11.2676,2.81 11.7266,3.039 12.2066,3.04 L15.0356,3.04 C18.8976,3.04 20.6966,5.019 20.6966,9.268 L20.6686,14.235 C20.6676,18.203 18.2016,20.669 14.2316,20.669 L6.4496,20.669 C2.4716,20.669 -0.0004,18.202 -0.0004,14.232 L-0.0004,6.433 C-0.0004,2.164 1.8986,9.59232693e-14 5.6426,9.59232693e-14 L7.6426,9.59232693e-14 Z M7.6416,1.5 L5.6426,1.5 C2.7386,1.5 1.4996,2.976 1.4996,6.433 L1.4996,14.232 C1.4996,17.416 3.2576,19.169 6.4496,19.169 L14.2316,19.169 C17.4156,19.169 19.1686,17.416 19.1686,14.232 L19.1686,14.229 L19.1966,9.264 C19.1966,5.865 18.0306,4.54 15.0356,4.54 L12.2056,4.54 C11.2566,4.539 10.3506,4.086 9.7806,3.328 L8.8676,2.114 C8.5806,1.729 8.1216,1.501 7.6416,1.5 Z M14.7158,12.2128 C15.1298,12.2128 15.4658,12.5488 15.4658,12.9628 C15.4658,13.3768 15.1298,13.7128 14.7158,13.7128 L5.9808,13.7128 C5.5668,13.7128 5.2308,13.3768 5.2308,12.9628 C5.2308,12.5488 5.5668,12.2128 5.9808,12.2128 L14.7158,12.2128 Z" id="archive-3"></path>
+      </g>
+      </g>
+    </svg>
+  );
+}
+
+export default ArchiveIcon;

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Plus } from 'lucide-react';
+import { PlusIcon } from '@/components/ui/icons';
 import Link from 'next/link';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
@@ -8,6 +8,7 @@ import { ProposalsList } from '@/components/proposals/ProposalsList';
 import { SearchBar } from '@/components/proposals/SearchBar';
 import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
 import { PageHero } from '@/components/ui/PageHero';
+import { Empty, EmptyDescription } from '@/components/ui/empty';
 import { FilterPillRow } from './_components/FilterPillRow';
 import { ExportButton } from './_components/ExportButton';
 
@@ -128,7 +129,7 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
                 textDecoration: 'none',
               }}
             >
-              <Plus size={17} strokeWidth={1.6} aria-hidden="true" />
+              <PlusIcon size={17} aria-hidden="true" />
               <span>{t('dashboard.cta.new', lang)}</span>
             </Link>
           </div>
@@ -152,20 +153,14 @@ export default async function ProposalsListPage({ searchParams }: PageParams) {
       {/* List or empty-state — empty-state copy switches per `archived` flag */}
       {initial.rows.length === 0 ? (
         <section className="card">
-          <p
-            style={{
-              color: 'var(--muted)',
-              fontSize: '14.5px',
-              textAlign: 'center',
-              padding: '40px 20px',
-              margin: 0,
-            }}
-          >
-            {t(
-              drafts ? 'proposals.empty.drafts' : archived ? 'proposals.empty.archived' : 'proposals.empty.actives',
-              lang,
-            )}
-          </p>
+          <Empty className="px-5 py-10">
+            <EmptyDescription className="text-[14.5px]">
+              {t(
+                drafts ? 'proposals.empty.drafts' : archived ? 'proposals.empty.archived' : 'proposals.empty.actives',
+                lang,
+              )}
+            </EmptyDescription>
+          </Empty>
         </section>
       ) : (
         <ProposalsList

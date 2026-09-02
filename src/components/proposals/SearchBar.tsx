@@ -2,15 +2,28 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, X } from 'lucide-react';
-import { t, type Lang } from '@/lib/i18n/dictionaries';
+import { SearchIcon, XIcon } from '@/components/ui/icons';
+import { t, type DictKey, type Lang } from '@/lib/i18n/dictionaries';
 import { useDebouncedValue } from '@/components/proposal/useDebouncedValue';
 
 export interface SearchBarProps {
   lang: Lang;
+  /**
+   * i18n key for the input's placeholder. Defaults to the proposals-list
+   * copy so every existing call site (`/proposals`, admin `/partners`) is
+   * byte-identical without an edit. Phase 30's client book passes
+   * 'clients.search.placeholder' to render client-specific copy.
+   */
+  placeholderKey?: DictKey;
+  /** i18n key for the input's aria-label. Same default-preserving contract as placeholderKey. */
+  ariaKey?: DictKey;
 }
 
-export function SearchBar({ lang }: SearchBarProps) {
+export function SearchBar({
+  lang,
+  placeholderKey = 'proposal.search.placeholder',
+  ariaKey = 'proposal.search.aria',
+}: SearchBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQ = searchParams.get('q') ?? '';
@@ -33,14 +46,14 @@ export function SearchBar({ lang }: SearchBarProps) {
 
   return (
     <div className="search-bar" role="search">
-      <Search size={17} color="var(--muted)" aria-hidden="true" />
+      <SearchIcon size={17} style={{ color: 'var(--muted)' }} aria-hidden="true" />
       <input
         type="search"
         inputMode="search"
         autoComplete="off"
         spellCheck={false}
-        placeholder={t('proposal.search.placeholder', lang)}
-        aria-label={t('proposal.search.aria', lang)}
+        placeholder={t(placeholderKey, lang)}
+        aria-label={t(ariaKey, lang)}
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
@@ -63,7 +76,7 @@ export function SearchBar({ lang }: SearchBarProps) {
             color: 'var(--muted)',
           }}
         >
-          <X size={14} />
+          <XIcon size={14} />
         </button>
       )}
     </div>

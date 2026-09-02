@@ -47,7 +47,7 @@ export const dictionaries = {
     'sidebar.view.agent': 'Agent',
     'sidebar.view.cycle': 'Changer de vue',
     'sidebar.view.aria': 'Vue',
-    'sidebar.eyebrow.navigation': 'NAVIGATION',
+    'sidebar.eyebrow.navigation': 'Navigation',
     'sidebar.nav.home': 'Accueil',
     'sidebar.nav.proposalsNew': 'Nouvelle proposition',
     'sidebar.nav.history': 'Historique',
@@ -283,6 +283,13 @@ export const dictionaries = {
     'shell.user.menu.settings': 'Paramètres',
     'shell.user.menu.logout': 'Se déconnecter',
     'shell.topbar.admin.badge': 'ADMIN',
+    // Phase 31.1 Plan 02 — D-06/D-07: header toggle accessible name + breadcrumb
+    // detail-route leaves. Dictionary-keyed by design (no entity names in the
+    // shell header — see 31.1-02-PLAN.md objective).
+    'shell.topbar.toggleSidebar': 'Basculer la barre latérale',
+    'shell.breadcrumb.clientDetail': 'Fiche client',
+    'shell.breadcrumb.companyDetail': 'Fiche société',
+    'shell.breadcrumb.proposalDetail': 'Proposition',
     'shell.locale.toggle.aria': 'Changer la langue',
     'shell.theme.toggle.aria': 'Changer le thème',
     'shell.footer.copyright': '© 2026 Leasétic — Application interne',
@@ -830,6 +837,8 @@ export const dictionaries = {
 
     // Créer partenaire (UI-SPEC rows 51-63; D-15/D-16/D-18)
     'admin.partners.breadcrumb.label': 'PARTENAIRES',
+    // Phase 31.1 Plan 02 — D-06: shell breadcrumb leaf for /partners/new.
+    'admin.partners.breadcrumb.new': 'Nouveau partenaire',
     'admin.partners.form.submit': "Envoyer l'invitation →",
     'admin.partners.form.submit.spinner': 'Envoi en cours…',
     'admin.partners.form.cancel.confirm': 'Vous avez des changements non enregistrés. Continuer ?',
@@ -948,6 +957,117 @@ export const dictionaries = {
       "Informations enregistrées, mais le mot de passe n'a pas été modifié.",
     'parametres.toast.partialSuccess.passwordOk.identityErr':
       "Mot de passe modifié, mais les informations n'ont pas été enregistrées.",
+
+    // ── Phase 30 — CRM registry (clients.* / admin.companies.*) ──────────────
+    'clients.page.title': 'Clients',
+    'clients.page.subtitle': 'Retrouvez vos clients et les propositions que vous leur avez faites.',
+    'clients.cta.new': 'Nouveau client',
+    'clients.search.placeholder': 'Rechercher un client…',
+    'clients.search.aria': 'Rechercher dans vos clients',
+    'clients.col.company': 'CLIENT',
+    'clients.col.siren': 'SIREN',
+    'clients.col.proposals': 'PROPOSITIONS',
+    'clients.col.lastActivity': 'DERNIÈRE ACTIVITÉ',
+    'clients.empty.zero.title': 'Votre portefeuille client démarre ici.',
+    'clients.empty.zero.body':
+      'Aucun client pour le moment — créez le premier et construisons votre pipeline commercial.',
+    'clients.empty.search.title': 'Aucun résultat ne correspond à votre recherche.',
+    'clients.detail.section.contacts': 'Contacts',
+    'clients.detail.section.proposals': 'Propositions',
+    'clients.detail.empty.proposals.title': 'Aucune proposition pour ce client.',
+    'clients.detail.empty.contacts.title': 'Aucun contact enregistré pour ce client.',
+    'clients.detail.cta.newProposal': 'Nouvelle proposition',
+    'clients.contact.cta.add': 'Ajouter un contact',
+    'clients.contact.cta.edit': 'Modifier',
+    'clients.contact.field.name': 'Nom',
+    'clients.contact.field.role': 'Fonction',
+    'clients.contact.field.role.placeholder': 'Ex. Directeur achats',
+    'clients.contact.field.phone': 'Téléphone',
+    'clients.contact.field.email': 'Email',
+    'clients.contact.action.edit': 'Modifier {0}',
+    'clients.contact.action.delete': 'Supprimer {0}',
+    'clients.contact.submit.create': 'Enregistrer le contact',
+    'clients.contact.submit.edit': 'Enregistrer les modifications',
+    'clients.contact.confirm.delete.title': 'Supprimer ce contact ?',
+    'clients.contact.confirm.delete.description':
+      'Cette action est définitive et retirera {0} de la fiche client.',
+    'clients.contact.confirm.delete.cancel': 'Annuler',
+    'clients.contact.confirm.delete.confirm': 'Supprimer',
+    'clients.contact.toast.created': 'Contact ajouté.',
+    'clients.contact.toast.updated': 'Contact mis à jour.',
+    'clients.contact.toast.deleted': 'Contact supprimé.',
+    'clients.modal.create.title': 'Nouveau client',
+    'clients.modal.create.field.name': 'Nom de la société',
+    'clients.modal.create.field.name.placeholder': 'Ex. Dupont Menuiserie',
+    'clients.modal.create.field.siren': 'SIREN',
+    'clients.modal.create.field.siren.helper': 'Facultatif. 9 chiffres, sans espaces.',
+    'clients.modal.create.submit': 'Créer le client',
+    'clients.modal.create.cancel': 'Annuler',
+    'clients.toast.created': 'Client créé.',
+    'clients.toast.error': 'Une erreur est survenue. Réessayez.',
+
+    'admin.companies.page.title': 'Sociétés',
+    'admin.companies.page.subtitle':
+      'Toutes les sociétés et leurs relations, tous partenaires confondus.',
+    'admin.companies.col.company': 'SOCIÉTÉ',
+    'admin.companies.col.siren': 'SIREN',
+    'admin.companies.col.relations': 'RELATIONS',
+    'admin.companies.col.lastActivity': 'DERNIÈRE ACTIVITÉ',
+    'admin.companies.empty.zero.title': 'Aucune relation active pour cette société.',
+    // Plan 30-08: list-level empty states (distinct from the per-company
+    // zero-relationships state above, which uses .empty.zero.title).
+    'admin.companies.list.empty.zero': 'Aucune société enregistrée.',
+    'admin.companies.list.empty.zero.body':
+      'Les sociétés apparaîtront ici dès que vos partenaires créeront leurs clients.',
+    'admin.companies.list.empty.search': 'Aucun résultat ne correspond à votre recherche.',
+    'admin.companies.detail.section.relations': 'Relations',
+    'admin.companies.relation.col.owner': 'TITULAIRE',
+    'admin.companies.relation.col.type': 'TYPE',
+    'admin.companies.relation.col.created': 'CRÉÉE LE',
+    'admin.companies.relation.col.proposals': 'PROPOSITIONS',
+    'admin.companies.relation.col.contacts': 'CONTACTS',
+    'admin.companies.relation.col.view': 'Voir →',
+    'admin.companies.relation.type.partner': 'Partenaire',
+    'admin.companies.relation.type.sales': 'Interne',
+
+    // ── Phase 31 — Reconciliation review queue (IMPORT-04/05) ──────────────────
+    'admin.reconciliation.page.title': 'File de réconciliation',
+    'admin.reconciliation.page.subtitle':
+      "Paires de sociétés signalées lors de l'extraction — fusionnez-les ou marquez-les définitivement séparées.",
+    'admin.reconciliation.reason.differing': 'SIREN différents',
+    'admin.reconciliation.reason.oneMissing': "SIREN absent d'un côté",
+    'admin.reconciliation.reason.bothMissing': 'SIREN absent des deux côtés',
+    'admin.reconciliation.action.merge': 'Fusionner',
+    'admin.reconciliation.action.keepSeparate': 'Marquer séparées',
+    // Not in the UI-SPEC's i18n Key Plan list — added per Rule 2 (bilingual
+    // correctness is a correctness requirement here, not a style choice):
+    // the counts line's words ("relations · contacts · propositions") differ
+    // in English ("proposals", matching admin.companies.relation.col.proposals'
+    // EN value), so they cannot be a shared French-only literal.
+    'admin.reconciliation.card.counts': '{r} relations · {c} contacts · {p} propositions',
+    'admin.reconciliation.compound.warning':
+      '{owner} détient une relation avec les deux sociétés. La fusion combinera aussi ces deux relations (contacts et propositions compris).',
+    'admin.reconciliation.merge.title': 'Fusionner ces deux sociétés ?',
+    'admin.reconciliation.merge.description':
+      '{companyA} et {companyB} seront fusionnées en une seule société. Cette action est définitive : la société non conservée sera supprimée, et ses relations, contacts et propositions seront transférés vers la société conservée.',
+    'admin.reconciliation.merge.survivorLabel': 'Société à conserver',
+    'admin.reconciliation.merge.cancel': 'Annuler',
+    'admin.reconciliation.merge.confirm': 'Fusionner',
+    'admin.reconciliation.merge.toast.success': 'Sociétés fusionnées.',
+    'admin.reconciliation.keepSeparate.title':
+      'Marquer ces sociétés comme définitivement séparées ?',
+    'admin.reconciliation.keepSeparate.description':
+      'Cette décision est permanente : {companyA} et {companyB} ne seront plus jamais signalées ensemble, même après un nouvel import.',
+    'admin.reconciliation.keepSeparate.cancel': 'Annuler',
+    'admin.reconciliation.keepSeparate.confirm': 'Marquer séparées',
+    'admin.reconciliation.keepSeparate.toast.success': 'Paire marquée comme séparée.',
+    'admin.reconciliation.toast.error': 'Une erreur est survenue. Réessayez.',
+    'admin.reconciliation.empty.title': 'Aucune paire à examiner.',
+    'admin.reconciliation.empty.body': 'Toutes les sociétés détectées ont été résolues.',
+    'sidebar.nav.adminReconciliation': 'Réconciliation',
+
+    'sidebar.nav.clients': 'Clients',
+    'sidebar.nav.adminCompanies': 'Sociétés',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -974,7 +1094,7 @@ export const dictionaries = {
     'sidebar.view.agent': 'Agent',
     'sidebar.view.cycle': 'Switch view',
     'sidebar.view.aria': 'View',
-    'sidebar.eyebrow.navigation': 'NAVIGATION',
+    'sidebar.eyebrow.navigation': 'Navigation',
     'sidebar.nav.home': 'Home',
     'sidebar.nav.proposalsNew': 'New proposal',
     'sidebar.nav.history': 'History',
@@ -1210,6 +1330,11 @@ export const dictionaries = {
     'shell.user.menu.settings': 'Settings',
     'shell.user.menu.logout': 'Log out',
     'shell.topbar.admin.badge': 'ADMIN',
+    // Phase 31.1 Plan 02 — D-06/D-07 EN counterparts.
+    'shell.topbar.toggleSidebar': 'Toggle sidebar',
+    'shell.breadcrumb.clientDetail': 'Client record',
+    'shell.breadcrumb.companyDetail': 'Company record',
+    'shell.breadcrumb.proposalDetail': 'Proposal',
     'shell.locale.toggle.aria': 'Change language',
     'shell.theme.toggle.aria': 'Change theme',
     'shell.footer.copyright': '© 2026 Leasétic — Internal application',
@@ -1716,6 +1841,8 @@ export const dictionaries = {
 
     // Créer partenaire
     'admin.partners.breadcrumb.label': 'PARTNERS',
+    // Phase 31.1 Plan 02 — D-06 EN counterpart.
+    'admin.partners.breadcrumb.new': 'New partner',
     'admin.partners.form.submit': 'Send invitation →',
     'admin.partners.form.submit.spinner': 'Sending…',
     'admin.partners.form.cancel.confirm': 'You have unsaved changes. Continue?',
@@ -1820,6 +1947,109 @@ export const dictionaries = {
       'Profile saved, but password was not changed.',
     'parametres.toast.partialSuccess.passwordOk.identityErr':
       'Password changed, but profile was not updated.',
+
+    // ── Phase 30 — CRM registry (clients.* / admin.companies.*) ──────────────
+    'clients.page.title': 'Clients',
+    'clients.page.subtitle': 'Find your clients and the proposals you have made for them.',
+    'clients.cta.new': 'New client',
+    'clients.search.placeholder': 'Search a client…',
+    'clients.search.aria': 'Search your clients',
+    'clients.col.company': 'CLIENT',
+    'clients.col.siren': 'SIREN',
+    'clients.col.proposals': 'PROPOSALS',
+    'clients.col.lastActivity': 'LAST ACTIVITY',
+    'clients.empty.zero.title': 'Your client book starts here.',
+    'clients.empty.zero.body':
+      "No clients yet — create your first one and let's build your sales pipeline.",
+    'clients.empty.search.title': 'No results match your search.',
+    'clients.detail.section.contacts': 'Contacts',
+    'clients.detail.section.proposals': 'Proposals',
+    'clients.detail.empty.proposals.title': 'No proposals for this client yet.',
+    'clients.detail.empty.contacts.title': 'No contacts recorded for this client.',
+    'clients.detail.cta.newProposal': 'New proposal',
+    'clients.contact.cta.add': 'Add a contact',
+    'clients.contact.cta.edit': 'Edit',
+    'clients.contact.field.name': 'Name',
+    'clients.contact.field.role': 'Role',
+    'clients.contact.field.role.placeholder': 'E.g. Purchasing Director',
+    'clients.contact.field.phone': 'Phone',
+    'clients.contact.field.email': 'Email',
+    'clients.contact.action.edit': 'Edit {0}',
+    'clients.contact.action.delete': 'Delete {0}',
+    'clients.contact.submit.create': 'Save contact',
+    'clients.contact.submit.edit': 'Save changes',
+    'clients.contact.confirm.delete.title': 'Delete this contact?',
+    'clients.contact.confirm.delete.description':
+      'This action is permanent and will remove {0} from the client record.',
+    'clients.contact.confirm.delete.cancel': 'Cancel',
+    'clients.contact.confirm.delete.confirm': 'Delete',
+    'clients.contact.toast.created': 'Contact added.',
+    'clients.contact.toast.updated': 'Contact updated.',
+    'clients.contact.toast.deleted': 'Contact deleted.',
+    'clients.modal.create.title': 'New client',
+    'clients.modal.create.field.name': 'Company name',
+    'clients.modal.create.field.name.placeholder': 'E.g. Dupont Menuiserie',
+    'clients.modal.create.field.siren': 'SIREN',
+    'clients.modal.create.field.siren.helper': 'Optional. 9 digits, no spaces.',
+    'clients.modal.create.submit': 'Create client',
+    'clients.modal.create.cancel': 'Cancel',
+    'clients.toast.created': 'Client created.',
+    'clients.toast.error': 'Something went wrong. Try again.',
+
+    'admin.companies.page.title': 'Companies',
+    'admin.companies.page.subtitle':
+      'All companies and their relationships, across every partner.',
+    'admin.companies.col.company': 'COMPANY',
+    'admin.companies.col.siren': 'SIREN',
+    'admin.companies.col.relations': 'RELATIONS',
+    'admin.companies.col.lastActivity': 'LAST ACTIVITY',
+    'admin.companies.empty.zero.title': 'No active relationship for this company.',
+    'admin.companies.list.empty.zero': 'No companies on record.',
+    'admin.companies.list.empty.zero.body':
+      'Companies will appear here as soon as your partners create their clients.',
+    'admin.companies.list.empty.search': 'No results match your search.',
+    'admin.companies.detail.section.relations': 'Relations',
+    'admin.companies.relation.col.owner': 'OWNER',
+    'admin.companies.relation.col.type': 'TYPE',
+    'admin.companies.relation.col.created': 'CREATED ON',
+    'admin.companies.relation.col.proposals': 'PROPOSALS',
+    'admin.companies.relation.col.contacts': 'CONTACTS',
+    'admin.companies.relation.col.view': 'View →',
+    'admin.companies.relation.type.partner': 'Partner',
+    'admin.companies.relation.type.sales': 'In-house',
+
+    // ── Phase 31 — Reconciliation review queue (IMPORT-04/05) ──────────────────
+    'admin.reconciliation.page.title': 'Reconciliation queue',
+    'admin.reconciliation.page.subtitle':
+      'Company pairs flagged during extraction — merge them or mark them permanently separate.',
+    'admin.reconciliation.reason.differing': 'Different SIRENs',
+    'admin.reconciliation.reason.oneMissing': 'Missing SIREN on one side',
+    'admin.reconciliation.reason.bothMissing': 'Missing SIREN on both sides',
+    'admin.reconciliation.action.merge': 'Merge',
+    'admin.reconciliation.action.keepSeparate': 'Keep separate',
+    'admin.reconciliation.card.counts': '{r} relations · {c} contacts · {p} proposals',
+    'admin.reconciliation.compound.warning':
+      '{owner} holds a relationship with both companies. Merging will also combine those two relationships (contacts and proposals included).',
+    'admin.reconciliation.merge.title': 'Merge these two companies?',
+    'admin.reconciliation.merge.description':
+      "{companyA} and {companyB} will be merged into one company. This action is final: the company you don't keep will be deleted, and its relationships, contacts and proposals will be transferred to the one you keep.",
+    'admin.reconciliation.merge.survivorLabel': 'Company to keep',
+    'admin.reconciliation.merge.cancel': 'Cancel',
+    'admin.reconciliation.merge.confirm': 'Merge',
+    'admin.reconciliation.merge.toast.success': 'Companies merged.',
+    'admin.reconciliation.keepSeparate.title': 'Mark these companies as permanently separate?',
+    'admin.reconciliation.keepSeparate.description':
+      'This decision is permanent: {companyA} and {companyB} will never be flagged together again, even after a future import.',
+    'admin.reconciliation.keepSeparate.cancel': 'Cancel',
+    'admin.reconciliation.keepSeparate.confirm': 'Keep separate',
+    'admin.reconciliation.keepSeparate.toast.success': 'Pair marked as separate.',
+    'admin.reconciliation.toast.error': 'Something went wrong. Try again.',
+    'admin.reconciliation.empty.title': 'No pairs to review.',
+    'admin.reconciliation.empty.body': 'All detected companies have been resolved.',
+    'sidebar.nav.adminReconciliation': 'Reconciliation',
+
+    'sidebar.nav.clients': 'Clients',
+    'sidebar.nav.adminCompanies': 'Companies',
   },
 } as const;
 

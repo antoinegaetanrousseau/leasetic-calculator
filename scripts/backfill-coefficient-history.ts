@@ -16,7 +16,8 @@
  *   # Local / preview Postgres:
  *   DATABASE_URL=postgres://... npm run db:backfill:coefficient-history
  *
- *   # Production Neon (gate triggers when host matches *.neon.tech):
+ *   # Any Neon branch (gate triggers when host matches *.neon.tech; the log
+ *   # names which branch, and flags `main` as a production write):
  *   DATABASE_URL=$NEON_PROD BACKFILL_CONFIRM=YES npm run db:backfill:coefficient-history
  *
  * Idempotency (D-15):
@@ -38,7 +39,8 @@
  *   - Subsequent rows: `before = previous row's snapshot` → semicolon-joined
  *     FR diff, e.g. `"Commission: 5.0000% → 5.5000%"`.
  */
-import 'dotenv/config';
+import './_load-env';
+import { resolveNeonTarget } from './_neon-target';
 
 const REQUIRED_CONFIRM_VALUE = 'YES';
 
@@ -92,16 +94,22 @@ async function main(): Promise<void> {
     console.error('[backfill] FATAL: DATABASE_URL is malformed');
     process.exit(2);
   }
-  const isNeonProd = hostname.endsWith('.neon.tech');
-  if (isNeonProd) {
+  // Gate stays as broad as before (ANY Neon host), but the message now names the
+  // branch. It previously said "Production Neon DB detected" for `development`
+  // and `preview` too, which blunts the warning where it actually matters.
+  const target = resolveNeonTarget(hostname);
+  if (target.isNeon) {
     if (process.env.BACKFILL_CONFIRM !== REQUIRED_CONFIRM_VALUE) {
       console.error(
-        `[backfill] FATAL: Production Neon DB detected (${hostname}). ` +
+        `[backfill] FATAL: about to WRITE to ${target.label} (${hostname}). ` +
           `Re-run with BACKFILL_CONFIRM=YES to confirm.`,
       );
       process.exit(2);
     }
-    console.log(`[backfill] Production Neon (${hostname}) — gate satisfied.`);
+    console.log(
+      `[backfill] writing to ${target.label} (${hostname}) — gate satisfied.` +
+        (target.isProductionSeverity ? ' *** PRODUCTION WRITE ***' : ''),
+    );
   } else {
     console.log(
       `[backfill] Non-prod DB (${hostname}) — typed-confirmation gate not enforced.`,

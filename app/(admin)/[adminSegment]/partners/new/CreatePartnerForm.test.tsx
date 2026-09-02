@@ -10,12 +10,13 @@
  *   - D-15 action card separation (form card + action card siblings)
  *   - D-15 submit label = t('admin.partners.form.submit') = "Envoyer l'invitation →"
  *   - D-15 submit spinner = t('admin.partners.form.submit.spinner') = "Envoi en cours…"
- *   - D-16 inline error state: aria-invalid + aria-describedby + red border via .invalid
+ *   - D-16 inline error state: aria-invalid + aria-describedby; the red border
  *     (global CSS rule `input[aria-invalid="true"] { border-color: var(--danger) }`)
  *   - D-18 dirty-form confirm dialog on Annuler (window.confirm baseline)
  *
  * Coverage (Phase 18 numbering matches 18-04 PLAN.md):
- *   - Test 3 (Phase 14): blurring firstName empty → aria-invalid="true" + .error-msg
+ *     comes from the shadcn Input's own aria-invalid styling (Phase 5).
+ *   - Test 3 (Phase 14): blurring firstName empty → aria-invalid + alert message
  *   - Test 4 (Phase 14): happy-path submit → action call + InviteUrlModal mounts (D-17)
  *   - Test 5 (Phase 14): duplicate-email → toast.error with duplicate FR copy
  *   - Test 6 (Phase 14): textarea > 1000 chars → counter danger color + aria-invalid
@@ -23,7 +24,7 @@
  *   - Test 8 (18-04 D-15): rendered structure has form card + action card siblings
  *   - Test 9 (18-04 D-15): submit button label = "Envoyer l'invitation →"
  *   - Test 10 (18-04 D-15): submitting state shows "Envoi en cours…" spinner copy
- *   - Test 11 (18-04 D-16): invalid email blur → red border (.invalid) + aria-invalid + aria-describedby + error <p>
+ *   - Test 11 (18-04 D-16): invalid email blur → aria-invalid + aria-describedby + alert
  *   - Test 12 (18-04 D-18): clean form Annuler → no confirm, navigates to /partners
  *   - Test 13 (18-04 D-18): dirty form Annuler → confirm dialog opens with FR copy
  *   - Test 14 (18-04 D-18): confirm OK → router.push to /partners
@@ -101,7 +102,7 @@ afterEach(() => {
 });
 
 describe('CreatePartnerForm (D-07 + D-08 + UI-SPEC §5.1)', () => {
-  it('Test 3: blurring firstName empty → aria-invalid="true" + .error-msg with FR required text', async () => {
+  it('Test 3: blurring firstName empty → aria-invalid + the FR required message', async () => {
     const createPartnerAction = vi.fn();
     render(
       <CreatePartnerForm
@@ -118,9 +119,10 @@ describe('CreatePartnerForm (D-07 + D-08 + UI-SPEC §5.1)', () => {
     await waitFor(() => {
       expect(firstNameInput.getAttribute('aria-invalid')).toBe('true');
     });
-    // The error-msg appears with the FR-resolved text.
+    // Phase 5: the message is a FieldError now, not a `.error-msg` <p>. What
+    // matters is that an alert carrying the resolved FR text appears.
     await waitFor(() => {
-      const err = document.querySelector('.error-msg');
+      const err = document.querySelector('[role="alert"]');
       expect(err).not.toBeNull();
       expect(err!.textContent).toContain('Ce champ est requis.');
     });
@@ -317,7 +319,7 @@ describe('CreatePartnerForm (D-07 + D-08 + UI-SPEC §5.1)', () => {
     await waitFor(() => expect(createPartnerAction).toHaveBeenCalled());
   });
 
-  it('Test 11 (D-16): invalid email blur → input.invalid + aria-invalid + aria-describedby + sibling error <p>', async () => {
+  it('Test 11 (D-16): invalid email blur → aria-invalid + aria-describedby wired to the error', async () => {
     render(
       <CreatePartnerForm
         lang="fr"
@@ -335,18 +337,15 @@ describe('CreatePartnerForm (D-07 + D-08 + UI-SPEC §5.1)', () => {
       expect(emailInput.getAttribute('aria-invalid')).toBe('true');
     });
 
-    // D-16: input gets the .invalid class (which the global CSS rule maps to
-    // border-color: var(--danger) — global CSS rule `input.invalid` covers it).
-    expect(emailInput.className).toMatch(/\binvalid\b/);
-
-    // D-16: aria-describedby points at the error <p>.
-    const describedBy = emailInput.getAttribute('aria-describedby');
-    expect(describedBy).toBe('cpf-email-error');
-    const errorP = document.getElementById('cpf-email-error');
-    expect(errorP).not.toBeNull();
-    expect(errorP!.tagName).toBe('P');
+    // Phase 5: the red border comes from the shadcn Input's own aria-invalid
+    // styling rather than a `.invalid` class, so the class assertion is gone.
+    // The accessibility contract is what actually has to hold.
+    expect(emailInput.getAttribute('aria-describedby')).toBe('cpf-email-error');
+    const error = document.getElementById('cpf-email-error');
+    expect(error).not.toBeNull();
+    expect(error!.getAttribute('role')).toBe('alert');
     // Error text rendered via t() — FR "Format d'email invalide." per existing key.
-    expect(errorP!.textContent).toMatch(/email/i);
+    expect(error!.textContent).toMatch(/email/i);
   });
 
   it('Test 12 (D-18): clean form Annuler → NO confirm dialog, immediate navigate to /<seg>/partners', () => {

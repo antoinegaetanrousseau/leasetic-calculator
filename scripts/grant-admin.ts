@@ -27,7 +27,7 @@
  * `accounts` row until they redeem the invitation URL via Plan 06-05's redeemToken.
  */
 
-import 'dotenv/config';
+import './_load-env';
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { eq } from 'drizzle-orm';

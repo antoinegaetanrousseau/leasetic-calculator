@@ -288,4 +288,37 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
     expect(snapshot.validityDays).toBe(PARAMS.validityDays);
     expect(snapshot.coefficients).toEqual(PARAMS.coefficients);
   });
+
+  it('Test 12: CRM-05 end-to-end — finalizing a draft that carries a clientRelationshipId leaves inputs deep-equal to the pre-finalize value', async () => {
+    // The draft row carries clientRelationshipId (Phase 30 Plan 09) alongside
+    // its inputs jsonb — a sibling column, not a sibling key inside inputs.
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      inputs: VALID_INPUTS,
+      createdAt: new Date('2026-05-12'),
+      lcRef: 'LC-2026-001',
+      clientRelationshipId: 'rel-1',
+    });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const });
+
+    // The PDF-rendered inputs are exactly the pre-finalize draft.inputs,
+    // re-parsed through proposalInputSchema — never touched by the presence
+    // of clientRelationshipId on the draft row.
+    const renderArg = renderProposalPdfMock.mock.calls[0][0] as {
+      data: { inputs: Record<string, unknown> };
+    };
+    expect(renderArg.data.inputs).toEqual(VALID_INPUTS);
+
+    // finalizeDraft's payload carries neither an `inputs` key (finalizeDraft
+    // never re-serializes the snapshot) nor a `clientRelationshipId` key
+    // (the link is set once at createDraft and never touched again) — the
+    // CRM-05 invariant holds all the way through the finalize pipeline.
+    const [, , payload] = finalizeDraftMock.mock.calls[0] as [
+      string,
+      string,
+      Record<string, unknown>,
+    ];
+    expect('inputs' in payload).toBe(false);
+    expect('clientRelationshipId' in payload).toBe(false);
+  });
 });

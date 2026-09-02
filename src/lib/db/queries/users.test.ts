@@ -87,6 +87,17 @@ describe('listInvitedPartners', () => {
     expect(src).toContain("AND proposals.status = 'active'");
   });
 
+  it('Phase 30 Plan 03 (ROLE-03) — invited-count and proposals-count predicates are widened to IN (partner, sales), never a plain equality on "partner"', () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const src = readFileSync(join(here, 'users.ts'), 'utf8');
+    const occurrences = src.match(/inArray\(schema\.users\.role, \['partner', 'sales'\]\)/g) ?? [];
+    // listPartnersWithCounts + listInvitedPartners — both widened.
+    expect(occurrences.length).toBe(2);
+    expect(src).not.toContain("eq(schema.users.role, 'partner')");
+    // ROLE-03 — 'admin' must never join the predicate.
+    expect(src).not.toMatch(/inArray\(schema\.users\.role,\s*\[[^\]]*'admin'[^\]]*\]\)/);
+  });
+
   it('does NOT include commission_pct or password fields in the returned shape', async () => {
     const fixture: InvitedPartnerRow[] = [
       {

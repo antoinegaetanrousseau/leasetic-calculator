@@ -112,6 +112,34 @@ The `production` environment's required-reviewer gate stays on `main` only
 (by design — non-prod branches are isolated environments that don't need the
 heavy approval flow).
 
+## Migration gates (INFRA-06)
+
+Phase 29 closed two defects in the `db-smoke` job that let a migration ship
+without ever being checked: the paths-filter pattern pointed at a directory
+that doesn't exist, and even when the job did fire, drizzle-orm's `migrate()`
+applies journal entries only — an orphaned `.sql` file with no journal entry
+was invisible to it. The scenario matrix below is the resulting behavior:
+
+| Changeset | Filter fires? | db-smoke outcome |
+|-----------|---------------|-------------------|
+| `drizzle/NNNN_x.sql` + `_journal.json` entry (normal `db:generate` output) | yes | passes — migrations apply to an ephemeral Neon branch |
+| `drizzle/NNNN_x.sql` only, no journal entry (the Phase 12 regression) | yes (was: no) | **fails** at the journal-parity step, before branch creation |
+| `_journal.json` only, no new `.sql` | yes | fails at the journal-parity step (dangling entry) |
+| No migration files touched | no | skips internal steps, reports green (Pattern B) |
+
+Two guard scripts enforce this: `scripts/check-migration-journal-sync.sh`
+asserts 1:1 parity between `drizzle/[0-9]*.sql` files and `_journal.json`
+tags (both directions) and runs inside the `db-smoke` job before Neon branch
+creation; `scripts/check-db-smoke-filter.sh` asserts the `schema:`
+paths-filter patterns above still match real migration paths and runs in
+`build-test` on every PR, so the filter cannot silently rot again.
+
+Restated unchanged from Phase 20 locked rule 3: **Migrations fan out via the
+`db-migrate.yml` GitHub workflow.** No ad-hoc `npm run db:migrate` against a
+real branch; always go through the approved workflow path (which keeps an
+audit trail and respects the `production` GitHub Environment's
+required-reviewer gate for `branch=main`).
+
 ## Recovery procedure (lagging branch)
 
 If a non-main branch falls behind on migrations (e.g., a CI flake skipped
@@ -175,4 +203,5 @@ in `<deferred>` of `.planning/phases/20-infra-hardening/20-CONTEXT.md`.
 
 ---
 
-*Runbook last updated: 2026-05-27. Phase 20 / INFRA-01 — Antoine*
+*Runbook last updated: 2026-08-31. Phase 20 / INFRA-01 (Antoine) — original 3-branch cutover;
+Phase 29 / INFRA-06 added the "Migration gates" section above.*

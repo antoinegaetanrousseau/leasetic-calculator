@@ -8,16 +8,16 @@ vi.mock('@node-rs/argon2', () => ({
   hash: vi.fn().mockResolvedValue('$argon2id$v=19$fixed-hash'),
 }));
 
-// Better Auth auth mock — must not reference outer variables (hoisting).
-// Use a module-level spy that persists across calls so we can assert on it.
-const mockRevokeUserSessions = vi.fn().mockResolvedValue(undefined);
-vi.mock('./index', () => ({
-  auth: () => ({
-    api: {
-      revokeUserSessions: (...args: unknown[]) => mockRevokeUserSessions(...args),
-    },
-  }),
-}));
+// NOTE: there is deliberately NO './index' (Better Auth) mock here any more.
+// redeem.ts used to call `auth().api.revokeUserSessions(...)` — an ADMIN-plugin
+// endpoint — and this file mocked it to resolve successfully. That mock is what
+// hid a real bug: in production the reset page is public, so the caller has no
+// admin session and the call threw `APIError: UNAUTHORIZED` every time, turning
+// a successful reset into a visible "server_error" AFTER the password had
+// already been written and the token spent. redeem.ts now deletes the session
+// rows directly, so it must not import Better Auth at all — if someone
+// reintroduces that dependency, this file will fail to resolve it rather than
+// silently paper over it.
 
 // Token mock — hashToken always returns a known value
 vi.mock('./tokens', () => ({
@@ -46,6 +46,9 @@ vi.mock('@/lib/db', () => {
       sessionVersion: 'sessionVersion',
       email: 'email',
     },
+    sessions: {
+      userId: 'userId',
+    },
   };
 
   const fakeDb = {
@@ -67,6 +70,9 @@ vi.mock('@/lib/db', () => {
     }),
     insert: vi.fn().mockReturnValue({
       values: vi.fn().mockResolvedValue(undefined),
+    }),
+    delete: vi.fn().mockReturnValue({
+      where: vi.fn().mockResolvedValue(undefined),
     }),
   };
 
@@ -91,6 +97,7 @@ const getFakeDb = () => (dbModule as any).__fakeDb as {
   };
   update: ReturnType<typeof vi.fn>;
   insert: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
 };
 
 const VALID_RECORD = {
@@ -107,7 +114,6 @@ const GOOD_PASSWORD = 'Password1!';
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockRevokeUserSessions.mockResolvedValue(undefined);
   const fakeDb = getFakeDb();
   fakeDb.query.passwordResets.findFirst.mockResolvedValue(null);
   fakeDb.query.users.findFirst.mockResolvedValue(null);
@@ -117,6 +123,9 @@ beforeEach(() => {
   });
   fakeDb.insert.mockReturnValue({
     values: vi.fn().mockResolvedValue(undefined),
+  });
+  fakeDb.delete.mockReturnValue({
+    where: vi.fn().mockResolvedValue(undefined),
   });
 });
 
@@ -205,10 +214,11 @@ describe('redeemToken', () => {
     expect(result).toEqual({ ok: true });
     // update called: accounts password + passwordResets usedAt + users sessionVersion = 3 times
     expect(fakeDb.update).toHaveBeenCalledTimes(3);
-    // revokeUserSessions called with correct userId
-    expect(mockRevokeUserSessions).toHaveBeenCalledWith({
-      body: { userId: 'user-2' },
-    });
+    // Sessions are evicted by a direct DELETE on the sessions table, NOT by
+    // Better Auth's admin-only revokeUserSessions API. Regression guard for the
+    // bug where that admin call threw UNAUTHORIZED on this public route and
+    // turned a completed reset into a user-visible "server_error".
+    expect(fakeDb.delete).toHaveBeenCalledTimes(1);
   });
 
   // Test 7: too-short password → Zod validation fails before any DB lookup

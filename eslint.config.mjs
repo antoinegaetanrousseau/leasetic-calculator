@@ -28,6 +28,16 @@ const config = [
       'out/**',
       '.remember/**',
       'coverage/**',
+      'src/figma/**',
+      // Vendor code imported verbatim from the ReUI registry (Base UI · Maia · Neutral).
+      // Not hand-maintained: re-imported wholesale on upgrade, so house rules are enforced
+      // at the call sites that consume these, not inside the vendored source.
+      'src/components/ui/**',
+      'src/components/reui/**',
+      'src/components/blocks/**',
+      'src/hooks/use-mobile.ts',
+      'src/hooks/use-file-upload.ts',
+      'src/hooks/use-copy-to-clipboard.ts',
       // Agent git-worktree scratch space: full duplicate copies of this repo.
       // Ignored via .git/info/exclude (a local, untracked file), so ESLint's
       // flat config cannot pick it up from .gitignore — it must be listed here.
@@ -115,6 +125,12 @@ const config = [
       '**/*.spec.{ts,tsx}',
       'app/error.tsx', // error.tsx must work without server-side i18n; bilingual fallback is hardcoded by design (D-30 / 06-RESEARCH.md §16)
       'app/dev/**', // dev-only diagnostic routes — never reachable in production (NODE_ENV gate, Plan 11-05 D-11)
+      // Vendor code imported verbatim from the ReUI registry (Base UI / Maia / Neutral preset).
+      // These ship with English demo copy and are re-imported on upgrade, so house i18n rules
+      // are enforced at the call sites that use them, not inside the vendored source itself.
+      'src/components/ui/**',
+      'src/components/reui/**',
+      'src/components/blocks/**',
     ],
     rules: {
       'no-restricted-syntax': [

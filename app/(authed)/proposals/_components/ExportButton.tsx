@@ -21,7 +21,7 @@
  */
 
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 
@@ -101,7 +101,7 @@ export function ExportButton({ lang, resultCount, q, archived }: ExportButtonPro
       style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
     >
       {state === 'loading' && (
-        <Loader2
+        <LoaderIcon
           size={15}
           aria-hidden="true"
           style={{ color: 'var(--teal)', animation: 'spin 1s linear infinite' }}

@@ -509,6 +509,18 @@ export async function listPurgeCandidates(): Promise<ProposalRow[]> {
 export interface CreateDraftArgs {
   userId: string;
   language: 'fr' | 'en';
+  /**
+   * CRM-05 (Phase 30 Plan 09): optional pointer to the client relationship
+   * this draft was started from (`?clientRelationshipId=` on the wizard's
+   * step-1 route, ownership-validated by the caller before this is set).
+   * This FK is a pointer to the LIVING registry record; `inputs` remains the
+   * FROZEN historical copy written once at finalization (ARCHITECTURE §2.5
+   * Option A / DATA-02). The two are deliberately duplicated data serving
+   * two purposes — this field is set ONCE here, at draft creation, and is
+   * intentionally absent from `UpdateDraftArgs`/`FinalizeDraftArgs` so no
+   * later step of the wizard lifecycle can move or clear it.
+   */
+  clientRelationshipId?: string;
 }
 
 // ── Phase 17 D-03 / D-04 — per-user sequential lc_ref allocation ────────────
@@ -617,6 +629,9 @@ export async function createDraft(args: CreateDraftArgs): Promise<ProposalRow> {
       lcRef,
       inputs: {},
       schemaVersion: '1.0.0',
+      // CRM-05: undefined yields NULL when no relationship was supplied —
+      // never coerced to '' or a sentinel. See CreateDraftArgs comment above.
+      clientRelationshipId: args.clientRelationshipId,
       // idempotencyKey, paramsSnapshot, computed still NULL until finalize.
     };
     try {

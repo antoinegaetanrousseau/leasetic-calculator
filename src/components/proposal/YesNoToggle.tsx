@@ -1,5 +1,7 @@
 'use client';
 
+import { segmentedGroup, segmentedButton } from './segmented';
+
 export interface YesNoToggleProps {
   ariaLabel: string;
   /** t('common.yes', lang) — already in the v10 dictionary. */
@@ -18,8 +20,9 @@ export interface YesNoToggleProps {
  * v10's 'oui' / 'non' string format is the consumer's job (Phase 8 PDF
  * may need that legacy format; Phase 7 stores boolean per CONTEXT D-3).
  *
- * The `.yn-group` wrapper + `.yn-btn` / `.yn-btn.on` classes were added
- * to globals.css by Plan 07-03 (single-source class contract).
+ * Phase 2: the `.yn-group` / `.yn-btn` v10 classes were retired in favour of
+ * the shared segmented chrome in ./segmented, which DurationSegmented also
+ * uses. Appearance and a11y are unchanged.
  */
 export function YesNoToggle({
   ariaLabel,
@@ -30,13 +33,13 @@ export function YesNoToggle({
   disabled = false,
 }: YesNoToggleProps) {
   return (
-    <div role="radiogroup" aria-label={ariaLabel} className="yn-group">
+    <div role="radiogroup" aria-label={ariaLabel} className={segmentedGroup()}>
       <button
         type="button"
         role="radio"
         aria-checked={value === true}
         disabled={disabled}
-        className={'yn-btn' + (value === true ? ' on' : '')}
+        className={segmentedButton({ active: value === true })}
         onClick={() => !disabled && onChange(true)}
       >
         {yesLabel}
@@ -46,7 +49,7 @@ export function YesNoToggle({
         role="radio"
         aria-checked={value === false}
         disabled={disabled}
-        className={'yn-btn' + (value === false ? ' on' : '')}
+        className={segmentedButton({ active: value === false })}
         onClick={() => !disabled && onChange(false)}
       >
         {noLabel}

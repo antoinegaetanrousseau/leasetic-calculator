@@ -49,3 +49,41 @@ export type { PartnerWithCount } from './users';
 
 export { writeAuditLog } from './audit-log';
 export type { AuditAction, AuditTargetType, WriteAuditLogArgs } from './audit-log';
+
+// Phase 30 Plan 04 — owner-scoped client-relationship registry (CRM-02/04/06/07).
+export {
+  listClientBook,
+  getClientRelationshipForOwner,
+  listContactsForRelationship,
+  listProposalsForRelationship,
+} from './client-relationships';
+export type {
+  ClientBookRow,
+  ClientBookSort,
+  ClientBookDir,
+  ListClientBookArgs,
+  ListClientBookResult,
+  ClientRelationshipDetail,
+  ContactListRow,
+  RelationshipProposalRow,
+} from './client-relationships';
+
+// Phase 30 Plan 04 — admin-only company & relationship registry (CRM-03).
+export {
+  listCompaniesForAdmin,
+  getCompanyForAdmin,
+  listRelationshipsForCompany,
+  getRelationshipForAdmin,
+  listContactsForRelationshipAdmin,
+  listProposalsForRelationshipAdmin,
+} from './companies';
+export type { AdminCompanyRow, AdminRelationshipRow } from './companies';
+
+// Phase 31 Plan 03 — admin-only reconciliation review queue (IMPORT-04/05, D-11).
+export { listPendingPairsForAdmin, getPendingPairForAdmin } from './reconciliation';
+export type {
+  AdminPairSide,
+  AdminPendingPairRow,
+  ListPendingPairsArgs,
+  ListPendingPairsResult,
+} from './reconciliation';

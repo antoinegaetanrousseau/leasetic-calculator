@@ -118,7 +118,7 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 - **Rebrand is token-scoped** — only the accent token changes; logo SVGs and success green are explicitly out of the recolor.
 - **PDF defect root-cause is a planning spike** — likely the narrow-no-break-space (U+202F) French thousands separator or a missing glyph in the embedded font; to be confirmed before the PDF phase plans.
 
-## Current Milestone: v1.5 — Proposal List Actions & Pill Fix
+## ✅ v1.5 — Proposal List Actions & Pill Fix — SHIPPED 2026-05-30
 
 **Goal:** Restore per-row management actions on the partner proposals list and fix the status-pill rendering across the home + proposals surfaces.
 
@@ -133,6 +133,44 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 - **ADMIN-09 envelope held** — `ProposalRowDto` never projects `params_snapshot`/commission; the 19-gate grep-contract suite must stay green.
 - **Pill fix is CSS/layout-scoped** — `StatusChip` is a bare `<span className="chip chip-{variant}">`; the defect lives in the list grid + `.chip` sizing, not the component contract.
 - **Phase numbering continues at Phase 26.**
+
+---
+
+## Current Milestone: v1.6 — CRM Foundation
+
+**Goal:** Give client data its own life independent of proposals — a shared company registry with private per-partner relationships — so the extranet can become the CRM that replaces HubSpot.
+
+**Why now:** client data currently exists *only* inside `proposals.inputs` (a JSONB blob that is immutable by design). Three proposals for the same client are three unrelated copies with no link between them; nothing survives a proposal; there is no way to ask "show me everything for this client". Separately, the app never learns whether a proposal converted — statuses are `draft | active | deleted` with `expired` derived, and there is no won / lost / signed.
+
+**Target features:**
+
+- **Safety net first** — Neon 3-branch split so `preview` / `development` stop resolving to the production `main` pooled endpoint (all three Vercel scopes currently hit prod, which is why `db:migrate` can never be run locally), plus a post-deploy DB-smoke CI step on any PR touching `drizzle/*.sql`. Hard prerequisite: v1.6 is migration-dense and includes an irreversible fuzzy backfill.
+- **Company & contact registry** — `companies` (global) + `client_relationships` (private, per-partner) + `contacts` (scoped to the relationship). `proposals` gains a nullable `client_relationship_id` FK.
+- **Two-source reconciliation** — extract clients from existing `proposals.inputs`, import contacts/companies from the HubSpot export, dedup on SIREN then normalized name, with a screen for a human to resolve ambiguous pairs. Dry-run mode required.
+- **Role model** — add a `sales` role so internal `Commercial` users hold relationships too ("house relationships"), giving imported HubSpot contacts an owner and the sales team the same pipeline UI.
+- **Pipeline & activity** — stages on the relationship, outcome on the proposal, an activity timeline mixing manual notes with system entries, and a `next_action_date` driving a "who to chase" list.
+
+**Key context / decisions baked in at milestone start:**
+
+- **`proposals.inputs` stays immutable** — the snapshot invariant (DATA-02 / ARCHITECTURE §2.5 Option A) is preserved. The CRM is strictly **additive**: the JSONB keeps the frozen historical copy so a generated PDF always reproduces exactly what was sent, while the FK points at the living record.
+- **Channel-conflict safe** — Partner A must never learn that Partner B is working the same client. Company identity is shared; the *relationship* (contacts, notes, pipeline, proposals) is private. Admin sees every relationship on a company.
+- **Contacts belong to the relationship, not the company** — a person at ACME is arguably a fact about ACME, but the mobile number a partner worked to get is that partner's asset.
+- **No `opportunities` entity** — deliberate YAGNI. Stage lives on the relationship (*where is this client*), outcome on the proposal (*did this quote convert*). If parallel deals appear, `opportunities` slots between the two without disturbing either.
+- **SIREN is the cross-system join key**, required **at deal-win, never at proposal** — a partner quoting a prospect must not be blocked on paperwork. `companies.siren` is nullable UNIQUE; `companies.name_normalized` is the fallback dedup key, stored as a column so the normalization rules are versioned in migrations rather than drifting in application code.
+- **Pipeline is partner-advanced** (Antoine 2026-08-31, rot risk flagged and accepted). Late stages (`signé`, `débloqué`) are marked **system-owned** from day one so the future contract-tool feedback can drive them; only early stages are hand-editable.
+- **External-ref columns land now, unused until v1.7+** — `companies.contract_tool_customer_id`, `synced_at`, `hubspot_company_id`, `contacts.hubspot_contact_id`. HubSpot IDs are import **provenance** (idempotent re-import + traceability), not sync keys — HubSpot is being retired, not integrated.
+- **The in-house contract tool is a custom app with a REST/GraphQL API**, but its customer schema is unseen. v1.6 designs the **seams only** and builds no integration.
+- **Phase numbering continues at Phase 29** (Phase 28 is the retro-documented ReUI/base-maia design-system migration).
+- **Assumes PR #6 lands first** — v1.6 builds on the ReUI design system from Phase 28.
+
+**Open dependency:** the HubSpot export (`hubspot-crm-exports-tous-les-contacts-2026-08-31.xlsx`, ~2.9 MB) is not yet readable — macOS blocks `~/Downloads` at the TCC level. Its column inventory gates the **import design only** (how much dedup can be automatic vs human-resolved), not the milestone definition.
+
+**Out of scope for v1.6** (deferred to v1.7+):
+
+- Contract-tool integration — win-event handoff, inbound status feedback
+- HubSpot retirement itself (only after the registry and pipeline prove out in real use)
+- Sales-team reporting and cross-book visibility beyond what the role model requires
+- Email logging, sequences, marketing, forms — never used in HubSpot, so never in scope
 
 ---
 
@@ -382,4 +420,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-05-30 after v1.5 milestone (Proposal List Actions & Pill Fix). Phases 26–27 shipped: per-row Archive/Restore on `/proposals` (Delete descoped → Archive-only, D-01) + status-pill content-hugging fix on home + `/proposals` (light + dark human-verified). 1184 tests passing. Next: `/gsd-new-milestone`.*
+*Last updated: 2026-08-31 at v1.6 milestone start (CRM Foundation). Since v1.5: Phase 28 (ReUI / base-maia design-system migration, 24 commits, retro-documented — PR #6 open, not yet merged). 1213 tests passing. v1.6 turns the quoting extranet into a CRM that replaces HubSpot: shared company registry + private per-partner relationships, two-source reconciliation, pipeline and activity. Next: `/gsd-plan-phase 29`.*

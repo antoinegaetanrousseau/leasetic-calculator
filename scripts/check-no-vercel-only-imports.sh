@@ -29,22 +29,43 @@ PATTERNS=(
 # We match it ONLY in import-context: from 'postgres' or require('postgres').
 # Handled separately below.
 
-# Search scope: source-code files outside the adapter directories.
-SEARCH_PATHS=("src" "app")
-# Note: EXCLUDE_DIRS variable defined for documentation; --exclude-dir flags used inline.
+# ---------------------------------------------------------------------------
+# Scope: GIT-TRACKED FILES ONLY, under src/ and app/.
+#
+# Consistent with scripts/check-no-drizzle-push.sh — see the long rationale there.
+# In short: a filesystem walk can be tripped by any untracked local file (agent
+# scratch, local experiments) that merely mentions a forbidden string, which makes
+# the guard fail locally while CI passes. Scoping to `git ls-files` means only
+# committed-or-staged content can fail the guard, and no exclusion list has to be
+# maintained as tooling changes. Exposure here was narrower than the drizzle-push
+# guard's (this one already scanned only src/ and app/, not the repo root), but a
+# stray untracked src/scratch.ts would still have tripped it.
+#
+# The storage/db adapter directories are excluded via pathspec rather than the
+# previous post-grep on path prefixes — same effect, expressed once.
+# ---------------------------------------------------------------------------
+readarray -t FILES < <(
+  git ls-files -- \
+    'src/*.ts' 'src/*.tsx' 'src/*.js' 'src/*.mjs' 'src/*.cjs' \
+    'app/*.ts' 'app/*.tsx' 'app/*.js' 'app/*.mjs' 'app/*.cjs' \
+    ':(exclude)src/lib/storage/**' \
+    ':(exclude)src/lib/db/**' \
+    2>/dev/null || true
+)
+
+if [ "${#FILES[@]}" -eq 0 ]; then
+  # Fail loudly rather than pass vacuously — a guard that inspects zero files is
+  # indistinguishable from a passing one.
+  echo "ERROR: guard could not enumerate git-tracked files under src/ and app/."
+  echo "This guard requires a git work tree (it scopes to 'git ls-files' by design)."
+  exit 1
+fi
 
 fail=0
 
 for p in "${PATTERNS[@]}"; do
-  # Search for the literal package name in source files
-  matches=$(
-    grep -rEnF \
-      --include='*.ts' --include='*.tsx' --include='*.js' --include='*.mjs' --include='*.cjs' \
-      --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=drizzle \
-      "$p" "${SEARCH_PATHS[@]}" 2>/dev/null \
-      | grep -v -E "^(src/lib/storage/|src/lib/db/)" \
-      || true
-  )
+  # -F (fixed strings): every pattern above is a literal package name, not a regex.
+  matches=$(grep -Fn "$p" -- "${FILES[@]}" 2>/dev/null || true)
   if [ -n "$matches" ]; then
     echo "ERROR: forbidden import '$p' found outside lib/storage|lib/db:"
     echo "$matches"
@@ -56,12 +77,7 @@ done
 # Special handling for the bare 'postgres' npm package.
 # Match import-context only: `from 'postgres'` or `from "postgres"` or `require('postgres')` or `require("postgres")`.
 pg_matches=$(
-  grep -rEn \
-    --include='*.ts' --include='*.tsx' --include='*.js' --include='*.mjs' --include='*.cjs' \
-    --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=drizzle \
-    "from ['\"]postgres['\"]|require\(['\"]postgres['\"]\)" "${SEARCH_PATHS[@]}" 2>/dev/null \
-    | grep -v -E "^(src/lib/storage/|src/lib/db/)" \
-    || true
+  grep -En "from ['\"]postgres['\"]|require\(['\"]postgres['\"]\)" -- "${FILES[@]}" 2>/dev/null || true
 )
 if [ -n "$pg_matches" ]; then
   echo "ERROR: forbidden import of 'postgres' (npm package) found outside lib/db:"
