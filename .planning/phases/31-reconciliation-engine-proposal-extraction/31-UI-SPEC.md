@@ -78,6 +78,10 @@ locked scope decision.
 
 ## Container Radius (LOCKED — decoupled from `--radius`)
 
+> Tracked project-wide as [`OPEN-A`](../../codebase/UI-CONVENTIONS.md#open-items) — a recorded **open item**, not a settled
+> convention. `--radius` itself stays pinned per [`UIC-04`](../../codebase/UI-CONVENTIONS.md). A checker should read the
+> 18px/24px split as deliberate and deferred, not as a defect.
+
 `app/globals.css` pins `--radius: 0.625rem` deliberately, after a documented incident where a
 larger `--radius` inflated the whole derived scale (`--radius-sm` through `--radius-4xl`) and
 broke Input/Button rounding app-wide (see `app/globals.css:67-74`). **Do not touch `--radius`
@@ -107,8 +111,9 @@ not this one's.
 
 ## Spacing Scale
 
-Reused verbatim from `30-UI-SPEC.md` — no new spacing values needed. Every value below is
-already in active use across the app.
+Per [`UIC-01`](../../codebase/UI-CONVENTIONS.md) — the ratified 4px-multiple scale (finer than the GSD default, every
+value still a strict multiple of 4). No new spacing values needed; every value below is already
+in active use across the app.
 
 | Token | Value | Usage on this surface |
 |-------|-------|-------|
@@ -127,7 +132,11 @@ exception, not a spacing exception.
 
 ## Typography
 
-Reused verbatim from `30-UI-SPEC.md`'s ratified 3-weight system (400 / 600 / 700). No new sizes.
+**Three font weights (400 / 600 / 700) — per [`UIC-02`](../../codebase/UI-CONVENTIONS.md), a ratified project-wide
+exception to the two-weight design-review threshold. This is not a Phase 31 declaration to
+re-derive or re-approve: it is inherited, already-ratified, and applies project-wide.**
+No new sizes; no new weights. Weights 300 and 500 are loaded by `app/layout.tsx` but remain
+unused and out of bounds, per UIC-02.
 
 | Role | Size | Weight | Line Height | Usage on this surface |
 |------|------|--------|-------------|-------------------|
@@ -141,7 +150,9 @@ Reused verbatim from `30-UI-SPEC.md`'s ratified 3-weight system (400 / 600 / 700
 
 ## Color
 
-Reused verbatim from `30-UI-SPEC.md` — same tokens, same 60/30/10 discipline. **This surface
+Per [`UIC-03`](../../codebase/UI-CONVENTIONS.md) — same tokens, same 60/30/10 discipline, same explicit accent reserve
+list. UIC-03 permits a phase to declare a **stricter** accent budget than the baseline, which is
+what this surface does. **This surface
 introduces zero new color tokens and, deliberately, near-zero new accent (`--primary`) usage:**
 
 | Role | Token | Usage on this surface |
