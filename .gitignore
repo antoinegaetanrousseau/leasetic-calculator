@@ -19,3 +19,6 @@ next-env.d.ts
 .env*.local
 .env.local.bak*
 .claude/settings.local.json
+
+# Phase 31 — reconciliation dry-run reports (contain live client data, never commit)
+.reconcile/
