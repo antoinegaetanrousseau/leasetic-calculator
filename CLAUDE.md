@@ -28,11 +28,14 @@ apply project-wide; a phase spec that uses them is **inheriting**, not newly dec
 
 - **OPEN-D — three ratified weights or four?** 500 ships pervasively; UIC-02 records three. Do
   not flag a surface for using 500 while this is unsettled.
-- **OPEN-A — container radius is split** (Phase 30 `.card` at token-derived 18px; Phase 31 queue
-  cards at literal `rounded-[24px]`). Deliberate and deferred to the app-shell refresh phase,
-  which will formalize a container-radius token. Do not converge them mid-phase.
-- `--radius: 0.625rem` is **pinned** (UIC-04). It drives the whole derived scale; changing it
-  previously turned every Input into a pill. Do not change it or the `@theme inline` multipliers.
+- `--radius: 0.625rem` is still declared but drives nothing in the scale (UIC-04). Controls
+  render at an explicit, standalone **26px** corner (`--radius-4xl`) and containers render at
+  the named **`--radius-container`** token (16px) — the two tiers share zero variables, so a
+  container change can never reach a control or vice versa. Do not reintroduce a
+  `calc(var(--radius) * n)` derivation; `tests/radius-scale.test.ts` and
+  `tests/container-radius.test.ts` gate against it.
+- OPEN-A (container radius split 18px/24px) was closed by `31.1-app-shell-refresh` — see
+  `.planning/codebase/UI-CONVENTIONS.md` for the full closure record.
 
 ## Codebase reference docs
 
