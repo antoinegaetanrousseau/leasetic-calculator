@@ -66,7 +66,7 @@ routine per-surface addition, not shell chrome, and is unaffected by the deferre
 |----------|-------|
 | Tool | shadcn, initialized (unchanged from Phase 30) — `components.json`, `style: "base-maia"` |
 | Preset | `base-maia`, `baseColor: neutral`, `cssVariables: true`, no class prefix |
-| Component library | shadcn (Base UI-backed) — `src/components/ui/dialog.tsx`, `alert-dialog.tsx`, `radio-group.tsx`, `badge.tsx`, `card.tsx`, `empty.tsx`, `button.tsx`, all already installed. No `@reui` block matches this surface's "compare two records" shape (checked all 22 vendored blocks under `src/components/blocks/`; none is a pair-comparison pattern) — this surface is a **bespoke composition of existing primitives**, the same discipline `ClientDetailPage`/`CompanyDetailPage` used in Phase 30 rather than forcing an ill-fitting block. |
+| Component library | shadcn (Base UI-backed) — `src/components/ui/dialog.tsx`, `alert-dialog.tsx`, `radio-group.tsx`, `badge.tsx`, `card.tsx`, `empty.tsx`, `button.tsx`, all already installed. No `@reui` block matches this surface's "compare two records" shape (checked all 24 vendored blocks under `src/components/blocks/`; none is a pair-comparison pattern) — this surface is a **bespoke composition of existing primitives**, the same discipline `ClientDetailPage`/`CompanyDetailPage` used in Phase 30 rather than forcing an ill-fitting block. |
 | Icon library | Iconly-sourced product vocabulary via `@/components/ui/icons` (unchanged two-tier system, see `30-UI-SPEC.md`). This phase needs **zero new icons** — `AlertTriangleIcon` and `CheckCircleIcon` already exist and cover every glyph this surface needs. |
 | Font | Inter, unchanged from Phase 30 |
 
@@ -120,7 +120,7 @@ in active use across the app.
 | xs | 4px | Icon-to-text gap inside badges (owner-type badge) |
 | sm | 8px | Inline gaps within a side column (name → SIREN → counts stack) |
 | md | 12–16px | Vertical rhythm inside a pair card's side column |
-| lg | 20px | Gap between the two side-columns and the card's internal horizontal padding |
+| lg | 20px | Gap between the two side-columns |
 | xl | 24px | Gap between stacked pair cards (`gap-6` in the page's `flex flex-col`) |
 | 2xl | 24px (container radius, see above) / 28-32px | Pair card internal padding (28px, matches `.card`'s existing 28px padding — only the corner radius is the literal exception, not the padding) |
 | 3xl | 48px | Empty/success-state vertical padding band |
@@ -215,7 +215,7 @@ this page — pairs arrive from the extraction script, never from a human action
 | Registry | Blocks Used | Safety Gate |
 |----------|-------------|-------------|
 | shadcn official (`base-maia`) | `dialog`, `alert-dialog`, `radio-group`, `badge`, `card`, `empty`, `button` — all already present under `src/components/ui/`, installed before this phase. No new `shadcn add` invocation required. | not required — pre-existing installation |
-| `@reui` | **None used.** All 22 vendored blocks under `src/components/blocks/` were checked against this surface's "flagged pair, two-sided compare, resolve" shape; none fits (`solution-crm-1..6` are pipeline/deal/contact-directory shapes, not comparison-pair shapes). No new registry fetch happens in this phase. | not applicable |
+| `@reui` | **None used.** All 24 vendored blocks under `src/components/blocks/` were checked against this surface's "flagged pair, two-sided compare, resolve" shape; none fits. `solution-crm-1..6` are pipeline/deal/contact-directory shapes; `dialog-1`, `empty-state-1` and `list-1` supply single-record chrome with no two-sided compare; the remainder (`app-shell-1`, `auth-1`, `dashboard-1/2`, `data-grid-base-1`, `data-grid-filtering-1`, `form-1`, `gantt-3`, `navbar-1`, `profile-1`, `settings-1`, `stats-1`, `stats-4`, `timeline-1`, `wizard-1`) address unrelated surfaces. No new registry fetch happens in this phase. | not applicable |
 
 **No new registry fetch happens in this phase.** If the planner later finds a genuinely better-
 fitting `@reui` component during implementation, the vetting gate in
@@ -375,9 +375,15 @@ pattern but **not destructive-colored**, because nothing is deleted; the permane
 - `AlertDialogTitle`: "Marquer ces sociétés comme définitivement séparées ?"
 - `AlertDialogDescription`: the keep-separate copy, interpolated with both company names.
 - `AlertDialogCancel`: "Annuler" (default/outline, unchanged from primitive default)
-- `AlertDialogAction`: "Marquer séparées" — **no `variant="destructive"` override** (stays at the
-  primitive's own default, which is `variant="outline"` per `alert-dialog.tsx:157` — confirmed
-  not `--primary`-colored either, keeping this surface's zero-accent budget intact).
+- `AlertDialogAction`: "Marquer séparées" — **`variant="outline"` is REQUIRED, not optional.**
+  `AlertDialogAction` passes no variant of its own (`alert-dialog.tsx:142-145`), so it falls
+  through to `Button`'s default variant (`button.tsx:35`), which is `bg-primary
+  text-primary-foreground` (`button.tsx:11`). Omitting the override therefore ships a
+  `--primary`-filled button and breaks this surface's zero-accent budget. (The
+  `variant = "outline"` default at `alert-dialog.tsx:157` belongs to **`AlertDialogCancel`**,
+  not to `AlertDialogAction` — an earlier revision of this spec cited it for the wrong component
+  and concluded, wrongly, that no override was needed.) No `variant="destructive"` either: this
+  action is not destructive.
 - Submit calls the resolve action (e.g. `keepPairSeparateAction(pairKey)`), writing the D-09
   decision row. On success: dialog closes, toast "Paire marquée comme séparée.",
   `router.refresh()`. On failure: generic bounded-error toast, dialog stays open.
