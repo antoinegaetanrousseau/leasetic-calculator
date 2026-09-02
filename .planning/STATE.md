@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-01T23:46:45.652Z"
+last_updated: "2026-09-02T00:41:03.668Z"
 last_activity: 2026-09-01
 progress:
-  total_phases: 18
+  total_phases: 19
   completed_phases: 14
   total_plans: 55
   completed_plans: 55
-  percent: 78
+  percent: 74
 ---
 
 # State — Matrice Commerciale
@@ -119,6 +119,10 @@ v1.1 ████████████████████ 6/6 phases com
 ⚠ **`FINAL-TEST-v11.md` master ship-gate runbook was never executed.** v10 is a prepared-but-undistributed prototype. v1.1 supersedes it; v10 will be retired at v1.1 launch (CUT-01) without ever reaching production partners. The runbook can be skipped — partners go straight from v9 → v1.1.
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 31.1 inserted after Phase 31: App Shell Refresh — sidebar converges on the vendored app-shell-1 block (fixed edge toggle, fixes the collapsed-rail logo/chevron stack), breadcrumbs in the shell header via getRouteMeta, BrandLogo 190px -> ~140px, and a named container-radius token that closes the 18px/24px seam Phase 31 opened. Split out of /gsd-ui-phase 31 by operator decision so a global visual refresh stays out of the milestone's riskiest data-migration phase (Phase 16 / Phase 28 precedent).
 
 ### Locked architectural decisions (carried into v1.1 planning)
 

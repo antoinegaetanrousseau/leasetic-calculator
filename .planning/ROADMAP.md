@@ -484,6 +484,23 @@ Plans:
 **Plans:** TBD
 **UI hint:** yes
 
+### Phase 31.1: App Shell Refresh (INSERTED)
+
+**Goal:** The application shell converges on the vendored `app-shell-1` block — a fixed edge toggle instead of an in-header chevron, breadcrumbs where the page title sits today, and a brand lockup sized for the sidebar it lives in — and the Maia large-radius look finally lands on container surfaces through a named token, without dragging inputs back into the pill shape that got it reverted the first time.
+**Depends on:** Phase 30 (`.card` at the token-derived radius) and Phase 31 (its review-queue cards carry the interim `rounded-[24px]` literal this phase converges); no schema dependency — this is presentation only
+**Requirements:** TBD
+**Success Criteria** (what must be TRUE):
+
+  1. Collapsing the sidebar no longer stacks the brand mark above a chevron: the collapsed rail shows the mark alone, and the collapse/expand control is reachable at the sidebar edge at every width.
+  2. The collapse/expand control remains focusable and FR/EN-labelled — keyboard users can still collapse the sidebar, and no two controls announce the same accessible name to a screen reader.
+  3. Every authenticated page renders a breadcrumb trail in the shell header, derived from `getRouteMeta`, in the viewer's language, with the current page as non-link text.
+  4. Container surfaces (cards, panels, sheets, dialogs) render at the agreed large radius via a **named token**, not a per-file literal, while `--radius` stays at `0.625rem` and every Input, Button and Select keeps its current corner.
+  5. Phase 30's `.card` and Phase 31's review-queue cards render at the same radius; no surface is left on a hardcoded `rounded-[24px]`.
+  6. The sidebar brand lockup renders ~26% smaller than its current 190px, and the sidebar width variables are still set where `SidebarProvider`'s inline style cannot outrank them.
+
+**Plans:** TBD
+**UI hint:** yes
+
 ### Phase 32: HubSpot Import
 
 **Goal:** The HubSpot export becomes companies, contacts, and relationships in the registry — reusing Phase 31's dry-run/dedup/review engine — with each HubSpot contact-owner mapped to a Leasétic sales-role user, and safe to re-run without creating duplicates.
