@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T10:15:28.705Z"
+last_updated: "2026-09-02T10:28:55.626Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 14
   total_plans: 63
-  completed_plans: 61
+  completed_plans: 62
   percent: 74
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 31 (reconciliation-engine-proposal-extraction) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Status: Ready to execute
 Last activity: 2026-09-02
 
@@ -403,6 +403,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31 P04 | ~10min | 2 tasks | 5 files |
 | Phase 31 P05 | 30min | 3 tasks | 4 files |
 | Phase 31 P06 | ~22min | 3 tasks | 14 files |
+| Phase 31 P07 | 15min | 3 tasks | 5 files |
 
 ## Decisions
 
@@ -491,3 +492,4 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31-06]: route-meta.ts's /companies/review tail match registered strictly before /companies (load-bearing ordering, regression-tested)
 - [Phase 31-06]: Added admin.reconciliation.card.counts dictionary key (fr/en), not in the UI-SPEC's i18n Key Plan — the counts line's words differ in English (proposals vs propositions), so bilingual correctness required a key the plan's literal list omitted
 - [Phase 31-06]: KeepSeparateDialog confirm uses explicit variant=outline — the UI-SPEC's claim about AlertDialogAction's own default variant does not match alert-dialog.tsx's actual code; outline was set explicitly to honor the same document's zero-accent-budget Color section
+- [Phase 31]: run.ts's counts field is read back from the just-written dry-run report via readLatestDryRunReport() rather than exporting report.ts's internal computeCounts(), keeping the plan's file changes scoped to files_modified

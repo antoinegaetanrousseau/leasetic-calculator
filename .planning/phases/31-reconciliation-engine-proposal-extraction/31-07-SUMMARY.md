@@ -140,3 +140,7 @@ None — no external service configuration required. This plan touches no infras
 ---
 *Phase: 31-reconciliation-engine-proposal-extraction*
 *Completed: 2026-09-02*
+
+## Self-Check: PASSED
+
+All 5 created/modified source files plus the SUMMARY itself verified present on disk; all 4 commit hashes (`b97058c`, `e09e9b0`, `741f946`, `f033b65`) verified present in git log.
