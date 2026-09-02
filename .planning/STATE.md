@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T20:29:28.948Z"
+last_updated: "2026-09-02T20:37:35.873Z"
 last_activity: 2026-09-02
 progress:
   total_phases: 19
   completed_phases: 15
   total_plans: 70
-  completed_plans: 67
+  completed_plans: 68
   percent: 79
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 31.1 (app-shell-refresh) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-09-02
 
@@ -409,6 +409,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31.1 P02 | 4min | 3 tasks | 3 files |
 | Phase 31.1 P03 | 4min | 3 tasks | 4 files |
 | Phase 31.1 P04 | ~14min | 3 tasks | 8 files |
+| Phase 31.1 P05 | ~5min | 2 tasks | 2 files |
 
 ## Decisions
 
@@ -510,3 +511,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31.1]: 31.1-04: rounded-container confirmed as the Tailwind utility for --radius-container (16px); used across card/dialog/alert-dialog/popover and the review-queue surfaces
 - [Phase 31.1]: 31.1-04: MergeDialog/KeepSeparateDialog rounded-[24px] overrides deleted, not replaced — the primitive supplies the radius
 - [Phase 31.1]: 31.1-04: segmented.ts's rounded-[12px] is a control-tier literal, out of D-01/D-02 scope — allow-listed in tests/container-radius.test.ts, not retired
+- [Phase 31.1-05]: Left --popover, --input and --sidebar-accent unchanged (DARK-GAP-01/02/03) — no invented dark-mode value ships for the three surfaces the single Colibris screenshot could not answer
+- [Phase 31.1-05]: tests/dark-palette.test.ts pins the three unsampled gap tokens' current values as a hard equality assertion so a future silent fill fails loudly
