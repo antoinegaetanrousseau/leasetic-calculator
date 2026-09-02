@@ -52,6 +52,7 @@ const ADMIN_HREFS = {
   coefficients: '/x/coefficients',
   partners: '/x/partners',
   companies: '/x/companies',
+  reconciliation: '/x/companies/review',
   history: '/x/history',
 } as const;
 
@@ -90,7 +91,7 @@ describe('AppSidebar', () => {
     expect(Array.from(links).filter((l) => l.hasAttribute('data-active'))).toHaveLength(1);
   });
 
-  it('Phase 18 D-27, widened by Plan 30-02: admin nav renders exactly 7 items, correct hrefs, no Historique', () => {
+  it('Phase 18 D-27, widened by Plan 30-02 and Plan 31-06: admin nav renders exactly 8 items, correct hrefs, no Historique', () => {
     const { container } = renderSidebar({
       activeNav: 'admin-coefficients',
       isAdmin: true,
@@ -100,13 +101,14 @@ describe('AppSidebar', () => {
     });
 
     const links = navLinksIn(container);
-    expect(links).toHaveLength(7);
+    expect(links).toHaveLength(8);
     expect(Array.from(links).map((l) => l.textContent)).toEqual([
       'Accueil',
       'Nouvelle proposition',
       'Propositions',
       'Partenaires',
       'Sociétés',
+      'Réconciliation',
       'Coefficients',
       'Aide',
     ]);
@@ -114,20 +116,41 @@ describe('AppSidebar', () => {
     // Historique is deliberately absent from the admin sidebar (D-27).
     expect(Array.from(links).some((l) => (l.textContent ?? '').includes('Historique'))).toBe(false);
 
-    // Admin home + partners + companies + coefficients use the forwarded
-    // segment hrefs; new / proposals / help stay on their canonical routes.
+    // Admin home + partners + companies + reconciliation + coefficients use the
+    // forwarded segment hrefs; new / proposals / help stay on their canonical routes.
     expect(Array.from(links).map((l) => l.getAttribute('href'))).toEqual([
       '/x',
       '/proposals/new/parametres',
       '/proposals',
       '/x/partners',
       '/x/companies',
+      '/x/companies/review',
       '/x/coefficients',
       '/aide',
     ]);
 
-    expect(links[5]).toHaveAttribute('data-active');
+    expect(links[6]).toHaveAttribute('data-active');
     expect(Array.from(links).filter((l) => l.hasAttribute('data-active'))).toHaveLength(1);
+  });
+
+  it('Plan 31-06 (UI-SPEC Access & Non-Leakage point 2): the reconciliation entry exists in the admin nav', () => {
+    const { container } = renderSidebar({
+      activeNav: 'admin-reconciliation',
+      isAdmin: true,
+      lang: 'fr',
+      theme: 'light',
+      adminHrefs: { ...ADMIN_HREFS },
+    });
+    const links = navLinksIn(container);
+    expect(Array.from(links).map((l) => l.getAttribute('href'))).toContain('/x/companies/review');
+    expect(Array.from(links).map((l) => l.textContent)).toContain('Réconciliation');
+  });
+
+  it('Plan 31-06 (UI-SPEC Access & Non-Leakage point 2): the partner nav never renders the reconciliation entry', () => {
+    const { container } = renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
+    const links = navLinksIn(container);
+    expect(Array.from(links).map((l) => l.getAttribute('href'))).not.toContain('/x/companies/review');
+    expect(Array.from(links).some((l) => (l.textContent ?? '').includes('Réconciliation'))).toBe(false);
   });
 
   it('AC-RS-04 (EN): partner nav renders English labels', () => {
@@ -273,7 +296,7 @@ describe('AppSidebar', () => {
       activeNav: 'admin-home', isAdmin: true, lang: 'fr', theme: 'light',
       adminHomeHref: '/x', adminHrefs: { ...ADMIN_HREFS },
     });
-    expect(navLinksIn(admin)).toHaveLength(7);
+    expect(navLinksIn(admin)).toHaveLength(8);
   });
 
   it('AC-RS-24-04 (D-02 auto-reconcile): adminSegment forces the admin nav', () => {
@@ -282,7 +305,7 @@ describe('AppSidebar', () => {
       activeNav: 'admin-home', isAdmin: true, lang: 'fr', theme: 'light',
       adminSegment: 'x', adminHrefs: { ...ADMIN_HREFS },
     });
-    expect(navLinksIn(container)).toHaveLength(7);
+    expect(navLinksIn(container)).toHaveLength(8);
   });
   /**
    * Regression — found in Phase 30 UAT.

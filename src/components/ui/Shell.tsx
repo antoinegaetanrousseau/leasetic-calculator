@@ -67,6 +67,7 @@ export async function Shell({
           coefficients: `/${adminSegment}/coefficients`,
           partners: `/${adminSegment}/partners`,
           companies: `/${adminSegment}/companies`,
+          reconciliation: `/${adminSegment}/companies/review`,
           history: `/${adminSegment}/history`,
         }
       : undefined;

@@ -21,7 +21,7 @@
  *     carried over unchanged. Those encode real product rules, not styling.
  */
 
-import { HomeIcon, PlusIcon, ProposalIcon, HelpIcon, UsersIcon, SlidersIcon, BuildingIcon } from '@/components/ui/icons';
+import { HomeIcon, PlusIcon, ProposalIcon, HelpIcon, UsersIcon, SlidersIcon, BuildingIcon, AlertTriangleIcon } from '@/components/ui/icons';
 import { useSyncExternalStore, type ComponentType } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -74,6 +74,7 @@ export interface AppSidebarProps {
     coefficients: string;
     partners: string;
     companies: string;
+    reconciliation: string;
     history: string;
   };
   /**
@@ -132,6 +133,7 @@ function adminNavItems(hrefs: NonNullable<AppSidebarProps['adminHrefs']>): NavIt
     { key: 'proposals', icon: ProposalIcon, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
     { key: 'admin-partners', icon: UsersIcon, labelKey: 'sidebar.nav.adminPartners', href: hrefs.partners },
     { key: 'admin-companies', icon: BuildingIcon, labelKey: 'sidebar.nav.adminCompanies', href: hrefs.companies },
+    { key: 'admin-reconciliation', icon: AlertTriangleIcon, labelKey: 'sidebar.nav.adminReconciliation', href: hrefs.reconciliation },
     { key: 'admin-coefficients', icon: SlidersIcon, labelKey: 'sidebar.nav.adminCoefficients', href: hrefs.coefficients },
     { key: 'help', icon: HelpIcon, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];

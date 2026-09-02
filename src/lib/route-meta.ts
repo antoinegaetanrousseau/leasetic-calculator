@@ -17,6 +17,7 @@ export type ActiveNav =
   | 'admin-coefficients'
   | 'admin-partners'
   | 'admin-companies'
+  | 'admin-reconciliation'
   | 'admin-history';
 
 export interface RouteMeta {
@@ -44,6 +45,12 @@ export function getRouteMeta(pathname: string, adminSegment?: string): RouteMeta
       }
       if (tail.startsWith('/partners')) {
         return { titleKey: 'sidebar.nav.adminPartners', activeNav: 'admin-partners' };
+      }
+      // Load-bearing ordering (D-16 / 31-UI-SPEC.md §4): the '/companies/review'
+      // tail match MUST be checked BEFORE the plain '/companies' match below, or
+      // the nested review route resolves to the admin-companies nav state.
+      if (tail.startsWith('/companies/review')) {
+        return { titleKey: 'sidebar.nav.adminReconciliation', activeNav: 'admin-reconciliation' };
       }
       if (tail.startsWith('/companies')) {
         return { titleKey: 'sidebar.nav.adminCompanies', activeNav: 'admin-companies' };

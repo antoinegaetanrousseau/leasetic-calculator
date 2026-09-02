@@ -107,6 +107,20 @@ describe('getRouteMeta — admin tree (with adminSegment)', () => {
     });
   });
 
+  it('returns admin-reconciliation for /<seg>/companies/review (Plan 31-06, D-16) — ordered before /companies', () => {
+    expect(getRouteMeta(`/${seg}/companies/review`, seg)).toEqual({
+      titleKey: 'sidebar.nav.adminReconciliation',
+      activeNav: 'admin-reconciliation',
+    });
+  });
+
+  it('regression: /<seg>/companies still resolves to admin-companies, not admin-reconciliation', () => {
+    expect(getRouteMeta(`/${seg}/companies`, seg)).toEqual({
+      titleKey: 'sidebar.nav.adminCompanies',
+      activeNav: 'admin-companies',
+    });
+  });
+
   it('does NOT misclassify a partner path that happens to share a prefix without the / separator', () => {
     // adminSegment='admin' must not match '/administrators' (no slash boundary).
     expect(getRouteMeta('/administrators', 'admin')).toEqual({

@@ -1021,6 +1021,36 @@ export const dictionaries = {
     'admin.companies.relation.type.partner': 'Partenaire',
     'admin.companies.relation.type.sales': 'Interne',
 
+    // ── Phase 31 — Reconciliation review queue (IMPORT-04/05) ──────────────────
+    'admin.reconciliation.page.title': 'File de réconciliation',
+    'admin.reconciliation.page.subtitle':
+      "Paires de sociétés signalées lors de l'extraction — fusionnez-les ou marquez-les définitivement séparées.",
+    'admin.reconciliation.reason.differing': 'SIREN différents',
+    'admin.reconciliation.reason.oneMissing': "SIREN absent d'un côté",
+    'admin.reconciliation.reason.bothMissing': 'SIREN absent des deux côtés',
+    'admin.reconciliation.action.merge': 'Fusionner',
+    'admin.reconciliation.action.keepSeparate': 'Marquer séparées',
+    'admin.reconciliation.compound.warning':
+      '{owner} détient une relation avec les deux sociétés. La fusion combinera aussi ces deux relations (contacts et propositions compris).',
+    'admin.reconciliation.merge.title': 'Fusionner ces deux sociétés ?',
+    'admin.reconciliation.merge.description':
+      '{companyA} et {companyB} seront fusionnées en une seule société. Cette action est définitive : la société non conservée sera supprimée, et ses relations, contacts et propositions seront transférés vers la société conservée.',
+    'admin.reconciliation.merge.survivorLabel': 'Société à conserver',
+    'admin.reconciliation.merge.cancel': 'Annuler',
+    'admin.reconciliation.merge.confirm': 'Fusionner',
+    'admin.reconciliation.merge.toast.success': 'Sociétés fusionnées.',
+    'admin.reconciliation.keepSeparate.title':
+      'Marquer ces sociétés comme définitivement séparées ?',
+    'admin.reconciliation.keepSeparate.description':
+      'Cette décision est permanente : {companyA} et {companyB} ne seront plus jamais signalées ensemble, même après un nouvel import.',
+    'admin.reconciliation.keepSeparate.cancel': 'Annuler',
+    'admin.reconciliation.keepSeparate.confirm': 'Marquer séparées',
+    'admin.reconciliation.keepSeparate.toast.success': 'Paire marquée comme séparée.',
+    'admin.reconciliation.toast.error': 'Une erreur est survenue. Réessayez.',
+    'admin.reconciliation.empty.title': 'Aucune paire à examiner.',
+    'admin.reconciliation.empty.body': 'Toutes les sociétés détectées ont été résolues.',
+    'sidebar.nav.adminReconciliation': 'Réconciliation',
+
     'sidebar.nav.clients': 'Clients',
     'sidebar.nav.adminCompanies': 'Sociétés',
   },
@@ -1965,6 +1995,35 @@ export const dictionaries = {
     'admin.companies.relation.col.view': 'View →',
     'admin.companies.relation.type.partner': 'Partner',
     'admin.companies.relation.type.sales': 'In-house',
+
+    // ── Phase 31 — Reconciliation review queue (IMPORT-04/05) ──────────────────
+    'admin.reconciliation.page.title': 'Reconciliation queue',
+    'admin.reconciliation.page.subtitle':
+      'Company pairs flagged during extraction — merge them or mark them permanently separate.',
+    'admin.reconciliation.reason.differing': 'Different SIRENs',
+    'admin.reconciliation.reason.oneMissing': 'Missing SIREN on one side',
+    'admin.reconciliation.reason.bothMissing': 'Missing SIREN on both sides',
+    'admin.reconciliation.action.merge': 'Merge',
+    'admin.reconciliation.action.keepSeparate': 'Keep separate',
+    'admin.reconciliation.compound.warning':
+      '{owner} holds a relationship with both companies. Merging will also combine those two relationships (contacts and proposals included).',
+    'admin.reconciliation.merge.title': 'Merge these two companies?',
+    'admin.reconciliation.merge.description':
+      "{companyA} and {companyB} will be merged into one company. This action is final: the company you don't keep will be deleted, and its relationships, contacts and proposals will be transferred to the one you keep.",
+    'admin.reconciliation.merge.survivorLabel': 'Company to keep',
+    'admin.reconciliation.merge.cancel': 'Cancel',
+    'admin.reconciliation.merge.confirm': 'Merge',
+    'admin.reconciliation.merge.toast.success': 'Companies merged.',
+    'admin.reconciliation.keepSeparate.title': 'Mark these companies as permanently separate?',
+    'admin.reconciliation.keepSeparate.description':
+      'This decision is permanent: {companyA} and {companyB} will never be flagged together again, even after a future import.',
+    'admin.reconciliation.keepSeparate.cancel': 'Cancel',
+    'admin.reconciliation.keepSeparate.confirm': 'Keep separate',
+    'admin.reconciliation.keepSeparate.toast.success': 'Pair marked as separate.',
+    'admin.reconciliation.toast.error': 'Something went wrong. Try again.',
+    'admin.reconciliation.empty.title': 'No pairs to review.',
+    'admin.reconciliation.empty.body': 'All detected companies have been resolved.',
+    'sidebar.nav.adminReconciliation': 'Reconciliation',
 
     'sidebar.nav.clients': 'Clients',
     'sidebar.nav.adminCompanies': 'Companies',
