@@ -24,8 +24,12 @@
  * contract, which is the unambiguous, load-bearing instruction here — see
  * 31-06-SUMMARY.md.
  *
- * `AlertDialogContent` carries the Container Radius contract's
- * `rounded-[24px]` override, same literal as `MergeDialog`.
+ * `AlertDialogContent` carried the Container Radius contract's hardcoded
+ * 24px corner override, same literal as `MergeDialog`. Phase 31.1-04 closed
+ * OPEN-A by moving `AlertDialogContent` itself onto `--radius-container`
+ * (16px, via the `rounded-container` utility), so the per-file override
+ * here is redundant and has been removed; this dialog now inherits its
+ * corner from the primitive.
  */
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -74,7 +78,7 @@ export function KeepSeparateDialog({ pair, open, onOpenChange, lang }: KeepSepar
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="rounded-[24px]">
+      <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{t('admin.reconciliation.keepSeparate.title', lang)}</AlertDialogTitle>
           <AlertDialogDescription>

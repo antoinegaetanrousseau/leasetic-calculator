@@ -8,10 +8,12 @@
  * real-app adoption of `RadioGroup`/`RadioGroupItem` outside primitive-
  * internal usage (31-UI-SPEC.md Component Inventory).
  *
- * `DialogContent` carries the Container Radius contract's `rounded-[24px]`
- * override — the first application of that literal to dialog chrome in this
- * app (LOCKED — do not converge this to the token-derived `rounded-4xl`
- * default here; that convergence is Phase 31.1's job, not this plan's).
+ * `DialogContent` carried the Container Radius contract's hardcoded 24px
+ * corner override — the first application of that literal to dialog chrome
+ * in this app. Phase 31.1-04 closed OPEN-A by moving `DialogContent` itself
+ * onto `--radius-container` (16px, via the `rounded-container` utility), so
+ * the per-file override here is redundant and has been removed; this dialog
+ * now inherits its corner from the primitive, the single source of truth.
  *
  * Destructive colouring is earned: the merge deletes the loser company
  * (D-12), so only the submit action carries the destructive-red button
@@ -103,7 +105,7 @@ export function MergeDialog({ pair, open, onOpenChange, lang }: MergeDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-[24px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('admin.reconciliation.merge.title', lang)}</DialogTitle>
         </DialogHeader>

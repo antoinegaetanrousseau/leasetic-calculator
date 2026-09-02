@@ -7,13 +7,16 @@
  * existing primitives (no `@reui` block matches this "compare two records"
  * shape — 31-UI-SPEC.md § Design System).
  *
- * Container Radius contract (LOCKED, 31-UI-SPEC.md § Container Radius):
- * `rounded-[24px]` is a LITERAL, decoupled from `--radius` — the Maia
- * container-radius value for this phase, deliberately different from Phase
- * 30's 18px token-derived `.card`. Do NOT "fix" this to `rounded-2xl` (the
- * 18px `.card` value) — that convergence is Phase 31.1's job, not this
- * plan's. `.card`'s background/border/shadow/padding are otherwise
- * reproduced verbatim (bg-card / border-border / --shadow-card / 28px).
+ * Container Radius contract (SUPERSEDED — Phase 31.1-04, closes OPEN-A):
+ * this card originally shipped a hardcoded 24px corner literal, deliberately
+ * decoupled from `--radius` and different from Phase 30's 18px
+ * token-derived `.card`. Phase 31.1 closed that split: the container-radius
+ * ladder is no longer per-file — it now renders at `--radius-container`
+ * (16px) via the `rounded-container` utility, the same token `.card` and
+ * the shadcn `Card`/`Dialog`/`AlertDialog`/`Popover` primitives read. See
+ * `tests/container-radius.test.ts`. `.card`'s background/border/shadow/
+ * padding are otherwise reproduced verbatim (bg-card / border-border /
+ * --shadow-card / 28px).
  *
  * ACCESS & NON-LEAKAGE (D-11, D-12 point 4, 31-UI-SPEC.md § Access &
  * Non-Leakage Contract): this card renders exactly the `AdminPendingPairRow`
@@ -105,7 +108,7 @@ export function PairReviewCard({
   onKeepSeparate,
 }: PairReviewCardProps) {
   return (
-    <div className="rounded-[24px] border border-border bg-card p-7 shadow-[var(--shadow-card)]">
+    <div className="rounded-container border border-border bg-card p-7 shadow-[var(--shadow-card)]">
       <p className="m-0 text-[13px] text-muted-foreground">{t(REASON_KEYS[pair.reason], lang)}</p>
 
       <div className="mt-3 grid grid-cols-2 gap-5">
