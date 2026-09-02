@@ -127,10 +127,22 @@
 /* === ReUI base-maia, dark. Registry defaults; the accent stays brand green,
    which is brand-invariant across themes. The legacy aliases above resolve
    through these automatically, so nothing needs re-aliasing here. === */
+/* --- Dark-mode shell-surface sampling (Phase 31.1, D-13, ROADMAP criterion 7) ---
+   Colibris's dark theme could not be reached by CSS scanning or a
+   prefers-color-scheme emulation + reload: the app applies ~438 inline
+   styles from JS state against 2 stylesheets, and no toggle was discoverable
+   via aria-label, menu probing, or localStorage. The whole evidence base for
+   the six declarations below is ONE operator-supplied screenshot of the
+   Colibris dashboard in dark mode, dated 2026-09-02. Treat every sampled
+   value as accurate to "~a shade," not exact — confirm against the live app
+   if it ever becomes reachable. The canonical record, including the
+   sampling table and confidence notes, is `31.1-UI-SPEC.md` § Dark Mode;
+   this block is the executable copy of that table. Each edited declaration
+   below is annotated with the surface it was sampled from. */
 html[data-theme="dark"] {
-  --background:              oklch(0.145 0 0);
+  --background:              #161616; /* page/content area — screenshot sample, mid-point of observed #131313-#1a1a1a */
   --foreground:              oklch(0.985 0 0);
-  --card:                    oklch(0.205 0 0);
+  --card:                    #1e1e1e; /* elevated card surface — screenshot sample, one step lighter than --background */
   --card-foreground:         oklch(0.985 0 0);
   --popover:                 oklch(0.205 0 0);
   --popover-foreground:      oklch(0.985 0 0);
@@ -139,21 +151,32 @@ html[data-theme="dark"] {
   --secondary:               oklch(0.269 0 0);
   --secondary-foreground:    oklch(0.985 0 0);
   --muted-surface:           oklch(0.269 0 0);
-  --muted-foreground:        oklch(0.708 0 0);
+  --muted-foreground:        oklch(0.65 0 0); /* secondary text — screenshot sample, a touch dimmer than the prior oklch(0.708 0 0) */
   --accent:                  oklch(0.269 0 0);
   --accent-foreground:       oklch(0.985 0 0);
   --destructive:             oklch(0.704 0.191 22.216);
-  --border:                  oklch(1 0 0 / 10%);
+  --border:                  oklch(1 0 0 / 8%); /* card/sidebar edges — screenshot sample, "visible but not assertive" dividers */
   --input:                   oklch(1 0 0 / 15%);
   --ring:                    var(--brand-accent);
-  --sidebar:                 oklch(0.205 0 0);
+  --sidebar:                 #161616; /* same as --background — Colibris separates the sidebar from the page with a border, not a fill step */
   --sidebar-foreground:      oklch(0.985 0 0);
   --sidebar-primary:         var(--brand-accent);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent:          oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border:          oklch(1 0 0 / 10%);
+  --sidebar-border:          oklch(1 0 0 / 8%); /* card/sidebar edges — screenshot sample, same measurement as --border */
   --sidebar-ring:            var(--brand-accent);
+
+  /* --- Unsampled surfaces (DARK-GAP-01/02/03) — left unchanged on purpose ---
+     The single available screenshot had no open dialog/popover and no
+     visible form, so the dialog/popover elevation step, the input fill, and
+     the sidebar hover/active-row treatment have no measurement to sample
+     from. `--popover`, `--input` and `--sidebar-accent` above therefore keep
+     their pre-existing registry values — a deliberate decision, not an
+     oversight. Do NOT fill them with an invented value. Closing a gap needs
+     a second, targeted Colibris screenshot; see `31.1-UI-SPEC.md` §
+     Unsampled and `tests/dark-palette.test.ts`, which pins these three
+     values so a later fill requires a conscious, deliberate test edit. */
 
   --destructive-foreground:  var(--color-red-600);
   --success-foreground:      var(--color-emerald-600);
