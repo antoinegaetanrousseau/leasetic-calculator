@@ -283,6 +283,13 @@ export const dictionaries = {
     'shell.user.menu.settings': 'Paramètres',
     'shell.user.menu.logout': 'Se déconnecter',
     'shell.topbar.admin.badge': 'ADMIN',
+    // Phase 31.1 Plan 02 — D-06/D-07: header toggle accessible name + breadcrumb
+    // detail-route leaves. Dictionary-keyed by design (no entity names in the
+    // shell header — see 31.1-02-PLAN.md objective).
+    'shell.topbar.toggleSidebar': 'Basculer la barre latérale',
+    'shell.breadcrumb.clientDetail': 'Fiche client',
+    'shell.breadcrumb.companyDetail': 'Fiche société',
+    'shell.breadcrumb.proposalDetail': 'Proposition',
     'shell.locale.toggle.aria': 'Changer la langue',
     'shell.theme.toggle.aria': 'Changer le thème',
     'shell.footer.copyright': '© 2026 Leasétic — Application interne',
@@ -830,6 +837,8 @@ export const dictionaries = {
 
     // Créer partenaire (UI-SPEC rows 51-63; D-15/D-16/D-18)
     'admin.partners.breadcrumb.label': 'PARTENAIRES',
+    // Phase 31.1 Plan 02 — D-06: shell breadcrumb leaf for /partners/new.
+    'admin.partners.breadcrumb.new': 'Nouveau partenaire',
     'admin.partners.form.submit': "Envoyer l'invitation →",
     'admin.partners.form.submit.spinner': 'Envoi en cours…',
     'admin.partners.form.cancel.confirm': 'Vous avez des changements non enregistrés. Continuer ?',
@@ -1321,6 +1330,11 @@ export const dictionaries = {
     'shell.user.menu.settings': 'Settings',
     'shell.user.menu.logout': 'Log out',
     'shell.topbar.admin.badge': 'ADMIN',
+    // Phase 31.1 Plan 02 — D-06/D-07 EN counterparts.
+    'shell.topbar.toggleSidebar': 'Toggle sidebar',
+    'shell.breadcrumb.clientDetail': 'Client record',
+    'shell.breadcrumb.companyDetail': 'Company record',
+    'shell.breadcrumb.proposalDetail': 'Proposal',
     'shell.locale.toggle.aria': 'Change language',
     'shell.theme.toggle.aria': 'Change theme',
     'shell.footer.copyright': '© 2026 Leasétic — Internal application',
@@ -1827,6 +1841,8 @@ export const dictionaries = {
 
     // Créer partenaire
     'admin.partners.breadcrumb.label': 'PARTNERS',
+    // Phase 31.1 Plan 02 — D-06 EN counterpart.
+    'admin.partners.breadcrumb.new': 'New partner',
     'admin.partners.form.submit': 'Send invitation →',
     'admin.partners.form.submit.spinner': 'Sending…',
     'admin.partners.form.cancel.confirm': 'You have unsaved changes. Continue?',
