@@ -1,35 +1,26 @@
 'use client';
 
 /**
- * Phase 30 Plan 06 — ClientsGrid (CRM-07, 30-UI-SPEC.md §1).
+ * Phase 30 Plan 06 — ClientsGrid (CRM-07), rebuilt at the Phase 33 acceptance
+ * checkpoint on ReUI's `list-2` block: a dense, stacked Frame whose header
+ * panel carries the list title and a sort Select, and whose content panel
+ * holds one row per relationship — a 36px icon tile, the company name over a
+ * muted "SIREN · N proposition(s)" line, and a right-aligned "Dernière
+ * activité" label/value pair. The DataGrid it replaces is gone: this list is
+ * cursor-paged and CRM-02 forbids a query builder over "my own book only".
  *
- * DataGrid's table/column/header machinery (`DataGrid` + `DataGridTable` +
- * `DataGridColumnHeader`), WITHOUT its pagination, filter builder or
- * row-selection sub-components — this app's lists are cursor-based, and
- * CRM-02 forbids a field-and-operator query builder over data scoped to
- * "my own relationships only". See 30-UI-SPEC.md's DataGrid decision.
+ * Sorting stays server-side: changing the Select pushes `sort`/`dir` into
+ * the URL and deletes `cursor` — the same reset `SearchBar` performs on
+ * query change — instead of re-ordering the loaded partial page (T-30-06-07).
  *
- * `recordCount` is `rows.length` — the CURRENT PAGE length, never a total.
- * A total row count over the unscoped table would be a CRM-02 inference
- * channel (T-30-06-02).
- *
- * Sorting is server-side (`manualSorting: true`): clicking a sortable header
- * pushes `sort`/`dir` into the URL and deletes `cursor` — the same reset
- * `SearchBar` already performs on query change — instead of re-ordering the
- * already-loaded partial page in place (T-30-06-07).
+ * No total count is ever rendered: a count over the unscoped table would be
+ * a CRM-02 inference channel (T-30-06-02).
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import type { ColumnDef, SortingState, Updater } from '@tanstack/react-table';
-import {
-  DataGrid,
-  dataGridFeatures,
-  type DataGridFeatures,
-} from '@/components/reui/data-grid/data-grid';
-import { DataGridTable } from '@/components/reui/data-grid/data-grid-table';
-import { DataGridColumnHeader } from '@/components/reui/data-grid/data-grid-column-header';
+import { Frame, FramePanel } from '@/components/reui/frame';
 import {
   Empty,
   EmptyContent,
@@ -38,17 +29,20 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
+import { Item, ItemMedia } from '@/components/ui/item';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { BuildingIcon, SearchIcon } from '@/components/ui/icons';
 import { formatDate } from '@/lib/i18n/format';
-import { t, type Lang } from '@/lib/i18n/dictionaries';
+import { t, type DictKey, type Lang } from '@/lib/i18n/dictionaries';
 import type { ClientBookDir, ClientBookRow, ClientBookSort } from '@/lib/db/queries';
 import { CreateClientDialog } from './CreateClientDialog';
-
-// TanStack's own hook is `useTable` in the v9 line this app pins
-// (@tanstack/react-table ^9). There is no `useReactTable` export at this
-// version — confirmed against every other data-grid block already vendored
-// under src/components/blocks/*.
-import { useTable } from '@tanstack/react-table';
 
 export interface ClientsGridProps {
   rows: ClientBookRow[];
@@ -58,6 +52,18 @@ export interface ClientsGridProps {
   q?: string;
   sort?: ClientBookSort;
   dir?: ClientBookDir;
+}
+
+const SORT_OPTIONS = [
+  'lastActivity-desc',
+  'lastActivity-asc',
+  'company-asc',
+  'company-desc',
+] as const;
+type SortOption = (typeof SORT_OPTIONS)[number];
+
+function isSortOption(value: unknown): value is SortOption {
+  return typeof value === 'string' && (SORT_OPTIONS as readonly string[]).includes(value);
 }
 
 function formatRowDate(date: Date, lang: Lang): string {
@@ -74,116 +80,82 @@ function buildLoadMoreHref(nextCursor: string, q?: string, sort?: ClientBookSort
   return `/clients?${params.toString()}`;
 }
 
+const ROW_CLASS = [
+  'flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 text-inherit no-underline',
+  'border-b border-border transition-colors last:border-b-0 hover:bg-[var(--hover-overlay)]',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+].join(' ');
+
+function ClientRow({ row, lang, onOpen }: { row: ClientBookRow; lang: Lang; onOpen: () => void }) {
+  return (
+    <div
+      data-slot="client-row"
+      role="button"
+      tabIndex={0}
+      aria-label={row.companyName}
+      className={ROW_CLASS}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') onOpen();
+      }}
+    >
+      <Item
+        className="flex size-9 shrink-0 items-center justify-center border-2 border-background bg-muted p-0 text-muted-foreground shadow-[0_1px_3px_0_rgba(0,0,0,0.14)]"
+        aria-hidden="true"
+      >
+        <ItemMedia variant="icon" className="size-auto">
+          <BuildingIcon size={16} />
+        </ItemMedia>
+      </Item>
+
+      <div className="min-w-0 flex-1">
+        <p className="m-0 truncate text-[15px] leading-tight font-medium text-foreground">
+          {row.companyName}
+        </p>
+        <p className="m-0 mt-0.5 truncate text-xs text-muted-foreground">
+          <span>{t('clients.row.siren', lang)}</span>{' '}
+          <span className="font-mono">{row.siren ?? '—'}</span>
+          <span aria-hidden="true"> · </span>
+          <span className="tabular-nums">{row.proposalsCount}</span>{' '}
+          {t('clients.row.proposalsSuffix', lang)}
+        </p>
+      </div>
+
+      <div className="shrink-0 space-y-0.5 text-right">
+        <p className="m-0 text-xs leading-none text-muted-foreground">
+          {t('clients.row.lastActivity', lang)}
+        </p>
+        <p className="m-0 text-sm leading-tight font-medium text-foreground tabular-nums">
+          {row.lastActivityAt ? formatRowDate(row.lastActivityAt, lang) : '—'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function ClientsGrid({ rows, nextCursor, lang, q, sort, dir }: ClientsGridProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const activeSort: ClientBookSort = sort ?? 'lastActivity';
   const activeDir: ClientBookDir = dir ?? 'desc';
-
-  const sorting: SortingState = useMemo(
-    () => [{ id: activeSort, desc: activeDir === 'desc' }],
-    [activeSort, activeDir],
-  );
+  const activeOption: SortOption = `${activeSort}-${activeDir}`;
 
   // Server-side sort + cursor reset (T-30-06-07). Never re-sorts `rows`
   // client-side — a fresh page for the new sort is requested from the server.
-  const handleSortingChange = useCallback(
-    (updaterOrValue: Updater<SortingState>) => {
-      const nextState =
-        typeof updaterOrValue === 'function' ? updaterOrValue(sorting) : updaterOrValue;
-
-      // DataGridColumnHeader's own click handler cycles asc -> desc -> clear
-      // for the currently-sorted column. There is no "no sort" URL state on
-      // this surface, so a clear collapses back to a direction toggle on the
-      // column that was already active, keeping the interaction a clean
-      // 2-way toggle from the caller's perspective.
-      const [columnId, desc] = nextState[0]
-        ? [nextState[0].id as ClientBookSort, nextState[0].desc]
-        : [activeSort, activeDir !== 'desc'];
-
+  const handleSortChange = useCallback(
+    (value: unknown) => {
+      if (!isSortOption(value) || value === activeOption) return;
+      const [columnId, direction] = value.split('-') as [ClientBookSort, ClientBookDir];
       const params = new URLSearchParams(searchParams.toString());
       params.set('sort', columnId);
-      params.set('dir', desc ? 'desc' : 'asc');
+      params.set('dir', direction);
       // Same reset SearchBar already performs on query change.
       params.delete('cursor');
       router.replace(`?${params.toString()}`, { scroll: false });
     },
-    [sorting, activeSort, activeDir, searchParams, router],
+    [activeOption, searchParams, router],
   );
-
-  const columns = useMemo<ColumnDef<DataGridFeatures, ClientBookRow>[]>(
-    () => [
-      {
-        accessorKey: 'companyName',
-        id: 'company',
-        header: ({ column }) => (
-          <DataGridColumnHeader column={column} title={t('clients.col.company', lang)} />
-        ),
-        cell: ({ row }) => (
-          <span className="text-[14.5px] font-semibold">{row.original.companyName}</span>
-        ),
-        enableSorting: true,
-      },
-      {
-        accessorKey: 'siren',
-        id: 'siren',
-        header: t('clients.col.siren', lang),
-        cell: ({ row }) => (
-          <span className="text-[13px] text-muted-foreground">
-            {row.original.siren ?? '—'}
-          </span>
-        ),
-        enableSorting: false,
-      },
-      {
-        accessorKey: 'proposalsCount',
-        id: 'proposals',
-        header: t('clients.col.proposals', lang),
-        cell: ({ row }) => (
-          <span className="text-[13px] text-muted-foreground">
-            {row.original.proposalsCount}
-          </span>
-        ),
-        enableSorting: false,
-        meta: { headerClassName: 'text-right', cellClassName: 'text-right' },
-      },
-      {
-        accessorKey: 'lastActivityAt',
-        id: 'lastActivity',
-        header: ({ column }) => (
-          <DataGridColumnHeader column={column} title={t('clients.col.lastActivity', lang)} />
-        ),
-        cell: ({ row }) =>
-          row.original.lastActivityAt ? formatRowDate(row.original.lastActivityAt, lang) : '—',
-        enableSorting: true,
-      },
-    ],
-    [lang],
-  );
-
-  // The `dataGridFeatures` bundle registers a row-pagination row model
-  // (default pageSize 10), which would silently truncate an already
-  // owner-scoped, already server-paginated page of up to 20 rows. This
-  // surface never renders the pagination footer component at all
-  // (30-UI-SPEC.md's DataGrid decision — cursor "Charger plus" only), so the
-  // pagination slice is neutralized here by sizing it to the full loaded
-  // page rather than pulling in a second, leaner feature bundle.
-  const pagination = useMemo(
-    () => ({ pageIndex: 0, pageSize: Math.max(rows.length, 1) }),
-    [rows.length],
-  );
-
-  const table = useTable({
-    features: dataGridFeatures,
-    columns,
-    data: rows,
-    getRowId: (row) => row.relationshipId,
-    manualSorting: true,
-    state: { sorting, pagination },
-    onSortingChange: handleSortingChange,
-    onPaginationChange: () => {},
-  });
 
   const hasQuery = Boolean(q && q.length > 0);
 
@@ -225,27 +197,55 @@ export function ClientsGrid({ rows, nextCursor, lang, q, sort, dir }: ClientsGri
     );
   }
 
-  return (
-    <section className="card overflow-hidden p-0">
-      <DataGrid
-        table={table}
-        recordCount={rows.length}
-        tableLayout={{ headerBackground: true, rowBorder: true }}
-        onRowClick={(row) => router.push(`/clients/${row.relationshipId}`)}
-      >
-        <DataGridTable />
-      </DataGrid>
+  const sortItems = SORT_OPTIONS.map((value) => ({
+    value,
+    label: t(`clients.list.sort.${value}` as DictKey, lang),
+  }));
 
-      {nextCursor && (
-        <div className="px-5 py-4 text-center">
-          <Link
-            href={buildLoadMoreHref(nextCursor, q, sort, dir)}
-            className="btn-out inline-flex items-center gap-2 text-[13px] no-underline"
+  return (
+    <Frame dense stacked spacing="sm" className="w-full">
+      <FramePanel className="flex items-center justify-between gap-3 p-3!">
+        <h2 className="m-0 text-base font-medium text-foreground">{t('clients.list.title', lang)}</h2>
+        <Select items={sortItems} value={activeOption} onValueChange={handleSortChange}>
+          <SelectTrigger
+            aria-label={t('clients.list.sort.label', lang)}
+            className="min-w-44 shrink-0 text-xs"
           >
-            {t('proposal.list.load.more', lang)}
-          </Link>
-        </div>
-      )}
-    </section>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {sortItems.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </FramePanel>
+
+      <FramePanel className="p-1.5!">
+        {rows.map((row) => (
+          <ClientRow
+            key={row.relationshipId}
+            row={row}
+            lang={lang}
+            onOpen={() => router.push(`/clients/${row.relationshipId}`)}
+          />
+        ))}
+
+        {nextCursor && (
+          <div className="px-2.5 pt-3 pb-1.5 text-center">
+            <Link
+              href={buildLoadMoreHref(nextCursor, q, sort, dir)}
+              className="btn-out inline-flex items-center gap-2 text-[13px] no-underline"
+            >
+              {t('proposal.list.load.more', lang)}
+            </Link>
+          </div>
+        )}
+      </FramePanel>
+    </Frame>
   );
 }
