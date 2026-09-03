@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-03T18:12:23.047Z"
+last_updated: "2026-09-03T18:19:28.539Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 17
   total_plans: 92
-  completed_plans: 83
+  completed_plans: 84
   percent: 85
 ---
 
@@ -420,6 +420,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 33-pipeline P07 | ~25min | 2 tasks | 4 files |
 | Phase 34 P01 | ~20min | 3 tasks | 10 files |
 | Phase 34 P02 | 20 | 3 tasks | 9 files |
+| Phase 34 P05 | 35min | 3 tasks | 7 files |
 
 ## Decisions
 
@@ -542,6 +543,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: 34-02: normalizeSiren is the codebase's only SIREN normalisation rule (D-23 / WR-15 closed) — future proposals store digits only, no stored inputs blob was rewritten
 
 - [Phase 34]: The FICHE-04 lead source is a NEW column `lead_source`, not `client_relationships.source` — that column is the Phase 31 D-08 provenance marker whose vocabulary drives the bulk-import undo path; both provenance CHECKs are untouched. Also: `relationship_events.actor_id` is text (Better Auth `users.id`), NULL means the system, and no trigger writes events (D-15 — a trigger cannot see the session, so ACTV-02's attribution would be lost).
+- [Phase ?]: 34-05: the à relancer rule is fixed in listRelationshipsNeedingFollowUp — due (next_action_at <= now()) or stale (next_action_at IS NULL AND updated_at < now() - 30 days), never a FUTURE next action; ordered bucket ASC then COALESCE(next_action_at, updated_at) ASC in SQL. 34-11 and 34-12 read it rather than re-deriving it.
+- [Phase ?]: 34-05: D-22 (33-REVIEW WR-06) closed — eq(proposals.userId, ownerId) lives inside listPipelineBoard's proposals leftJoin and(...), never the WHERE, where it would degrade the LEFT JOIN to an INNER JOIN and drop every zero-proposal relationship off the board.
 
 ### Blockers
 
