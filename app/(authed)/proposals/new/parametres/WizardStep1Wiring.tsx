@@ -80,21 +80,19 @@ export function WizardStep1Wiring({
         draftId={draftId}
         lang={lang}
       />
-      <div style={{ marginTop: 16 }}>
-        <WizardActionBar
-          currentStep={1}
-          draftId={draftId}
-          lang={lang}
-          onSaveDraft={onSaveDraft}
-          primary={{
-            kind: 'action',
-            onClick: onContinue,
-            label: t('wizard.action.step1.continue', lang),
-            spinnerLabel: t('wizard.action.step1.continue.spinner', lang),
-            isSubmitting: isContinuePending,
-          }}
-        />
-      </div>
+      <WizardActionBar
+        currentStep={1}
+        draftId={draftId}
+        lang={lang}
+        onSaveDraft={onSaveDraft}
+        primary={{
+          kind: 'action',
+          onClick: onContinue,
+          label: t('wizard.action.step1.continue', lang),
+          spinnerLabel: t('wizard.action.step1.continue.spinner', lang),
+          isSubmitting: isContinuePending,
+        }}
+      />
     </>
   );
 }

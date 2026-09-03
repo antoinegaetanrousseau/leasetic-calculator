@@ -92,15 +92,13 @@ describe('Stepper', () => {
     expect(items[2]).toHaveAttribute('aria-disabled', 'true');
   });
 
-  it('AC-ST-09: container <ol> inline style contains padding 20px 28px, border-radius 16, var(--surface) bg, shadow-card', () => {
-    const { container } = render(<Stepper currentStep={1} completedSteps={[]} lang="fr" />);
-
-    const ol = container.querySelector('ol[role="list"]') as HTMLElement | null;
-    expect(ol).not.toBeNull();
-    const style = ol!.getAttribute('style') ?? '';
-    expect(style).toMatch(/padding:\s*20px 28px/);
-    expect(style).toMatch(/border-radius:\s*16px/);
-    expect(style).toMatch(/background:\s*var\(--surface\)/);
-    expect(style).toMatch(/box-shadow:\s*var\(--shadow-card\)/);
+  it('AC-ST-09: the <ol> carries no card chrome of its own (WizardCard owns it) and exposes state hooks', () => {
+    const { container } = render(<Stepper currentStep={2} completedSteps={[1]} lang="fr" />);
+    const list = container.querySelector('ol[role="list"]') as HTMLElement;
+    expect(list.getAttribute('style')).toBeNull();
+    const indicators = Array.from(container.querySelectorAll('[data-slot="stepper-indicator"]'));
+    expect(indicators.map((el) => el.getAttribute('data-state'))).toEqual(['done', 'active', 'pending']);
+    const separators = container.querySelectorAll('[data-slot="stepper-separator"]');
+    expect(separators).toHaveLength(2);
   });
 });

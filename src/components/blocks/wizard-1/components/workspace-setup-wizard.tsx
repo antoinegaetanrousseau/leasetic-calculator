@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useMemo, useState, type FormEvent } from "react"
 import {
   Stepper,

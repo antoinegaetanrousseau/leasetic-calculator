@@ -1,21 +1,25 @@
 /**
- * Stepper — 3-step horizontal progress indicator (COMP-01, UI-SPEC §6.2).
+ * Stepper — 3-step horizontal progress indicator (COMP-01, UI-SPEC §6.2),
+ * restyled on ReUI's `wizard-1` block nav at the Phase 33 acceptance
+ * checkpoint: 24px indicators (completed = filled primary with a check,
+ * active = primary tint with a slowly spinning dashed ring, pending = muted
+ * with a border), a small title, and hairline connectors that turn primary
+ * once the step before them is done.
  *
- * Server component: state is fully derived from `currentStep` + `completedSteps` props.
- * No client boundary; Phase 13 wizard derives currentStep + completedSteps from URL
- * pathname server-side and passes as props.
+ * It stays a server component with the same `<ol role="list">` / `<li>`
+ * contract: the wizard's state is the URL, so the ReUI Stepper primitive's
+ * client state machine is not needed — pages derive `currentStep` and
+ * `completedSteps` server-side and pass them as props.
  *
  * Step-state derivation (per UI-SPEC §6.2):
  *   completedSteps.includes(n) AND n !== currentStep → done   (Check icon, optionally <Link>)
  *   n === currentStep                                → active (numeric, no Link)
  *   else                                             → pending (numeric, outlined, no Link)
- *
- * Phase 11 ships in-component fallback labels (DEFAULT_LABELS_FR / EN). Phase 13 will
- * override via the `stepLabels` prop (no `proposals.wizard.stepN` i18n keys yet).
  */
-import { Fragment, type CSSProperties } from 'react';
+import { Fragment } from 'react';
 import Link from 'next/link';
 import { CheckIcon } from '@/components/ui/icons';
+import { cn } from '@/lib/utils';
 import { type Lang } from '@/lib/i18n/dictionaries';
 
 type StepNumber = 1 | 2 | 3;
@@ -34,7 +38,6 @@ export interface StepperProps {
   hrefForStep?: (step: StepNumber) => string;
 }
 
-// Phase 11 hardcoded fallback labels — Phase 13 will provide via stepLabels prop.
 const DEFAULT_LABELS_FR: [string, string, string] = ['Paramètres', 'Calcul', 'Vérification'];
 const DEFAULT_LABELS_EN: [string, string, string] = ['Parameters', 'Calculation', 'Verification'];
 
@@ -44,92 +47,59 @@ function deriveState(n: StepNumber, currentStep: StepNumber, completedSteps: num
   return 'pending';
 }
 
+const INDICATOR_BASE =
+  'relative isolate flex size-6 shrink-0 items-center justify-center overflow-visible rounded-full text-xs font-medium';
+
+const INDICATOR_BY_STATE: Record<StepState, string> = {
+  done: 'bg-primary text-primary-foreground',
+  active:
+    "bg-primary/10 text-primary before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-full before:border before:border-dashed before:border-primary before:content-[''] before:animate-[spin_8s_linear_infinite] motion-reduce:before:animate-none",
+  pending: 'border border-border bg-muted text-foreground',
+};
+
 export function Stepper({ currentStep, completedSteps, lang, stepLabels, hrefForStep }: StepperProps) {
   const labels: [string, string, string] =
     stepLabels ?? (lang === 'fr' ? DEFAULT_LABELS_FR : DEFAULT_LABELS_EN);
 
   return (
-    <ol
-      role="list"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 16,
-        boxShadow: 'var(--shadow-card)',
-        padding: '20px 28px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        listStyle: 'none',
-        margin: 0,
-      }}
-    >
+    <ol role="list" aria-label="Wizard progress" className="m-0 flex w-full list-none items-center gap-2 p-0">
       {([1, 2, 3] as const).map((n, idx) => {
         const state = deriveState(n, currentStep, completedSteps);
         const label = labels[n - 1];
 
-        const circleClass =
-          state === 'active'
-            ? 'stepper-circle stepper-circle--active'
-            : state === 'done'
-              ? 'stepper-circle stepper-circle--done'
-              : 'stepper-circle stepper-circle--pending';
-
-        const circleStyle: CSSProperties = {
-          width: 32,
-          height: 32,
-          borderRadius: 9999,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          fontSize: 14,
-          fontWeight: 600,
-          fontFamily: 'var(--font-sans)',
-          background: state === 'pending' ? 'var(--paper)' : 'var(--gd)',
-          border: state === 'pending' ? '2px solid var(--border)' : 'none',
-          color: state === 'pending' ? 'var(--muted)' : '#ffffff',
-        };
-
-        const labelStyle: CSSProperties = {
-          fontSize: '14.5px',
-          lineHeight: 1.55,
-          fontFamily: 'var(--font-sans)',
-          color: state === 'pending' ? 'var(--muted)' : 'var(--ink)',
-          fontWeight: state === 'pending' ? 500 : 600,
-        };
-
         const circle = (
-          <span className={circleClass} style={circleStyle}>
-            {state === 'done' ? (
-              <CheckIcon size={16} aria-hidden="true" />
-            ) : (
-              String(n)
-            )}
+          <span
+            data-slot="stepper-indicator"
+            data-state={state}
+            className={cn(INDICATOR_BASE, INDICATOR_BY_STATE[state])}
+          >
+            {state === 'done' ? <CheckIcon size={14} aria-hidden="true" /> : String(n)}
           </span>
         );
 
-        // Done step wrapped in Link only when hrefForStep provided.
+        const title = (
+          <span
+            data-slot="stepper-title"
+            className={cn('text-sm', state === 'active' ? 'font-medium text-foreground' : 'text-foreground')}
+          >
+            {label}
+          </span>
+        );
+
         const inner =
           state === 'done' && hrefForStep ? (
             <Link
               href={hrefForStep(n)}
               aria-label={label}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                textDecoration: 'none',
-                color: 'inherit',
-              }}
+              className="inline-flex items-center gap-1.5 text-inherit no-underline hover:text-primary"
             >
               {circle}
-              <span style={labelStyle}>{label}</span>
+              {title}
             </Link>
           ) : (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span className="inline-flex items-center gap-1.5">
               {circle}
-              <span style={labelStyle}>{label}</span>
+              {title}
             </span>
           );
 
@@ -139,13 +109,14 @@ export function Stepper({ currentStep, completedSteps, lang, stepLabels, hrefFor
 
         return (
           <Fragment key={n}>
-            <li style={{ display: 'flex', alignItems: 'center', gap: 8 }} {...liAria}>
+            <li data-slot="stepper-item" data-state={state} className="flex shrink-0 items-center" {...liAria}>
               {inner}
             </li>
             {idx < 2 && (
               <span
                 aria-hidden="true"
-                style={{ flex: 1, height: 2, background: 'var(--border)' }}
+                data-slot="stepper-separator"
+                className={cn('mx-2.5 h-px flex-1', state === 'done' ? 'bg-primary' : 'bg-border')}
               />
             )}
           </Fragment>

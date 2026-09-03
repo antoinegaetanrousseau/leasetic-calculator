@@ -34,9 +34,9 @@ function renderCard(
 }
 
 describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
-  it('Test 1: renders inside a single .card (one section.card)', () => {
+  it('Test 1: renders inside a single .card (one section[data-slot="wizard-panel"])', () => {
     const { container } = renderCard();
-    const cards = container.querySelectorAll('section.card');
+    const cards = container.querySelectorAll('section[data-slot="wizard-panel"]');
     expect(cards.length).toBe(1);
   });
 
@@ -71,7 +71,7 @@ describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
 
   it('Test 6: renders an <hr> divider between the 2 sections inside the card with 1px solid var(--border) and 24px vertical margin', () => {
     const { container } = renderCard();
-    const card = container.querySelector('section.card');
+    const card = container.querySelector('section[data-slot="wizard-panel"]');
     expect(card).not.toBeNull();
     const hr = card!.querySelector('hr');
     expect(hr).not.toBeNull();
@@ -81,18 +81,18 @@ describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
     expect(style).toMatch(/margin:\s*24px 0/);
   });
 
-  it('Test 7: INFORMATIONS COMPLÉMENTAIRES section header appears inside the .card', () => {
+  it('Test 7: INFORMATIONS COMPLÉMENTAIRES section header appears inside the panel', () => {
     const { container } = renderCard();
-    const card = container.querySelector('section.card');
+    const card = container.querySelector('section[data-slot="wizard-panel"]');
     expect(card).not.toBeNull();
     expect(card!.textContent).toMatch(/INFORMATIONS COMPL/);
     // No accordion trigger — fields are always visible.
     expect(screen.queryByRole('button', { name: /Plus de détails/ })).toBeNull();
   });
 
-  it('Test 8: 5 optional fields are always visible inside the .card in order: clientRole, clientSiren, projectDesc, slb, evalParc', () => {
+  it('Test 8: 5 optional fields are always visible inside the panel in order: clientRole, clientSiren, projectDesc, slb, evalParc', () => {
     const { container } = renderCard();
-    const card = container.querySelector('section.card');
+    const card = container.querySelector('section[data-slot="wizard-panel"]');
     expect(card).not.toBeNull();
     // Read the inputs/labels inside the card IN ORDER.
     const labels = Array.from(card!.querySelectorAll('label')).map((l) =>

@@ -64,7 +64,7 @@ import {
   listContactsForRelationship,
 } from '@/lib/db/queries/client-relationships';
 import { PageHero } from '@/components/ui/PageHero';
-import { Stepper } from '@/components/ui/Stepper';
+import { WizardCard } from '../_components/WizardCard';
 import type { ProposalInput } from '@/lib/calc';
 
 import { WizardStep1Wiring } from './WizardStep1Wiring';
@@ -275,26 +275,23 @@ export default async function ParametresStep1Page({
         subtitle={t('wizard.step1.subtitle', lang)}
       />
 
-      {/* Stepper at the top — D-20: completedSteps from draft.inputs. */}
-      <div>
-        <Stepper
-          currentStep={1}
-          completedSteps={completedSteps}
-          lang={lang}
-          hrefForStep={(n) =>
-            `/proposals/new/${['parametres', 'calcul', 'verification'][n - 1]}?draft_id=${draft.id}`
-          }
-        />
-      </div>
-
-      <div style={{ marginTop: 16 }}>
+      {/* Phase 33: the wizard-1 shell — stepper header + form panel + footer
+          in ONE card. D-20: completedSteps from draft.inputs. */}
+      <WizardCard
+        currentStep={1}
+        completedSteps={completedSteps}
+        lang={lang}
+        hrefForStep={(n) =>
+          `/proposals/new/${['parametres', 'calcul', 'verification'][n - 1]}?draft_id=${draft.id}`
+        }
+      >
         <ProposalFormProvider prefill={prefill}>
           <WizardStep1Wiring
             draftId={draft.id}
             lang={lang}
           />
         </ProposalFormProvider>
-      </div>
+      </WizardCard>
     </div>
   );
 }

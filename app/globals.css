@@ -287,6 +287,14 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
    `className="card px-6 py-10"` silently rendered at .card's own 28px, and a
    `p-0` meant to sit a table flush inside a card did nothing at all. */
 @layer components {
+  /* Phase 33 — flat sections inside the wizard-1 card shell (WizardCard).
+     Nested RecapSection panels inside the step-3 review panel stack with
+     hairlines instead of card chrome. */
+  .wizard-panel { padding: 24px 28px; }
+  .wizard-panel + .wizard-panel { border-top: 1px solid var(--border); }
+  .wizard-panel .wizard-panel { padding: 0 0 20px; }
+  .wizard-panel .wizard-panel + .wizard-panel { border-top: 1px solid var(--border); padding-top: 20px; }
+
   /* Card chrome — UI-SPEC §3.2.2.
      The radius tracks the token rather than a literal: shadcn's own Card is
      `rounded-2xl`, and while this said 16px the two disagreed — three metric

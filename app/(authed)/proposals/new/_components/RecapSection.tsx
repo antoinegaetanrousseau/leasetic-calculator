@@ -52,6 +52,12 @@ export interface RecapSectionProps {
    * Default: false (no visual change for any pre-existing consumer).
    */
   lastRowDivider?: boolean;
+  /**
+   * Phase 33: `'panel'` renders as a flat `.wizard-panel` section for use
+   * inside `WizardCard` (ReUI wizard-1 shell); `'card'` keeps the standalone
+   * `.card` chrome for any other consumer.
+   */
+  variant?: 'card' | 'panel';
 }
 
 export function RecapSection({
@@ -60,10 +66,15 @@ export function RecapSection({
   modifierLink,
   rowSublabels,
   lastRowDivider = false,
+  variant = 'card',
 }: RecapSectionProps) {
   const lastIdx = rows.length - 1;
   return (
-    <section className="card" style={{ marginBottom: 16 }}>
+    <section
+      data-slot={variant === 'panel' ? 'wizard-panel' : undefined}
+      className={variant === 'panel' ? 'wizard-panel' : 'card'}
+      style={variant === 'panel' ? undefined : { marginBottom: 16 }}
+    >
       <div
         style={{
           display: 'flex',

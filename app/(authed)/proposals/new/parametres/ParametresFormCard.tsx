@@ -75,8 +75,10 @@ export function ParametresFormCard({
 
   return (
     <>
-      {/* D-05: ONE .card containing both sections separated by an hr divider */}
-      <section className="card">
+      {/* D-05: ONE panel containing both sections separated by an hr divider.
+          A flat `.wizard-panel` (not `.card`) since Phase 33: the surrounding
+          WizardCard owns the card chrome, per ReUI's wizard-1 block. */}
+      <section data-slot="wizard-panel" className="wizard-panel">
         {/* ── Section 1: INFORMATIONS CLIENT ─────────────────────────────── */}
         <SectionTitle>{t('wizard.section.informations.client', lang)}</SectionTitle>
 

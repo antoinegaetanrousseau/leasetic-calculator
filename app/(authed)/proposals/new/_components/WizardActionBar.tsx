@@ -23,7 +23,9 @@
 
 import { useTransition } from 'react';
 import Link from 'next/link';
-import { LoaderIcon } from '@/components/ui/icons';
+import { ArrowRightIcon, ChevronLeftIcon, LoaderIcon } from '@/components/ui/icons';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
@@ -92,88 +94,73 @@ export function WizardActionBar({
 
   return (
     <section
-      className="card"
-      style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+      data-slot="wizard-footer"
+      className="flex items-center gap-2 border-t border-border px-7 py-4"
     >
       {/* D-19: ← Précédent omitted entirely on step 1. */}
       {currentStep > 1 && (
-        <Link
-          href={prevHref}
-          aria-label={t('wizard.action.previous.aria', lang)}
-          style={{
-            color: 'var(--muted)',
-            fontSize: 14.5,
-            fontWeight: 500,
-            textDecoration: 'none',
-            // Saving in progress → suppress nav to avoid race with the
-            // server-side redirect from saveAsDraftAction.
-            pointerEvents: anyBusy ? 'none' : undefined,
-            opacity: anyBusy ? 0.6 : 1,
-          }}
+        <Button
+          variant="outline"
+          render={
+            <Link
+              href={prevHref}
+              aria-label={t('wizard.action.previous.aria', lang)}
+              aria-disabled={anyBusy || undefined}
+            />
+          }
+          // Saving in progress → suppress nav to avoid a race with the
+          // server-side redirect from saveAsDraftAction.
+          className={cn(anyBusy && 'pointer-events-none opacity-60')}
         >
+          <ChevronLeftIcon size={16} data-icon="inline-start" aria-hidden="true" />
           {t('wizard.action.previous', lang)}
-        </Link>
+        </Button>
       )}
 
-      <button
+      <Button
         type="button"
-        className="btn-out"
+        variant="ghost"
         onClick={handleSave}
         disabled={anyBusy}
         aria-busy={isSavePending || undefined}
       >
         {t('wizard.action.save.draft', lang)}
-      </button>
+      </Button>
 
       {/* Flex spacer — pushes the primary CTA to the right edge. */}
-      <div style={{ flex: 1 }} />
+      <div className="flex-1" />
 
       {primary.kind === 'link' ? (
-        <Link
-          href={primary.href}
-          className="btn-green"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            pointerEvents: anyBusy ? 'none' : undefined,
-            opacity: anyBusy ? 0.6 : 1,
-          }}
+        <Button
+          render={<Link href={primary.href} aria-disabled={anyBusy || undefined} />}
+          className={cn(anyBusy && 'pointer-events-none opacity-60')}
         >
           {primary.label}
-        </Link>
+          <ArrowRightIcon size={16} data-icon="inline-end" aria-hidden="true" />
+        </Button>
       ) : (
         // D-24: step-3 finalize CTA — when isSubmitting, label morphs to
-        // spinnerLabel + Loader2 spins inline, button gets aria-busy and is
+        // spinnerLabel + the loader spins inline, button gets aria-busy and is
         // disabled. Other bar controls also disabled via `anyBusy`.
-        <button
+        <Button
           type="button"
-          className="btn-green"
           onClick={primary.onClick}
           disabled={primary.isSubmitting}
           aria-busy={primary.isSubmitting || undefined}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            filter: primary.isSubmitting ? 'brightness(0.9)' : undefined,
-          }}
         >
-          {primary.isSubmitting && (
+          {primary.isSubmitting ? (
             <LoaderIcon
               size={16}
               aria-hidden="true"
-              style={{
-                // No global `.animate-spin` utility in app/globals.css — inline
-                // the keyframes-style animation using the standard CSS
-                // shorthand. Vitest jsdom ignores @keyframes; production CSS
-                // resolves to a smooth 1s rotation per UI-SPEC §11.
-                animation: 'spin 1s linear infinite',
-              }}
+              data-icon="inline-start"
+              style={{ animation: 'spin 1s linear infinite' }}
             />
-          )}
+          ) : null}
           {primary.isSubmitting ? primary.spinnerLabel : primary.label}
-        </button>
+          {!primary.isSubmitting ? (
+            <ArrowRightIcon size={16} data-icon="inline-end" aria-hidden="true" />
+          ) : null}
+        </Button>
       )}
     </section>
   );

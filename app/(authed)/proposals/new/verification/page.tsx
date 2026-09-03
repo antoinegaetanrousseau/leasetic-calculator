@@ -51,7 +51,7 @@ import {
   proposalInputSchema,
 } from '@/lib/calc';
 import { PageHero } from '@/components/ui/PageHero';
-import { Stepper } from '@/components/ui/Stepper';
+import { WizardCard } from '../_components/WizardCard';
 
 import { PdfPreviewMock } from '../_components/PdfPreviewMock';
 import { RecapSection } from '../_components/RecapSection';
@@ -275,20 +275,17 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
         subtitle={t('wizard.step3.subtitle', lang)}
       />
 
-      {/* D-19: Stepper lives BELOW PageHero as a sibling (NOT composed
-          inside PageHero). PageHero's baked-in marginBottom:32 already
-          provides the gap; no extra wrapper needed. */}
-      <div style={{ marginBottom: 32 }}>
-        <Stepper
-          currentStep={3}
-          completedSteps={completedSteps}
-          lang={lang}
-          hrefForStep={(n) =>
-            `/proposals/new/${['parametres', 'calcul', 'verification'][n - 1]}?draft_id=${draft.id}`
-          }
-        />
-      </div>
-
+      {/* Phase 33: the wizard-1 shell — stepper header + review panel +
+          footer in ONE card. D-20: currentStep=3 with completedSteps. */}
+      <WizardCard
+        currentStep={3}
+        completedSteps={completedSteps}
+        lang={lang}
+        hrefForStep={(n) =>
+          `/proposals/new/${['parametres', 'calcul', 'verification'][n - 1]}?draft_id=${draft.id}`
+        }
+      >
+      <section data-slot="wizard-panel" className="wizard-panel">
       {/* ────────────────────────────────────────────────────────────────────
           2-column grid (UI-SPEC §5.7).
           - Left column (minmax(0, 1fr)): 3 RecapSection cards.
@@ -305,6 +302,7 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
         <div>
           {/* ● CLIENT — links back to step 1 (D-23) */}
           <RecapSection
+            variant="panel"
             sectionTitle={t('wizard.section.client', lang)}
             modifierLink={{
               href: `/proposals/new/parametres?draft_id=${draft.id}`,
@@ -315,6 +313,7 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
 
           {/* ● PROJET — links back to step 1 (D-23) */}
           <RecapSection
+            variant="panel"
             sectionTitle={t('wizard.section.projet', lang)}
             modifierLink={{
               href: `/proposals/new/parametres?draft_id=${draft.id}`,
@@ -328,6 +327,7 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
               disclosure site on this page). For Agent/Commercial: 2 rows only,
               no commission disclosure (PTYPE-05 structural absence). */}
           <RecapSection
+            variant="panel"
             sectionTitle={t('wizard.section.calcul', lang)}
             modifierLink={{
               href: `/proposals/new/calcul?draft_id=${draft.id}`,
@@ -402,13 +402,13 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
           OUTSIDE the 2-column grid. Wires the Confirmer CTA to POST
           /api/proposals/finalize (D-16/D-24 owned by FinalizeButton).
       ──────────────────────────────────────────────────────────────────── */}
-      <div style={{ marginTop: 16 }}>
-        <FinalizeButton
-          draftId={draft.id}
-          onSaveDraft={onSaveDraft}
-          lang={lang}
-        />
-      </div>
+      </section>
+      <FinalizeButton
+        draftId={draft.id}
+        onSaveDraft={onSaveDraft}
+        lang={lang}
+      />
+      </WizardCard>
     </div>
   );
 }

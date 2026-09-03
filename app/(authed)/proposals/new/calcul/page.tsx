@@ -55,7 +55,7 @@ import {
   type ProposalInput,
 } from '@/lib/calc';
 import { PageHero } from '@/components/ui/PageHero';
-import { Stepper } from '@/components/ui/Stepper';
+import { WizardCard } from '../_components/WizardCard';
 
 import { RecapSection } from '../_components/RecapSection';
 import { WizardActionBar } from '../_components/WizardActionBar';
@@ -324,32 +324,17 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
         subtitle={t('wizard.step2.subtitle', lang)}
       />
 
-      {/* D-20: Stepper currentStep=2 with completedSteps from the draft. */}
-      <div>
-        <Stepper
-          currentStep={2}
-          completedSteps={completedSteps}
-          lang={lang}
-          hrefForStep={(n) =>
-            `/proposals/new/${['parametres', 'calcul', 'verification'][n - 1]}?draft_id=${draft.id}`
-          }
-        />
-      </div>
-
-      {/* ────────────────────────────────────────────────────────────────────
-          Phase 17 WIZ-02 (D-16) — net-new loyer-mensuel hero card.
-          Layout: flex row, LEFT block (sublabel + 36px/700/--teal value)
-          and RIGHT block (Tranche/Coefficient chip via .chip-language
-          chrome). State machine preserved verbatim:
-            - state='computed': sublabel + big teal value + Tranche chip
-            - state='on-demand': "Sur demande" + contact line (no chip)
-            - state='missing': fallback heading + CTA replaced
-            - inputsIncomplete or paramsMissing: error msg + ← Retour CTA
-      ──────────────────────────────────────────────────────────────────── */}
-      <section
-        className="card"
-        style={{ marginTop: 16 }}
+      {/* Phase 33: the wizard-1 shell — stepper header + panels + footer in
+          ONE card. D-20: currentStep=2 with completedSteps from the draft. */}
+      <WizardCard
+        currentStep={2}
+        completedSteps={completedSteps}
+        lang={lang}
+        hrefForStep={(n) =>
+          `/proposals/new/${['parametres', 'calcul', 'verification'][n - 1]}?draft_id=${draft.id}`
+        }
       >
+      <section data-slot="wizard-panel" className="wizard-panel">
         {inputsIncomplete || paramsMissing ? (
           <div
             role="alert"
@@ -479,8 +464,8 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
           stable; row values fall back to '—' when not 'computed'.
       ──────────────────────────────────────────────────────────────────── */}
       {!inputsIncomplete && !paramsMissing && (
-        <div style={{ marginTop: 16 }}>
-          <RecapSection
+        <RecapSection
+            variant="panel"
             sectionTitle={t('wizard.step2.detail.title', lang)}
             rows={detailRows}
             rowSublabels={
@@ -491,7 +476,6 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
             // a top border separator to read as the totalized result row.
             lastRowDivider={true}
           />
-        </div>
       )}
 
       {/* ────────────────────────────────────────────────────────────────────
@@ -500,8 +484,8 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
           surface).
       ──────────────────────────────────────────────────────────────────── */}
       {!inputsIncomplete && recapRows.length > 0 && (
-        <div style={{ marginTop: 16 }}>
-          <RecapSection
+        <RecapSection
+            variant="panel"
             sectionTitle={t('wizard.step2.recap.title', lang)}
             modifierLink={{
               href: `/proposals/new/parametres?draft_id=${draft.id}`,
@@ -509,21 +493,19 @@ export default async function CalculStep2Page({ searchParams }: PageProps) {
             }}
             rows={recapRows}
           />
-        </div>
       )}
 
       {/* ────────────────────────────────────────────────────────────────────
           WizardActionBar — D-19: ← Précédent + Save + (Continuer | Retour).
       ──────────────────────────────────────────────────────────────────── */}
-      <div style={{ marginTop: 16 }}>
-        <WizardActionBar
-          currentStep={2}
-          draftId={draft.id}
-          lang={lang}
-          onSaveDraft={onSaveDraft}
-          primary={primary}
-        />
-      </div>
+      <WizardActionBar
+        currentStep={2}
+        draftId={draft.id}
+        lang={lang}
+        onSaveDraft={onSaveDraft}
+        primary={primary}
+      />
+      </WizardCard>
     </div>
   );
 }
