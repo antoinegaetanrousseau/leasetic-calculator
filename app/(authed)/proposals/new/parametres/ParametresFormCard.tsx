@@ -34,7 +34,7 @@
  */
 
 import { SectionTitle } from '@/components/ui/SectionTitle';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Field, FieldError, FieldLabel, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { z } from 'zod';
@@ -81,6 +81,7 @@ export function ParametresFormCard({
       <section data-slot="wizard-panel" className="wizard-panel">
         {/* ── Section 1: INFORMATIONS CLIENT ─────────────────────────────── */}
         <SectionTitle>{t('wizard.section.informations.client', lang)}</SectionTitle>
+        <FieldGroup className="gap-5">
 
         {/* clientCo — wizard-scoped label "Nom du client" per UI-SPEC §6.3 */}
         <Field>
@@ -169,6 +170,7 @@ export function ParametresFormCard({
         </Field>
 
         {/* D-05: 24px divider between the two sections inside the single .card */}
+        </FieldGroup>
         <hr
           style={{
             border: 'none',
@@ -179,6 +181,7 @@ export function ParametresFormCard({
 
         {/* ── Section 2: DÉTAILS DU PROJET ──────────────────────────────── */}
         <SectionTitle>{t('wizard.section.details.projet', lang)}</SectionTitle>
+        <FieldGroup className="gap-5">
 
         {/* partnerRef — reuses v1.1 form.project.ref */}
         <Field>
@@ -258,6 +261,7 @@ export function ParametresFormCard({
             </FieldError>
           )}
         </Field>
+        </FieldGroup>
         <hr
           style={{
             border: 'none',
@@ -268,6 +272,7 @@ export function ParametresFormCard({
 
         {/* ── Section 3: INFORMATIONS COMPLÉMENTAIRES ───────────────────── */}
         <SectionTitle>{t('wizard.section.details.complementaires', lang)}</SectionTitle>
+        <FieldGroup className="gap-5">
 
         {/* clientRole */}
         <Field>
@@ -353,6 +358,7 @@ export function ParametresFormCard({
             )}
           />
         </Field>
+        </FieldGroup>
       </section>
     </>
   );
