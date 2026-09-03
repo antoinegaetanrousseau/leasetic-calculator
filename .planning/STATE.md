@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: planning
-last_updated: "2026-09-03T15:42:08.236Z"
+last_updated: "2026-09-03T17:27:47.400Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 17
-  total_plans: 79
-  completed_plans: 79
+  total_plans: 92
+  completed_plans: 81
   percent: 85
 ---
 
@@ -418,6 +418,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 33 P05 | ~30min | 3 tasks | 11 files |
 | Phase 33-pipeline P06 | 45min | 3 tasks | 11 files |
 | Phase 33-pipeline P07 | ~25min | 2 tasks | 4 files |
+| Phase 34 P02 | 20 | 3 tasks | 9 files |
 
 ## Decisions
 
@@ -536,6 +537,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 33-07]: KanbanItem composed with render={<KanbanItemHandle cursor />} to merge dnd-kit's focus attributes and drag listeners onto one DOM node for A-5 keyboard operability
 - [Phase 33-07]: Rule 1 auto-fix: replaced the plan's useEffect reseed-on-prop-change with React's render-time prop-identity comparison (setState during render, not inside useEffect) to satisfy this repo's react-hooks/set-state-in-effect eslint gate, in both PipelineBoard and PipelineMobileList
 - [Phase ?]: 33-08: added a 7th fail-closed rejection assertion (INSERT against a nonexistent client_relationship_id) beyond the plan's literal 12-point list, closing the 'missing company row' branch named in 33-01-PLAN.md's decision record
+- [Phase ?]: 34-02: the registry SEARCH result is trusted only when results[0].siren equals the requested SIREN; a mismatch and an empty result set are both not_found
+- [Phase ?]: 34-02: normalizeSiren is the codebase's only SIREN normalisation rule (D-23 / WR-15 closed) — future proposals store digits only, no stored inputs blob was rewritten
 
 ### Blockers
 

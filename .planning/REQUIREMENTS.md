@@ -103,8 +103,8 @@ The client page is currently a name, an optional SIREN, a contact list and a pro
 
 Sharing rule for every requirement below: **the registry owns identity, partners own the rest.** `companies` is a shared row (CRM-01) — two partners quoting the same SIREN attach to it — so registry-sourced identity is read-only to everyone, a short list of shared display fields is partner-editable and audit-logged, and anything about the relationship is private to its owner.
 
-- [ ] **FICHE-01**: Creating a client looks the company up in the public SIRENE registry by its SIREN and stores what comes back. A registry outage never blocks creation; the record is simply marked as needing completion.
-- [ ] **FICHE-02**: Registry-sourced identity — legal name, address, legal form, NAF code, activity section, headcount band, founding date, administrative state — renders read-only, with the date it was last synced and a control to refresh it.
+- [x] **FICHE-01**: Creating a client looks the company up in the public SIRENE registry by its SIREN and stores what comes back. A registry outage never blocks creation; the record is simply marked as needing completion.
+- [x] **FICHE-02**: Registry-sourced identity — legal name, address, legal form, NAF code, activity section, headcount band, founding date, administrative state — renders read-only, with the date it was last synced and a control to refresh it.
 - [ ] **FICHE-03**: A partner edits the shared display fields (display name, website, phone) and corrects a wrong SIREN, which re-runs the lookup. Every such edit is audit-logged, because other partners see it.
 - [ ] **FICHE-04**: A partner records private relationship facts — source, description — that no other partner on the same company can see.
 - [ ] **FICHE-05**: The client page is a header plus tabs (Informations, Contacts, Propositions, Activité), each section edited in place through its own dialog rather than a separate edit screen.
