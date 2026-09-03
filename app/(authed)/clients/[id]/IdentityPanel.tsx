@@ -149,7 +149,7 @@ export function IdentityPanel({ relationshipId, identity, siren, lang }: Identit
     : t('clients.registry.neverSynced', lang);
 
   return (
-    <section className="card mb-4">
+    <section className="card mb-4" data-testid="identity-panel">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <SectionTitle className="mb-0">{t('clients.registry.title', lang)}</SectionTitle>
