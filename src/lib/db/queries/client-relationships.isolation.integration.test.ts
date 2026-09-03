@@ -59,6 +59,7 @@ const {
   listContactsForRelationship,
 } = await import('./client-relationships');
 const { listRelationshipsForCompany } = await import('./companies');
+const { listPipelineBoard, getConversionRateForOwner } = await import('./pipeline');
 const { __resetDbForTests } = await import('@/lib/db');
 
 const DATABASE_URL_TEST = process.env.DATABASE_URL_TEST;
@@ -264,6 +265,7 @@ describe.skipIf(!shouldRun)(
     const runId = Date.now();
     const userAId = `pipe-iso-a-${runId}`;
     const userBId = `pipe-iso-b-${runId}`;
+    const userCId = `pipe-iso-c-${runId}`;
     // 9-digit SIREN derived from runId so concurrent runs never collide on
     // the companies.siren unique index.
     const sirenSeed = String(runId).padStart(9, '0').slice(-9);
@@ -273,9 +275,17 @@ describe.skipIf(!shouldRun)(
     let relANoSirenId: string;
     let relAWithSirenId: string;
     let relBNoSirenId: string;
+    let relBWithSirenId: string;
     let relDefaultStageId: string;
     let proposalANoSirenId: string;
     let proposalAWithSirenId: string;
+    let proposalLostId: string;
+    let proposalDraftId: string;
+    let proposalDeletedActiveId: string;
+    let proposalNullRelId: string;
+    let proposalBWonId: string;
+    let contactAWithSiren1Id: string;
+    let contactAWithSiren2Id: string;
 
     // Same params_snapshot/computed shape the Phase 30 seed above uses.
     const paramsSnapshot = JSON.stringify({
@@ -306,7 +316,8 @@ describe.skipIf(!shouldRun)(
         INSERT INTO users (id, email, role, partner_type)
         VALUES
           (${userAId}, ${`${userAId}@example.test`}, 'partner', 'Partenaire'),
-          (${userBId}, ${`${userBId}@example.test`}, 'partner', 'Partenaire')
+          (${userBId}, ${`${userBId}@example.test`}, 'partner', 'Partenaire'),
+          (${userCId}, ${`${userCId}@example.test`}, 'partner', 'Partenaire')
       `;
 
       const companyNoSiren = await sql<Array<{ id: string }>>`
@@ -334,6 +345,14 @@ describe.skipIf(!shouldRun)(
       `;
       relBNoSirenId = relBNoSiren[0]!.id;
 
+      // B also gets a relationship on the SIREN'd company — needed so B's
+      // conversion-rate fixture (below) can carry a real outcome='won' row
+      // without tripping the SIREN gate.
+      const relBWithSiren = await sql<Array<{ id: string }>>`
+        INSERT INTO client_relationships (company_id, owner_id) VALUES (${companyWithSirenId}, ${userBId}) RETURNING id
+      `;
+      relBWithSirenId = relBWithSiren[0]!.id;
+
       const proposalANoSiren = await sql<Array<{ id: string }>>`
         INSERT INTO proposals (
           user_id, status, language, lc_ref, idempotency_key,
@@ -355,16 +374,109 @@ describe.skipIf(!shouldRun)(
         ) RETURNING id
       `;
       proposalAWithSirenId = proposalAWithSiren[0]!.id;
+
+      // ── Task 2's mixed dataset: one row of every excluded category, plus
+      // a second proposal on relAWithSiren so its card's proposalsCount can
+      // prove DISTINCT (2), not a contacts×proposals cartesian product. ──
+
+      const proposalLost = await sql<Array<{ id: string }>>`
+        INSERT INTO proposals (
+          user_id, status, language, lc_ref, idempotency_key,
+          inputs, params_snapshot, computed, client_relationship_id,
+          outcome, outcome_date
+        ) VALUES (
+          ${userAId}, 'active', 'fr', ${`LC-PIPE-ISO-${runId}-A3`}, ${randomUUID()},
+          '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, ${relAWithSirenId},
+          'lost', now()
+        ) RETURNING id
+      `;
+      proposalLostId = proposalLost[0]!.id;
+
+      const proposalDraft = await sql<Array<{ id: string }>>`
+        INSERT INTO proposals (
+          user_id, status, language,
+          inputs, params_snapshot, computed, client_relationship_id
+        ) VALUES (
+          ${userAId}, 'draft', 'fr',
+          '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, ${relANoSirenId}
+        ) RETURNING id
+      `;
+      proposalDraftId = proposalDraft[0]!.id;
+
+      const proposalDeletedActive = await sql<Array<{ id: string }>>`
+        INSERT INTO proposals (
+          user_id, status, language, lc_ref, idempotency_key,
+          inputs, params_snapshot, computed, client_relationship_id, deleted_at
+        ) VALUES (
+          ${userAId}, 'active', 'fr', ${`LC-PIPE-ISO-${runId}-A4`}, ${randomUUID()},
+          '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, ${relANoSirenId}, now()
+        ) RETURNING id
+      `;
+      proposalDeletedActiveId = proposalDeletedActive[0]!.id;
+
+      const proposalNullRel = await sql<Array<{ id: string }>>`
+        INSERT INTO proposals (
+          user_id, status, language, lc_ref, idempotency_key,
+          inputs, params_snapshot, computed, client_relationship_id
+        ) VALUES (
+          ${userAId}, 'active', 'fr', ${`LC-PIPE-ISO-${runId}-A5`}, ${randomUUID()},
+          '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, NULL
+        ) RETURNING id
+      `;
+      proposalNullRelId = proposalNullRel[0]!.id;
+
+      // Partner B's own won proposal — proves D-12: B's numbers must never
+      // move A's numerator/denominator.
+      const proposalBWon = await sql<Array<{ id: string }>>`
+        INSERT INTO proposals (
+          user_id, status, language, lc_ref, idempotency_key,
+          inputs, params_snapshot, computed, client_relationship_id,
+          outcome, outcome_date
+        ) VALUES (
+          ${userBId}, 'active', 'fr', ${`LC-PIPE-ISO-${runId}-B1`}, ${randomUUID()},
+          '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, ${relBWithSirenId},
+          'won', now()
+        ) RETURNING id
+      `;
+      proposalBWonId = proposalBWon[0]!.id;
+
+      const contacts = await sql<Array<{ id: string }>>`
+        INSERT INTO contacts (client_relationship_id, name, role, phone, email)
+        VALUES
+          (${relAWithSirenId}, 'Pipeline Contact One', 'Achats', '0600000001', ${`contact1-${runId}@a-siren.test`}),
+          (${relAWithSirenId}, 'Pipeline Contact Two', 'Direction', '0600000002', ${`contact2-${runId}@a-siren.test`})
+        RETURNING id
+      `;
+      contactAWithSiren1Id = contacts[0]!.id;
+      contactAWithSiren2Id = contacts[1]!.id;
     });
 
     afterAll(async () => {
       if (!sql) return;
-      // FK-safe order: proposals -> client_relationships -> companies -> users.
-      const proposalIds = [proposalANoSirenId, proposalAWithSirenId].filter(Boolean);
+      // FK-safe order: contacts -> proposals -> client_relationships -> companies -> users.
+      const contactIds = [contactAWithSiren1Id, contactAWithSiren2Id].filter(Boolean);
+      if (contactIds.length > 0) {
+        await sql`DELETE FROM contacts WHERE id = ANY(${contactIds})`;
+      }
+      const proposalIds = [
+        proposalANoSirenId,
+        proposalAWithSirenId,
+        proposalLostId,
+        proposalDraftId,
+        proposalDeletedActiveId,
+        proposalNullRelId,
+        proposalBWonId,
+      ].filter(Boolean);
       if (proposalIds.length > 0) {
         await sql`DELETE FROM proposals WHERE id = ANY(${proposalIds})`;
       }
-      const relIds = [relANoSirenId, relAWithSirenId, relBNoSirenId, relDefaultStageId].filter(Boolean);
+      const relIds = [
+        relANoSirenId,
+        relAWithSirenId,
+        relBNoSirenId,
+        relBWithSirenId,
+        relDefaultStageId,
+      ].filter(Boolean);
       if (relIds.length > 0) {
         await sql`DELETE FROM client_relationships WHERE id = ANY(${relIds})`;
       }
@@ -372,7 +484,7 @@ describe.skipIf(!shouldRun)(
       if (companyIds.length > 0) {
         await sql`DELETE FROM companies WHERE id = ANY(${companyIds})`;
       }
-      await sql`DELETE FROM users WHERE id = ANY(${[userAId, userBId]})`;
+      await sql`DELETE FROM users WHERE id = ANY(${[userAId, userBId, userCId]})`;
       await sql.end({ timeout: 5 });
     });
 
@@ -523,11 +635,75 @@ describe.skipIf(!shouldRun)(
       `;
       expect(row[0]?.status).toBe('draft');
       expect(row[0]?.outcome).toBe('won');
-      // Note: task 33-08-02 extends this seed with a mixed conversion-rate
-      // and board dataset, and reuses this final state (status='active',
-      // outcome='won') as one of its counted rows — restored here so this
-      // task's own assertion is self-contained regardless of what runs next.
+      // Restore — task 2's conversion-rate dataset below counts this
+      // proposal in the 'active' denominator.
       await sql`UPDATE proposals SET status = 'active' WHERE id = ${proposalAWithSirenId}`;
+    });
+
+    // ── Task 2: the conversion-rate formula (PIPE-03, D-12) ─────────────────
+
+    it('getConversionRateForOwner: the locked denominator over a dataset containing one row of every excluded category', async () => {
+      const rate = await getConversionRateForOwner(userAId);
+      // won: proposalAWithSiren (outcome='won'). total: proposalANoSiren
+      // (active, no outcome) + proposalAWithSiren (active, won) +
+      // proposalLost (active, lost) — the draft, the soft-deleted-active,
+      // and the no-relationship rows are all excluded by the locked
+      // denominator (33-03-PLAN.md <decision_record>).
+      const expectedWon = 1;
+      const expectedTotal = 3;
+      expect(rate.won).toBe(expectedWon);
+      expect(rate.total).toBe(expectedTotal);
+      expect(rate.pct).toBe(Math.round((expectedWon / expectedTotal) * 100));
+    });
+
+    it('D-12: partner B\'s won proposal never enters partner A\'s numerator or denominator', async () => {
+      const rateA = await getConversionRateForOwner(userAId);
+      const rateB = await getConversionRateForOwner(userBId);
+      expect(rateA.total).toBe(3);
+      expect(rateB).toEqual({ won: 1, total: 1, pct: 100 });
+    });
+
+    it('a partner with no relationship-linked active proposals returns pct=null, not 0', async () => {
+      const rateC = await getConversionRateForOwner(userCId);
+      expect(rateC).toEqual({ won: 0, total: 0, pct: null });
+      expect(rateC.pct).toBeNull();
+    });
+
+    // ── Task 2: the board (PIPE-04) ─────────────────────────────────────────
+
+    it('listPipelineBoard: returns exactly the seven PIPELINE_STAGES keys, empty reserved lanes for this caller', async () => {
+      const board = await listPipelineBoard({ ownerId: userAId });
+      expect(Object.keys(board).sort()).toEqual([...PIPELINE_STAGES].sort());
+      expect(board.signe).toEqual([]);
+      expect(board.debloque).toEqual([]);
+    });
+
+    it('listPipelineBoard: every card belongs to the caller only, siren renders null/seeded correctly', async () => {
+      const board = await listPipelineBoard({ ownerId: userAId });
+      const allCards = Object.values(board).flat();
+      expect(allCards.some((c) => c.relationshipId === relBNoSirenId)).toBe(false);
+      expect(allCards.some((c) => c.relationshipId === relBWithSirenId)).toBe(false);
+
+      const noSirenCard = allCards.find((c) => c.relationshipId === relANoSirenId);
+      const withSirenCard = allCards.find((c) => c.relationshipId === relAWithSirenId);
+      expect(noSirenCard?.siren).toBeNull();
+      expect(withSirenCard?.siren).toBe(sirenSeed);
+    });
+
+    it('listPipelineBoard: contactsCount and proposalsCount are DISTINCT counts, not a cartesian product', async () => {
+      const board = await listPipelineBoard({ ownerId: userAId });
+      const card = Object.values(board).flat().find((c) => c.relationshipId === relAWithSirenId);
+      expect(card?.contactsCount).toBe(2);
+      expect(card?.proposalsCount).toBe(2);
+    });
+
+    it('listPipelineBoard: reflects a stage change end to end', async () => {
+      await sql`UPDATE client_relationships SET stage = 'negociation' WHERE id = ${relAWithSirenId}`;
+      const board = await listPipelineBoard({ ownerId: userAId });
+      const inNegociation = board.negociation.some((c) => c.relationshipId === relAWithSirenId);
+      const inProspect = board.prospect.some((c) => c.relationshipId === relAWithSirenId);
+      expect(inNegociation).toBe(true);
+      expect(inProspect).toBe(false);
     });
   },
 );
