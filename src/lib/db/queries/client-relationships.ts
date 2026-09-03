@@ -337,8 +337,8 @@ export async function getClientRelationshipForOwner(
       // The four CHECK-constrained columns. They are plain `text` in the
       // schema, so the projection carries the TS narrowing that the CHECK
       // already guarantees in the database — done here rather than in a
-      // `.map()` so this function stays a single statement returning
-      // `rows[0] ?? null` untouched (its D-18 contract).
+      // `.map()` so this function stays a single statement whose return
+      // expression, and therefore its D-18 null contract, is untouched.
       registryState: sql<RegistryState | null>`${schema.companies.registryState}`,
       registryStatus: sql<RegistryStatus>`${schema.companies.registryStatus}`,
       leadSource: sql<LeadSource | null>`${schema.clientRelationships.leadSource}`,
