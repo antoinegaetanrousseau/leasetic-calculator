@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-02T23:50:19.017Z"
-last_activity: 2026-09-02 -- Phase 33 planning complete
+last_updated: "2026-09-03T00:06:39.890Z"
+last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 16
   total_plans: 79
-  completed_plans: 70
+  completed_plans: 71
   percent: 80
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 31.1 — app-shell-refresh
+**Current focus:** Phase 33 — pipeline
 
 ## Current Position
 
-Phase: 31.1 (app-shell-refresh) — EXECUTING
-Plan: 7 of 7
+Phase: 33 (pipeline) — EXECUTING
+Plan: 2 of 9
 Status: Ready to execute
-Last activity: 2026-09-02 -- Phase 33 planning complete
+Last activity: 2026-09-03
 
 ## Deferred Items
 
@@ -412,6 +412,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31.1 P05 | ~5min | 2 tasks | 2 files |
 | Phase 31.1 P06 | 6min | 3 tasks | 4 files |
 | Phase 31.1 P07 | ~60min | 3 tasks | 2 files |
+| Phase 33 P01 | ~25min | 3 tasks | 8 files |
 
 ## Decisions
 
@@ -519,3 +520,4 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: 31.1-06: Collapsed sidebar badge fill is bg-sidebar-accent, not bg-sidebar-primary — the mark asset is #01CC72 and the primary token resolves to the same green, which would render the mark invisible.
 - [Phase 31.1]: Dark-mode gaps (DARK-GAP-01/02/03) accepted as-is; no values invented, closure path recorded in UI-CONVENTIONS.md
 - [Phase 31.1]: CLAUDE.md Open Items corrected per operator-approved text (OPEN-A closed, --radius drives nothing in the scale)
+- [Phase 33]: D-07's DB SIREN gate is a trigger, not a CHECK (Postgres CHECK cannot join proposals -> client_relationships -> companies); proposals_won_requires_siren() + two WHEN-gated triggers, FOR SHARE lock, fail-closed
