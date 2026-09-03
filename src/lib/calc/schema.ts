@@ -14,6 +14,7 @@
  * NOT on a coerced number, to keep the contract DB-numeric-compatible.
  */
 import { z } from 'zod';
+import { normalizeSiren } from '@/lib/crm/siren';
 
 /**
  * v10 amount validation rules (Matrice_2026_THE_Leasetic-v10.html line 1712 +
@@ -59,16 +60,42 @@ const optionalPhoneSchema = z
     message: 'error.field.phone.invalid',
   });
 
-/** Optional SIREN: empty OR exactly 9 digits when stripped. */
 /**
  * Operator decision 2026-09-03 (supersedes PIPE-05's "never at proposal"):
  * a proposal cannot exist without the client's SIREN. Required and exactly
  * nine digits once formatting spaces are stripped.
+ *
+ * Phase 34 (D-23, closing 33-REVIEW WR-15): this schema now shares
+ * `normalizeSiren` (src/lib/crm/siren.ts) with `createClientSchema` and the
+ * reconciliation engine, and the transform+refine pair below is
+ * `crm/schemas.ts`'s verbatim. It previously counted digits with a locally
+ * written regex and never transformed, so `proposals.inputs.clientSiren` was
+ * persisted exactly as typed — with `SirenInput`'s formatting spaces, and,
+ * for any caller that is not the wizard (POST /api/proposals parses this
+ * schema against a raw request body), with arbitrary junk around the digits.
+ * Two schemas for one rule is how the two drift.
+ *
+ * FICHE-01 is what makes a single rule load-bearing rather than cosmetic: the
+ * SIREN is now the key the company registry is queried by
+ * (src/lib/registry/recherche-entreprises.ts), so a stored value that does not
+ * match `companies_siren_check` and the matcher is a lookup that silently
+ * finds nothing.
+ *
+ * The transform keeps the distinction `normalizeSiren` deliberately collapses:
+ * a blank value must fail as `error.field.required`, while a provided-but-
+ * malformed one falls back to the trimmed original so it fails the shape check
+ * below with `error.field.siren.invalid`.
+ *
+ * Scope (DATA-01..04): `proposals.inputs` is an immutable snapshot. This
+ * changes what a NEWLY created proposal stores. It rewrites nothing already
+ * stored — no migration, no backfill, no re-normalisation on read.
  */
 const requiredSirenSchema = z
   .string({ message: 'error.field.required' })
-  .refine((s) => s.trim().length > 0, { message: 'error.field.required' })
-  .refine((s) => s.trim().length === 0 || s.replace(/\D/g, '').length === 9, {
+  .trim()
+  .min(1, { message: 'error.field.required' })
+  .transform((v) => normalizeSiren(v) ?? v)
+  .refine((v) => /^[0-9]{9}$/.test(v), {
     message: 'error.field.siren.invalid',
   });
 

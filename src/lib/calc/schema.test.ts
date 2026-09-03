@@ -208,3 +208,91 @@ describe('coefficientsSchema (D-2 typed constant validator)', () => {
     expect(r.success).toBe(false);
   });
 });
+
+/**
+ * Phase 34 Plan 02 Task 3 — D-23 / 33-REVIEW WR-15.
+ *
+ * `requiredSirenSchema` used to `.refine()` on a locally-written digit count
+ * and never `.transform()`, so `proposals.inputs.clientSiren` was persisted
+ * exactly as typed — with the SirenInput formatting spaces, and, for a caller
+ * that is not the UI (POST /api/proposals parses this schema against a raw
+ * body), with arbitrary junk around the digits. It now shares `normalizeSiren`
+ * with `createClientSchema` and the reconciliation engine, so what gets stored
+ * is what `companies_siren_check` and the matcher both expect: nine digits.
+ *
+ * FICHE-01 is what makes one rule load-bearing rather than cosmetic — the
+ * SIREN is now the registry lookup key.
+ */
+describe('requiredSirenSchema converges on normalizeSiren (D-23 / WR-15)', () => {
+  const base = {
+    partnerCo: 'Société Informatique XY',
+    partnerName: 'Antoine Rousseau',
+    clientCo: 'ACME SARL',
+    amountHT: '75000',
+    durationMonths: 48 as const,
+    validityDays: 30 as const,
+  };
+
+  const parseSiren = (clientSiren: unknown) =>
+    proposalInputSchema.safeParse({ ...base, clientSiren });
+
+  const messages = (r: ReturnType<typeof parseSiren>) =>
+    r.success ? [] : r.error.issues.map((i) => i.message);
+
+  it('test 1: a digits-only SIREN parses unchanged', () => {
+    const r = parseSiren('552100554');
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.clientSiren).toBe('552100554');
+  });
+
+  it('test 2: formatting spaces are NORMALISED away, not merely tolerated', () => {
+    const r = parseSiren('552 100 554');
+    expect(r.success).toBe(true);
+    // The old schema accepted this and stored it verbatim, spaces and all.
+    if (r.success) expect(r.data.clientSiren).toBe('552100554');
+  });
+
+  it('test 3: WR-15’s counter-example no longer survives verbatim', () => {
+    // WR-15's complaint is that `1a2b3c4d5e6f7g8h9` "strips to nine digits and
+    // passes" — and was then PERSISTED AS TYPED. Sharing `normalizeSiren` is
+    // what fixes that: the value still parses (nine digits are nine digits, in
+    // this schema exactly as in `createClientSchema` and in the reconciliation
+    // engine) but what reaches `proposals.inputs` is the normalised form. A
+    // stricter rule here, and only here, would recreate the drift D-23 closes.
+    const r = parseSiren('1a2b3c4d5e6f7g8h9');
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.clientSiren).toBe('123456789');
+      expect(r.data.clientSiren).not.toBe('1a2b3c4d5e6f7g8h9');
+    }
+  });
+
+  it('test 4: empty and blank stay error.field.required, not error.field.siren.invalid', () => {
+    expect(messages(parseSiren(''))).toContain('error.field.required');
+    expect(messages(parseSiren(''))).not.toContain('error.field.siren.invalid');
+    expect(messages(parseSiren('   '))).toContain('error.field.required');
+    expect(messages(parseSiren('   '))).not.toContain('error.field.siren.invalid');
+    expect(messages(parseSiren(undefined))).toContain('error.field.required');
+  });
+
+  it('test 5: a digit count other than nine is error.field.siren.invalid', () => {
+    expect(messages(parseSiren('55210055'))).toContain('error.field.siren.invalid');
+    expect(messages(parseSiren('5521005541'))).toContain('error.field.siren.invalid');
+    expect(messages(parseSiren('552 100 55'))).toContain('error.field.siren.invalid');
+    expect(messages(parseSiren('SIREN inconnu'))).toContain('error.field.siren.invalid');
+  });
+
+  it('test 6: the full form output carries a digits-only clientSiren', () => {
+    const parsed = proposalInputSchema.parse({
+      ...base,
+      clientSiren: '552 100 554',
+      clientName: 'Jean Dupont',
+      clientTel: '06 12 34 56 78',
+    });
+    expect(parsed.clientSiren).toBe('552100554');
+    expect(/^[0-9]{9}$/.test(parsed.clientSiren)).toBe(true);
+    // The SIREN is the registry lookup key (FICHE-01); the phone is NOT
+    // normalised, so this is a deliberate difference, not an oversight.
+    expect(parsed.clientTel).toBe('06 12 34 56 78');
+  });
+});
