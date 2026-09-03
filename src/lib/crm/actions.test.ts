@@ -198,6 +198,7 @@ import {
   createContactAction,
   deleteContactAction,
   refreshCompanyRegistryAction,
+  updateCompanyDisplayAction,
   updateContactAction,
 } from './actions';
 
@@ -632,5 +633,182 @@ describe('refreshCompanyRegistryAction', () => {
       'clients.toast.error',
     );
     expect(mockState.calls).toHaveLength(0);
+  });
+});
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  Phase 34 Plan 07 — updateCompanyDisplayAction (FICHE-03, D-02, D-03)       */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+const BEFORE_ROW = {
+  name: 'Dupont Menuiserie',
+  website: 'https://dupont.fr',
+  phone: '0123456789',
+  siren: '552100554',
+};
+
+const VALID_EDIT = {
+  relationshipId: REL_ID,
+  name: 'Dupont Menuiserie SARL',
+  website: 'https://dupont-menuiserie.fr',
+  phone: '0198765432',
+  siren: '552100554',
+};
+
+describe('updateCompanyDisplayAction', () => {
+  it('calls requireRelationshipHolder() as its FIRST await', async () => {
+    class NextNotFoundError extends Error {}
+    requireRelationshipHolderMock.mockRejectedValueOnce(new NextNotFoundError('NEXT_NOT_FOUND'));
+
+    await expect(updateCompanyDisplayAction(VALID_EDIT)).rejects.toThrow('NEXT_NOT_FOUND');
+    expect(mockState.calls).toHaveLength(0);
+  });
+
+  it('updates companies through an owner-scoped subquery carrying BOTH the relationship id and owner_id', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await updateCompanyDisplayAction(VALID_EDIT);
+
+    const updateIdx = mockState.calls.findIndex((c) => c.kind === 'update');
+    expect(updateIdx).toBeGreaterThan(-1);
+    expect(mockState.calls[updateIdx].payload).toBe(schema.companies);
+
+    // The UPDATE's own WHERE — companies has no owner_id column, so the
+    // re-proof rides in the embedded subquery, not a direct column match.
+    const updateWhere = mockState.calls.slice(updateIdx).find((c) => c.kind === 'where');
+    expect(sqlReferencesColumn(updateWhere!.payload, 'owner_id')).toBe(true);
+    expect(sqlReferencesColumn(updateWhere!.payload, 'id')).toBe(true);
+  });
+
+  it('D-02: the .set() key set is EXACTLY name, website, phone, siren and updatedAt — no registry column, nothing sourced from a caller-named key', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await updateCompanyDisplayAction({
+      ...VALID_EDIT,
+      // A caller trying to ride a registry column in on the parsed input.
+      legalName: 'ATTACKER SA',
+      registryStatus: 'synced',
+      nafCode: '00.00Z',
+    });
+
+    const setCall = mockState.calls.find((c) => c.kind === 'set');
+    const payload = setCall!.payload as Record<string, unknown>;
+    expect(Object.keys(payload).sort()).toEqual(['name', 'phone', 'siren', 'updatedAt', 'website']);
+    expect(payload.name).toBe('Dupont Menuiserie SARL');
+    expect(payload.updatedAt).toBeInstanceOf(Date);
+  });
+
+  it('normalises absent website and phone to null rather than undefined', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await updateCompanyDisplayAction({ relationshipId: REL_ID, name: 'X', siren: '552100554' });
+
+    const payload = mockState.calls.find((c) => c.kind === 'set')!.payload as Record<string, unknown>;
+    expect(payload.website).toBeNull();
+    expect(payload.phone).toBeNull();
+  });
+
+  it('throws the bounded key when zero rows are affected — not reachable through a relationship the caller owns', async () => {
+    mockState.resultQueue = [[], []];
+
+    await expect(updateCompanyDisplayAction(VALID_EDIT)).rejects.toThrow('clients.toast.error');
+    expect(writeAuditLogMock).not.toHaveBeenCalled();
+  });
+
+  it('collapses a companies.siren unique violation into the bounded key and never leaks the driver message (trap 10)', async () => {
+    const driverMessage = 'duplicate key value violates unique constraint "companies_siren_unique"';
+    mockState.resultQueue = [[BEFORE_ROW], new Error(driverMessage)];
+
+    await expect(updateCompanyDisplayAction({ ...VALID_EDIT, siren: '999999999' })).rejects.toThrow(
+      'clients.toast.error',
+    );
+    await expect(
+      updateCompanyDisplayAction({ ...VALID_EDIT, siren: '999999999' }).catch((e: Error) => e.message),
+    ).resolves.not.toContain('companies_siren_unique');
+  });
+
+  it('D-03: writes an audit row whose payload key set is exactly companyId, before and after — and before/after carry only the four shared-tier values', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await updateCompanyDisplayAction(VALID_EDIT);
+
+    const auditCall = writeAuditLogMock.mock.calls[0][0];
+    expect(auditCall.action).toBe('company.display_update');
+    expect(auditCall.targetType).toBe('company');
+    expect(auditCall.targetId).toBe('company-1');
+    expect(auditCall.actorId).toBe('user-1');
+    expect(Object.keys(auditCall.payload).sort()).toEqual(['after', 'before', 'companyId']);
+    // A future addition of commission or rate data must fail here (D-26 / ADMIN-09).
+    expect(Object.keys(auditCall.payload.before).sort()).toEqual(['name', 'phone', 'siren', 'website']);
+    expect(Object.keys(auditCall.payload.after).sort()).toEqual(['name', 'phone', 'siren', 'website']);
+    expect(auditCall.payload.before.name).toBe('Dupont Menuiserie');
+    expect(auditCall.payload.after.name).toBe('Dupont Menuiserie SARL');
+  });
+
+  it('writes NO siren_correct row and re-runs NO lookup when the submitted SIREN is unchanged', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await updateCompanyDisplayAction(VALID_EDIT);
+
+    expect(writeAuditLogMock).toHaveBeenCalledTimes(1);
+    expect(syncCompanyRegistryMock).not.toHaveBeenCalled();
+  });
+
+  it('on a SIREN correction writes a second audit row AND re-runs the lookup against the NEW value', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await updateCompanyDisplayAction({ ...VALID_EDIT, siren: '123456789' });
+
+    expect(writeAuditLogMock).toHaveBeenCalledTimes(2);
+    const correction = writeAuditLogMock.mock.calls[1][0];
+    expect(correction.action).toBe('company.siren_correct');
+    expect(correction.targetType).toBe('company');
+    expect(correction.targetId).toBe('company-1');
+    expect(correction.payload).toEqual({
+      companyId: 'company-1',
+      before: '552100554',
+      after: '123456789',
+    });
+
+    expect(syncCompanyRegistryMock).toHaveBeenCalledWith({
+      companyId: 'company-1',
+      siren: '123456789',
+      relationshipId: REL_ID,
+      actorId: 'user-1',
+      ownerId: 'user-1',
+    });
+  });
+
+  it('a failed post-correction sync does NOT roll the correction back — the action still resolves', async () => {
+    // There is no transaction to roll back with (neon-http), and pretending
+    // otherwise would leave the two halves inconsistent in the worse direction.
+    syncCompanyRegistryMock.mockResolvedValue({ ok: false, reason: 'unavailable' });
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await expect(
+      updateCompanyDisplayAction({ ...VALID_EDIT, siren: '123456789' }),
+    ).resolves.toBeUndefined();
+    expect(writeAuditLogMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('revalidates both the clients layout and the pipeline board, which render the company name and SIREN', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await updateCompanyDisplayAction(VALID_EDIT);
+
+    expect(revalidatePathMock).toHaveBeenCalledWith('/clients', 'layout');
+    expect(revalidatePathMock).toHaveBeenCalledWith('/pipeline');
+  });
+
+  it('reads the before values with an owner-scoped SELECT that is a DATA read, not the authorization step — the UPDATE re-proves ownership independently', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+
+    await updateCompanyDisplayAction(VALID_EDIT);
+
+    // Both statements carry the owner predicate. Removing the SELECT entirely
+    // would still leave the write safe; it exists only for the audit payload.
+    const wheres = mockState.calls.filter((c) => c.kind === 'where');
+    expect(wheres.length).toBeGreaterThanOrEqual(2);
+    expect(wheres.every((w) => sqlReferencesColumn(w.payload, 'owner_id'))).toBe(true);
   });
 });
