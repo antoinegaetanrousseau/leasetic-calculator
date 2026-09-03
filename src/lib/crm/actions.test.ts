@@ -60,6 +60,12 @@ vi.mock('@/lib/db', async () => {
         mockState.calls.push({ kind: 'from', payload: table });
         return builder;
       },
+      // Phase 34 Plan 07 — `refreshCompanyRegistryAction` resolves the company
+      // through the caller's OWN relationship, so the builder must chain a join.
+      innerJoin: (table: unknown, on: unknown) => {
+        mockState.calls.push({ kind: 'innerJoin', payload: { table, on } });
+        return builder;
+      },
       where: (clause: unknown) => {
         mockState.calls.push({ kind: 'where', payload: clause });
         builder._whereClause = clause;
@@ -170,10 +176,28 @@ vi.mock('@/lib/db/queries/audit-log', () => ({
   writeAuditLog: writeAuditLogMock,
 }));
 
+/**
+ * Phase 34 Plan 07 — `./registry-sync` is mocked so the registry tier stays a
+ * spy here. Its own contract (never throws, writes only its own columns, maps
+ * every lookup outcome onto a status) is pinned in registry-sync.test.ts; this
+ * suite asserts only what the ACTIONS do with it.
+ */
+const { syncCompanyRegistryMock, revalidatePathMock } = vi.hoisted(() => ({
+  syncCompanyRegistryMock: vi.fn(),
+  revalidatePathMock: vi.fn(),
+}));
+vi.mock('./registry-sync', () => ({
+  syncCompanyRegistry: syncCompanyRegistryMock,
+}));
+vi.mock('next/cache', () => ({
+  revalidatePath: revalidatePathMock,
+}));
+
 import {
   createClientRelationshipAction,
   createContactAction,
   deleteContactAction,
+  refreshCompanyRegistryAction,
   updateContactAction,
 } from './actions';
 
@@ -209,6 +233,9 @@ beforeEach(() => {
   requireRelationshipHolderMock.mockResolvedValue({ session: CALLER_SESSION, role: 'partner' });
   writeAuditLogMock.mockReset();
   writeAuditLogMock.mockResolvedValue({ id: 'audit-1' });
+  syncCompanyRegistryMock.mockReset();
+  syncCompanyRegistryMock.mockResolvedValue({ ok: true });
+  revalidatePathMock.mockReset();
 });
 
 afterEach(() => vi.clearAllMocks());
@@ -413,5 +440,197 @@ describe('deleteContactAction', () => {
     const whereCalls = mockState.calls.filter((c) => c.kind === 'where');
     const lastWhere = whereCalls[whereCalls.length - 1];
     expect(sqlReferencesColumn(lastWhere.payload, 'owner_id')).toBe(true);
+  });
+});
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  Phase 34 Plan 07 — the D-09 registry hook                                  */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+const NEW_COMPANY = { id: 'company-r', name: 'X', siren: '123456789', registryStatus: 'pending' };
+const NEW_RELATIONSHIP = { id: 'rel-r', companyId: 'company-r', ownerId: 'user-1' };
+
+describe('createClientRelationshipAction — the D-09 registry hook', () => {
+  it('D-09: a registry failure NEVER blocks client creation — the action still resolves with a relationshipId', async () => {
+    // syncCompanyRegistry cannot throw (pinned in registry-sync.test.ts); a
+    // lookup outage reaches this action as a RESOLVED non-ok result.
+    syncCompanyRegistryMock.mockResolvedValue({ ok: false, reason: 'unavailable' });
+    mockState.resultQueue = [[], [NEW_COMPANY], [NEW_RELATIONSHIP]];
+
+    const result = await createClientRelationshipAction({ name: 'X', siren: '123456789' });
+
+    // Identical to the success case — same shape, same id, no extra field.
+    expect(result).toEqual({ relationshipId: 'rel-r' });
+    expect(Object.keys(result)).toEqual(['relationshipId']);
+  });
+
+  it('D-09: a not_found registry answer is equally invisible to the caller', async () => {
+    syncCompanyRegistryMock.mockResolvedValue({ ok: false, reason: 'not_found' });
+    mockState.resultQueue = [[], [NEW_COMPANY], [NEW_RELATIONSHIP]];
+
+    await expect(createClientRelationshipAction({ name: 'X', siren: '123456789' })).resolves.toEqual({
+      relationshipId: 'rel-r',
+    });
+  });
+
+  it('runs the sync on the success path and leaves the returned relationshipId untouched', async () => {
+    mockState.resultQueue = [[], [NEW_COMPANY], [NEW_RELATIONSHIP]];
+
+    const result = await createClientRelationshipAction({ name: 'X', siren: '123456789' });
+
+    expect(syncCompanyRegistryMock).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ relationshipId: 'rel-r' });
+  });
+
+  it('passes the caller\'s OWN relationship and session id — never an id taken from the caller\'s input', async () => {
+    mockState.resultQueue = [[], [NEW_COMPANY], [NEW_RELATIONSHIP]];
+
+    await createClientRelationshipAction({
+      name: 'X',
+      siren: '123456789',
+      ownerId: 'attacker-id',
+      actorId: 'attacker-id',
+      relationshipId: 'someone-elses-rel',
+    });
+
+    expect(syncCompanyRegistryMock).toHaveBeenCalledWith({
+      companyId: 'company-r',
+      siren: '123456789',
+      relationshipId: 'rel-r',
+      actorId: 'user-1',
+      ownerId: 'user-1',
+    });
+  });
+
+  it('skips the sync when the resolved company already reads registry_status = synced', async () => {
+    // Creating a SECOND relationship on an already-synced shared company must
+    // not re-hit the registry API.
+    const syncedCompany = { id: 'company-s', name: 'Shared', siren: '999999999', registryStatus: 'synced' };
+    mockState.resultQueue = [[syncedCompany], [{ id: 'rel-s', companyId: 'company-s', ownerId: 'user-1' }]];
+
+    const result = await createClientRelationshipAction({ name: 'Shared', siren: '999999999' });
+
+    expect(result).toEqual({ relationshipId: 'rel-s' });
+    expect(syncCompanyRegistryMock).not.toHaveBeenCalled();
+  });
+
+  it.each(['pending', 'not_found', 'error'])(
+    'runs the sync for a company whose status is %s',
+    async (registryStatus) => {
+      const company = { id: 'company-x', name: 'Shared', siren: '999999999', registryStatus };
+      mockState.resultQueue = [[company], [{ id: 'rel-x', companyId: 'company-x', ownerId: 'user-1' }]];
+
+      await createClientRelationshipAction({ name: 'Shared', siren: '999999999' });
+
+      expect(syncCompanyRegistryMock).toHaveBeenCalledTimes(1);
+      expect(syncCompanyRegistryMock.mock.calls[0][0]).toMatchObject({ companyId: 'company-x' });
+    },
+  );
+
+  it('adds no statement of its own — the sync reads the status off the company row the action already resolved', async () => {
+    mockState.resultQueue = [[], [NEW_COMPANY], [NEW_RELATIONSHIP]];
+
+    await createClientRelationshipAction({ name: 'X', siren: '123456789' });
+
+    // Three terminals: the by-SIREN miss, the company insert, the relationship
+    // insert. A fourth would be a narrow re-read of `companies` that the
+    // widened projections make unnecessary.
+    expect(mockState.calls.filter((c) => c.kind === 'returning' || c.kind === 'limit')).toHaveLength(3);
+  });
+});
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  Phase 34 Plan 07 — refreshCompanyRegistryAction                            */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+const REL_ID = '00000000-0000-4000-8000-000000000001';
+
+describe('refreshCompanyRegistryAction', () => {
+  it('calls requireRelationshipHolder() as its FIRST await — nothing touches the DB before the gate', async () => {
+    class NextNotFoundError extends Error {}
+    requireRelationshipHolderMock.mockRejectedValueOnce(new NextNotFoundError('NEXT_NOT_FOUND'));
+
+    await expect(refreshCompanyRegistryAction({ relationshipId: REL_ID })).rejects.toThrow('NEXT_NOT_FOUND');
+    expect(mockState.calls).toHaveLength(0);
+  });
+
+  it('resolves the company through an owner-scoped join carrying BOTH the relationship id and owner_id', async () => {
+    mockState.resultQueue = [[{ companyId: 'company-1', siren: '123456789' }]];
+
+    await refreshCompanyRegistryAction({ relationshipId: REL_ID });
+
+    expect(mockState.calls.some((c) => c.kind === 'innerJoin')).toBe(true);
+    const whereCall = mockState.calls.find((c) => c.kind === 'where');
+    expect(sqlReferencesColumn(whereCall!.payload, 'id')).toBe(true);
+    expect(sqlReferencesColumn(whereCall!.payload, 'owner_id')).toBe(true);
+  });
+
+  it('throws the bounded key for a relationship the caller does not own — not-owned is NOT a recoverable outcome', async () => {
+    mockState.resultQueue = [[]]; // zero rows: not owned, or not found — indistinguishable
+
+    await expect(refreshCompanyRegistryAction({ relationshipId: REL_ID })).rejects.toThrow('clients.toast.error');
+    expect(syncCompanyRegistryMock).not.toHaveBeenCalled();
+  });
+
+  it('RETURNS no_siren when the company has no SIREN — a recoverable outcome the dialog can act on (D-24)', async () => {
+    mockState.resultQueue = [[{ companyId: 'company-1', siren: null }]];
+
+    const result = await refreshCompanyRegistryAction({ relationshipId: REL_ID });
+
+    expect(result).toEqual({ ok: false, reason: 'no_siren' });
+    expect(syncCompanyRegistryMock).not.toHaveBeenCalled();
+  });
+
+  it('passes the caller\'s session id as both actorId and ownerId, and its own relationship id', async () => {
+    mockState.resultQueue = [[{ companyId: 'company-1', siren: '123456789' }]];
+
+    await refreshCompanyRegistryAction({ relationshipId: REL_ID });
+
+    expect(syncCompanyRegistryMock).toHaveBeenCalledWith({
+      companyId: 'company-1',
+      siren: '123456789',
+      relationshipId: REL_ID,
+      actorId: 'user-1',
+      ownerId: 'user-1',
+    });
+  });
+
+  it.each([
+    [{ ok: true }, { ok: true }],
+    [{ ok: false, reason: 'not_found' }, { ok: false, reason: 'not_found' }],
+    [{ ok: false, reason: 'unavailable' }, { ok: false, reason: 'unavailable' }],
+  ])('returns the sync outcome %j unchanged', async (syncResult, expected) => {
+    syncCompanyRegistryMock.mockResolvedValue(syncResult);
+    mockState.resultQueue = [[{ companyId: 'company-1', siren: '123456789' }]];
+
+    await expect(refreshCompanyRegistryAction({ relationshipId: REL_ID })).resolves.toEqual(expected);
+  });
+
+  it('returns a result carrying no company id, no company name and no other partner\'s data', async () => {
+    syncCompanyRegistryMock.mockResolvedValue({ ok: false, reason: 'not_found' });
+    mockState.resultQueue = [[{ companyId: 'company-1', siren: '123456789' }]];
+
+    const failure = await refreshCompanyRegistryAction({ relationshipId: REL_ID });
+    expect(Object.keys(failure).sort()).toEqual(['ok', 'reason']);
+
+    syncCompanyRegistryMock.mockResolvedValue({ ok: true });
+    mockState.resultQueue = [[{ companyId: 'company-1', siren: '123456789' }]];
+    const success = await refreshCompanyRegistryAction({ relationshipId: REL_ID });
+    expect(Object.keys(success)).toEqual(['ok']);
+  });
+
+  it('revalidates the clients layout after a sync so the refreshed identity renders', async () => {
+    mockState.resultQueue = [[{ companyId: 'company-1', siren: '123456789' }]];
+
+    await refreshCompanyRegistryAction({ relationshipId: REL_ID });
+
+    expect(revalidatePathMock).toHaveBeenCalledWith('/clients', 'layout');
+  });
+
+  it('collapses a malformed input into the bounded key without touching the DB', async () => {
+    await expect(refreshCompanyRegistryAction({ relationshipId: 'not-a-uuid' })).rejects.toThrow(
+      'clients.toast.error',
+    );
+    expect(mockState.calls).toHaveLength(0);
   });
 });
