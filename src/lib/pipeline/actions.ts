@@ -36,6 +36,19 @@
  * stage as a consequence of a proposal outcome, and the two outcome actions
  * never import or reference the stage column at all. `advanceRelationshipStageAction`
  * is the ONLY write path for the stage column in this codebase.
+ *
+ * Phase 34 Plan 08 — ACTV-02 timeline events. Every action here appends its
+ * own `relationship_events` row through `insertRelationshipEventForOwner`,
+ * because D-15 forbids a database trigger: a trigger cannot see the session,
+ * so an event it wrote would carry no actor and ACTV-02 requires attribution.
+ * `actorId` is therefore ALWAYS `session.user.id` here — never null, never
+ * defaulted. Each of those writes ALSO inverts this module's "zero rows is the
+ * only failure signal" rule, deliberately: the event is written after the row
+ * write it narrates has already committed (there are no transactions), so a
+ * null or thrown result is logged and swallowed. Failing a stage change or a
+ * recorded outcome to preserve the completeness of its narration would be
+ * strictly worse than a gap in the timeline. Read `if (!event)` without a
+ * `throw` as the contract, not as a missing branch.
  */
 
 import { revalidatePath } from 'next/cache';
@@ -43,6 +56,7 @@ import { and, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { requireRelationshipHolder } from '@/lib/auth/require';
 import { db, schema } from '@/lib/db';
 import { writeAuditLog } from '@/lib/db/queries/audit-log';
+import { insertRelationshipEventForOwner } from '@/lib/db/queries';
 import type { MarkWonResult } from './constants';
 import { advanceStageSchema, markLostSchema, markWonSchema } from './schemas';
 
@@ -60,17 +74,43 @@ const BOUNDED_ERROR = 'pipeline.toast.error';
  * constraint on `client_relationships` admits them, but no code path in this
  * module can ever produce them (PIPE-02).
  *
- * The current stage is intentionally NOT read back for the audit payload —
- * that would require an authorization-shaped pre-SELECT this module
- * otherwise never issues. The audit payload records the destination value
- * only; the origin value is recoverable from the previous audit row, which
- * is what Phase 34's timeline will read.
+ * D-21 / 33-REVIEW WR-16 — the audit payload carries BOTH stages. This used
+ * to record the destination only, on the theory that the origin was
+ * "recoverable from the previous audit row, which is what Phase 34's timeline
+ * will read". Building that timeline is what disproved it: walking `audit_log`
+ * backwards is a join across a table carrying no relationship index, it breaks
+ * the moment a row is purged, and it yields nothing at all for the FIRST stage
+ * change a relationship ever has. `audit-log.ts` has documented "the from/to
+ * stage strings" since Phase 33, so the gap is closed by writing the value
+ * rather than by amending the promise.
+ *
+ * The SELECT that supplies it is A DATA READ FOR THE AUDIT PAYLOAD, NOT THE
+ * AUTHORIZATION STEP. The UPDATE below still carries `id = relationshipId AND
+ * owner_id = session.user.id` in its own WHERE, a zero-row result is still the
+ * only failure signal, and deleting the read entirely would leave this action
+ * exactly as safe. It must never be collapsed into a check-then-write: making
+ * it the gate would reopen the TOCTOU window `createContactAction`'s comment
+ * forbids.
  */
 export async function advanceRelationshipStageAction(raw: unknown): Promise<void> {
   const { session } = await requireRelationshipHolder(); // FIRST — PITFALLS §7.3
   try {
     const input = advanceStageSchema.parse(raw);
     const dbi = db();
+
+    // D-21: a DATA READ FOR THE AUDIT PAYLOAD, NOT THE AUTHORIZATION STEP —
+    // see the doc comment above. The action deliberately does NOT branch on
+    // whether this returned a row: the UPDATE below is the gate, and it throws
+    // the bounded key a moment later for the same non-owned relationship.
+    const previous = await dbi
+      .select({ stage: schema.clientRelationships.stage })
+      .from(schema.clientRelationships)
+      .where(and(
+        eq(schema.clientRelationships.id, input.relationshipId),
+        eq(schema.clientRelationships.ownerId, session.user.id),
+      ))
+      .limit(1);
+    const fromStage = previous[0]?.stage ?? null;
 
     // Ownership re-proved inside the UPDATE's own WHERE — never a separate
     // SELECT (T-30-05-05). Zero rows returned is the only failure signal,
@@ -93,10 +133,32 @@ export async function advanceRelationshipStageAction(raw: unknown): Promise<void
       action: 'relationship.stage_change',
       targetType: 'client_relationship',
       targetId: input.relationshipId,
-      payload: { toStage: input.toStage },
+      payload: { fromStage, toStage: input.toStage },
     });
 
+    // ACTV-02: written by the action that caused the change, never by a
+    // trigger — a trigger cannot see the session and ACTV-02 requires an actor
+    // (D-15). Its own try/catch, and a null result is only logged: the stage
+    // has ALREADY moved, so a missing timeline entry is a narration gap and
+    // must not be turned into a failed move (see the module header).
+    try {
+      const event = await insertRelationshipEventForOwner({
+        relationshipId: input.relationshipId,
+        ownerId: session.user.id,
+        kind: 'stage_changed',
+        actorId: session.user.id,
+        payload: { fromStage, toStage: input.toStage },
+      });
+      if (!event) {
+        console.error('[advanceRelationshipStageAction] stage_changed event not written');
+      }
+    } catch (eventError) {
+      console.error('[advanceRelationshipStageAction] stage_changed event failed:', eventError);
+    }
+
     revalidatePath('/pipeline');
+    // The client page's Activité tab renders the event written just above.
+    revalidatePath('/clients', 'layout');
   } catch (e) {
     if (e instanceof Error && e.message === BOUNDED_ERROR) {
       throw e; // already the bounded key — don't double-log or re-wrap
@@ -150,6 +212,37 @@ export async function markProposalLostAction(raw: unknown): Promise<void> {
       targetId: input.proposalId,
       payload: { outcomeDate: input.date.toISOString() },
     });
+
+    // ACTV-02 (D-15). The relationship id comes from the UPDATE's own
+    // `.returning()` — the owner-scoped write this action already performed —
+    // so no extra read, and above all no new authorization read, is issued. A
+    // proposal created outside the CRM flow carries no relationship and has
+    // nothing to narrate onto. Null/throw is logged only: the outcome is
+    // already recorded (see the module header).
+    const lostRelationshipId = updated[0].clientRelationshipId;
+    if (lostRelationshipId) {
+      try {
+        const event = await insertRelationshipEventForOwner({
+          relationshipId: lostRelationshipId,
+          ownerId: session.user.id,
+          kind: 'outcome_set',
+          actorId: session.user.id,
+          // Ids and the caller-submitted date only. `reason` is partner free
+          // text that does not belong in a payload beside ids, and no amount,
+          // commission or rate value may ever enter one (D-26 / ADMIN-09).
+          payload: {
+            proposalId: input.proposalId,
+            outcome: 'lost',
+            outcomeDate: input.date.toISOString(),
+          },
+        });
+        if (!event) {
+          console.error('[markProposalLostAction] outcome_set event not written');
+        }
+      } catch (eventError) {
+        console.error('[markProposalLostAction] outcome_set event failed:', eventError);
+      }
+    }
 
     // No single client-detail path is derivable without a read — revalidate
     // the whole /clients subtree (list + every detail page) plus the board.
@@ -299,6 +392,32 @@ export async function markProposalWonAction(raw: unknown): Promise<MarkWonResult
       targetId: input.proposalId,
       payload: { outcomeDate: input.date.toISOString() },
     });
+
+    // ACTV-02 (D-15), same shape as the lost path: the relationship id comes
+    // from the owner-scoped UPDATE's `.returning()`, never from a new read.
+    // Unreachable on the `siren_required` branch, which returned above — a
+    // refused win narrates nothing.
+    const wonRelationshipId = updated[0].clientRelationshipId;
+    if (wonRelationshipId) {
+      try {
+        const event = await insertRelationshipEventForOwner({
+          relationshipId: wonRelationshipId,
+          ownerId: session.user.id,
+          kind: 'outcome_set',
+          actorId: session.user.id,
+          payload: {
+            proposalId: input.proposalId,
+            outcome: 'won',
+            outcomeDate: input.date.toISOString(),
+          },
+        });
+        if (!event) {
+          console.error('[markProposalWonAction] outcome_set event not written');
+        }
+      } catch (eventError) {
+        console.error('[markProposalWonAction] outcome_set event failed:', eventError);
+      }
+    }
 
     revalidatePath('/clients', 'layout');
     revalidatePath('/pipeline');
