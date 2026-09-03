@@ -113,6 +113,7 @@ vi.mock('@/lib/db/queries', () => ({
   insertRelationshipEventForOwner: insertRelationshipEventForOwnerMock,
 }));
 
+import { schema } from '@/lib/db';
 import { syncCompanyRegistry } from './registry-sync';
 
 const IDENTITY = {
@@ -153,6 +154,26 @@ const ARGS = {
   actorId: 'user-1',
   ownerId: 'user-1',
 };
+
+/** Walks a Drizzle condition tree looking for a column named `columnName`.
+ * Skips the `.table` back-reference, which enumerates every sibling column
+ * (see actions.test.ts / 30-04-SUMMARY.md Issues Encountered #1). */
+function sqlReferencesColumn(node: unknown, columnName: string, seen = new Set<unknown>()): boolean {
+  if (node === null || typeof node !== 'object') return false;
+  if (seen.has(node)) return false;
+  seen.add(node);
+  const obj = node as Record<string, unknown>;
+  if (obj.name === columnName && 'table' in obj) return true;
+  for (const [key, value] of Object.entries(obj)) {
+    if (key === 'table') continue;
+    if (Array.isArray(value)) {
+      if (value.some((v) => sqlReferencesColumn(v, columnName, seen))) return true;
+    } else if (value && typeof value === 'object') {
+      if (sqlReferencesColumn(value, columnName, seen)) return true;
+    }
+  }
+  return false;
+}
 
 function setPayload(): Record<string, unknown> {
   const call = mockState.calls.find((c) => c.kind === 'set');
@@ -206,8 +227,12 @@ describe('syncCompanyRegistry — the success branch', () => {
 
     const updateCall = mockState.calls.find((c) => c.kind === 'update');
     expect(updateCall).toBeDefined();
-    const table = updateCall!.payload as { [k: symbol]: unknown };
-    expect(String((table as unknown as { _: { name: string } })._?.name ?? '')).toBe('companies');
+    // The mocked `@/lib/db` re-exports the REAL `@/db/schema`, so this is an
+    // identity check against the actual table object, not a name string.
+    expect(updateCall!.payload).toBe(schema.companies);
+
+    const whereCall = mockState.calls.find((c) => c.kind === 'where');
+    expect(sqlReferencesColumn(whereCall!.payload, 'id')).toBe(true);
   });
 
   it('with a null relationshipId still writes the columns and simply skips the event (the creation path)', async () => {
