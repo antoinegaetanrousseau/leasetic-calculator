@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { finalizeWizard } from '@/lib/api/proposals/finalize-wizard';
 import { requireUser } from '@/lib/auth/require';
+import { getProposalById, insertRelationshipEventForOwner } from '@/lib/db/queries';
 import { getCurrentLang } from '@/lib/i18n';
 
 /**
@@ -35,6 +36,18 @@ import { getCurrentLang } from '@/lib/i18n';
  *   - T-R Repudiation: Phase 12's finalizeDraft writes one audit_log entry
  *     `action='proposal.create'` inside the same transaction as the UPDATE.
  *     Append-only audit_log table provides non-repudiation.
+ *   - T-I / T-E ACTV-02 timeline hook (Phase 34 plan 34-08): the
+ *     `proposal_finalized` event carries the proposal id and its LC reference
+ *     only — never an amount, a rate or the partner-only-visible field
+ *     (ADMIN-09 / D-26). It is written by this handler rather than by a
+ *     database trigger because a trigger cannot see the session and ACTV-02
+ *     requires an actor (D-15). This is a `requireUser()` surface serving every
+ *     role, so the write is made safe by passing `ownerId: userId` into
+ *     `insertRelationshipEventForOwner`, whose `INSERT … SELECT` inserts
+ *     nothing for a caller who does not own the relationship. The hook lives in
+ *     its own try/catch AFTER finalizeWizard has resolved, so it cannot reach
+ *     the outer catch and cannot change the response, the status code or the
+ *     bounded error surface above.
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -88,6 +101,32 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await finalizeWizard({ userId, draftId, language, partnerType });
+
+    // ACTV-02 (D-15) — narrate the finalize onto the owner's timeline. Its OWN
+    // try/catch, deliberately: by this point the PDF is rendered, uploaded and
+    // the row is finalized, so a missing timeline entry is a narration gap and
+    // must never turn a successful finalize into a 500. Nothing in here can
+    // reach the outer catch, and the 200 below is unconditional.
+    try {
+      const proposal = await getProposalById(result.id);
+      // A proposal created outside the CRM flow carries no relationship and has
+      // nothing to narrate onto. The `userId` equality is defence in depth in
+      // the shape app/api/proposals/[id]/pdf/route.ts uses on the same helper —
+      // it is NOT the gate: ownership is proved inside the helper's
+      // `INSERT … SELECT` by the `ownerId` argument below.
+      if (proposal && proposal.userId === userId && proposal.clientRelationshipId) {
+        await insertRelationshipEventForOwner({
+          relationshipId: proposal.clientRelationshipId,
+          ownerId: userId,
+          kind: 'proposal_finalized',
+          actorId: userId,
+          payload: { proposalId: result.id, lcRef: proposal.lcRef },
+        });
+      }
+    } catch (e) {
+      console.error('[finalize] proposal_finalized event not written:', e);
+    }
+
     return NextResponse.json({ id: result.id }, { status: 200 });
   } catch (err) {
     const message = err instanceof Error ? err.message : '';
