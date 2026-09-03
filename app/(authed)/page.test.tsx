@@ -19,6 +19,8 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 vi.mock('server-only', () => ({}));
 
@@ -29,6 +31,7 @@ const {
   countTotalMock,
   countDraftsMock,
   buildListResponseMock,
+  listRelanceMock,
   callOrder,
 } = vi.hoisted(() => {
   const order: string[] = [];
@@ -39,6 +42,7 @@ const {
     countTotalMock: vi.fn(),
     countDraftsMock: vi.fn(),
     buildListResponseMock: vi.fn(),
+    listRelanceMock: vi.fn(),
     callOrder: order,
   };
 });
@@ -89,6 +93,17 @@ vi.mock('@/lib/api/proposals/list', () => ({
   },
 }));
 
+// Phase 34 Plan 09 — the follow-up list comes from the query BARREL, never
+// from the sibling module (`src/lib/db/queries/index.ts` is the only entry
+// point consumers use). Mocking the barrel also keeps `server-only` and the
+// Neon driver out of this suite.
+vi.mock('@/lib/db/queries', () => ({
+  listRelationshipsNeedingFollowUp: (...args: unknown[]) => {
+    callOrder.push('listRelationshipsNeedingFollowUp');
+    return listRelanceMock(...args);
+  },
+}));
+
 // Import AFTER all mocks are in place.
 import HomePage from './page';
 
@@ -119,6 +134,7 @@ beforeEach(() => {
   countTotalMock.mockResolvedValue(0);
   countDraftsMock.mockResolvedValue(0);
   buildListResponseMock.mockResolvedValue({ rows: [], hasMore: false, nextCursor: null });
+  listRelanceMock.mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -228,5 +244,136 @@ describe('Partner Home / — PHOME-01/02/03', () => {
     expect(monthIdx).toBeGreaterThan(userIdx);
     expect(totalIdx).toBeGreaterThan(userIdx);
     expect(draftsIdx).toBeGreaterThan(userIdx);
+  });
+});
+
+
+/**
+ * Phase 34 Plan 09 Task 2 — the "à relancer" card on the home page
+ * (ACTV-04/05, CRM-02, D-20).
+ *
+ * The threat these tests exist for is not a rendering bug: it is an owner id
+ * arriving from anywhere other than the session, and a role branch creating a
+ * second surface to secure. Both are asserted directly.
+ */
+const DAY_MS = 86_400_000;
+
+function makeFollowUp(over: {
+  relationshipId: string;
+  companyName?: string;
+  bucket?: number;
+  nextActionAt?: Date | null;
+  updatedAt?: Date;
+}) {
+  return {
+    relationshipId: over.relationshipId,
+    companyName: over.companyName ?? 'Alpha SAS',
+    siren: '123456789',
+    stage: 'contact',
+    nextActionAt: over.nextActionAt ?? null,
+    nextActionNote: null,
+    updatedAt: over.updatedAt ?? new Date(Date.now() - 40 * DAY_MS),
+    bucket: over.bucket ?? 1,
+  };
+}
+
+describe('Partner Home / — à relancer card (ACTV-04/05, D-20)', () => {
+  it('Test 1: listRelationshipsNeedingFollowUp is called with the SESSION user id and a limit of 5', async () => {
+    await HomePage();
+
+    expect(listRelanceMock).toHaveBeenCalledTimes(1);
+    const [ownerId, limit] = listRelanceMock.mock.calls[0];
+    // Exactly the mocked session id — never a search param, header or any
+    // other request-supplied source (T-34-09-02).
+    expect(ownerId).toBe(USER_ID);
+    expect(limit).toBe(5);
+  });
+
+  it('Test 2: the follow-up query joins the SAME Promise.all as the four existing queries', async () => {
+    // If the page awaited the follow-up list separately, its call would land
+    // after buildListResponse had already settled. Resolving buildListResponse
+    // on a later macrotask makes that ordering observable.
+    buildListResponseMock.mockImplementation(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+      callOrder.push('buildListResponse:resolved');
+      return { rows: [], hasMore: false, nextCursor: null };
+    });
+
+    await HomePage();
+
+    const relanceIdx = callOrder.indexOf('listRelationshipsNeedingFollowUp');
+    const resolvedIdx = callOrder.indexOf('buildListResponse:resolved');
+    expect(relanceIdx).toBeGreaterThanOrEqual(0);
+    expect(resolvedIdx).toBeGreaterThan(relanceIdx);
+    expect(listRelanceMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test 3: requireUser is still the first await, before the follow-up query', async () => {
+    await HomePage();
+    const userIdx = callOrder.indexOf('requireUser');
+    const relanceIdx = callOrder.indexOf('listRelationshipsNeedingFollowUp');
+    expect(userIdx).toBe(0);
+    expect(relanceIdx).toBeGreaterThan(userIdx);
+  });
+
+  it('Test 4: an empty follow-up list renders no card at all — not an empty shell', async () => {
+    listRelanceMock.mockResolvedValue([]);
+    const node = await HomePage();
+    const { container } = render(node);
+
+    expect(container.querySelectorAll('[data-testid="relance-row"]').length).toBe(0);
+    // dashboard.relance.title FR = 'À relancer'
+    expect(container.textContent).not.toContain('À relancer');
+    // ...and not the reserved empty-state copy either.
+    expect(container.textContent).not.toContain('Aucune relance prévue.');
+  });
+
+  it('Test 5: with rows, the card renders ABOVE the recent-proposals card', async () => {
+    listRelanceMock.mockResolvedValue([
+      makeFollowUp({ relationshipId: 'rel-1', companyName: 'Alpha SAS' }),
+      makeFollowUp({ relationshipId: 'rel-2', companyName: 'Beta SARL' }),
+    ]);
+    buildListResponseMock.mockResolvedValue({
+      rows: [1, 2].map(makeRow),
+      hasMore: false,
+      nextCursor: null,
+    });
+
+    const node = await HomePage();
+    const { container } = render(node);
+
+    const relanceRows = Array.from(container.querySelectorAll('[data-testid="relance-row"]'));
+    expect(relanceRows.length).toBe(2);
+    expect(relanceRows[0].getAttribute('href')).toBe('/clients/rel-1');
+    expect(container.textContent).toContain('À relancer');
+
+    const firstProposalRow = container.querySelector('a[href^="/proposals/prop-"]');
+    expect(firstProposalRow).not.toBeNull();
+    // DOCUMENT_POSITION_FOLLOWING (4) — the proposals card comes after.
+    expect(
+      relanceRows[0].compareDocumentPosition(firstProposalRow!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('Test 6: an admin (owning no relationships) gets the page with no card and no role branch', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'user-admin', email: 'admin@example.com', displayName: 'Root' } },
+    });
+    listRelanceMock.mockResolvedValue([]);
+
+    const node = await HomePage();
+    const { container } = render(node);
+    expect(container.querySelectorAll('[data-testid="relance-row"]').length).toBe(0);
+    expect(listRelanceMock).toHaveBeenCalledWith('user-admin', 5);
+
+    // The admin case must fall out of owning nothing, NOT out of a branch:
+    // a branch would be a second surface to secure (T-34-09-03).
+    const src = readFileSync(
+      fileURLToPath(new URL('./page.tsx', import.meta.url)),
+      'utf8',
+    );
+    expect(src).not.toMatch(/requireAdmin/);
+    expect(src).not.toMatch(/role\s*[!=]==/);
   });
 });
