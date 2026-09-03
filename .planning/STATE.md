@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-03T18:19:28.539Z"
+last_updated: "2026-09-03T18:53:58.926Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 17
   total_plans: 92
-  completed_plans: 84
+  completed_plans: 90
   percent: 85
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 34 (fiche-client) — EXECUTING
-Plan: 3 of 13
+Plan: 4 of 13
 Status: Ready to execute
 Last activity: 2026-09-03
 
@@ -421,6 +421,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 34 P01 | ~20min | 3 tasks | 10 files |
 | Phase 34 P02 | 20 | 3 tasks | 9 files |
 | Phase 34 P05 | 35min | 3 tasks | 7 files |
+| Phase 34 P10 | 22min | 3 tasks | 8 files |
 
 ## Decisions
 
@@ -545,6 +546,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 34]: The FICHE-04 lead source is a NEW column `lead_source`, not `client_relationships.source` — that column is the Phase 31 D-08 provenance marker whose vocabulary drives the bulk-import undo path; both provenance CHECKs are untouched. Also: `relationship_events.actor_id` is text (Better Auth `users.id`), NULL means the system, and no trigger writes events (D-15 — a trigger cannot see the session, so ACTV-02's attribution would be lost).
 - [Phase ?]: 34-05: the à relancer rule is fixed in listRelationshipsNeedingFollowUp — due (next_action_at <= now()) or stale (next_action_at IS NULL AND updated_at < now() - 30 days), never a FUTURE next action; ordered bucket ASC then COALESCE(next_action_at, updated_at) ASC in SQL. 34-11 and 34-12 read it rather than re-deriving it.
 - [Phase ?]: 34-05: D-22 (33-REVIEW WR-06) closed — eq(proposals.userId, ownerId) lives inside listPipelineBoard's proposals leftJoin and(...), never the WHERE, where it would degrade the LEFT JOIN to an INNER JOIN and drop every zero-proposal relationship off the board.
+- [Phase ?]: 34-10: a recoverable server-action outcome is consumed as a RETURNED discriminated result; a SIREN UNIQUE collision is deliberately NOT one and collapses into the bounded toast
+- [Phase ?]: 34-10: D-02 is enforced by two independent guards — a registry-column grep across all four dialogs and an input-count test on the shared-tier form
 
 ### Blockers
 
