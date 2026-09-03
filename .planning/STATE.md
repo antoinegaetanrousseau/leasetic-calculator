@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-03T18:53:58.926Z"
+last_updated: "2026-09-03T19:22:01.329Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 17
   total_plans: 92
-  completed_plans: 90
+  completed_plans: 91
   percent: 85
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 34 (fiche-client) — EXECUTING
-Plan: 11 of 13 (34-12 in flight)
+Plan: 12 of 13 (34-12 complete)
 Status: Ready to execute
 Last activity: 2026-09-03
 
@@ -422,6 +422,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 34 P02 | 20 | 3 tasks | 9 files |
 | Phase 34 P05 | 35min | 3 tasks | 7 files |
 | Phase 34 P10 | 22min | 3 tasks | 8 files |
+| Phase 34 P12 | 21min | 3 tasks | 10 files |
 
 ## Decisions
 
@@ -548,6 +549,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: 34-05: D-22 (33-REVIEW WR-06) closed — eq(proposals.userId, ownerId) lives inside listPipelineBoard's proposals leftJoin and(...), never the WHERE, where it would degrade the LEFT JOIN to an INNER JOIN and drop every zero-proposal relationship off the board.
 - [Phase ?]: 34-10: a recoverable server-action outcome is consumed as a RETURNED discriminated result; a SIREN UNIQUE collision is deliberately NOT one and collapses into the bounded toast
 - [Phase ?]: 34-10: D-02 is enforced by two independent guards — a registry-column grep across all four dialogs and an input-count test on the shared-tier form
+- [Phase ?]: 34-12: /clients/[id] keeps max-w-[720px] exactly as it was — considered during the tab rebuild and deliberately not changed (UIC-09).
 
 ### Blockers
 
