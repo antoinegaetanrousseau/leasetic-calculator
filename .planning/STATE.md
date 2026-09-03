@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-03T00:35:35.406Z"
+last_updated: "2026-09-03T00:49:36.727Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 16
   total_plans: 79
-  completed_plans: 73
+  completed_plans: 74
   percent: 80
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 33 (pipeline) — EXECUTING
-Plan: 4 of 9
+Plan: 5 of 9
 Status: Ready to execute
 Last activity: 2026-09-03
 
@@ -415,6 +415,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 33 P01 | ~25min | 3 tasks | 8 files |
 | Phase 33 P03 | ~20min | 2 tasks | 8 files |
 | Phase 33-pipeline P04 | ~25min | 3 tasks | 5 files |
+| Phase 33 P05 | ~30min | 3 tasks | 11 files |
 
 ## Decisions
 
@@ -527,3 +528,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 33]: validityDays is projected out of params_snapshot via projectValidityDays (select-aliased 'snapshot', never returned as paramsSnapshot) mirroring computedClientMonthly's ADMIN-09 pattern; admin's companies.ts keeps validityDays null rather than reopening its own stricter no-params_snapshot guard.
 - [Phase 33-04]: Switched .returning({ id: ... }) to bare .returning() across all four UPDATE statements in pipeline/actions.ts — drizzle-orm@0.45.2/neon-http rejected the column-scoped returning() overload (TS2554); no existing write module in this codebase uses that form
 - [Phase 33-04]: SIREN_REQUIRED sentinel is a narrow, one-off exception to bounded-error discipline, scoped to markProposalWonAction only — Only reachable after an owner-scoped read already matched the caller's own proposal; carries no company data; advanceRelationshipStageAction and markProposalLostAction keep the single bounded key
+- [Phase 33-05]: AppSidebar.test.tsx's Agent-view non-admin test count fixed alongside the four plan-named assertions (Rule 1 auto-fix — the new Pipeline entry breaks it too)
+- [Phase 33-05]: Pipeline nav entry shares clients' isAdmin conditional (one ternary, two entries) — final partner order: Accueil, Nouvelle proposition, Propositions, Clients, Pipeline, Aide
