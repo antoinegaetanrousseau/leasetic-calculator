@@ -634,7 +634,7 @@ and can correct any of it without leaving the page.
   4. Opening a relationship shows a single chronological timeline mixing manual notes and system events — no separate tabs for the two — and a stage change or a finalized proposal appends a timestamped, attributed event with no user action required.
   5. A partner adds a dated note and sets a next-action date on a relationship, then opens an "à relancer" list ordered by next-action date and staleness, scoped to relationships they own.
 
-**Plans:** 5/13 plans executed
+**Plans:** 9/13 plans executed
 
 Plans:
 - [x] 34-01-PLAN.md — wave 1 — data foundation: the three D-01 tiers, `relationship_events`, migration 0010, the full dictionary namespace
@@ -642,10 +642,10 @@ Plans:
 - [x] 34-03-PLAN.md — wave 1 — ReUI blocks `solution-crm-5` + `solution-users-2`, and a font/vendoring integrity gate
 - [x] 34-04-PLAN.md — wave 2 — apply migration 0010 to the Neon development branch (own wave, gated workflow only)
 - [x] 34-05-PLAN.md — wave 3 — read layer: timeline reads, the owner-scoped event insert, the à-relancer query, and D-22's board-join fix
-- [ ] 34-06-PLAN.md — wave 4 — private-tier actions: relation details, dated notes, next-action date
-- [ ] 34-07-PLAN.md — wave 4 — registry write path: the D-09 creation hook, the refresh action, and the audited shared-tier edit
-- [ ] 34-08-PLAN.md — wave 4 — system events: `stage_changed`, `outcome_set`, `proposal_finalized`, and D-21's `fromStage` fix
-- [ ] 34-09-PLAN.md — wave 4 — home "à relancer" card (ACTV-05)
+- [x] 34-06-PLAN.md — wave 4 — private-tier actions: relation details, dated notes, next-action date
+- [x] 34-07-PLAN.md — wave 4 — registry write path: the D-09 creation hook, the refresh action, and the audited shared-tier edit
+- [x] 34-08-PLAN.md — wave 4 — system events: `stage_changed`, `outcome_set`, `proposal_finalized`, and D-21's `fromStage` fix
+- [x] 34-09-PLAN.md — wave 4 — home "à relancer" card (ACTV-05)
 - [ ] 34-10-PLAN.md — wave 5 — the four section-edit surfaces: relation, next action, company, registry refresh
 - [ ] 34-11-PLAN.md — wave 5 — the unified activity timeline and the note composer
 - [ ] 34-12-PLAN.md — wave 6 — client page rebuild: header, four tabs, identity and relation panels
@@ -720,7 +720,7 @@ phase's own work touches):
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
 | 35. Sales Motivation | v1.7 | TBD | Not started | - |
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
-| 34. Activity & Follow-Up | v1.6 | 5/13 | In Progress|  |
+| 34. Activity & Follow-Up | v1.6 | 9/13 | In Progress|  |
 
 ---
 

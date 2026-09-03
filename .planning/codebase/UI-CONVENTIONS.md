@@ -404,6 +404,29 @@ icon-button pairs follow the same rule, not a looser one.
 
 ---
 
+## Plan-authoring note: grep-based acceptance criteria measure prose too
+
+An acceptance criterion of the shape `grep -c "someCall(" src/foo.ts` returns a
+number that counts the file's own doc comments. This phase hit it four separate
+times — a header explaining "this module never calls `writeAuditLog`" makes
+`grep -c "writeAuditLog"` return 1, and a comment warning against
+`--font-sans: var(--font-sans)` made a font-integrity test fail on a healthy
+file.
+
+Executors have each resolved it the same way, correctly: reword the prose to
+name the thing without its literal call syntax, keep the check as written, and
+record it. Two better options when authoring:
+
+- Strip comments before matching, the way
+  `tests/server-action-error-contracts.test.ts` does.
+- Anchor the pattern to code shape rather than the bare token — `^'use server';`
+  rather than `'use server'`, `grep -c "^import.*writeAuditLog"` rather than the
+  identifier alone.
+
+Never weaken the assertion to make a prose match go away: the point of these
+gates is that they fail loudly, and a criterion that has to be argued with on
+every run stops being read.
+
 ## Vendored ReUI modifications to re-apply after any re-import
 
 Vendored ReUI code (`src/components/reui/**`, `src/components/ui/**`,
