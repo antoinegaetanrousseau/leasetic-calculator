@@ -62,7 +62,7 @@ vi.mock('@/lib/i18n', async (importOriginal) => {
 });
 
 const { listPipelineBoardMock, getConversionRateForOwnerMock } = vi.hoisted(() => ({
-  listPipelineBoardMock: vi.fn(async () => ({
+  listPipelineBoardMock: vi.fn(async (_args: { ownerId: string }) => ({
     prospect: [
       {
         relationshipId: 'rel-1',
@@ -191,9 +191,9 @@ describe('pipeline access boundary (D-10 / CRM-02 / ROLE-02)', () => {
     roleRef.current = 'partner';
     await callPage();
 
-    const [args] = listPipelineBoardMock.mock.calls[0] as [{ ownerId: string }];
-    expect(args.ownerId).toBe(SESSION_BY_ROLE.partner.id);
-    expect(args.ownerId).not.toBe('admin-1');
-    expect(args.ownerId).not.toBe('sales-1');
+    const args = listPipelineBoardMock.mock.calls[0]?.[0];
+    expect(args?.ownerId).toBe(SESSION_BY_ROLE.partner.id);
+    expect(args?.ownerId).not.toBe('admin-1');
+    expect(args?.ownerId).not.toBe('sales-1');
   });
 });
