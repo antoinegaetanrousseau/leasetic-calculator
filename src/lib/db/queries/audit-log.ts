@@ -44,7 +44,15 @@ export type AuditAction =
   | 'company_pair.flag'
   | 'company.merge'
   | 'client_relationship.merge'
-  | 'company_pair.keep_separate';
+  | 'company_pair.keep_separate'
+  // ── Phase 33 — Pipeline (PIPE-01..05) ───────────────────────────────────
+  // Payloads carry ids, the from/to stage strings and the caller-submitted
+  // date/SIREN only — never commission or rate data (ADMIN-09). Phase 34's
+  // ACTV-02 reads the stage-change action below for the activity timeline.
+  | 'relationship.stage_change'
+  | 'proposal.outcome_won'
+  | 'proposal.outcome_lost'
+  | 'company.siren_add';
 
 export type AuditTargetType = 'proposal' | 'user' | 'global_params' | 'client_relationship' | 'contact' | 'company' | 'company_pair';
 
