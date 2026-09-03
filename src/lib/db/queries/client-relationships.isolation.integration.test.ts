@@ -44,6 +44,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import postgres from 'postgres';
 import { randomUUID } from 'node:crypto';
+import { PIPELINE_STAGES } from '@/lib/pipeline/stages';
 
 // The real query modules under test `import 'server-only'`, which throws
 // outside a Next.js server render — mock it as a no-op, same pattern used by
@@ -233,6 +234,300 @@ describe.skipIf(!shouldRun)(
       const ownerIds = result.map((r) => r.ownerId).sort();
       expect(ownerIds).toEqual([userAId, userBId].sort());
       expect(result.every((r) => r.relationshipId === relASharedId || r.relationshipId === relBSharedId)).toBe(true);
+    });
+  },
+);
+
+/**
+ * Phase 33 (33-08) — DB-level gate proofs plus the conversion-rate and board
+ * proofs, added per 33-CONTEXT.md's "extend it rather than writing a
+ * parallel one" instruction. Same file, same DATABASE_URL_TEST gate, same
+ * skip-by-default guard, same `server-only` mock and `__resetDbForTests()`
+ * call — but its OWN describe, its OWN runId-scoped fixtures, its OWN
+ * FK-safe afterAll. It does NOT share the Phase 30 block's beforeAll: that
+ * seed is asserted against by roughly a dozen existing tests above, and
+ * extending it with stages/outcomes/SIREN/five more proposals would put
+ * every one of those assertions at risk for no benefit (33-08-PLAN.md
+ * <decision_record>).
+ *
+ * This block deliberately never imports `src/lib/pipeline/actions.ts` — the
+ * `'use server'` directive and the auth gate fail outside a Next request
+ * scope. The application half of the SIREN gate is unit-tested (mocked db())
+ * in plan 33-04; this block proves the database half with no application
+ * code in the path at all (D-07's belt-and-braces design).
+ */
+describe.skipIf(!shouldRun)(
+  'pipeline — database-layer invariants (real Postgres, Phase 33)',
+  () => {
+    let sql: ReturnType<typeof postgres>;
+
+    const runId = Date.now();
+    const userAId = `pipe-iso-a-${runId}`;
+    const userBId = `pipe-iso-b-${runId}`;
+    // 9-digit SIREN derived from runId so concurrent runs never collide on
+    // the companies.siren unique index.
+    const sirenSeed = String(runId).padStart(9, '0').slice(-9);
+
+    let companyNoSirenId: string;
+    let companyWithSirenId: string;
+    let relANoSirenId: string;
+    let relAWithSirenId: string;
+    let relBNoSirenId: string;
+    let relDefaultStageId: string;
+    let proposalANoSirenId: string;
+    let proposalAWithSirenId: string;
+
+    // Same params_snapshot/computed shape the Phase 30 seed above uses.
+    const paramsSnapshot = JSON.stringify({
+      commissionPct: '5.0000',
+      maxAmount: '100000.00',
+      validityDays: 30,
+      coefficients: {
+        t1: { 36: '0.0300', 48: '0.0250', 60: '0.0200' },
+        t2: { 36: '0.0300', 48: '0.0250', 60: '0.0200' },
+        t3: { 36: '0.0300', 48: '0.0250', 60: '0.0200' },
+        t4: { 36: '0.0300', 48: '0.0250', 60: '0.0200' },
+      },
+      partnerType: 'Partenaire',
+      commissionApplied: true,
+    });
+    const computed = JSON.stringify({ loyerHT: 543.21 });
+
+    beforeAll(async () => {
+      sql = postgres(DATABASE_URL_TEST!, {
+        max: 1,
+        prepare: false,
+        onnotice: () => {},
+      });
+
+      __resetDbForTests();
+
+      await sql`
+        INSERT INTO users (id, email, role, partner_type)
+        VALUES
+          (${userAId}, ${`${userAId}@example.test`}, 'partner', 'Partenaire'),
+          (${userBId}, ${`${userBId}@example.test`}, 'partner', 'Partenaire')
+      `;
+
+      const companyNoSiren = await sql<Array<{ id: string }>>`
+        INSERT INTO companies (name) VALUES (${`Pipeline No-SIREN Co ${runId}`}) RETURNING id
+      `;
+      companyNoSirenId = companyNoSiren[0]!.id;
+
+      const companyWithSiren = await sql<Array<{ id: string }>>`
+        INSERT INTO companies (name, siren) VALUES (${`Pipeline SIREN Co ${runId}`}, ${sirenSeed}) RETURNING id
+      `;
+      companyWithSirenId = companyWithSiren[0]!.id;
+
+      const relANoSiren = await sql<Array<{ id: string }>>`
+        INSERT INTO client_relationships (company_id, owner_id) VALUES (${companyNoSirenId}, ${userAId}) RETURNING id
+      `;
+      relANoSirenId = relANoSiren[0]!.id;
+
+      const relAWithSiren = await sql<Array<{ id: string }>>`
+        INSERT INTO client_relationships (company_id, owner_id) VALUES (${companyWithSirenId}, ${userAId}) RETURNING id
+      `;
+      relAWithSirenId = relAWithSiren[0]!.id;
+
+      const relBNoSiren = await sql<Array<{ id: string }>>`
+        INSERT INTO client_relationships (company_id, owner_id) VALUES (${companyNoSirenId}, ${userBId}) RETURNING id
+      `;
+      relBNoSirenId = relBNoSiren[0]!.id;
+
+      const proposalANoSiren = await sql<Array<{ id: string }>>`
+        INSERT INTO proposals (
+          user_id, status, language, lc_ref, idempotency_key,
+          inputs, params_snapshot, computed, client_relationship_id
+        ) VALUES (
+          ${userAId}, 'active', 'fr', ${`LC-PIPE-ISO-${runId}-A1`}, ${randomUUID()},
+          '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, ${relANoSirenId}
+        ) RETURNING id
+      `;
+      proposalANoSirenId = proposalANoSiren[0]!.id;
+
+      const proposalAWithSiren = await sql<Array<{ id: string }>>`
+        INSERT INTO proposals (
+          user_id, status, language, lc_ref, idempotency_key,
+          inputs, params_snapshot, computed, client_relationship_id
+        ) VALUES (
+          ${userAId}, 'active', 'fr', ${`LC-PIPE-ISO-${runId}-A2`}, ${randomUUID()},
+          '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, ${relAWithSirenId}
+        ) RETURNING id
+      `;
+      proposalAWithSirenId = proposalAWithSiren[0]!.id;
+    });
+
+    afterAll(async () => {
+      if (!sql) return;
+      // FK-safe order: proposals -> client_relationships -> companies -> users.
+      const proposalIds = [proposalANoSirenId, proposalAWithSirenId].filter(Boolean);
+      if (proposalIds.length > 0) {
+        await sql`DELETE FROM proposals WHERE id = ANY(${proposalIds})`;
+      }
+      const relIds = [relANoSirenId, relAWithSirenId, relBNoSirenId, relDefaultStageId].filter(Boolean);
+      if (relIds.length > 0) {
+        await sql`DELETE FROM client_relationships WHERE id = ANY(${relIds})`;
+      }
+      const companyIds = [companyNoSirenId, companyWithSirenId].filter(Boolean);
+      if (companyIds.length > 0) {
+        await sql`DELETE FROM companies WHERE id = ANY(${companyIds})`;
+      }
+      await sql`DELETE FROM users WHERE id = ANY(${[userAId, userBId]})`;
+      await sql.end({ timeout: 5 });
+    });
+
+    // ── Task 1: the SIREN gate (PIPE-05 / D-07) ─────────────────────────────
+
+    it('PIPE-05: UPDATE outcome=won on a proposal whose company has no SIREN REJECTS', async () => {
+      await expect(
+        sql`UPDATE proposals SET outcome = 'won', outcome_date = now() WHERE id = ${proposalANoSirenId}`,
+      ).rejects.toThrow(/PIPE-05/);
+    });
+
+    it('PIPE-05: the same UPDATE against a proposal whose company HAS a SIREN succeeds — the gate is a gate, not a wall', async () => {
+      await sql`UPDATE proposals SET outcome = 'won', outcome_date = now() WHERE id = ${proposalAWithSirenId}`;
+      const row = await sql<Array<{ outcome: string; outcome_date: Date }>>`
+        SELECT outcome, outcome_date FROM proposals WHERE id = ${proposalAWithSirenId}
+      `;
+      expect(row[0]?.outcome).toBe('won');
+      expect(row[0]?.outcome_date).not.toBeNull();
+    });
+
+    it('D-08: outcome=lost never requires a SIREN — quoting/advancing is never blocked', async () => {
+      await sql`UPDATE proposals SET outcome = 'lost', outcome_date = now() WHERE id = ${proposalANoSirenId}`;
+      const row = await sql<Array<{ outcome: string }>>`
+        SELECT outcome FROM proposals WHERE id = ${proposalANoSirenId}
+      `;
+      expect(row[0]?.outcome).toBe('lost');
+    });
+
+    it('PIPE-05: INSERT with outcome=won on a no-SIREN relationship REJECTS (the _ins trigger)', async () => {
+      const idem = randomUUID();
+      await expect(
+        sql`
+          INSERT INTO proposals (
+            user_id, status, language, idempotency_key,
+            inputs, params_snapshot, computed, client_relationship_id,
+            outcome, outcome_date
+          ) VALUES (
+            ${userAId}, 'active', 'fr', ${idem},
+            '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, ${relANoSirenId},
+            'won', now()
+          )
+        `,
+      ).rejects.toThrow(/PIPE-05/);
+      const leaked = await sql<Array<{ id: string }>>`SELECT id FROM proposals WHERE idempotency_key = ${idem}`;
+      if (leaked.length > 0) {
+        await sql`DELETE FROM proposals WHERE id = ${leaked[0]!.id}`;
+      }
+      expect(leaked).toHaveLength(0);
+    });
+
+    it('PIPE-05: INSERT with outcome=won and client_relationship_id=NULL REJECTS (fail-closed)', async () => {
+      const idem = randomUUID();
+      await expect(
+        sql`
+          INSERT INTO proposals (
+            user_id, status, language, idempotency_key,
+            inputs, params_snapshot, computed, client_relationship_id,
+            outcome, outcome_date
+          ) VALUES (
+            ${userAId}, 'active', 'fr', ${idem},
+            '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, NULL,
+            'won', now()
+          )
+        `,
+      ).rejects.toThrow(/PIPE-05/);
+      const leaked = await sql<Array<{ id: string }>>`SELECT id FROM proposals WHERE idempotency_key = ${idem}`;
+      if (leaked.length > 0) {
+        await sql`DELETE FROM proposals WHERE id = ${leaked[0]!.id}`;
+      }
+      expect(leaked).toHaveLength(0);
+    });
+
+    it('PIPE-05: INSERT with outcome=won pointing at a nonexistent relationship REJECTS (missing-row fail-closed branch)', async () => {
+      const idem = randomUUID();
+      await expect(
+        sql`
+          INSERT INTO proposals (
+            user_id, status, language, idempotency_key,
+            inputs, params_snapshot, computed, client_relationship_id,
+            outcome, outcome_date
+          ) VALUES (
+            ${userAId}, 'active', 'fr', ${idem},
+            '{}'::jsonb, ${paramsSnapshot}::jsonb, ${computed}::jsonb, ${randomUUID()},
+            'won', now()
+          )
+        `,
+      ).rejects.toThrow(/PIPE-05/);
+      const leaked = await sql<Array<{ id: string }>>`SELECT id FROM proposals WHERE idempotency_key = ${idem}`;
+      if (leaked.length > 0) {
+        await sql`DELETE FROM proposals WHERE id = ${leaked[0]!.id}`;
+      }
+      expect(leaked).toHaveLength(0);
+    });
+
+    it('outcome=NULL never fires the trigger — the WHEN clause gates on won only', async () => {
+      await sql`UPDATE proposals SET outcome = NULL, outcome_date = NULL WHERE id = ${proposalANoSirenId}`;
+      const row = await sql<Array<{ outcome: string | null }>>`
+        SELECT outcome FROM proposals WHERE id = ${proposalANoSirenId}
+      `;
+      expect(row[0]?.outcome).toBeNull();
+    });
+
+    // ── Task 1: the three CHECKs (PIPE-01 / PIPE-02 / D-05 / D-06) ─────────
+
+    it('client_relationships_stage_check: an unknown stage REJECTS', async () => {
+      await expect(
+        sql`UPDATE client_relationships SET stage = 'not_a_stage' WHERE id = ${relANoSirenId}`,
+      ).rejects.toThrow(/client_relationships_stage_check/);
+    });
+
+    it('client_relationships_stage_check: all seven D-01 stages are accepted — the reserved pair on purpose (D-04)', async () => {
+      for (const stage of PIPELINE_STAGES) {
+        await sql`UPDATE client_relationships SET stage = ${stage} WHERE id = ${relANoSirenId}`;
+        const row = await sql<Array<{ stage: string }>>`SELECT stage FROM client_relationships WHERE id = ${relANoSirenId}`;
+        expect(row[0]?.stage).toBe(stage);
+      }
+      // Reset: relANoSirenId is not a board-bucket fixture itself, but a
+      // stray reserved-stage row here would corrupt task 2's "empty
+      // signe/debloque lanes for this caller" assertion below.
+      await sql`UPDATE client_relationships SET stage = 'prospect' WHERE id = ${relANoSirenId}`;
+    });
+
+    it('a freshly inserted relationship defaults to stage=prospect without naming the column', async () => {
+      const fresh = await sql<Array<{ id: string }>>`
+        INSERT INTO client_relationships (company_id, owner_id) VALUES (${companyNoSirenId}, ${userAId}) RETURNING id
+      `;
+      relDefaultStageId = fresh[0]!.id;
+      const row = await sql<Array<{ stage: string }>>`SELECT stage FROM client_relationships WHERE id = ${relDefaultStageId}`;
+      expect(row[0]?.stage).toBe('prospect');
+    });
+
+    it('proposals_outcome_check: outcome=unanswered is not storable (D-06 — derived, never stored)', async () => {
+      await expect(
+        sql`UPDATE proposals SET outcome = 'unanswered', outcome_date = now() WHERE id = ${proposalANoSirenId}`,
+      ).rejects.toThrow(/proposals_outcome_check/);
+    });
+
+    it('proposals_outcome_completeness_check: outcome set without outcome_date REJECTS', async () => {
+      await expect(
+        sql`UPDATE proposals SET outcome = 'lost', outcome_date = NULL WHERE id = ${proposalANoSirenId}`,
+      ).rejects.toThrow(/proposals_outcome_completeness_check/);
+    });
+
+    it('D-05: status can still change on a row carrying an outcome — status and outcome are orthogonal', async () => {
+      await sql`UPDATE proposals SET status = 'draft' WHERE id = ${proposalAWithSirenId}`;
+      const row = await sql<Array<{ status: string; outcome: string }>>`
+        SELECT status, outcome FROM proposals WHERE id = ${proposalAWithSirenId}
+      `;
+      expect(row[0]?.status).toBe('draft');
+      expect(row[0]?.outcome).toBe('won');
+      // Note: task 33-08-02 extends this seed with a mixed conversion-rate
+      // and board dataset, and reuses this final state (status='active',
+      // outcome='won') as one of its counted rows — restored here so this
+      // task's own assertion is self-contained regardless of what runs next.
+      await sql`UPDATE proposals SET status = 'active' WHERE id = ${proposalAWithSirenId}`;
     });
   },
 );
