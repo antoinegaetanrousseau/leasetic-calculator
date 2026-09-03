@@ -110,7 +110,7 @@ continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on 
 - [x] **Phase 31: Reconciliation Engine & Proposal Extraction** — dry-run-first dedup engine (SIREN auto-merge, name-normalized flagging, human-resolution UI) exercised against existing `proposals.inputs` (completed 2026-09-02)
 - [x] **Phase 31.1: App Shell Refresh** (INSERTED) — shell converged on the sibling Colibris product: header breadcrumbs, header-owned collapse control, 120px lockup, and a two-tier radius scale that decouples containers from controls (executed 2026-09-02; dark-mode verification pending)
 - ~~**Phase 32: HubSpot Import**~~ — **REMOVED 2026-09-02** by operator decision; IMPORT-02/IMPORT-07 dropped with it. The number is retained, not reused — see Phase Details.
-- [ ] **Phase 33: Pipeline** — partner-advanced stage on the relationship (late stages system-owned), won/lost/unanswered outcome on the proposal, SIREN-gated win
+- [x] **Phase 33: Pipeline** — partner-advanced stage on the relationship (late stages system-owned), won/lost/unanswered outcome on the proposal, SIREN-gated win (completed 2026-09-03)
 - [ ] **Phase 34: Activity & Follow-Up** — unified timeline (manual notes + system events), next-action date, "who to chase" list
 
 ### 📋 v1.7 — Sales Motivation (Phase 35+) — NOT STARTED
@@ -586,7 +586,7 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
   4. Marking a deal `won` is blocked unless the company has a SIREN on file; quoting or advancing early pipeline stages is never blocked by a missing SIREN.
   5. A partner opens their pipeline view and sees their own relationships grouped by stage; they never see another partner's relationships.
 
-**Plans:** 8/9 plans executed
+**Plans:** 9/9 plans complete
 **Wave 1**
 
 - [x] 33-01-PLAN.md — Schema, stage vocabulary, migration 0009 with the SIREN-gate triggers, and the full pipeline.* dictionary
@@ -609,7 +609,7 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 33-09-PLAN.md — The /pipeline route, its access boundary, and phase acceptance
+- [x] 33-09-PLAN.md — The /pipeline route, its access boundary, and phase acceptance
 
 **UI hint:** yes
 
@@ -686,7 +686,7 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | 8/8 | Complete   | 2026-09-02 |
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
 | 35. Sales Motivation | v1.7 | TBD | Not started | - |
-| 33. Pipeline | v1.6 | 8/9 | In Progress|  |
+| 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
 | 34. Activity & Follow-Up | v1.6 | TBD | Not started | - |
 
 ---

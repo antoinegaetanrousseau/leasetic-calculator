@@ -222,3 +222,71 @@ commit hashes present in git log:
 passed, 38 skipped, 0 failed. `npm run build` exits 0, `/pipeline` listed as
 a registered route. `git diff --stat package.json package-lock.json
 components.json` empty.
+
+---
+
+## Task 3 — Acceptance Checkpoint: APPROVED (2026-09-03)
+
+Approved by Antoine on 2026-09-03: *"approved, steps 5 worked, 10 worked and
+13 correct. all pass."* All fifteen acceptance steps confirmed.
+
+### The three called-out steps
+
+| Step | What it gates | Result |
+|---|---|---|
+| 5 | the keyboard path (A-5, as amended) | **PASS** — arrow keys move a focused card between adjacent settable lanes |
+| 10 | the inline SIREN gate preserving typed values (D-08) | **PASS** — dialog stayed open, kept the typed date and reason, completed after a valid SIREN |
+| 13 | the Decoupling Contract (D-04) | **PASS** — a won proposal did not move its relationship's card to Signé |
+
+### Two amendments applied before the walkthrough
+
+1. **A-5 withdrawn as a drag gate.** Antoine's decision, 2026-09-03: "no
+   keyboard drag, only with cursor." Pick-up/drop and Escape-to-cancel were
+   removed from the implementation (commit `1119c5f`) and replaced by a
+   deterministic arrow-key move. Step 5 in the PLAN was restated to match, in
+   commit `54450d6` — the original script described behaviour the code
+   deliberately no longer has and could never have been approved as written.
+2. **SIREN made mandatory** at proposal and client creation (commit
+   `8daac4a`). A SIREN-less company is therefore no longer producible through
+   the UI, which made step 10 reachable only on a seeded legacy row. The DB
+   trigger `proposals_won_requires_siren` and the inline dialog gate are both
+   retained as the safety net for pre-existing rows.
+
+### Fixture prerequisite (commit `54450d6`)
+
+The `development` Neon branch did not satisfy this plan's stated precondition
+— two relationships, both on one company, no finalized partner proposal — so
+steps 2-5, 9, 11, 12 and 14 were *unreachable* rather than passing, and step
+10 was unreachable by construction. `scripts/seed-pipeline-fixtures.ts`
+(`npm run db:seed:pipeline-fixtures`) seeds nine relationships across the five
+settable stages and six finalized proposals, including one past its validity
+window with no outcome and one on a siren-less legacy company. It is
+development-only with no override flag, idempotent, and reverts with
+`--remove`. No fixture carries a pre-set outcome and none uses a reserved
+stage (D-04).
+
+### Automated gates (re-run at approval, after commits 1119c5f / 8daac4a / 54450d6)
+
+| Gate | Result |
+|---|---|
+| `npm run lint:check` | exit 0 |
+| `npm run typecheck` | exit 0 |
+| `npm run test` | exit 0 — 1810 passed, 38 skipped, 0 failed (146 files) |
+| `npm run build` | exit 0 — compiled successfully, `/pipeline` registered |
+
+The build was deliberately run **after** the manual walkthrough, not before:
+a `next build` sharing `.next/` with a running `next dev` leaves the dev
+server serving a stale `globals.css` compile, which would have corrupted the
+visual steps.
+
+### ROADMAP success criteria → evidence
+
+| # | Criterion | Evidenced by |
+|---|---|---|
+| 1 | own relationships grouped by stage, own conversion rate | steps 1, 2, 6, 7, 12 |
+| 2 | reserved stages refuse partner writes | steps 3, 4, 5, 8 |
+| 3 | outcome capture with date and reason | steps 9, 11 + the recorded integration run in `33-08-SUMMARY.md` |
+| 4 | won requires a SIREN | step 10 + the DB-level trigger proof in `33-08-SUMMARY.md` |
+| 5 | no cross-partner comparison anywhere | steps 6, 12 |
+
+*Completed: 2026-09-03 — checkpoint approved, plan 33-09 closed.*

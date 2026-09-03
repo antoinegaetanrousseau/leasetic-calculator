@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: executing
-last_updated: "2026-09-03T10:27:30.418Z"
+status: planning
+last_updated: "2026-09-03T15:05:50.498Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
@@ -23,13 +23,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 33 — pipeline
+**Current focus:** Phase 34 — activity & follow up
 
 ## Current Position
 
-Phase: 33 (pipeline) — EXECUTING
-Plan: 9 of 9 (33-09) tasks 1-2 complete — /pipeline route + access test, all 4 gates green (7cafde8, 4b7a72b, 8c76c88); task 3 blocking human-verify checkpoint pending operator walkthrough (15-step acceptance, steps 5/10/13 called out). Do NOT mark 33-09 complete or advance the Current Plan counter until task 3 is approved.
-Status: Awaiting task 3 checkpoint approval (33-09) — phase's final plan
+Phase: 34
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-09-03
 
 ## Deferred Items
