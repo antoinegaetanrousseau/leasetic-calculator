@@ -18,7 +18,7 @@
  */
 import {
   pgTable, serial, text, integer, timestamp, uuid, check,
-  jsonb, numeric, uniqueIndex, index,
+  jsonb, numeric, uniqueIndex, index, date,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -405,6 +405,38 @@ export const companies = pgTable('companies', {
   // without touching human-entered data. See the Phase 31 block below for the
   // companyPairDecisions table this column feeds into.
   source: text('source'),
+  // Phase 34 (FICHE-01/02, D-01 registry tier) — identity as the SIRENE registry
+  // returned it. NOTHING but the recherche-entreprises lookup ever writes these
+  // columns: D-02 makes that structural, so no partner-facing form and no action
+  // in this phase accepts a registry column name from a caller. All nullable —
+  // D-01 defers the bulk backfill, so an existing company simply reads as not yet
+  // synced (registry_status = 'pending') until someone opens it and refreshes.
+  // There is deliberately no NAF-label column (D-06): the API returns codes and
+  // carries no `libelle` anywhere in its payload, so labels ship as small lookup
+  // tables in code (headcount band, the 21 NAF sections) — never as a column.
+  legalName: text('legal_name'),
+  addressLine: text('address_line'),
+  postalCode: text('postal_code'),
+  city: text('city'),
+  legalForm: text('legal_form'),
+  nafCode: text('naf_code'),
+  nafSection: text('naf_section'),
+  headcountBand: text('headcount_band'),
+  foundedOn: date('founded_on'),
+  // D-11: `etat_administratif` — 'A' active, 'C' ceased. A partner should see
+  // that a company has stopped trading before quoting it.
+  registryState: text('registry_state'),
+  registrySyncedAt: timestamp('registry_synced_at', { withTimezone: true }),
+  // Phase 34 (FICHE-03, D-01 shared-display tier) — beside the existing `name`,
+  // which stays the display name (D-13: no rename, no backfill). Any partner on
+  // the company may edit these, and the edit is audit-logged precisely BECAUSE
+  // every other partner on the company sees the result (D-03).
+  website: text('website'),
+  phone: text('phone'),
+  // NOT NULL with a default so the migration backfills every existing company to
+  // 'pending' — D-01's deferred-backfill position, stated as a column default
+  // rather than a data migration.
+  registryStatus: text('registry_status').notNull().default('pending'),
 }, (table) => [
   check('companies_siren_check', sql`${table.siren} IS NULL OR ${table.siren} ~ '^[0-9]{9}$'`),
   index('companies_name_normalized_idx').on(table.nameNormalized),
@@ -415,6 +447,18 @@ export const companies = pgTable('companies', {
     .on(table.hubspotCompanyId)
     .where(sql`${table.hubspotCompanyId} IS NOT NULL`),
   check('companies_source_check', sql`${table.source} IS NULL OR ${table.source} IN ('proposal_extraction','hubspot_import')`),
+  // Phase 34 (FICHE-02, D-01): the four sync outcomes. NOT NULL, so no
+  // "IS NULL OR" branch — every company has a sync status from the moment the
+  // migration lands.
+  check(
+    'companies_registry_status_check',
+    sql`${table.registryStatus} IN ('synced','pending','not_found','error')`,
+  ),
+  // Phase 34 (D-11): 'A' active, 'C' ceased. NULL until the company is synced.
+  check(
+    'companies_registry_state_check',
+    sql`${table.registryState} IS NULL OR ${table.registryState} IN ('A','C')`,
+  ),
 ]);
 
 /**
@@ -437,6 +481,22 @@ export const clientRelationships = pgTable('client_relationships', {
   // is the single source of truth for the TS side). 'signe'/'debloque' are
   // system-owned — nothing in v1.6 writes them (D-04).
   stage: text('stage').notNull().default('prospect'),
+  // Phase 34 (FICHE-04, D-01 private tier) — visible to the OWNING PARTNER ONLY.
+  // These live here rather than on `companies` precisely because `companies` is a
+  // shared row (CRM-01): two partners quoting the same SIREN see the same company
+  // but must never see each other's lead source, notes or follow-up plans.
+  //
+  // `leadSource` is NOT the Phase 31 `source` column above. That one is the D-08
+  // provenance marker ("NULL means entered by a human") whose whole purpose is to
+  // let a bad bulk import be undone by deleting every row carrying its value;
+  // widening its CHECK to admit partner-entered lead sources would fuse two
+  // unrelated vocabularies into one column. See 34-01-PLAN.md <decision_record>.
+  leadSource: text('lead_source'),
+  description: text('description'),
+  // withTimezone like `proposals.outcomeDate` (Phase 33): the dialog that writes
+  // it is the same `<input type="date">` + `z.coerce.date()` pair as MarkWonDialog.
+  nextActionAt: timestamp('next_action_at', { withTimezone: true }),
+  nextActionNote: text('next_action_note'),
 }, (table) => [
   uniqueIndex('client_relationships_company_id_owner_id_uq').on(table.companyId, table.ownerId),
   // CRM-07 cursor index — a partner's own client book.
@@ -452,6 +512,15 @@ export const clientRelationships = pgTable('client_relationships', {
   ),
   // Phase 33 (PIPE-04): the board query filters on owner_id and groups by stage.
   index('client_relationships_owner_id_stage_idx').on(table.ownerId, table.stage),
+  // Phase 34 (FICHE-04, D-01): the five-value lead-source vocabulary. Distinct
+  // from the Phase 31 provenance CHECK above, which is left exactly as it was.
+  check(
+    'client_relationships_lead_source_check',
+    sql`${table.leadSource} IS NULL OR ${table.leadSource} IN ('recommandation','prospection','salon','site_web','autre')`,
+  ),
+  // Phase 34 (ACTV-04/05): the home page's "à relancer" query filters on
+  // owner_id and orders by next_action_at.
+  index('client_relationships_owner_id_next_action_at_idx').on(table.ownerId, table.nextActionAt),
 ]);
 
 /**
@@ -483,6 +552,58 @@ export const contacts = pgTable('contacts', {
     .on(table.hubspotContactId)
     .where(sql`${table.hubspotContactId} IS NOT NULL`),
   check('contacts_source_check', sql`${table.source} IS NULL OR ${table.source} IN ('proposal_extraction','hubspot_import')`),
+]);
+
+/**
+ * The relationship activity timeline (ACTV-01..03, D-14).
+ *
+ * Private tier, like the columns it hangs off: an event belongs to ONE
+ * `client_relationships` row and cascades with it, so it is structurally
+ * unreachable from the shared `companies` record (the same containment argument
+ * as `contacts`, T-30-01-03). Nothing here is visible to another partner on the
+ * same company.
+ *
+ * `actor_id` is NULLABLE BY DESIGN and NULL means "the system did it" (D-14).
+ * It is `text`, never `uuid`, because `users.id` is Better Auth text — same as
+ * `auditLog.actorId` and `coefficientHistory.changedByUserId` above.
+ *
+ * D-15 — SYSTEM EVENTS ARE WRITTEN BY THE ACTIONS THAT CAUSE THEM, NEVER BY A
+ * DATABASE TRIGGER. A trigger cannot see the session, so an event it wrote would
+ * carry no actor, and ACTV-02 requires attribution. The absence of a trigger for
+ * this table is therefore deliberate, not an omission. (Same reasoning that put
+ * the Phase 33 SIREN gate in an action rather than only in a trigger.)
+ *
+ * `kind` follows the Phase 33 D-02 contract — a TypeScript union plus a DB
+ * CHECK, never a lookup table. The TS half is `RELATIONSHIP_EVENT_KINDS` in
+ * `src/lib/relationship/kinds.ts`; both enumerate identical values in identical
+ * order.
+ */
+export const relationshipEvents = pgTable('relationship_events', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  clientRelationshipId: uuid('client_relationship_id')
+    .notNull()
+    .references(() => clientRelationships.id, { onDelete: 'cascade' }),
+  kind: text('kind').notNull(),
+  // text, not uuid — users.id is Better Auth text. NULL = the system did it (D-14).
+  actorId: text('actor_id').references(() => users.id, { onDelete: 'set null' }),
+  // Separate from created_at: a note may be backdated by its composer, while
+  // created_at records when the row was actually written.
+  occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull().defaultNow(),
+  // The note text. NULL for system events, which render from `kind` + `payload`.
+  body: text('body'),
+  payload: jsonb('payload').$type<Record<string, unknown>>(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  // D-14's six-value vocabulary, in vocabulary order.
+  check(
+    'relationship_events_kind_check',
+    sql`${table.kind} IN ('note','stage_changed','proposal_finalized','outcome_set','registry_synced','next_action_set')`,
+  ),
+  // D-14's reverse-chronological read — the same composite DESC shape as
+  // contacts_client_relationship_id_created_at_idx. 58 chars, under PostgreSQL's
+  // 63-character identifier limit.
+  index('relationship_events_relationship_id_occurred_at_idx')
+    .on(table.clientRelationshipId, sql`${table.occurredAt} DESC`),
 ]);
 
 // ── Phase 31 reconciliation engine (IMPORT-01..06) ──────────────────────────
@@ -559,3 +680,7 @@ export type NewContactRow = typeof contacts.$inferInsert;
 // Type exports for Phase 31 reconciliation engine tables.
 export type CompanyPairDecisionRow = typeof companyPairDecisions.$inferSelect;
 export type NewCompanyPairDecisionRow = typeof companyPairDecisions.$inferInsert;
+
+// Type exports for Phase 34 fiche client.
+export type RelationshipEventRow = typeof relationshipEvents.$inferSelect;
+export type NewRelationshipEventRow = typeof relationshipEvents.$inferInsert;
