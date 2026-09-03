@@ -193,6 +193,7 @@ vi.mock('next/cache', () => ({
   revalidatePath: revalidatePathMock,
 }));
 
+import { schema } from '@/lib/db';
 import {
   createClientRelationshipAction,
   createContactAction,

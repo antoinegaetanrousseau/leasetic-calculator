@@ -33,14 +33,14 @@
  * This module now also holds the registry hook (D-09) and the shared-tier
  * edit (D-03). Two things about it changed shape:
  *
- * REGISTRY COLUMNS ARE NOT WRITTEN HERE. `legal_name`, `address_line`,
- * `postal_code`, `city`, `legal_form`, `naf_code`, `naf_section`,
- * `headcount_band`, `founded_on`, `registry_state` and the two sync columns
- * are written exclusively through `./registry-sync`, which is the only
- * function in the codebase that names one (D-01/D-02). No action below
- * accepts a registry column name from a caller, and none may start doing so:
- * a grep gate asserts that no registry column name appears in this file at
- * all.
+ * REGISTRY COLUMNS ARE NOT WRITTEN HERE. The ten registry-tier identity
+ * columns and the two sync columns are written exclusively through
+ * `./registry-sync`, which is the only function in the codebase that names one
+ * (D-01/D-02) — that file's header lists them. No action below accepts a
+ * registry column name from a caller, and none may start doing so: a grep gate
+ * asserts that no such column name appears in this file at all. The one
+ * registry-tier value this module reads is the company's sync status, purely to
+ * decide whether the D-09 hook has anything to do.
  *
  * `refreshCompanyRegistryAction` IS THIS MODULE'S FIRST ACTION WITH A
  * RETURNED DISCRIMINATED RESULT (D-24). `no_siren`, `not_found` and
@@ -59,7 +59,7 @@ import { db, schema } from '@/lib/db';
 import { writeAuditLog } from '@/lib/db/queries/audit-log';
 import type { RegistryRefreshResult } from './constants';
 import { syncCompanyRegistry } from './registry-sync';
-import { contactSchema, createClientSchema } from './schemas';
+import { contactSchema, createClientSchema, updateCompanyDisplaySchema } from './schemas';
 
 /** Single bounded error key for every failure class in this module (T-30-05-03). */
 const BOUNDED_ERROR = 'clients.toast.error';
@@ -88,7 +88,7 @@ export async function createClientRelationshipAction(
     const dbi = db();
 
     // ── Resolve or create the company row ─────────────────────────────────
-    // The projections below carry `siren` and `registry_status` alongside the
+    // The projections below carry the SIREN and the sync status alongside the
     // id purely so the D-09 hook at the end of this function needs NO extra
     // statement: reading a row we are already reading is not a second query,
     // and it keeps the hook off the critical path entirely.
@@ -200,8 +200,9 @@ export async function createClientRelationshipAction(
     //
     // There is deliberately NO try/catch here and NO branch on the result.
     // `syncCompanyRegistry` cannot throw (that is its defining property, pinned
-    // in registry-sync.test.ts) and its failure is already persisted as
-    // `registry_status`. D-09: A REGISTRY FAILURE NEVER BLOCKS CLIENT CREATION.
+    // in registry-sync.test.ts) and its failure is already persisted as the
+    // company's sync status. D-09: A REGISTRY FAILURE NEVER BLOCKS CLIENT
+    // CREATION.
     // Do not add a guard here — a guard is how a lookup failure would turn into
     // BOUNDED_ERROR and cost the partner the client they just created.
     if (companySiren !== null && companyRegistryStatus !== 'synced') {
@@ -281,7 +282,7 @@ export async function refreshCompanyRegistryAction(raw: unknown): Promise<Regist
       ownerId: session.user.id,
     });
 
-    // The sync wrote at minimum `registry_status`, which the client page and
+    // The sync wrote the company's sync status at minimum, which the client page and
     // its header render, so the layout is revalidated on every branch.
     revalidatePath('/clients', 'layout');
 
@@ -290,6 +291,139 @@ export async function refreshCompanyRegistryAction(raw: unknown): Promise<Regist
     if (e instanceof Error && e.message === BOUNDED_ERROR) throw e;
     const msg = e instanceof Error ? e.message : String(e);
     console.error('[refreshCompanyRegistryAction] failed:', msg);
+    throw new Error(BOUNDED_ERROR);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  updateCompanyDisplayAction (FICHE-03) — the audited shared-tier edit        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Edit the three display fields and, if needed, correct the SIREN.
+ *
+ * `companies` IS SHARED (CRM-01). This write changes what EVERY other partner
+ * holding a relationship on the company sees — which is exactly why D-03
+ * requires an audit row carrying before and after, and why the caller may only
+ * reach the company through a relationship they own. A private-tier edit needs
+ * neither.
+ *
+ * The `.set()` below names four columns and a timestamp as literals. It is
+ * never spread from the parsed input, so no key a caller invents can become a
+ * column write, and no registry-tier column is reachable from here at all
+ * (D-02 — see the module header).
+ *
+ * A SIREN CORRECTION RE-RUNS THE LOOKUP, AFTER THE WRITE. The correction is the
+ * edit the partner asked for and the audit row records it; the sync then runs
+ * against the new value. If the sync fails, the correction STILL STANDS and the
+ * status reflects the failure — the same non-blocking discipline as D-09. There
+ * is no transaction to roll back with (neon-http), and pretending otherwise
+ * would leave the two halves inconsistent in the other, worse direction.
+ */
+export async function updateCompanyDisplayAction(raw: unknown): Promise<void> {
+  const { session } = await requireRelationshipHolder(); // FIRST — PITFALLS §7.3
+  try {
+    const input = updateCompanyDisplaySchema.parse(raw);
+    const dbi = db();
+
+    // Owner-scoped subquery: the company reachable through the caller's OWN
+    // relationship. `companies` is not owned by FK the way `client_relationships`
+    // is, so the re-proof goes through the join, not a direct column match.
+    const reachableCompanyIds = dbi
+      .select({ id: schema.clientRelationships.companyId })
+      .from(schema.clientRelationships)
+      .where(and(
+        eq(schema.clientRelationships.id, input.relationshipId),
+        eq(schema.clientRelationships.ownerId, session.user.id),
+      ));
+
+    // THIS SELECT IS A DATA READ FOR THE AUDIT PAYLOAD, NOT THE AUTHORIZATION
+    // STEP. PostgreSQL's `UPDATE ... RETURNING` returns the NEW row, so D-03's
+    // "before" needs a read of its own. The UPDATE below independently re-proves
+    // ownership inside its own WHERE; if this SELECT were deleted outright the
+    // write would still be safe. Do NOT turn it into a check-then-write by
+    // branching on it before the UPDATE — that is the TOCTOU pattern
+    // `createContactAction`'s comment forbids.
+    const beforeRows = await dbi
+      .select({
+        name: schema.companies.name,
+        website: schema.companies.website,
+        phone: schema.companies.phone,
+        siren: schema.companies.siren,
+      })
+      .from(schema.companies)
+      .where(inArray(schema.companies.id, reachableCompanyIds))
+      .limit(1);
+
+    const after = {
+      name: input.name,
+      website: input.website ?? null,
+      phone: input.phone ?? null,
+      siren: input.siren,
+    };
+
+    // Four literal columns plus the timestamp. A `companies.siren` unique
+    // violation raised by ANOTHER partner's data throws here and is collapsed
+    // by the outer catch into BOUNDED_ERROR, never surfaced (34-PATTERNS trap 10).
+    const updated = await dbi
+      .update(schema.companies)
+      .set({
+        name: input.name,
+        website: input.website ?? null,
+        phone: input.phone ?? null,
+        siren: input.siren,
+        updatedAt: new Date(),
+      })
+      .where(inArray(schema.companies.id, reachableCompanyIds))
+      .returning();
+
+    if (updated.length === 0) {
+      // Either no such relationship or not the caller's — deliberately
+      // indistinguishable, and the only failure signal.
+      throw new Error('company not reachable through a relationship the caller owns');
+    }
+
+    const companyId = updated[0].id;
+    const before = beforeRows[0] ?? { name: null, website: null, phone: null, siren: null };
+
+    // D-03: the audit row exists BECAUSE other partners see the result. D-26 /
+    // ADMIN-09: ids and caller-submitted values only — never commission data.
+    await writeAuditLog({
+      actorId: session.user.id,
+      action: 'company.display_update',
+      targetType: 'company',
+      targetId: companyId,
+      payload: { companyId, before, after },
+    });
+
+    if (input.siren !== before.siren) {
+      await writeAuditLog({
+        actorId: session.user.id,
+        action: 'company.siren_correct',
+        targetType: 'company',
+        targetId: companyId,
+        payload: { companyId, before: before.siren, after: input.siren },
+      });
+
+      // Re-run the lookup against the corrected value. No branch on the result
+      // and no guard: it cannot throw, and a failure leaves the correction
+      // standing with the status telling the partner to retry.
+      await syncCompanyRegistry({
+        companyId,
+        siren: input.siren,
+        relationshipId: input.relationshipId,
+        actorId: session.user.id,
+        ownerId: session.user.id,
+      });
+    }
+
+    // The board renders the company name and SIREN, so it is revalidated too.
+    revalidatePath('/clients', 'layout');
+    revalidatePath('/pipeline');
+  } catch (e) {
+    if (e instanceof Error && e.message === BOUNDED_ERROR) throw e;
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[updateCompanyDisplayAction] failed:', msg);
     throw new Error(BOUNDED_ERROR);
   }
 }

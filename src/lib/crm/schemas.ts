@@ -30,18 +30,32 @@ import { normalizeSiren } from './siren';
  * `normalizeSiren` falls back to the original trimmed string, which then
  * fails the shape check on purpose.
  */
+/**
+ * The ONE required-SIREN field, shared by `createClientSchema` and (Phase 34
+ * Plan 07) `updateCompanyDisplaySchema`. Extracted rather than written twice:
+ * D-23 makes a single normalisation rule load-bearing now that the SIREN is
+ * the registry lookup key, and two hand-copied `.transform(...).refine(...)`
+ * pairs are exactly how that rule would drift.
+ *
+ * MEASURED BEHAVIOUR, so nobody has to rediscover it: `normalizeSiren` STRIPS
+ * every non-digit and then checks the shape, so "552 100 554" and
+ * "1a2b3c4d5e6f7g8h9" both normalise to nine digits and both pass. Only a
+ * value that does not yield exactly nine digits fails.
+ */
+const requiredSirenField = z
+  .string({ message: 'error.field.required' })
+  .trim()
+  .min(1, { message: 'error.field.required' })
+  .transform((v) => normalizeSiren(v) ?? v)
+  .refine((v) => /^[0-9]{9}$/.test(v), {
+    message: 'error.field.siren.invalid',
+  });
+
 export const createClientSchema = z.object({
   name: z.string().trim().min(1, { message: 'error.field.required' }),
   // Required since 2026-09-03 (operator decision): a client cannot be
   // created without its SIREN. Formatting spaces are stripped.
-  siren: z
-    .string({ message: 'error.field.required' })
-    .trim()
-    .min(1, { message: 'error.field.required' })
-    .transform((v) => normalizeSiren(v) ?? v)
-    .refine((v) => /^[0-9]{9}$/.test(v), {
-      message: 'error.field.siren.invalid',
-    }),
+  siren: requiredSirenField,
 });
 
 export type CreateClientInput = z.infer<typeof createClientSchema>;
@@ -70,3 +84,39 @@ export const contactSchema = z.object({
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;
+
+/**
+ * `updateCompanyDisplaySchema` — the shared-tier edit (FICHE-03, D-01 tier two).
+ *
+ * THE FOUR FIELDS ARE THE WHOLE SCHEMA, and that is the point. `companies` is a
+ * SHARED row: a partner editing it changes what every other partner on that
+ * company sees. D-01 tier one — the registry identity — is written by the
+ * SIRENE lookup and by nothing else, so no registry field appears here and none
+ * may be added. A caller submitting `legalName` alongside these keys has it
+ * dropped by the parse and, one layer further in, could not reach the write
+ * anyway: `updateCompanyDisplayAction`'s `.set()` names its columns as literals.
+ *
+ * `siren` reuses `requiredSirenField` — the same const `createClientSchema`
+ * uses, never a second copy of the rule (D-23).
+ */
+export const updateCompanyDisplaySchema = z.object({
+  relationshipId: z.string().uuid(),
+  name: z.string().trim().min(1, { message: 'error.field.required' }).max(200),
+  /**
+   * Deliberately lenient (a bare host like `dupont-menuiserie.fr` is what a
+   * partner actually types) but not a free-text field: it must contain no
+   * whitespace and at least one dot, and the length cap does the rest. Emits
+   * `error.field.url.invalid`, which is already in the dictionary — no new key.
+   */
+  website: optionalTrimmed
+    .refine((v) => v === undefined || v.length <= 300, { message: 'error.field.url.invalid' })
+    .refine((v) => v === undefined || /^[^\s]+\.[^\s]+$/.test(v), {
+      message: 'error.field.url.invalid',
+    }),
+  phone: optionalTrimmed.refine((v) => v === undefined || v.length <= 40, {
+    message: 'error.field.required',
+  }),
+  siren: requiredSirenField,
+});
+
+export type UpdateCompanyDisplayInput = z.infer<typeof updateCompanyDisplaySchema>;
