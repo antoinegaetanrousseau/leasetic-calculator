@@ -107,7 +107,7 @@ Sharing rule for every requirement below: **the registry owns identity, partners
 - [x] **FICHE-02**: Registry-sourced identity — legal name, address, legal form, NAF code, activity section, headcount band, founding date, administrative state — renders read-only, with the date it was last synced and a control to refresh it.
 - [x] **FICHE-03**: A partner edits the shared display fields (display name, website, phone) and corrects a wrong SIREN, which re-runs the lookup. Every such edit is audit-logged, because other partners see it.
 - [x] **FICHE-04**: A partner records private relationship facts — source, description — that no other partner on the same company can see.
-- [ ] **FICHE-05**: The client page is a header plus tabs (Informations, Contacts, Propositions, Activité), each section edited in place through its own dialog rather than a separate edit screen.
+- [x] **FICHE-05**: The client page is a header plus tabs (Informations, Contacts, Propositions, Activité), each section edited in place through its own dialog rather than a separate edit screen.
 
 ### Activity & Follow-Up (ACTV)
 
