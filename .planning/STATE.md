@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: paused
-last_updated: "2026-09-03T10:14:58.374Z"
+status: executing
+last_updated: "2026-09-03T10:27:30.418Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
-  completed_phases: 16
+  completed_phases: 17
   total_plans: 79
-  completed_plans: 78
-  percent: 80
+  completed_plans: 79
+  percent: 85
 ---
 
 # State — Matrice Commerciale
@@ -28,8 +28,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 33 (pipeline) — EXECUTING
-Plan: 8 of 9 (33-08) complete — checkpoint approved 2026-09-03 (28/28 on Neon development); next: 33-09
-Status: Ready to execute 33-09
+Plan: 9 of 9 (33-09) tasks 1-2 complete — /pipeline route + access test, all 4 gates green (7cafde8, 4b7a72b, 8c76c88); task 3 blocking human-verify checkpoint pending operator walkthrough (15-step acceptance, steps 5/10/13 called out). Do NOT mark 33-09 complete or advance the Current Plan counter until task 3 is approved.
+Status: Awaiting task 3 checkpoint approval (33-09) — phase's final plan
 Last activity: 2026-09-03
 
 ## Deferred Items
