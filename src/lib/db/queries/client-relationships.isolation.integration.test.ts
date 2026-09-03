@@ -272,6 +272,7 @@ describe.skipIf(!shouldRun)(
 
     let companyNoSirenId: string;
     let companyWithSirenId: string;
+    let companyDefaultStageId: string;
     let relANoSirenId: string;
     let relAWithSirenId: string;
     let relBNoSirenId: string;
@@ -480,7 +481,7 @@ describe.skipIf(!shouldRun)(
       if (relIds.length > 0) {
         await sql`DELETE FROM client_relationships WHERE id = ANY(${relIds})`;
       }
-      const companyIds = [companyNoSirenId, companyWithSirenId].filter(Boolean);
+      const companyIds = [companyNoSirenId, companyWithSirenId, companyDefaultStageId].filter(Boolean);
       if (companyIds.length > 0) {
         await sql`DELETE FROM companies WHERE id = ANY(${companyIds})`;
       }
@@ -608,8 +609,14 @@ describe.skipIf(!shouldRun)(
     });
 
     it('a freshly inserted relationship defaults to stage=prospect without naming the column', async () => {
+      // Own company: (companyNoSirenId, userAId) already exists as relANoSirenId
+      // and client_relationships_company_id_owner_id_uq would reject a duplicate.
+      const freshCompany = await sql<Array<{ id: string }>>`
+        INSERT INTO companies (name) VALUES (${`Pipeline Default-Stage Co ${runId}`}) RETURNING id
+      `;
+      companyDefaultStageId = freshCompany[0]!.id;
       const fresh = await sql<Array<{ id: string }>>`
-        INSERT INTO client_relationships (company_id, owner_id) VALUES (${companyNoSirenId}, ${userAId}) RETURNING id
+        INSERT INTO client_relationships (company_id, owner_id) VALUES (${companyDefaultStageId}, ${userAId}) RETURNING id
       `;
       relDefaultStageId = fresh[0]!.id;
       const row = await sql<Array<{ stage: string }>>`SELECT stage FROM client_relationships WHERE id = ${relDefaultStageId}`;
