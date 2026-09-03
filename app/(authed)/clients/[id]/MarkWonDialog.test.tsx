@@ -38,6 +38,11 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/lib/pipeline/actions', () => ({
   markProposalWonAction: markProposalWonActionMock,
+}));
+
+// SIREN_REQUIRED lives in the plain (non-'use server') constants module —
+// see src/lib/pipeline/constants.ts's own header for why.
+vi.mock('@/lib/pipeline/constants', () => ({
   SIREN_REQUIRED: 'pipeline.error.sirenRequired',
 }));
 

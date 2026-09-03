@@ -42,6 +42,7 @@ import { requireRelationshipHolder } from '@/lib/auth/require';
 import { db, schema } from '@/lib/db';
 import { writeAuditLog } from '@/lib/db/queries/audit-log';
 import { advanceStageSchema, markLostSchema, markWonSchema } from './schemas';
+import { SIREN_REQUIRED } from './constants';
 
 /** Single bounded error key for every failure class in this module (T-30-05-03), bar one documented exception below. */
 const BOUNDED_ERROR = 'pipeline.toast.error';
@@ -51,8 +52,15 @@ const BOUNDED_ERROR = 'pipeline.toast.error';
  * module — see the module header for the full reasoning. Reachable ONLY
  * from `markProposalWonAction`, and only after the owner-scoped
  * branch-selector read already matched the caller's own proposal.
+ *
+ * Plan 33-06 Rule 3 auto-fix: the sentinel's VALUE now lives in
+ * `./constants` (a plain, non-`'use server'` module) and is imported here,
+ * not declared inline — a `'use server'` file may export only async
+ * functions, so this module deliberately does NOT re-export
+ * `SIREN_REQUIRED` itself. Client callers (`MarkWonDialog.tsx`) import the
+ * sentinel from `@/lib/pipeline/constants` directly. See `./constants.ts`
+ * for the full reasoning.
  */
-export const SIREN_REQUIRED = 'pipeline.error.sirenRequired';
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  advanceRelationshipStageAction (PIPE-01, PIPE-02, D-01..D-04)              */

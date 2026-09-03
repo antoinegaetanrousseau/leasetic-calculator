@@ -10,16 +10,23 @@
  * never user-editable.
  *
  * D-08's inline SIREN gate: `markProposalWonAction` submits optimistically.
- * Only when it rejects with the `SIREN_REQUIRED` sentinel (imported from
- * `@/lib/pipeline/actions`, never re-declared as a literal) does this
- * component reveal a third field, below the still-filled date/reason
- * fields — the whole point of D-08 is that the partner never loses their
- * place or their typed values. The gate is discovered server-side (this
- * plan's own decision record): the dialog never pre-computes whether the
- * company has a SIREN, it only reacts to the server's answer.
+ * Only when it rejects with the `SIREN_REQUIRED` sentinel (imported, never
+ * re-declared as a literal) does this component reveal a third field,
+ * below the still-filled date/reason fields — the whole point of D-08 is
+ * that the partner never loses their place or their typed values. The gate
+ * is discovered server-side (this plan's own decision record): the dialog
+ * never pre-computes whether the company has a SIREN, it only reacts to
+ * the server's answer.
  *
  * Every other failure collapses to the single bounded toast
  * (`pipeline.toast.error`) — the raw error is never inspected or rendered.
+ *
+ * Rule 3 auto-fix (see `@/lib/pipeline/constants`): `SIREN_REQUIRED` is
+ * imported from `@/lib/pipeline/constants`, NOT from
+ * `@/lib/pipeline/actions` — `actions.ts` carries `'use server'`, and
+ * Next.js's Server Actions build fails any `'use server'` file exporting a
+ * non-function value, which broke `npm run build` the moment this
+ * component tried to import the sentinel from there.
  */
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -42,7 +49,8 @@ import { Input } from '@/components/ui/input';
 import { SirenInput } from '@/components/proposal/SirenInput';
 import { t, type DictKey, type Lang } from '@/lib/i18n/dictionaries';
 import { markWonSchema } from '@/lib/pipeline/schemas';
-import { markProposalWonAction, SIREN_REQUIRED } from '@/lib/pipeline/actions';
+import { markProposalWonAction } from '@/lib/pipeline/actions';
+import { SIREN_REQUIRED } from '@/lib/pipeline/constants';
 
 export interface MarkWonDialogProps {
   proposalId: string;

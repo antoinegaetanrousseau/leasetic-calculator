@@ -25,6 +25,9 @@ vi.mock('sonner', () => ({
 vi.mock('@/lib/pipeline/actions', () => ({
   markProposalWonAction: vi.fn(),
   markProposalLostAction: vi.fn(),
+}));
+
+vi.mock('@/lib/pipeline/constants', () => ({
   SIREN_REQUIRED: 'pipeline.error.sirenRequired',
 }));
 

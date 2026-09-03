@@ -10,11 +10,13 @@ import type { ProposalRowDto } from '@/lib/api/proposals/list';
 import { requireRelationshipHolder } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
 import {
+  deriveProposalOutcome,
   getClientRelationshipForOwner,
   listContactsForRelationship,
   listProposalsForRelationship,
 } from '@/lib/db/queries';
 import { ContactList } from './ContactList';
+import { ProposalOutcomeControl } from './ProposalOutcomeControl';
 
 // PITFALLS §1.6 — cookie/session-reading route opts out of static rendering.
 export const dynamic = 'force-dynamic';
@@ -71,28 +73,46 @@ export default async function ClientDetailPage({ params }: PageProps) {
   // ProposalRow.tsx) is reused verbatim, per 30-UI-SPEC.md §3 — no new
   // proposal-row component. `listProposalsForRelationship`'s row shape
   // (plan 30-04) is deliberately narrower than the full DB row for
-  // ADMIN-09 (no params_snapshot, no pdfGeneratedAt projected at all) —
-  // two consequences follow, both documented in this plan's SUMMARY:
+  // ADMIN-09 (no params_snapshot as a returned row shape) — two
+  // consequences follow, both documented in this plan's SUMMARY:
   //   - `amountHT` carries `computedClientMonthly` (the client-facing
   //     monthly figure already projected out of `computed.loyerHT` by plan
   //     30-04), not the raw equipment price — the only currency figure this
   //     narrower row shape exposes.
   //   - `displayStatus` is the stored draft/active status as-is; this page
-  //     cannot distinguish "active" from "expired" the way /proposals can,
-  //     since that derivation needs paramsSnapshot.validityDays +
-  //     pdfGeneratedAt, both intentionally excluded here for ADMIN-09
-  //     minimization.
+  //     still cannot distinguish "active" from "expired" the lifecycle-
+  //     status way `/proposals` can. Plan 33-03 DID additionally project
+  //     `validityDays` (out of `params_snapshot`, narrowly, ADMIN-09) and
+  //     `pdfGeneratedAt` onto this row shape — but solely so
+  //     `deriveProposalOutcome` below can resolve the commercial-outcome
+  //     axis's `unanswered` state at render time (D-06). The raw
+  //     `params_snapshot` object itself still never reaches any returned
+  //     row shape; lifecycle status (D-05) and commercial outcome remain
+  //     two independent facts, rendered as two independent chips.
   const proposalRows: ProposalRowDto[] = proposals.map((p) => ({
     id: p.id,
     lcRef: p.lcRef ?? '',
     clientCo: relationship.companyName,
     amountHT: p.computedClientMonthly != null ? String(p.computedClientMonthly) : '0',
     createdAt: p.createdAt.toISOString(),
-    validityDays: 30,
+    validityDays: (p.validityDays as 15 | 30 | 60 | null) ?? 30,
     language: p.language,
     deletedAt: p.deletedAt ? p.deletedAt.toISOString() : null,
     displayStatus: p.status,
   }));
+
+  // Phase 33 (PIPE-03, D-06) — the derived outcome per proposal, computed
+  // HERE on the server, beside the adapter above, never inside the client
+  // component: `deriveProposalOutcome` reads `new Date()`, and deriving it
+  // during client render would make a row's outcome depend on the client
+  // clock (react-hooks purity — the same reason ProposalRow itself takes
+  // `nowMs` from the server rather than calling `Date.now()` in render).
+  //
+  // Nothing below on this page reads, renders or writes the relationship's
+  // board-position column at all — that column is written only from
+  // `/pipeline` (D-04's Decoupling Contract). This page renders an outcome
+  // control per proposal only, never a board-position control.
+  const outcomes = new Map(proposals.map((p) => [p.id, deriveProposalOutcome(p)]));
 
   const newProposalHref = `/proposals/new/parametres?clientRelationshipId=${id}`;
 
@@ -134,7 +154,18 @@ export default async function ClientDetailPage({ params }: PageProps) {
           <>
             <div className="flex flex-col">
               {proposalRows.map((row) => (
-                <ProposalRow key={row.id} row={row} lang={lang} />
+                <ProposalRow
+                  key={row.id}
+                  row={row}
+                  lang={lang}
+                  actionsSlot={
+                    <ProposalOutcomeControl
+                      proposalId={row.id}
+                      outcome={outcomes.get(row.id) ?? null}
+                      lang={lang}
+                    />
+                  }
+                />
               ))}
             </div>
             <div className="mt-4">

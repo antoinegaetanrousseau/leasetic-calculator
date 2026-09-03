@@ -1,5 +1,6 @@
 /**
  * Phase 30 Plan 07 Task 1 — /clients/[id] page.tsx tests.
+ * Phase 33 Plan 06 Task 3 — extended with the outcome-control wiring tests.
  *
  * The page is a server component that fans out:
  *   - requireRelationshipHolder()  (auth gate, FIRST)
@@ -21,12 +22,20 @@
  *   6. Source-level acceptance checks: no maxWidth wrapper, force-dynamic,
  *      clientRelationshipId= in the href, notFound() precedes the contacts
  *      read in source order.
+ *   7 (Plan 33-06). Each rendered proposal row carries a
+ *      `data-outcome-state` element; a `won`-outcome row renders the
+ *      "Gagné" badge and no trigger buttons; a lapsed, undecided row
+ *      derives `unanswered` and keeps both override triggers; the page's
+ *      HTML never renders a pipeline-stage display string (D-04).
  *
  * ContactList and ProposalRow are stubbed — their own behavior is covered
- * by their dedicated test files.
+ * by their dedicated test files. MarkWonDialog/MarkLostDialog (rendered
+ * inside the real ProposalOutcomeControl) are also stubbed — their own
+ * behavior is covered by MarkWonDialog.test.tsx / MarkLostDialog.test.tsx.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderToString } from 'react-dom/server';
+import type { RelationshipProposalRow } from '@/lib/db/queries';
 
 vi.mock('server-only', () => ({}));
 
@@ -34,6 +43,11 @@ vi.mock('next/navigation', () => ({
   notFound: vi.fn(() => {
     throw new Error('NEXT_NOT_FOUND');
   }),
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
+
+vi.mock('sonner', () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
 }));
 
 const { requireRelationshipHolderMock } = vi.hoisted(() => ({
@@ -62,23 +76,46 @@ const {
 } = vi.hoisted(() => ({
   getClientRelationshipForOwnerMock: vi.fn(),
   listContactsForRelationshipMock: vi.fn(async () => []),
-  listProposalsForRelationshipMock: vi.fn(async () => []),
+  listProposalsForRelationshipMock: vi.fn(
+    async (): Promise<RelationshipProposalRow[]> => [],
+  ),
 }));
 
-vi.mock('@/lib/db/queries', () => ({
-  getClientRelationshipForOwner: getClientRelationshipForOwnerMock,
-  listContactsForRelationship: listContactsForRelationshipMock,
-  listProposalsForRelationship: listProposalsForRelationshipMock,
-}));
+// `deriveProposalOutcome` is re-exported unmocked (real, pure function) so
+// the outcome-derivation assertions below exercise the actual D-06 rule,
+// not a re-implementation of it.
+vi.mock('@/lib/db/queries', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/db/queries')>();
+  return {
+    ...actual,
+    getClientRelationshipForOwner: getClientRelationshipForOwnerMock,
+    listContactsForRelationship: listContactsForRelationshipMock,
+    listProposalsForRelationship: listProposalsForRelationshipMock,
+  };
+});
 
 vi.mock('./ContactList', () => ({
   ContactList: () => <div data-testid="contact-list-stub" />,
 }));
 
 vi.mock('@/components/proposals/ProposalRow', () => ({
-  ProposalRow: ({ row }: { row: { id: string } }) => (
-    <div data-testid={`proposal-row-${row.id}`} />
-  ),
+  ProposalRow: ({
+    row,
+    actionsSlot,
+  }: {
+    row: { id: string };
+    actionsSlot?: React.ReactNode;
+  }) => <div data-testid={`proposal-row-${row.id}`}>{actionsSlot}</div>,
+}));
+
+// ProposalOutcomeControl itself renders for real (it's the surface under
+// test), but the two dialogs it mounts are stubbed — their own submit/gate
+// behavior is covered by their dedicated test files.
+vi.mock('./MarkWonDialog', () => ({
+  MarkWonDialog: () => null,
+}));
+vi.mock('./MarkLostDialog', () => ({
+  MarkLostDialog: () => null,
 }));
 
 import ClientDetailPage from './page';
@@ -89,6 +126,38 @@ const RELATIONSHIP = {
   companyName: 'Dupont Menuiserie',
   siren: '123456789',
   createdAt: new Date('2026-01-01T00:00:00Z'),
+};
+
+const PROPOSAL_WON = {
+  id: 'prop-won',
+  lcRef: 'LC-1',
+  status: 'active' as const,
+  language: 'fr' as const,
+  createdAt: new Date('2026-01-01T00:00:00Z'),
+  deletedAt: null,
+  computedClientMonthly: 500,
+  outcome: 'won' as const,
+  outcomeDate: new Date('2026-02-01T00:00:00Z'),
+  outcomeReason: null,
+  pdfGeneratedAt: new Date('2026-01-01T00:00:00Z'),
+  validityDays: 30,
+};
+
+// No explicit outcome; a PDF generated in 2020 is well past a 30-day
+// validity window — deriveProposalOutcome resolves this to 'unanswered'.
+const PROPOSAL_UNANSWERED = {
+  id: 'prop-unanswered',
+  lcRef: 'LC-2',
+  status: 'active' as const,
+  language: 'fr' as const,
+  createdAt: new Date('2020-01-01T00:00:00Z'),
+  deletedAt: null,
+  computedClientMonthly: 300,
+  outcome: null,
+  outcomeDate: null,
+  outcomeReason: null,
+  pdfGeneratedAt: new Date('2020-01-01T00:00:00Z'),
+  validityDays: 30,
 };
 
 beforeEach(() => {
@@ -168,5 +237,55 @@ describe('clients/[id]/page.tsx — Task 1 server route', () => {
     const contactsIdx = pageSource.indexOf('listContactsForRelationship(');
     expect(notFoundIdx).toBeGreaterThan(0);
     expect(contactsIdx).toBeGreaterThan(notFoundIdx);
+  });
+});
+
+describe('clients/[id]/page.tsx — Plan 33-06 Task 3 outcome-control wiring', () => {
+  it('Outcome Test 1: a won-outcome proposal renders the state hook and the "Gagné" badge, no trigger buttons', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue(RELATIONSHIP);
+    listProposalsForRelationshipMock.mockResolvedValue([PROPOSAL_WON]);
+
+    const tree = await ClientDetailPage({ params: Promise.resolve({ id: 'rel-1' }) });
+    const html = renderToString(tree);
+
+    expect(html).toContain('data-outcome-state="won"');
+    expect(html).toContain('Gagné');
+    expect(html).not.toContain('Marquer gagné');
+    expect(html).not.toContain('Marquer perdu');
+  });
+
+  it('Outcome Test 2: a lapsed, undecided proposal derives "unanswered" and keeps both override triggers', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue(RELATIONSHIP);
+    listProposalsForRelationshipMock.mockResolvedValue([PROPOSAL_UNANSWERED]);
+
+    const tree = await ClientDetailPage({ params: Promise.resolve({ id: 'rel-1' }) });
+    const html = renderToString(tree);
+
+    expect(html).toContain('data-outcome-state="unanswered"');
+    expect(html).toContain('Sans réponse');
+    expect(html).toContain('Marquer gagné');
+    expect(html).toContain('Marquer perdu');
+  });
+
+  it('Outcome Test 3 (D-04): the page HTML never renders a pipeline-stage display string', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue(RELATIONSHIP);
+    listProposalsForRelationshipMock.mockResolvedValue([PROPOSAL_WON, PROPOSAL_UNANSWERED]);
+
+    const tree = await ClientDetailPage({ params: Promise.resolve({ id: 'rel-1' }) });
+    const html = renderToString(tree);
+
+    // 'Perdu' is deliberately excluded — it is shared vocabulary with the
+    // proposal outcome badge (pipeline.outcome.badge.lost), which is the
+    // legitimate, expected string this page DOES render.
+    for (const stageLabel of [
+      'Négociation',
+      'Prospect',
+      'Qualifié',
+      'Proposition envoyée',
+      'Signé',
+      'Débloqué',
+    ]) {
+      expect(html).not.toContain(stageLabel);
+    }
   });
 });

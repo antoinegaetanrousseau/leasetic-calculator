@@ -119,8 +119,11 @@ import {
   advanceRelationshipStageAction,
   markProposalLostAction,
   markProposalWonAction,
-  SIREN_REQUIRED,
 } from './actions';
+// Plan 33-06 Rule 3 auto-fix: SIREN_REQUIRED moved to a plain module (a
+// 'use server' file may export only async functions) — see
+// src/lib/pipeline/constants.ts for the full reasoning.
+import { SIREN_REQUIRED } from './constants';
 
 const CALLER_SESSION = { user: { id: 'user-1', email: 'partner@example.com' } };
 const RELATIONSHIP_ID = '11111111-1111-4111-8111-111111111111';
