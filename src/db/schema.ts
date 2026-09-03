@@ -256,6 +256,18 @@ export const proposals = pgTable('proposals', {
   // declared later in this file; the callback form resolves the forward reference.
   clientRelationshipId: uuid('client_relationship_id')
     .references(() => clientRelationships.id, { onDelete: 'set null' }),
+
+  // Phase 33 (PIPE-03, D-05/D-06/D-08): commercial outcome, orthogonal to
+  // `status` above (lifecycle) — a proposal can be `active` AND `won`. Fresh
+  // top-level columns only; never touches inputs/paramsSnapshot/computed/
+  // schemaVersion (CRM-05 immutability, ARCHITECTURE §2.5 Option A).
+  // Stored values: 'won' | 'lost' | NULL. 'unanswered' is derived at
+  // query/render time — never stored (D-06, following Phase 12 D-07's
+  // deriveDisplayStatus precedent for 'expired').
+  outcome: text('outcome'),
+  outcomeDate: timestamp('outcome_date', { withTimezone: true }),
+  // Optional even when outcome is set — D-08's dialog labels it "Motif (facultatif)".
+  outcomeReason: text('outcome_reason'),
 }, (table) => [
   // D-A2: language whitelist enforced at the DB.
   check('proposals_language_check', sql`${table.language} IN ('fr', 'en')`),
@@ -287,6 +299,18 @@ export const proposals = pgTable('proposals', {
   // CRM-06: "every proposal for this client" cursor query.
   index('proposals_client_relationship_id_created_at_idx')
     .on(table.clientRelationshipId, sql`${table.createdAt} DESC`),
+
+  // Phase 33 (D-06): only 'won'/'lost' are ever stored — 'unanswered' is
+  // derived, following the same derive-don't-store discipline the lifecycle
+  // status column above already applies to 'expired'.
+  check('proposals_outcome_check', sql`${table.outcome} IS NULL OR ${table.outcome} IN ('won','lost')`),
+  // Phase 33 (PIPE-03): outcome set requires outcome_date set (same nullable-pair
+  // completeness shape as company_pair_decisions_resolution_check below).
+  // outcome_reason stays optional on the "set" branch per D-08.
+  check(
+    'proposals_outcome_completeness_check',
+    sql`(${table.outcome} IS NULL AND ${table.outcomeDate} IS NULL AND ${table.outcomeReason} IS NULL) OR (${table.outcome} IS NOT NULL AND ${table.outcomeDate} IS NOT NULL)`,
+  ),
 ]);
 
 /**
@@ -408,6 +432,11 @@ export const clientRelationships = pgTable('client_relationships', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   // Phase 31 (D-08) — provenance marker, same contract as companies.source below.
   source: text('source'),
+  // Phase 33 (PIPE-01/02, D-01/D-02/D-04): the pipeline stage. Fixed
+  // seven-value vocabulary, TypeScript union + DB CHECK (src/lib/pipeline/stages.ts
+  // is the single source of truth for the TS side). 'signe'/'debloque' are
+  // system-owned — nothing in v1.6 writes them (D-04).
+  stage: text('stage').notNull().default('prospect'),
 }, (table) => [
   uniqueIndex('client_relationships_company_id_owner_id_uq').on(table.companyId, table.ownerId),
   // CRM-07 cursor index — a partner's own client book.
@@ -416,6 +445,13 @@ export const clientRelationships = pgTable('client_relationships', {
   // CRM-03 admin lookup — every relationship on a company.
   index('client_relationships_company_id_idx').on(table.companyId),
   check('client_relationships_source_check', sql`${table.source} IS NULL OR ${table.source} IN ('proposal_extraction','hubspot_import')`),
+  // Phase 33 (D-01): the seven-value stage vocabulary, in vocabulary order.
+  check(
+    'client_relationships_stage_check',
+    sql`${table.stage} IN ('prospect','qualifie','proposition_envoyee','negociation','perdu','signe','debloque')`,
+  ),
+  // Phase 33 (PIPE-04): the board query filters on owner_id and groups by stage.
+  index('client_relationships_owner_id_stage_idx').on(table.ownerId, table.stage),
 ]);
 
 /**
