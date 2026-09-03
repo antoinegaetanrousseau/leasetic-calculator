@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "siren": "552100554",
+      "nom_complet": "ELECTRICITE DE FRANCE",
+      "nom_raison_sociale": "ELECTRICITE DE FRANCE",
+      "nature_juridique": "5599",
+      "activite_principale": "35.11Z",
+      "section_activite_principale": "D",
+      "tranche_effectif_salarie": "52",
+      "date_creation": "1955-01-01",
+      "etat_administratif": "A",
+      "categorie_entreprise": "GE",
+      "nombre_etablissements_ouverts": 231,
+      "siege": {
+        "siret": "55210055400013",
+        "adresse": "22 AVENUE DE WAGRAM 75008 PARIS 8",
+        "code_postal": "75008",
+        "libelle_commune": "PARIS 8",
+        "departement": "75",
+        "activite_principale": "35.11Z"
+      },
+      "complements": {
+        "est_bio": false,
+        "est_entrepreneur_individuel": false
+      }
+    }
+  ],
+  "total_results": 1,
+  "page": 1,
+  "per_page": 1,
+  "total_pages": 1
+}
