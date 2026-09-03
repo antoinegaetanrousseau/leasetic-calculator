@@ -1,6 +1,8 @@
 import 'server-only';
 import { and, asc, desc, eq, ilike, ne, or, sql } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import type { PipelineStage } from '@/lib/pipeline/stages';
+import type { LeadSource, RegistryState, RegistryStatus } from '@/lib/relationship/kinds';
 
 /**
  * Phase 30 Plan 04 — owner-scoped client-relationship registry queries.
@@ -242,12 +244,57 @@ export async function listClientBook(args: ListClientBookArgs): Promise<ListClie
 
 // ── Client detail (CRM-06, CRM-02, CRM-04) ───────────────────────────────────
 
+/**
+ * Phase 34 (FICHE-02/03/04) widens this row to ALL THREE D-01 tiers, because
+ * the client page has to render the read-only/editable boundary between them
+ * and can only do that if one owner-scoped statement returns all three. The
+ * grouping below IS that boundary — do not reorder it into alphabetical or
+ * table order, or the page layer has to re-derive D-01 from the design doc.
+ */
 export interface ClientRelationshipDetail {
   relationshipId: string;
   companyId: string;
+  createdAt: Date;
+
+  // ── Shared display tier (D-01) — any partner on the company may edit these,
+  // and the edit is audit-logged precisely BECAUSE every other partner on the
+  // company sees the result (D-03). `companyName` is `companies.name`, which
+  // stays the display name (D-13) — it is NOT `legalName`.
   companyName: string;
   siren: string | null;
-  createdAt: Date;
+  website: string | null;
+  phone: string | null;
+
+  // ── Registry tier (D-01) — written by the SIRENE lookup and NOTHING else.
+  // No partner-facing form may write any of these (D-02, structural). All
+  // nullable because the bulk backfill is deferred: an existing company reads
+  // as `registryStatus: 'pending'` until someone opens it and refreshes.
+  legalName: string | null;
+  addressLine: string | null;
+  postalCode: string | null;
+  city: string | null;
+  /** The raw legal-form CODE. D-06: the API carries no label, and the ~100-row table is not shipped. */
+  legalForm: string | null;
+  /** The raw NAF code; `nafSection` is its 21-entry section letter. D-06: there is deliberately no NAF label column. */
+  nafCode: string | null;
+  nafSection: string | null;
+  /** The registry's headcount CODE — '42' renders as "250 à 499 salariés" via the lookup table (D-06). */
+  headcountBand: string | null;
+  /** A `date` column: Drizzle hands back 'YYYY-MM-DD', not a Date. */
+  foundedOn: string | null;
+  /** D-11 `etat_administratif`: 'A' active, 'C' ceased — a partner should see a company has stopped trading. */
+  registryState: RegistryState | null;
+  registryStatus: RegistryStatus;
+  registrySyncedAt: Date | null;
+
+  // ── Private relationship tier (D-01) — the OWNING PARTNER ONLY. These live
+  // on `client_relationships`, not `companies`, so two partners quoting the
+  // same SIREN never see each other's lead source, notes or follow-up plans.
+  leadSource: LeadSource | null;
+  description: string | null;
+  nextActionAt: Date | null;
+  nextActionNote: string | null;
+  stage: PipelineStage;
 }
 
 /**
@@ -266,9 +313,36 @@ export async function getClientRelationshipForOwner(
     .select({
       relationshipId: schema.clientRelationships.id,
       companyId: schema.companies.id,
+      createdAt: schema.clientRelationships.createdAt,
+      // Shared display tier (D-01).
       companyName: schema.companies.name,
       siren: schema.companies.siren,
-      createdAt: schema.clientRelationships.createdAt,
+      website: schema.companies.website,
+      phone: schema.companies.phone,
+      // Registry tier (D-01) — read-only to every partner-facing surface.
+      legalName: schema.companies.legalName,
+      addressLine: schema.companies.addressLine,
+      postalCode: schema.companies.postalCode,
+      city: schema.companies.city,
+      legalForm: schema.companies.legalForm,
+      nafCode: schema.companies.nafCode,
+      nafSection: schema.companies.nafSection,
+      headcountBand: schema.companies.headcountBand,
+      foundedOn: schema.companies.foundedOn,
+      registrySyncedAt: schema.companies.registrySyncedAt,
+      // Private relationship tier (D-01) + the Phase 33 stage.
+      description: schema.clientRelationships.description,
+      nextActionAt: schema.clientRelationships.nextActionAt,
+      nextActionNote: schema.clientRelationships.nextActionNote,
+      // The four CHECK-constrained columns. They are plain `text` in the
+      // schema, so the projection carries the TS narrowing that the CHECK
+      // already guarantees in the database — done here rather than in a
+      // `.map()` so this function stays a single statement returning
+      // `rows[0] ?? null` untouched (its D-18 contract).
+      registryState: sql<RegistryState | null>`${schema.companies.registryState}`,
+      registryStatus: sql<RegistryStatus>`${schema.companies.registryStatus}`,
+      leadSource: sql<LeadSource | null>`${schema.clientRelationships.leadSource}`,
+      stage: sql<PipelineStage>`${schema.clientRelationships.stage}`,
     })
     .from(schema.clientRelationships)
     .innerJoin(schema.companies, eq(schema.companies.id, schema.clientRelationships.companyId))

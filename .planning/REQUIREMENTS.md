@@ -97,26 +97,34 @@ Partner-advanced stages (Antoine's explicit choice on 2026-08-31; the risk that 
 - [x] **PIPE-05**: Marking a deal **won** requires a SIREN on the company — the soft gate at handoff, never at proposal, so a partner quoting a prospect is never blocked on paperwork.
   - **Superseded 2026-09-03 (operator decision, Phase 33 acceptance):** the SIREN is **mandatory** at proposal creation (wizard step 1) and at client creation. The win-time gate (DB trigger + inline dialog) stays only as a safety net for legacy rows created before this date.
 
+> **Bookkeeping note (2026-09-03).** Phase 34's plan-level `requirements:`
+> frontmatter causes each plan's completion to tick every requirement it
+> *names*, so FICHE-01..05 and ACTV-01..04 were all checked off after waves 1-2
+> even though not one line of the client page exists yet. They were unchecked
+> by hand. These stay unchecked until the phase's acceptance walkthrough
+> (34-13) passes — a requirements file that claims undelivered work is worse
+> than one that lags.
+
 ### Client Record (FICHE)
 
 The client page is currently a name, an optional SIREN, a contact list and a proposal list. A partner cannot see who the company actually is, cannot record anything about the relationship, and cannot correct a single field. Added 2026-09-03 after Antoine asked for "a better interface to interact with my client page… more information displayed from the client, and edited".
 
 Sharing rule for every requirement below: **the registry owns identity, partners own the rest.** `companies` is a shared row (CRM-01) — two partners quoting the same SIREN attach to it — so registry-sourced identity is read-only to everyone, a short list of shared display fields is partner-editable and audit-logged, and anything about the relationship is private to its owner.
 
-- [x] **FICHE-01**: Creating a client looks the company up in the public SIRENE registry by its SIREN and stores what comes back. A registry outage never blocks creation; the record is simply marked as needing completion.
-- [x] **FICHE-02**: Registry-sourced identity — legal name, address, legal form, NAF code, activity section, headcount band, founding date, administrative state — renders read-only, with the date it was last synced and a control to refresh it.
-- [x] **FICHE-03**: A partner edits the shared display fields (display name, website, phone) and corrects a wrong SIREN, which re-runs the lookup. Every such edit is audit-logged, because other partners see it.
-- [x] **FICHE-04**: A partner records private relationship facts — source, description — that no other partner on the same company can see.
-- [x] **FICHE-05**: The client page is a header plus tabs (Informations, Contacts, Propositions, Activité), each section edited in place through its own dialog rather than a separate edit screen.
+- [ ] **FICHE-01**: Creating a client looks the company up in the public SIRENE registry by its SIREN and stores what comes back. A registry outage never blocks creation; the record is simply marked as needing completion.
+- [ ] **FICHE-02**: Registry-sourced identity — legal name, address, legal form, NAF code, activity section, headcount band, founding date, administrative state — renders read-only, with the date it was last synced and a control to refresh it.
+- [ ] **FICHE-03**: A partner edits the shared display fields (display name, website, phone) and corrects a wrong SIREN, which re-runs the lookup. Every such edit is audit-logged, because other partners see it.
+- [ ] **FICHE-04**: A partner records private relationship facts — source, description — that no other partner on the same company can see.
+- [ ] **FICHE-05**: The client page is a header plus tabs (Informations, Contacts, Propositions, Activité), each section edited in place through its own dialog rather than a separate edit screen.
 
 ### Activity & Follow-Up (ACTV)
 
 Answers "who do I chase this week" — and captures the two lead-qualification signals the wizard already collects and currently discards (`slb` sale-leaseback, `evalParc` parc evaluation).
 
-- [x] **ACTV-01**: A relationship has a single timeline mixing manual notes with system events.
-- [x] **ACTV-02**: System events — stage change, proposal sent — are recorded automatically, with actor and timestamp.
-- [x] **ACTV-03**: A user can add a dated note to a relationship.
-- [x] **ACTV-04**: A relationship carries a next-action date.
+- [ ] **ACTV-01**: A relationship has a single timeline mixing manual notes with system events.
+- [ ] **ACTV-02**: System events — stage change, proposal sent — are recorded automatically, with actor and timestamp.
+- [ ] **ACTV-03**: A user can add a dated note to a relationship.
+- [ ] **ACTV-04**: A relationship carries a next-action date.
 - [ ] **ACTV-05**: A user sees a list of relationships needing follow-up, driven by next-action date and staleness.
 
 ---

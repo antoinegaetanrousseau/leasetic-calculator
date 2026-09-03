@@ -83,6 +83,12 @@ export async function listPipelineBoard(
       and(
         eq(schema.proposals.clientRelationshipId, schema.clientRelationships.id),
         ne(schema.proposals.status, 'deleted'),
+        // D-22 (33-REVIEW WR-06) — the CRM-02 defence-in-depth predicate
+        // `listProposalsForRelationship` already carries. It belongs in the
+        // JOIN condition, never the WHERE: in the WHERE it would degrade this
+        // LEFT JOIN to an INNER JOIN and drop every relationship with zero
+        // owned proposals off the board.
+        eq(schema.proposals.userId, args.ownerId),
       ),
     )
     // CRM-02: ownerId is the ONLY predicate — a partner's own book, nothing else.
