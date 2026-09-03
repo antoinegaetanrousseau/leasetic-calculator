@@ -135,9 +135,13 @@ assumption. There is no `libelle` for NAF, legal form or headcount anywhere in
 the payload, so the app must own the label tables or show raw codes. The
 proportionate answer:
 
-- **Headcount band** — ship the table. It is roughly a dozen entries and turns
-  "42" into "250 à 499 salariés", which is exactly the "how big are they" signal
-  the field exists for. (Resolves open question 2 as *render it*.)
+- **Headcount band** — ship the table. It is 16 INSEE codes and turns a code
+  into a readable band, which is exactly the "how big are they" signal the field
+  exists for. (Resolves open question 2 as *render it*.) Note the codes are not
+  intuitive: `32` is "250 à 499 salariés" and `42` is "1 000 à 1 999" — an
+  earlier draft of this spec had that example wrong, so encode the published
+  INSEE list rather than an illustration, with a raw-code fallback for anything
+  unrecognised.
 - **Activity** — store `activite_principale` and display it beside the label for
   `section_activite_principale`, a 21-entry table ("M" → "Activités
   spécialisées, scientifiques et techniques"). Do NOT ship the ~700-row NAF

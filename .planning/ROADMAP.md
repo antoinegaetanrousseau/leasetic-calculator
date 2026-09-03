@@ -634,7 +634,23 @@ and can correct any of it without leaving the page.
   4. Opening a relationship shows a single chronological timeline mixing manual notes and system events — no separate tabs for the two — and a stage change or a finalized proposal appends a timestamped, attributed event with no user action required.
   5. A partner adds a dated note and sets a next-action date on a relationship, then opens an "à relancer" list ordered by next-action date and staleness, scoped to relationships they own.
 
-**Plans:** TBD
+**Plans:** 13 plans in 7 waves
+
+Plans:
+- [ ] 34-01-PLAN.md — wave 1 — data foundation: the three D-01 tiers, `relationship_events`, migration 0010, the full dictionary namespace
+- [ ] 34-02-PLAN.md — wave 1 — registry module: the measured lookup, D-05's identity assertion, the label tables, and D-23's SIREN convergence
+- [ ] 34-03-PLAN.md — wave 1 — ReUI blocks `solution-crm-5` + `solution-users-2`, and a font/vendoring integrity gate
+- [ ] 34-04-PLAN.md — wave 2 — apply migration 0010 to the Neon development branch (own wave, gated workflow only)
+- [ ] 34-05-PLAN.md — wave 3 — read layer: timeline reads, the owner-scoped event insert, the à-relancer query, and D-22's board-join fix
+- [ ] 34-06-PLAN.md — wave 4 — private-tier actions: relation details, dated notes, next-action date
+- [ ] 34-07-PLAN.md — wave 4 — registry write path: the D-09 creation hook, the refresh action, and the audited shared-tier edit
+- [ ] 34-08-PLAN.md — wave 4 — system events: `stage_changed`, `outcome_set`, `proposal_finalized`, and D-21's `fromStage` fix
+- [ ] 34-09-PLAN.md — wave 4 — home "à relancer" card (ACTV-05)
+- [ ] 34-10-PLAN.md — wave 5 — the four section-edit surfaces: relation, next action, company, registry refresh
+- [ ] 34-11-PLAN.md — wave 5 — the unified activity timeline and the note composer
+- [ ] 34-12-PLAN.md — wave 6 — client page rebuild: header, four tabs, identity and relation panels
+- [ ] 34-13-PLAN.md — wave 7 — acceptance fixtures, then the Phase 34 acceptance walkthrough
+
 **UI hint:** yes
 
 **Design:** `docs/superpowers/specs/2026-09-03-fiche-client-design.md`
