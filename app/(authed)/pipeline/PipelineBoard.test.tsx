@@ -139,6 +139,22 @@ describe('PipelineBoard (Plan 33-07 Task 1) — structure', () => {
     );
   });
 
+  // 33-REVIEW WR-02. dnd-kit's activator listeners share this DOM node, so
+  // during a live keyboard drag an arrow key would otherwise fire BOTH
+  // dnd-kit's drag-move and the direct path — two stage writes, two audit
+  // rows, and a final stage the partner never chose.
+  it('Test 9b: an arrow key during a live dnd-kit drag is ignored — dnd-kit owns the arrows', () => {
+    const initial = makeEmptyBoard();
+    initial.prospect = [makeRow()];
+    const { container } = render(<PipelineBoard initial={initial} lang="fr" />);
+    const item = container.querySelector('[data-slot="kanban-item"]') as HTMLElement;
+
+    item.dataset.dragging = 'true';
+    fireEvent.keyDown(item, { key: 'ArrowRight' });
+
+    expect(advanceRelationshipStageActionMock).not.toHaveBeenCalled();
+  });
+
   it('Test 10: ArrowLeft on the first settable stage, and arrows from a focused child, do nothing', () => {
     const initial = makeEmptyBoard();
     initial.prospect = [makeRow()];

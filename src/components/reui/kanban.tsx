@@ -628,7 +628,17 @@ function KanbanBoard({ className, render, ...props }: KanbanBoardProps) {
 
 export interface KanbanColumnProps extends useRender.ComponentProps<"div"> {
   value: string
-  disabled?: boolean
+  /**
+   * LEASETIC LOCAL MODIFICATION (33-REVIEW WR-01) — re-apply after any ReUI
+   * re-import. Upstream types this as a bare `boolean`, which forwards into
+   * `useSortable({ disabled })` and disables the column's DROPPABLE as well
+   * as its draggable. A lane that is meant to read as "you may not drop
+   * here" then stops being a collision target at all: `over` resolves to
+   * null, `handleDragEnd` returns early, `onMove` never fires, and the card
+   * silently snaps back with no explanation. dnd-kit's own object form
+   * separates the two, so it is accepted here and passed straight through.
+   */
+  disabled?: boolean | { draggable?: boolean; droppable?: boolean }
 }
 
 function KanbanColumn({
@@ -649,9 +659,18 @@ function KanbanColumn({
     isDragging: isSortableDragging,
   } = useSortable({
     id: value,
-    disabled: disabled || isOverlay,
+    // An overlay is never interactive at all, so it collapses to `true`.
+    disabled: isOverlay ? true : disabled,
     animateLayoutChanges,
   })
+
+  // `disabled` may now be an object, which must never reach an attribute or a
+  // className — React would render "[object Object]". A column counts as
+  // disabled for presentation when EITHER axis is off.
+  const isDisabledForDisplay =
+    typeof disabled === "object" && disabled !== null
+      ? Boolean(disabled.draggable || disabled.droppable)
+      : Boolean(disabled)
 
   // Hooks must run unconditionally; the derived value below is used only in the non-overlay branch.
   const { activeId, isColumn } = useContext(KanbanContext)
@@ -674,13 +693,13 @@ function KanbanColumn({
         "data-slot": "kanban-column",
         "data-value": value,
         "data-dragging": isSortableDragging,
-        "data-disabled": disabled,
+        "data-disabled": isDisabledForDisplay,
         ref: setNodeRef,
         style,
         className: cn(
           "group/kanban-column flex flex-col",
           isSortableDragging && "opacity-50 z-50",
-          disabled && "opacity-50",
+          isDisabledForDisplay && "opacity-50",
           className
         ),
         children: props.children,
@@ -696,7 +715,12 @@ function KanbanColumn({
               isDragging: true,
               disabled: false,
             }
-          : { attributes, listeners, isDragging: isColumnDragging, disabled }
+          : {
+              attributes,
+              listeners,
+              isDragging: isColumnDragging,
+              disabled: isDisabledForDisplay,
+            }
       }
     >
       {useRender({

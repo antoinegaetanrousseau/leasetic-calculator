@@ -404,6 +404,17 @@ icon-button pairs follow the same rule, not a looser one.
 
 ---
 
+## Vendored ReUI modifications to re-apply after any re-import
+
+Vendored ReUI code (`src/components/reui/**`, `src/components/ui/**`,
+`src/components/blocks/**`) is re-imported wholesale on upgrade and is excluded
+from ESLint, so every local change to it must be listed here or it will be
+silently lost.
+
+| File | Change | Why |
+|---|---|---|
+| `src/components/reui/kanban.tsx` | `KanbanColumn`'s `disabled` prop accepts dnd-kit's object form (`{ draggable, droppable }`) as well as a boolean, and `data-disabled` / the opacity class derive from a normalised boolean. | Upstream types it as a bare boolean and forwards it into `useSortable`, which disables the column's DROPPABLE along with its draggable. A lane meant to read "no drops here" then stops being a collision target entirely, so `over` is null, `onMove` never fires, and a refusal message keyed to the drop cannot run — the card just snaps back unexplained. Added 2026-09-03 (33-REVIEW WR-01); the pipeline board's reserved lanes depend on it. |
+
 ## Open Items
 
 These are **live, deliberate open questions**. They are recorded here so a checker does not

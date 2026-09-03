@@ -10,23 +10,27 @@
  * never user-editable.
  *
  * D-08's inline SIREN gate: `markProposalWonAction` submits optimistically.
- * Only when it rejects with the `SIREN_REQUIRED` sentinel (imported, never
- * re-declared as a literal) does this component reveal a third field,
- * below the still-filled date/reason fields — the whole point of D-08 is
- * that the partner never loses their place or their typed values. The gate
- * is discovered server-side (this plan's own decision record): the dialog
- * never pre-computes whether the company has a SIREN, it only reacts to
- * the server's answer.
+ * Only when it RESOLVES to `{ ok: false, reason: 'siren_required' }` does
+ * this component reveal a third field, below the still-filled date/reason
+ * fields — the whole point of D-08 is that the partner never loses their
+ * place or their typed values. The gate is discovered server-side (this
+ * plan's own decision record): the dialog never pre-computes whether the
+ * company has a SIREN, it only reacts to the server's answer.
+ *
+ * A RESOLVED value, never a thrown sentinel (33-REVIEW CR-01). This
+ * component used to compare a thrown error's `.message` against a
+ * `SIREN_REQUIRED` constant. Next.js substitutes a generic message plus a
+ * digest for a Server Function's thrown error in production builds, so that
+ * comparison was true in `next dev` and false everywhere real: the partner
+ * got a bounded toast and no way to supply the SIREN, which is the precise
+ * dead end D-08 exists to prevent. The sentinel is deleted;
+ * `@/lib/pipeline/constants` now carries the result TYPE instead.
+ * `tests/server-action-error-contracts.test.ts` fails the build if any
+ * client component starts branching on a server action's error message
+ * again.
  *
  * Every other failure collapses to the single bounded toast
  * (`pipeline.toast.error`) — the raw error is never inspected or rendered.
- *
- * Rule 3 auto-fix (see `@/lib/pipeline/constants`): `SIREN_REQUIRED` is
- * imported from `@/lib/pipeline/constants`, NOT from
- * `@/lib/pipeline/actions` — `actions.ts` carries `'use server'`, and
- * Next.js's Server Actions build fails any `'use server'` file exporting a
- * non-function value, which broke `npm run build` the moment this
- * component tried to import the sentinel from there.
  */
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';

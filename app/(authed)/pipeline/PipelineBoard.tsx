@@ -244,6 +244,10 @@ export function PipelineBoard({ initial, lang }: PipelineBoardProps) {
    * between the partner-settable stages. The reserved lanes are simply not
    * in that list (D-04), and every move still flows through
    * `handleKanbanMove` — the single stage-write call site (D-09.2).
+   *
+   * The two paths are mutually exclusive by construction: `onItemKeyDown`
+   * stands down while a dnd-kit drag is live (33-REVIEW WR-02), so a stage
+   * change is written exactly once whichever path the partner uses.
    */
   const moveByKeyboard = (row: PipelineCardRow, stage: PipelineStage, direction: -1 | 1) => {
     const settable = PARTNER_SETTABLE_STAGES as readonly PipelineStage[];
@@ -263,6 +267,14 @@ export function PipelineBoard({ initial, lang }: PipelineBoardProps) {
 
   const onItemKeyDown = (row: PipelineCardRow, stage: PipelineStage) => (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return; // only when the card itself is focused
+    // 33-REVIEW WR-02: dnd-kit's activator listeners (its own onKeyDown among
+    // them) are merged onto THIS node by `render={<KanbanItemHandle cursor />}`.
+    // Once a keyboard drag is active, an arrow would fire dnd-kit's drag-move
+    // AND this direct path, and committing with Space would then write the
+    // stage a second time from indices computed against a stale `columns`
+    // closure — two audit rows and a stage the partner never chose. While a
+    // drag is live, dnd-kit owns the arrow keys.
+    if (event.currentTarget.dataset.dragging === 'true') return;
     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
       event.preventDefault();
       moveByKeyboard(row, stage, event.key === 'ArrowRight' ? 1 : -1);
@@ -309,7 +321,20 @@ export function PipelineBoard({ initial, lang }: PipelineBoardProps) {
             const isPerdu = stage === 'perdu';
 
             return (
-              <KanbanColumn key={stage} value={stage} disabled={reserved} className={COLUMN_WIDTH}>
+              <KanbanColumn
+                key={stage}
+                value={stage}
+                // 33-REVIEW WR-01: a reserved lane must stay a DROP TARGET
+                // while refusing to be dragged. A bare `disabled` turned off
+                // the droppable too, so a card released over Signé resolved
+                // `over` to null, `onMove` never ran, and D-09.1's third layer
+                // — the explanatory refusal toast — was unreachable: the card
+                // just snapped back with no reason given, which D-09.1 itself
+                // calls worse than a lane that reads as unreachable. The
+                // refusal now happens where it belongs, in `handleKanbanMove`.
+                disabled={reserved ? { draggable: true, droppable: false } : false}
+                className={COLUMN_WIDTH}
+              >
                 <section
                   className={cn(
                     'flex min-h-[16rem] flex-col gap-2 rounded-container border p-2.5 transition-colors',
