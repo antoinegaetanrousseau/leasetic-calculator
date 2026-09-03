@@ -155,8 +155,11 @@ describe('IdentityPanel — the read-only registry tier (D-02)', () => {
     const state = screen.getByTestId('identity-field-state');
     expect(state.textContent).toContain(t('clients.registry.state.ceased', 'fr'));
     expect(state.getAttribute('data-ceased')).toBe('true');
-    // UIC-03: prominence comes from weight, never a destructive fill.
-    expect(state.innerHTML).not.toContain('destructive');
+    // UIC-03: prominence comes from weight, never a destructive fill. (The
+    // badge's base class list carries `aria-invalid:*-destructive` utilities
+    // from upstream, so the assertion targets the FILL specifically.)
+    expect(state.innerHTML).not.toContain('bg-destructive');
+    expect(state.innerHTML).toContain('font-bold');
   });
 
   it('Test 5b: an active company renders the active wording, unweighted', () => {
