@@ -586,7 +586,7 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
   4. Marking a deal `won` is blocked unless the company has a SIREN on file; quoting or advancing early pipeline stages is never blocked by a missing SIREN.
   5. A partner opens their pipeline view and sees their own relationships grouped by stage; they never see another partner's relationships.
 
-**Plans:** 4/9 plans executed
+**Plans:** 5/9 plans executed
 **Wave 1**
 
 - [x] 33-01-PLAN.md — Schema, stage vocabulary, migration 0009 with the SIREN-gate triggers, and the full pipeline.* dictionary
@@ -600,7 +600,7 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 33-05-PLAN.md — Conversion-rate copy, pipeline card and lane header, drag-refusal CSS, sidebar and breadcrumb
-- [ ] 33-06-PLAN.md — Proposal outcome capture on /clients/[id] with D-08's inline SIREN dialog
+- [x] 33-06-PLAN.md — Proposal outcome capture on /clients/[id] with D-08's inline SIREN dialog
 - [ ] 33-08-PLAN.md — Integration proofs: the SIREN-gate triggers and the conversion-rate formula on real Postgres
 
 **Wave 4** *(blocked on Wave 3 completion)*
@@ -686,7 +686,7 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | 8/8 | Complete   | 2026-09-02 |
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
 | 35. Sales Motivation | v1.7 | TBD | Not started | - |
-| 33. Pipeline | v1.6 | 4/9 | In Progress|  |
+| 33. Pipeline | v1.6 | 5/9 | In Progress|  |
 | 34. Activity & Follow-Up | v1.6 | TBD | Not started | - |
 
 ---

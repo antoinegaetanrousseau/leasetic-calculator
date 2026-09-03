@@ -139,3 +139,11 @@ None — no external service configuration required. This plan touches no migrat
 ---
 *Phase: 33-pipeline*
 *Completed: 2026-09-03*
+
+## Self-Check: PASSED
+
+All created files verified present on disk (MarkWonDialog.tsx, MarkWonDialog.test.tsx,
+MarkLostDialog.tsx, MarkLostDialog.test.tsx, ProposalOutcomeControl.tsx,
+ProposalOutcomeControl.test.tsx, src/lib/pipeline/constants.ts) and all task commit
+hashes (674f843, 9087f9e, f595db4) plus this summary's own commit (6041869)
+verified present in git log.
