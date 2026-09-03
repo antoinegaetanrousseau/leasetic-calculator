@@ -114,6 +114,17 @@ describe('getRouteMeta — partner tree (no adminSegment)', () => {
       breadcrumb: [{ labelKey: 'sidebar.nav.clients' }],
     });
   });
+
+  it('returns pipeline for /pipeline and /pipeline/ — Plan 33-05, a single non-link crumb (no child detail route)', () => {
+    const expected = {
+      titleKey: 'sidebar.nav.pipeline',
+      activeNav: 'pipeline',
+      breadcrumb: [{ labelKey: 'sidebar.nav.pipeline' }],
+    };
+    expect(getRouteMeta('/pipeline')).toEqual(expected);
+    expect(getRouteMeta('/pipeline/')).toEqual(expected);
+    expect(getRouteMeta('/pipeline').breadcrumb[0].href).toBeUndefined();
+  });
 });
 
 describe('getRouteMeta — admin tree (with adminSegment)', () => {
@@ -234,6 +245,8 @@ describe('getRouteMeta — breadcrumb trail invariants (D-06, ROADMAP criterion 
     ['/clients'],
     ['/clients/abc-123'],
     ['/clients/'],
+    ['/pipeline'],
+    ['/pipeline/'],
     ['/aide'],
     ['/aide/commencer-ici'],
     ['/something-unknown'],

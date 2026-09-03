@@ -11,6 +11,7 @@ export type ActiveNav =
   | 'proposals-new'
   | 'proposals'
   | 'clients'
+  | 'pipeline'
   | 'history'
   | 'help'
   | 'admin-home'
@@ -194,6 +195,15 @@ export function getRouteMeta(pathname: string, adminSegment?: string): RouteMeta
             { labelKey: 'shell.breadcrumb.clientDetail' },
           ]
         : [{ labelKey: 'sidebar.nav.clients' }],
+    };
+  }
+  if (pathname.startsWith('/pipeline')) {
+    // No `hasDetail` fork here, unlike `/clients` above — `/pipeline` has no
+    // child detail route (33-UI-SPEC.md §0: a single non-link crumb).
+    return {
+      titleKey: 'sidebar.nav.pipeline',
+      activeNav: 'pipeline',
+      breadcrumb: [{ labelKey: 'sidebar.nav.pipeline' }],
     };
   }
   if (pathname.startsWith('/aide')) {

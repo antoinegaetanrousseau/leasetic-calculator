@@ -72,16 +72,17 @@ afterEach(() => {
 describe('AppSidebar', () => {
   // ── Per-role nav contract (Phase 18 D-27) ────────────────────────────────
 
-  it('AC-RS-04: partner nav renders exactly 5 items in FR order (Plan 30-02 adds Clients)', () => {
+  it('AC-RS-04: partner nav renders exactly 6 items in FR order (Plan 33-05 adds Pipeline)', () => {
     const { container } = renderSidebar({ activeNav: 'home', isAdmin: false, lang: 'fr', theme: 'light' });
 
     const links = navLinksIn(container);
-    expect(links).toHaveLength(5);
+    expect(links).toHaveLength(6);
     expect(Array.from(links).map((l) => l.textContent)).toEqual([
       'Accueil',
       'Nouvelle proposition',
       'Propositions',
       'Clients',
+      'Pipeline',
       'Aide',
     ]);
     // Active item is exposed via the primitive's data-active hook. base-ui
@@ -160,6 +161,7 @@ describe('AppSidebar', () => {
       'New proposal',
       'Proposals',
       'Clients',
+      'Pipeline',
       'Help',
     ]);
   });
@@ -185,7 +187,7 @@ describe('AppSidebar', () => {
     // Nav items remain present and reachable — the primitive hides their labels
     // visually in icon mode rather than unmounting them, which keeps the links
     // available to assistive tech.
-    expect(navLinksIn(container)).toHaveLength(5);
+    expect(navLinksIn(container)).toHaveLength(6);
   });
 
   it('AC-RS-01/03: toggling via the providers own keyboard shortcut flips collapse state', async () => {
@@ -396,6 +398,19 @@ describe('AppSidebar', () => {
     });
     const hrefs = Array.from(navLinksIn(container)).map((a) => a.getAttribute('href'));
     expect(hrefs).toContain('/clients');
-    expect(navLinksIn(container)).toHaveLength(5);
+    // Plan 33-05: Pipeline joined Clients inside the same non-admin spread,
+    // so the count moved from 5 to 6 alongside this assertion.
+    expect(navLinksIn(container)).toHaveLength(6);
+  });
+
+  // ── Pipeline nav entry (Phase 33 Plan 05) ────────────────────────────────
+
+  it('T-33-05-04: an admin (Agent view) never sees the /pipeline link that would 404 for them', () => {
+    window.sessionStorage.setItem('leasetic.view', 'agent');
+    const { container } = renderSidebar({
+      activeNav: 'home', isAdmin: true, lang: 'fr', theme: 'light', adminHomeHref: '/x',
+    });
+    const hrefs = Array.from(navLinksIn(container)).map((a) => a.getAttribute('href'));
+    expect(hrefs).not.toContain('/pipeline');
   });
 });

@@ -21,7 +21,7 @@
  *     carried over unchanged. Those encode real product rules, not styling.
  */
 
-import { HomeIcon, PlusIcon, ProposalIcon, HelpIcon, UsersIcon, SlidersIcon, BuildingIcon, AlertTriangleIcon } from '@/components/ui/icons';
+import { HomeIcon, PlusIcon, ProposalIcon, HelpIcon, UsersIcon, SlidersIcon, BuildingIcon, AlertTriangleIcon, BarChartIcon } from '@/components/ui/icons';
 import { useSyncExternalStore, type ComponentType } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -107,6 +107,10 @@ type NavItem = { key: ActiveNav; icon: ComponentType<{ size?: number; className?
  * The gate is deliberately not relaxed instead: an admin holds no client
  * relationships, so /clients would be empty for them by construction. Their
  * equivalent surface is Sociétés (admin-companies) in Admin view.
+ *
+ * Phase 33 Plan 05: `pipeline` shares `clients`' conditional, for the same
+ * reason — `/pipeline` is also `requireRelationshipHolder()`-gated, so it
+ * would 404 for an admin in Agent view exactly as `/clients` does.
  */
 function partnerNavItems(isAdmin: boolean): NavItem[] {
   return [
@@ -115,7 +119,10 @@ function partnerNavItems(isAdmin: boolean): NavItem[] {
     { key: 'proposals', icon: ProposalIcon, labelKey: 'sidebar.nav.proposals', href: '/proposals' },
     ...(isAdmin
       ? []
-      : [{ key: 'clients' as const, icon: BuildingIcon, labelKey: 'sidebar.nav.clients' as DictKey, href: '/clients' }]),
+      : [
+          { key: 'clients' as const, icon: BuildingIcon, labelKey: 'sidebar.nav.clients' as DictKey, href: '/clients' },
+          { key: 'pipeline' as const, icon: BarChartIcon, labelKey: 'sidebar.nav.pipeline' as DictKey, href: '/pipeline' },
+        ]),
     { key: 'help', icon: HelpIcon, labelKey: 'sidebar.nav.help', href: '/aide' },
   ];
 }
