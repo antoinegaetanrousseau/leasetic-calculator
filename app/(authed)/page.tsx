@@ -3,10 +3,10 @@ import { PlusIcon } from '@/components/ui/icons';
 import Link from 'next/link';
 import { requireUser } from '@/lib/auth/require';
 import { getCurrentLang, t } from '@/lib/i18n';
-import { type DictKey } from '@/lib/i18n/dictionaries';
 import { PageHero } from '@/components/ui/PageHero';
 import { MetricTile } from '@/components/ui/MetricTile';
-import { StatusChip } from '@/components/ui/StatusChip';
+import { ProposalListFrame } from '@/components/proposals/ProposalListFrame';
+import { ProposalRowBody } from '@/components/proposals/ProposalRow';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,7 +16,6 @@ import {
 } from '@/lib/db/queries/proposal-aggregates';
 import { buildListResponse } from '@/lib/api/proposals/list';
 import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
-import { formatCurrency } from '@/lib/i18n/format';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Accueil — Leasétic Matrice' };
@@ -79,57 +78,51 @@ export default async function HomePage() {
         />
       </div>
 
-      <Card className="mt-0">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-            {t('dashboard.recent.title', lang)}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {recentRows.length === 0 ? (
+      {recentRows.length === 0 ? (
+        <Card className="mt-0">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+              {t('dashboard.recent.title', lang)}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <p className="text-muted-foreground text-[14.5px] m-0">
               {t('dashboard.recent.empty', lang)}
             </p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {recentRows.map((row) => {
-                const chipKey = `chip.${row.displayStatus}` as DictKey;
-                return (
-                  <Link
-                    key={row.id}
-                    href={`/proposals/${row.id}`}
-                    className="group flex items-center justify-between p-3 rounded-lg border border-transparent hover:border-border hover:bg-muted/30 transition-all no-underline"
-                  >
-                    <div className="grid grid-cols-[1fr_80px_100px] items-center gap-4 flex-1">
-                      <span className="text-[14.5px] font-semibold text-foreground truncate">
-                        {row.clientCo}
-                      </span>
-                      <span className="text-[13px] font-medium text-foreground font-mono">
-                        {row.lcRef}
-                      </span>
-                      <span className="text-[14.5px] font-semibold text-foreground text-right tabular-nums">
-                        {formatCurrency(Number(row.amountHT), lang)}
-                      </span>
-                    </div>
-                    <div className="ml-4 flex-shrink-0">
-                      <StatusChip variant={row.displayStatus} label={t(chipKey, lang)} />
-                    </div>
-                  </Link>
-                );
-              })}
+            <div className="mt-6 text-right">
+              <Link
+                href="/proposals"
+                className="text-sm font-medium text-primary hover:underline transition-colors"
+              >
+                {t('dashboard.recent.viewAll', lang)}
+              </Link>
             </div>
-          )}
-
-          <div className="mt-6 text-right">
+          </CardContent>
+        </Card>
+      ) : (
+        <ProposalListFrame
+          className="mt-0"
+          title={t('dashboard.recent.title', lang)}
+          action={
             <Link
               href="/proposals"
-              className="text-sm font-medium text-primary hover:underline transition-colors"
+              className="text-sm font-medium text-primary no-underline hover:underline"
             >
               {t('dashboard.recent.viewAll', lang)}
             </Link>
-          </div>
-        </CardContent>
-      </Card>
+          }
+        >
+          {recentRows.map((row) => (
+            <Link
+              key={row.id}
+              href={`/proposals/${row.id}`}
+              className="flex min-w-0 items-center gap-3 rounded-lg border-b border-border px-2.5 py-2.5 text-inherit no-underline transition-colors last:border-b-0 hover:bg-[var(--hover-overlay)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ProposalRowBody row={row} lang={lang} />
+            </Link>
+          ))}
+        </ProposalListFrame>
+      )}
     </div>
   );
 }

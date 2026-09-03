@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation';
 import type { Lang } from '@/lib/i18n/dictionaries';
 import type { ListResponse, ProposalRowDto } from '@/lib/api/proposals/list';
 import { ProposalRow } from './ProposalRow';
+import { ProposalListFrame } from './ProposalListFrame';
 import { LoadMoreButton } from './LoadMoreButton';
 import { DraftActionsClient } from './DraftActionsClient';
 import { RowActionsClient } from './RowActionsClient';
@@ -48,6 +49,7 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
 
   return (
     <div>
+      <ProposalListFrame>
       {rows.map((row) => (
         <ProposalRow
           key={row.id}
@@ -65,6 +67,7 @@ export function ProposalsList({ lang, initial }: ProposalsListProps) {
           }
         />
       ))}
+      </ProposalListFrame>
       {hasMore && (
         <LoadMoreButton
           lang={lang}

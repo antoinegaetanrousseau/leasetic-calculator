@@ -4,6 +4,9 @@ import { cva } from 'class-variance-authority';
 import { useRouter } from 'next/navigation';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate } from '@/lib/i18n/format';
+import { cn } from '@/lib/utils';
+import { Item, ItemMedia } from '@/components/ui/item';
+import { FileTextIcon } from '@/components/ui/icons';
 import { StatusChip } from '@/components/ui/StatusChip';
 import type { ProposalRowDto } from '@/lib/api/proposals/list';
 
@@ -21,10 +24,6 @@ export interface ProposalRowProps {
    * When true, dim the row (opacity 0.7). Callers should derive this per row
    * from `row.displayStatus === 'deleted'`, not from a per-view flag — the
    * archived view mixes expired and soft-deleted rows.
-   *
-   * Phase 14 narrowed this prop: the StatusChip is driven by
-   * `row.displayStatus` and RowActionsClient derives the Restore slot the same
-   * way, so opacity is all that is left here.
    */
   deleted?: boolean;
   /** When true, render a clickable div (not a Link) with draftActionsSlot on the right. */
@@ -35,61 +34,112 @@ export interface ProposalRowProps {
   actionsSlot?: React.ReactNode;
   /**
    * Phase 33: on `/clients/[id]` every row belongs to the page's own company,
-   * so the client-name column is redundant. `hideClient` drops it and lets the
-   * date column absorb the slack instead of a fixed-track grid overflowing the
-   * card at laptop width.
+   * so the company name is redundant — the reference becomes the row title.
    */
   hideClient?: boolean;
 }
 
 /**
- * Phase 4: ported off the v10 `.list-row` / `.is-deleted` / `.is-draft` rules.
+ * Row anatomy adopted from ReUI's `list-2` block (`FundRow`) at the Phase 33
+ * acceptance checkpoint, replacing the v10-era fixed-track grid that overflowed
+ * at laptop width: a 36px icon tile, a title over a muted secondary line, and
+ * a right-aligned label/value pair. The tile is tinted with the same feedback
+ * token `StatusChip` uses for the row's status — one signal, two places.
  *
- * This stays a clickable grid row rather than becoming a shadcn Table row: the
- * rows are navigational (role="button", they route on click), not tabular data
- * under column headers, so a <table> would be the wrong semantics.
- *
- * The three v10 variants declared the same grid template and differed only in
- * opacity, so `is-draft` collapses into the base and only `deleted` survives as
- * a variant. The focus ring moves from the old teal to `ring-ring`, which is
- * the design system's green-700 — DS rule 1 makes green the only interactive
- * signal, and --ring was pointed at it in Phase 1.
+ * The row stays a clickable `role="button"` rather than a `<table>` row: rows
+ * are navigational, not tabular data under column headers.
  */
 const rowClass = cva(
   [
-    'grid min-w-0 items-center gap-4',
-    'cursor-pointer rounded-lg border-b border-border p-4 text-inherit no-underline',
-    'transition-colors last:border-b-0 hover:bg-[var(--hover-overlay)]',
+    'flex min-w-0 items-center gap-3 rounded-lg px-2.5 py-2.5 text-inherit no-underline',
+    'cursor-pointer border-b border-border transition-colors last:border-b-0 hover:bg-[var(--hover-overlay)]',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   ].join(' '),
   {
-    variants: {
-      deleted: { true: 'opacity-70', false: '' },
-      layout: {
-        full: 'grid-cols-[minmax(0,1fr)_100px_130px_100px_max-content_auto]',
-        compact: 'grid-cols-[110px_130px_minmax(0,1fr)_max-content_auto]',
-      },
-    },
-    defaultVariants: { deleted: false, layout: 'full' },
+    variants: { deleted: { true: 'opacity-70', false: '' } },
+    defaultVariants: { deleted: false },
   },
 );
 
+const TILE_TINT: Record<ProposalRowDto['displayStatus'], string> = {
+  active: 'bg-success/15 text-success-foreground',
+  draft: 'bg-warning/15 text-warning-foreground',
+  expired: 'bg-muted text-muted-foreground',
+  deleted: 'bg-destructive/15 text-destructive',
+};
+
+function ProposalTile({ status }: { status: ProposalRowDto['displayStatus'] }) {
+  return (
+    <Item
+      className={cn(
+        'flex size-9 shrink-0 items-center justify-center border-2 border-background p-0 shadow-[0_1px_3px_0_rgba(0,0,0,0.14)]',
+        TILE_TINT[status],
+      )}
+      aria-hidden="true"
+    >
+      <ItemMedia variant="icon" className="size-auto">
+        <FileTextIcon size={16} />
+      </ItemMedia>
+    </Item>
+  );
+}
+
+export interface ProposalRowBodyProps {
+  row: ProposalRowDto;
+  lang: Lang;
+  hideClient?: boolean;
+  /** Rendered after the status chip (row actions). */
+  trailing?: React.ReactNode;
+}
+
 /**
- * Phase 14 D-27 — chip rendering switched from the ad-hoc
- * <ValidityChip> / <DeletedChip> composition to a single <StatusChip>
- * driven by the server-derived `row.displayStatus` (one of
- * 'draft' | 'active' | 'expired' | 'deleted').
- *
- * Trade-off documented in 14-06-SUMMARY: the validity-countdown tooltip
- * previously surfaced by ValidityChip ("Valable jusqu'au DD/MM/YYYY") is
- * NOT preserved by StatusChip. UI-SPEC §5.8 does not mandate tooltip
- * parity for v1.2; ValidityChip.tsx remains on disk as Phase 8 code if a
- * future iteration wants to restore the tooltip.
+ * The row's content, shared by `ProposalRow` (clickable div) and the home
+ * page's recent list (a `Link` per row).
  *
  * ADMIN-09: row.displayStatus is a bounded 4-string union. row.paramsSnapshot
  * (which contains commission_pct) is NEVER projected onto ProposalRowDto —
  * defense in depth.
  */
+export function ProposalRowBody({ row, lang, hideClient = false, trailing = null }: ProposalRowBodyProps) {
+  const chipLabelKey = `chip.${row.displayStatus}` as DictKey;
+  const date = formatDate(new Date(row.createdAt), lang);
+
+  return (
+    <>
+      <ProposalTile status={row.displayStatus} />
+
+      <div className="min-w-0 flex-1">
+        <p className="m-0 truncate text-[15px] leading-tight font-medium text-foreground">
+          {hideClient ? row.lcRef : row.clientCo}
+        </p>
+        <p className="m-0 mt-0.5 truncate text-xs text-muted-foreground">
+          {hideClient ? (
+            date
+          ) : (
+            <>
+              <span className="font-mono">{row.lcRef}</span>
+              <span aria-hidden="true"> · </span>
+              {date}
+            </>
+          )}
+        </p>
+      </div>
+
+      <div className="shrink-0 space-y-0.5 text-right">
+        <p className="m-0 text-xs leading-none text-muted-foreground">
+          {t('proposal.row.amountLabel', lang)}
+        </p>
+        <p className="m-0 text-sm leading-tight font-medium text-foreground tabular-nums">
+          {formatCurrency(Number(row.amountHT), lang)}
+        </p>
+      </div>
+
+      <StatusChip variant={row.displayStatus} label={t(chipLabelKey, lang)} className="shrink-0" />
+      {trailing}
+    </>
+  );
+}
+
 export function ProposalRow({
   row,
   lang,
@@ -100,62 +150,31 @@ export function ProposalRow({
   hideClient = false,
 }: ProposalRowProps) {
   const router = useRouter();
-  const className = rowClass({ deleted, layout: hideClient ? 'compact' : 'full' });
+  const className = rowClass({ deleted });
   const ariaLabel = row.clientCo
     ? `${row.clientCo}${row.lcRef ? ` ${row.lcRef}` : ''}`
     : t('proposal.detail.title', lang).replace('{0}', row.lcRef);
-  const chipLabelKey = `chip.${row.displayStatus}` as DictKey;
-
-  const columns = (
-    <>
-      {!hideClient && (
-        <span className="truncate text-[14.5px] font-semibold text-ink">{row.clientCo}</span>
-      )}
-      <span className="truncate font-mono text-[13px] font-medium text-ink">{row.lcRef}</span>
-      <span className="text-right text-[14.5px] font-semibold text-ink tabular-nums">
-        {formatCurrency(Number(row.amountHT), lang)}
-      </span>
-      <span className="text-[13px] font-normal text-[var(--muted)]">
-        {formatDate(new Date(row.createdAt), lang)}
-      </span>
-      <StatusChip variant={row.displayStatus} label={t(chipLabelKey, lang)} />
-    </>
-  );
-
-  if (draftMode) {
-    return (
-      <div
-        className={className}
-        data-slot="proposal-row"
-        data-draft="true"
-        role="button"
-        tabIndex={0}
-        aria-label={ariaLabel}
-        onClick={() => router.push(`/proposals/new/parametres?draft_id=${row.id}`)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') router.push(`/proposals/new/parametres?draft_id=${row.id}`);
-        }}
-      >
-        {columns}
-        {draftActionsSlot}
-      </div>
-    );
-  }
+  const href = draftMode ? `/proposals/new/parametres?draft_id=${row.id}` : `/proposals/${row.id}`;
 
   return (
     <div
       className={className}
       data-slot="proposal-row"
+      data-draft={draftMode ? 'true' : undefined}
       role="button"
       tabIndex={0}
       aria-label={ariaLabel}
-      onClick={() => router.push(`/proposals/${row.id}`)}
+      onClick={() => router.push(href)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') router.push(`/proposals/${row.id}`);
+        if (e.key === 'Enter') router.push(href);
       }}
     >
-      {columns}
-      {actionsSlot}
+      <ProposalRowBody
+        row={row}
+        lang={lang}
+        hideClient={hideClient}
+        trailing={draftMode ? draftActionsSlot : actionsSlot}
+      />
     </div>
   );
 }
