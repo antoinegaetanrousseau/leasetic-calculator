@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-03T00:06:39.890Z"
+last_updated: "2026-09-03T00:22:15.579Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 16
   total_plans: 79
-  completed_plans: 71
+  completed_plans: 72
   percent: 80
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 33 (pipeline) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Ready to execute
 Last activity: 2026-09-03
 
@@ -413,6 +413,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 31.1 P06 | 6min | 3 tasks | 4 files |
 | Phase 31.1 P07 | ~60min | 3 tasks | 2 files |
 | Phase 33 P01 | ~25min | 3 tasks | 8 files |
+| Phase 33 P03 | ~20min | 2 tasks | 8 files |
 
 ## Decisions
 
@@ -521,3 +522,5 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 31.1]: Dark-mode gaps (DARK-GAP-01/02/03) accepted as-is; no values invented, closure path recorded in UI-CONVENTIONS.md
 - [Phase 31.1]: CLAUDE.md Open Items corrected per operator-approved text (OPEN-A closed, --radius drives nothing in the scale)
 - [Phase 33]: D-07's DB SIREN gate is a trigger, not a CHECK (Postgres CHECK cannot join proposals -> client_relationships -> companies); proposals_won_requires_siren() + two WHEN-gated triggers, FOR SHARE lock, fail-closed
+- [Phase 33]: Conversion-rate formula locked (A-2): won=COUNT(outcome='won'), total=COUNT(status='active' AND deleted_at IS NULL AND client_relationship_id IS NOT NULL), pct=null on zero denominator else Math.round(won/total*100), both scoped to owner in one statement (D-12).
+- [Phase 33]: validityDays is projected out of params_snapshot via projectValidityDays (select-aliased 'snapshot', never returned as paramsSnapshot) mirroring computedClientMonthly's ADMIN-09 pattern; admin's companies.ts keeps validityDays null rather than reopening its own stricter no-params_snapshot guard.

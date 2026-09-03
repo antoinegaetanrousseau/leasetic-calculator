@@ -93,7 +93,7 @@ Partner-advanced stages (Antoine's explicit choice on 2026-08-31; the risk that 
 - [x] **PIPE-01**: A relationship carries a pipeline stage that its owner can advance.
 - [x] **PIPE-02**: Late stages (`signé`, `débloqué`) are marked system-owned and are **not** hand-editable — reserved for contract-tool feedback in a later milestone.
 - [x] **PIPE-03**: A proposal records an outcome (`won` / `lost` / `unanswered`) with a date and an optional reason, giving a real per-quote conversion rate.
-- [ ] **PIPE-04**: A partner sees their pipeline grouped by stage.
+- [x] **PIPE-04**: A partner sees their pipeline grouped by stage.
 - [x] **PIPE-05**: Marking a deal **won** requires a SIREN on the company — the soft gate at handoff, never at proposal, so a partner quoting a prospect is never blocked on paperwork.
 
 ### Activity & Follow-Up (ACTV)
