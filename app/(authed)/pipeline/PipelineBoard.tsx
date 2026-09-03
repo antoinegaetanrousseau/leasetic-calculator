@@ -42,12 +42,15 @@ import {
   KanbanColumnContent,
   KanbanItem,
   KanbanItemHandle,
+  KanbanOverlay,
   type KanbanMoveEvent,
 } from '@/components/reui/kanban';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { PipelineCard } from './PipelineCard';
 import { PipelineColumnHeader } from './PipelineColumnHeader';
+import { cn } from '@/lib/utils';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
+import { stageLabel } from '@/lib/pipeline/format';
 import { advanceRelationshipStageAction } from '@/lib/pipeline/actions';
 import { PIPELINE_STAGES, isReservedStage, type PipelineStage } from '@/lib/pipeline/stages';
 import type { PipelineCardRow } from '@/lib/db/queries/pipeline';
@@ -57,8 +60,30 @@ export interface PipelineBoardProps {
   lang: Lang;
 }
 
-const ACTIVE_COLUMN_WIDTH = 'w-[280px] shrink-0';
-const RESERVED_COLUMN_WIDTH = 'w-[220px] shrink-0';
+/**
+ * Lane surfaces, adopted from ReUI's `kanban-board-1` block at the 33-09
+ * acceptance checkpoint: every lane is a bordered, faintly tinted section of
+ * one fixed width. Tints use only feedback tokens (`--warning`, `--success`,
+ * `--destructive`, `--muted`) — none alias `--brand-accent`, so UIC-03's
+ * four-item accent reserve list for this surface is untouched. The two
+ * reserved lanes are dashed and quieter than everything else (D-04).
+ */
+const LANE_SURFACE: Record<PipelineStage, string> = {
+  prospect: 'border-border bg-muted/25 dark:bg-muted/10',
+  qualifie: 'border-border bg-muted/25 dark:bg-muted/10',
+  proposition_envoyee:
+    'border-warning/20 bg-warning/[0.045] dark:border-warning/25 dark:bg-warning/10',
+  negociation: 'border-success/20 bg-success/[0.045] dark:border-success/25 dark:bg-success/10',
+  perdu:
+    'border-destructive/20 bg-destructive/[0.045] dark:border-destructive/25 dark:bg-destructive/10',
+  signe: 'border-dashed border-border bg-muted/15 dark:bg-muted/5',
+  debloque: 'border-dashed border-border bg-muted/15 dark:bg-muted/5',
+};
+
+const COLUMN_WIDTH = 'w-[17.5rem] min-w-[17.5rem] rounded-container';
+
+const LANE_NOTICE_CLASS =
+  'rounded-container border border-dashed border-border/70 bg-background/55 px-3 py-6 text-center text-xs text-muted-foreground transition-colors';
 
 /**
  * The vendored `deal-pipeline.tsx`'s `BoardScrollArea`, copied near-verbatim
@@ -205,6 +230,24 @@ export function PipelineBoard({ initial, lang }: PipelineBoardProps) {
       refresh: () => router.refresh(),
     });
 
+  const renderCards = (stage: PipelineStage, rows: PipelineCardRow[]) => (
+    <KanbanColumnContent value={stage} className="min-h-28 gap-2">
+      {rows.length > 0 ? (
+        rows.map((row) => (
+          <KanbanItem
+            key={row.relationshipId}
+            value={row.relationshipId}
+            render={<KanbanItemHandle cursor />}
+          >
+            <PipelineCard row={row} lang={lang} />
+          </KanbanItem>
+        ))
+      ) : (
+        <div className={LANE_NOTICE_CLASS}>{t('pipeline.lane.empty', lang)}</div>
+      )}
+    </KanbanColumnContent>
+  );
+
   return (
     <Kanban
       value={columns}
@@ -212,77 +255,73 @@ export function PipelineBoard({ initial, lang }: PipelineBoardProps) {
       getItemValue={(row) => row.relationshipId}
       onMove={onMove}
       restoreOnCancel
+      className="w-full"
     >
       <BoardScrollArea>
-        <KanbanBoard className="flex gap-4">
+        <KanbanBoard className="grid min-w-max auto-cols-[17.5rem] grid-flow-col grid-cols-none gap-3 px-1 pb-2">
           {PIPELINE_STAGES.map((stage) => {
             const rows = columns[stage];
             const reserved = isReservedStage(stage);
             const isPerdu = stage === 'perdu';
 
             return (
-              <KanbanColumn
-                key={stage}
-                value={stage}
-                disabled={reserved}
-                className={reserved ? RESERVED_COLUMN_WIDTH : ACTIVE_COLUMN_WIDTH}
-              >
-                <PipelineColumnHeader stage={stage} count={rows.length} lang={lang} />
+              <KanbanColumn key={stage} value={stage} disabled={reserved} className={COLUMN_WIDTH}>
+                <section
+                  className={cn(
+                    'flex min-h-[16rem] flex-col gap-2 rounded-container border p-2.5 transition-colors',
+                    LANE_SURFACE[stage],
+                  )}
+                  aria-label={stageLabel(stage, lang)}
+                >
+                  <PipelineColumnHeader stage={stage} count={rows.length} lang={lang} />
 
-                {reserved ? (
-                  // Layer 1 of D-09.1 — always-on visual muting, drag-independent.
-                  // No KanbanColumnContent for a reserved lane: it never carries
-                  // cards, so there is nothing to make sortable.
-                  <div className="mt-2 flex flex-1 items-start rounded-lg bg-muted/40 p-3">
-                    <p className="text-[13px] text-muted-foreground">
+                  {reserved ? (
+                    // Layer 1 of D-09.1 — always-on visual muting, drag-independent.
+                    // No KanbanColumnContent for a reserved lane: it never carries
+                    // cards, so there is nothing to make sortable.
+                    <div className={LANE_NOTICE_CLASS}>
                       {t('pipeline.lane.reserved.caption', lang)}
-                    </p>
-                  </div>
-                ) : isPerdu ? (
-                  // Perdu is partner-settable (D-03), so it still gets a real
-                  // KanbanColumnContent — only its default visibility is
-                  // reduced, never its function. Closed by default.
-                  <Collapsible open={perduOpen} onOpenChange={setPerduOpen} className="mt-2">
-                    <CollapsibleTrigger className="text-left text-[13px] text-muted-foreground hover:text-foreground">
-                      {perduOpen
-                        ? t('pipeline.perdu.disclosure.hide', lang)
-                        : t('pipeline.perdu.disclosure.show', lang).replace(
-                            '{n}',
-                            String(rows.length),
-                          )}
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <KanbanColumnContent value={stage} className="mt-2">
-                        {rows.map((row) => (
-                          <KanbanItem
-                            key={row.relationshipId}
-                            value={row.relationshipId}
-                            render={<KanbanItemHandle cursor />}
-                          >
-                            <PipelineCard row={row} lang={lang} />
-                          </KanbanItem>
-                        ))}
-                      </KanbanColumnContent>
-                    </CollapsibleContent>
-                  </Collapsible>
-                ) : (
-                  <KanbanColumnContent value={stage} className="mt-2">
-                    {rows.map((row) => (
-                      <KanbanItem
-                        key={row.relationshipId}
-                        value={row.relationshipId}
-                        render={<KanbanItemHandle cursor />}
-                      >
-                        <PipelineCard row={row} lang={lang} />
-                      </KanbanItem>
-                    ))}
-                  </KanbanColumnContent>
-                )}
+                    </div>
+                  ) : isPerdu ? (
+                    // Perdu is partner-settable (D-03), so it still gets a real
+                    // KanbanColumnContent — only its default visibility is
+                    // reduced, never its function. Closed by default.
+                    <Collapsible open={perduOpen} onOpenChange={setPerduOpen}>
+                      <CollapsibleTrigger className="px-0.5 text-left text-xs text-muted-foreground hover:text-foreground">
+                        {perduOpen
+                          ? t('pipeline.perdu.disclosure.hide', lang)
+                          : t('pipeline.perdu.disclosure.show', lang).replace(
+                              '{n}',
+                              String(rows.length),
+                            )}
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-2">{renderCards(stage, rows)}</CollapsibleContent>
+                    </Collapsible>
+                  ) : (
+                    renderCards(stage, rows)
+                  )}
+                </section>
               </KanbanColumn>
             );
           })}
         </KanbanBoard>
       </BoardScrollArea>
+
+      {/* The block's drag preview: without a KanbanOverlay dnd-kit shows no
+          lifted card while dragging. Columns are never draggable here. */}
+      <KanbanOverlay>
+        {({ value, variant }) => {
+          if (variant === 'column') return null;
+          const row = Object.values(columns)
+            .flat()
+            .find((candidate) => candidate.relationshipId === value);
+          return row ? (
+            <div className="w-[17.5rem]">
+              <PipelineCard row={row} lang={lang} isOverlay />
+            </div>
+          ) : null;
+        }}
+      </KanbanOverlay>
     </Kanban>
   );
 }

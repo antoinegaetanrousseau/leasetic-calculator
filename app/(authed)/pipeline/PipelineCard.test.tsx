@@ -39,15 +39,17 @@ describe('PipelineCard', () => {
     render(
       <PipelineCard row={{ ...BASE_ROW, contactsCount: 0, proposalsCount: 0 }} lang="fr" />,
     );
-    const counts = screen.getByText((_, el) => el?.textContent === '0 contact(s) · 0 proposition(s)');
-    expect(counts).toBeDefined();
+    expect(screen.getByText('0 contact(s)')).toBeDefined();
+    expect(screen.getByText('0 proposition(s)')).toBeDefined();
   });
 
   it('renders in both langs', () => {
     const { unmount } = render(<PipelineCard row={BASE_ROW} lang="en" />);
-    expect(screen.getByText('2 contact(s) · 3 proposal(s)')).toBeDefined();
+    expect(screen.getByText('2 contact(s)')).toBeDefined();
+    expect(screen.getByText('3 proposal(s)')).toBeDefined();
     unmount();
     render(<PipelineCard row={BASE_ROW} lang="fr" />);
-    expect(screen.getByText('2 contact(s) · 3 proposition(s)')).toBeDefined();
+    expect(screen.getByText('2 contact(s)')).toBeDefined();
+    expect(screen.getByText('3 proposition(s)')).toBeDefined();
   });
 });

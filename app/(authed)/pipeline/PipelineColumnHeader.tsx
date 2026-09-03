@@ -1,6 +1,9 @@
 /**
  * Phase 33 Plan 05 — the three-state lane header (D-09 "the three lane
- * states, and why they must look different").
+ * states, and why they must look different"), laid out like the column
+ * header of ReUI's `kanban-board-1` block: title + count badge on one
+ * 32px row. No column grip — the seven stages are a fixed, ordered
+ * vocabulary (D-01/D-02), never reorderable.
  *
  * `data-lane-state` (`reserved` / `terminal` / `active`) is a stable test
  * hook, the same discipline `MetricTile`'s `data-variant` established — the
@@ -28,12 +31,14 @@ export function PipelineColumnHeader({ stage, count, lang }: PipelineColumnHeade
 
   if (isReservedStage(stage)) {
     return (
-      <div data-lane-state="reserved" className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-1 text-[14px] font-semibold text-muted-foreground">
-          <BanIcon size={16} aria-hidden="true" />
-          {label}
-        </span>
-        <Badge variant="secondary">{t('pipeline.lane.reserved.badge', lang)}</Badge>
+      <div data-lane-state="reserved" className="flex h-8 items-center gap-2 px-0.5">
+        <div className="flex min-w-0 items-center gap-2">
+          <h3 className="flex min-w-0 items-center gap-1.5 truncate text-sm font-semibold text-muted-foreground">
+            <BanIcon size={14} aria-hidden="true" className="shrink-0" />
+            {label}
+          </h3>
+          <Badge variant="secondary">{t('pipeline.lane.reserved.badge', lang)}</Badge>
+        </div>
       </div>
     );
   }
@@ -46,16 +51,18 @@ export function PipelineColumnHeader({ stage, count, lang }: PipelineColumnHeade
   return (
     <div
       data-lane-state={isTerminal ? 'terminal' : 'active'}
-      className="flex items-center justify-between gap-2"
+      className="flex h-8 items-center gap-2 px-0.5"
     >
-      <span
-        className={`text-[14px] font-semibold ${isTerminal ? 'text-muted-foreground' : 'text-foreground'}`}
-      >
-        {label}
-      </span>
-      <Badge variant="outline" className="bg-background">
-        {count}
-      </Badge>
+      <div className="flex min-w-0 items-center gap-2">
+        <h3
+          className={`truncate text-sm font-semibold ${isTerminal ? 'text-muted-foreground' : 'text-foreground'}`}
+        >
+          {label}
+        </h3>
+        <Badge variant="outline" className="bg-background">
+          {count}
+        </Badge>
+      </div>
     </div>
   );
 }
