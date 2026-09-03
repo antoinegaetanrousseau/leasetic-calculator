@@ -28,8 +28,11 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 34 (fiche-client) — EXECUTING
-Plan: 12 of 13 (34-12 complete)
-Status: Ready to execute
+Plan: 13 of 13 (34-13 task 1 complete — acceptance fixtures seeded)
+Status: BLOCKED on human checkpoint — 34-13 task 2, the 24-step acceptance walkthrough, is
+Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
+reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
+FICHE-01..05 / ACTV-01..05 stay OPEN until that checkpoint is approved.
 Last activity: 2026-09-03
 
 ## Deferred Items
