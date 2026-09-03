@@ -120,10 +120,6 @@ import {
   markProposalLostAction,
   markProposalWonAction,
 } from './actions';
-// Plan 33-06 Rule 3 auto-fix: SIREN_REQUIRED moved to a plain module (a
-// 'use server' file may export only async functions) — see
-// src/lib/pipeline/constants.ts for the full reasoning.
-import { SIREN_REQUIRED } from './constants';
 
 const CALLER_SESSION = { user: { id: 'user-1', email: 'partner@example.com' } };
 const RELATIONSHIP_ID = '11111111-1111-4111-8111-111111111111';
@@ -237,6 +233,19 @@ describe('markProposalLostAction', () => {
     expect(sqlReferencesColumn(whereCall!.payload, 'user_id')).toBe(true);
   });
 
+  // 33-REVIEW CR-04 — an outcome belongs to a proposal that was actually sent.
+  // Neither outcome UPDATE used to constrain the lifecycle status, so a DRAFT
+  // could be marked won or lost; the badge then contradicted the conversion
+  // rate, which counts finalized rows only, with no undo path.
+  it('constrains the UPDATE to status = active, so a draft can never carry an outcome', async () => {
+    mockState.resultQueue = [[{ id: PROPOSAL_ID }]];
+
+    await markProposalLostAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' });
+
+    const whereCall = mockState.calls.find((c) => c.kind === 'where');
+    expect(sqlReferencesColumn(whereCall!.payload, 'status')).toBe(true);
+  });
+
   it('never sets a stage field — the set() payload keys are exactly outcome/outcomeDate/outcomeReason (D-04)', async () => {
     mockState.resultQueue = [[{ id: PROPOSAL_ID }]];
 
@@ -260,22 +269,39 @@ describe('markProposalLostAction', () => {
 });
 
 describe('markProposalWonAction', () => {
-  it('throws exactly SIREN_REQUIRED and performs no UPDATE when the company has no siren and none was supplied', async () => {
+  // 33-REVIEW CR-01: the gate is RETURNED, never thrown. Next.js replaces a
+  // Server Function's thrown error message with a generic string plus a
+  // digest in production builds, so a thrown sentinel could not survive the
+  // boundary and D-08's inline field never appeared for a real partner. A
+  // returned value does survive — this test pins that contract.
+  it('RETURNS { ok: false, reason: siren_required } and performs no UPDATE when the company has no siren and none was supplied', async () => {
     mockState.resultQueue = [[{ siren: null }]]; // the gate branch-selector read
 
     await expect(
       markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
-    ).rejects.toThrow(SIREN_REQUIRED);
+    ).resolves.toEqual({ ok: false, reason: 'siren_required' });
     expect(mockState.calls.filter((c) => c.kind === 'update')).toHaveLength(0);
   });
 
-  it('throws the bounded error, NOT SIREN_REQUIRED, when the proposal is not owned by the caller', async () => {
+  it('THROWS the bounded error — never the siren_required result — when the proposal is not owned by the caller', async () => {
     mockState.resultQueue = [[]]; // the gate select matches zero rows — not found / not owned
 
     await expect(
       markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
     ).rejects.toThrow('pipeline.toast.error');
     expect(mockState.calls.filter((c) => c.kind === 'update')).toHaveLength(0);
+  });
+
+  it('constrains the won UPDATE to status = active as well (33-REVIEW CR-04)', async () => {
+    mockState.resultQueue = [
+      [{ siren: '123456789' }], // gate branch-selector read
+      [{ id: PROPOSAL_ID }], // the won write
+    ];
+
+    await markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' });
+
+    const updateWhere = mockState.calls.filter((c) => c.kind === 'where').at(-1);
+    expect(sqlReferencesColumn(updateWhere!.payload, 'status')).toBe(true);
   });
 
   it('when a siren is supplied, the companies UPDATE carries both siren IS NULL and the owner-scoped relationship subquery', async () => {

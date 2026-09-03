@@ -27,9 +27,6 @@ vi.mock('@/lib/pipeline/actions', () => ({
   markProposalLostAction: vi.fn(),
 }));
 
-vi.mock('@/lib/pipeline/constants', () => ({
-  SIREN_REQUIRED: 'pipeline.error.sirenRequired',
-}));
 
 import { ProposalOutcomeControl } from './ProposalOutcomeControl';
 

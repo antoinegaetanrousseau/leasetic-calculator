@@ -12,16 +12,18 @@
  * elsewhere in this codebase appears nowhere in this file.
  *
  * Bounded-error discipline (T-30-05-03), with one documented exception:
- * every failure class in every action throws the single key
- * `BOUNDED_ERROR` — EXCEPT `markProposalWonAction`'s SIREN gate, which also
- * throws the distinct `SIREN_REQUIRED` sentinel so D-08's dialog can reveal
- * an inline SIREN field instead of a dead-end toast. This leaks nothing
- * that matters: the sentinel is only reachable for a proposal the caller
- * ALREADY owns (the pre-read that selects it is itself owner-scoped), the
- * company's missing SIREN is a fact the caller can already read on
- * `/clients/[id]`, and the sentinel carries no company id, no company name,
- * no other partner's data — a bare string. This is not a project-wide
- * relaxation: two failure classes total, one action; `advanceRelationshipStageAction`
+ * every failure class in every action THROWS the single key `BOUNDED_ERROR`
+ * — EXCEPT `markProposalWonAction`'s SIREN gate, which RETURNS
+ * `{ ok: false, reason: 'siren_required' }` so D-08's dialog can reveal an
+ * inline SIREN field instead of a dead-end toast. Returned, not thrown:
+ * Next.js substitutes a generic message plus a digest for a Server
+ * Function's thrown error in production builds, so the sentinel-on-message
+ * handshake this module used to rely on worked only in dev (33-REVIEW
+ * CR-01). This leaks nothing that matters: the branch is only reachable for
+ * a proposal the caller ALREADY owns (the pre-read that selects it is itself
+ * owner-scoped), the company's missing SIREN is a fact the caller can
+ * already read on `/clients/[id]`, and the result carries no company id, no
+ * company name, no other partner's data. `advanceRelationshipStageAction`
  * and `markProposalLostAction` both keep the single bounded key.
  *
  * Non-transactional by design (T-30-05-09 note): the Neon HTTP driver
@@ -41,26 +43,11 @@ import { and, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { requireRelationshipHolder } from '@/lib/auth/require';
 import { db, schema } from '@/lib/db';
 import { writeAuditLog } from '@/lib/db/queries/audit-log';
+import type { MarkWonResult } from './constants';
 import { advanceStageSchema, markLostSchema, markWonSchema } from './schemas';
-import { SIREN_REQUIRED } from './constants';
 
 /** Single bounded error key for every failure class in this module (T-30-05-03), bar one documented exception below. */
 const BOUNDED_ERROR = 'pipeline.toast.error';
-
-/**
- * The one deliberate, narrow exception to bounded-error discipline in this
- * module — see the module header for the full reasoning. Reachable ONLY
- * from `markProposalWonAction`, and only after the owner-scoped
- * branch-selector read already matched the caller's own proposal.
- *
- * Plan 33-06 Rule 3 auto-fix: the sentinel's VALUE now lives in
- * `./constants` (a plain, non-`'use server'` module) and is imported here,
- * not declared inline — a `'use server'` file may export only async
- * functions, so this module deliberately does NOT re-export
- * `SIREN_REQUIRED` itself. Client callers (`MarkWonDialog.tsx`) import the
- * sentinel from `@/lib/pipeline/constants` directly. See `./constants.ts`
- * for the full reasoning.
- */
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  advanceRelationshipStageAction (PIPE-01, PIPE-02, D-01..D-04)              */
@@ -147,6 +134,8 @@ export async function markProposalLostAction(raw: unknown): Promise<void> {
       .where(and(
         eq(schema.proposals.id, input.proposalId),
         eq(schema.proposals.userId, session.user.id),
+        // 33-REVIEW CR-04 — same lifecycle guard as the won path.
+        eq(schema.proposals.status, 'active'),
       ))
       .returning();
 
@@ -194,7 +183,7 @@ export async function markProposalLostAction(raw: unknown): Promise<void> {
  *    own WHERE — the DB triggers from plan 33-01 are a third, independent
  *    layer behind this.
  */
-export async function markProposalWonAction(raw: unknown): Promise<void> {
+export async function markProposalWonAction(raw: unknown): Promise<MarkWonResult> {
   const { session } = await requireRelationshipHolder(); // FIRST — PITFALLS §7.3
   try {
     const input = markWonSchema.parse(raw);
@@ -259,7 +248,14 @@ export async function markProposalWonAction(raw: unknown): Promise<void> {
       throw new Error(BOUNDED_ERROR);
     }
     if (gateRow[0].siren === null) {
-      throw new Error(SIREN_REQUIRED);
+      // RETURNED, never thrown (33-REVIEW CR-01). Next.js replaces a Server
+      // Function's thrown error message with a generic string plus a digest in
+      // production builds, so the old `throw new Error(SIREN_REQUIRED)` +
+      // `e.message === SIREN_REQUIRED` handshake worked in dev and silently
+      // degraded to a generic toast in production — leaving the partner with no
+      // way to supply the SIREN, the exact dead end D-08 exists to prevent. A
+      // returned value crosses the serialisation boundary intact.
+      return { ok: false, reason: 'siren_required' };
     }
 
     // ── 3. The write, with ownership AND the SIREN predicate re-proved ───
@@ -282,6 +278,12 @@ export async function markProposalWonAction(raw: unknown): Promise<void> {
       .where(and(
         eq(schema.proposals.id, input.proposalId),
         eq(schema.proposals.userId, session.user.id),
+        // 33-REVIEW CR-04: an outcome belongs to a proposal that was actually
+        // sent. A draft has no client-facing existence to win or lose, and
+        // `getConversionRateForOwner` counts only finalized rows — recording a
+        // win on a draft made the badge and the headline metric disagree with
+        // no undo path.
+        eq(schema.proposals.status, 'active'),
         inArray(schema.proposals.clientRelationshipId, ownedRelationshipsWithSiren),
       ))
       .returning();
@@ -300,9 +302,10 @@ export async function markProposalWonAction(raw: unknown): Promise<void> {
 
     revalidatePath('/clients', 'layout');
     revalidatePath('/pipeline');
+    return { ok: true };
   } catch (e) {
-    if (e instanceof Error && (e.message === BOUNDED_ERROR || e.message === SIREN_REQUIRED)) {
-      throw e; // already a recognized sentinel — don't double-log or re-wrap
+    if (e instanceof Error && e.message === BOUNDED_ERROR) {
+      throw e; // already the bounded sentinel — don't double-log or re-wrap
     }
     const msg = e instanceof Error ? e.message : String(e);
     console.error('[markProposalWonAction] failed:', msg);

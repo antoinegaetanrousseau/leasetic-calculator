@@ -6,7 +6,7 @@
  *      gagné", with NO SIREN field present initially.
  *   2. Submitting calls markProposalWonAction once with the proposal id and
  *      a date, and no `siren` key.
- *   3. A SIREN_REQUIRED rejection keeps the dialog open, reveals the SIREN
+ *   3. A { ok: false, reason: 'siren_required' } RESULT keeps the dialog open, reveals the SIREN
  *      input + banner, preserves the previously entered date/reason, flips
  *      the submit label, and never calls toast.error.
  *   4. Resubmitting after entering a SIREN calls the action a second time
@@ -38,12 +38,6 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/lib/pipeline/actions', () => ({
   markProposalWonAction: markProposalWonActionMock,
-}));
-
-// SIREN_REQUIRED lives in the plain (non-'use server') constants module —
-// see src/lib/pipeline/constants.ts's own header for why.
-vi.mock('@/lib/pipeline/constants', () => ({
-  SIREN_REQUIRED: 'pipeline.error.sirenRequired',
 }));
 
 import { MarkWonDialog } from './MarkWonDialog';
@@ -81,7 +75,7 @@ describe('MarkWonDialog (Plan 33-06 Task 1)', () => {
   });
 
   it('Test 2: submitting calls the action once with the proposal id and a date, no siren key', async () => {
-    markProposalWonActionMock.mockResolvedValueOnce(undefined);
+    markProposalWonActionMock.mockResolvedValueOnce({ ok: true });
     renderDialog();
 
     fireEvent.click(screen.getByRole('button', { name: 'Marquer gagné' }));
@@ -93,8 +87,8 @@ describe('MarkWonDialog (Plan 33-06 Task 1)', () => {
     expect('siren' in call).toBe(false);
   });
 
-  it('Test 3: SIREN_REQUIRED rejection reveals the SIREN field, preserves values, relabels submit, no toast.error', async () => {
-    markProposalWonActionMock.mockRejectedValueOnce(new Error('pipeline.error.sirenRequired'));
+  it('Test 3: a siren_required RESULT reveals the SIREN field, preserves values, relabels submit, no toast.error', async () => {
+    markProposalWonActionMock.mockResolvedValueOnce({ ok: false, reason: 'siren_required' });
     renderDialog();
 
     fireEvent.change(screen.getByLabelText(/Date de signature/), {
@@ -123,8 +117,8 @@ describe('MarkWonDialog (Plan 33-06 Task 1)', () => {
   });
 
   it('Test 4: resubmitting after entering a SIREN calls the action a second time with the normalized siren', async () => {
-    markProposalWonActionMock.mockRejectedValueOnce(new Error('pipeline.error.sirenRequired'));
-    markProposalWonActionMock.mockResolvedValueOnce(undefined);
+    markProposalWonActionMock.mockResolvedValueOnce({ ok: false, reason: 'siren_required' });
+    markProposalWonActionMock.mockResolvedValueOnce({ ok: true });
     renderDialog();
 
     fireEvent.click(screen.getByRole('button', { name: 'Marquer gagné' }));
@@ -154,7 +148,7 @@ describe('MarkWonDialog (Plan 33-06 Task 1)', () => {
   });
 
   it('Test 6: a success closes the dialog and calls router.refresh', async () => {
-    markProposalWonActionMock.mockResolvedValueOnce(undefined);
+    markProposalWonActionMock.mockResolvedValueOnce({ ok: true });
     const { onOpenChange } = renderDialog();
 
     fireEvent.click(screen.getByRole('button', { name: 'Marquer gagné' }));

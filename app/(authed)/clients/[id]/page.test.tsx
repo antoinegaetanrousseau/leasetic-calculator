@@ -160,6 +160,22 @@ const PROPOSAL_UNANSWERED = {
   validityDays: 30,
 };
 
+// A DRAFT: never sent, so it has no client-facing existence to win or lose.
+const PROPOSAL_DRAFT = {
+  id: 'prop-draft',
+  lcRef: '',
+  status: 'draft' as const,
+  language: 'fr' as const,
+  createdAt: new Date('2026-01-01T00:00:00Z'),
+  deletedAt: null,
+  computedClientMonthly: null,
+  outcome: null,
+  outcomeDate: null,
+  outcomeReason: null,
+  pdfGeneratedAt: null,
+  validityDays: 30,
+};
+
 beforeEach(() => {
   requireRelationshipHolderMock.mockClear();
   getClientRelationshipForOwnerMock.mockReset();
@@ -265,6 +281,20 @@ describe('clients/[id]/page.tsx — Plan 33-06 Task 3 outcome-control wiring', (
     expect(html).toContain('Sans réponse');
     expect(html).toContain('Marquer gagné');
     expect(html).toContain('Marquer perdu');
+  });
+
+  // 33-REVIEW CR-04. The server actions refuse a draft in their own WHERE;
+  // this is the matching UI half, so a partner is never offered a control
+  // whose write the server would reject.
+  it('Outcome Test 2b: a DRAFT proposal offers neither outcome trigger', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue(RELATIONSHIP);
+    listProposalsForRelationshipMock.mockResolvedValue([PROPOSAL_DRAFT]);
+
+    const tree = await ClientDetailPage({ params: Promise.resolve({ id: 'rel-1' }) });
+    const html = renderToString(tree);
+
+    expect(html).not.toContain('Marquer gagné');
+    expect(html).not.toContain('Marquer perdu');
   });
 
   it('Outcome Test 3 (D-04): the page HTML never renders a pipeline-stage display string', async () => {

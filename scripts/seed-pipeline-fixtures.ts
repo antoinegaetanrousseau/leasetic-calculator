@@ -77,7 +77,16 @@ type SeedProposal = {
   key: string;
   /** Patched into params_snapshot.validityDays, which is what the row's badge reads. */
   validityDays: number;
-  /** created_at = now - ageDays. Past validity when ageDays > validityDays. */
+  /**
+   * created_at AND pdf_generated_at = now - ageDays. Past validity when
+   * ageDays > validityDays.
+   *
+   * 33-REVIEW CR-03: `deriveProposalOutcome` returns null the moment
+   * `pdfGeneratedAt` is null, and measures the validity window FROM it — not
+   * from created_at. A fixture that left the column null could never reach
+   * 'unanswered' no matter how old it was, so the step-14 fixture proved
+   * nothing. Every fixture sets both columns to the same instant.
+   */
   ageDays: number;
   /** What this row makes reachable in the walkthrough. Printed by --dry-run. */
   proves: string;
@@ -277,15 +286,34 @@ async function main(): Promise<void> {
   const sql = neon(databaseUrl);
 
   if (remove) {
+    // 33-REVIEW CR-05: every statement below is scoped to the SEEDED owners as
+    // well as the fixture companies. Company identity alone is not enough —
+    // `companies` is a SHARED registry (CRM-01), so a real partner may have
+    // attached their own relationship to one of these companies since the
+    // seed, and an unscoped delete would take that relationship and cascade
+    // away their contacts.
+    const removalPartners = (await sql`
+      select id, email from users where role = 'partner' order by email limit 2`) as Array<{
+      id: string;
+      email: string;
+    }>;
+    const ownerIdsForRemoval = removalPartners.map((u) => u.id);
+    if (ownerIdsForRemoval.length === 0) {
+      fail('no partner accounts found — cannot scope the revert to the seeded owners.');
+    }
+
     // Guard: the contacts FK cascades on relationship delete. A contact a
     // partner added by hand to a fixture relationship is real data and must not
-    // vanish inside a fixture revert.
+    // vanish inside a fixture revert. `<> all` (never `<> any`, which is true
+    // whenever the name differs from at least ONE element of the array and so
+    // fired on every row) — 33-REVIEW CR-02.
     const handEntered = (await sql`
       select count(*)::int as n from contacts c
       join client_relationships r on r.id = c.client_relationship_id
       join companies co on co.id = r.company_id
       where (co.siren = any(${FIXTURE_SIRENS}) or co.name = any(${FIXTURE_SIRENLESS_NAMES}))
-        and c.name <> any(${FIXTURES.map((f) => f.contactName)})`) as Array<{ n: number }>;
+        and r.owner_id = any(${ownerIdsForRemoval})
+        and c.name <> all(${FIXTURES.map((f) => f.contactName)})`) as Array<{ n: number }>;
     if (handEntered[0].n > 0) {
       fail(
         String(handEntered[0].n) +
@@ -298,10 +326,12 @@ async function main(): Promise<void> {
       const preview = (await sql`select
         (select count(*)::int from proposals where idempotency_key like ${FIXTURE_PREFIX + '%'}) as fixture_proposals,
         (select count(*)::int from client_relationships r join companies co on co.id = r.company_id
-          where co.siren = any(${FIXTURE_SIRENS}) or co.name = any(${FIXTURE_SIRENLESS_NAMES})) as relationships,
+          where (co.siren = any(${FIXTURE_SIRENS}) or co.name = any(${FIXTURE_SIRENLESS_NAMES}))
+            and r.owner_id = any(${ownerIdsForRemoval})) as relationships,
         (select count(*)::int from contacts c join client_relationships r on r.id = c.client_relationship_id
           join companies co on co.id = r.company_id
-          where co.siren = any(${FIXTURE_SIRENS}) or co.name = any(${FIXTURE_SIRENLESS_NAMES})) as contacts_cascaded,
+          where (co.siren = any(${FIXTURE_SIRENS}) or co.name = any(${FIXTURE_SIRENLESS_NAMES}))
+            and r.owner_id = any(${ownerIdsForRemoval})) as contacts_cascaded,
         (select count(*)::int from companies
           where siren = any(${FIXTURE_SIRENS}) or name = any(${FIXTURE_SIRENLESS_NAMES})) as companies`) as Array<
         Record<string, number>
@@ -318,6 +348,7 @@ async function main(): Promise<void> {
       using companies co
       where co.id = r.company_id
         and (co.siren = any(${FIXTURE_SIRENS}) or co.name = any(${FIXTURE_SIRENLESS_NAMES}))
+        and r.owner_id = any(${ownerIdsForRemoval})
       returning r.id`;
     // Only companies left with no relationship at all — never one another
     // partner has since attached to.
@@ -443,6 +474,10 @@ async function main(): Promise<void> {
         continue;
       }
 
+      // Both columns carry the same instant: created_at is when the partner
+      // built it, pdf_generated_at is what the validity window is measured
+      // from (33-REVIEW CR-03).
+      const sentAt = daysAgo(p.ageDays);
       const inputs = {
         ...donorInputs,
         clientCo: f.name,
@@ -455,14 +490,15 @@ async function main(): Promise<void> {
       await sql`
         insert into proposals
           (user_id, status, language, lc_ref, idempotency_key, schema_version,
-           inputs, params_snapshot, computed, client_relationship_id, created_at)
+           inputs, params_snapshot, computed, client_relationship_id,
+           created_at, pdf_generated_at)
         values
           (${ownerId}, 'active', 'fr',
            ${'LC-SEED-PIPE-' + p.key}, ${idem}, '1.0.0',
            ${JSON.stringify(inputs)}::jsonb,
            ${JSON.stringify(snapshot)}::jsonb,
            ${JSON.stringify(computed)}::jsonb,
-           ${relationshipId}, ${daysAgo(p.ageDays)})`;
+           ${relationshipId}, ${sentAt}, ${sentAt})`;
       proposalsInserted += 1;
     }
   }

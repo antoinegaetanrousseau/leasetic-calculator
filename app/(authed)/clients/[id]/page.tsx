@@ -160,11 +160,20 @@ export default async function ClientDetailPage({ params }: PageProps) {
                   lang={lang}
                   hideClient
                   actionsSlot={
-                    <ProposalOutcomeControl
-                      proposalId={row.id}
-                      outcome={outcomes.get(row.id) ?? null}
-                      lang={lang}
-                    />
+                    // 33-REVIEW CR-04: only a FINALIZED proposal can carry an
+                    // outcome. A draft was never sent, so there is nothing to
+                    // win or lose, and `getConversionRateForOwner` counts only
+                    // finalized rows — offering the triggers here produced a
+                    // "Gagné" badge the headline conversion rate disagreed
+                    // with, and no way to undo it. The server actions refuse
+                    // drafts too; this is the matching half, not the guard.
+                    row.displayStatus === 'active' ? (
+                      <ProposalOutcomeControl
+                        proposalId={row.id}
+                        outcome={outcomes.get(row.id) ?? null}
+                        lang={lang}
+                      />
+                    ) : null
                   }
                 />
               ))}

@@ -50,7 +50,6 @@ import { SirenInput } from '@/components/proposal/SirenInput';
 import { t, type DictKey, type Lang } from '@/lib/i18n/dictionaries';
 import { markWonSchema } from '@/lib/pipeline/schemas';
 import { markProposalWonAction } from '@/lib/pipeline/actions';
-import { SIREN_REQUIRED } from '@/lib/pipeline/constants';
 
 export interface MarkWonDialogProps {
   proposalId: string;
@@ -88,7 +87,7 @@ export function MarkWonDialog({ proposalId, open, onOpenChange, lang }: MarkWonD
 
   const onSubmit = async (data: MarkWonFormValues) => {
     try {
-      await markProposalWonAction({
+      const result = await markProposalWonAction({
         proposalId,
         date: data.date,
         reason: data.reason,
@@ -96,16 +95,23 @@ export function MarkWonDialog({ proposalId, open, onOpenChange, lang }: MarkWonD
         // carries a siren key at all.
         ...(sirenRequired ? { siren: data.siren } : {}),
       });
-      toast.success(t('pipeline.outcome.won.toast.success', lang));
-      onOpenChange(false);
-      router.refresh();
-    } catch (e) {
-      if (e instanceof Error && e.message === SIREN_REQUIRED) {
-        // The in-dialog banner IS the message — no toast on top of it, and
-        // the dialog stays open with every field intact (D-08).
+
+      if (!result.ok) {
+        // D-08's gate arrives as a RETURNED value, not a thrown sentinel
+        // (33-REVIEW CR-01): Next.js replaces a Server Function's thrown
+        // error message with a generic string in production builds, so the
+        // old `e.message === SIREN_REQUIRED` branch was dev-only and real
+        // partners hit a dead-end toast. The in-dialog banner IS the
+        // message — no toast on top of it, and the dialog stays open with
+        // every field intact.
         setSirenRequired(true);
         return;
       }
+
+      toast.success(t('pipeline.outcome.won.toast.success', lang));
+      onOpenChange(false);
+      router.refresh();
+    } catch {
       toast.error(t('pipeline.toast.error', lang));
       // Dialog stays open so the partner can retry without re-entering data.
     }
