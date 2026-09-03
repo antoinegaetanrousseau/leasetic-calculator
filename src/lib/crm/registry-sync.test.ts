@@ -101,9 +101,10 @@ vi.mock('@/lib/db', async () => {
   };
 });
 
-const { lookupCompanyBySirenMock, insertRelationshipEventForOwnerMock } = vi.hoisted(() => ({
+const { lookupCompanyBySirenMock, insertRelationshipEventForOwnerMock, writeAuditLogMock } = vi.hoisted(() => ({
   lookupCompanyBySirenMock: vi.fn(),
   insertRelationshipEventForOwnerMock: vi.fn(),
+  writeAuditLogMock: vi.fn(),
 }));
 
 vi.mock('@/lib/registry/recherche-entreprises', () => ({
@@ -111,6 +112,9 @@ vi.mock('@/lib/registry/recherche-entreprises', () => ({
 }));
 vi.mock('@/lib/db/queries', () => ({
   insertRelationshipEventForOwner: insertRelationshipEventForOwnerMock,
+}));
+vi.mock('@/lib/db/queries/audit-log', () => ({
+  writeAuditLog: writeAuditLogMock,
 }));
 
 import { schema } from '@/lib/db';
@@ -327,16 +331,64 @@ describe('syncCompanyRegistry — it never throws (D-09)', () => {
     consoleError.mockRestore();
   });
 
-  it('still RESOLVES when the event insert fails — the identity write already landed and the caller is never given an exception', async () => {
+  // CHANGED 2026-09-03. This test previously asserted `{ ok: false, reason:
+  // 'unavailable' }` here — it encoded a defect rather than a contract. The
+  // event write happens AFTER the ten identity columns have already committed
+  // (there is no transaction; the neon-http driver has none), so letting its
+  // failure unwind into the outer catch reported a SUCCESSFUL sync as an
+  // outage: the partner saw a failure toast sitting on top of freshly
+  // refreshed data, and a creation-time sync looked like the registry was
+  // down. Same defect class as 33-REVIEW WR-03 and the one plan 34-08 fixed in
+  // the stage action. The narration writes are now individually try/caught.
+  it('RESOLVES ok when the event insert fails — the identity write already landed, so a lost timeline entry must not be reported as a failed sync', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     lookupCompanyBySirenMock.mockResolvedValue({ ok: true, data: IDENTITY });
     insertRelationshipEventForOwnerMock.mockRejectedValue(new Error('event insert failed'));
     mockState.resultQueue = [[]];
 
-    // The columns go FIRST and the event second precisely because there is no
-    // transaction: a lost timeline entry is the harmless direction.
-    await expect(syncCompanyRegistry(ARGS)).resolves.toEqual({ ok: false, reason: 'unavailable' });
+    await expect(syncCompanyRegistry(ARGS)).resolves.toEqual({ ok: true });
+    expect(Object.keys(setPayload()).sort()).toEqual(SYNCED_SET_KEYS);
+    expect(consoleError).toHaveBeenCalled(); // logged server-side, never surfaced
+    consoleError.mockRestore();
+  });
+
+  // D-03: the sync writes columns every partner on the company can see, so who
+  // triggered it is recorded at company level. The timeline event is scoped to
+  // one relationship; this row is not.
+  it('writes a company.registry_sync audit row carrying ids and the submitted SIREN only', async () => {
+    lookupCompanyBySirenMock.mockResolvedValue({ ok: true, data: IDENTITY });
+    mockState.resultQueue = [[]];
+
+    await expect(syncCompanyRegistry(ARGS)).resolves.toEqual({ ok: true });
+
+    expect(writeAuditLogMock).toHaveBeenCalledTimes(1);
+    const row = writeAuditLogMock.mock.calls[0][0];
+    expect(row.action).toBe('company.registry_sync');
+    expect(row.targetType).toBe('company');
+    expect(row.targetId).toBe(ARGS.companyId);
+    expect(row.actorId).toBe(ARGS.actorId);
+    // No registry VALUE may appear — not the legal name, not the address.
+    expect(Object.keys(row.payload).sort()).toEqual(['relationshipId', 'siren']);
+    expect(JSON.stringify(row.payload)).not.toContain(IDENTITY.legalName);
+  });
+
+  it('RESOLVES ok when the audit write fails — it narrates a committed change and cannot veto it', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    lookupCompanyBySirenMock.mockResolvedValue({ ok: true, data: IDENTITY });
+    writeAuditLogMock.mockRejectedValue(new Error('audit insert failed'));
+    mockState.resultQueue = [[]];
+
+    await expect(syncCompanyRegistry(ARGS)).resolves.toEqual({ ok: true });
     expect(Object.keys(setPayload()).sort()).toEqual(SYNCED_SET_KEYS);
     consoleError.mockRestore();
+  });
+
+  it('writes NO audit row when the lookup did not succeed — nothing shared changed', async () => {
+    lookupCompanyBySirenMock.mockResolvedValue({ ok: false, reason: 'not_found' });
+    mockState.resultQueue = [[]];
+
+    await syncCompanyRegistry(ARGS);
+
+    expect(writeAuditLogMock).not.toHaveBeenCalled();
   });
 });

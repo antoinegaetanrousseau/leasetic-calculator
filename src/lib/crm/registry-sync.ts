@@ -3,6 +3,7 @@ import 'server-only';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { insertRelationshipEventForOwner } from '@/lib/db/queries';
+import { writeAuditLog } from '@/lib/db/queries/audit-log';
 import { lookupCompanyBySiren } from '@/lib/registry/recherche-entreprises';
 import type { RegistryRefreshResult } from './constants';
 
@@ -50,9 +51,11 @@ import type { RegistryRefreshResult } from './constants';
  *
  * NO TRANSACTIONS (`crm/actions.ts` module header). The production driver is
  * `drizzle-orm/neon-http`, whose `.transaction()` throws at runtime, so the
- * column write and the event write are two separate statements. The COLUMNS GO
- * FIRST: a crash between them leaves a synced identity with no timeline entry,
- * which is the harmless direction.
+ * column write, the event write and the audit write are three separate
+ * statements. The COLUMNS GO FIRST: a crash between them leaves a synced
+ * identity with no timeline entry, which is the harmless direction. The two
+ * narration writes are individually try/caught so neither can report a
+ * committed sync as a failure.
  */
 export interface SyncCompanyRegistryArgs {
   companyId: string;
@@ -115,16 +118,51 @@ export async function syncCompanyRegistry(
       })
       .where(eq(schema.companies.id, args.companyId));
 
+    // ── Narration: the two writes below describe a change that has ALREADY
+    // committed above, so neither may report the sync as failed.
+    //
+    // Both are wrapped individually. Without this, a throw from either would
+    // unwind into the outer catch and return `{ ok: false, reason:
+    // 'unavailable' }` for a sync whose ten identity columns are already on
+    // disk — the caller would show a failure toast over refreshed data, and a
+    // creation-time sync would look like an outage. That is the same defect
+    // plan 34-08 fixed in the stage action, and 33-REVIEW WR-03 raised against
+    // the outcome actions.
     if (args.relationshipId !== null) {
-      await insertRelationshipEventForOwner({
-        relationshipId: args.relationshipId,
-        ownerId: args.ownerId,
-        kind: 'registry_synced',
+      try {
+        await insertRelationshipEventForOwner({
+          relationshipId: args.relationshipId,
+          ownerId: args.ownerId,
+          kind: 'registry_synced',
+          actorId: args.actorId,
+          // Only the SIREN the caller already submitted — no commission data,
+          // no other partner's data (D-26 / ADMIN-09).
+          payload: { siren: args.siren },
+        });
+      } catch (e) {
+        console.error('[syncCompanyRegistry] timeline event failed:', e); // server-side only
+      }
+    }
+
+    // D-03 — this write changed columns EVERY partner holding the company sees,
+    // so who triggered it and when is recorded, the same as a shared-tier
+    // display edit. Operator decision, 2026-09-03: a refresh is not a
+    // partner-authored edit, but it does change shared data, and that is what
+    // D-03 audits. The timeline event is scoped to one relationship; this row
+    // is the company-level record.
+    //
+    // Payload carries IDS and the caller-submitted SIREN only — never a
+    // registry value, never commission data (D-26 / ADMIN-09).
+    try {
+      await writeAuditLog({
         actorId: args.actorId,
-        // Only the SIREN the caller already submitted — no commission data,
-        // no other partner's data (D-26 / ADMIN-09).
-        payload: { siren: args.siren },
+        action: 'company.registry_sync',
+        targetType: 'company',
+        targetId: args.companyId,
+        payload: { siren: args.siren, relationshipId: args.relationshipId },
       });
+    } catch (e) {
+      console.error('[syncCompanyRegistry] audit write failed:', e); // server-side only
     }
 
     return { ok: true };
