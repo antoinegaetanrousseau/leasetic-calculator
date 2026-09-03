@@ -53,7 +53,7 @@ findings:
   warning: 16
   info: 10
   total: 31
-status: issues_found
+status: partially_remediated
 ---
 
 # Phase 33: Code Review Report
@@ -62,6 +62,22 @@ status: issues_found
 **Depth:** standard
 **Files Reviewed:** 43 (+ `drizzle/0009_phase33_pipeline.sql`, read as the DB half of D-07)
 **Status:** issues_found
+
+## Remediation status (2026-09-03)
+
+| Finding | Status |
+|---|---|
+| CR-01 D-08's SIREN gate dead in production | **fixed** — `8b58470`, plus `tests/server-action-error-contracts.test.ts` as the recurrence guard |
+| CR-02 `--remove` guard always aborted | **fixed** — `8b58470` |
+| CR-03 `unanswered` fixture unreachable | **fixed** — `8b58470` |
+| CR-04 outcome on a draft | **fixed** — `8b58470` |
+| CR-05 `--remove` could destroy real data | **fixed** — `8b58470` |
+| WR-01 reserved-lane refusal unreachable | **fixed** — `52d03e1` |
+| WR-02 arrow + keyboard drag double-write | **fixed** — `52d03e1` |
+| WR-03..WR-16 (14 findings), IN-01..IN-10 | **open, unclaimed** |
+
+Steps 3, 10 and 14 of the 33-09 acceptance walkthrough were re-walked after the
+fixes and pass. See `33-09-SUMMARY.md` § "Post-Review Re-Verification".
 
 ## Summary
 
