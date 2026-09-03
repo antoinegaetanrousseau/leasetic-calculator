@@ -111,7 +111,7 @@ continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on 
 - [x] **Phase 31.1: App Shell Refresh** (INSERTED) — shell converged on the sibling Colibris product: header breadcrumbs, header-owned collapse control, 120px lockup, and a two-tier radius scale that decouples containers from controls (executed 2026-09-02; dark-mode verification pending)
 - ~~**Phase 32: HubSpot Import**~~ — **REMOVED 2026-09-02** by operator decision; IMPORT-02/IMPORT-07 dropped with it. The number is retained, not reused — see Phase Details.
 - [x] **Phase 33: Pipeline** — partner-advanced stage on the relationship (late stages system-owned), won/lost/unanswered outcome on the proposal, SIREN-gated win (completed 2026-09-03)
-- [ ] **Phase 34: Activity & Follow-Up** — unified timeline (manual notes + system events), next-action date, "who to chase" list
+- [ ] **Phase 34: Fiche client** — registry-backed company identity, per-section editing, tabbed client page, unified timeline (manual notes + system events), next-action date, "à relancer" list
 
 ### 📋 v1.7 — Sales Motivation (Phase 35+) — NOT STARTED
 
@@ -613,27 +613,44 @@ hardcodes `source: 'proposal_extraction'` at several call sites, so a second sou
 
 **UI hint:** yes
 
-### Phase 34: Activity & Follow-Up
+### Phase 34: Fiche client
 
-**Goal:** A relationship's full history — manual notes and system events together — is visible in one place, and a partner can see who needs to be chased this week.
-**Depends on:** Phase 33 (system events include pipeline stage changes, so the pipeline must exist to generate them)
-**Requirements:** ACTV-01, ACTV-02, ACTV-03, ACTV-04, ACTV-05
+**Redefined 2026-09-03.** Was "Activity & Follow-Up" (ACTV-01..05 only). Antoine
+asked for a client page that shows and edits real information about a company;
+the timeline is one section of that page rather than a phase of its own, so the
+two were merged. The ACTV requirements are unchanged — FICHE-01..05 were added
+in front of them.
+
+**Goal:** A partner opens a client and sees who the company actually is, what
+they have recorded about the relationship, and its full history in one place —
+and can correct any of it without leaving the page.
+**Depends on:** Phase 33 (stage changes are one of the system events the timeline renders, so the pipeline must exist to generate them)
+**Requirements:** FICHE-01, FICHE-02, FICHE-03, FICHE-04, FICHE-05, ACTV-01, ACTV-02, ACTV-03, ACTV-04, ACTV-05
 **Success Criteria** (what must be TRUE):
 
-  1. Opening a relationship shows a single chronological timeline mixing manual notes and system events — no separate tabs for the two.
-  2. A stage change or a new proposal automatically appends a timestamped, attributed system event to the relevant relationship's timeline with no user action required.
-  3. A user adds a dated note to a relationship and sees it appear in the timeline immediately.
-  4. A user sets or edits a next-action date on a relationship.
-  5. A user opens a "who to chase" list and sees relationships ordered by next-action date and staleness, scoped to relationships they own.
+  1. Creating a client with a SIREN fills the company's identity from the public SIRENE registry without any further input; a registry outage still creates the client, marked as needing completion, and a later refresh completes it.
+  2. Registry-sourced identity renders read-only with its last-synced date, and no partner-facing form can write those fields; the shared display fields (display name, website, phone) and a SIREN correction ARE editable, and every such edit writes an audit row because other partners see it.
+  3. A partner records source and description on a relationship, and a second partner holding the same company sees none of it.
+  4. Opening a relationship shows a single chronological timeline mixing manual notes and system events — no separate tabs for the two — and a stage change or a finalized proposal appends a timestamped, attributed event with no user action required.
+  5. A partner adds a dated note and sets a next-action date on a relationship, then opens an "à relancer" list ordered by next-action date and staleness, scoped to relationships they own.
 
 **Plans:** TBD
 **UI hint:** yes
+
+**Design:** `docs/superpowers/specs/2026-09-03-fiche-client-design.md`
+
+**Folded in from the Phase 33 review** (`33-REVIEW.md`, open findings that this
+phase's own work touches):
+
+  - **WR-16** — the stage-change audit payload carries only `toStage`, while `audit-log.ts` documents "the from/to stage strings" for ACTV-02's timeline. Fix it here, where the timeline is built and the gap becomes visible.
+  - **WR-06** — the board's `proposalsCount` join omits the `proposals.user_id` predicate that `listProposalsForRelationship` carries as CRM-02 defence-in-depth.
+  - **WR-15** — `requiredSirenSchema` in `calc/schema.ts` neither normalises nor rejects interleaved non-digits, while its same-day sibling in `crm/schemas.ts` does both via `normalizeSiren`. FICHE-01 makes the SIREN the registry lookup key, so one normalisation rule becomes load-bearing.
 
 ### Phase 35: Sales Motivation
 
 **Milestone:** v1.7 — Sales Motivation
 **Goal:** A partner sees their own book gaining momentum — what moved and when, streaks of sustained activity, and badges for milestones reached — so the pipeline is something they want to keep current rather than a form they have to maintain.
-**Depends on:** Phase 34 (ACTV-02's system events with actor and timestamp are what momentum is computed from), Phase 33 (stages to move between, conversion rate to build on)
+**Depends on:** Phase 34 — Fiche client (ACTV-02's system events with actor and timestamp are what momentum is computed from), Phase 33 (stages to move between, conversion rate to build on)
 **Requirements:** TBD — no `GAME-*` requirements exist yet; they should be written before planning
 **Success Criteria** (what must be TRUE):
 
