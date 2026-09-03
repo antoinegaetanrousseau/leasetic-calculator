@@ -343,3 +343,46 @@ Status is `human_needed`, not `passed`: five verification items require a person
 
 _Verified: 2026-09-03T15:31:12Z_
 _Verifier: Claude (gsd-verifier) — goal-backward, adversarial stance, at commit `8b58470`_
+
+---
+
+## Addendum — 2026-09-03, after commit `52d03e1`
+
+This report was written at commit `8b58470`. Three of its five human items
+have since been acted on; the record below supersedes the corresponding
+`human_verification` entries. Nothing in the per-criterion verdicts changes —
+all five were already assessed as delivered in code.
+
+**Closed by an operator re-walk.** Antoine re-walked the two steps whose
+evidence this report voided, plus the reserved-lane drop: *"steps 3, 10 and 14
+all pass now."*
+
+- **Item 2 (step 14, the `unanswered` badge) — CLOSED.** Observed on the
+  repaired fixture.
+- **Item 4 (reserved-lane drop refusal) — CLOSED.** WR-01 was fixed in
+  `52d03e1`: `KanbanColumn` now accepts dnd-kit's object form of `disabled`,
+  so a reserved lane stays a drop target while refusing to be dragged, and
+  `handleKanbanMove`'s refusal branch runs. The refusal is a message, not a
+  silent snap-back.
+- **Item 1 (step 10, D-08's gate) — PARTIALLY CLOSED.** Re-walked and passing,
+  but against `next dev`, not the production build this report asked for. The
+  residual risk is materially lower than when the item was written: the
+  repaired path carries no error message at all, and a Server Function's
+  RETURN value serialises identically in dev and production. The remaining
+  gap is observational, not structural. `tests/server-action-error-contracts.test.ts`
+  (added in `52d03e1`) is the recurrence guard the review asked for — it fails
+  the build if any client component branches on a caught error's `.message`
+  again.
+
+**Item 3 (Space → ArrowRight → Space) — STILL OPEN, but no longer sitting on
+an unfixed defect.** WR-02 was fixed in `52d03e1`: the component's direct
+arrow path stands down while `data-dragging` is true, so dnd-kit owns the
+arrows during a live drag and exactly one write occurs.
+`PipelineBoard.test.tsx` Test 9b pins it. The operator walk remains
+unperformed.
+
+**Item 5 (migration 0009 on `main` / `preview`) — STILL OPEN by design.**
+Unchanged: a deliberate deferral to milestone close.
+
+Gates at `52d03e1`: `lint:check` 0, `typecheck` 0, `test` 0 (1817 passed, 38
+skipped), `build` 0.

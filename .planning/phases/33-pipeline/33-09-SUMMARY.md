@@ -290,3 +290,52 @@ visual steps.
 | 5 | no cross-partner comparison anywhere | steps 6, 12 |
 
 *Completed: 2026-09-03 — checkpoint approved, plan 33-09 closed.*
+
+---
+
+## Post-Review Re-Verification (2026-09-03, after commits 8b58470 / 52d03e1)
+
+The code review (`33-REVIEW.md`) ran AFTER this checkpoint was approved and
+found five criticals, two of which invalidated acceptance evidence recorded
+above. Both were repaired and the affected steps re-walked by Antoine, who
+reported: *"steps 3, 10 and 14 all pass now."*
+
+| Step | Why the original pass did not hold | Re-walk result |
+|---|---|---|
+| 3 | The reserved-lane refusal message was unreachable: `disabled` on the column disabled its DROPPABLE too, so a drop resolved `over` to null and the refusal branch never ran. What was visible was a silent snap-back, which D-09.1 calls worse than a lane that reads as unreachable (WR-01). | **PASS** — the lane is now a drop target that refuses out loud (`52d03e1`) |
+| 10 | The gate travelled as a thrown error whose `.message` the dialog matched. Next.js redacts a Server Function's thrown message in production builds, so the gate was dev-only — the original pass observed behaviour that does not exist in production (CR-01). | **PASS** — the gate is now a returned discriminated result (`8b58470`) |
+| 14 | The seeded row left `pdf_generated_at` null, and `deriveProposalOutcome` short-circuits to null on that, so the "Sans réponse" badge could not have rendered on the row it was checked against (CR-03). | **PASS** — fixture repaired; only the step-14 row is past validity (`8b58470`) |
+
+Steps 1, 2, 4-9 and 11-15 stand on their original walkthrough — none of the
+findings touched the code paths they exercise.
+
+### Still open after this re-walk
+
+1. **Step 10 in a production build.** `33-VERIFICATION.md`'s first human item
+   asks for the gate to be re-walked against `npm run build && npm run start`
+   rather than `next dev`, because dev-vs-production divergence is the exact
+   class CR-01 belonged to. Residual risk is low — the repaired path carries
+   no error message at all, and a Server Function's RETURN value serialises
+   identically in both modes — but it has not been observed in production mode.
+2. **The Space-then-arrow interaction.** WR-02 is fixed (`52d03e1`) and pinned
+   by `PipelineBoard.test.tsx` Test 9b, but no operator has walked a dnd-kit
+   keyboard drag (Space → ArrowRight → Space) to confirm exactly one stage
+   change and one audit row.
+3. **Migration 0009 on `main` / `preview`.** Deliberately deferred to milestone
+   close per `33-02-SUMMARY.md`; every criterion is true in the codebase and on
+   the development branch, and none is true in production until 0009 lands.
+
+### Findings fixed after approval
+
+| Finding | Fixed in |
+|---|---|
+| CR-01 — D-08's SIREN gate dead in production | `8b58470` |
+| CR-02 — `--remove` guard always aborted (`<> any`) | `8b58470` |
+| CR-03 — the `unanswered` fixture could not reach `unanswered` | `8b58470` |
+| CR-04 — an outcome could be recorded on a draft | `8b58470` |
+| CR-05 — `--remove` could destroy another partner's data | `8b58470` |
+| WR-01 — reserved-lane refusal unreachable | `52d03e1` |
+| WR-02 — arrow + keyboard drag double-write | `52d03e1` |
+
+The remaining 14 warnings and 10 info findings in `33-REVIEW.md` are untouched
+and unclaimed.
