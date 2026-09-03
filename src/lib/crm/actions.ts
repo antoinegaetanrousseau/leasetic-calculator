@@ -28,12 +28,37 @@
  * NOTHING` + a re-select on the same unique index, so a crash between steps
  * leaves, at worst, a harmless orphan `companies` row (never a corrupted or
  * partially-visible relationship) and a retry is always safe.
+ *
+ * ── Phase 34 Plan 07 ──────────────────────────────────────────────────────
+ * This module now also holds the registry hook (D-09) and the shared-tier
+ * edit (D-03). Two things about it changed shape:
+ *
+ * REGISTRY COLUMNS ARE NOT WRITTEN HERE. `legal_name`, `address_line`,
+ * `postal_code`, `city`, `legal_form`, `naf_code`, `naf_section`,
+ * `headcount_band`, `founded_on`, `registry_state` and the two sync columns
+ * are written exclusively through `./registry-sync`, which is the only
+ * function in the codebase that names one (D-01/D-02). No action below
+ * accepts a registry column name from a caller, and none may start doing so:
+ * a grep gate asserts that no registry column name appears in this file at
+ * all.
+ *
+ * `refreshCompanyRegistryAction` IS THIS MODULE'S FIRST ACTION WITH A
+ * RETURNED DISCRIMINATED RESULT (D-24). `no_siren`, `not_found` and
+ * `unavailable` are recoverable outcomes a dialog acts on, and they travel
+ * as VALUES because Next.js redacts a Server Function's thrown message in
+ * production builds (33-REVIEW CR-01). Every other failure class in every
+ * action here — including "not owned" — still throws the single bounded key
+ * `'clients.toast.error'`.
  */
 
 import { and, eq, inArray, sql } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 import { requireRelationshipHolder } from '@/lib/auth/require';
 import { db, schema } from '@/lib/db';
 import { writeAuditLog } from '@/lib/db/queries/audit-log';
+import type { RegistryRefreshResult } from './constants';
+import { syncCompanyRegistry } from './registry-sync';
 import { contactSchema, createClientSchema } from './schemas';
 
 /** Single bounded error key for every failure class in this module (T-30-05-03). */
@@ -63,15 +88,27 @@ export async function createClientRelationshipAction(
     const dbi = db();
 
     // ── Resolve or create the company row ─────────────────────────────────
+    // The projections below carry `siren` and `registry_status` alongside the
+    // id purely so the D-09 hook at the end of this function needs NO extra
+    // statement: reading a row we are already reading is not a second query,
+    // and it keeps the hook off the critical path entirely.
     let companyId: string;
+    let companySiren: string | null = null;
+    let companyRegistryStatus: string | null = null;
     if (input.siren) {
       const bySiren = await dbi
-        .select({ id: schema.companies.id })
+        .select({
+          id: schema.companies.id,
+          siren: schema.companies.siren,
+          registryStatus: schema.companies.registryStatus,
+        })
         .from(schema.companies)
         .where(eq(schema.companies.siren, input.siren))
         .limit(1);
       if (bySiren[0]) {
         companyId = bySiren[0].id;
+        companySiren = bySiren[0].siren;
+        companyRegistryStatus = bySiren[0].registryStatus;
       } else {
         const inserted = await dbi
           .insert(schema.companies)
@@ -80,11 +117,17 @@ export async function createClientRelationshipAction(
           .returning();
         if (inserted[0]) {
           companyId = inserted[0].id;
+          companySiren = inserted[0].siren;
+          companyRegistryStatus = inserted[0].registryStatus;
         } else {
           // A concurrent creator won the race on the same siren — re-select
           // rather than branch the caller-visible outcome on which path ran.
           const reselected = await dbi
-            .select({ id: schema.companies.id })
+            .select({
+              id: schema.companies.id,
+              siren: schema.companies.siren,
+              registryStatus: schema.companies.registryStatus,
+            })
             .from(schema.companies)
             .where(eq(schema.companies.siren, input.siren))
             .limit(1);
@@ -92,6 +135,8 @@ export async function createClientRelationshipAction(
             throw new Error('siren insert/reselect race unresolved');
           }
           companyId = reselected[0].id;
+          companySiren = reselected[0].siren;
+          companyRegistryStatus = reselected[0].registryStatus;
         }
       }
     } else {
@@ -102,6 +147,8 @@ export async function createClientRelationshipAction(
         .values({ name: input.name })
         .returning();
       companyId = inserted[0].id;
+      companySiren = inserted[0].siren;
+      companyRegistryStatus = inserted[0].registryStatus;
     }
 
     // ── Bind the caller's own relationship to the company ─────────────────
@@ -146,10 +193,103 @@ export async function createClientRelationshipAction(
       payload: { companyId },
     });
 
+    // ── The D-09 registry hook ────────────────────────────────────────────
+    // Fill the company's registry identity, but ONLY when it is new or not yet
+    // synced — creating a second relationship on an already-synced shared
+    // company must not re-hit the registry API.
+    //
+    // There is deliberately NO try/catch here and NO branch on the result.
+    // `syncCompanyRegistry` cannot throw (that is its defining property, pinned
+    // in registry-sync.test.ts) and its failure is already persisted as
+    // `registry_status`. D-09: A REGISTRY FAILURE NEVER BLOCKS CLIENT CREATION.
+    // Do not add a guard here — a guard is how a lookup failure would turn into
+    // BOUNDED_ERROR and cost the partner the client they just created.
+    if (companySiren !== null && companyRegistryStatus !== 'synced') {
+      await syncCompanyRegistry({
+        companyId,
+        siren: companySiren,
+        relationshipId,
+        actorId: session.user.id,
+        ownerId: session.user.id,
+      });
+    }
+
+    // Unchanged and unconditional, whatever the registry did.
     return { relationshipId };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('[createClientRelationshipAction] failed:', msg);
+    throw new Error(BOUNDED_ERROR);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  refreshCompanyRegistryAction (FICHE-02) — on-demand registry refresh        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/** Local, non-exported: a `'use server'` file may export only async functions. */
+const refreshCompanyRegistrySchema = z.object({
+  relationshipId: z.string().uuid(),
+});
+
+/**
+ * Re-run the registry lookup for the company behind ONE relationship the
+ * caller owns, and append a `registry_synced` event to that caller's own
+ * timeline on success.
+ *
+ * `companies` has no `owner_id` column, so the re-proof goes through the join
+ * to the caller's own `client_relationships` row, not a direct column match.
+ * Zero rows means either "no such relationship" or "not yours" — deliberately
+ * indistinguishable, and neither is a recoverable outcome, so both throw the
+ * bounded key rather than returning one.
+ */
+export async function refreshCompanyRegistryAction(raw: unknown): Promise<RegistryRefreshResult> {
+  const { session } = await requireRelationshipHolder(); // FIRST — PITFALLS §7.3
+  try {
+    const input = refreshCompanyRegistrySchema.parse(raw);
+    const dbi = db();
+
+    const rows = await dbi
+      .select({ companyId: schema.companies.id, siren: schema.companies.siren })
+      .from(schema.clientRelationships)
+      .innerJoin(schema.companies, eq(schema.companies.id, schema.clientRelationships.companyId))
+      .where(and(
+        eq(schema.clientRelationships.id, input.relationshipId),
+        eq(schema.clientRelationships.ownerId, session.user.id),
+      ))
+      .limit(1);
+
+    const row = rows[0];
+    if (!row) {
+      throw new Error('relationship not owned by caller');
+    }
+
+    if (row.siren === null) {
+      // RETURNED, never thrown (D-24 / 33-REVIEW CR-01). Next.js replaces a
+      // Server Function's thrown message with a generic string plus a digest in
+      // a production build, so a sentinel here would work under `npm run dev`
+      // and silently degrade to a dead-end toast once deployed. A returned
+      // value crosses the serialisation boundary intact.
+      return { ok: false, reason: 'no_siren' };
+    }
+
+    const result = await syncCompanyRegistry({
+      companyId: row.companyId,
+      siren: row.siren,
+      relationshipId: input.relationshipId,
+      actorId: session.user.id,
+      ownerId: session.user.id,
+    });
+
+    // The sync wrote at minimum `registry_status`, which the client page and
+    // its header render, so the layout is revalidated on every branch.
+    revalidatePath('/clients', 'layout');
+
+    return result;
+  } catch (e) {
+    if (e instanceof Error && e.message === BOUNDED_ERROR) throw e;
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[refreshCompanyRegistryAction] failed:', msg);
     throw new Error(BOUNDED_ERROR);
   }
 }
