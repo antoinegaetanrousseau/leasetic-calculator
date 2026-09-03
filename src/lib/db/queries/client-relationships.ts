@@ -28,7 +28,10 @@ import { db, schema } from '@/lib/db';
  * or anything from `global_params`. Where a client-facing monthly figure is
  * needed, only the single needed scalar is projected out of the `computed`
  * jsonb column — the raw `computed` object itself is never part of any
- * returned row shape.
+ * returned row shape. Phase 33 narrows this the same way for `validityDays`
+ * (`projectValidityDays`, below): a proposal-validity duration in days, not
+ * a commission or rate value — the raw `params_snapshot` object still never
+ * reaches any returned row shape.
  */
 
 // ── Client book (CRM-07) ─────────────────────────────────────────────────────
@@ -333,6 +336,16 @@ export interface RelationshipProposalRow {
    * reaches this row shape.
    */
   computedClientMonthly: number | null;
+  // Phase 33 (PIPE-03, D-06) — the two scalars `deriveProposalOutcome`
+  // (src/lib/db/queries/proposals.ts) needs, plus the three stored outcome
+  // columns. `outcome`/`outcomeDate`/`outcomeReason` are selected directly
+  // (top-level `proposals` columns, no projection needed); `validityDays` is
+  // narrowly projected out of `params_snapshot` — see `projectValidityDays`.
+  outcome: 'won' | 'lost' | null;
+  outcomeDate: Date | null;
+  outcomeReason: string | null;
+  pdfGeneratedAt: Date | null;
+  validityDays: number | null;
 }
 
 function projectComputedClientMonthly(computed: unknown): number | null {
@@ -340,6 +353,25 @@ function projectComputedClientMonthly(computed: unknown): number | null {
   if (typeof loyerHT === 'number') return loyerHT;
   if (typeof loyerHT === 'string') {
     const parsed = parseFloat(loyerHT);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+}
+
+/**
+ * ADMIN-09 narrowing (Phase 33): projects ONLY the `validityDays` integer
+ * out of the `params_snapshot` jsonb column, mirroring
+ * `projectComputedClientMonthly`'s shape exactly. `validityDays` is a
+ * proposal-validity duration in days, not a commission or rate value — but
+ * the same discipline applies regardless: the raw `params_snapshot` object
+ * itself never becomes part of any returned row shape. Returns `null` when
+ * absent or non-numeric (drafts, whose `params_snapshot` is NULL).
+ */
+function projectValidityDays(snapshot: unknown): number | null {
+  const validityDays = (snapshot as { validityDays?: unknown } | null)?.validityDays;
+  if (typeof validityDays === 'number') return validityDays;
+  if (typeof validityDays === 'string') {
+    const parsed = parseInt(validityDays, 10);
     return Number.isNaN(parsed) ? null : parsed;
   }
   return null;
@@ -366,6 +398,15 @@ export async function listProposalsForRelationship(
       createdAt: schema.proposals.createdAt,
       deletedAt: schema.proposals.deletedAt,
       computed: schema.proposals.computed,
+      outcome: schema.proposals.outcome,
+      outcomeDate: schema.proposals.outcomeDate,
+      outcomeReason: schema.proposals.outcomeReason,
+      pdfGeneratedAt: schema.proposals.pdfGeneratedAt,
+      // Aliased as `snapshot` (not `paramsSnapshot`) — ADMIN-09 requires the
+      // raw jsonb never appear under a key that could be mistaken for a
+      // returned row property; `projectValidityDays` narrows it below before
+      // it ever leaves this function.
+      snapshot: schema.proposals.paramsSnapshot,
     })
     .from(schema.proposals)
     .where(and(
@@ -383,5 +424,10 @@ export async function listProposalsForRelationship(
     createdAt: r.createdAt,
     deletedAt: r.deletedAt,
     computedClientMonthly: projectComputedClientMonthly(r.computed),
+    outcome: r.outcome as 'won' | 'lost' | null,
+    outcomeDate: r.outcomeDate,
+    outcomeReason: r.outcomeReason,
+    pdfGeneratedAt: r.pdfGeneratedAt,
+    validityDays: projectValidityDays(r.snapshot),
   }));
 }

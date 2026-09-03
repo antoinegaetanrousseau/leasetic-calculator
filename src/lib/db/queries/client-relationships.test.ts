@@ -408,6 +408,11 @@ describe('listProposalsForRelationship — CRM-06, ADMIN-09', () => {
         createdAt: new Date('2026-01-01T00:00:00Z'),
         deletedAt: null,
         computed: { loyerHT: 1234.56, someOtherInternalField: 'x' },
+        outcome: null,
+        outcomeDate: null,
+        outcomeReason: null,
+        pdfGeneratedAt: new Date('2026-01-02T00:00:00Z'),
+        snapshot: { validityDays: 45, commissionPct: '0.05' },
       },
     ];
     const result = await listProposalsForRelationship('rel-1', 'owner-A');
@@ -420,8 +425,15 @@ describe('listProposalsForRelationship — CRM-06, ADMIN-09', () => {
       createdAt: new Date('2026-01-01T00:00:00Z'),
       deletedAt: null,
       computedClientMonthly: 1234.56,
+      outcome: null,
+      outcomeDate: null,
+      outcomeReason: null,
+      pdfGeneratedAt: new Date('2026-01-02T00:00:00Z'),
+      validityDays: 45,
     });
     expect(result[0]).not.toHaveProperty('computed');
+    expect(result[0]).not.toHaveProperty('snapshot');
+    expect(result[0]).not.toHaveProperty('paramsSnapshot');
   });
 
   it('null computed → computedClientMonthly is null (defensive, does not throw)', async () => {
@@ -434,10 +446,16 @@ describe('listProposalsForRelationship — CRM-06, ADMIN-09', () => {
         createdAt: new Date('2026-01-01T00:00:00Z'),
         deletedAt: null,
         computed: null,
+        outcome: null,
+        outcomeDate: null,
+        outcomeReason: null,
+        pdfGeneratedAt: null,
+        snapshot: null,
       },
     ];
     const result = await listProposalsForRelationship('rel-1', 'owner-A');
     expect(result[0].computedClientMonthly).toBeNull();
+    expect(result[0].validityDays).toBeNull();
   });
 
   it('excludes soft-deleted proposals via a status predicate', async () => {
@@ -448,15 +466,51 @@ describe('listProposalsForRelationship — CRM-06, ADMIN-09', () => {
     // ne(status, 'deleted') carries the literal string 'deleted' as a bind param.
     expect(sqlReferencesValue(whereCall!.payload, 'deleted')).toBe(true);
   });
+
+  it('still filters on BOTH client_relationship_id AND proposals.user_id in the same statement (defense in depth)', async () => {
+    mockState.selectResult = [];
+    await listProposalsForRelationship('rel-1', 'owner-A');
+    const whereCall = calls.find((c) => c.kind === 'where');
+    expect(whereCall).toBeDefined();
+    expect(sqlReferencesColumn(whereCall!.payload, 'client_relationship_id')).toBe(true);
+    expect(sqlReferencesColumn(whereCall!.payload, 'user_id')).toBe(true);
+  });
+
+  it('returned rows expose validityDays but never a raw paramsSnapshot/snapshot property', async () => {
+    mockState.selectResult = [
+      {
+        id: 'p-2',
+        lcRef: 'LC-2026-002',
+        status: 'active',
+        language: 'fr',
+        createdAt: new Date('2026-01-01T00:00:00Z'),
+        deletedAt: null,
+        computed: {},
+        outcome: 'won',
+        outcomeDate: new Date('2026-01-05T00:00:00Z'),
+        outcomeReason: null,
+        pdfGeneratedAt: new Date('2026-01-02T00:00:00Z'),
+        snapshot: { validityDays: 30 },
+      },
+    ];
+    const result = await listProposalsForRelationship('rel-1', 'owner-A');
+    expect(result[0].validityDays).toBe(30);
+    expect(result[0].outcome).toBe('won');
+    expect(result[0]).not.toHaveProperty('paramsSnapshot');
+    expect(result[0]).not.toHaveProperty('snapshot');
+  });
 });
 
-describe('ADMIN-09 — no commission/params_snapshot in this module (source guard)', () => {
-  it('the compiled module never selects proposals.params_snapshot', () => {
-    // Static guard mirrors the plan's grep acceptance criteria — enforced here
-    // too so a future edit that reintroduces it fails the test suite, not
-    // just a manual grep.
+describe('ADMIN-09 — the raw params_snapshot object never becomes a returned row shape (source guard)', () => {
+  // Phase 33 (PIPE-03) narrows, rather than removes, this guard: the module
+  // now legitimately SELECTS `proposals.paramsSnapshot` (aliased `snapshot`)
+  // so `projectValidityDays` can narrow it server-side — the same pattern
+  // `computed`/`projectComputedClientMonthly` already established. What must
+  // still be true, and is asserted here: no returned row shape ever exposes
+  // a `paramsSnapshot:` key, mirroring the plan's grep acceptance criterion.
+  it('the compiled module never returns a row shape carrying a paramsSnapshot property', () => {
     const here = dirname(fileURLToPath(import.meta.url));
     const src = readFileSync(join(here, 'client-relationships.ts'), 'utf8');
-    expect(src).not.toMatch(/schema\.proposals\.paramsSnapshot/);
+    expect(src).not.toMatch(/paramsSnapshot:/);
   });
 });

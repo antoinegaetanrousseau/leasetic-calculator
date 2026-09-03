@@ -66,6 +66,7 @@ import {
   // Phase 12 — DB-01 draft CRUD lifecycle
   createDraft, updateDraft, finalizeDraft, listDraftsByUser, getDraftById,
   deriveDisplayStatus,
+  deriveProposalOutcome,
 } from './proposals';
 import type { ProposalRow } from '@/db/schema';
 
@@ -471,6 +472,53 @@ describe('deriveDisplayStatus', () => {
     expect(
       deriveDisplayStatus(row({ status: 'active', paramsSnapshot: null as never })),
     ).toBe('active');
+  });
+});
+
+describe('deriveProposalOutcome — Phase 33 D-06', () => {
+  it('a stored "won" past its validity window still returns "won" verbatim (explicit decision wins)', () => {
+    const past = new Date(Date.now() - 100 * 24 * 60 * 60 * 1000);
+    expect(
+      deriveProposalOutcome({ outcome: 'won', pdfGeneratedAt: past, validityDays: 30 }),
+    ).toBe('won');
+  });
+
+  it('a stored "lost" inside the window still returns "lost" verbatim', () => {
+    const recent = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000);
+    expect(
+      deriveProposalOutcome({ outcome: 'lost', pdfGeneratedAt: recent, validityDays: 30 }),
+    ).toBe('lost');
+  });
+
+  it('null outcome with null pdfGeneratedAt returns null (unfinalized, no window yet)', () => {
+    expect(
+      deriveProposalOutcome({ outcome: null, pdfGeneratedAt: null, validityDays: 30 }),
+    ).toBeNull();
+  });
+
+  it('null outcome inside the validity window returns null (still active, no outcome yet)', () => {
+    const recent = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000);
+    expect(
+      deriveProposalOutcome({ outcome: null, pdfGeneratedAt: recent, validityDays: 30 }),
+    ).toBeNull();
+  });
+
+  it('null outcome one day past pdfGeneratedAt + validityDays returns "unanswered"', () => {
+    const past = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000);
+    expect(
+      deriveProposalOutcome({ outcome: null, pdfGeneratedAt: past, validityDays: 30 }),
+    ).toBe('unanswered');
+  });
+
+  it('null validityDays falls back to 30 days', () => {
+    const past = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000);
+    expect(
+      deriveProposalOutcome({ outcome: null, pdfGeneratedAt: past, validityDays: null }),
+    ).toBe('unanswered');
+    const recent = new Date(Date.now() - 29 * 24 * 60 * 60 * 1000);
+    expect(
+      deriveProposalOutcome({ outcome: null, pdfGeneratedAt: recent, validityDays: null }),
+    ).toBeNull();
   });
 });
 

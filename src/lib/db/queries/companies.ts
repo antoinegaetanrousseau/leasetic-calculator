@@ -325,6 +325,10 @@ export async function listProposalsForRelationshipAdmin(relationshipId: string):
       createdAt: schema.proposals.createdAt,
       deletedAt: schema.proposals.deletedAt,
       computed: schema.proposals.computed,
+      outcome: schema.proposals.outcome,
+      outcomeDate: schema.proposals.outcomeDate,
+      outcomeReason: schema.proposals.outcomeReason,
+      pdfGeneratedAt: schema.proposals.pdfGeneratedAt,
     })
     .from(schema.proposals)
     .where(and(
@@ -341,5 +345,13 @@ export async function listProposalsForRelationshipAdmin(relationshipId: string):
     createdAt: r.createdAt,
     deletedAt: r.deletedAt,
     computedClientMonthly: projectComputedClientMonthly(r.computed),
+    outcome: r.outcome as 'won' | 'lost' | null,
+    outcomeDate: r.outcomeDate,
+    outcomeReason: r.outcomeReason,
+    pdfGeneratedAt: r.pdfGeneratedAt,
+    // ADMIN-09 (this file's own header comment, preserved): params_snapshot
+    // is never selected here, so validityDays cannot be projected from it —
+    // deriveProposalOutcome's 30-day fallback applies for admin-viewed rows.
+    validityDays: null,
   }));
 }

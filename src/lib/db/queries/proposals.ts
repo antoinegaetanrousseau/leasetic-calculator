@@ -911,3 +911,41 @@ export function deriveDisplayStatus(row: ProposalRow): DisplayStatus {
   if (new Date() > expiresAt) return 'expired';
   return 'active';
 }
+
+// ── Phase 33 — D-06: outcome derivation (extends Phase 12 D-07) ────────────
+
+export type DisplayOutcome = 'won' | 'lost' | 'unanswered' | null;
+
+/**
+ * D-06 derivation rule. `'unanswered'` is NEVER stored — the
+ * `proposals_outcome_check` CHECK constraint deliberately admits only
+ * `'won'`/`'lost'` as stored values, and no scheduled job may ever write
+ * `'unanswered'` on expiry (same discipline `deriveDisplayStatus` already
+ * applies to `'expired'`, extended here to the commercial-outcome column).
+ *
+ * Rules, in order:
+ *   1. A stored `'won'` or `'lost'` returns verbatim — an explicit partner
+ *      decision always wins; D-06 lets the partner override.
+ *   2. A null `pdfGeneratedAt` returns `null` — unfinalized, no validity
+ *      window exists yet to have lapsed.
+ *   3. Otherwise, compute `expiresAt = pdfGeneratedAt + (validityDays ?? 30)
+ *      days` (identical arithmetic to `deriveDisplayStatus`) and return
+ *      `'unanswered'` once `now()` is past it, else `null` (active, still
+ *      within window, no outcome yet).
+ *
+ * Pure function — no DB. Safe to import from server or client code.
+ */
+export function deriveProposalOutcome(row: {
+  outcome: string | null;
+  pdfGeneratedAt: Date | null;
+  validityDays: number | null;
+}): DisplayOutcome {
+  if (row.outcome === 'won' || row.outcome === 'lost') return row.outcome;
+  if (row.pdfGeneratedAt == null) return null;
+  const validityDays = row.validityDays ?? 30;
+  const expiresAt = new Date(
+    row.pdfGeneratedAt.getTime() + validityDays * 24 * 60 * 60 * 1000,
+  );
+  if (new Date() > expiresAt) return 'unanswered';
+  return null;
+}
