@@ -514,3 +514,107 @@ describe('ADMIN-09 — the raw params_snapshot object never becomes a returned r
     expect(src).not.toMatch(/paramsSnapshot:/);
   });
 });
+
+// ── Phase 34 Plan 05 — the widened three-tier detail row (FICHE-02/03/04) ────
+
+/**
+ * D-01 splits everything on a client page into three tiers, and the page has
+ * to render the read-only/editable boundary between them. That is only
+ * possible if ONE owner-scoped statement returns all three — hence these
+ * assertions on the projection itself rather than on the mock's echo.
+ */
+const D01_REGISTRY_TIER_FIELDS = [
+  'legalName',
+  'addressLine',
+  'postalCode',
+  'city',
+  'legalForm',
+  'nafCode',
+  'nafSection',
+  'headcountBand',
+  'foundedOn',
+  'registryState',
+  'registryStatus',
+  'registrySyncedAt',
+] as const;
+
+const D01_SHARED_DISPLAY_TIER_FIELDS = ['companyName', 'siren', 'website', 'phone'] as const;
+
+const D01_PRIVATE_TIER_FIELDS = [
+  'leadSource',
+  'description',
+  'nextActionAt',
+  'nextActionNote',
+  'stage',
+] as const;
+
+describe('getClientRelationshipForOwner — the three D-01 tiers in ONE statement', () => {
+  it('still carries owner_id in its WHERE and still returns null for zero rows (IDOR contract unchanged)', async () => {
+    mockState.selectResult = [];
+    const result = await getClientRelationshipForOwner('rel-1', 'owner-A');
+    expect(result).toBeNull();
+    const whereCalls = calls.filter((c) => c.kind === 'where');
+    expect(whereCalls.some((c) => sqlReferencesColumn(c.payload, 'owner_id'))).toBe(true);
+  });
+
+  it('projects every registry, shared-display and private-tier column', async () => {
+    mockState.selectResult = [];
+    await getClientRelationshipForOwner('rel-1', 'owner-A');
+    const projection = calls.find((c) => c.kind === 'select')!.payload as Record<string, unknown>;
+    const keys = Object.keys(projection);
+    for (const field of [
+      ...D01_REGISTRY_TIER_FIELDS,
+      ...D01_SHARED_DISPLAY_TIER_FIELDS,
+      ...D01_PRIVATE_TIER_FIELDS,
+      'relationshipId',
+      'companyId',
+      'createdAt',
+    ]) {
+      expect(keys).toContain(field);
+    }
+  });
+
+  it('passes a widened driver row through untouched', async () => {
+    mockState.selectResult = [
+      {
+        relationshipId: 'rel-1',
+        companyId: 'co-1',
+        companyName: 'Acme',
+        siren: '123456789',
+        createdAt: new Date('2026-01-01T00:00:00Z'),
+        legalName: 'ACME SAS',
+        addressLine: '1 rue de la Paix',
+        postalCode: '75002',
+        city: 'PARIS',
+        legalForm: '5710',
+        nafCode: '62.01Z',
+        nafSection: 'J',
+        headcountBand: '12',
+        foundedOn: '2015-03-01',
+        registryState: 'A',
+        registryStatus: 'synced',
+        registrySyncedAt: new Date('2026-09-01T00:00:00Z'),
+        website: 'https://acme.fr',
+        phone: '+33100000000',
+        leadSource: 'salon',
+        description: 'Rencontré au SIMI',
+        nextActionAt: new Date('2026-09-10T00:00:00Z'),
+        nextActionNote: 'Relancer sur la proposition',
+        stage: 'negociation',
+      },
+    ];
+    const result = await getClientRelationshipForOwner('rel-1', 'owner-A');
+    expect(result?.legalName).toBe('ACME SAS');
+    expect(result?.registryStatus).toBe('synced');
+    expect(result?.leadSource).toBe('salon');
+    expect(result?.stage).toBe('negociation');
+    expect(result?.nafSection).toBe('J');
+  });
+
+  it('is still ONE statement — a widened row shape must not become a second round trip', async () => {
+    mockState.selectResult = [];
+    await getClientRelationshipForOwner('rel-1', 'owner-A');
+    expect(calls.filter((c) => c.kind === 'select')).toHaveLength(1);
+    expect(calls.filter((c) => c.kind === 'limit')).toHaveLength(1);
+  });
+});

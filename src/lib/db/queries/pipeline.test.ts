@@ -259,3 +259,51 @@ describe('no admin path (T-30-04-09 precedent)', () => {
     expect(src).not.toMatch(/requireAdmin|includeAllOwners|allOwners|ownerId\?:/);
   });
 });
+
+// ── Phase 34 Plan 05 — D-22 / 33-REVIEW WR-06 ───────────────────────────────
+
+describe('listPipelineBoard — D-22: proposalsCount carries the proposals.user_id predicate', () => {
+  it('the proposals leftJoin CONDITION contains proposals.user_id', async () => {
+    await listPipelineBoard({ ownerId: 'owner-A' });
+    const leftJoins = calls.filter((c) => c.kind === 'leftJoin');
+    expect(leftJoins).toHaveLength(2);
+    // `contacts` has no user_id column, so a hit can only come from the
+    // proposals join condition.
+    const carriesOwner = leftJoins.some((c) =>
+      sqlReferencesColumn((c.payload as { on: unknown }).on, 'user_id'),
+    );
+    expect(carriesOwner).toBe(true);
+  });
+
+  it('REGRESSION GUARD — the predicate must NOT migrate into the WHERE, or the LEFT JOIN degrades to an INNER JOIN', async () => {
+    // If `eq(proposals.userId, ownerId)` is moved from the join condition to
+    // the statement's WHERE, every relationship with zero owned proposals
+    // yields a NULL proposals.user_id, fails the WHERE and vanishes from the
+    // board — a partner's brand-new prospects, i.e. most of the Prospect lane.
+    // This assertion is the reason the predicate lives where it lives.
+    await listPipelineBoard({ ownerId: 'owner-A' });
+    const whereCalls = calls.filter((c) => c.kind === 'where');
+    expect(whereCalls.length).toBeGreaterThan(0);
+    expect(whereCalls.some((c) => sqlReferencesColumn(c.payload, 'user_id'))).toBe(false);
+    // …and it still carries the one predicate it is supposed to carry.
+    expect(whereCalls.some((c) => sqlReferencesColumn(c.payload, 'owner_id'))).toBe(true);
+  });
+
+  it('a relationship with zero owned proposals still appears on the board, with proposalsCount 0', async () => {
+    mockState.selectResult = [
+      {
+        relationshipId: 'rel-new',
+        companyId: 'co-new',
+        companyName: 'Nouveau Prospect',
+        siren: null,
+        stage: 'prospect',
+        contactsCount: '0',
+        proposalsCount: '0',
+      },
+    ];
+    const result = await listPipelineBoard({ ownerId: 'owner-A' });
+    expect(result.prospect).toHaveLength(1);
+    expect(result.prospect[0].relationshipId).toBe('rel-new');
+    expect(result.prospect[0].proposalsCount).toBe(0);
+  });
+});
