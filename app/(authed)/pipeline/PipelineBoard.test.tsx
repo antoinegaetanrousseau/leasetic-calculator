@@ -15,7 +15,7 @@
  * exercised regardless of how the event was produced.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { PipelineCardRow } from '@/lib/db/queries/pipeline';
 import { PIPELINE_STAGES, type PipelineStage } from '@/lib/pipeline/stages';
 
@@ -122,6 +122,32 @@ describe('PipelineBoard (Plan 33-07 Task 1) — structure', () => {
     const item = container.querySelector('[data-slot="kanban-item"]');
     expect(item).not.toBeNull();
     expect(item?.getAttribute('tabindex')).not.toBeNull();
+  });
+
+  it('Test 9: ArrowRight on a focused card advances it one settable stage through the single write path', async () => {
+    advanceRelationshipStageActionMock.mockResolvedValue(undefined);
+    const initial = makeEmptyBoard();
+    initial.prospect = [makeRow()];
+    const { container } = render(<PipelineBoard initial={initial} lang="fr" />);
+    const item = container.querySelector('[data-slot="kanban-item"]') as HTMLElement;
+    fireEvent.keyDown(item, { key: 'ArrowRight' });
+    await waitFor(() =>
+      expect(advanceRelationshipStageActionMock).toHaveBeenCalledWith({
+        relationshipId: 'rel-1',
+        toStage: 'qualifie',
+      }),
+    );
+  });
+
+  it('Test 10: ArrowLeft on the first settable stage, and arrows from a focused child, do nothing', () => {
+    const initial = makeEmptyBoard();
+    initial.prospect = [makeRow()];
+    const { container } = render(<PipelineBoard initial={initial} lang="fr" />);
+    const item = container.querySelector('[data-slot="kanban-item"]') as HTMLElement;
+    fireEvent.keyDown(item, { key: 'ArrowLeft' });
+    const link = item.querySelector('a') as HTMLElement;
+    fireEvent.keyDown(link, { key: 'ArrowRight' });
+    expect(advanceRelationshipStageActionMock).not.toHaveBeenCalled();
   });
 });
 

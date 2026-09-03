@@ -31,6 +31,7 @@
  * primitive's actual merge order before writing this composition.
  */
 import { useState, type ReactNode } from 'react';
+import type React from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ScrollArea as ScrollAreaPrimitive } from '@base-ui/react/scroll-area';
@@ -52,7 +53,12 @@ import { cn } from '@/lib/utils';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import { stageLabel } from '@/lib/pipeline/format';
 import { advanceRelationshipStageAction } from '@/lib/pipeline/actions';
-import { PIPELINE_STAGES, isReservedStage, type PipelineStage } from '@/lib/pipeline/stages';
+import {
+  PARTNER_SETTABLE_STAGES,
+  PIPELINE_STAGES,
+  isReservedStage,
+  type PipelineStage,
+} from '@/lib/pipeline/stages';
 import type { PipelineCardRow } from '@/lib/db/queries/pipeline';
 
 export interface PipelineBoardProps {
@@ -230,6 +236,39 @@ export function PipelineBoard({ initial, lang }: PipelineBoardProps) {
       refresh: () => router.refresh(),
     });
 
+  /**
+   * A-5 keyboard operability, deterministic path. dnd-kit's KeyboardSensor
+   * (Space → arrows → Space) stays wired through KanbanItemHandle, but it
+   * proved unreliable in real browsers at the 33-09 acceptance checkpoint,
+   * so a focused card also moves directly with ArrowLeft / ArrowRight
+   * between the partner-settable stages. The reserved lanes are simply not
+   * in that list (D-04), and every move still flows through
+   * `handleKanbanMove` — the single stage-write call site (D-09.2).
+   */
+  const moveByKeyboard = (row: PipelineCardRow, stage: PipelineStage, direction: -1 | 1) => {
+    const settable = PARTNER_SETTABLE_STAGES as readonly PipelineStage[];
+    const target = settable[settable.indexOf(stage) + direction];
+    if (!target) return;
+    void handleKanbanMove({
+      activeContainer: stage,
+      activeIndex: columns[stage].findIndex((r) => r.relationshipId === row.relationshipId),
+      overContainer: target,
+      overIndex: columns[target].length,
+      columns,
+      setColumns,
+      lang,
+      refresh: () => router.refresh(),
+    });
+  };
+
+  const onItemKeyDown = (row: PipelineCardRow, stage: PipelineStage) => (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return; // only when the card itself is focused
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      moveByKeyboard(row, stage, event.key === 'ArrowRight' ? 1 : -1);
+    }
+  };
+
   const renderCards = (stage: PipelineStage, rows: PipelineCardRow[]) => (
     <KanbanColumnContent value={stage} className="min-h-28 gap-2">
       {rows.length > 0 ? (
@@ -238,6 +277,8 @@ export function PipelineBoard({ initial, lang }: PipelineBoardProps) {
             key={row.relationshipId}
             value={row.relationshipId}
             render={<KanbanItemHandle cursor />}
+            aria-keyshortcuts="ArrowLeft ArrowRight"
+            onKeyDown={onItemKeyDown(row, stage)}
           >
             <PipelineCard row={row} lang={lang} />
           </KanbanItem>
@@ -257,6 +298,9 @@ export function PipelineBoard({ initial, lang }: PipelineBoardProps) {
       restoreOnCancel
       className="w-full"
     >
+      <p id="pipeline-keyboard-hint" className="sr-only">
+        {t('pipeline.board.keyboardHint', lang)}
+      </p>
       <BoardScrollArea>
         <KanbanBoard className="grid min-w-max auto-cols-[17.5rem] grid-flow-col grid-cols-none gap-3 px-1 pb-2">
           {PIPELINE_STAGES.map((stage) => {
