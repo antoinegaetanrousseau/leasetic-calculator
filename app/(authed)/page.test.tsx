@@ -20,7 +20,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 
 vi.mock('server-only', () => ({}));
 
@@ -369,10 +369,9 @@ describe('Partner Home / — à relancer card (ACTV-04/05, D-20)', () => {
 
     // The admin case must fall out of owning nothing, NOT out of a branch:
     // a branch would be a second surface to secure (T-34-09-03).
-    const src = readFileSync(
-      fileURLToPath(new URL('./page.tsx', import.meta.url)),
-      'utf8',
-    );
+    // Resolved from the vitest cwd (the repo root), not from import.meta.url:
+    // under the jsdom environment that URL is not a file: URL.
+    const src = readFileSync(join(process.cwd(), 'app', '(authed)', 'page.tsx'), 'utf8');
     expect(src).not.toMatch(/requireAdmin/);
     expect(src).not.toMatch(/role\s*[!=]==/);
   });

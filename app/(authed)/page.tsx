@@ -14,8 +14,20 @@ import {
   countTotal,
   countDrafts,
 } from '@/lib/db/queries/proposal-aggregates';
+import { listRelationshipsNeedingFollowUp } from '@/lib/db/queries';
 import { buildListResponse } from '@/lib/api/proposals/list';
 import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
+import { RelanceCard } from './_components/RelanceCard';
+
+/**
+ * Read the current timestamp. Extracted to a module-level async helper so the
+ * clock is not read inside a React component render function
+ * (react-hooks/purity) — the same shape `app/(authed)/proposals/[id]/page.tsx`
+ * already uses. Server-only, called once per request.
+ */
+async function getNowMs(): Promise<number> {
+  return Date.now();
+}
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Accueil — Leasétic Matrice' };
@@ -33,14 +45,29 @@ export default async function HomePage() {
   const displayName = u.displayName ?? u.name ?? u.email;
   const userId = u.id;
 
-  const [countThisMonthVal, countTotalVal, countDraftsVal, recentList] = await Promise.all([
-    countThisMonth(userId),
-    countTotal(userId),
-    countDrafts(userId),
-    buildListResponse({ userId, limit: 5 }),
-  ]);
+  const [countThisMonthVal, countTotalVal, countDraftsVal, recentList, relanceRows] =
+    await Promise.all([
+      countThisMonth(userId),
+      countTotal(userId),
+      countDrafts(userId),
+      buildListResponse({ userId, limit: 5 }),
+      // D-20: the "à relancer" list belongs on the home page, and it joins the
+      // page's existing single round of queries rather than adding a second.
+      // `userId` is the session's, and it is compiled into the statement's own
+      // WHERE (CRM-02) — the limit is applied in SQL there too, so nothing here
+      // re-sorts or re-slices the result.
+      //
+      // No role branch guards this call: the page uses requireUser(), and an
+      // admin simply owns no relationships and receives an empty list. Branching
+      // on the role would create a second surface to secure for no gain.
+      listRelationshipsNeedingFollowUp(userId, 5),
+    ]);
 
   const recentRows = recentList.rows.slice(0, 5);
+  // Read the clock ONCE, here on the server: the follow-up labels are derived
+  // from it, and deriving them during a client render would tie them to the
+  // visitor's clock instead of ours (the same reason ProposalRow takes nowMs).
+  const nowMs = await getNowMs();
 
   return (
     <div>
@@ -77,6 +104,8 @@ export default async function HomePage() {
           value={String(countDraftsVal)}
         />
       </div>
+
+      <RelanceCard rows={relanceRows} lang={lang} nowMs={nowMs} />
 
       {recentRows.length === 0 ? (
         <Card className="mt-0">
