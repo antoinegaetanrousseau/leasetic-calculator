@@ -135,3 +135,10 @@ None — no external service configuration required.
 ---
 *Phase: 33-pipeline*
 *Completed: 2026-09-03*
+
+## Self-Check: PASSED
+
+All created files verified present on disk (src/lib/pipeline/format.ts, format.test.ts,
+app/(authed)/pipeline/PipelineCard.tsx, PipelineCard.test.tsx, PipelineColumnHeader.tsx,
+PipelineColumnHeader.test.tsx) and all task commit hashes (36fc5dc, f08d370, c3ac2f8, 3f525ae)
+verified present in git log.
