@@ -93,3 +93,16 @@ export type {
 // Phase 33 Plan 03 — owner-scoped pipeline board + conversion rate (PIPE-03/04, CRM-02, D-12).
 export { listPipelineBoard, getConversionRateForOwner } from './pipeline';
 export type { PipelineCardRow, ConversionRate } from './pipeline';
+
+// Phase 34 Plan 05 — owner-scoped relationship timeline, event writes and the
+// follow-up list (ACTV-01/02/03/04/05, CRM-02).
+export {
+  listRelationshipEvents,
+  insertRelationshipEventForOwner,
+  listRelationshipsNeedingFollowUp,
+} from './relationship-events';
+export type {
+  RelationshipEventListRow,
+  InsertRelationshipEventArgs,
+  FollowUpRow,
+} from './relationship-events';
