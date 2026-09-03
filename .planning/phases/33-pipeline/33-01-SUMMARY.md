@@ -141,3 +141,9 @@ None — no external service configuration required. The migration is authored, 
 ---
 *Phase: 33-pipeline*
 *Completed: 2026-09-03*
+
+## Self-Check: PASSED
+
+All created files verified present on disk (src/lib/pipeline/stages.ts, stages.test.ts,
+drizzle/0009_phase33_pipeline.sql, drizzle/meta/0009_snapshot.json) and all task commit
+hashes (08ffcc1, c40c04b, 5874343) verified present in git log.
