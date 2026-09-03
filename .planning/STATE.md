@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 34 (fiche-client) — EXECUTING
-Plan: 4 of 13
+Plan: 11 of 13 (34-12 in flight)
 Status: Ready to execute
 Last activity: 2026-09-03
 
