@@ -86,13 +86,13 @@ vi.mock('./NextActionDialog', () => ({
   ),
 }));
 
-import { ClientHeader } from './ClientHeader';
+import { ClientHeader, type ClientHeaderProps } from './ClientHeader';
 import { t } from '@/lib/i18n/dictionaries';
 import { formatDate } from '@/lib/i18n/format';
 
 const REL_ID = '11111111-1111-4111-8111-111111111111';
 
-const BASE_PROPS = {
+const BASE_PROPS: ClientHeaderProps = {
   relationshipId: REL_ID,
   companyName: 'Dupont Menuiserie',
   siren: '552100554',
@@ -108,7 +108,7 @@ const BASE_PROPS = {
   lang: 'fr' as const,
 };
 
-function renderHeader(overrides: Partial<typeof BASE_PROPS> = {}) {
+function renderHeader(overrides: Partial<ClientHeaderProps> = {}) {
   return render(<ClientHeader {...BASE_PROPS} {...overrides} />);
 }
 
