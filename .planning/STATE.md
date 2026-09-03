@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: executing
-last_updated: "2026-09-03T01:34:42.723Z"
+status: paused
+last_updated: "2026-09-03T10:14:58.374Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 16
   total_plans: 79
-  completed_plans: 76
+  completed_plans: 78
   percent: 80
 ---
 
@@ -28,8 +28,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 33 (pipeline) — EXECUTING
-Plan: 7 of 9
-Status: Ready to execute
+Plan: 8 of 9 (33-08) — tasks 1-2 committed, task 3 is a BLOCKING operator checkpoint, awaiting approval
+Status: Paused at checkpoint — do not advance past 33-08 or mark ROADMAP.md complete until the operator
+runs the integration suite against the Neon development branch and approves (see Blockers below and
+33-08-SUMMARY.md's "Awaiting" section)
 Last activity: 2026-09-03
 
 ## Deferred Items
@@ -535,3 +537,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: 33-06: SIREN_REQUIRED moved out of src/lib/pipeline/actions.ts ('use server') into a new plain src/lib/pipeline/constants.ts — Next.js rejects non-async exports from 'use server' files, which only surfaced when MarkWonDialog (client) first imported the sentinel.
 - [Phase 33-07]: KanbanItem composed with render={<KanbanItemHandle cursor />} to merge dnd-kit's focus attributes and drag listeners onto one DOM node for A-5 keyboard operability
 - [Phase 33-07]: Rule 1 auto-fix: replaced the plan's useEffect reseed-on-prop-change with React's render-time prop-identity comparison (setState during render, not inside useEffect) to satisfy this repo's react-hooks/set-state-in-effect eslint gate, in both PipelineBoard and PipelineMobileList
+- [Phase ?]: 33-08: added a 7th fail-closed rejection assertion (INSERT against a nonexistent client_relationship_id) beyond the plan's literal 12-point list, closing the 'missing company row' branch named in 33-01-PLAN.md's decision record
+
+### Blockers
+
+- 33-08 task 3: blocking operator checkpoint pending
