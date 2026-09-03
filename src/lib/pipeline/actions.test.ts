@@ -8,6 +8,12 @@
  * actions.ts operate on real Column objects. Extended here with
  * `innerJoin`/`leftJoin` on the select builder, needed by
  * `markProposalWonAction`'s joined branch-selector read and subqueries.
+ *
+ * Phase 34 Plan 08 (ACTV-02, D-21) extends the harness with a mock of the
+ * `@/lib/db/queries` barrel, so `insertRelationshipEventForOwner` is a spy that
+ * ALSO records itself into `mockState.calls` — the timeline events must be
+ * provably written AFTER the row write they narrate, and call order is the only
+ * way to assert that on a driver with no transactions.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -115,6 +121,13 @@ vi.mock('@/lib/db/queries/audit-log', () => ({
   writeAuditLog: writeAuditLogMock,
 }));
 
+const { insertRelationshipEventMock } = vi.hoisted(() => ({
+  insertRelationshipEventMock: vi.fn(),
+}));
+vi.mock('@/lib/db/queries', () => ({
+  insertRelationshipEventForOwner: insertRelationshipEventMock,
+}));
+
 import {
   advanceRelationshipStageAction,
   markProposalLostAction,
@@ -155,6 +168,13 @@ beforeEach(() => {
   requireRelationshipHolderMock.mockResolvedValue({ session: CALLER_SESSION, role: 'partner' });
   writeAuditLogMock.mockReset();
   writeAuditLogMock.mockResolvedValue({ id: 'audit-1' });
+  insertRelationshipEventMock.mockReset();
+  // Records itself into the same ordered call log as the db builder, so a test
+  // can prove the event lands AFTER the UPDATE it narrates.
+  insertRelationshipEventMock.mockImplementation(async (args: unknown) => {
+    mockState.calls.push({ kind: 'event', payload: args });
+    return { id: 'event-1' };
+  });
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
@@ -185,28 +205,45 @@ describe('advanceRelationshipStageAction', () => {
     expect(mockState.calls).toHaveLength(0);
   });
 
+  // D-21 / T-34-08-02 — the fromStage pre-read must NOT have become the gate.
+  // The predicate walk deliberately starts AFTER the `update` call so it reads
+  // the UPDATE's own WHERE, not the pre-read's.
   it('composes the UPDATE with both client_relationships.id and owner_id predicates', async () => {
-    mockState.resultQueue = [[{ id: RELATIONSHIP_ID, stage: 'qualifie' }]];
+    mockState.resultQueue = [
+      [{ stage: 'prospect' }], // D-21 fromStage pre-read (payload data, not the gate)
+      [{ id: RELATIONSHIP_ID, stage: 'qualifie' }], // the UPDATE
+    ];
 
     await advanceRelationshipStageAction({ relationshipId: RELATIONSHIP_ID, toStage: 'qualifie' });
 
-    const whereCall = mockState.calls.find((c) => c.kind === 'where');
+    const updateIdx = mockState.calls.findIndex((c) => c.kind === 'update');
+    expect(updateIdx).toBeGreaterThanOrEqual(0);
+    const whereCall = mockState.calls.slice(updateIdx).find((c) => c.kind === 'where');
     expect(whereCall).toBeDefined();
     expect(sqlReferencesColumn(whereCall!.payload, 'id')).toBe(true);
     expect(sqlReferencesColumn(whereCall!.payload, 'owner_id')).toBe(true);
   });
 
+  // T-34-08-02 — the pre-read returning a row does NOT let the action proceed
+  // on a relationship the caller does not own. Only the UPDATE decides.
   it('throws the bounded error and writes no audit row on a zero-row returning()', async () => {
-    mockState.resultQueue = [[]]; // UPDATE ... WHERE matched zero rows
+    mockState.resultQueue = [
+      [{ stage: 'prospect' }], // pre-read succeeded...
+      [], // ...but the UPDATE ... WHERE matched zero rows
+    ];
 
     await expect(
       advanceRelationshipStageAction({ relationshipId: RELATIONSHIP_ID, toStage: 'qualifie' }),
     ).rejects.toThrow('pipeline.toast.error');
     expect(writeAuditLogMock).not.toHaveBeenCalled();
+    expect(insertRelationshipEventMock).not.toHaveBeenCalled();
   });
 
   it("writes exactly one audit row with action 'relationship.stage_change' on success", async () => {
-    mockState.resultQueue = [[{ id: RELATIONSHIP_ID, stage: 'qualifie' }]];
+    mockState.resultQueue = [
+      [{ stage: 'prospect' }],
+      [{ id: RELATIONSHIP_ID, stage: 'qualifie' }],
+    ];
 
     await advanceRelationshipStageAction({ relationshipId: RELATIONSHIP_ID, toStage: 'qualifie' });
 
@@ -218,6 +255,87 @@ describe('advanceRelationshipStageAction', () => {
         targetId: RELATIONSHIP_ID,
       }),
     );
+  });
+
+  // ── D-21 / 33-REVIEW WR-16 ────────────────────────────────────────────────
+  // audit-log.ts has documented "the from/to stage strings" since Phase 33
+  // while the code wrote `toStage` alone. The key set is asserted EXACTLY so
+  // neither half can be dropped again silently.
+  it('writes an audit payload whose key set is exactly { fromStage, toStage }, with the pre-read stage as fromStage (D-21)', async () => {
+    mockState.resultQueue = [
+      [{ stage: 'prospect' }], // the relationship's stage before the move
+      [{ id: RELATIONSHIP_ID, stage: 'qualifie' }],
+    ];
+
+    await advanceRelationshipStageAction({ relationshipId: RELATIONSHIP_ID, toStage: 'qualifie' });
+
+    const payload = writeAuditLogMock.mock.calls[0][0].payload as Record<string, unknown>;
+    expect(Object.keys(payload).sort()).toEqual(['fromStage', 'toStage']);
+    expect(payload.fromStage).toBe('prospect');
+    expect(payload.toStage).toBe('qualifie');
+  });
+
+  // ── ACTV-02 / D-15 ────────────────────────────────────────────────────────
+  it('appends a stage_changed event attributed to the session user, with payload keys exactly { fromStage, toStage }', async () => {
+    mockState.resultQueue = [
+      [{ stage: 'prospect' }],
+      [{ id: RELATIONSHIP_ID, stage: 'qualifie' }],
+    ];
+
+    await advanceRelationshipStageAction({ relationshipId: RELATIONSHIP_ID, toStage: 'qualifie' });
+
+    expect(insertRelationshipEventMock).toHaveBeenCalledTimes(1);
+    const args = insertRelationshipEventMock.mock.calls[0][0] as Record<string, unknown>;
+    expect(args.kind).toBe('stage_changed');
+    expect(args.relationshipId).toBe(RELATIONSHIP_ID);
+    expect(args.ownerId).toBe(CALLER_SESSION.user.id);
+    // T-34-08-01: never null — a null actor would be indistinguishable from a
+    // genuinely system-initiated event, and ACTV-02 requires attribution.
+    expect(args.actorId).toBe(CALLER_SESSION.user.id);
+    expect(Object.keys(args.payload as object).sort()).toEqual(['fromStage', 'toStage']);
+    expect((args.payload as Record<string, unknown>).fromStage).toBe('prospect');
+  });
+
+  it('writes the stage_changed event AFTER the stage UPDATE, never before (no transactions — 34-PATTERNS trap 1)', async () => {
+    mockState.resultQueue = [
+      [{ stage: 'prospect' }],
+      [{ id: RELATIONSHIP_ID, stage: 'qualifie' }],
+    ];
+
+    await advanceRelationshipStageAction({ relationshipId: RELATIONSHIP_ID, toStage: 'qualifie' });
+
+    const updateIdx = mockState.calls.findIndex((c) => c.kind === 'update');
+    const returningIdx = mockState.calls.findIndex((c) => c.kind === 'returning');
+    const eventIdx = mockState.calls.findIndex((c) => c.kind === 'event');
+    expect(updateIdx).toBeGreaterThanOrEqual(0);
+    expect(eventIdx).toBeGreaterThan(returningIdx);
+  });
+
+  // <decision_record> section two — a failed event write must not fail the
+  // thing that happened. The stage HAS moved by this point.
+  it('still RESOLVES when the event write returns null (the stage already moved)', async () => {
+    insertRelationshipEventMock.mockResolvedValueOnce(null);
+    mockState.resultQueue = [
+      [{ stage: 'prospect' }],
+      [{ id: RELATIONSHIP_ID, stage: 'qualifie' }],
+    ];
+
+    await expect(
+      advanceRelationshipStageAction({ relationshipId: RELATIONSHIP_ID, toStage: 'qualifie' }),
+    ).resolves.toBeUndefined();
+  });
+
+  it('still RESOLVES when the event write throws (T-34-08-04)', async () => {
+    insertRelationshipEventMock.mockRejectedValueOnce(new Error('driver exploded'));
+    mockState.resultQueue = [
+      [{ stage: 'prospect' }],
+      [{ id: RELATIONSHIP_ID, stage: 'qualifie' }],
+    ];
+
+    await expect(
+      advanceRelationshipStageAction({ relationshipId: RELATIONSHIP_ID, toStage: 'qualifie' }),
+    ).resolves.toBeUndefined();
+    expect(console.error).toHaveBeenCalled();
   });
 });
 
@@ -265,6 +383,46 @@ describe('markProposalLostAction', () => {
       markProposalLostAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
     ).rejects.toThrow('pipeline.toast.error');
     expect(writeAuditLogMock).not.toHaveBeenCalled();
+    expect(insertRelationshipEventMock).not.toHaveBeenCalled();
+  });
+
+  // ── ACTV-02 / D-15 ────────────────────────────────────────────────────────
+  // T-34-08-05: the key set is asserted EXACTLY. `reason` is partner free text
+  // that does not belong in a payload beside ids, and no amount, commission or
+  // rate value may ever enter one (D-26 / ADMIN-09).
+  it('appends an outcome_set event attributed to the session user, with payload keys exactly { proposalId, outcome, outcomeDate }', async () => {
+    mockState.resultQueue = [[{ id: PROPOSAL_ID, clientRelationshipId: RELATIONSHIP_ID }]];
+
+    await markProposalLostAction({ proposalId: PROPOSAL_ID, date: '2026-09-03', reason: 'Budget' });
+
+    expect(insertRelationshipEventMock).toHaveBeenCalledTimes(1);
+    const args = insertRelationshipEventMock.mock.calls[0][0] as Record<string, unknown>;
+    expect(args.kind).toBe('outcome_set');
+    expect(args.relationshipId).toBe(RELATIONSHIP_ID);
+    expect(args.ownerId).toBe(CALLER_SESSION.user.id);
+    expect(args.actorId).toBe(CALLER_SESSION.user.id);
+    const payload = args.payload as Record<string, unknown>;
+    expect(Object.keys(payload).sort()).toEqual(['outcome', 'outcomeDate', 'proposalId']);
+    expect(payload.outcome).toBe('lost');
+    expect(payload.proposalId).toBe(PROPOSAL_ID);
+  });
+
+  it('writes no event for a proposal that carries no client_relationship_id (nothing to narrate onto)', async () => {
+    mockState.resultQueue = [[{ id: PROPOSAL_ID, clientRelationshipId: null }]];
+
+    await expect(
+      markProposalLostAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
+    ).resolves.toBeUndefined();
+    expect(insertRelationshipEventMock).not.toHaveBeenCalled();
+  });
+
+  it('still RESOLVES when the outcome event write returns null (the outcome already recorded)', async () => {
+    insertRelationshipEventMock.mockResolvedValueOnce(null);
+    mockState.resultQueue = [[{ id: PROPOSAL_ID, clientRelationshipId: RELATIONSHIP_ID }]];
+
+    await expect(
+      markProposalLostAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
+    ).resolves.toBeUndefined();
   });
 });
 
@@ -361,5 +519,89 @@ describe('markProposalWonAction', () => {
       markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
     ).rejects.toThrow('pipeline.toast.error');
     expect(writeAuditLogMock).not.toHaveBeenCalled();
+    expect(insertRelationshipEventMock).not.toHaveBeenCalled();
+  });
+
+  // ── ACTV-02 / D-15 ────────────────────────────────────────────────────────
+  it('appends an outcome_set event attributed to the session user, with payload keys exactly { proposalId, outcome, outcomeDate }', async () => {
+    mockState.resultQueue = [
+      [{ siren: '123456789' }],
+      [{ id: PROPOSAL_ID, clientRelationshipId: RELATIONSHIP_ID }],
+    ];
+
+    await expect(
+      markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
+    ).resolves.toEqual({ ok: true });
+
+    expect(insertRelationshipEventMock).toHaveBeenCalledTimes(1);
+    const args = insertRelationshipEventMock.mock.calls[0][0] as Record<string, unknown>;
+    expect(args.kind).toBe('outcome_set');
+    expect(args.relationshipId).toBe(RELATIONSHIP_ID);
+    expect(args.ownerId).toBe(CALLER_SESSION.user.id);
+    expect(args.actorId).toBe(CALLER_SESSION.user.id);
+    const payload = args.payload as Record<string, unknown>;
+    expect(Object.keys(payload).sort()).toEqual(['outcome', 'outcomeDate', 'proposalId']);
+    expect(payload.outcome).toBe('won');
+  });
+
+  it('writes the outcome_set event AFTER the outcome UPDATE', async () => {
+    mockState.resultQueue = [
+      [{ siren: '123456789' }],
+      [{ id: PROPOSAL_ID, clientRelationshipId: RELATIONSHIP_ID }],
+    ];
+
+    await markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' });
+
+    const returningIdx = mockState.calls.findIndex((c) => c.kind === 'returning');
+    const eventIdx = mockState.calls.findIndex((c) => c.kind === 'event');
+    expect(returningIdx).toBeGreaterThanOrEqual(0);
+    expect(eventIdx).toBeGreaterThan(returningIdx);
+  });
+
+  // 33-REVIEW CR-01 stays intact AND a refused win narrates nothing.
+  it('returns the siren_required result before any event write — a refused win narrates nothing', async () => {
+    mockState.resultQueue = [[{ siren: null }]];
+
+    await expect(
+      markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
+    ).resolves.toEqual({ ok: false, reason: 'siren_required' });
+    expect(insertRelationshipEventMock).not.toHaveBeenCalled();
+  });
+
+  it('writes no event for a won proposal that carries no client_relationship_id', async () => {
+    mockState.resultQueue = [
+      [{ siren: '123456789' }],
+      [{ id: PROPOSAL_ID, clientRelationshipId: null }],
+    ];
+
+    await expect(
+      markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
+    ).resolves.toEqual({ ok: true });
+    expect(insertRelationshipEventMock).not.toHaveBeenCalled();
+  });
+
+  it('still returns { ok: true } when the outcome event write returns null', async () => {
+    insertRelationshipEventMock.mockResolvedValueOnce(null);
+    mockState.resultQueue = [
+      [{ siren: '123456789' }],
+      [{ id: PROPOSAL_ID, clientRelationshipId: RELATIONSHIP_ID }],
+    ];
+
+    await expect(
+      markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
+    ).resolves.toEqual({ ok: true });
+  });
+
+  it('still returns { ok: true } when the outcome event write throws (T-34-08-04)', async () => {
+    insertRelationshipEventMock.mockRejectedValueOnce(new Error('driver exploded'));
+    mockState.resultQueue = [
+      [{ siren: '123456789' }],
+      [{ id: PROPOSAL_ID, clientRelationshipId: RELATIONSHIP_ID }],
+    ];
+
+    await expect(
+      markProposalWonAction({ proposalId: PROPOSAL_ID, date: '2026-09-03' }),
+    ).resolves.toEqual({ ok: true });
+    expect(console.error).toHaveBeenCalled();
   });
 });
