@@ -49,10 +49,26 @@ export type AuditAction =
   // Payloads carry ids, the from/to stage strings and the caller-submitted
   // date/SIREN only — never commission or rate data (ADMIN-09). Phase 34's
   // ACTV-02 reads the stage-change action below for the activity timeline.
+  // NOTE: 'relationship.stage_change' currently writes `toStage` only, so the
+  // from/to promise above is the CONTRACT, not yet the code. Phase 34 plan 34-08
+  // closes WR-16 by writing `fromStage` too, in src/lib/pipeline/actions.ts.
   | 'relationship.stage_change'
   | 'proposal.outcome_won'
   | 'proposal.outcome_lost'
-  | 'company.siren_add';
+  | 'company.siren_add'
+  // ── Phase 34 — Fiche client (FICHE-01..03, D-03) ──────────────────────────
+  // Shared-tier only. A `companies` edit is audit-logged precisely BECAUSE
+  // `companies` is a shared row (CRM-01) and every other partner on that company
+  // sees the result. A PRIVATE-tier edit — lead source, description, next action,
+  // notes, timeline events on `client_relationships` — is deliberately NOT
+  // audited (D-03): it is visible to its owner alone, so there is no other party
+  // to be accountable to, and an audit row would surface one partner's private
+  // note in the admin audit viewer (ADMIN-07). Do not add an action for one.
+  // Payloads carry ids and caller-submitted values only, never commission data
+  // (ADMIN-09, D-26).
+  | 'company.display_update'
+  | 'company.siren_correct'
+  | 'company.registry_sync';
 
 export type AuditTargetType = 'proposal' | 'user' | 'global_params' | 'client_relationship' | 'contact' | 'company' | 'company_pair';
 

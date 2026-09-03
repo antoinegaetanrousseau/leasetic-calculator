@@ -5,9 +5,9 @@ describe('i18n dictionary parity', () => {
   const frKeys = Object.keys(dictionaries.fr);
   const enKeys = Object.keys(dictionaries.en);
 
-  it('has at least 790 keys per language (raised in Phase 30 for the clients.* / admin.companies.* namespaces)', () => {
-    expect(frKeys.length).toBeGreaterThanOrEqual(790);
-    expect(enKeys.length).toBeGreaterThanOrEqual(790);
+  it('has at least 981 keys per language (raised in Phase 34 for the fiche-client / timeline / à-relancer namespaces)', () => {
+    expect(frKeys.length).toBeGreaterThanOrEqual(981);
+    expect(enKeys.length).toBeGreaterThanOrEqual(981);
   });
 
   it('every FR key exists in EN', () => {
@@ -447,5 +447,157 @@ describe('Phase 30 CRM registry i18n keys (Plan 30-02)', () => {
       .map(([, v]) => v);
     expect(crmValues).not.toContain(sirenInvalid);
     expect(crmValues).not.toContain(emailInvalid);
+  });
+});
+
+// ── Phase 34 — Fiche client (Plan 34-01) ─────────────────────────────────────
+//
+// The compile-time `_EnParityProof` in dictionaries.ts is the real gate for
+// FR↔EN parity. This suite guards the two things it cannot see: an empty string
+// in either language, and the loss of a positional placeholder that a call site
+// depends on.
+
+const phase34Keys: DictKey[] = [
+  // Tabs + header (FICHE-05)
+  'clients.detail.tab.informations',
+  'clients.detail.tab.contacts',
+  'clients.detail.tab.proposals',
+  'clients.detail.tab.activity',
+  'clients.detail.header.modify',
+  'clients.detail.header.nextAction',
+  'clients.detail.header.noNextAction',
+  // Registry panel (FICHE-02)
+  'clients.registry.title',
+  'clients.registry.syncedAt',
+  'clients.registry.neverSynced',
+  'clients.registry.refresh',
+  'clients.registry.refreshing',
+  'clients.registry.toast.synced',
+  'clients.registry.toast.notFound',
+  'clients.registry.toast.error',
+  'clients.registry.status.synced',
+  'clients.registry.status.pending',
+  'clients.registry.status.notFound',
+  'clients.registry.status.error',
+  'clients.registry.state.active',
+  'clients.registry.state.ceased',
+  'clients.registry.field.legalName',
+  'clients.registry.field.address',
+  'clients.registry.field.legalForm',
+  'clients.registry.field.activity',
+  'clients.registry.field.headcount',
+  'clients.registry.field.foundedOn',
+  'clients.registry.field.state',
+  'clients.registry.empty',
+  // Relation panel (FICHE-04)
+  'clients.relation.title',
+  'clients.relation.modify',
+  'clients.relation.field.leadSource',
+  'clients.relation.field.description',
+  'clients.relation.field.nextActionAt',
+  'clients.relation.field.nextActionNote',
+  'clients.relation.source.recommandation',
+  'clients.relation.source.prospection',
+  'clients.relation.source.salon',
+  'clients.relation.source.siteWeb',
+  'clients.relation.source.autre',
+  'clients.relation.source.placeholder',
+  'clients.relation.empty',
+  'clients.relation.dialog.title',
+  'clients.relation.dialog.submit',
+  'clients.relation.toast.updated',
+  // Company (shared-display) dialog (FICHE-03)
+  'clients.company.dialog.title',
+  'clients.company.dialog.hint',
+  'clients.company.field.name',
+  'clients.company.field.website',
+  'clients.company.field.phone',
+  'clients.company.field.siren',
+  'clients.company.field.sirenHelper',
+  'clients.company.dialog.submit',
+  'clients.company.toast.updated',
+  // Timeline (ACTV-01/02/03)
+  'clients.timeline.title',
+  'clients.timeline.empty',
+  'clients.timeline.filter.all',
+  'clients.timeline.filter.notes',
+  'clients.timeline.filter.system',
+  'clients.timeline.actor.system',
+  'clients.timeline.bucket.today',
+  'clients.timeline.bucket.yesterday',
+  'clients.timeline.bucket.earlier',
+  'clients.timeline.kind.note',
+  'clients.timeline.kind.stageChanged',
+  'clients.timeline.kind.proposalFinalized',
+  'clients.timeline.kind.outcomeSet',
+  'clients.timeline.kind.registrySynced',
+  'clients.timeline.kind.nextActionSet',
+  'clients.timeline.note.label',
+  'clients.timeline.note.placeholder',
+  'clients.timeline.note.submit',
+  'clients.timeline.note.toast.added',
+  'clients.timeline.note.dateLabel',
+  'clients.timeline.event.stageChanged',
+  // Next action (ACTV-04)
+  'clients.nextAction.dialog.title',
+  'clients.nextAction.dialog.dateLabel',
+  'clients.nextAction.dialog.noteLabel',
+  'clients.nextAction.dialog.submit',
+  'clients.nextAction.dialog.clear',
+  'clients.nextAction.dialog.toast.set',
+  'clients.nextAction.dialog.toast.cleared',
+  // Bounded error key for src/lib/relationship/actions.ts
+  'relationship.toast.error',
+  // Website validation (FICHE-03)
+  'error.field.url.invalid',
+  // Home "à relancer" card (ACTV-05, D-20)
+  'dashboard.relance.title',
+  'dashboard.relance.empty',
+  'dashboard.relance.viewAll',
+  'dashboard.relance.due',
+  'dashboard.relance.overdue',
+  'dashboard.relance.stale',
+];
+
+describe('Phase 34 fiche-client i18n delta (Plan 34-01)', () => {
+  for (const key of phase34Keys) {
+    it(`${key} resolves non-empty in fr + en`, () => {
+      expect(t(key, 'fr').length).toBeGreaterThan(0);
+      expect(t(key, 'en').length).toBeGreaterThan(0);
+    });
+  }
+
+  describe('interpolation contract', () => {
+    const singleArgKeys: DictKey[] = [
+      'clients.detail.header.nextAction', // {0} = the formatted date
+      'clients.registry.syncedAt',        // {0} = the formatted timestamp
+      'dashboard.relance.due',            // {0} = the formatted date
+      'dashboard.relance.stale',          // {0} = days since last activity
+    ];
+
+    for (const key of singleArgKeys) {
+      it(`${key} contains {0} in fr + en`, () => {
+        expect(t(key, 'fr')).toContain('{0}');
+        expect(t(key, 'en')).toContain('{0}');
+      });
+    }
+
+    it('clients.timeline.event.stageChanged carries both {0} and {1} in fr + en', () => {
+      // {0} = from stage, {1} = to stage. Both are substituted by the call site
+      // with .replace() — never by a template literal in the dictionary value.
+      for (const lang of ['fr', 'en'] as const) {
+        expect(t('clients.timeline.event.stageChanged', lang)).toContain('{0}');
+        expect(t('clients.timeline.event.stageChanged', lang)).toContain('{1}');
+      }
+    });
+  });
+
+  it('relationship.toast.error is its own key, not an alias of clients.toast.error', () => {
+    // Namespaces in this file do not share keys, even when the copy is identical
+    // (clients.toast.error and admin.reconciliation.toast.error already coexist
+    // this way). Both keys must exist independently.
+    const fr = dictionaries.fr as Record<string, string>;
+    expect(typeof fr['relationship.toast.error']).toBe('string');
+    expect(typeof fr['clients.toast.error']).toBe('string');
   });
 });
