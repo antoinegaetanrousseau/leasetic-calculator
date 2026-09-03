@@ -703,12 +703,12 @@ export const dictionaries = {
     'wizard.step3.pdf.preview.aria': 'Aperçu de la proposition à générer',
     'wizard.step3.pdf.loyer.label': 'LOYER MENSUEL',
     // §6.7 Action bar button labels
-    'wizard.action.previous': '← Précédent',
+    'wizard.action.previous': 'Précédent',
     'wizard.action.previous.aria': 'Étape précédente',
     'wizard.action.save.draft': 'Enregistrer comme brouillon',
-    'wizard.action.step1.continue': 'Continuer vers le calcul →',
+    'wizard.action.step1.continue': 'Continuer vers le calcul',
     'wizard.action.step1.continue.spinner': 'Enregistrement en cours…',
-    'wizard.action.step2.continue': 'Continuer vers la vérification →',
+    'wizard.action.step2.continue': 'Continuer vers la vérification',
     'wizard.action.step3.confirm': 'Confirmer & Générer le PDF',
     'wizard.action.step3.confirm.spinner': 'Génération en cours…',
     // §6.8 Toast strings (sonner)
@@ -1778,12 +1778,12 @@ export const dictionaries = {
     'wizard.step3.pdf.preview.aria': 'Preview of the proposal to be generated',
     'wizard.step3.pdf.loyer.label': 'MONTHLY RENT',
     // §6.7 Action bar button labels
-    'wizard.action.previous': '← Previous',
+    'wizard.action.previous': 'Previous',
     'wizard.action.previous.aria': 'Previous step',
     'wizard.action.save.draft': 'Save as draft',
-    'wizard.action.step1.continue': 'Continue to calculation →',
+    'wizard.action.step1.continue': 'Continue to calculation',
     'wizard.action.step1.continue.spinner': 'Saving…',
-    'wizard.action.step2.continue': 'Continue to review →',
+    'wizard.action.step2.continue': 'Continue to review',
     'wizard.action.step3.confirm': 'Confirm & Generate PDF',
     'wizard.action.step3.confirm.spinner': 'Generating…',
     // §6.8 Toast strings (sonner)
