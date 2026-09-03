@@ -22,10 +22,19 @@
  * test hook. Wrapped in a `stopPropagation` handler, matching
  * `RowActionsClient`'s precedent for actionsSlot content on a clickable
  * `ProposalRow`.
+ *
+ * Trigger shape (33-09 acceptance correction): the UI-SPEC's two
+ * `size="sm"` text buttons overflowed `ProposalRow`'s fixed-track grid at
+ * laptop width once the sidebar is open. The triggers are now the 32px
+ * icon buttons Phase 26 established for row actions, with the spec's
+ * labels carried as `aria-label` + `title` so the accessible name — and
+ * therefore every test and acceptance step that clicks "Marquer gagné" /
+ * "Marquer perdu" — is unchanged.
  */
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { CheckCircleIcon, XIcon } from '@/components/ui/icons';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import type { DisplayOutcome } from '@/lib/db/queries';
 import { MarkWonDialog } from './MarkWonDialog';
@@ -53,7 +62,7 @@ export function ProposalOutcomeControl({
   return (
     <div
       data-outcome-state={state}
-      className="flex items-center gap-2"
+      className="flex items-center justify-end gap-1.5"
       onClick={(e) => e.stopPropagation()}
     >
       {outcome === 'won' && (
@@ -73,11 +82,25 @@ export function ProposalOutcomeControl({
       )}
       {showTriggers && (
         <>
-          <Button type="button" variant="outline" size="sm" onClick={() => setOpenDialog('won')}>
-            {t('pipeline.outcome.trigger.won', lang)}
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-sm"
+            aria-label={t('pipeline.outcome.trigger.won', lang)}
+            title={t('pipeline.outcome.trigger.won', lang)}
+            onClick={() => setOpenDialog('won')}
+          >
+            <CheckCircleIcon size={16} aria-hidden="true" />
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => setOpenDialog('lost')}>
-            {t('pipeline.outcome.trigger.lost', lang)}
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-sm"
+            aria-label={t('pipeline.outcome.trigger.lost', lang)}
+            title={t('pipeline.outcome.trigger.lost', lang)}
+            onClick={() => setOpenDialog('lost')}
+          >
+            <XIcon size={16} aria-hidden="true" />
           </Button>
 
           <MarkWonDialog

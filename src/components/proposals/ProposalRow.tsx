@@ -33,6 +33,13 @@ export interface ProposalRowProps {
   draftActionsSlot?: React.ReactNode;
   /** Icon action buttons rendered on the right for finalized (active/expired/deleted) rows (D-06). */
   actionsSlot?: React.ReactNode;
+  /**
+   * Phase 33: on `/clients/[id]` every row belongs to the page's own company,
+   * so the client-name column is redundant. `hideClient` drops it and lets the
+   * date column absorb the slack instead of a fixed-track grid overflowing the
+   * card at laptop width.
+   */
+  hideClient?: boolean;
 }
 
 /**
@@ -50,14 +57,20 @@ export interface ProposalRowProps {
  */
 const rowClass = cva(
   [
-    'grid grid-cols-[1fr_100px_130px_100px_max-content_auto] items-center gap-4',
+    'grid min-w-0 items-center gap-4',
     'cursor-pointer rounded-lg border-b border-border p-4 text-inherit no-underline',
     'transition-colors last:border-b-0 hover:bg-[var(--hover-overlay)]',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   ].join(' '),
   {
-    variants: { deleted: { true: 'opacity-70', false: '' } },
-    defaultVariants: { deleted: false },
+    variants: {
+      deleted: { true: 'opacity-70', false: '' },
+      layout: {
+        full: 'grid-cols-[minmax(0,1fr)_100px_130px_100px_max-content_auto]',
+        compact: 'grid-cols-[110px_130px_minmax(0,1fr)_max-content_auto]',
+      },
+    },
+    defaultVariants: { deleted: false, layout: 'full' },
   },
 );
 
@@ -84,9 +97,10 @@ export function ProposalRow({
   draftMode = false,
   draftActionsSlot = null,
   actionsSlot = null,
+  hideClient = false,
 }: ProposalRowProps) {
   const router = useRouter();
-  const className = rowClass({ deleted });
+  const className = rowClass({ deleted, layout: hideClient ? 'compact' : 'full' });
   const ariaLabel = row.clientCo
     ? `${row.clientCo}${row.lcRef ? ` ${row.lcRef}` : ''}`
     : t('proposal.detail.title', lang).replace('{0}', row.lcRef);
@@ -94,8 +108,10 @@ export function ProposalRow({
 
   const columns = (
     <>
-      <span className="truncate text-[14.5px] font-semibold text-ink">{row.clientCo}</span>
-      <span className="font-mono text-[13px] font-medium text-ink">{row.lcRef}</span>
+      {!hideClient && (
+        <span className="truncate text-[14.5px] font-semibold text-ink">{row.clientCo}</span>
+      )}
+      <span className="truncate font-mono text-[13px] font-medium text-ink">{row.lcRef}</span>
       <span className="text-right text-[14.5px] font-semibold text-ink tabular-nums">
         {formatCurrency(Number(row.amountHT), lang)}
       </span>

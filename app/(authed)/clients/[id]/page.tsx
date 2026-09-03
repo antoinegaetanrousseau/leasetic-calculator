@@ -158,6 +158,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
                   key={row.id}
                   row={row}
                   lang={lang}
+                  hideClient
                   actionsSlot={
                     <ProposalOutcomeControl
                       proposalId={row.id}
