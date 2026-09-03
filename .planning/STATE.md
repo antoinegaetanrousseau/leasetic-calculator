@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: planning
-last_updated: "2026-09-03T17:27:47.400Z"
+status: executing
+last_updated: "2026-09-03T17:28:17.000Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
@@ -23,13 +23,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 34 — activity & follow up
+**Current focus:** Phase 34 — fiche client
 
 ## Current Position
 
-Phase: 34
-Plan: Not started
-Status: Ready to plan
+Phase: 34 (fiche-client) — EXECUTING
+Plan: 3 of 13
+Status: Ready to execute
 Last activity: 2026-09-03
 
 ## Deferred Items
@@ -418,6 +418,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 33 P05 | ~30min | 3 tasks | 11 files |
 | Phase 33-pipeline P06 | 45min | 3 tasks | 11 files |
 | Phase 33-pipeline P07 | ~25min | 2 tasks | 4 files |
+| Phase 34 P01 | ~20min | 3 tasks | 10 files |
 | Phase 34 P02 | 20 | 3 tasks | 9 files |
 
 ## Decisions
@@ -539,6 +540,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: 33-08: added a 7th fail-closed rejection assertion (INSERT against a nonexistent client_relationship_id) beyond the plan's literal 12-point list, closing the 'missing company row' branch named in 33-01-PLAN.md's decision record
 - [Phase ?]: 34-02: the registry SEARCH result is trusted only when results[0].siren equals the requested SIREN; a mismatch and an empty result set are both not_found
 - [Phase ?]: 34-02: normalizeSiren is the codebase's only SIREN normalisation rule (D-23 / WR-15 closed) — future proposals store digits only, no stored inputs blob was rewritten
+
+- [Phase 34]: The FICHE-04 lead source is a NEW column `lead_source`, not `client_relationships.source` — that column is the Phase 31 D-08 provenance marker whose vocabulary drives the bulk-import undo path; both provenance CHECKs are untouched. Also: `relationship_events.actor_id` is text (Better Auth `users.id`), NULL means the system, and no trigger writes events (D-15 — a trigger cannot see the session, so ACTV-02's attribution would be lost).
 
 ### Blockers
 

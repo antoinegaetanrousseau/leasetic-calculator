@@ -105,18 +105,18 @@ Sharing rule for every requirement below: **the registry owns identity, partners
 
 - [x] **FICHE-01**: Creating a client looks the company up in the public SIRENE registry by its SIREN and stores what comes back. A registry outage never blocks creation; the record is simply marked as needing completion.
 - [x] **FICHE-02**: Registry-sourced identity — legal name, address, legal form, NAF code, activity section, headcount band, founding date, administrative state — renders read-only, with the date it was last synced and a control to refresh it.
-- [ ] **FICHE-03**: A partner edits the shared display fields (display name, website, phone) and corrects a wrong SIREN, which re-runs the lookup. Every such edit is audit-logged, because other partners see it.
-- [ ] **FICHE-04**: A partner records private relationship facts — source, description — that no other partner on the same company can see.
+- [x] **FICHE-03**: A partner edits the shared display fields (display name, website, phone) and corrects a wrong SIREN, which re-runs the lookup. Every such edit is audit-logged, because other partners see it.
+- [x] **FICHE-04**: A partner records private relationship facts — source, description — that no other partner on the same company can see.
 - [ ] **FICHE-05**: The client page is a header plus tabs (Informations, Contacts, Propositions, Activité), each section edited in place through its own dialog rather than a separate edit screen.
 
 ### Activity & Follow-Up (ACTV)
 
 Answers "who do I chase this week" — and captures the two lead-qualification signals the wizard already collects and currently discards (`slb` sale-leaseback, `evalParc` parc evaluation).
 
-- [ ] **ACTV-01**: A relationship has a single timeline mixing manual notes with system events.
-- [ ] **ACTV-02**: System events — stage change, proposal sent — are recorded automatically, with actor and timestamp.
-- [ ] **ACTV-03**: A user can add a dated note to a relationship.
-- [ ] **ACTV-04**: A relationship carries a next-action date.
+- [x] **ACTV-01**: A relationship has a single timeline mixing manual notes with system events.
+- [x] **ACTV-02**: System events — stage change, proposal sent — are recorded automatically, with actor and timestamp.
+- [x] **ACTV-03**: A user can add a dated note to a relationship.
+- [x] **ACTV-04**: A relationship carries a next-action date.
 - [ ] **ACTV-05**: A user sees a list of relationships needing follow-up, driven by next-action date and staleness.
 
 ---
