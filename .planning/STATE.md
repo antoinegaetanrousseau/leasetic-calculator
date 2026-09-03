@@ -28,10 +28,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 33 (pipeline) — EXECUTING
-Plan: 8 of 9 (33-08) — tasks 1-2 committed, task 3 is a BLOCKING operator checkpoint, awaiting approval
-Status: Paused at checkpoint — do not advance past 33-08 or mark ROADMAP.md complete until the operator
-runs the integration suite against the Neon development branch and approves (see Blockers below and
-33-08-SUMMARY.md's "Awaiting" section)
+Plan: 8 of 9 (33-08) complete — checkpoint approved 2026-09-03 (28/28 on Neon development); next: 33-09
+Status: Ready to execute 33-09
 Last activity: 2026-09-03
 
 ## Deferred Items
@@ -541,4 +539,4 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 
 ### Blockers
 
-- 33-08 task 3: blocking operator checkpoint pending
+- (resolved 2026-09-03) 33-08 task 3: integration suite ran on Neon development — 28/28 passed, cleanup verified

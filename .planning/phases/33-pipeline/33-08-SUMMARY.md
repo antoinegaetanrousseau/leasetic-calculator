@@ -3,7 +3,7 @@ phase: 33-pipeline
 plan: 08
 subsystem: testing
 tags: [postgres, vitest, integration-test, trigger, pipeline, siren-gate, conversion-rate]
-status: partial — awaiting operator checkpoint (task 3)
+status: complete
 
 # Dependency graph
 requires:
@@ -51,7 +51,7 @@ duration: ~35min (tasks 1-2 only; task 3 pending)
 completed: null
 ---
 
-# Phase 33 Plan 08: Pipeline Integration Test Summary (PARTIAL — tasks 1-2 complete, task 3 is a blocking operator checkpoint)
+# Phase 33 Plan 08: Pipeline Integration Test Summary
 
 **Twenty new assertions in a second `describe` block prove the `proposals_won_requires_siren` triggers, the three Phase 33 CHECK constraints, `getConversionRateForOwner`'s locked denominator, and `listPipelineBoard`'s seven-lane/DISTINCT-count behaviour against real Postgres — source-level only until an operator runs the suite against the migrated Neon development branch (task 3).**
 
@@ -127,7 +127,23 @@ None beyond the deviation above. Splitting the single authored change into two a
 
 ---
 *Phase: 33-pipeline*
-*Status: partial — task 3 (blocking operator checkpoint) pending*
+*Status: complete — task 3 checkpoint approved 2026-09-03 (see "Checkpoint result")*
+
+## Checkpoint result (task 3) — 2026-09-03
+
+Run by the orchestrator on the operator's behalf after verifying that `.env.local`'s `DATABASE_URL`
+resolves to the Neon **development** endpoint (`ep-polished-band-alphc576-pooler`, branch
+`br-tiny-hat-alk1dent` per `docs/operations/neon-branch-routing.md`), never `main`.
+
+- Command: `DATABASE_URL=$DEV DATABASE_URL_TEST=$DEV npx vitest run src/lib/db/queries/client-relationships.isolation.integration.test.ts`
+- First run: **27 passed, 1 failed** — `a freshly inserted relationship defaults to stage=prospect` hit
+  `client_relationships_company_id_owner_id_uq` because it reused the `(companyNoSirenId, userAId)` pair
+  that already exists as `relANoSirenId`. Test bug, not a product bug. Fixed in `f9b9032` by giving that
+  proof its own company (`Pipeline Default-Stage Co <runId>`), torn down in `afterAll`.
+- Second run: **`Test Files 1 passed (1)` / `Tests 28 passed (28)`** — Phase 30 block (8) unchanged,
+  Phase 33 block (20) all green, 0 skipped, ~7.7 s.
+- Cleanup: `SELECT count(*) FROM users WHERE id LIKE 'pipe-iso-%'` → `0`; companies named `Pipeline %` → `0`.
+- `npm run lint:check` and `npm run typecheck` exit 0 after the fix.
 
 ## Self-Check: PASSED
 
