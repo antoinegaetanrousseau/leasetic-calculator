@@ -472,6 +472,18 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
     display: block;
   }
 
+  /* Phase 33 Plan 05, D-09.1 layer 2 — reserved-lane drag-in-progress
+     feedback. Plain CSS rather than a Tailwind `group-data-*` variant: the
+     `data-dragging` attribute lives on `[data-slot=kanban]` (kanban.tsx's
+     root), a different element than the descendant
+     `[data-slot=kanban-column][data-disabled=true]` (the two reserved
+     lanes), and Tailwind's group variant cannot express that two-element
+     descendant-attribute combination cleanly. `--destructive` and the 2px
+     ring width are already in the app's vocabulary — no new token. */
+  [data-slot="kanban"][data-dragging="true"] [data-slot="kanban-column"][data-disabled="true"] {
+    @apply ring-2 ring-destructive/40 cursor-not-allowed;
+  }
+
   @theme inline {
     /* Both resolve to Inter, registered by next/font/google in app/layout.tsx.
        shadcn init originally emitted a self-referential `--font-sans: var(--font-sans)`
