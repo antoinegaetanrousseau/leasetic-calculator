@@ -37,6 +37,7 @@ const VALID_INPUTS = {
   partnerCo: 'Leasetic SAS',
   partnerName: 'Bob Partner',
   clientCo: 'Acme Corp',
+  clientSiren: '123456789',
   amountHT: '75000',
   durationMonths: 48 as const,
 };

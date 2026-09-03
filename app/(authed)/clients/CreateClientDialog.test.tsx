@@ -67,7 +67,7 @@ describe('CreateClientDialog (Plan 30-06 Task 3)', () => {
     expect(trigger.className).toContain('bg-primary');
   });
 
-  it('Test 2: dialog contains exactly two fields — name (required) and SIREN (optional, no asterisk)', async () => {
+  it('Test 2: dialog contains exactly two fields — name and SIREN, both required', async () => {
     render(<CreateClientDialog lang="fr" />);
     await openDialog();
 
@@ -76,12 +76,12 @@ describe('CreateClientDialog (Plan 30-06 Task 3)', () => {
     const nameLabel = screen.getByText('Nom de la société').closest('label');
     expect(nameLabel?.querySelector('.text-destructive')).not.toBeNull();
 
-    const sirenInput = screen.getByLabelText('SIREN');
+    const sirenInput = screen.getByLabelText(/^SIREN/);
     expect(sirenInput).toBeInTheDocument();
     const sirenLabel = screen.getByText('SIREN').closest('label');
-    expect(sirenLabel?.querySelector('.text-destructive')).toBeNull();
+    expect(sirenLabel?.querySelector('.text-destructive')).not.toBeNull();
 
-    expect(screen.getByText('Facultatif. 9 chiffres, sans espaces.')).toBeInTheDocument();
+    expect(screen.getByText('9 chiffres, sans espaces.')).toBeInTheDocument();
   });
 
   it('Test 3: a 4-digit SIREN shows error.field.siren.invalid and does not call the action', async () => {
@@ -91,7 +91,7 @@ describe('CreateClientDialog (Plan 30-06 Task 3)', () => {
     fireEvent.change(screen.getByLabelText(/Nom de la société/), {
       target: { value: 'Dupont Menuiserie' },
     });
-    fireEvent.change(screen.getByLabelText('SIREN'), { target: { value: '1234' } });
+    fireEvent.change(screen.getByLabelText(/^SIREN/), { target: { value: '1234' } });
     fireEvent.click(screen.getByRole('button', { name: 'Créer le client' }));
 
     await screen.findByText('SIREN invalide (9 chiffres requis).');
@@ -106,6 +106,7 @@ describe('CreateClientDialog (Plan 30-06 Task 3)', () => {
     fireEvent.change(screen.getByLabelText(/Nom de la société/), {
       target: { value: 'Dupont Menuiserie' },
     });
+    fireEvent.change(screen.getByLabelText(/^SIREN/), { target: { value: '123456789' } });
     fireEvent.click(screen.getByRole('button', { name: 'Créer le client' }));
 
     await waitFor(() => expect(createClientRelationshipActionMock).toHaveBeenCalledTimes(1));
@@ -122,6 +123,7 @@ describe('CreateClientDialog (Plan 30-06 Task 3)', () => {
     fireEvent.change(screen.getByLabelText(/Nom de la société/), {
       target: { value: 'Dupont Menuiserie' },
     });
+    fireEvent.change(screen.getByLabelText(/^SIREN/), { target: { value: '123456789' } });
     fireEvent.click(screen.getByRole('button', { name: 'Créer le client' }));
 
     await waitFor(() =>
@@ -140,7 +142,7 @@ describe('CreateClientDialog (Plan 30-06 Task 3)', () => {
     expect(container.querySelector('[role="combobox"]')).toBeNull();
     const nameInput = screen.getByLabelText(/Nom de la société/);
     expect(nameInput.getAttribute('autocomplete')).toBe('off');
-    const sirenInput = screen.getByLabelText('SIREN');
+    const sirenInput = screen.getByLabelText(/^SIREN/);
     expect(sirenInput.getAttribute('autocomplete')).toBe('off');
   });
 });

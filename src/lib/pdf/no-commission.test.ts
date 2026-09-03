@@ -169,6 +169,7 @@ function buildDraftInputs(fixture: { amountHT: string; durationMonths: 36 | 48 |
     partnerCo: 'Leasetic SAS',
     partnerName: 'Bob Partner',
     clientCo: 'Acme Inc',
+    clientSiren: '123456789',
     clientName: 'Alice',
     amountHT: fixture.amountHT,
     durationMonths: fixture.durationMonths,

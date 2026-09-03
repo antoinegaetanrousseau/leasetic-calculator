@@ -32,15 +32,14 @@ import { normalizeSiren } from './siren';
  */
 export const createClientSchema = z.object({
   name: z.string().trim().min(1, { message: 'error.field.required' }),
+  // Required since 2026-09-03 (operator decision): a client cannot be
+  // created without its SIREN. Formatting spaces are stripped.
   siren: z
-    .string()
-    .optional()
-    .transform((v) => {
-      const trimmed = v?.trim();
-      if (!trimmed) return undefined;
-      return normalizeSiren(v) ?? trimmed;
-    })
-    .refine((v) => v === undefined || /^[0-9]{9}$/.test(v), {
+    .string({ message: 'error.field.required' })
+    .trim()
+    .min(1, { message: 'error.field.required' })
+    .transform((v) => normalizeSiren(v) ?? v)
+    .refine((v) => /^[0-9]{9}$/.test(v), {
       message: 'error.field.siren.invalid',
     }),
 });

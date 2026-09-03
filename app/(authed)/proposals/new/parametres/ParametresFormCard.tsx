@@ -11,7 +11,7 @@
  *   - D-05: 7 default fields split into INFORMATIONS CLIENT (clientCo, clientName,
  *     clientEmail, clientTel) + DÉTAILS DU PROJET (partnerRef, amountHT,
  *     durationMonths) inside ONE .card.
- *   - D-06: 5 optional fields (clientRole, clientSiren, projectDesc, slb,
+ *   - D-06: 4 optional fields (clientRole, projectDesc, slb,
  *     evalParc — in this order per UI-SPEC §5.2) live inside the accordion.
  *   - D-07: partnerCo + partnerName are session-hydrated server-side and
  *     NEVER rendered as visible inputs here.
@@ -104,6 +104,38 @@ export function ParametresFormCard({
           {errors.clientCo && (
             <FieldError id="client-co-error" role="alert">
               {t(errors.clientCo.message as DictKey, lang)}
+            </FieldError>
+          )}
+        </Field>
+
+        {/* clientSiren — required since 2026-09-03 (operator decision); Controller-bound SirenInput */}
+        <Field>
+          <FieldLabel htmlFor="client-siren">
+            {t('form.client.siren', lang)}
+            <span className="ml-0.5 text-destructive" aria-hidden="true">
+              *
+            </span>
+          </FieldLabel>
+          <Controller
+            name="clientSiren"
+            control={control}
+            render={({ field }) => (
+              <SirenInput
+                inputId="client-siren"
+                placeholder={t('form.client.siren.placeholder', lang)}
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                invalid={!!errors.clientSiren}
+                ariaDescribedBy={
+                  errors.clientSiren ? 'client-siren-error' : undefined
+                }
+              />
+            )}
+          />
+          {errors.clientSiren && (
+            <FieldError id="client-siren-error" role="alert">
+              {t((errors.clientSiren.message as DictKey) ?? 'error.field.siren.invalid', lang)}
             </FieldError>
           )}
         </Field>
@@ -283,33 +315,6 @@ export function ParametresFormCard({
             placeholder={t('form.client.role.placeholder', lang)}
             {...register('clientRole')}
           />
-        </Field>
-
-        {/* clientSiren — Controller-bound SirenInput */}
-        <Field>
-          <FieldLabel htmlFor="client-siren">{t('form.client.siren', lang)}</FieldLabel>
-          <Controller
-            name="clientSiren"
-            control={control}
-            render={({ field }) => (
-              <SirenInput
-                inputId="client-siren"
-                placeholder={t('form.client.siren.placeholder', lang)}
-                value={field.value ?? ''}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                invalid={!!errors.clientSiren}
-                ariaDescribedBy={
-                  errors.clientSiren ? 'client-siren-error' : undefined
-                }
-              />
-            )}
-          />
-          {errors.clientSiren && (
-            <FieldError id="client-siren-error" role="alert">
-              {t('error.field.siren.invalid', lang)}
-            </FieldError>
-          )}
         </Field>
 
         {/* projectDesc */}

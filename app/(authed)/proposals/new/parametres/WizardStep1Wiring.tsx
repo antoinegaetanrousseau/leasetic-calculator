@@ -61,7 +61,7 @@ export function WizardStep1Wiring({
       // Only trigger the 3 visible required fields — partnerCo/partnerName/validityDays
       // are session/server-hydrated hidden fields; triggering them would silently
       // block advance when the user's account has no companyName set.
-      const valid = await form.trigger(['clientCo', 'amountHT', 'durationMonths']);
+      const valid = await form.trigger(['clientCo', 'clientSiren', 'amountHT', 'durationMonths']);
       if (!valid) return; // field errors visible inline; no toast needed
 
       try {

@@ -96,6 +96,7 @@ const COMPLETE_INPUTS = {
   partnerCo: 'Acme Leasing',
   partnerName: 'Alice Partner',
   clientCo: 'CompanyX',
+  clientSiren: '123456789',
   clientName: 'Bob Buyer',
   clientEmail: 'bob@companyx.example',
   clientTel: '01 23 45 67 89',

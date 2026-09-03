@@ -60,10 +60,15 @@ const optionalPhoneSchema = z
   });
 
 /** Optional SIREN: empty OR exactly 9 digits when stripped. */
-const optionalSirenSchema = z
-  .string()
-  .optional()
-  .refine((s) => s === undefined || s === '' || s.replace(/\D/g, '').length === 9, {
+/**
+ * Operator decision 2026-09-03 (supersedes PIPE-05's "never at proposal"):
+ * a proposal cannot exist without the client's SIREN. Required and exactly
+ * nine digits once formatting spaces are stripped.
+ */
+const requiredSirenSchema = z
+  .string({ message: 'error.field.required' })
+  .refine((s) => s.trim().length > 0, { message: 'error.field.required' })
+  .refine((s) => s.trim().length === 0 || s.replace(/\D/g, '').length === 9, {
     message: 'error.field.siren.invalid',
   });
 
@@ -102,7 +107,7 @@ export const proposalInputSchema = z.object({
   clientRole: z.string().optional(),
   clientTel: optionalPhoneSchema,
   clientEmail: optionalEmailSchema,
-  clientSiren: optionalSirenSchema,
+  clientSiren: requiredSirenSchema,
 
   // Intérêts exprimés card
   slb: z.boolean().optional(),

@@ -90,7 +90,7 @@ describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
     expect(screen.queryByRole('button', { name: /Plus de détails/ })).toBeNull();
   });
 
-  it('Test 8: 5 optional fields are always visible inside the panel in order: clientRole, clientSiren, projectDesc, slb, evalParc', () => {
+  it('Test 8: 4 optional fields are always visible inside the panel in order: clientRole, projectDesc, slb, evalParc; SIREN sits in the client section as a required field', () => {
     const { container } = renderCard();
     const card = container.querySelector('section[data-slot="wizard-panel"]');
     expect(card).not.toBeNull();
@@ -103,12 +103,17 @@ describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
       labels.findIndex((txt) => txt.includes(substring));
     const idxRole = findIdx('Qualité / Fonction');
     const idxSiren = findIdx('SIREN');
+    const idxClient = findIdx('Nom du client');
+    const idxContact = findIdx('Personne de contact');
     const idxDesc = findIdx('Descriptif');
     const idxSlb = findIdx('sale & lease-back');
     const idxEval = findIdx('parc sortant');
+    expect(idxSiren).toBeGreaterThan(idxClient);
+    expect(idxSiren).toBeLessThan(idxContact);
+    const sirenLabel = Array.from(card!.querySelectorAll('label')).find((l) => l.textContent?.includes('SIREN'));
+    expect(sirenLabel?.querySelector('.text-destructive')).not.toBeNull();
     expect(idxRole).toBeGreaterThanOrEqual(0);
-    expect(idxSiren).toBeGreaterThan(idxRole);
-    expect(idxDesc).toBeGreaterThan(idxSiren);
+    expect(idxDesc).toBeGreaterThan(idxRole);
     expect(idxSlb).toBeGreaterThan(idxDesc);
     expect(idxEval).toBeGreaterThan(idxSlb);
   });

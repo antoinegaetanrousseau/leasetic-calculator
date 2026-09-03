@@ -63,7 +63,7 @@ export function CreateClientDialog({ lang }: CreateClientDialogProps) {
     formState: { errors, isSubmitting },
   } = useForm<CreateClientFormValues>({
     resolver: zodResolver(createClientSchema),
-    defaultValues: { name: '', siren: undefined },
+    defaultValues: { name: '', siren: '' },
   });
 
   const onSubmit = async (data: CreateClientFormValues) => {
@@ -123,6 +123,9 @@ export function CreateClientDialog({ lang }: CreateClientDialogProps) {
           <Field>
             <FieldLabel htmlFor="create-client-siren">
               {t('clients.modal.create.field.siren', lang)}
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
+                *
+              </span>
             </FieldLabel>
             <Controller
               name="siren"

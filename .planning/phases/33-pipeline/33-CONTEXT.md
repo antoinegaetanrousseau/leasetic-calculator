@@ -72,6 +72,11 @@ Deferred Ideas.
   The gate applies **only at `won`**. Quoting and advancing the early stages are never blocked
   by a missing SIREN — that is the whole point of PIPE-05.
 
+- **Acceptance amendment (2026-09-03, operator decision):** the SIREN is mandatory at proposal
+  creation and client creation, so D-07/D-08 no longer describe the normal path. They stay in
+  force as a safety net for legacy rows without a SIREN: the DB trigger still refuses `won`, and
+  the inline dialog still recovers. See `REQUIREMENTS.md` PIPE-05.
+
 ### The pipeline view (PIPE-04)
 
 - **D-09:** **Kanban board, drag to advance**, built on the vendored `src/components/reui/kanban.tsx`.

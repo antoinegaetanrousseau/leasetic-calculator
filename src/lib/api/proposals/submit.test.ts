@@ -40,6 +40,7 @@ const VALID_BODY = {
   partnerCo: 'Memento IT',
   partnerName: 'Antoine Rousseau',
   clientCo: 'Société Cliente Alpha',
+  clientSiren: '123456789',
   amountHT: '75000',
   durationMonths: 48,
   validityDays: 30,

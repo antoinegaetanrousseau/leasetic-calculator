@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { contactSchema, createClientSchema } from './schemas';
 
 describe('createClientSchema', () => {
-  it('accepts a name with siren absent', () => {
-    const result = createClientSchema.safeParse({ name: 'Dupont Menuiserie' });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.siren).toBeUndefined();
+  it('rejects a missing or blank siren (mandatory since 2026-09-03)', () => {
+    const absent = createClientSchema.safeParse({ name: 'Dupont Menuiserie' });
+    expect(absent.success).toBe(false);
+    const blank = createClientSchema.safeParse({ name: 'Dupont Menuiserie', siren: '  ' });
+    expect(blank.success).toBe(false);
+    if (!blank.success) {
+      expect(blank.error.issues[0].message).toBe('error.field.required');
     }
   });
 

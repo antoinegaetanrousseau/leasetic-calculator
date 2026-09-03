@@ -258,16 +258,13 @@ describe('createClientRelationshipAction', () => {
     expect(second.relationshipId).toBe('rel-3');
   });
 
-  it('with no SIREN always creates a new company row — no SIREN select is attempted', async () => {
-    const companyRow = { id: 'company-4', name: 'No Siren Co' };
-    const relationshipRow = { id: 'rel-4', companyId: 'company-4', ownerId: 'user-1' };
-    mockState.resultQueue = [[companyRow], [relationshipRow]];
+  it('without a SIREN the action rejects with the bounded error and touches no table (mandatory since 2026-09-03)', async () => {
+    mockState.resultQueue = [];
 
-    const result = await createClientRelationshipAction({ name: 'No Siren Co' });
-
-    expect(result.relationshipId).toBe('rel-4');
-    // The very first DB call must be the company INSERT, not a SIREN SELECT.
-    expect(mockState.calls[0]).toMatchObject({ kind: 'insert' });
+    await expect(createClientRelationshipAction({ name: 'No Siren Co' })).rejects.toThrow(
+      'clients.toast.error',
+    );
+    expect(mockState.calls).toHaveLength(0);
   });
 
   it('refuses admins — the notFound() thrown by requireRelationshipHolder propagates unwrapped', async () => {
@@ -279,11 +276,11 @@ describe('createClientRelationshipAction', () => {
   });
 
   it('never trusts a caller-supplied ownerId — the relationship is always bound to session.user.id', async () => {
-    const companyRow = { id: 'company-5', name: 'Attack Co' };
+    const companyRow = { id: 'company-5', name: 'Attack Co', siren: '555555555' };
     const relationshipRow = { id: 'rel-5', companyId: 'company-5', ownerId: 'user-1' };
-    mockState.resultQueue = [[companyRow], [relationshipRow]];
+    mockState.resultQueue = [[], [companyRow], [relationshipRow]];
 
-    await createClientRelationshipAction({ name: 'Attack Co', ownerId: 'attacker-id' });
+    await createClientRelationshipAction({ name: 'Attack Co', siren: '555555555', ownerId: 'attacker-id' });
 
     const valuesCalls = mockState.calls.filter(
       (c): c is MockCall & { payload: { ownerId?: string } } =>
@@ -294,11 +291,11 @@ describe('createClientRelationshipAction', () => {
   });
 
   it('writes an audit payload carrying only companyId — no commission field, no pre-existence signal', async () => {
-    const companyRow = { id: 'company-6', name: 'X' };
+    const companyRow = { id: 'company-6', name: 'X', siren: '666666666' };
     const relationshipRow = { id: 'rel-6', companyId: 'company-6', ownerId: 'user-1' };
-    mockState.resultQueue = [[companyRow], [relationshipRow]];
+    mockState.resultQueue = [[], [companyRow], [relationshipRow]];
 
-    await createClientRelationshipAction({ name: 'X' });
+    await createClientRelationshipAction({ name: 'X', siren: '666666666' });
 
     const auditCall = writeAuditLogMock.mock.calls[0][0];
     expect(auditCall.payload).toEqual({ companyId: 'company-6' });

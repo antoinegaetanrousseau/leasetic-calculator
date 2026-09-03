@@ -27,6 +27,7 @@ describe('validityDaysSchema (v10 assertValidity port — CALC-05 2/3)', () => {
       partnerCo: 'p',
       partnerName: 'pn',
       clientCo: 'cc',
+      clientSiren: '123456789',
       amountHT: '75000',
       durationMonths: 48,
     });
@@ -88,6 +89,7 @@ describe('durationMonthsSchema (v10 lines 577-581)', () => {
 
 describe('proposalInputSchema (PROP-06 + UI-SPEC §4 15-field inventory)', () => {
   const validBase = {
+  clientSiren: '123 456 789',
     partnerCo: 'Société Informatique XY',
     partnerName: 'Antoine Rousseau',
     clientCo: 'ACME SARL', // PROP-06 required
@@ -131,7 +133,6 @@ describe('proposalInputSchema (PROP-06 + UI-SPEC §4 15-field inventory)', () =>
         clientRole: '',
         clientTel: '',
         clientEmail: '',
-        clientSiren: '',
         slb: false,
         evalParc: false,
         projectDesc: '',
@@ -148,6 +149,13 @@ describe('proposalInputSchema (PROP-06 + UI-SPEC §4 15-field inventory)', () =>
   it('rejects phone with !==10 digits when non-empty', () => {
     const r = proposalInputSchema.safeParse({ ...validBase, clientTel: '06 12' });
     expect(r.success).toBe(false);
+  });
+
+  it('rejects a missing or blank SIREN (mandatory since 2026-09-03)', () => {
+    expect(proposalInputSchema.safeParse({ ...validBase, clientSiren: '' }).success).toBe(false);
+    const { clientSiren: _omit, ...withoutSiren } = validBase;
+    void _omit;
+    expect(proposalInputSchema.safeParse(withoutSiren).success).toBe(false);
   });
 
   it('rejects SIREN with !==9 digits when non-empty', () => {
@@ -172,6 +180,7 @@ describe('proposalInputSchema (PROP-06 + UI-SPEC §4 15-field inventory)', () =>
       partnerCo: 'p',
       partnerName: 'pn',
       clientCo: 'cc',
+      clientSiren: '123456789',
       amountHT: '75000',
       durationMonths: 48,
     });

@@ -95,6 +95,7 @@ Partner-advanced stages (Antoine's explicit choice on 2026-08-31; the risk that 
 - [x] **PIPE-03**: A proposal records an outcome (`won` / `lost` / `unanswered`) with a date and an optional reason, giving a real per-quote conversion rate.
 - [x] **PIPE-04**: A partner sees their pipeline grouped by stage.
 - [x] **PIPE-05**: Marking a deal **won** requires a SIREN on the company — the soft gate at handoff, never at proposal, so a partner quoting a prospect is never blocked on paperwork.
+  - **Superseded 2026-09-03 (operator decision, Phase 33 acceptance):** the SIREN is **mandatory** at proposal creation (wizard step 1) and at client creation. The win-time gate (DB trigger + inline dialog) stays only as a safety net for legacy rows created before this date.
 
 ### Activity & Follow-Up (ACTV)
 
@@ -130,7 +131,7 @@ Answers "who do I chase this week" — and captures the two lead-qualification s
 | Marketing emails, lead-capture forms, attribution | Not used in HubSpot; each is a separate product surface. |
 | Mutating `proposals.inputs` | The snapshot invariant is load-bearing for PDF reproduction and 10-year retention. Non-negotiable. |
 | Sharing contacts across partners | Directly contradicts the channel-conflict protection that CRM-02 exists to provide. |
-| Requiring SIREN at proposal time | Would block a partner quoting a prospect on paperwork they may not have. Gated at win instead (PIPE-05). |
+| Requiring SIREN at proposal time | ~~Would block a partner quoting a prospect on paperwork they may not have. Gated at win instead (PIPE-05).~~ **Reversed 2026-09-03:** SIREN is now required at proposal and client creation. |
 | Fuzzy matching at query time | Matching happens once, at import, with human resolution. Re-deriving it forever is the master-data anti-pattern this model exists to avoid. |
 
 ---

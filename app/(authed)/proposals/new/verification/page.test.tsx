@@ -100,6 +100,7 @@ const COMPLETE_INPUTS = {
   partnerCo: 'Acme Leasing',
   partnerName: 'Alice Partner',
   clientCo: 'CompanyX',
+  clientSiren: '123456789',
   clientName: 'Bob Buyer',
   clientEmail: 'bob@companyx.example',
   clientTel: '01 23 45 67 89',
@@ -318,7 +319,7 @@ describe('verification/page.tsx (D-01 / D-03 / D-14 / D-15 / D-16)', () => {
   // ──────────────────────────────────────────────────────────────────────────
   // Test 9 — accordion fields appear only when filled
   // ──────────────────────────────────────────────────────────────────────────
-  it('Test 9: ● CLIENT recap includes clientRole + clientSiren ONLY when accordion fields are filled', async () => {
+  it('Test 9: ● CLIENT recap includes clientRole ONLY when filled; SIREN always', async () => {
     // First sub-case: NOT filled → those labels absent.
     {
       const tree = await VerificationStep3Page({
@@ -327,7 +328,8 @@ describe('verification/page.tsx (D-01 / D-03 / D-14 / D-15 / D-16)', () => {
       const { container } = render(tree);
       const text = container.textContent ?? '';
       expect(text).not.toContain('Qualité / Fonction');
-      expect(text).not.toContain('SIREN');
+      // SIREN is mandatory since 2026-09-03, so it is always part of the recap.
+      expect(text).toContain('123456789');
       cleanup();
     }
 
