@@ -705,7 +705,22 @@ phase's own work touches):
   4. **No cross-partner comparison is possible, including by inference.** No leaderboard, ranking, peer benchmark or team aggregate. A partner learns nothing about another partner's book from any surface in this phase — counts and wording included, per the inference standard in `30-SECURITY.md`.
   5. A partner who never engages with any of it is not penalised: their pipeline, conversion rate and chase list behave exactly as they did before this phase.
 
-**Plans:** TBD
+**Resolved during planning (2026-09-05):** the generic-wizard under-report is
+ACCEPTED and DISCLOSED. `35-UI-SPEC.md`'s copywriting contract carries a
+permanent, quiet line in every state — "Seules les propositions démarrées depuis
+une fiche client sont suivies ici." — with no icon, no warning colour and no
+conditional trigger. Changing the wizard to attach a client before finalizing is
+explicitly OUT of scope for this phase. This decision is settled; do not reopen.
+
+**Plans:** 5 plans in 4 waves
+
+Plans:
+- [ ] 35-01-PLAN.md — momentum domain logic: the one Europe/Paris Mon–Sun week window, the streak fold, the badge ladder, and the shared contracts both wave-2 plans compile against (wave 1)
+- [ ] 35-02-PLAN.md — owner-scoped read layer over `relationship_events`: movements, progress week keys, badge counts; owner predicate in the same statement, no write path (wave 2)
+- [ ] 35-03-PLAN.md — the 19 `dashboard.momentum.*` fr/en keys and the `MomentumCard` server component: one Card, three parts, two permanent footer lines (wave 2)
+- [ ] 35-04-PLAN.md — mutation-verified owner-isolation and week-boundary proof against real Postgres, skip-by-default on `DATABASE_URL_TEST` (wave 3)
+- [ ] 35-05-PLAN.md — home-page wiring with the admin gate at the call site, updated page tests, and human verification of the rendered surface (wave 4)
+
 **UI hint:** yes
 
 > **Why this is not in v1.6.** Raised during Phase 33's discussion (2026-09-02) as motivational treatment for the pipeline board. Momentum turned out to require stage-change history with actor and timestamp — which *is* ACTV-02, and belongs to Phase 34 — so building it inside Phase 33 would have duplicated Phase 34's work or shipped against data that did not exist. Deferred deliberately so it lands on that foundation. See `.planning/phases/33-pipeline/33-CONTEXT.md` Deferred Ideas and `33-DISCUSSION-LOG.md` § Motivation.
