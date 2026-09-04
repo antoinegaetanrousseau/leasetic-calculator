@@ -386,25 +386,43 @@ export async function updateCompanyDisplayAction(raw: unknown): Promise<void> {
     const companyId = updated[0].id;
     const before = beforeRows[0] ?? { name: null, website: null, phone: null, siren: null };
 
+    // ── Narration, AFTER an UPDATE that has already committed ──────────────
+    //
+    // Guarded as a pair (34-SECURITY WARNING-01). The driver is neon-http, so
+    // there is no transaction to roll back: an unguarded throw here would
+    // unwind into the outer catch and raise BOUNDED_ERROR for an edit whose
+    // columns are already on disk. The partner would see an error over a
+    // change that landed and retry it — the same defect plan 34-08 fixed in
+    // the stage action and registry-sync.ts fixed for the refresh.
+    //
+    // A lost audit row is the lesser harm and is recoverable from the server
+    // log; a partner mistrusting a write that succeeded is not.
+    //
     // D-03: the audit row exists BECAUSE other partners see the result. D-26 /
     // ADMIN-09: ids and caller-submitted values only — never commission data.
-    await writeAuditLog({
-      actorId: session.user.id,
-      action: 'company.display_update',
-      targetType: 'company',
-      targetId: companyId,
-      payload: { companyId, before, after },
-    });
-
-    if (input.siren !== before.siren) {
+    try {
       await writeAuditLog({
         actorId: session.user.id,
-        action: 'company.siren_correct',
+        action: 'company.display_update',
         targetType: 'company',
         targetId: companyId,
-        payload: { companyId, before: before.siren, after: input.siren },
+        payload: { companyId, before, after },
       });
 
+      if (input.siren !== before.siren) {
+        await writeAuditLog({
+          actorId: session.user.id,
+          action: 'company.siren_correct',
+          targetType: 'company',
+          targetId: companyId,
+          payload: { companyId, before: before.siren, after: input.siren },
+        });
+      }
+    } catch (e) {
+      console.error('[updateCompanyDisplayAction] audit write failed:', e); // server-side only
+    }
+
+    if (input.siren !== before.siren) {
       // Re-run the lookup against the corrected value. No branch on the result
       // and no guard: it cannot throw, and a failure leaves the correction
       // standing with the status telling the partner to retry.

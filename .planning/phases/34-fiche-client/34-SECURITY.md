@@ -612,3 +612,71 @@ lesson.
 ---
 
 *No implementation file was modified by this audit.*
+
+---
+
+## 7. Post-audit addendum — 2026-09-04
+
+### 7.1 Status of §6
+
+| # | Item | Status |
+|---|---|---|
+| 1 | BLOCKER-01, `createContactAction` projection | **FIXED** (`9fe3af4`), verified live |
+| 2 | BLOCKER-02, the privacy claim | **CLOSED for the privacy half** — see the resolution under BLOCKER-02. Step 14 and the visual steps remain, and are not privacy claims |
+| 3 | Extend the isolation suite to the Phase 34 queries (WARNING-02) | **DONE** (`dab173c`), 28 → 34 tests, mutation-verified. Wiring `DATABASE_URL_TEST` into CI is still open |
+| 4 | Stop swallowing the audit write (WARNING-01) | **DONE** — see 7.2 |
+| 5 | Migration run URLs in `34-04-SUMMARY.md` (WARNING-03) | **DONE** (`2bb1b45`) |
+| 6 | Scheme allowlist on `website` (LOW-01) | **MITIGATED AT RENDER** — see 7.3 |
+
+### 7.2 WARNING-01 — resolved, and the resolution is the opposite of what was asked
+
+The finding named two sites. They needed opposite treatment, which is worth
+recording because "stop swallowing it" would have been wrong for one of them.
+
+- `registry-sync.ts` — already guarded, deliberately. The write describes a
+  sync whose ten identity columns are ALREADY on disk. Letting it throw would
+  return `{ ok: false, reason: 'unavailable' }` for a refresh that succeeded.
+- `updateCompanyDisplayAction` — was NOT guarded, and now is. Both of its
+  audit writes are post-commit, so an unguarded throw unwound into the outer
+  catch and raised `BOUNDED_ERROR` for an UPDATE already committed: the
+  partner sees a failure over an edit that landed, and retries it. There is no
+  transaction to roll back — the driver is `neon-http`.
+
+The rule both now follow: **a lost audit row is recoverable from the server
+log; a partner mistrusting a write that succeeded is not.** The SIREN re-sync
+sits OUTSIDE the guard on purpose — it is the partner's actual intent, not
+narration about it. Both covered by tests and mutation-verified.
+
+### 7.3 LOW-01 — `website` is now inert unless it is http(s)
+
+The stored value is unchanged (validation is deliberately loose so partners can
+type `example.com`); the guard is at RENDER, in `ClientHeader.toSafeHttpUrl`.
+A value that does not parse as http or https is shown as plain text and never
+becomes an `href`. This mattered more once the field was displayed at all:
+before 2026-09-04 `website` was editable and rendered nowhere, so the loose
+validation had no sink. Mutation-verified.
+
+### 7.4 NEW SURFACE — `deleteClientRelationshipAction`
+
+**Added after this audit ran.** It is the only DESTRUCTIVE statement in the
+CRM, so it is recorded here rather than left for the next reader to discover.
+
+| Threat | Mitigation | Evidence |
+|---|---|---|
+| A partner deletes another partner's client | `owner_id = <caller>` inside the `DELETE ... WHERE` — never a pre-check | integration test, mutation-verified |
+| Probing which relationship ids exist | "not owned" and "no such id" both return `not_found`; the diagnostic query that distinguishes `has_proposals` is itself owner-scoped | integration test |
+| A finalized proposal silently orphaned | `NOT EXISTS` guard in the same statement; the FK is `ON DELETE SET NULL`, so without it the document survives having lost its client | integration test, mutation-verified |
+| TOCTOU between the guard and the delete | both predicates in ONE statement — `neon-http` has no transactions, so a check-then-delete pair is a real window | by construction |
+| Deleting a company another partner holds | the action never names `companies` in a write; the row survives, as does the registry cache keyed by its UNIQUE siren | integration test asserts the company still exists |
+| A refusal reaching the UI as a generic toast | the outcome is a RETURNED discriminated union, never a thrown sentinel (D-24 / 33-REVIEW CR-01) | dialog tests cover all four branches |
+| No trace of what was deleted | audit row `client_relationship.delete` carries the company id; guarded, post-commit | integration test |
+
+Residual, accepted: deletion is irreversible — there is no archive tier.
+Operator decision, 2026-09-04, with archiving deferred to its own phase.
+
+### 7.5 Still open
+
+- `DATABASE_URL_TEST` is not wired into CI, so all three integration suites
+  skip there and run only when someone runs them by hand.
+- Pushes to `main` have been bypassing 2 required status checks.
+

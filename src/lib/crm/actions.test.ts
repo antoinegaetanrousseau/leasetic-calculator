@@ -665,6 +665,32 @@ describe('updateCompanyDisplayAction', () => {
     expect(mockState.calls).toHaveLength(0);
   });
 
+  // 34-SECURITY WARNING-01 — the audit write is post-commit narration.
+  it('a FAILING audit write does not fail the edit — the columns are already on disk', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+    writeAuditLogMock.mockRejectedValueOnce(new Error('audit_log unreachable'));
+
+    // Unguarded, this rejection would unwind into the outer catch and raise
+    // the bounded error for an UPDATE that already committed — the partner
+    // sees a failure over a change that landed, and retries it. There is no
+    // transaction to roll back: the driver is neon-http.
+    await expect(updateCompanyDisplayAction(VALID_EDIT)).resolves.toBeUndefined();
+  });
+
+  it('a failing audit write still lets a SIREN correction re-sync the registry', async () => {
+    mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
+    writeAuditLogMock.mockRejectedValue(new Error('audit_log unreachable'));
+
+    // The re-sync sits OUTSIDE the audit guard on purpose: it is the partner's
+    // actual intent when they correct a SIREN, not narration about it.
+    await expect(
+      // Must DIFFER from BEFORE_ROW.siren, or there is no correction to
+      // re-sync. 632012100 is L'ORÉAL — a real, Luhn-valid SIREN.
+      updateCompanyDisplayAction({ ...VALID_EDIT, siren: '632012100' }),
+    ).resolves.toBeUndefined();
+    expect(syncCompanyRegistryMock).toHaveBeenCalled();
+  });
+
   it('updates companies through an owner-scoped subquery carrying BOTH the relationship id and owner_id', async () => {
     mockState.resultQueue = [[BEFORE_ROW], [{ id: 'company-1' }]];
 
