@@ -74,6 +74,7 @@ maybe('insertRelationshipEventForOwner — against real Postgres', () => {
 
   afterAll(async () => {
     if (!sql) return;
+    await sql`delete from contacts where client_relationship_id = ${relationshipId}`;
     await sql`delete from relationship_events where client_relationship_id = ${relationshipId}`;
     await sql`delete from client_relationships where id = ${relationshipId}`;
     await sql`delete from companies where id = ${companyId}`;
@@ -104,6 +105,45 @@ maybe('insertRelationshipEventForOwner — against real Postgres', () => {
     // The two columns the broken version omitted must still be populated.
     expect(rows[0].occurred_at).toBeInstanceOf(Date);
     expect(rows[0].created_at).toBeInstanceOf(Date);
+  });
+
+  // The SECOND of the repo's two INSERT … SELECT builders, and the one that had
+  // been broken longest: `createContactAction` projected 5 of `contacts`' 11
+  // columns, so contact creation threw on every call from the moment Phase 30's
+  // TOCTOU fix introduced it. Production held zero contact rows when it was
+  // found. Both builders are covered here so the class is closed, not just its
+  // two known instances.
+  it('createContactAction writes a contact — the other INSERT … SELECT projection also matches its table', async () => {
+    process.env.DATABASE_URL = TEST_URL;
+    vi.doMock('@/lib/auth/require', () => ({
+      requireRelationshipHolder: async () => ({
+        session: { user: { id: ownerId, email: 'integration@example.test' } },
+        role: 'partner',
+      }),
+    }));
+    const { createContactAction } = await import('@/lib/crm/actions');
+
+    const result = await createContactAction(relationshipId, {
+      name: 'ZZ Integration Contact',
+      role: 'Gérant',
+      phone: '0102030405',
+      email: 'zz.integration@example.test',
+    });
+
+    expect(result.id).toBeTruthy();
+
+    const rows = await sql`
+      select name, role, phone, email, created_at, source
+      from contacts where client_relationship_id = ${relationshipId}`;
+    expect(rows).toHaveLength(1);
+    expect(rows[0].name).toBe('ZZ Integration Contact');
+    expect(rows[0].created_at).toBeInstanceOf(Date);
+    // The provenance marker must stay NULL: this row was entered by a human,
+    // not produced by an import (Phase 31 D-08).
+    expect(rows[0].source).toBeNull();
+
+    await sql`delete from contacts where client_relationship_id = ${relationshipId}`;
+    vi.doUnmock('@/lib/auth/require');
   });
 
   it('writes NOTHING when the caller does not own the relationship — the ownership proof is in the INSERT itself', async () => {

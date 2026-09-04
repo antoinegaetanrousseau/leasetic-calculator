@@ -468,12 +468,33 @@ export async function createContactAction(
       .insert(schema.contacts)
       .select(
         dbi
+          // EVERY column of `contacts`, in the table's own declaration order.
+          //
+          // Drizzle's INSERT … SELECT compares the projection's keys against the
+          // WHOLE table definition — same count, same order — and throws
+          // "selected fields are not the same or are in a different order
+          // compared to the table definition" otherwise. This projection listed
+          // five of eleven columns, so `createContactAction` threw on EVERY call
+          // from the moment the TOCTOU fix below introduced it: contact creation
+          // has never worked in production, which had zero contact rows when
+          // this was found. Fail-closed, so nothing leaked and no ownership
+          // check was skipped — but the feature was dead and every gate was
+          // green, because the unit tests mock the driver and therefore never
+          // run Drizzle's validation.
+          //
+          // If a column is added to `contacts`, it must be added here too.
           .select({
+            id: sql<string>`gen_random_uuid()`.as('id'),
             clientRelationshipId: schema.clientRelationships.id,
             name: sql<string>`${input.name}`.as('name'),
             role: sql<string | null>`${input.role ?? null}`.as('role'),
             phone: sql<string | null>`${input.phone ?? null}`.as('phone'),
             email: sql<string | null>`${input.email ?? null}`.as('email'),
+            hubspotContactId: sql<string | null>`NULL::text`.as('hubspot_contact_id'),
+            syncedAt: sql<Date | null>`NULL::timestamptz`.as('synced_at'),
+            createdAt: sql<Date>`now()`.as('created_at'),
+            updatedAt: sql<Date>`now()`.as('updated_at'),
+            source: sql<string | null>`NULL::text`.as('source'),
           })
           .from(schema.clientRelationships)
           .where(and(
