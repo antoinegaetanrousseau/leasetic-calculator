@@ -712,7 +712,7 @@ une fiche client sont suivies ici." — with no icon, no warning colour and no
 conditional trigger. Changing the wizard to attach a client before finalizing is
 explicitly OUT of scope for this phase. This decision is settled; do not reopen.
 
-**Plans:** 5 plans in 4 waves
+**Plans:** 0/5 plans executed
 
 Plans:
 - [ ] 35-01-PLAN.md — momentum domain logic: the one Europe/Paris Mon–Sun week window, the streak fold, the badge ladder, and the shared contracts both wave-2 plans compile against (wave 1)
@@ -764,7 +764,7 @@ Plans:
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
-| 35. Sales Motivation | v1.7 | TBD | Not started | - |
+| 35. Sales Motivation | v1.7 | 0/5 | Planned    |  |
 
 ---
 
