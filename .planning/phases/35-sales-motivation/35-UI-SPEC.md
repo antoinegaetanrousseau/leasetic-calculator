@@ -111,8 +111,9 @@ Reading order, in priority:
    "the list visibly explains why the streak stands"). Same row treatment as `RelanceCard`.
 3. **Badge ladder** — a standing reference, not news. Renders last, in the smallest text size on
    the card, because GAME-03 requires it to be *readable*, not that it compete for attention.
-4. **Under-report disclosure** — smallest, quietest text on the card, permanently present at the
-   bottom (see § Copywriting).
+4. **Credibility line + under-report disclosure** — two separate, always-rendered lines
+   (every state, not zero-state-only), smallest and quietest text on the card, stacked at the
+   bottom in that order (see § Copywriting).
 
 **Consequence for the executor:** no part of this card may render larger or more saturated than
 `RelanceCard`'s own rows. If a later request asks to "make the streak pop," that is a D-19
@@ -137,12 +138,21 @@ project's existing declared values — every size below is a value `30-UI-SPEC.m
 | Badge axis label | **12px** (`text-xs`) | 700 | 1.3 | "CLIENTS" / "VICTOIRES" / "RÉGULARITÉ" — mirrors `MetricTile`'s own label treatment (`text-[11.8px] font-bold tracking-[0.06em] uppercase`), rounded to the nearest already-declared step |
 | Badge tier entry — earned | **13px** | 600 | 1.4 | "Bronze (3 clients)" with a leading `CheckCircleIcon` |
 | Badge tier entry — unearned | **13px** | 400 | 1.4 | Same text, `text-muted-foreground`, no icon |
-| Under-report disclosure | **12px** (`text-xs`) | 400 | 1.4 | Permanent footer line |
-| Zero-state credibility line ("Activité suivie depuis…") | **12px** (`text-xs`) | 400 | 1.4 | Same size/weight as the disclosure line — both are quiet, secondary lines by design (D-14 calls it "one quiet line") |
+| Credibility line ("Activité suivie depuis…") | **12px** (`text-xs`) | 400 | 1.4 | **Always rendered, every state — not zero-state-only.** Sits immediately above the disclosure line, same quiet treatment (D-14 calls it "one quiet line") |
+| Under-report disclosure | **12px** (`text-xs`) | 400 | 1.4 | Permanent footer line, directly below the credibility line |
 
 The declared scale is **14.5 / 13 / 12 — a subset of sizes already in the app's palette**, plus
 the inherited 13px `CardTitle` eyebrow. No size outside what `RelanceCard`/`MetricTile` already
 render.
+
+**Distinguishability sanity-check (checker non-blocking note).** 12px sits directly beside 13px in
+two places on this card: the badge axis label (12px) above its own tier entries (13px), and the
+credibility/disclosure pair (12px) beneath the badge ladder's 13px tier text. Both pairs stay
+distinguishable in practice for the same reason `MetricTile`'s label/sublabel pair already does
+(11.8px vs 12.5px, an even smaller 0.7px gap, shipped and unchanged) — the smaller size is always
+paired with a **different weight and case** (700 + uppercase + wide tracking for the axis label,
+vs 400/600 + sentence case for tier text and the footer lines), so the differentiator is
+typographic treatment, not raw px delta. No size change made.
 
 ---
 
@@ -189,8 +199,8 @@ might expect a feedback color and must not find one: D-11 is explicit that this 
 |---|---|---|
 | Card eyebrow title | **"VOTRE PROGRESSION"** | **"YOUR PROGRESS"** |
 | Streak — active (n≥1) | **"{n} semaine(s). Un dossier doit avancer d'ici dimanche."** | **"{n} week(s). A deal must advance by Sunday."** |
-| Streak — zero state (D-13/D-14 combined, one paragraph per D-18) | **"Pas encore de série. Faites avancer un dossier cette semaine pour démarrer une série."** | **"No streak yet. Advance a deal this week to start one."** |
-| Zero-state credibility line (D-14, dynamic month/year) | **"Activité suivie depuis {mois} {année}."** e.g. "Activité suivie depuis septembre 2026." | **"Activity tracked since {month} {year}."** |
+| Streak — zero state (D-13's invitation text ONLY — see correction note below) | **"Pas encore de série. Faites avancer un dossier cette semaine pour démarrer une série."** | **"No streak yet. Advance a deal this week to start one."** |
+| Credibility line (D-14, dynamic month/year) — **rendered ALWAYS, in every state, not only when the streak is zero** — sits at the bottom of the card, immediately above the under-report disclosure line (§ Mechanics "Rendering rule") | **"Activité suivie depuis {mois} {année}."** e.g. "Activité suivie depuis septembre 2026." | **"Activity tracked since {month} {year}."** |
 | Movements — section label | **"Cette semaine"** | **"This week"** |
 | Movement row — stage advance | **"{companyName} → {stageLabel}, {jour}"** | **"{companyName} → {stageLabel}, {day}"** |
 | Movement row — proposal finalized | **"{companyName} — proposition envoyée, {jour}"** | **"{companyName} — proposal sent, {day}"** |
@@ -208,6 +218,19 @@ might expect a feedback color and must not find one: D-11 is explicit that this 
 shorthand `33-UI-SPEC.md` already shipped in production copy ("{won} gagnée(s) sur {total}
 proposition(s)"), reused here for consistency rather than introducing real plural-rule branching
 for a house style this small.
+
+**Correction (gsd-ui-checker fix, 2026-09-04).** An earlier revision of this table labeled the
+zero-state streak row "D-13/D-14 combined, one paragraph" while separately declaring
+`trackedSinceLabel` as its own prop and `dashboard.momentum.trackedSince` as its own i18n key —
+two independent strings contradicting a "combined" label, and the JSX skeleton never rendered
+`trackedSinceLabel` at all. Resolved as **two separate strings, both real**: D-13's invitation
+sentence is the streak row's zero-state text ONLY (shown when `streakWeeks === 0`); D-14's
+credibility line is a THIRD, independent string that renders **unconditionally, in every state** —
+active streak or zero — stacked immediately above the permanent under-report disclosure line. This
+is deliberate, not an oversight: D-14 names this "the phase's only real credibility risk" precisely
+for an **established** partner whose real history predates the timeline fix, and that partner's
+streak is very much non-zero. A zero-state-only credibility line would hide it from exactly the
+people it exists to reassure.
 
 **Primary CTA:** N/A. This card is informational, not actionable — GAME-05 requires that ignoring
 it costs nothing, which argues against giving it a CTA that competes with `PageHero`'s "Nouvelle
@@ -349,7 +372,9 @@ interface MomentumCardProps {
   streakWeeks: number;        // current streak, 0 if broken/never started
   movements: MomentumRow[];   // already owner-scoped, already window-filtered, already ordered
   badgeProgress: BadgeAxisProgress[]; // 3 axes × 3 tiers, earned flags pre-computed
-  trackedSinceLabel: string;  // D-14's dynamic "septembre 2026" fragment, computed server-side
+  trackedSinceLabel: string;  // D-14's dynamic "septembre 2026" fragment, computed server-side.
+                              // ALWAYS passed and ALWAYS rendered (see Composition below) — not
+                              // conditional on streakWeeks or movements.length.
 }
 ```
 
@@ -368,7 +393,10 @@ component, so an admin's request never even resolves the momentum queries.
     </CardTitle>
   </CardHeader>
   <CardContent className="flex flex-col gap-4">
-    {/* Part 1 — streak sentence, always rendered, D-12 */}
+    {/* Part 1 — streak sentence, always rendered, D-12. The zero-state variant is D-13's
+        invitation text ONLY. D-14's credibility line is a SEPARATE string and does NOT
+        live inside this <p> — it renders unconditionally near the bottom of the card,
+        see below. */}
     <p>{streak sentence, one of the two variants in § Copywriting}</p>
 
     {/* Part 2 — this week's movements */}
@@ -385,7 +413,14 @@ component, so an admin's request never even resolves the momentum queries.
       {/* one row per axis */}
     </div>
 
-    {/* Permanent disclosure — operator instruction */}
+    {/* Credibility line (D-14) — ALWAYS rendered, unconditionally, in every state.
+        Not gated on streakWeeks === 0, not gated on movements.length === 0. Sits directly
+        above the disclosure line, same quiet treatment — this is what lets an established
+        partner with real (pre-fix) history see "activité suivie depuis..." even in a week
+        their streak is active and non-zero. */}
+    <p className="text-xs text-muted-foreground">{trackedSinceLabel}</p>
+
+    {/* Permanent disclosure — operator instruction. Always rendered, same tier, directly below. */}
     <p className="text-xs text-muted-foreground">{t('dashboard.momentum.disclosure', lang)}</p>
   </CardContent>
 </Card>
@@ -417,7 +452,7 @@ New namespace: `dashboard.momentum.*`. Both `fr` and `en` required.
 dashboard.momentum.title
 dashboard.momentum.streak.active         ({0} = n, "(s)" convention baked into the string)
 dashboard.momentum.streak.zero
-dashboard.momentum.trackedSince          ({0} = "septembre 2026"-style fragment)
+dashboard.momentum.trackedSince          ({0} = "septembre 2026"-style fragment; ALWAYS interpolated and rendered, every state — see § Mechanics/Copywriting correction note)
 dashboard.momentum.thisWeek
 dashboard.momentum.empty
 dashboard.momentum.moreCount             ({0} = n)
