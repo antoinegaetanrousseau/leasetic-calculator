@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: BLOCKED on human checkpoint — 34-13 task 2, the 24-step acceptance walkthrough, is
-last_updated: "2026-09-04T21:24:41.932Z"
+status: ready_to_plan
+last_updated: 2026-09-04T21:35:17.414Z
 last_activity: 2026-09-03
 progress:
   total_phases: 20
   completed_phases: 18
   total_plans: 92
-  completed_plans: 92
+  completed_plans: 175
   percent: 90
+stopped_at: Phase 34 complete (13/13) — ready to discuss Phase 35
 ---
 
 # State — Matrice Commerciale
@@ -23,17 +24,17 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 34 — fiche client
+**Current focus:** Phase 35 — sales motivation
 
 ## Current Position
 
-Phase: 34 (fiche-client) — EXECUTING
-Plan: 13 of 13 (34-13 task 1 complete — acceptance fixtures seeded)
-Status: BLOCKED on human checkpoint — 34-13 task 2, the 24-step acceptance walkthrough, is
+Phase: 35
+Plan: Not started
+Status: Ready to plan
 Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
 reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
 FICHE-01..05 / ACTV-01..05 stay OPEN until that checkpoint is approved.
-Last activity: 2026-09-03
+Last activity: 2026-09-04
 
 ## Deferred Items
 

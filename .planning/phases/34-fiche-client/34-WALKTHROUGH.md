@@ -133,3 +133,58 @@ worth a glance while you are in there, but nothing rests on them alone.
 
 Deletion is irreversible — no archive tier. Operator decision, 2026-09-04;
 archiving deferred to its own phase.
+
+
+---
+
+## RESULT — 2026-09-04: all 24 steps closed
+
+Antoine walked the six human steps himself; the other eighteen were closed by
+evidence (see the table above). **Five passed as written. Step 8 failed, and
+finding that was the entire value of walking it.**
+
+### Step 8 — the failure, and what it actually was
+
+A genuinely ceased company (SIREN `923804504`, BOULANGERIE DE L'EUROPE) was
+created and synced to `registry_status = 'error'` with `registry_state`,
+`legal_name` and `city` all NULL. The client existed, so from the UI it looked
+like it had worked — but the ceased state the step exists to check had never
+rendered, because no identity was written at all.
+
+Cause: Zod's `.optional()` accepts `undefined` and **rejects `null`**. The
+SIRENE API omits nothing — it sends an explicit `null`. Since `results` is an
+array of objects, one null in one field failed the whole payload, and
+`syncCompanyRegistry` maps a parse failure to `'error'`.
+
+**The trigger was not being ceased.** `923804504` carries the unclassified NAF
+`00.00Z`, so `section_activite_principale` is null. Any company with an
+unclassified activity was affected, ceased or active. Nothing caught it because
+the only fixture was hand-written from the design doc and happened to populate
+every field.
+
+Fixed in `e2d0a15` — twelve fields to `.nullish()`, `orNull` hardened against a
+null it can now receive, the real payload captured as a fixture, and
+mutation-verified.
+
+### Step 8 — re-walked on production, same evening
+
+```
+registry_status = 'synced'
+registry_state  = 'C'                            ← ceased, and legible
+address_line    = '395 RTE DEPARTEMENTALE 96'    ← locality stripped, not duplicated
+naf_section     = null                           ← the null that broke the parser
+```
+
+That single re-check independently confirms three of the day's fixes: the null
+tolerance, the address de-duplication, and the registry-sync event write (a
+fourth `registry_synced` row was appended).
+
+### Verdict
+
+**Phase 34 acceptance: PASSED.** FICHE-01..05 and ACTV-01..05 ticked in
+`.planning/REQUIREMENTS.md`.
+
+The lesson worth carrying: the six steps left for a human were the ones no test
+in this repo could stand in for, and one of them found a production defect that
+2249 green tests did not. The hand-written fixture was the blind spot — it
+documented the design's field list rather than the API's real behaviour.

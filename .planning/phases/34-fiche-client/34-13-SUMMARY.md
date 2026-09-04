@@ -3,7 +3,7 @@ phase: 34-fiche-client
 plan: 13
 subsystem: tooling
 tags: [seeder, fixtures, acceptance, neon, development-only, sirene]
-status: partial — task 1 complete; task 2 (acceptance walkthrough) reduced to 6 steps, pending Antoine
+status: complete — acceptance walkthrough passed 2026-09-04 (step 8 failed first, fixed in e2d0a15, re-walked green)
 
 # Dependency graph
 requires:
@@ -310,3 +310,15 @@ The distinction it draws: a step is closed only when something would FAIL if
 the behaviour broke. The remaining six are a live registry round-trip, two
 visual judgements, browser history, and the PDF regression check — none of
 which a test in this repo can stand in for.
+
+
+---
+
+## CLOSED, 2026-09-04
+
+Task 2 is complete. Antoine walked the six remaining steps; five passed as
+written and step 8 failed, exposing a registry parser defect that affected every
+company with an unclassified NAF — not just ceased ones. Fixed in `e2d0a15`,
+mutation-verified, and re-walked green on production the same evening.
+
+All ten of the phase's requirements (FICHE-01..05, ACTV-01..05) are ticked.

@@ -105,24 +105,27 @@ Partner-advanced stages (Antoine's explicit choice on 2026-08-31; the risk that 
 > (34-13) passes — a requirements file that claims undelivered work is worse
 > than one that lags.
 >
-> **Update 2026-09-04.** The walkthrough is down from 24 unperformed steps to
-> **6**; `34-WALKTHROUGH.md` records which are closed and by what. These
-> requirements still stay unchecked, because the rule above is the point: the
-> six remaining steps are exactly the ones no test in this repo can stand in
-> for. What each remaining step gates:
+> **CLOSED 2026-09-04.** The acceptance walkthrough passed and all ten
+> requirements above are ticked. The path there: 18 of the 24 steps were closed
+> by evidence (three mutation-verified integration suites against real
+> Postgres, plus a live production session), and Antoine walked the remaining
+> six himself.
 >
-> | Step | Gates |
-> |---|---|
-> | 1 | FICHE-01 (create → registry → render, end to end) |
-> | 3, 7 | FICHE-01, FICHE-02 (a live SIRENE round-trip, success and not-found) |
-> | 8 | FICHE-02 (the ceased state reads correctly) |
-> | 11 | FICHE-03 (SIREN correction re-runs the lookup) |
-> | 14 | no requirement — a PDF regression check |
-> | 21 | FICHE-05 (four tabs, and reload keeps the tab) |
+> **Step 8 failed on the first attempt, and that was the point of walking it.**
+> A genuinely ceased company synced to `registry_status = 'error'` with no
+> identity at all, so the ceased state the step exists to check never rendered.
+> Cause: Zod's `.optional()` accepts `undefined` and rejects `null`, and the
+> SIRENE API sends an explicit `null` — so one null field failed the whole
+> payload. The trigger was not being ceased: SIREN 923804504 carries the
+> unclassified NAF `00.00Z`, so `section_activite_principale` was null. **Any
+> company with an unclassified activity was affected, active or not.** Twelve
+> fields moved to `.nullish()` in `e2d0a15`, mutation-verified. Re-walked on
+> production the same evening: synced, `registry_state = 'C'`, address stored
+> without the duplicated locality.
 >
-> FICHE-04 and ACTV-01..04 are gated by nothing left on that list: their
-> evidence is the mutation-verified integration suites. They stay unchecked
-> only so the whole set is ticked in one honest pass rather than piecemeal.
+> The bookkeeping rule above held: had these been ticked when the plans
+> completed, a real production defect would have shipped under ten green
+> checkboxes.
 
 ### Client Record (FICHE)
 
@@ -130,21 +133,21 @@ The client page is currently a name, an optional SIREN, a contact list and a pro
 
 Sharing rule for every requirement below: **the registry owns identity, partners own the rest.** `companies` is a shared row (CRM-01) — two partners quoting the same SIREN attach to it — so registry-sourced identity is read-only to everyone, a short list of shared display fields is partner-editable and audit-logged, and anything about the relationship is private to its owner.
 
-- [ ] **FICHE-01**: Creating a client looks the company up in the public SIRENE registry by its SIREN and stores what comes back. A registry outage never blocks creation; the record is simply marked as needing completion.
-- [ ] **FICHE-02**: Registry-sourced identity — legal name, address, legal form, NAF code, activity section, headcount band, founding date, administrative state — renders read-only, with the date it was last synced and a control to refresh it.
-- [ ] **FICHE-03**: A partner edits the shared display fields (display name, website, phone) and corrects a wrong SIREN, which re-runs the lookup. Every such edit is audit-logged, because other partners see it.
-- [ ] **FICHE-04**: A partner records private relationship facts — source, description — that no other partner on the same company can see.
-- [ ] **FICHE-05**: The client page is a header plus tabs (Informations, Contacts, Propositions, Activité), each section edited in place through its own dialog rather than a separate edit screen.
+- [x] **FICHE-01**: Creating a client looks the company up in the public SIRENE registry by its SIREN and stores what comes back. A registry outage never blocks creation; the record is simply marked as needing completion.
+- [x] **FICHE-02**: Registry-sourced identity — legal name, address, legal form, NAF code, activity section, headcount band, founding date, administrative state — renders read-only, with the date it was last synced and a control to refresh it.
+- [x] **FICHE-03**: A partner edits the shared display fields (display name, website, phone) and corrects a wrong SIREN, which re-runs the lookup. Every such edit is audit-logged, because other partners see it.
+- [x] **FICHE-04**: A partner records private relationship facts — source, description — that no other partner on the same company can see.
+- [x] **FICHE-05**: The client page is a header plus tabs (Informations, Contacts, Propositions, Activité), each section edited in place through its own dialog rather than a separate edit screen.
 
 ### Activity & Follow-Up (ACTV)
 
 Answers "who do I chase this week" — and captures the two lead-qualification signals the wizard already collects and currently discards (`slb` sale-leaseback, `evalParc` parc evaluation).
 
-- [ ] **ACTV-01**: A relationship has a single timeline mixing manual notes with system events.
-- [ ] **ACTV-02**: System events — stage change, proposal sent — are recorded automatically, with actor and timestamp.
-- [ ] **ACTV-03**: A user can add a dated note to a relationship.
-- [ ] **ACTV-04**: A relationship carries a next-action date.
-- [ ] **ACTV-05**: A user sees a list of relationships needing follow-up, driven by next-action date and staleness.
+- [x] **ACTV-01**: A relationship has a single timeline mixing manual notes with system events.
+- [x] **ACTV-02**: System events — stage change, proposal sent — are recorded automatically, with actor and timestamp.
+- [x] **ACTV-03**: A user can add a dated note to a relationship.
+- [x] **ACTV-04**: A relationship carries a next-action date.
+- [x] **ACTV-05**: A user sees a list of relationships needing follow-up, driven by next-action date and staleness.
 
 ### Sales Motivation (GAME)
 

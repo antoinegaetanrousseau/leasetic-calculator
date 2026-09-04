@@ -111,7 +111,7 @@ continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on 
 - [x] **Phase 31.1: App Shell Refresh** (INSERTED) — shell converged on the sibling Colibris product: header breadcrumbs, header-owned collapse control, 120px lockup, and a two-tier radius scale that decouples containers from controls (executed 2026-09-02; dark-mode verification pending)
 - ~~**Phase 32: HubSpot Import**~~ — **REMOVED 2026-09-02** by operator decision; IMPORT-02/IMPORT-07 dropped with it. The number is retained, not reused — see Phase Details.
 - [x] **Phase 33: Pipeline** — partner-advanced stage on the relationship (late stages system-owned), won/lost/unanswered outcome on the proposal, SIREN-gated win (completed 2026-09-03)
-- [ ] **Phase 34: Fiche client** — registry-backed company identity, per-section editing, tabbed client page, unified timeline (manual notes + system events), next-action date, "à relancer" list
+- [x] **Phase 34: Fiche client** — registry-backed company identity, per-section editing, tabbed client page, unified timeline (manual notes + system events), next-action date, "à relancer" list (completed 2026-09-04)
 
 ### 📋 v1.7 — Sales Motivation (Phase 35+) — NOT STARTED
 
@@ -634,7 +634,7 @@ and can correct any of it without leaving the page.
   4. Opening a relationship shows a single chronological timeline mixing manual notes and system events — no separate tabs for the two — and a stage change or a finalized proposal appends a timestamped, attributed event with no user action required.
   5. A partner adds a dated note and sets a next-action date on a relationship, then opens an "à relancer" list ordered by next-action date and staleness, scoped to relationships they own.
 
-**Plans:** 12/13 plans executed
+**Plans:** 13/13 plans complete
 
 Plans:
 - [x] 34-01-PLAN.md — wave 1 — data foundation: the three D-01 tiers, `relationship_events`, migration 0010, the full dictionary namespace
@@ -649,7 +649,7 @@ Plans:
 - [x] 34-10-PLAN.md — wave 5 — the four section-edit surfaces: relation, next action, company, registry refresh
 - [x] 34-11-PLAN.md — wave 5 — the unified activity timeline and the note composer
 - [x] 34-12-PLAN.md — wave 6 — client page rebuild: header, four tabs, identity and relation panels
-- [ ] 34-13-PLAN.md — wave 7 — acceptance fixtures, then the Phase 34 acceptance walkthrough
+- [x] 34-13-PLAN.md — wave 7 — acceptance fixtures, then the Phase 34 acceptance walkthrough (completed 2026-09-04)
 
 **UI hint:** yes
 
@@ -747,9 +747,9 @@ phase's own work touches):
 | 30. Company & Contact Registry | v1.6 | 9/9 | Complete    | 2026-09-02 |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | 8/8 | Complete   | 2026-09-02 |
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
-| 35. Sales Motivation | v1.7 | TBD | Not started | - |
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
-| 34. Activity & Follow-Up | v1.6 | 12/13 | In Progress|  |
+| 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
+| 35. Sales Motivation | v1.7 | TBD | Not started | - |
 
 ---
 
