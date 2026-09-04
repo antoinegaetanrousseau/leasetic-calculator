@@ -146,6 +146,39 @@ Answers "who do I chase this week" — and captures the two lead-qualification s
 - [ ] **ACTV-04**: A relationship carries a next-action date.
 - [ ] **ACTV-05**: A user sees a list of relationships needing follow-up, driven by next-action date and staleness.
 
+### Sales Motivation (GAME)
+
+Added 2026-09-04 for Phase 35 / v1.7. Raised during Phase 33's discussion and
+deferred deliberately so it lands on ACTV-02's recorded history rather than
+beside it: *"conversion rate, stage counts and movements showing momentum,
+implement streaks and badges to motivate sales efforts."*
+
+**Two decisions shape all of these, both operator calls, 2026-09-04.**
+
+*Only real progress counts* — a stage advance or a finalized proposal. Notes
+and next-action dates do not. A partner must not be able to keep a streak
+alive by typing a note: a metric that is trivially satisfiable stops measuring
+anything, and a motivation feature that rewarded typing over selling would
+teach the wrong habit. The accepted cost is that genuine work which moves
+nothing — a long call, a quote being considered — reads as a quiet week.
+
+*Streaks are weekly*, not daily. In a leasing pipeline a deal moves every few
+weeks, so most days are legitimately quiet; a daily streak would sit at zero
+for nearly everyone and read as an accusation rather than encouragement. A
+streak that is easy to break stops motivating and starts nagging.
+
+**The permanent constraint (CRM-02).** Relationships are private to their
+owner, so a leaderboard is not merely declined here — it is unbuildable
+without the channel-conflict leak the ownership model exists to prevent.
+Phase 30's security review treats leakage as an *inference* property: counts
+and wording leak too.
+
+- [ ] **GAME-01**: A partner sees what moved in their own book recently — stage advances and proposals finalized, with when — read from the relationship timeline rather than from a second record of the same events kept for this feature.
+- [ ] **GAME-02**: A partner sees a streak of consecutive weeks in which their book made real progress, and can see what would break the current one before it breaks.
+- [ ] **GAME-03**: A partner earns badges for milestones reached in their own book, and the criterion for every badge — earned or not — is readable rather than guessed at.
+- [ ] **GAME-04**: No surface in this feature lets a partner learn anything about another partner's book, including by inference from a count, a rank, a total or a choice of wording. No leaderboard, ranking, peer benchmark or team aggregate exists.
+- [ ] **GAME-05**: A partner who ignores all of it is not penalised: their pipeline, conversion rate and follow-up list behave exactly as they did before this feature, and nothing is withheld from them for not engaging.
+
 ---
 
 ## Future Requirements (deferred beyond v1.6)
@@ -215,3 +248,8 @@ Every v1.6 REQ-ID maps to exactly one phase. Coverage: 31/31 (100%).
 | ACTV-03 | Phase 34 — Fiche client |
 | ACTV-04 | Phase 34 — Fiche client |
 | ACTV-05 | Phase 34 — Fiche client |
+| GAME-01 | Phase 35 — Sales Motivation |
+| GAME-02 | Phase 35 — Sales Motivation |
+| GAME-03 | Phase 35 — Sales Motivation |
+| GAME-04 | Phase 35 — Sales Motivation |
+| GAME-05 | Phase 35 — Sales Motivation |

@@ -667,7 +667,36 @@ phase's own work touches):
 **Milestone:** v1.7 — Sales Motivation
 **Goal:** A partner sees their own book gaining momentum — what moved and when, streaks of sustained activity, and badges for milestones reached — so the pipeline is something they want to keep current rather than a form they have to maintain.
 **Depends on:** Phase 34 — Fiche client (ACTV-02's system events with actor and timestamp are what momentum is computed from), Phase 33 (stages to move between, conversion rate to build on)
-**Requirements:** TBD — no `GAME-*` requirements exist yet; they should be written before planning
+**Requirements:** GAME-01, GAME-02, GAME-03, GAME-04, GAME-05 — written 2026-09-04, see `.planning/REQUIREMENTS.md`
+
+**Decisions already taken (2026-09-04), so planning does not reopen them:**
+  - **Only real progress counts** — a stage advance or a finalized proposal. Notes and next-action dates do not, or a partner keeps a streak alive by typing.
+  - **Streaks are weekly.** A leasing deal moves every few weeks; a daily streak would sit at zero for nearly everyone and read as an accusation.
+  - **Badges are DERIVED from the event timeline, not persisted.** No awarding job and no new write path — which matters because `neon-http` has no transactions, so an award could never be made atomic with the event that earned it. Changing a criterion re-reads history correctly instead of leaving stale awards behind.
+  - **It lives on the home page**, beside the "à relancer" card, where a partner already starts.
+
+**Known data constraints — measured on production 2026-09-04, before planning:**
+
+  1. **There is no event history to compute from.** `relationship_events` holds
+     exactly TWO rows in production, both written today, because the timeline
+     `INSERT … SELECT` was broken from the day it shipped until `62e26fa`.
+     Every stage change and finalize before 2026-09-04 recorded nothing and is
+     unrecoverable. Momentum, streaks and badges therefore start at zero for
+     every partner. Phase 35 must treat "no history yet" as the NORMAL first
+     state and read as encouraging rather than as an empty accusation — not as
+     an edge case discovered late.
+  2. **Only proposals started from a client page carry a client link.**
+     `proposals.client_relationship_id` is set by the D-30 / CRM-05 path
+     (`/proposals/new/parametres?clientRelationshipId=…`, which the client page
+     links to) and by reconciliation. A proposal begun from the generic "new
+     proposal" entry point stays NULL, so `app/api/proposals/finalize` skips
+     its `proposal_finalized` event — correctly, since there is no timeline to
+     narrate onto. All 5 active proposals in production are unlinked today.
+     GAME-01 counts "proposals finalized" from these events, so it will
+     under-report for any partner who starts from the generic wizard.
+     **Decide during planning:** accept the under-report and say so in the UI,
+     or let the wizard attach a client before finalizing. Do not discover this
+     mid-build.
 **Success Criteria** (what must be TRUE):
 
   1. A partner sees what moved in their book over a recent window — stage advances and proposals sent — derived from Phase 34's recorded system events rather than from a parallel event store built here.
