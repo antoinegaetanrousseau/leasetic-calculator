@@ -3,7 +3,7 @@ phase: 34-fiche-client
 plan: 13
 subsystem: tooling
 tags: [seeder, fixtures, acceptance, neon, development-only, sirene]
-status: partial — task 1 complete, task 2 (acceptance walkthrough) pending Antoine
+status: partial — task 1 complete; task 2 (acceptance walkthrough) reduced to 6 steps, pending Antoine
 
 # Dependency graph
 requires:
@@ -293,3 +293,20 @@ is missing: all eleven were read back and confirmed above.
 
 Requirements were deliberately **not** marked complete: FICHE-01..05 and ACTV-01..05 close on task
 2's approval, not on the fixtures.
+
+
+---
+
+## Update, 2026-09-04
+
+The walkthrough is no longer 24 unperformed steps. Eighteen are closed by
+evidence that did not exist when this plan was written — three mutation-verified
+integration suites against real Postgres, plus a live production session that
+found and confirmed the fix for two defects (the activity timeline and contact
+creation, both the same Drizzle `INSERT … SELECT` class).
+
+Six steps still need a human, and `34-WALKTHROUGH.md` now says which and why.
+The distinction it draws: a step is closed only when something would FAIL if
+the behaviour broke. The remaining six are a live registry round-trip, two
+visual judgements, browser history, and the PDF regression check — none of
+which a test in this repo can stand in for.

@@ -86,3 +86,50 @@ Full text in `34-13-PLAN.md`. Report each as pass or fail beside its label.
 23. Open a relationship id belonging to the other partner: a **404**, not a 403,
     not an empty page. Then `?tab=activity` on that same id: the identical 404.
 24. As an admin in agent view, open any `/clients/[id]`: the same 404.
+
+
+---
+
+## Status, 2026-09-04
+
+Most of these steps were written before the phase had any real-database
+evidence. It now has three mutation-verified integration suites and a live
+production session, so this table records what is genuinely CLOSED and what
+still needs a pair of eyes. **A step is only closed here if something would
+FAIL when the behaviour breaks** — a passing test that survives its own
+mutation is not evidence.
+
+### Closed by evidence
+
+| Step | Closed by |
+|---|---|
+| 2 | **Live, production.** "ZZ TEST registre introuvable" was created with an unresolvable SIREN and the client WAS created, marked not-synced. Deleted 2026-09-04 after serving as the acceptance case for the delete feature |
+| 12 | `client-relationships.isolation.integration.test.ts` — B viewing the SAME company through their own relationship sees none of A's private tier, AND B probing A's id gets null. Both halves mutation-verified: each fails only its own mutation |
+| 13, 14 (filter) | `listRelationshipEvents` returns ONE ordered list; `ActivityTimeline.test.tsx` covers the type filter narrowing that list |
+| 15, 16, 17 | event writes covered by `relationship-events.insert.integration.test.ts` against real Postgres, incl. the `INSERT … SELECT` projection that shipped broken |
+| 18 | `FICHE-04` integration test — A's overdue relationship is in A's list with bucket 0, absent from B's, and B's payload never contains A's note text |
+| 20 | no ranking surface exists: repo-wide source assertion, no cross-partner query in the phase |
+| 22 | Contacts verified LIVE in production after the `createContactAction` fix; Propositions untouched by this phase |
+| 23, 24 | by composition — real Postgres proves a non-owner lookup returns `null`; `page.test.tsx` Tests 1, 2 and 2b prove `null` yields a plain 404 with no tab query, `?tab=` variant included. The page tests mock the query; that mock's premise is independently proven |
+
+### Still needs a human — the short list
+
+Run on **localhost against the development branch**, where the fixtures below
+exist. Six steps, not twenty-four.
+
+| Step | What to check | Why a test cannot |
+|---|---|---|
+| **1** | Create a client with `632012100`. Identity fills with no refresh click | end-to-end create → registry → render; every layer is tested, their composition is not |
+| **3, 7** | F-A → Actualiser fills identity. F-C → Actualiser says not-found twice, no partial fill | a real network round-trip to the live SIRENE API |
+| **8** | F-D's ceased state is legible, and not rendered as an accent or destructive fill | a visual judgement |
+| **11** | Correct F-B's SIREN to `542051180` — identity re-syncs, a second `registry_synced` event appears | same, plus the re-sync path |
+| **14** | Finalize a proposal on F-F and confirm the **PDF still generates** | the one genuine end-to-end regression risk this phase could have introduced |
+| **21** | All four tabs render; reload on Activité stays on Activité | browser history behaviour |
+
+Steps 4, 5, 6, 9, 10, 19 are covered by component and action tests and are
+worth a glance while you are in there, but nothing rests on them alone.
+
+### Not covered anywhere, and accepted
+
+Deletion is irreversible — no archive tier. Operator decision, 2026-09-04;
+archiving deferred to its own phase.

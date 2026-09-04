@@ -104,6 +104,25 @@ Partner-advanced stages (Antoine's explicit choice on 2026-08-31; the risk that 
 > by hand. These stay unchecked until the phase's acceptance walkthrough
 > (34-13) passes — a requirements file that claims undelivered work is worse
 > than one that lags.
+>
+> **Update 2026-09-04.** The walkthrough is down from 24 unperformed steps to
+> **6**; `34-WALKTHROUGH.md` records which are closed and by what. These
+> requirements still stay unchecked, because the rule above is the point: the
+> six remaining steps are exactly the ones no test in this repo can stand in
+> for. What each remaining step gates:
+>
+> | Step | Gates |
+> |---|---|
+> | 1 | FICHE-01 (create → registry → render, end to end) |
+> | 3, 7 | FICHE-01, FICHE-02 (a live SIRENE round-trip, success and not-found) |
+> | 8 | FICHE-02 (the ceased state reads correctly) |
+> | 11 | FICHE-03 (SIREN correction re-runs the lookup) |
+> | 14 | no requirement — a PDF regression check |
+> | 21 | FICHE-05 (four tabs, and reload keeps the tab) |
+>
+> FICHE-04 and ACTV-01..04 are gated by nothing left on that list: their
+> evidence is the mutation-verified integration suites. They stay unchecked
+> only so the whole set is ticked in one honest pass rather than piecemeal.
 
 ### Client Record (FICHE)
 
