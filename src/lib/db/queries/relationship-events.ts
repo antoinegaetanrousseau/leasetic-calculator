@@ -159,13 +159,32 @@ export async function insertRelationshipEventForOwner(
     .insert(schema.relationshipEvents)
     .select(
       dbi
+        // EVERY column of `relationship_events`, in the table's own declaration
+        // order — including the two that have database defaults.
+        //
+        // This is not stylistic. Drizzle's INSERT … SELECT validates the
+        // projection against the whole table definition and throws "selected
+        // fields are not the same or are in a different order compared to the
+        // table definition" if a single column is missing or out of order. The
+        // first version omitted `id` and `created_at` on the reasonable
+        // assumption that their defaults would fill them, and every event write
+        // in the application threw — silently, because each call site wraps this
+        // in its own try/catch so a failed narration can never veto a committed
+        // change. The result was an activity timeline that was empty in
+        // production while every gate stayed green: the unit tests mock the
+        // driver, so they assert the SHAPE of this call and never run Drizzle's
+        // validation. Found by walking the acceptance steps on the live app.
+        //
+        // If a column is ever added to the table, it must be added here too.
         .select({
+          id: sql<string>`gen_random_uuid()`.as('id'),
           clientRelationshipId: schema.clientRelationships.id,
           kind: sql<string>`${args.kind}::text`.as('kind'),
           actorId: sql<string | null>`${args.actorId}::text`.as('actor_id'),
           occurredAt: sql<Date>`COALESCE(${args.occurredAt ?? null}::timestamptz, now())`.as('occurred_at'),
           body: sql<string | null>`${args.body ?? null}::text`.as('body'),
           payload: sql<Record<string, unknown> | null>`${args.payload ? JSON.stringify(args.payload) : null}::jsonb`.as('payload'),
+          createdAt: sql<Date>`now()`.as('created_at'),
         })
         .from(schema.clientRelationships)
         .where(and(
