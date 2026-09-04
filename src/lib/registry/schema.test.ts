@@ -5,6 +5,7 @@ import {
   type RegistryResult,
 } from './schema';
 import fixture from './__fixtures__/search-response.json';
+import ceasedFixture from './__fixtures__/search-response-ceased-nulls.json';
 
 /**
  * Phase 34 Plan 02 Task 1 — the payload parser (D-06, D-08, D-10).
@@ -113,6 +114,68 @@ describe('registrySearchResponseSchema (D-08 / D-10)', () => {
       false,
     );
     expect(registrySearchResponseSchema.safeParse({}).success).toBe(false);
+  });
+});
+
+// ── The null trap (production defect, 2026-09-04) ──────────────────────────
+//
+// Zod's `.optional()` accepts `undefined` and REJECTS `null`. This API omits
+// nothing — it sends an explicit `null`. Because `results` is an array of
+// objects, ONE null in ONE field failed the whole payload, and
+// `syncCompanyRegistry` maps a parse failure to `registry_status = 'error'`
+// with no identity written at all.
+//
+// Found by walking Phase 34's acceptance step 8 on production: SIREN
+// 923804504 has the unclassified NAF 00.00Z and therefore
+// `section_activite_principale: null`. It synced to 'error' and rendered
+// nothing. The hand-written EDF fixture happened to populate every field, so
+// nothing in 2249 tests caught it. This fixture is the REAL payload, trimmed
+// to the fields the parser reads.
+describe('registrySearchResponseSchema — explicit nulls from the API', () => {
+  it('parses a payload whose optional field is null, rather than failing the whole result', () => {
+    const parsed = registrySearchResponseSchema.safeParse(ceasedFixture);
+    expect(parsed.success).toBe(true);
+  });
+
+  it('maps that payload to a usable identity, ceased state included', () => {
+    const first = registrySearchResponseSchema.parse(ceasedFixture).results[0];
+    const identity = toRegistryIdentity(first, '923804504');
+
+    expect(identity).not.toBeNull();
+    expect(identity?.legalName).toBe("BOULANGERIE DE L'EUROPE");
+    // The whole point of acceptance step 8: the ceased marker must arrive.
+    expect(identity?.registryState).toBe('C');
+    // The null field becomes null — not '' and not a thrown TypeError from
+    // reading .length off it in orNull.
+    expect(identity?.nafSection).toBeNull();
+    expect(identity?.nafCode).toBe('00.00Z');
+    // And the address still parses, locality stripped.
+    expect(identity?.addressLine).toBe('395 RTE DEPARTEMENTALE 96');
+    expect(identity?.city).toBe('FUVEAU');
+  });
+
+  it('tolerates a null anywhere the schema allows one, including the whole siege', () => {
+    const parsed = registrySearchResponseSchema.safeParse({
+      results: [{
+        siren: '923804504',
+        nom_raison_sociale: null,
+        nom_complet: null,
+        nature_juridique: null,
+        activite_principale: null,
+        section_activite_principale: null,
+        tranche_effectif_salarie: null,
+        date_creation: null,
+        etat_administratif: null,
+        siege: null,
+      }],
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    // Every field null must yield nulls, never a throw — a result this empty
+    // is useless but it must not poison the other results in the array.
+    const identity = toRegistryIdentity(parsed.data.results[0], '923804504');
+    expect(identity?.legalName).toBeNull();
+    expect(identity?.addressLine).toBeNull();
   });
 });
 

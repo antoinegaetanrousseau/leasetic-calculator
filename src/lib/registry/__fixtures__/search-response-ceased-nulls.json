@@ -1,0 +1,20 @@
+{
+  "results": [
+    {
+      "siren": "923804504",
+      "nom_complet": "BOULANGERIE DE L'EUROPE (BOULANGERIE)",
+      "nom_raison_sociale": "BOULANGERIE DE L'EUROPE",
+      "nature_juridique": "5499",
+      "activite_principale": "00.00Z",
+      "section_activite_principale": null,
+      "tranche_effectif_salarie": "NN",
+      "date_creation": "2023-07-20",
+      "etat_administratif": "C",
+      "siege": {
+        "adresse": "395 RTE DEPARTEMENTALE 96 13710 FUVEAU",
+        "code_postal": "13710",
+        "libelle_commune": "FUVEAU"
+      }
+    }
+  ]
+}

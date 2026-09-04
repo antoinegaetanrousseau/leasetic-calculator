@@ -46,11 +46,24 @@ const truncated = (limit: number) =>
     .trim()
     .transform((v) => (v.length > limit ? v.slice(0, limit) : v));
 
-/** The `siege` sub-object: the head-office address, all three parts optional. */
+/**
+ * The `siege` sub-object: the head-office address, all three parts optional.
+ *
+ * `.nullish()`, NEVER `.optional()`. Zod's `.optional()` accepts `undefined`
+ * and REJECTS `null`, but this API omits nothing — it sends an explicit
+ * `null`. Because `results` is an array of this object, one null in one field
+ * fails the WHOLE payload, and `syncCompanyRegistry` maps that to
+ * `registry_status = 'error'` with no identity written at all.
+ *
+ * Found in production 2026-09-04: SIREN 923804504 sends
+ * `section_activite_principale: null` (its NAF is the unclassified 00.00Z),
+ * so the company synced to `error` and rendered no identity. The hand-written
+ * EDF fixture happened to have every field populated, so nothing caught it.
+ */
 const registrySiegeSchema = z.object({
-  adresse: truncated(ADDRESS_MAX).pipe(z.string().max(ADDRESS_MAX)).optional(),
-  code_postal: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).optional(),
-  libelle_commune: truncated(COMMUNE_MAX).pipe(z.string().max(COMMUNE_MAX)).optional(),
+  adresse: truncated(ADDRESS_MAX).pipe(z.string().max(ADDRESS_MAX)).nullish(),
+  code_postal: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).nullish(),
+  libelle_commune: truncated(COMMUNE_MAX).pipe(z.string().max(COMMUNE_MAX)).nullish(),
 });
 
 /**
@@ -61,15 +74,15 @@ const registrySiegeSchema = z.object({
  */
 export const registryResultSchema = z.object({
   siren: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)),
-  nom_raison_sociale: truncated(NAME_MAX).pipe(z.string().max(NAME_MAX)).optional(),
-  nom_complet: truncated(NAME_MAX).pipe(z.string().max(NAME_MAX)).optional(),
-  nature_juridique: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).optional(),
-  activite_principale: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).optional(),
-  section_activite_principale: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).optional(),
-  tranche_effectif_salarie: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).optional(),
-  date_creation: truncated(DATE_MAX).pipe(z.string().max(DATE_MAX)).optional(),
-  etat_administratif: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).optional(),
-  siege: registrySiegeSchema.optional(),
+  nom_raison_sociale: truncated(NAME_MAX).pipe(z.string().max(NAME_MAX)).nullish(),
+  nom_complet: truncated(NAME_MAX).pipe(z.string().max(NAME_MAX)).nullish(),
+  nature_juridique: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).nullish(),
+  activite_principale: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).nullish(),
+  section_activite_principale: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).nullish(),
+  tranche_effectif_salarie: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).nullish(),
+  date_creation: truncated(DATE_MAX).pipe(z.string().max(DATE_MAX)).nullish(),
+  etat_administratif: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).nullish(),
+  siege: registrySiegeSchema.nullish(),
 });
 
 export type RegistryResult = z.infer<typeof registryResultSchema>;
@@ -103,9 +116,16 @@ export type RegistryIdentity = {
   registryState: string | null;
 };
 
-/** An absent OR empty upstream value becomes null, never '' — the column stores NULL. */
-const orNull = (value: string | undefined): string | null =>
-  value === undefined || value.length === 0 ? null : value;
+/**
+ * An absent OR empty upstream value becomes null, never '' — the column stores
+ * NULL.
+ *
+ * Takes `null` as well as `undefined` since the schema moved to `.nullish()`:
+ * the previous signature would have thrown a TypeError reading `.length` off
+ * a null the parser now lets through.
+ */
+const orNull = (value: string | null | undefined): string | null =>
+  value === undefined || value === null || value.length === 0 ? null : value;
 
 /**
  * The street line, with the locality the API already appended stripped off.
