@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: planning
-last_updated: "2026-09-04T21:56:13.517Z"
+status: executing
+last_updated: "2026-09-04T23:45:38.365Z"
 last_activity: 2026-09-04
 progress:
   total_phases: 20
   completed_phases: 18
-  total_plans: 92
-  completed_plans: 92
+  total_plans: 97
+  completed_plans: 93
   percent: 90
 ---
 
@@ -23,13 +23,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 35 — sales motivation
+**Current focus:** Phase 35 — sales-motivation
 
 ## Current Position
 
-Phase: 35
-Plan: Not started
-Status: Ready to plan
+Phase: 35 (sales-motivation) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
 Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
 reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
 FICHE-01..05 / ACTV-01..05 stay OPEN until that checkpoint is approved.
@@ -426,6 +426,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 34 P05 | 35min | 3 tasks | 7 files |
 | Phase 34 P10 | 22min | 3 tasks | 8 files |
 | Phase 34 P12 | 21min | 3 tasks | 10 files |
+| Phase 35 P01 | ~20min | 2 tasks | 5 files |
 
 ## Decisions
 
@@ -553,6 +554,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: 34-10: a recoverable server-action outcome is consumed as a RETURNED discriminated result; a SIREN UNIQUE collision is deliberately NOT one and collapses into the bounded toast
 - [Phase ?]: 34-10: D-02 is enforced by two independent guards — a registry-column grep across all four dialogs and an input-count test on the shared-tier form
 - [Phase ?]: 34-12: /clients/[id] keeps max-w-[720px] exactly as it was — considered during the tab rebuild and deliberately not changed (UIC-09).
+- [Phase 35]: Badge thresholds (operator-adjustable): clients bronze=3/silver=10/gold=25, wins bronze=1/silver=5/gold=15, consistency bronze=2/silver=6/gold=12
+- [Phase 35]: summarizeStreaks currentWeeks two-branch rule: alive if the previous week has progress and current week is empty; longestWeeks is an independent max-over-history scan so a broken current streak never erases the longest-ever consistency badge (D-07/A-5)
+- [Phase 35]: GAME-01/02/03 requirement checkboxes left OPEN after 35-01 (pure logic only, no query layer, no UI) — following this project's established FICHE/ACTV precedent (Phase 34), requirements mark-complete is deferred to the plan that actually grounds the observable behavior (35-05, MomentumCard wired onto the home page)
 
 ### Blockers
 
