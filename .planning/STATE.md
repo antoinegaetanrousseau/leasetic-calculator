@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: executing
-last_updated: "2026-09-03T19:22:01.329Z"
+status: BLOCKED on human checkpoint — 34-13 task 2, the 24-step acceptance walkthrough, is
+last_updated: "2026-09-04T21:24:41.932Z"
 last_activity: 2026-09-03
 progress:
   total_phases: 20
-  completed_phases: 17
+  completed_phases: 18
   total_plans: 92
-  completed_plans: 91
-  percent: 85
+  completed_plans: 92
+  percent: 90
 ---
 
 # State — Matrice Commerciale
