@@ -7,6 +7,12 @@
 **Result:** **107 CLOSED / 5 PARTIAL / 4 OPEN / 2 accepted-and-discharged**
 
 **Verdict: DO NOT LAUNCH WEDNESDAY WITHOUT CLOSING BLOCKER-01 AND BLOCKER-02.**
+
+> **Update 2026-09-04.** BLOCKER-01 is FIXED and verified live (commit `9fe3af4`
+> — contact creation had never worked since Phase 30). BLOCKER-02's privacy half
+> is CLOSED by mutation-verified real-database tests — see the resolution block
+> under BLOCKER-02. What remains of BLOCKER-02 is end-to-end walkthrough
+> coverage that is not a privacy claim.
 Neither is a confidentiality break. Both are live functional defects on the CRM
 path, one of which was introduced by a security fix.
 
@@ -137,6 +143,53 @@ precisely the shape that produced the timeline outage.
 **Action:** walk steps 10, 12, 14, 18, 23 and 24 against the migrated production
 database with two real accounts before Wednesday, and record each result beside
 its fixture label. Nothing here needs a code change; it needs evidence.
+
+#### Resolution, 2026-09-04 — the privacy half is CLOSED by real-database evidence
+
+`client-relationships.isolation.integration.test.ts` was extended from 28 tests
+to 34 and **run against the Neon development branch** (guarded by an explicit
+host check that refuses any URL that is not `ep-polished-band`). Six new tests
+cover the Phase 34 surface the file had never touched:
+
+| New test | Closes | Evidence |
+|---|---|---|
+| B sees the SHARED registry identity | D-01 tier one | positive half — a broken join would fail here, so the negatives below are not vacuous |
+| **B views the SAME company through their OWN relationship** | D-01 tier three, **step 12** | A's description / next-action note / lead source are null on B's row, B probing A's id is null |
+| B's timeline on their own shared relationship is empty | ACTV-01 | A has two events on the same company; B sees none |
+| B probing A's ids for events | T-34-05-01, D-18 | four probes return the identical `[]` |
+| A's overdue relationship never in B's follow-up | FICHE-04, **step 18** | and B's payload never contains A's note text |
+| an admin gets an empty follow-up list | T-34-05-04 | empty array, not a throw, not every partner's work |
+
+**Mutation-verified**, which is the part that makes this evidence rather than
+decoration. Three separate mutations were applied and reverted:
+
+1. drop `owner_id` from `listRelationshipEvents` → the D-18 probe test fails.
+2. drop `owner_id` from `listRelationshipsNeedingFollowUp` → both follow-up
+   tests fail.
+3. drop `owner_id` from `getClientRelationshipForOwner` → the headline test
+   fails.
+
+Mutation 3 is worth recording: the headline test **passed** it in its first
+form. Asserting only that B's own row is empty proves the tier ASSIGNMENT (the
+private fields live on `client_relationships`, not on the shared `companies`
+row) and says nothing about the owner predicate, because B's row is still
+selected by its own id. The test now asserts both, and each half fails only its
+own mutation. A single half would have read exactly like proof of the whole
+claim.
+
+**Steps 23/24 (the 404 contract) are closed by composition**, not by a browser:
+the integration test proves on real Postgres that a non-owner lookup returns
+`null`, and `page.test.tsx` Tests 1, 2 and 2b prove that a `null` lookup
+produces a plain 404 with no tab query ever constructed, including the
+`?tab=activity` variant. The page tests mock the query — that mock's premise is
+now independently proven, which is what makes the composition sound.
+
+**What remains open is no longer a privacy claim.** Step 14 (finalizing a
+proposal still generates its PDF) and the visual steps are end-to-end
+behaviours a human still has to see. The phase's central isolation claim no
+longer rests on mocked tests.
+
+CI is unaffected: without `DATABASE_URL_TEST` the whole block still skips.
 
 ---
 

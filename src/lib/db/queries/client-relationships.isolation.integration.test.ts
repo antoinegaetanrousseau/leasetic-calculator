@@ -60,6 +60,10 @@ const {
 } = await import('./client-relationships');
 const { listRelationshipsForCompany } = await import('./companies');
 const { listPipelineBoard, getConversionRateForOwner } = await import('./pipeline');
+const {
+  listRelationshipEvents,
+  listRelationshipsNeedingFollowUp,
+} = await import('./relationship-events');
 const { __resetDbForTests } = await import('@/lib/db');
 
 const DATABASE_URL_TEST = process.env.DATABASE_URL_TEST;
@@ -87,8 +91,18 @@ describe.skipIf(!shouldRun)(
     let relAOnlyId: string;
     let contactId: string;
     let proposalId: string;
+    // Phase 34: timeline events written on A's relationships only.
+    const eventIds: string[] = [];
+    const userAdminId = `crm-iso-test-admin-${runId}`;
 
     const companyAOnlyName = `A-Only Isolation Co ${runId}`;
+    // Private-tier values written on A's side of the SHARED company. Every
+    // one of them is searched for by name in B's results below, so a leak
+    // through any field shows up as a failing assertion rather than a
+    // silently-passing "not undefined".
+    const A_PRIVATE_DESCRIPTION = `A private description ${runId}`;
+    const A_PRIVATE_NEXT_ACTION_NOTE = `A private relance ${runId}`;
+    const A_PRIVATE_NOTE_BODY = `A private note body ${runId}`;
 
     beforeAll(async () => {
       sql = postgres(DATABASE_URL_TEST!, {
@@ -107,7 +121,11 @@ describe.skipIf(!shouldRun)(
         INSERT INTO users (id, email, role, partner_type)
         VALUES
           (${userAId}, ${`${userAId}@example.test`}, 'partner', 'Partenaire'),
-          (${userBId}, ${`${userBId}@example.test`}, 'partner', 'Partenaire')
+          (${userBId}, ${`${userBId}@example.test`}, 'partner', 'Partenaire'),
+          -- partner_type is NOT NULL with a CHECK for every role, so the
+          -- admin carries a meaningless one. The admin owns NO relationship:
+          -- that is the whole point of the T-34-05-04 probe below.
+          (${userAdminId}, ${`${userAdminId}@example.test`}, 'admin', 'Partenaire')
       `;
 
       const shared = await sql<Array<{ id: string }>>`
@@ -170,16 +188,67 @@ describe.skipIf(!shouldRun)(
         ) RETURNING id
       `;
       proposalId = proposal[0]!.id;
+
+      // ── Phase 34 fixtures ────────────────────────────────────────────────
+      //
+      // The SHARED company is the interesting one, and it is the exact shape
+      // of walkthrough step 12 (fixtures F-F and F-F'): one company, two
+      // partners, each with their own relationship to it. Everything below
+      // hangs off A's side of it. B's side is left deliberately bare, so the
+      // assertions can distinguish "B cannot reach A's id" (a weak claim, an
+      // id probe) from "B, legitimately viewing the SAME company through
+      // their OWN relationship, sees none of A's work" — which is the claim
+      // the phase actually makes to a partner.
+
+      // Registry tier (D-01 tier one) — SHARED. Both partners must see it.
+      await sql`
+        UPDATE companies SET
+          legal_name = 'SHARED ISOLATION SA',
+          address_line = '1 RUE DU PARTAGE',
+          postal_code = '75001',
+          city = 'PARIS',
+          legal_form = 'SAS',
+          naf_code = '62.01Z',
+          registry_state = 'A',
+          registry_status = 'synced',
+          registry_synced_at = now()
+        WHERE id = ${companySharedId}
+      `;
+
+      // Private relationship tier (D-01 tier three) — A's side ONLY.
+      // `next_action_at` is in the PAST so this relationship is "due", which
+      // is what the follow-up isolation probe below depends on.
+      await sql`
+        UPDATE client_relationships SET
+          description = ${A_PRIVATE_DESCRIPTION},
+          next_action_note = ${A_PRIVATE_NEXT_ACTION_NOTE},
+          next_action_at = now() - interval '2 days',
+          lead_source = 'recommandation'
+        WHERE id = ${relASharedId}
+      `;
+
+      // Two timeline events on A's side of the SHARED company, and one on
+      // A's A-only relationship. B owns none of them.
+      const events = await sql<Array<{ id: string }>>`
+        INSERT INTO relationship_events (client_relationship_id, kind, actor_id, body, occurred_at)
+        VALUES
+          (${relASharedId}, 'note', ${userAId}, ${A_PRIVATE_NOTE_BODY}, now() - interval '1 day'),
+          (${relASharedId}, 'stage_changed', ${userAId}, NULL, now()),
+          (${relAOnlyId}, 'note', ${userAId}, 'A-only note', now())
+        RETURNING id
+      `;
+      eventIds.push(...events.map((e) => e.id));
     });
 
     afterAll(async () => {
       if (!sql) return;
       // FK-safe order: contacts -> proposals -> client_relationships -> companies -> users.
+      if (eventIds.length) await sql`DELETE FROM relationship_events WHERE id = ANY(${eventIds})`;
       if (contactId) await sql`DELETE FROM contacts WHERE id = ${contactId}`;
       if (proposalId) await sql`DELETE FROM proposals WHERE id = ${proposalId}`;
       await sql`DELETE FROM client_relationships WHERE id = ANY(${[relASharedId, relBSharedId, relAOnlyId].filter(Boolean)})`;
       await sql`DELETE FROM companies WHERE id = ANY(${[companySharedId, companyAOnlyId].filter(Boolean)})`;
-      await sql`DELETE FROM users WHERE id = ANY(${[userAId, userBId]})`;
+      await sql`DELETE FROM users WHERE id = ANY(${[userAId, userBId, userAdminId]})`;
       await sql.end({ timeout: 5 });
     });
 
@@ -235,6 +304,119 @@ describe.skipIf(!shouldRun)(
       const ownerIds = result.map((r) => r.ownerId).sort();
       expect(ownerIds).toEqual([userAId, userBId].sort());
       expect(result.every((r) => r.relationshipId === relASharedId || r.relationshipId === relBSharedId)).toBe(true);
+    });
+
+    // ── Phase 34 — the three-tier sharing rule, against a real database ────
+    //
+    // WHY THESE EXIST. The phase's headline claim to a partner is that the
+    // notes and follow-ups they write on a company are theirs alone, even
+    // when another partner holds the same company. Until these tests, that
+    // claim rested entirely on unit tests with a MOCKED driver: they prove
+    // the WHERE clause is COMPOSED with an owner predicate, and prove nothing
+    // about whether the resulting join actually filters. The 34 security
+    // audit called this out, and the two production defects found the same
+    // week — both query builders that type-checked, unit-tested green, and
+    // threw on every real call — are the standing argument for why a mocked
+    // driver is not evidence about a query.
+
+    it('D-01 tier one: partner B sees the SHARED registry identity on the shared company', async () => {
+      const bView = await getClientRelationshipForOwner(relBSharedId, userBId);
+      expect(bView).not.toBeNull();
+      // The positive half of the rule: registry identity is company-level, so
+      // B gets the full identity A's refresh wrote. A test that only asserted
+      // the negative half would pass just as well if the whole join were
+      // broken.
+      expect(bView?.legalName).toBe('SHARED ISOLATION SA');
+      expect(bView?.city).toBe('PARIS');
+      expect(bView?.registryStatus).toBe('synced');
+      expect(bView?.registrySyncedAt).toBeInstanceOf(Date);
+    });
+
+    it('THE HEADLINE CLAIM (D-01 tier three / walkthrough step 12): B views the SAME company through their OWN relationship and sees none of A\'s private fields', async () => {
+      const aView = await getClientRelationshipForOwner(relASharedId, userAId);
+      const bView = await getClientRelationshipForOwner(relBSharedId, userBId);
+
+      // A wrote them, so A sees them — otherwise the negative assertions
+      // below would pass against a column that was never populated.
+      expect(aView?.description).toBe(A_PRIVATE_DESCRIPTION);
+      expect(aView?.nextActionNote).toBe(A_PRIVATE_NEXT_ACTION_NOTE);
+      expect(aView?.leadSource).toBe('recommandation');
+      expect(aView?.nextActionAt).toBeInstanceOf(Date);
+
+      // B holds a legitimate relationship to the very same company. Every
+      // private-tier field must be empty on B's side.
+      expect(bView?.companyId).toBe(aView?.companyId);
+      expect(bView?.description).toBeNull();
+      expect(bView?.nextActionNote).toBeNull();
+      expect(bView?.nextActionAt).toBeNull();
+      expect(bView?.leadSource).toBeNull();
+
+      // And no field of B's row carries A's text anywhere — this catches a
+      // leak through a column the assertions above do not name individually.
+      expect(JSON.stringify(bView)).not.toContain(A_PRIVATE_DESCRIPTION);
+      expect(JSON.stringify(bView)).not.toContain(A_PRIVATE_NEXT_ACTION_NOTE);
+
+      // The two assertions above and the one below fail for DIFFERENT
+      // reasons, and both are needed:
+      //
+      //   - B's own row being empty proves the TIER ASSIGNMENT: the private
+      //     fields live on `client_relationships`, not on the shared
+      //     `companies` row. Move `next_action_note` onto `companies` and
+      //     the assertions above fail while the owner predicate still works.
+      //   - B probing A's id proves the OWNER PREDICATE. Drop
+      //     `owner_id = ownerId` from the WHERE and this one fails while the
+      //     assertions above still pass, because B's row is still selected
+      //     by its own id.
+      //
+      // Verified by mutation, 2026-09-04: each mutation fails only its own
+      // assertion. A single one of them would have looked like proof of the
+      // whole claim and been half of it.
+      expect(await getClientRelationshipForOwner(relASharedId, userBId)).toBeNull();
+    });
+
+    it('ACTV-01: B\'s timeline on their own shared relationship is EMPTY, though A has events on the same company', async () => {
+      const aEvents = await listRelationshipEvents(relASharedId, userAId);
+      expect(aEvents).toHaveLength(2);
+      expect(aEvents.some((e) => e.body === A_PRIVATE_NOTE_BODY)).toBe(true);
+
+      const bEvents = await listRelationshipEvents(relBSharedId, userBId);
+      expect(bEvents).toEqual([]);
+    });
+
+    it('ACTV-01 / D-18: B probing A\'s relationship ids for events is indistinguishable from an empty timeline', async () => {
+      const probeShared = await listRelationshipEvents(relASharedId, userBId);
+      const probeAOnly = await listRelationshipEvents(relAOnlyId, userBId);
+      const nonexistent = await listRelationshipEvents(randomUUID(), userBId);
+      const ownEmpty = await listRelationshipEvents(relBSharedId, userBId);
+
+      // All four answers are the same value. A probing partner learns nothing
+      // about whether the id exists, is owned by someone else, or is empty.
+      expect(probeShared).toEqual([]);
+      expect(probeAOnly).toEqual([]);
+      expect(nonexistent).toEqual([]);
+      expect(ownEmpty).toEqual([]);
+      expect(probeShared).toStrictEqual(nonexistent);
+    });
+
+    it('FICHE-04: A\'s overdue relationship appears in A\'s follow-up list and never in B\'s', async () => {
+      const aFollowUp = await listRelationshipsNeedingFollowUp(userAId, 50);
+      const aIds = aFollowUp.map((r) => r.relationshipId);
+      expect(aIds).toContain(relASharedId);
+      expect(aFollowUp.find((r) => r.relationshipId === relASharedId)?.bucket).toBe(0);
+
+      const bFollowUp = await listRelationshipsNeedingFollowUp(userBId, 50);
+      const bIds = bFollowUp.map((r) => r.relationshipId);
+      expect(bIds).not.toContain(relASharedId);
+      expect(bIds).not.toContain(relAOnlyId);
+      expect(JSON.stringify(bFollowUp)).not.toContain(A_PRIVATE_NEXT_ACTION_NOTE);
+    });
+
+    it('T-34-05-04: an ADMIN — who owns no relationship — gets an empty follow-up list and no error', async () => {
+      // The home page calls this with requireUser(), not
+      // requireRelationshipHolder(), so an admin genuinely reaches it. The
+      // contract is an empty array, NOT a throw and NOT every partner's work.
+      const adminFollowUp = await listRelationshipsNeedingFollowUp(userAdminId, 50);
+      expect(adminFollowUp).toEqual([]);
     });
   },
 );
