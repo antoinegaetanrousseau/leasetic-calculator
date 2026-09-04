@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: ready_to_plan
-last_updated: 2026-09-04T21:35:17.414Z
-last_activity: 2026-09-03
+status: planning
+last_updated: "2026-09-04T21:56:13.517Z"
+last_activity: 2026-09-04
 progress:
   total_phases: 20
   completed_phases: 18
   total_plans: 92
-  completed_plans: 175
+  completed_plans: 92
   percent: 90
-stopped_at: Phase 34 complete (13/13) — ready to discuss Phase 35
 ---
 
 # State — Matrice Commerciale
