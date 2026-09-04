@@ -53,9 +53,24 @@ empty. This plan is an operator action, not a code change.
 
 ## Next Phase Readiness
 
-Waves 3 and later may now read the new columns. Production (`main`) and
-`preview` remain unmigrated, deliberately, until milestone close — the same
-position `33-02-SUMMARY.md` recorded for migration 0009.
+Waves 3 and later may now read the new columns.
+
+**Superseded the same day.** This plan migrated `development` only, and the
+paragraph here originally said production and preview would stay unmigrated
+until milestone close. Both were migrated on 2026-09-04 on Antoine's explicit
+instruction, ahead of a launch planned for the following Wednesday:
+
+| Neon branch | Workflow run | Result |
+|---|---|---|
+| `preview` | 33860553406 | success — brought it from pre-Phase-30 to 0010 |
+| `main` (production) | 33863987955 | success — 0009 and 0010, applied before the code shipped |
+
+Production was verified by live query afterwards: 11 migrations applied, every
+new column and table present, `relationship_events.actor_id` typed `text`, and
+the existing rows intact. The `production` GitHub Environment's controls held —
+choice-constrained branch input, the literal `MIGRATE PROD` confirmation, and
+the required-reviewer gate, which the orchestrator approved using Antoine's
+authenticated CLI on his instruction in chat, recorded in the approval comment.
 
 ---
 *Phase: 34-fiche-client*
