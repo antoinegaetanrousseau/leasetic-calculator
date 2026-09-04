@@ -51,13 +51,13 @@
  * `'clients.toast.error'`.
  */
 
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, notExists, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireRelationshipHolder } from '@/lib/auth/require';
 import { db, schema } from '@/lib/db';
 import { writeAuditLog } from '@/lib/db/queries/audit-log';
-import type { RegistryRefreshResult } from './constants';
+import type { DeleteClientResult, RegistryRefreshResult } from './constants';
 import { syncCompanyRegistry } from './registry-sync';
 import { contactSchema, createClientSchema, updateCompanyDisplaySchema } from './schemas';
 
@@ -611,6 +611,110 @@ export async function deleteContactAction(contactId: string): Promise<void> {
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('[deleteContactAction] failed:', msg);
+    throw new Error(BOUNDED_ERROR);
+  }
+}
+
+/**
+ * Delete a client file the caller owns (operator decision, 2026-09-04).
+ *
+ * WHAT GOES, AND WHAT STAYS. The `client_relationships` row goes, and its
+ * contacts and timeline events go with it — both foreign keys are already
+ * `ON DELETE cascade`. Three things deliberately survive:
+ *
+ *   - the `companies` row. It is SHARED (D-01 tier one): another partner may
+ *     hold the same company, and it is also the registry cache keyed by a
+ *     UNIQUE siren. Deleting a client must never reach across into another
+ *     partner's book, so this action never names `companies` in a write.
+ *   - finalized proposals — which is why the guard below exists.
+ *   - the audit row, which is the only remaining trace once the row is gone.
+ *
+ * THE GUARD AND THE OWNERSHIP CHECK ARE ONE STATEMENT. The production driver
+ * is `drizzle-orm/neon-http`, whose `.transaction()` throws at runtime, so a
+ * "count the proposals, then delete" pair would leave a real TOCTOU window: a
+ * proposal finalized between the two statements would be orphaned by a delete
+ * that had already decided there were none. Both conditions therefore live
+ * inside the `DELETE ... WHERE`, and the `NOT EXISTS` is evaluated by
+ * PostgreSQL against the same snapshot as the delete itself.
+ *
+ * WHY THERE IS A SECOND QUERY ANYWAY. Deleting nothing is ambiguous — not
+ * owned, or blocked by a proposal — and a partner who is refused deserves to
+ * know which. The diagnostic runs only when zero rows were deleted, and it is
+ * itself scoped to `owner_id`, so a caller probing someone else's id counts
+ * zero and is told `not_found`. The ambiguity is preserved for the probing
+ * caller and resolved only for the legitimate one.
+ */
+export async function deleteClientRelationshipAction(
+  relationshipId: string,
+): Promise<DeleteClientResult> {
+  const { session } = await requireRelationshipHolder(); // FIRST — PITFALLS §7.3
+  try {
+    const dbi = db();
+
+    // 'draft' is not yet a commercial document and 'deleted' is already
+    // withdrawn; only a live finalized proposal blocks.
+    const blockingProposal = dbi
+      .select({ one: sql<number>`1` })
+      .from(schema.proposals)
+      .where(and(
+        eq(schema.proposals.clientRelationshipId, schema.clientRelationships.id),
+        eq(schema.proposals.status, 'active'),
+      ));
+
+    const deleted = await dbi
+      .delete(schema.clientRelationships)
+      .where(and(
+        eq(schema.clientRelationships.id, relationshipId),
+        eq(schema.clientRelationships.ownerId, session.user.id),
+        notExists(blockingProposal),
+      ))
+      .returning();
+
+    if (deleted.length === 0) {
+      const blocked = await dbi
+        .select({ id: schema.proposals.id })
+        .from(schema.proposals)
+        .innerJoin(
+          schema.clientRelationships,
+          eq(schema.clientRelationships.id, schema.proposals.clientRelationshipId),
+        )
+        .where(and(
+          eq(schema.clientRelationships.id, relationshipId),
+          // Carried in the SAME statement — a non-owner counts zero here and
+          // is told `not_found`, exactly like a nonexistent id.
+          eq(schema.clientRelationships.ownerId, session.user.id),
+          eq(schema.proposals.status, 'active'),
+        ));
+
+      return blocked.length > 0
+        ? { ok: false, reason: 'has_proposals', count: blocked.length }
+        : { ok: false, reason: 'not_found' };
+    }
+
+    // Narration, AFTER a delete that has already committed. Guarded so a
+    // failed audit write can never report a completed deletion as an error —
+    // the partner would retry and be told `not_found` for a row they just
+    // successfully removed.
+    try {
+      await writeAuditLog({
+        actorId: session.user.id,
+        action: 'client_relationship.delete',
+        targetType: 'client_relationship',
+        targetId: relationshipId,
+        // The company id is the only way back to what was deleted once the
+        // row is gone. No registry values, no commission data (D-26).
+        payload: { companyId: deleted[0]!.companyId },
+      });
+    } catch (e) {
+      console.error('[deleteClientRelationshipAction] audit write failed:', e); // server-side only
+    }
+
+    revalidatePath('/clients', 'layout');
+    revalidatePath('/pipeline');
+    return { ok: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[deleteClientRelationshipAction] failed:', msg);
     throw new Error(BOUNDED_ERROR);
   }
 }

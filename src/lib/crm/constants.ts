@@ -39,3 +39,34 @@
 export type RegistryRefreshResult =
   | { ok: true }
   | { ok: false; reason: 'no_siren' | 'not_found' | 'unavailable' };
+
+/**
+ * What `deleteClientRelationshipAction` resolves to.
+ *
+ * A RETURNED union, for the same reason `RegistryRefreshResult` is one
+ * (D-24 / 33-REVIEW CR-01): Next.js redacts a Server Function's thrown
+ * message in a production build, so a recoverable outcome the UI must branch
+ * on can never travel as a thrown sentinel. It works in `npm run dev` and
+ * degrades to a generic toast once deployed — which is exactly how the SIREN
+ * gate shipped broken in Phase 33.
+ *
+ *   - `has_proposals` — the client has at least one FINALIZED proposal. A
+ *                       finalized proposal is a real commercial document with
+ *                       an LC reference and a PDF; the foreign key would
+ *                       merely null its link, leaving a document that no
+ *                       longer knows whose it was. Operator decision,
+ *                       2026-09-04: refuse instead. Drafts and already-deleted
+ *                       proposals do not block.
+ *   - `not_found`     — no such relationship, OR it belongs to another
+ *                       partner. ONE reason for both, so a probing caller
+ *                       cannot use this action to test whether an id exists
+ *                       (D-18, the same contract the page's 404 keeps).
+ *
+ * `count` is the caller's OWN finalized-proposal count. It is safe to return
+ * because the query behind it is owner-scoped: a non-owner never reaches this
+ * branch at all.
+ */
+export type DeleteClientResult =
+  | { ok: true }
+  | { ok: false; reason: 'has_proposals'; count: number }
+  | { ok: false; reason: 'not_found' };

@@ -45,7 +45,7 @@ describe('lookupCompanyBySiren — the happy path', () => {
       ok: true,
       data: {
         legalName: 'ELECTRICITE DE FRANCE',
-        addressLine: '22 AVENUE DE WAGRAM 75008 PARIS 8',
+        addressLine: '22 AVENUE DE WAGRAM',
         postalCode: '75008',
         city: 'PARIS 8',
         legalForm: '5599',

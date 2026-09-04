@@ -30,6 +30,9 @@ export type AuditAction =
   // Payloads carry only ids and caller-submitted values — never commission
   // data, never the pre-existing/new-company distinction (T-30-05-02/07).
   | 'client_relationship.create'
+  // Phase 34 follow-up, 2026-09-04 — the deleted row is gone, so this is the
+  // only remaining trace of what a partner removed.
+  | 'client_relationship.delete'
   | 'contact.create'
   | 'contact.update'
   | 'contact.delete'

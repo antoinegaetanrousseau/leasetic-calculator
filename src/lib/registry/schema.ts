@@ -108,6 +108,34 @@ const orNull = (value: string | undefined): string | null =>
   value === undefined || value.length === 0 ? null : value;
 
 /**
+ * The street line, with the locality the API already appended stripped off.
+ *
+ * `siege.adresse` is the FULL formatted address and ends with the very
+ * postcode and commune that `code_postal` and `libelle_commune` repeat — for
+ * SIREN 632012100 it is literally `'14 RUE ROYALE 75008 PARIS'` next to
+ * `'75008'` and `'PARIS'`. Storing it whole made the three columns overlap,
+ * and the identity panel, which composes them, rendered
+ * `14 RUE ROYALE 75008 PARIS, 75008 PARIS`.
+ *
+ * Only an EXACT trailing `'<code_postal> <libelle_commune>'` is removed, so a
+ * street that genuinely repeats its commune name keeps it. An address with no
+ * street at all strips to nothing and becomes null rather than `''` — the
+ * column stores the absence, same rule as `orNull`.
+ */
+function streetLineOf(siege: RegistryResult['siege']): string | null {
+  const full = orNull(siege?.adresse);
+  if (full === null) return null;
+
+  const locality = [siege?.code_postal, siege?.libelle_commune]
+    .filter((part): part is string => typeof part === 'string' && part.length > 0)
+    .join(' ');
+  if (locality.length === 0) return full;
+
+  const street = full.endsWith(locality) ? full.slice(0, -locality.length).trim() : full;
+  return street.length > 0 ? street : null;
+}
+
+/**
  * Map one parsed search hit onto the registry tier (design § 2).
  *
  * `requestedSiren` is not decoration: it re-proves D-05 at the last possible
@@ -126,7 +154,7 @@ export function toRegistryIdentity(
 
   return {
     legalName: orNull(result.nom_raison_sociale) ?? orNull(result.nom_complet),
-    addressLine: orNull(result.siege?.adresse),
+    addressLine: streetLineOf(result.siege),
     postalCode: orNull(result.siege?.code_postal),
     city: orNull(result.siege?.libelle_commune),
     legalForm: orNull(result.nature_juridique),

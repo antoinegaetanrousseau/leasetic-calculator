@@ -52,6 +52,7 @@ import { advanceRelationshipStageAction } from '@/lib/pipeline/actions';
 import { stageLabel } from '@/lib/pipeline/format';
 import { PIPELINE_STAGES, isReservedStage, type PipelineStage } from '@/lib/pipeline/stages';
 import { EditCompanyDialog } from './EditCompanyDialog';
+import { DeleteClientDialog } from './DeleteClientDialog';
 import { NextActionDialog } from './NextActionDialog';
 
 export interface ClientHeaderProps {
@@ -72,7 +73,7 @@ export interface ClientHeaderProps {
 }
 
 /** Which dialog is open. `null` is closed; there is no "both" (see header). */
-type OpenDialog = 'company' | 'nextAction' | null;
+type OpenDialog = 'company' | 'nextAction' | 'delete' | null;
 
 const DATE_OPTS: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -95,6 +96,35 @@ function buildStageItems(lang: Lang): Record<PipelineStage, string> {
   ) as Record<PipelineStage, string>;
 }
 
+/**
+ * A partner-entered website as a SAFE http(s) href, or null.
+ *
+ * `updateCompanyDisplaySchema` validates `website` as "no whitespace, at
+ * least one dot" — deliberately loose, because partners type `example.com`.
+ * That check passes `javascript:alert(1).x`, so the stored value must never
+ * reach an `href` unexamined: this is partner-supplied text being turned into
+ * a navigable target, which is exactly the shape that becomes a stored XSS
+ * when it is trusted. Anything that is not http or https renders as plain
+ * text instead, so a bad value is inert rather than rejected.
+ *
+ * A value carrying no scheme at all gets `https://`, which is what a partner
+ * typing a bare domain means.
+ */
+export function toSafeHttpUrl(raw: string | null): string | null {
+  if (raw === null) return null;
+  const value = raw.trim();
+  if (value.length === 0) return null;
+
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(value);
+  let parsed: URL;
+  try {
+    parsed = new URL(hasScheme ? value : `https://${value}`);
+  } catch {
+    return null;
+  }
+  return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : null;
+}
+
 export function ClientHeader({
   relationshipId,
   companyName,
@@ -108,6 +138,11 @@ export function ClientHeader({
   const router = useRouter();
   const [openDialog, setOpenDialog] = useState<OpenDialog>(null);
   const stageItems = buildStageItems(lang);
+  // Shared display tier (D-01): partner-owned, unlike everything on the
+  // identity panel. Both were editable from this header since 34-12 and
+  // rendered nowhere, so a partner could save a phone number and never see it
+  // again.
+  const websiteHref = toSafeHttpUrl(company.website);
 
   const nextActionLabel = nextActionAt
     ? t('clients.detail.header.nextAction', lang).replace(
@@ -145,7 +180,45 @@ export function ClientHeader({
         >
           {t('clients.detail.header.modify', lang)}
         </Button>
+        {/* Destructive, so a quiet ghost beside the primary edit rather than a
+            second outlined button competing with it. The confirmation carries
+            the weight, not the trigger. */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          data-testid="client-header-delete"
+          onClick={() => setOpenDialog('delete')}
+        >
+          {t('clients.detail.delete.trigger', lang)}
+        </Button>
       </div>
+
+      {(company.phone !== null || company.website !== null) && (
+        <div
+          data-testid="client-header-contact"
+          className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-muted-foreground"
+        >
+          {company.phone !== null && (
+            <span data-testid="client-header-phone">{company.phone}</span>
+          )}
+          {company.website !== null &&
+            (websiteHref !== null ? (
+              <a
+                data-testid="client-header-website"
+                href={websiteHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-foreground"
+              >
+                {company.website}
+              </a>
+            ) : (
+              /* Not an http(s) URL — shown, but never made navigable. */
+              <span data-testid="client-header-website">{company.website}</span>
+            ))}
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-3">
         <Select items={stageItems} value={stage} onValueChange={(value) => onStageChange(String(value))}>
@@ -194,6 +267,13 @@ export function ClientHeader({
           nextActionAt: nextActionAt ? nextActionAt.toISOString().slice(0, 10) : null,
           nextActionNote,
         }}
+        lang={lang}
+      />
+      <DeleteClientDialog
+        open={openDialog === 'delete'}
+        onOpenChange={(open) => setOpenDialog(open ? 'delete' : null)}
+        relationshipId={relationshipId}
+        companyName={companyName}
         lang={lang}
       />
     </div>

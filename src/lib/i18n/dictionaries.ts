@@ -1003,6 +1003,17 @@ export const dictionaries = {
       'Cette action est définitive et retirera {0} de la fiche client.',
     'clients.contact.confirm.delete.cancel': 'Annuler',
     'clients.contact.confirm.delete.confirm': 'Supprimer',
+    // ── Suppression d'une fiche client (2026-09-04) ─────────────────────────
+    'clients.detail.delete.trigger': 'Supprimer la fiche',
+    'clients.detail.confirm.delete.title': 'Supprimer cette fiche client ?',
+    'clients.detail.confirm.delete.description':
+      'La fiche « {0} », ses contacts et tout son historique seront définitivement supprimés. Cette action est irréversible. L\'entreprise elle-même est conservée : un autre partenaire peut la suivre.',
+    'clients.detail.confirm.delete.cancel': 'Annuler',
+    'clients.detail.confirm.delete.confirm': 'Supprimer',
+    'clients.detail.toast.deleted': 'Fiche client supprimée.',
+    // Le nombre de propositions finalisées remplace {0}.
+    'clients.detail.delete.blocked':
+      'Suppression impossible : {0} proposition(s) finalisée(s) sont rattachées à ce client.',
     'clients.contact.toast.created': 'Contact ajouté.',
     'clients.contact.toast.updated': 'Contact mis à jour.',
     'clients.contact.toast.deleted': 'Contact supprimé.',
@@ -2176,6 +2187,16 @@ export const dictionaries = {
       'This action is permanent and will remove {0} from the client record.',
     'clients.contact.confirm.delete.cancel': 'Cancel',
     'clients.contact.confirm.delete.confirm': 'Delete',
+    // ── Client file deletion (2026-09-04) ───────────────────────────────────
+    'clients.detail.delete.trigger': 'Delete client',
+    'clients.detail.confirm.delete.title': 'Delete this client file?',
+    'clients.detail.confirm.delete.description':
+      '"{0}", its contacts and its entire history will be permanently deleted. This cannot be undone. The company itself is kept — another partner may be tracking it.',
+    'clients.detail.confirm.delete.cancel': 'Cancel',
+    'clients.detail.confirm.delete.confirm': 'Delete',
+    'clients.detail.toast.deleted': 'Client file deleted.',
+    'clients.detail.delete.blocked':
+      'Cannot delete: {0} finalized proposal(s) are attached to this client.',
     'clients.contact.toast.created': 'Contact added.',
     'clients.contact.toast.updated': 'Contact updated.',
     'clients.contact.toast.deleted': 'Contact deleted.',

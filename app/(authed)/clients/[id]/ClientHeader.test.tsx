@@ -86,6 +86,16 @@ vi.mock('./NextActionDialog', () => ({
   ),
 }));
 
+vi.mock('./DeleteClientDialog', () => ({
+  DeleteClientDialog: ({ open, companyName }: { open: boolean; companyName: string }) => (
+    <div
+      data-testid="delete-client-dialog"
+      data-open={open ? 'true' : 'false'}
+      data-company={companyName}
+    />
+  ),
+}));
+
 import { ClientHeader, type ClientHeaderProps } from './ClientHeader';
 import { t } from '@/lib/i18n/dictionaries';
 import { formatDate } from '@/lib/i18n/format';
@@ -292,5 +302,68 @@ describe('ClientHeader — source contracts', () => {
 
   it('Test 6c: the reserved stages are disabled here too (PIPE-02)', () => {
     expect(source).toContain('isReservedStage');
+  });
+});
+
+// ── Shared display tier: website and phone (fix, 2026-09-04) ────────────────
+//
+// Both were editable from this header since 34-12 and rendered NOWHERE, so a
+// partner could save a phone number and never see it again.
+describe('ClientHeader — website and phone', () => {
+  it('renders the phone and links the website', () => {
+    renderHeader();
+    expect(screen.getByTestId('client-header-phone')).toHaveTextContent('04 78 00 00 00');
+    const link = screen.getByTestId('client-header-website');
+    expect(link.tagName).toBe('A');
+    // A bare domain is what partners type; https is assumed.
+    expect(link).toHaveAttribute('href', 'https://dupont-menuiserie.fr/');
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+  });
+
+  it('SECURITY: a javascript: website is rendered as TEXT, never as an href', () => {
+    // `updateCompanyDisplaySchema` validates website as "no whitespace, at
+    // least one dot" — deliberately loose so partners can type example.com.
+    // `javascript:alert(1).x` satisfies it, so the value reaching an href
+    // unexamined would be a stored XSS. It must render inert instead.
+    renderHeader({
+      company: { ...BASE_PROPS.company, website: 'javascript:alert(document.cookie).x' },
+    });
+    const el = screen.getByTestId('client-header-website');
+    expect(el.tagName).not.toBe('A');
+    expect(el).not.toHaveAttribute('href');
+    expect(el).toHaveTextContent('javascript:alert(document.cookie).x');
+  });
+
+  it('keeps an explicit http:// scheme rather than forcing https', () => {
+    renderHeader({ company: { ...BASE_PROPS.company, website: 'http://legacy.example.com' } });
+    expect(screen.getByTestId('client-header-website')).toHaveAttribute(
+      'href',
+      'http://legacy.example.com/',
+    );
+  });
+
+  it('renders no contact line at all when both values are null', () => {
+    renderHeader({ company: { ...BASE_PROPS.company, website: null, phone: null } });
+    // An empty muted row reads as a broken header — omit it entirely, the
+    // same rule the SIREN already follows.
+    expect(screen.queryByTestId('client-header-contact')).toBeNull();
+  });
+});
+
+describe('ClientHeader — delete trigger', () => {
+  it('opens DeleteClientDialog with the company name, and only that dialog', () => {
+    renderHeader();
+    expect(screen.getByTestId('delete-client-dialog')).toHaveAttribute('data-open', 'false');
+
+    fireEvent.click(screen.getByTestId('client-header-delete'));
+
+    expect(screen.getByTestId('delete-client-dialog')).toHaveAttribute('data-open', 'true');
+    expect(screen.getByTestId('delete-client-dialog')).toHaveAttribute(
+      'data-company',
+      'Dupont Menuiserie',
+    );
+    // The single-discriminant state means "both open" is not expressible.
+    expect(screen.getByTestId('edit-company-dialog')).toHaveAttribute('data-open', 'false');
+    expect(screen.getByTestId('next-action-dialog')).toHaveAttribute('data-open', 'false');
   });
 });

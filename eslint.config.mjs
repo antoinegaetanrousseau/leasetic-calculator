@@ -53,6 +53,12 @@ const config = [
       'eslint.config.mjs',
       'drizzle.config.ts',
       'scripts/**',
+      // Integration tests open a RAW client to seed fixtures and to verify
+      // results independently of the code under test — checking the row with
+      // the same abstraction that wrote it proves nothing. This rule protects
+      // the portability of SHIPPED code (BOOT-06); a test file never ships.
+      // Deliberately narrow: only `*.integration.test.ts`, never `*.test.ts`.
+      '**/*.integration.test.ts',
     ],
     rules: {
       'no-restricted-imports': [

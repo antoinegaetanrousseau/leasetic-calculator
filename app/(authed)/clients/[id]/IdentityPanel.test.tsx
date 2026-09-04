@@ -207,3 +207,47 @@ describe('IdentityPanel — the read-only registry tier (D-02)', () => {
     expect(screen.queryByText(/\{0\}/)).toBeNull();
   });
 });
+
+// ── Address composition (fix, 2026-09-04) ──────────────────────────────────
+//
+// The API's `siege.adresse` is the FULL formatted address and already ends
+// with the postcode and commune, so composing the three columns printed the
+// locality twice: "14 RUE ROYALE 75008 PARIS, 75008 PARIS". The parser now
+// stores the street line only; this panel additionally tolerates the rows
+// written BEFORE that fix, which are in production and self-heal only when
+// someone clicks Actualiser.
+describe('IdentityPanel — address composition', () => {
+  const addressOf = () =>
+    screen.getByTestId('identity-field-address').textContent ?? '';
+
+  it('composes the street line with the postcode and commune', () => {
+    renderPanel();
+    expect(addressOf()).toContain('12 RUE DES LILAS, 69003 LYON');
+  });
+
+  it('does NOT repeat the locality for a row stored before the parser fix', () => {
+    renderPanel({
+      ...SYNCED_IDENTITY,
+      // Exactly what production holds for such a row.
+      addressLine: '14 RUE ROYALE 75008 PARIS',
+      postalCode: '75008',
+      city: 'PARIS',
+    });
+    const address = addressOf();
+    expect(address).toContain('14 RUE ROYALE 75008 PARIS');
+    expect(address).not.toContain('PARIS, 75008 PARIS');
+    // The locality appears once, not twice.
+    expect(address.match(/75008/g) ?? []).toHaveLength(1);
+  });
+
+  it('renders the locality alone when there is no street line', () => {
+    renderPanel({ ...SYNCED_IDENTITY, addressLine: null });
+    expect(addressOf()).toContain('69003 LYON');
+  });
+
+  it('omits the address row entirely when every part is absent', () => {
+    renderPanel({ ...SYNCED_IDENTITY, addressLine: null, postalCode: null, city: null });
+    // An absent field is omitted, never rendered as a dash (file header).
+    expect(screen.queryByTestId('identity-field-address')).toBeNull();
+  });
+});

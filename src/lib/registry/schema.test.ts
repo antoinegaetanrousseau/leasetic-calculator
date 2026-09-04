@@ -26,7 +26,7 @@ describe('registrySearchResponseSchema (D-08 / D-10)', () => {
     const identity = toRegistryIdentity(first, '552100554');
     expect(identity).toEqual({
       legalName: 'ELECTRICITE DE FRANCE',
-      addressLine: '22 AVENUE DE WAGRAM 75008 PARIS 8',
+      addressLine: '22 AVENUE DE WAGRAM',
       postalCode: '75008',
       city: 'PARIS 8',
       legalForm: '5599',
@@ -46,7 +46,7 @@ describe('registrySearchResponseSchema (D-08 / D-10)', () => {
           nom_raison_sociale: 'ELECTRICITE DE FRANCE',
           champ_ajoute_en_amont: 'valeur inattendue',
           siege: {
-            adresse: '22 AVENUE DE WAGRAM 75008 PARIS 8',
+            adresse: '22 AVENUE DE WAGRAM',
             code_postal: '75008',
             libelle_commune: 'PARIS 8',
             nouveau_champ_siege: 'valeur inattendue',
@@ -122,6 +122,70 @@ describe('toRegistryIdentity (D-05 defence in depth, D-06)', () => {
       results: [{ siren: '552100554', nom_complet: 'ELECTRICITE DE FRANCE' }],
     }).results[0];
     expect(toRegistryIdentity(result, '552100554')?.legalName).toBe('ELECTRICITE DE FRANCE');
+  });
+
+  // ── addressLine: the street line ONLY (fix, 2026-09-04) ──────────────────
+  //
+  // `siege.adresse` is the full formatted address and already ends with the
+  // postcode and commune that `code_postal` and `libelle_commune` repeat, so
+  // storing it whole made the identity panel print the locality twice.
+  const parseSiege = (siege: Record<string, string>) =>
+    registrySearchResponseSchema.parse({ results: [{ siren: '552100554', siege }] }).results[0];
+
+  it('strips the trailing locality the API appends to siege.adresse', () => {
+    const identity = toRegistryIdentity(
+      parseSiege({
+        adresse: '14 RUE ROYALE 75008 PARIS',
+        code_postal: '75008',
+        libelle_commune: 'PARIS',
+      }),
+      '552100554',
+    );
+    expect(identity?.addressLine).toBe('14 RUE ROYALE');
+    // The columns it was overlapping with are untouched.
+    expect(identity?.postalCode).toBe('75008');
+    expect(identity?.city).toBe('PARIS');
+  });
+
+  it('handles a commune whose own name contains a space (PARIS 8)', () => {
+    const identity = toRegistryIdentity(
+      parseSiege({
+        adresse: '22 AVENUE DE WAGRAM 75008 PARIS 8',
+        code_postal: '75008',
+        libelle_commune: 'PARIS 8',
+      }),
+      '552100554',
+    );
+    expect(identity?.addressLine).toBe('22 AVENUE DE WAGRAM');
+  });
+
+  it('keeps a street that genuinely repeats the commune name mid-address', () => {
+    // Only an EXACT trailing match is stripped, so 'RUE DE LYON' survives in
+    // a LYON address rather than being mangled.
+    const identity = toRegistryIdentity(
+      parseSiege({
+        adresse: '3 RUE DE LYON 69002 LYON',
+        code_postal: '69002',
+        libelle_commune: 'LYON',
+      }),
+      '552100554',
+    );
+    expect(identity?.addressLine).toBe('3 RUE DE LYON');
+  });
+
+  it('an address that is ONLY the locality becomes null, never an empty string', () => {
+    const identity = toRegistryIdentity(
+      parseSiege({ adresse: '75008 PARIS', code_postal: '75008', libelle_commune: 'PARIS' }),
+      '552100554',
+    );
+    // '' would be stored as an empty column value and render as a blank row;
+    // the absence has to be NULL, same rule as every other field.
+    expect(identity?.addressLine).toBeNull();
+  });
+
+  it('leaves the address untouched when the API sends no postcode or commune', () => {
+    const identity = toRegistryIdentity(parseSiege({ adresse: '14 RUE ROYALE' }), '552100554');
+    expect(identity?.addressLine).toBe('14 RUE ROYALE');
   });
 
   it('returns null when the result carries a different siren than the one requested', () => {

@@ -100,6 +100,26 @@ function formatRegistryDay(day: string | null, lang: Lang): string | null {
   return formatDate(parsed, lang, { ...DATE_OPTS, timeZone: 'UTC' });
 }
 
+/**
+ * The street line, the postcode and the commune as one address.
+ *
+ * Rows synced BEFORE the `streetLineOf` fix in `registry/schema.ts` stored the
+ * registry's full formatted address in `address_line` — postcode and commune
+ * included — because that is what `siege.adresse` returns. Composing those
+ * blindly prints the locality twice. They self-heal on the next refresh, but
+ * they are in production today, so the tail is dropped when it is already
+ * there rather than making a partner click Actualiser to fix a display bug.
+ */
+function composeAddress(identity: RegistryIdentity): string | null {
+  const locality = joinPresent([identity.postalCode, identity.city], ' ');
+  const street = identity.addressLine === null ? null : identity.addressLine.trim();
+
+  if (street !== null && locality !== null && street.endsWith(locality)) {
+    return street;
+  }
+  return joinPresent([street, locality], ', ');
+}
+
 function buildRows(identity: RegistryIdentity, lang: Lang): FieldRow[] {
   const rows: FieldRow[] = [];
 
@@ -110,14 +130,7 @@ function buildRows(identity: RegistryIdentity, lang: Lang): FieldRow[] {
   };
 
   push('legal-name', 'clients.registry.field.legalName', identity.legalName);
-  push(
-    'address',
-    'clients.registry.field.address',
-    joinPresent(
-      [identity.addressLine, joinPresent([identity.postalCode, identity.city], ' ')],
-      ', ',
-    ),
-  );
+  push('address', 'clients.registry.field.address', composeAddress(identity));
   push('legal-form', 'clients.registry.field.legalForm', identity.legalForm);
   push(
     'activity',
