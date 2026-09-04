@@ -176,10 +176,10 @@ without the channel-conflict leak the ownership model exists to prevent.
 Phase 30's security review treats leakage as an *inference* property: counts
 and wording leak too.
 
-- [ ] **GAME-01**: A partner sees what moved in their own book recently — stage advances and proposals finalized, with when — read from the relationship timeline rather than from a second record of the same events kept for this feature.
-- [ ] **GAME-02**: A partner sees a streak of consecutive weeks in which their book made real progress, and can see what would break the current one before it breaks.
-- [ ] **GAME-03**: A partner earns badges for milestones reached in their own book, and the criterion for every badge — earned or not — is readable rather than guessed at.
-- [ ] **GAME-04**: No surface in this feature lets a partner learn anything about another partner's book, including by inference from a count, a rank, a total or a choice of wording. No leaderboard, ranking, peer benchmark or team aggregate exists.
+- [x] **GAME-01**: A partner sees what moved in their own book recently — stage advances and proposals finalized, with when — read from the relationship timeline rather than from a second record of the same events kept for this feature.
+- [x] **GAME-02**: A partner sees a streak of consecutive weeks in which their book made real progress, and can see what would break the current one before it breaks.
+- [x] **GAME-03**: A partner earns badges for milestones reached in their own book, and the criterion for every badge — earned or not — is readable rather than guessed at.
+- [x] **GAME-04**: No surface in this feature lets a partner learn anything about another partner's book, including by inference from a count, a rank, a total or a choice of wording. No leaderboard, ranking, peer benchmark or team aggregate exists.
 - [ ] **GAME-05**: A partner who ignores all of it is not penalised: their pipeline, conversion rate and follow-up list behave exactly as they did before this feature, and nothing is withheld from them for not engaging.
 
 ---

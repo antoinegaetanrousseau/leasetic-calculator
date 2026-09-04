@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-04T23:45:38.365Z"
+last_updated: "2026-09-04T23:56:37.220Z"
 last_activity: 2026-09-04
 progress:
   total_phases: 20
   completed_phases: 18
   total_plans: 97
-  completed_plans: 93
+  completed_plans: 94
   percent: 90
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 35 (sales-motivation) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
 reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
@@ -427,6 +427,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 34 P10 | 22min | 3 tasks | 8 files |
 | Phase 34 P12 | 21min | 3 tasks | 10 files |
 | Phase 35 P01 | ~20min | 2 tasks | 5 files |
+| Phase 35 P02 | ~20min | 2 tasks | 3 files |
 
 ## Decisions
 
@@ -557,6 +558,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 35]: Badge thresholds (operator-adjustable): clients bronze=3/silver=10/gold=25, wins bronze=1/silver=5/gold=15, consistency bronze=2/silver=6/gold=12
 - [Phase 35]: summarizeStreaks currentWeeks two-branch rule: alive if the previous week has progress and current week is empty; longestWeeks is an independent max-over-history scan so a broken current streak never erases the longest-ever consistency badge (D-07/A-5)
 - [Phase 35]: GAME-01/02/03 requirement checkboxes left OPEN after 35-01 (pure logic only, no query layer, no UI) — following this project's established FICHE/ACTV precedent (Phase 34), requirements mark-complete is deferred to the plan that actually grounds the observable behavior (35-05, MomentumCard wired onto the home page)
+- [Phase 35]: isProgressEvent excludes toStage='perdu' explicitly (D-11 gaming-route closure); no new index added over relationship_events_relationship_id_occurred_at_idx (near-empty table, D-23 holds)
 
 ### Blockers
 

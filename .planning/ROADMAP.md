@@ -712,11 +712,11 @@ une fiche client sont suivies ici." — with no icon, no warning colour and no
 conditional trigger. Changing the wizard to attach a client before finalizing is
 explicitly OUT of scope for this phase. This decision is settled; do not reopen.
 
-**Plans:** 1/5 plans executed
+**Plans:** 2/5 plans executed
 
 Plans:
 - [x] 35-01-PLAN.md — momentum domain logic: the one Europe/Paris Mon–Sun week window, the streak fold, the badge ladder, and the shared contracts both wave-2 plans compile against (wave 1)
-- [ ] 35-02-PLAN.md — owner-scoped read layer over `relationship_events`: movements, progress week keys, badge counts; owner predicate in the same statement, no write path (wave 2)
+- [x] 35-02-PLAN.md — owner-scoped read layer over `relationship_events`: movements, progress week keys, badge counts; owner predicate in the same statement, no write path (wave 2)
 - [ ] 35-03-PLAN.md — the 19 `dashboard.momentum.*` fr/en keys and the `MomentumCard` server component: one Card, three parts, two permanent footer lines (wave 2)
 - [ ] 35-04-PLAN.md — mutation-verified owner-isolation and week-boundary proof against real Postgres, skip-by-default on `DATABASE_URL_TEST` (wave 3)
 - [ ] 35-05-PLAN.md — home-page wiring with the admin gate at the call site, updated page tests, and human verification of the rendered surface (wave 4)
@@ -764,7 +764,7 @@ Plans:
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
-| 35. Sales Motivation | v1.7 | 1/5 | In Progress|  |
+| 35. Sales Motivation | v1.7 | 2/5 | In Progress|  |
 
 ---
 
