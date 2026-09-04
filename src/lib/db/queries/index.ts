@@ -106,3 +106,6 @@ export type {
   InsertRelationshipEventArgs,
   FollowUpRow,
 } from './relationship-events';
+
+// Phase 35 — owner-scoped momentum / streak / badge reads (GAME-01..05, CRM-02, D-03).
+export { listWeeklyMovementsForOwner, listProgressWeekKeysForOwner, getBadgeCountsForOwner } from './momentum';
