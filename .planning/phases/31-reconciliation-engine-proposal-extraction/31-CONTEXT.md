@@ -212,7 +212,7 @@ not hard-code "source = proposals", but no HubSpot-specific code belongs here.
 - **Extending the provenance column to `companies` and `client_relationships`** as well as
   `contacts` — surfaced but not decided; see open questions.
 
-## Open Questions (recorded, not guessed)
+## Questions recorded at planning time — all statuses resolved inline 2026-09-05 (Phase 36, HOUSE-02)
 
 These were surfaced during discussion and deliberately left for the planner or a follow-up
 conversation rather than silently assumed:
@@ -220,15 +220,35 @@ conversation rather than silently assumed:
 1. **Re-run idempotency.** What happens on a second *real* run over proposals already linked in
    Phase 30 or by a prior run? Proposals carrying a `client_relationship_id` could be skipped or
    re-checked. IMPORT-07 covers idempotency formally but lands in Phase 32.
+   — RESOLVED 2026-09-02
+   — see .planning/phases/31-reconciliation-engine-proposal-extraction/31-08-SUMMARY.md: a source
+   row already carrying `client_relationship_id` is skipped, confirmed against real data;
+   IMPORT-07's formal Phase-32 treatment never shipped because Phase 32 was never executed.
 2. **Canonical name selection.** When several proposals name the same company with different
    spellings that normalize identically, which spelling becomes `companies.name`? Oldest, newest,
    most frequent?
+   — RESOLVED 2026-09-02
+   — see .planning/phases/31-reconciliation-engine-proposal-extraction/31-02-SUMMARY.md: most
+   frequent raw spelling wins; ties break on earliest source-row timestamp, then lexicographic
+   ascending.
 3. **Engine granularity.** Does the engine run globally in one pass across all partners, or
    per-partner? This interacts with D-11: a global pass can see pairs no single partner can.
+   — RESOLVED 2026-09-02
+   — see .planning/phases/31-reconciliation-engine-proposal-extraction/31-02-SUMMARY.md: one
+   global pass across all partners — SIREN auto-merge is inherently cross-partner, so a
+   per-partner pass could never satisfy criterion 3.
 4. **Provenance scope.** Does D-08's column belong on `contacts` only, or on `companies` and
    `client_relationships` too?
+   — RESOLVED 2026-09-02
+   — see .planning/phases/31-reconciliation-engine-proposal-extraction/31-01-SUMMARY.md: the
+   `source` column was added to companies, client_relationships AND contacts, not contacts-only;
+   confirmed present in real data by 31-08-SUMMARY.md.
 5. **Contact conflict across provenance.** If an extracted contact's email later collides with a
    partner-entered one, is it merged or left alone?
+   — RESOLVED 2026-09-02
+   — see .planning/phases/31-reconciliation-engine-proposal-extraction/31-05-SUMMARY.md: the
+   extraction never touches a contact it did not create; a matching contact whose source is NULL is
+   left strictly alone and reported as a contact_conflicts_with_human_row skip.
 
 </deferred>
 

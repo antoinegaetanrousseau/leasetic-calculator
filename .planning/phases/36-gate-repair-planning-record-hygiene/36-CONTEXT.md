@@ -110,7 +110,7 @@ their own areas — do not reach into them.
 
   Four files, and **they use three different shapes** — verified 2026-09-05, do not assume
   a uniform `<open_questions>` tag: `08-CONTEXT.md` has a real `<open_questions>` XML block
-  (4 bullets, not 3); `06-CONTEXT.md` and `07-CONTEXT.md` use a `### Open questions` heading
+  (4 bullets, not 3); `06-CONTEXT.md` and `07-CONTEXT.md` use an Open-questions markdown heading
   nested inside `<canonical_refs>`; `31-CONTEXT.md` has **5** questions under a markdown
   heading inside its `<deferred>` block, with no `<open_questions>` tag at all. Note that 06/07/08
   moved into `.planning/milestones/v1.1-phases/` during the 2026-09-05 cleanup; only
