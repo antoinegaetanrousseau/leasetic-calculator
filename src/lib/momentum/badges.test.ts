@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BADGE_THRESHOLDS, deriveBadgeProgress, summarizeStreaks } from './badges';
+import type { MomentumBadgeCounts, StreakSummary } from './types';
 
 // Fixed clock for every case: current week key '2026-09-07', previous '2026-08-31'.
 const NOW_MS = Date.parse('2026-09-09T10:00:00Z');
@@ -146,6 +147,45 @@ describe('BADGE_THRESHOLDS', () => {
       wins: { bronze: 1, silver: 5, gold: 15 },
       consistency: { bronze: 2, silver: 6, gold: 12 },
     });
+  });
+
+  // GAP-03 / IN-02: frozen at both nesting levels — an outer-only freeze
+  // still leaves the inner axis objects mutable, so each level is asserted
+  // individually rather than via a loop that could pass over an empty list.
+  it('is frozen at the outer level', () => {
+    expect(Object.isFrozen(BADGE_THRESHOLDS)).toBe(true);
+  });
+
+  it('is frozen at the inner level for each of the three axes', () => {
+    expect(Object.isFrozen(BADGE_THRESHOLDS.clients)).toBe(true);
+    expect(Object.isFrozen(BADGE_THRESHOLDS.wins)).toBe(true);
+    expect(Object.isFrozen(BADGE_THRESHOLDS.consistency)).toBe(true);
+  });
+
+  it('throws on a top-level reassignment attempt (strict mode)', () => {
+    expect(() => {
+      (BADGE_THRESHOLDS as unknown as Record<string, unknown>).wins = {};
+    }).toThrow();
+  });
+
+  it('throws on a nested mutation attempt — the case a shallow-only freeze would fail', () => {
+    expect(() => {
+      (BADGE_THRESHOLDS.wins as unknown as Record<string, number>).gold = 999;
+    }).toThrow();
+  });
+
+  it('reads are unaffected: deriveBadgeProgress returns the same result before and after an attempted (throwing) mutation', () => {
+    const counts: MomentumBadgeCounts = { distinctClients: 5, wins: 2 };
+    const streaks: StreakSummary = { currentWeeks: 1, longestWeeks: 3 };
+
+    const before = deriveBadgeProgress(counts, streaks);
+
+    expect(() => {
+      (BADGE_THRESHOLDS.wins as unknown as Record<string, number>).gold = 999;
+    }).toThrow();
+
+    const after = deriveBadgeProgress(counts, streaks);
+    expect(after).toEqual(before);
   });
 });
 

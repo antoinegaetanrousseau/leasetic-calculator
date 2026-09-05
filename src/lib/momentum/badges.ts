@@ -19,12 +19,19 @@ import { shiftWeekKey, weekKeyFromMs } from './window';
  * Claude's Discretion): changing one is a constant edit here, never a
  * migration (D-03). Numbers are deliberately reachable early, given every
  * partner starts from zero history (D-14).
+ *
+ * GAP-03 / IN-02: frozen at BOTH nesting levels (the outer object AND each
+ * of the three axis objects) so an accidental mutation throws in strict
+ * mode instead of silently drifting for the life of the process — freezing
+ * only the outer object alone would leave e.g. `.wins` mutable. Changing a
+ * threshold is still a constant edit here, never a migration (D-03).
  */
-export const BADGE_THRESHOLDS: Record<BadgeAxisId, Record<BadgeTierId, number>> = {
-  clients: { bronze: 3, silver: 10, gold: 25 },
-  wins: { bronze: 1, silver: 5, gold: 15 },
-  consistency: { bronze: 2, silver: 6, gold: 12 },
-};
+export const BADGE_THRESHOLDS: Readonly<Record<BadgeAxisId, Readonly<Record<BadgeTierId, number>>>> =
+  Object.freeze({
+    clients: Object.freeze({ bronze: 3, silver: 10, gold: 25 }),
+    wins: Object.freeze({ bronze: 1, silver: 5, gold: 15 }),
+    consistency: Object.freeze({ bronze: 2, silver: 6, gold: 12 }),
+  });
 
 /** Axis order + tier order the ladder always renders in (D-06). */
 const AXIS_ORDER: readonly BadgeAxisId[] = ['clients', 'wins', 'consistency'];
