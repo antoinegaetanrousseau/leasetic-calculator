@@ -155,7 +155,11 @@ export default async function HomePage() {
 
       <RelanceCard rows={relanceRows} lang={lang} nowMs={nowMs} />
 
-      {!isAdmin && momentum && <MomentumCard
+      {/* GAP-03 / IN-01: `momentum` is already null for every admin, per the
+          role-gated ternary above that produces `momentumData` — the role
+          gate lives at the query, not at the render, so a second role check
+          here was redundant (35-REVIEW.md IN-01). */}
+      {momentum && <MomentumCard
         lang={lang}
         streakWeeks={momentum.streakWeeks}
         movements={momentum.movements}
