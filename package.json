@@ -20,6 +20,7 @@
     "check:migration-journal-sync": "bash scripts/check-migration-journal-sync.sh",
     "check:db-smoke-filter": "bash scripts/check-db-smoke-filter.sh",
     "check:local-db-branch": "bash scripts/check-local-db-branch.sh",
+    "probe:write-isolation": "tsx scripts/probe-write-isolation.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:migrate:dry-run": "tsx scripts/migrate.ts --dry-run",
     "db:backfill:coefficient-history": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-coefficient-history.ts",
