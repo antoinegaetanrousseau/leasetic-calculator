@@ -231,6 +231,16 @@ function createClient(
  *
  * The resolved host is deliberately NOT echoed: on a malformed URL it can be a
  * fragment of the credential.
+ *
+ * The comparison is case-insensitive on BOTH sides. `extractHostname` folds
+ * case (DNS is case-insensitive) but `postgres:` is not a WHATWG "special"
+ * scheme, so the driver preserves whatever case it was given — comparing the
+ * two on different footings made a benign DNS-case difference trip this
+ * assertion. That matters more than the inconvenience: this is the one message
+ * in the script that means "the guard and the connect path disagree, something
+ * is routing you somewhere unexpected", and an alarm that fires on benign input
+ * teaches the operator to dismiss exactly the signal that must never be
+ * dismissed.
  */
 async function openClient(
   varName: string,
@@ -240,7 +250,7 @@ async function openClient(
 ) {
   const sql = createClient(varName, url, connection);
   const resolved = sql.options.host;
-  if (resolved.length !== 1 || resolved[0] !== expectedHost) {
+  if (resolved.length !== 1 || resolved[0].toLowerCase() !== expectedHost) {
     console.error(
       `ERROR: the postgres driver resolved a different host for ${varName} than the `
       + 'allow-list accepted — refusing.',
