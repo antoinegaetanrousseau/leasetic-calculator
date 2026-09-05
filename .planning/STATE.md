@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 36 — Gate Repair & Planning-Record Hygiene (complete)
+Phase: 37 — CRM Stack Closure (context gathered)
 Plan: 06/06 complete
-Status: Executing — Phase 36 complete, Phase 37 (CRM Stack Closure) next
-Last activity: 2026-09-05 -- Phase 36 plan 06 executed (CLOSE-05 probe outcome folded into 29-VERIFICATION.md/29-SECURITY.md, 29-VALIDATION.md created, part 3 of 3 — Phase 36 complete)
+Status: Context gathered — awaiting `/gsd-plan-phase 37 --skip-ui`
+Last activity: 2026-09-05 — Phase 36 complete (verification passed); Phase 37 context gathered (6 decisions)
 
 **v1.8 phase order and why:**
 
