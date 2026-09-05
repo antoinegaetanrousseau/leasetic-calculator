@@ -106,10 +106,10 @@ stops existing.
 
 ### Housekeeping (HOUSE)
 
-- [ ] **HOUSE-01**: `npm run lint:check` reports zero errors on a clean tree. It currently reports
+- [x] **HOUSE-01**: `npm run lint:check` reports zero errors on a clean tree. It currently reports
   559, every one of them inside two stray `.claude/worktrees/*` copies that nobody is editing —
   a gate whose output has become safe to ignore.
-- [ ] **HOUSE-02**: A milestone audit no longer re-reports resolved v1.1-era questions — the
+- [x] **HOUSE-02**: A milestone audit no longer re-reports resolved v1.1-era questions — the
   `<open_questions>` blocks in `06-CONTEXT.md`, `07-CONTEXT.md`, `08-CONTEXT.md` and `31-CONTEXT.md`
   carry their real resolved-or-deferred status.
 - [ ] **HOUSE-03**: The stale `[~]` markers on CALC-07 and PROP-01 read `[x]`, and
@@ -172,8 +172,8 @@ stops existing.
 | OPS-02 | Phase 39 — Operational & Credential Gates | Pending |
 | OPS-03 | Phase 39 — Operational & Credential Gates | Pending |
 | OPS-04 | Phase 39 — Operational & Credential Gates | Pending |
-| HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
-| HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+| HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
+| HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
 | HOUSE-04 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
 
