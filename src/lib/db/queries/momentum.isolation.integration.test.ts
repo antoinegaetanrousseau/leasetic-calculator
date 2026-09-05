@@ -147,14 +147,21 @@ describe.skipIf(!shouldRun)(
       actorId: string;
       occurredAt: Date;
       body?: string | null;
-      payload?: Record<string, unknown> | null;
+      payload?: Record<string, string> | null;
     }): Promise<string> {
-      const payloadJson = opts.payload ? JSON.stringify(opts.payload) : null;
+      // Use `sql.json(...)`, not a pre-`JSON.stringify`'d string cast to
+      // `::jsonb` — the `postgres` driver JSON-encodes an object bind
+      // parameter exactly once when told it's JSON. Pre-stringifying and
+      // casting the resulting TEXT to `::jsonb` double-encodes it (the
+      // driver still JSON-encodes the already-JSON string), storing a jsonb
+      // STRING SCALAR rather than an object — `payload->>'toStage'` then
+      // silently returns NULL forever. Found and fixed while writing this
+      // suite; verify with a raw `SELECT payload` if this ever regresses.
       const rows = await sql<Array<{ id: string }>>`
         INSERT INTO relationship_events (client_relationship_id, kind, actor_id, occurred_at, body, payload)
         VALUES (
           ${opts.relationshipId}, ${opts.kind}, ${opts.actorId}, ${opts.occurredAt},
-          ${opts.body ?? null}, ${payloadJson}::jsonb
+          ${opts.body ?? null}, ${sql.json(opts.payload ?? null)}
         )
         RETURNING id
       `;
