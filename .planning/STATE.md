@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
-status: roadmapped
-last_updated: "2026-09-05T12:10:00.000Z"
-last_activity: 2026-09-05
+status: Roadmapped — awaiting `/gsd-plan-phase 36`
+last_updated: "2026-09-05T12:36:11.398Z"
+last_activity: 2026-09-05 — v1.8 ROADMAP written (5 phases, 36-40)
 progress:
-  total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 25
+  completed_phases: 7
+  total_plans: 53
+  completed_plans: 53
+  percent: 28
 ---
 
 # State — Matrice Commerciale
