@@ -56,7 +56,7 @@ stops existing.
   build** rather than `next dev` — leaving `33-VERIFICATION.md` at `status: passed`.
 - [ ] **CLOSE-04**: Phase 34 has a goal-backward `34-VERIFICATION.md` and a `34-REVIEW.md`; it
   shipped 13 plans with neither.
-- [ ] **CLOSE-05**: Phase 29 has a `29-VALIDATION.md` recording Nyquist coverage, and INFRA-05's
+- [x] **CLOSE-05**: Phase 29 has a `29-VALIDATION.md` recording Nyquist coverage, and INFRA-05's
   write-isolation is either empirically probed or its architectural-inference basis is recorded as
   the final answer with that limitation stated.
 - [ ] **CLOSE-06**: v1.6 is formally closed — a `MILESTONES.md` entry describing what actually
@@ -163,7 +163,7 @@ stops existing.
 | CLOSE-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
 | CLOSE-03 | Phase 37 — CRM Stack Closure | Pending |
 | CLOSE-04 | Phase 37 — CRM Stack Closure | Pending |
-| CLOSE-05 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+| CLOSE-05 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | CLOSE-06 | Phase 40 — Milestone Record Closure | Pending |
 | CLOSE-07 | Phase 40 — Milestone Record Closure | Pending |
 | CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
