@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T19:43:38.727Z"
-last_activity: 2026-09-05 -- Phase 37 planning complete
+last_updated: "2026-09-05T20:17:22.327Z"
+last_activity: 2026-09-05
 progress:
   total_phases: 25
   completed_phases: 8
   total_plans: 64
-  completed_plans: 59
+  completed_plans: 60
   percent: 32
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** v1.8 — Deferred Items. Roadmapped 2026-09-05: 5 phases (36-40), 21/21 requirements mapped. Closing the inherited v1.0-v1.7 backlog; no new capability.
+**Current focus:** Phase 37 — crm-stack-closure
 
 ## Current Position
 
-Phase: 37 — CRM Stack Closure (context gathered)
-Plan: 06/06 complete
+Phase: 37 (crm-stack-closure) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-09-05 -- Phase 37 planning complete
+Last activity: 2026-09-05
 
 **v1.8 phase order and why:**
 
@@ -473,6 +473,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 36 P04 | ~7min | 2 tasks | 2 files |
 | Phase 36 P05 | ~8min | 2 tasks | 1 file |
 | Phase 36 P06 | ~35min | 3 tasks | 4 files |
+| Phase 37 P01 | 25min | 3 tasks | 3 files |
 
 ## Decisions
 
@@ -622,6 +623,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 36]: DEV_HOST/MAIN_HOST in probe-write-isolation.ts declared with explicit `: string` type (not inferred literal type) — TypeScript otherwise narrows both after the sequential mismatch-and-exit guards and flags the devHost===mainHost transposition-equality check as a compile error (no overlap between literal types), even though it is the correct runtime check (Rule 1 auto-fix)
 - [Phase 36]: CLOSE-05 part 2 of 3 — operator ran scripts/probe-write-isolation.ts for real against the Neon development/main branches (D-36-03). Verdict ISOLATED, exit 0, sentinel isolation-probe-36-a72d43b9-7b3d-44c6-bab2-19a6b588665a deleted cleanly. A live (non-synthetic) attempt with the development URL in the PROBE_MAIN_URL slot was refused by the exact-hostname allow-list before any client was constructed — the first real-credential exercise of that gate. Recorded verbatim, credential-free, in 36-PROBE-TRANSCRIPT.md; production credential never reached the agent (hidden `read -rs` shell prompt, unset after run). 29-VERIFICATION.md/29-SECURITY.md/29-VALIDATION.md and the CLOSE-05 checkbox are explicitly plan 36-06's job, not touched here.
 - [Phase 36]: CLOSE-05 part 3 of 3 (D-36-03/D-36-04, plan 36-06, Phase 36 complete) — 29-VERIFICATION.md's Known Weak Link section, Score line, Human Verification Required and Gaps Summary amended additively with the 2026-09-05 ISOLATED verdict, residual re-classified WARNING→INFORMATIONAL; 29-SECURITY.md gained a dated `## T-29-06 Revisit` moving T-29-06 from accept to mitigate — empirically closed, attributed `Antoine (plan owner), 2026-09-05`, naming the second (SQL-level, Better-Auth-free) upgrade path distinct from the blocked grant-admin.ts path; 29-VALIDATION.md created (136 lines) with `nyquist_compliant: not-derivable` — Phase 29 ran with `workflow.research: false` and produced no 29-RESEARCH.md, so no Nyquist dimensions exist to reconstruct honestly, recorded as a measurement gap (not coverage gap) against the phase's 5/5 verified must-haves. All August 2026-08-31 text preserved verbatim (grep-count parity checked against pre-edit HEAD before each commit). CLOSE-05 flipped complete in REQUIREMENTS.md.
+- [Phase 37]: D-37-01: admin bypass expressed as isAdmin = role === 'admin' guarding the ownership check; !proposal stays an independent short-circuit so absence is never bypassable
+- [Phase 37]: D-37-02: ADMIN-09 envelope needed no adjustment for /proposals/[id] (structurally commission-free); the 20th grep gate is a regression guard, pinned with committed positive + negative non-vacuity controls
+- [Phase 37]: Consolidated tests/admin-09-grep-contracts.test.ts's two duplicate vi.mock('@/lib/auth/require', ...) factories into one exporting both requireAdmin and requireUser
 
 ### Blockers
 

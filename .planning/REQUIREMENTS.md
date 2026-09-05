@@ -71,7 +71,7 @@ stops existing.
 
 ### Functional Gaps (GAP)
 
-- [ ] **GAP-01**: An admin following the oversight click-through from a relationship to one of its
+- [x] **GAP-01**: An admin following the oversight click-through from a relationship to one of its
   proposals reaches the proposal detail page instead of a 404, with an explicit recorded decision on
   whether the ADMIN-09 commission-invisibility envelope needs adjusting for that surface (it renders
   more inputs than the row/list view).
@@ -167,7 +167,7 @@ stops existing.
 | CLOSE-06 | Phase 40 — Milestone Record Closure | Pending |
 | CLOSE-07 | Phase 40 — Milestone Record Closure | Pending |
 | CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
-| GAP-01 | Phase 37 — CRM Stack Closure | Pending |
+| GAP-01 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
 | GAP-03 | Phase 37 — CRM Stack Closure | Pending |
 | GAP-04 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
