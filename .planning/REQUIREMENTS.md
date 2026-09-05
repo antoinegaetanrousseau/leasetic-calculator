@@ -155,4 +155,36 @@ stops existing.
 
 | Requirement | Phase | Status |
 |---|---|---|
-| _(filled by the roadmapper)_ | | |
+| CLOSE-01 | Phase 37 — CRM Stack Closure | Pending |
+| CLOSE-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
+| CLOSE-03 | Phase 37 — CRM Stack Closure | Pending |
+| CLOSE-04 | Phase 37 — CRM Stack Closure | Pending |
+| CLOSE-05 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+| CLOSE-06 | Phase 40 — Milestone Record Closure | Pending |
+| CLOSE-07 | Phase 40 — Milestone Record Closure | Pending |
+| CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
+| GAP-01 | Phase 37 — CRM Stack Closure | Pending |
+| GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
+| GAP-03 | Phase 37 — CRM Stack Closure | Pending |
+| GAP-04 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
+| GAP-05 | Phase 39 — Operational & Credential Gates | Pending |
+| OPS-01 | Phase 39 — Operational & Credential Gates | Pending |
+| OPS-02 | Phase 39 — Operational & Credential Gates | Pending |
+| OPS-03 | Phase 39 — Operational & Credential Gates | Pending |
+| OPS-04 | Phase 39 — Operational & Credential Gates | Pending |
+| HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+| HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+| HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+| HOUSE-04 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+
+**Coverage: 21/21 requirements mapped to exactly one phase — no orphans, no duplicates.**
+
+| Phase | Requirements | Count |
+|---|---|---|
+| 36 — Gate Repair & Planning-Record Hygiene | HOUSE-01, HOUSE-02, HOUSE-03, HOUSE-04, CLOSE-05 | 5 |
+| 37 — CRM Stack Closure | CLOSE-01, CLOSE-03, CLOSE-04, GAP-01, GAP-03 | 5 |
+| 38 — Shell, Dialogs & Visual Conventions | CLOSE-02, CLOSE-08, GAP-02, GAP-04 | 4 |
+| 39 — Operational & Credential Gates | OPS-01, OPS-02, OPS-03, OPS-04, GAP-05 | 5 |
+| 40 — Milestone Record Closure | CLOSE-06, CLOSE-07 | 2 |
+
+*Traceability filled 2026-09-05 by the roadmapper. Phase details in `.planning/ROADMAP.md`.*

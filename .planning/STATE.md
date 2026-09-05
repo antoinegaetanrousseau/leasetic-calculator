@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
-status: planning
-last_updated: "2026-09-05T11:34:06.042Z"
+status: roadmapped
+last_updated: "2026-09-05T12:10:00.000Z"
 last_activity: 2026-09-05
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,14 +23,27 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Milestone complete
+**Current focus:** v1.8 — Deferred Items. Roadmapped 2026-09-05: 5 phases (36-40), 21/21 requirements mapped. Closing the inherited v1.0-v1.7 backlog; no new capability.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 36 — Gate Repair & Planning-Record Hygiene (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-09-05 — Milestone v1.8 started
+Status: Roadmapped — awaiting `/gsd-plan-phase 36`
+Last activity: 2026-09-05 — v1.8 ROADMAP written (5 phases, 36-40)
+
+**v1.8 phase order and why:**
+
+| Phase | Requirements | Why here |
+|---|---|---|
+| 36 — Gate Repair & Planning-Record Hygiene | HOUSE-01..04, CLOSE-05 | FIRST — every later phase proves itself against `lint:check`, which currently reports 559 phantom errors from stray worktrees |
+| 37 — CRM Stack Closure | CLOSE-01, CLOSE-03, CLOSE-04, GAP-01, GAP-03 | The v1.6/v1.7 surfaces; CLOSE-01's UAT test 9 walks straight into GAP-01's `/proposals/[id]` dead end, so they close together |
+| 38 — Shell, Dialogs & Visual Conventions | CLOSE-02, CLOSE-08, GAP-02, GAP-04 | One light+dark operator walk over the shell, dialogs and padding sites, with the two CSS/primitive gaps fixed in the same pass |
+| 39 — Operational & Credential Gates | OPS-01..04, GAP-05 | The rotation walk is the evidence that `last_login_at` writes; OPS-03/04 close on a recorded decision when the external party is silent |
+| 40 — Milestone Record Closure | CLOSE-06, CLOSE-07 | LAST — it records what phases 36-39 did, and archives phases 28-35 |
+
+**Do not touch `.planning/phases/28..35` before Phase 40.** Archiving them is CLOSE-07's job,
+performed inside the milestone.
 
 ## Deferred Items
 
@@ -145,6 +158,8 @@ v1.1 ████████████████████ 6/6 phases com
 ## Accumulated Context
 
 ### Roadmap Evolution
+
+- v1.8 (Deferred Items) roadmapped 2026-09-05 — 5 phases, 36-40. Numbering continues from Phase 35: Phase 32 was removed and Phase 31.1 was an insertion, so neither advances the count. Human-verification items were deliberately NOT pooled into one verification phase — each attaches to the phase that fixes the surface it verifies (operator decision).
 
 - Phase 31.1 inserted after Phase 31: App Shell Refresh — sidebar converges on the vendored app-shell-1 block (fixed edge toggle, fixes the collapsed-rail logo/chevron stack), breadcrumbs in the shell header via getRouteMeta, BrandLogo 190px -> ~140px, and a named container-radius token that closes the 18px/24px seam Phase 31 opened. Split out of /gsd-ui-phase 31 by operator decision so a global visual refresh stays out of the milestone's riskiest data-migration phase (Phase 16 / Phase 28 precedent).
 

@@ -10,6 +10,7 @@
 - ✅ **v1.5 — Proposal List Actions & Pill Fix** — Phases 26-27 (shipped 2026-05-30) — see `milestones/v1.5-ROADMAP.md`
 - ✅ **v1.6 — CRM Foundation** — Phases 29-34 (shipped 2026-09-04) — CRM registry, proposal reconciliation, pipeline, activity — *never formally archived; captured in `milestones/v1.7-ROADMAP.md`*
 - ✅ **v1.7 — Sales Motivation** — Phase 35 (shipped 2026-09-05) — momentum, weekly streaks and a 3×3 badge ladder derived from the activity timeline; own-book only by construction (CRM-02) — see `milestones/v1.7-ROADMAP.md`
+- 🚧 **v1.8 — Deferred Items** — Phases 36-40 (started 2026-09-05) — closes the inherited v1.0-v1.7 backlog: verification debt, functional gaps, operational gates, housekeeping. No new capability.
 
 ---
 
@@ -118,6 +119,21 @@ continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on 
 - [x] **Phase 35: Sales Motivation** — momentum, streaks and badges built on Phase 34's event timeline; own-book only, no cross-partner comparison (completed 2026-09-05)
 
 </details>
+
+### 🚧 v1.8 — Deferred Items (Phases 36-40) — IN PROGRESS
+
+Close the accumulated deferred backlog from v1.0-v1.7 — verification debt, known functional gaps,
+and the pre-onboarding operational gates — so that no shipped milestone still carries an unclosed
+item. No new table, no new surface, no formula change. Human-verification items attach to the phase
+that fixes the related surface rather than being pooled into one verification phase. Phase numbering
+continues from Phase 35 (Phase 32 was removed and Phase 31.1 was an insertion — neither advances
+the count).
+
+- [ ] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had
+- [ ] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404
+- [ ] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose
+- [ ] **Phase 39: Operational & Credential Gates** — the shared admin password retired, `last_login_at` actually written, `trustedOrigins` explicit, OVH and retention closable by a recorded decision
+- [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived
 
 ---
 
@@ -727,6 +743,150 @@ Plans:
 
 ---
 
+### Phase 36: Gate Repair & Planning-Record Hygiene
+
+**Milestone:** v1.8 — Deferred Items
+**Goal:** The gates and records that every later phase relies on to prove itself clean become
+trustworthy again — `lint:check` reports only real findings, no audit re-reports something already
+resolved, and Phase 29's coverage claim stops being an assertion with no record behind it.
+**Depends on:** Phase 35 (v1.7 complete). Nothing in this phase depends on the rest of v1.8; the rest
+of v1.8 depends on this one, because every later phase closes by showing a clean gate.
+**Requirements:** HOUSE-01, HOUSE-02, HOUSE-03, HOUSE-04, CLOSE-05
+**Success Criteria** (what must be TRUE):
+
+  1. `npm run lint:check` on a clean tree exits zero with no errors reported — the two stray
+     `.claude/worktrees/*` copies contribute none of the 559 current findings, and whatever removes
+     them (deletion or an ignore rule) is written down so a future worktree cannot silently
+     reintroduce the same noise.
+  2. A milestone audit run across `.planning/` reports no open v1.1-era question: the
+     `<open_questions>` blocks in `06-CONTEXT.md`, `07-CONTEXT.md`, `08-CONTEXT.md` and
+     `31-CONTEXT.md` each carry their real resolved-or-deferred status with the outcome named.
+  3. CALC-07 and PROP-01 read `[x]` rather than `[~]`, and `scripts/seed-partner-launch.ts` is
+     reachable through an npm script rather than by path.
+  4. The 18 dead vendored ReUI blocks (816K, zero imports) carry a dated keep-or-delete decision with
+     its rationale, superseding the provisional "Delete nothing yet" of 2026-08-31 — and if the call
+     is delete, the deletion is recorded as separate work rather than performed here.
+  5. `29-VALIDATION.md` exists and records Phase 29's Nyquist coverage, and INFRA-05's
+     write-isolation is either empirically probed against the Neon `development` branch or recorded
+     as an architectural inference that is the final answer, with that limitation stated in the file.
+
+**Plans:** TBD
+
+### Phase 37: CRM Stack Closure
+
+**Milestone:** v1.8 — Deferred Items
+**Goal:** Every surface v1.6 and v1.7 shipped — client book, admin oversight, pipeline board, fiche
+client, momentum — is walked, evidenced and free of the gaps its own phase deferred, including the
+`/proposals/[id]` dead end that Phase 30 assigned to "Phase 33/34" and neither picked up.
+**Depends on:** Phase 36 (a clean `lint:check` is how this phase's code changes prove themselves)
+**Requirements:** CLOSE-01, CLOSE-03, CLOSE-04, GAP-01, GAP-03
+**Success Criteria** (what must be TRUE):
+
+  1. An admin following the oversight click-through from a relationship to one of its proposals
+     reaches the proposal detail page instead of a 404, and a recorded decision states whether the
+     ADMIN-09 commission-invisibility envelope needs adjusting for a surface that renders more inputs
+     than the row/list view — with the 19-gate grep-contract suite green either way.
+  2. `30-UAT.md` reads `pending: 0`: scenarios 2 (Clients nav per role), 9 (admin relationship
+     detail), 10 (sales-role parity and admin exclusion) and 12 (no regression) are walked and
+     recorded, with scenario 9 walking the click-through of criterion 1 rather than the dead end it
+     hits today.
+  3. `33-VERIFICATION.md` reads `status: passed`: a Space → ArrowRight → Space keyboard drag on the
+     pipeline board produces exactly one write, and D-08's gate is confirmed against a **production
+     build**, not `next dev`.
+  4. Phase 34 has a goal-backward `34-VERIFICATION.md` and a `34-REVIEW.md` — it shipped 13 plans
+     with neither.
+  5. Phase 35's two INFO findings are gone: the redundant `!isAdmin` check beside an already
+     null-gated `momentum` value is removed, and `BADGE_THRESHOLDS` is no longer exported as a
+     mutable object — with the momentum card rendering identically before and after.
+
+**Plans:** TBD
+
+**UI hint:** yes
+
+### Phase 38: Shell, Dialogs & Visual Conventions
+
+**Milestone:** v1.8 — Deferred Items
+**Goal:** The app shell, its dialogs and its spacing conventions hold in both themes and both
+languages — verified by the operator walk that Phase 28 and Phase 31.1 both left owing, and with the
+two CSS/primitive gaps that walk keeps re-surfacing actually fixed.
+**Depends on:** Phase 36 (clean lint gate). Independent of Phase 37 — different surfaces, no shared
+files.
+**Requirements:** CLOSE-02, CLOSE-08, GAP-02, GAP-04
+**Success Criteria** (what must be TRUE):
+
+  1. `31.1-VERIFICATION.md` reads `status: passed`: on first paint in dark theme the shell renders
+     the six pinned Colibris tokens with no flash of light chrome, and the PDF/print surface still
+     renders white-on-`#1a2832` in dark mode.
+  2. Phase 28's browser-verification backlog is walked in light **and** dark with each result
+     recorded — wizard step 1, `/proposals`, coefficients history, `/parametres`, and the six
+     `PartnersList` / `LcReferencesList` padding sites.
+  3. Every icon-only dialog close control announces an accessible name in the viewer's language —
+     the shared `dialog.tsx` primitive no longer hardcodes English `"Close"` in a French-default
+     product, verified in FR and EN.
+  4. The "Charger plus" pagination control and `.btn-out` agree with the app's declared conventions —
+     on-grid padding and the standard focus treatment — or `UI-CONVENTIONS.md` records the `0.6rem`
+     vertical padding and the third hardcoded focus shadow as a dated, deliberate exception.
+
+**Plans:** TBD
+
+**UI hint:** yes
+
+### Phase 39: Operational & Credential Gates
+
+**Milestone:** v1.8 — Deferred Items
+**Goal:** The gates standing between this app and its first real partner are closed — individually
+held admin credentials, a login that actually records itself, an explicit CSRF position, and dated
+answers on OVH and retention — with the two externally dependent items closable by a recorded
+decision rather than left hanging on someone else's reply.
+**Depends on:** Phase 36 (clean lint gate). Ordered after Phases 37 and 38 so the credential rotation
+runs against the finished surfaces, matching the Phase 21 precedent.
+**Requirements:** OPS-01, OPS-02, OPS-03, OPS-04, GAP-05
+**Success Criteria** (what must be TRUE):
+
+  1. Neither admin can sign in with the shared `leasetic2026` password, and each holds an individual
+     strong credential — evidenced by a successful sign-in with the new credential and a failed one
+     with the old.
+  2. The admin partners list shows a real last-login date for an account that has just signed in:
+     `users.last_login_at` is **written** at login, not only read, so rows stop showing `—`. The
+     rotation walk in criterion 1 is the evidence.
+  3. Better Auth `trustedOrigins` is explicitly configured rather than left to its default, and the
+     "SameSite=Lax + `__Secure-` cookies are the real CSRF defence" reasoning inherited since v1.2 is
+     either re-affirmed with a date or revised — with Phase 20's middleware Origin gate still
+     rejecting an untrusted Origin.
+  4. OPS-03 is closed either way: `scripts/smoke-ovh.ts` has run against a real OVH target with its
+     result recorded, **or** — if no target is provided — a dated decision re-dates or cancels the
+     September-2026 cutover and names who owns the next step. An unanswered external party leaves
+     this requirement closed, not open.
+  5. OPS-04 is closed either way: DATA-11's 10-year PDF retention carries Thomas's written legal
+     sign-off, **or** — absent his reply — a dated interim decision naming who accepts the risk and
+     until when. Same rule: silence from the external party still closes the item.
+
+**Plans:** TBD
+
+### Phase 40: Milestone Record Closure
+
+**Milestone:** v1.8 — Deferred Items
+**Goal:** The planning record tells the truth about what shipped — v1.6 formally closed and audited
+against its finished state rather than its half-built one, Phase 28 attributed, and phases 28-35
+archived where the tooling expects to find them.
+**Depends on:** Phases 36-39 — this phase records what they did, so it cannot run before them.
+**Requirements:** CLOSE-06, CLOSE-07
+**Success Criteria** (what must be TRUE):
+
+  1. `MILESTONES.md` carries a v1.6 entry describing what actually shipped (Phases 29, 30, 31, 31.1,
+     33, 34 — Phase 32 removed), and both `milestones/v1.6-ROADMAP.md` and
+     `milestones/v1.6-REQUIREMENTS.md` snapshots are present.
+  2. A v1.6 milestone audit has been re-run against the finished milestone — the existing one was
+     written on 2026-09-01, before Phases 31/33/34 — and its findings are recorded.
+  3. `ROADMAP.md` no longer shows v1.6 as IN PROGRESS while its own milestone list calls it shipped,
+     and Phase 28 carries a milestone in the phase table instead of appearing nowhere in it.
+  4. Phases 28-35 are archived into their `milestones/v{X.Y}-phases/` directories, and
+     `.planning/phases/` holds only the phases a current or future milestone still needs.
+
+**Plans:** TBD
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -765,7 +925,14 @@ Plans:
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
+| 36. Gate Repair & Planning-Record Hygiene | v1.8 | 0/? | Not started | - |
+| 37. CRM Stack Closure | v1.8 | 0/? | Not started | - |
+| 38. Shell, Dialogs & Visual Conventions | v1.8 | 0/? | Not started | - |
+| 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
+| 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 
 ---
 
 *Last updated: 2026-08-31 — v1.6 ROADMAP created: 6 phases (29-34), 31/31 requirements mapped, 100% coverage. Phase 29 RESCOPED 2026-08-31 — the Neon 3-branch split already shipped in Phase 20 (the v1.3 carry-forward that claimed otherwise was stale); Phase 29 is now a small CI-filter repair and is NOT a blocking prerequisite. Phase 32 (HubSpot Import) has an open dependency on the unreadable `.xlsx` export file gating detailed design only. Next: `/gsd-plan-phase 29`.*
+
+*Updated 2026-09-05 — v1.8 (Deferred Items) roadmap appended: 5 phases (36-40), 21/21 requirements mapped, 100% coverage. Phase numbering continues from 35 (32 removed, 31.1 inserted — neither advances the count). HOUSE-01 lands first because every later phase proves itself against `lint:check`; CLOSE-06/07 land last because they record what the earlier phases did. Human-verification items attach to the phase that fixes the related surface. Next: `/gsd-plan-phase 36`.*
