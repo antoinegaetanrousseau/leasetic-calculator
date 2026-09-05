@@ -115,6 +115,24 @@ function safeErrorMessage(err: unknown): string {
   return raw.replace(/postgres:\/\/[^\s]*/g, '[redacted]');
 }
 
+/**
+ * Construct a `postgres` client with construction itself inside a `try`.
+ * `postgres()` parses the URL EAGERLY (`parseOptions` → `parseUrl` → `new URL`),
+ * so it can throw synchronously. Left unguarded, that throw escapes `main()` as
+ * an unhandled rejection and Node's default handler inspects the error object —
+ * and `ERR_INVALID_URL` carries the offending string on an own enumerable
+ * `input` property, which the inspector dumps verbatim, password and all. Only
+ * `err.message` is ever printed here, via `safeErrorMessage`.
+ */
+function createClient(varName: string, url: string) {
+  try {
+    return postgres(url, { max: 1, prepare: false, onnotice: () => {} });
+  } catch (err) {
+    console.error(`ERROR: the postgres driver rejected ${varName}: ${safeErrorMessage(err)}`);
+    process.exit(1);
+  }
+}
+
 async function main(): Promise<void> {
   const devUrl = process.env.PROBE_DEV_URL;
   const mainUrl = process.env.PROBE_MAIN_URL;
@@ -166,8 +184,8 @@ async function main(): Promise<void> {
   console.log(`main host: ${mainHost}`);
   console.log(`sentinel:  ${sentinel}`);
 
-  const devSql = postgres(devUrl, { max: 1, prepare: false, onnotice: () => {} });
-  const mainSql = postgres(mainUrl, { max: 1, prepare: false, onnotice: () => {} });
+  const devSql = createClient('PROBE_DEV_URL', devUrl);
+  const mainSql = createClient('PROBE_MAIN_URL', mainUrl);
 
   let exitCode = 1;
 
@@ -240,4 +258,12 @@ async function main(): Promise<void> {
   process.exit(exitCode);
 }
 
-main();
+// Terminal handler. `main()` must never be invoked bare: Node's default
+// unhandled-rejection handler prints the whole error OBJECT, and postgres.js
+// errors can carry the connection string on a property (`input`, `cause`, …).
+// Everything that escapes `main()` is funnelled through `safeErrorMessage`,
+// which prints the message text only.
+main().catch((err: unknown) => {
+  console.error(`FATAL: ${safeErrorMessage(err)}`);
+  process.exit(1);
+});
