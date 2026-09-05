@@ -780,7 +780,7 @@ of v1.8 depends on this one, because every later phase closes by showing a clean
   5. `29-VALIDATION.md` exists and records Phase 29's Nyquist coverage, and INFRA-05's
      write-isolation is either empirically probed against the Neon `development` branch or recorded
      as an architectural inference that is the final answer, with that limitation stated in the file.
-**Plans:** 3/6 plans executed
+**Plans:** 4/6 plans executed
 **Wave 1**
 
 - [x] 36-01-PLAN.md — HOUSE-01 lint-gate closure by evidence + HOUSE-02 in-place annotation of the four stale CONTEXT open-question blocks, plus the heading retitle in `31-CONTEXT.md` and the prose fix in `36-CONTEXT.md` that clear the real audit detector (wave 1)
@@ -789,7 +789,7 @@ of v1.8 depends on this one, because every later phase closes by showing a clean
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 36-04-PLAN.md — CLOSE-05a: `scripts/probe-write-isolation.ts` sentinel probe + `probe:write-isolation` entry, with all D-36-03 safety gates self-tested synthetically (wave 2)
+- [x] 36-04-PLAN.md — CLOSE-05a: `scripts/probe-write-isolation.ts` sentinel probe + `probe:write-isolation` entry, with all D-36-03 safety gates self-tested synthetically (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -966,7 +966,7 @@ archived where the tooling expects to find them.
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
-| 36. Gate Repair & Planning-Record Hygiene | v1.8 | 3/6 | In Progress|  |
+| 36. Gate Repair & Planning-Record Hygiene | v1.8 | 4/6 | In Progress|  |
 | 37. CRM Stack Closure | v1.8 | 0/? | Not started | - |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 0/? | Not started | - |
 | 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
