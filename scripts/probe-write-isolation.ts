@@ -78,15 +78,35 @@ function usage(): void {
   );
 }
 
-// Substring between '@' and the following '/' or ':' — the TypeScript
-// equivalent of check-local-db-branch.sh's `sed -E 's#^[^@]*@##; s#[/:].*$##'`.
+// A bare DNS hostname as it appears in a Neon pooled URL: ASCII letters,
+// digits, dots and hyphens only. Anything else — a comma-separated multihost
+// list, a bracketed IPv6 literal, a percent-escape, a stray fragment of a
+// credential — is refused rather than reported back to the operator.
+const HOSTNAME_RE = /^[a-z0-9.-]+$/;
+
+// Parse with the platform URL parser — the SAME parser the postgres driver
+// uses (`postgres/src/index.js:543` calls `new URL`). This is deliberately NOT
+// the TypeScript equivalent of check-local-db-branch.sh's
+// `sed -E 's#^[^@]*@##; s#[/:].*$##'` any more: that hand-rolled form splits on
+// the FIRST '@', so a password legally containing '@' made the "hostname" a
+// substring beginning with the tail of the password, which was then echoed
+// into an error message (a credential leak), and a string with no '://' at all
+// yielded a plausible-looking hostname that the driver never connected to (a
+// false PASS). A null return here takes the "could not parse a hostname"
+// refusal branch, which echoes no input-derived text at all.
 function extractHostname(url: string): string | null {
-  const atIndex = url.indexOf('@');
-  if (atIndex === -1) return null;
-  const rest = url.slice(atIndex + 1);
-  const end = rest.search(/[/:]/);
-  const host = end === -1 ? rest : rest.slice(0, end);
-  return host || null;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== 'postgres:' && parsed.protocol !== 'postgresql:') return null;
+  // `postgres:` is not a WHATWG "special" scheme, so the host is parsed as an
+  // opaque host and is NOT case-folded — fold it here so an operator pasting a
+  // URL with any uppercase in the host is not refused over DNS case.
+  const host = parsed.hostname.toLowerCase();
+  return host && HOSTNAME_RE.test(host) ? host : null;
 }
 
 /** Strip a caught error down to a bounded, credential-free message. */
