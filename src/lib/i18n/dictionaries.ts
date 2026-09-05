@@ -1287,6 +1287,16 @@ export const dictionaries = {
     'dashboard.momentum.badge.entry.clients': '{0} ({1} client(s))',
     'dashboard.momentum.badge.entry.wins': '{0} ({1} victoire(s))',
     'dashboard.momentum.badge.entry.consistency': '{0} ({1} semaine(s))',
+    // Phase 35 D-19a (gamified visual treatment) — the labels the restyled
+    // card needs. None of them is comparative: GAME-04 forbids any wording
+    // that implies another partner exists, and `MomentumCard.test.tsx`
+    // guards the vocabulary.
+    'dashboard.momentum.streak.label': 'Série en cours',
+    'dashboard.momentum.badge.sectionLabel': 'Vos paliers',
+    'dashboard.momentum.badge.progress': '{0} / {1}',
+    'dashboard.momentum.badge.progressLabel': '{0} : {1} sur {2}.',
+    'dashboard.momentum.badge.allEarned': 'Tous les paliers atteints',
+    'dashboard.momentum.badge.earnedMarker': 'Atteint',
     'dashboard.momentum.disclosure':
       'Seules les propositions démarrées depuis une fiche client sont suivies ici.',
   },
@@ -2457,6 +2467,12 @@ export const dictionaries = {
     'dashboard.momentum.badge.entry.clients': '{0} ({1} client(s))',
     'dashboard.momentum.badge.entry.wins': '{0} ({1} win(s))',
     'dashboard.momentum.badge.entry.consistency': '{0} ({1} week(s))',
+    'dashboard.momentum.streak.label': 'Current streak',
+    'dashboard.momentum.badge.sectionLabel': 'Your tiers',
+    'dashboard.momentum.badge.progress': '{0} / {1}',
+    'dashboard.momentum.badge.progressLabel': '{0}: {1} of {2}.',
+    'dashboard.momentum.badge.allEarned': 'All tiers reached',
+    'dashboard.momentum.badge.earnedMarker': 'Reached',
     'dashboard.momentum.disclosure': 'Only proposals started from a client page are tracked here.',
   },
 } as const;
