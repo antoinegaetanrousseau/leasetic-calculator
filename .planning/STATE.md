@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
-status: executing
-last_updated: "2026-09-05T20:59:25.178Z"
+status: verifying
+last_updated: "2026-09-05T23:16:26.065Z"
 last_activity: 2026-09-05
 progress:
   total_phases: 25
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 64
-  completed_plans: 63
-  percent: 32
+  completed_plans: 64
+  percent: 36
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 37 (crm-stack-closure) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-05
 
 **v1.8 phase order and why:**
@@ -477,6 +477,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 37 P02 | 15min | 3 tasks | 3 files |
 | Phase 37 P03 | ~55min | 2 tasks | 2 files |
 | Phase 37 P04 | 50min | 2 tasks | 1 files |
+| Phase 37 P05 | ~40min | 1 tasks | 3 files |
 
 ## Decisions
 
@@ -633,6 +634,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 37]: D-37-05 / IN-02: froze BADGE_THRESHOLDS at both nesting levels via nested Object.freeze calls plus a Readonly nested Record type
 - [Phase 37]: Phase 34 verification (37-03): status passed, 10/10 must-haves, verified_at_commit 5753d22 — The solution-users-2 artifact discrepancy (11 files claimed by 34-03-SUMMARY.md, absent from disk) was traced to Phase 36's own recorded HOUSE-04 deletion, not a Phase 34 gap.
 - [Phase 37]: 34-REVIEW.md landed (0 Critical / 1 Warning / 1 Info); CLOSE-04 marked complete now that both 34-VERIFICATION.md and 34-REVIEW.md exist.
+- [Phase 37]: D-37-04 walk performed by agent browser automation, at operator's explicit direction, not human observation
+- [Phase 37]: 33-VERIFICATION.md item 5 (migration 0009 on main/preview) explicitly restated as open, non-blocking deferral owned by Phase 40/CLOSE-06, not silently dropped when status moved to passed
+- [Phase 37]: Admin PDF route defect found during the walk (missing D-37-01 bypass) fixed in commit 7999759 at the operator's explicit decision
 
 ### Blockers
 

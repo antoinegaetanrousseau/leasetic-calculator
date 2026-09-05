@@ -45,13 +45,13 @@ stops existing.
 
 ### Closure & Verification Debt (CLOSE)
 
-- [ ] **CLOSE-01**: Phase 30's four pending UAT scenarios (2 — Clients nav per role; 9 — admin
+- [x] **CLOSE-01**: Phase 30's four pending UAT scenarios (2 — Clients nav per role; 9 — admin
   relationship detail; 10 — sales-role parity and admin exclusion; 12 — no regression) are walked
   and recorded, leaving `30-UAT.md` at `pending: 0`.
 - [ ] **CLOSE-02**: Phase 31.1's two human checks are performed — the dark-theme shell renders the
   six pinned Colibris tokens with no flash of light chrome on first paint, and the PDF surface still
   renders white-on-`#1a2832` in dark mode — leaving `31.1-VERIFICATION.md` at `status: passed`.
-- [ ] **CLOSE-03**: Phase 33's residual human items are walked — the Space → ArrowRight → Space
+- [x] **CLOSE-03**: Phase 33's residual human items are walked — the Space → ArrowRight → Space
   keyboard drag produces exactly one write, and D-08's gate is confirmed against a **production
   build** rather than `next dev` — leaving `33-VERIFICATION.md` at `status: passed`.
 - [x] **CLOSE-04**: Phase 34 has a goal-backward `34-VERIFICATION.md` and a `34-REVIEW.md`; it
@@ -159,9 +159,9 @@ stops existing.
 
 | Requirement | Phase | Status |
 |---|---|---|
-| CLOSE-01 | Phase 37 — CRM Stack Closure | Pending |
+| CLOSE-01 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
-| CLOSE-03 | Phase 37 — CRM Stack Closure | Pending |
+| CLOSE-03 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-04 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-05 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | CLOSE-06 | Phase 40 — Milestone Record Closure | Pending |

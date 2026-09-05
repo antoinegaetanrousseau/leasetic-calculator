@@ -130,7 +130,7 @@ continues from Phase 35 (Phase 32 was removed and Phase 31.1 was an insertion �
 the count).
 
 - [x] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had (completed 2026-09-05)
-- [ ] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404
+- [x] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404 (completed 2026-09-05)
 - [ ] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose
 - [ ] **Phase 39: Operational & Credential Gates** — the shared admin password retired, `last_login_at` actually written, `trustedOrigins` explicit, OVH and retention closable by a recorded decision
 - [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived
@@ -830,7 +830,7 @@ client, momentum — is walked, evidenced and free of the gaps its own phase def
      null-gated `momentum` value is removed, and `BADGE_THRESHOLDS` is no longer exported as a
      mutable object — with the momentum card rendering identically before and after.
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 Plans:
 **Wave 1**
 
@@ -841,7 +841,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 37-05-PLAN.md — wave 2 — CLOSE-01 + CLOSE-03: one consolidated operator walk of six items after all code lands; `30-UAT.md` to `pending: 0`, `33-VERIFICATION.md` to `status: passed` (D-37-04)
+- [x] 37-05-PLAN.md — wave 2 — CLOSE-01 + CLOSE-03: one consolidated operator walk of six items after all code lands; `30-UAT.md` to `pending: 0`, `33-VERIFICATION.md` to `status: passed` (D-37-04)
 
 **UI hint:** yes
 
@@ -978,7 +978,7 @@ archived where the tooling expects to find them.
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
-| 37. CRM Stack Closure | v1.8 | 4/5 | In Progress|  |
+| 37. CRM Stack Closure | v1.8 | 5/5 | Complete   | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 0/? | Not started | - |
 | 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
