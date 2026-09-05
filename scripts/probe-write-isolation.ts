@@ -144,9 +144,35 @@ function safeErrorMessage(err: unknown): string {
  * `input` property, which the inspector dumps verbatim, password and all. Only
  * `err.message` is ever printed here, via `safeErrorMessage`.
  */
-function createClient(varName: string, url: string) {
+/**
+ * Startup parameters that make the `main` (production) session read-only at the
+ * SERVER, so any future write on that client errors instead of succeeding.
+ *
+ * Until now the "exactly one read-only statement on `mainSql`" property was
+ * enforced only by the source reading correctly today — a later edit adding a
+ * second statement is a one-line change against production with nothing but a
+ * lexical convention in its way. D-36-03 treats reading production from a local
+ * machine as the thing INFRA-05 forbids; that exception deserves a mechanical
+ * floor. postgres.js merges this straight into the StartupMessage
+ * (`postgres/src/connection.js:970`).
+ *
+ * Ideally pair this with a dedicated read-only Neon role in the PROBE_MAIN_URL
+ * slot; this is the floor that holds even when the operator supplies the owner
+ * role, which is what happens in practice.
+ *
+ * If a pooled endpoint ever refuses this startup parameter the run fails closed
+ * (connection error, exit 1) rather than silently connecting read-write — in
+ * that case use the branch's direct (non-pooled) endpoint for the main slot.
+ */
+const MAIN_SESSION_READ_ONLY = { default_transaction_read_only: true } as const;
+
+function createClient(
+  varName: string,
+  url: string,
+  connection?: { default_transaction_read_only?: boolean },
+) {
   try {
-    return postgres(url, { max: 1, prepare: false, onnotice: () => {} });
+    return postgres(url, { max: 1, prepare: false, onnotice: () => {}, connection });
   } catch (err) {
     console.error(`ERROR: the postgres driver rejected ${varName}: ${safeErrorMessage(err)}`);
     process.exit(1);
@@ -171,8 +197,13 @@ function createClient(varName: string, url: string) {
  * The resolved host is deliberately NOT echoed: on a malformed URL it can be a
  * fragment of the credential.
  */
-async function openClient(varName: string, url: string, expectedHost: string) {
-  const sql = createClient(varName, url);
+async function openClient(
+  varName: string,
+  url: string,
+  expectedHost: string,
+  connection?: { default_transaction_read_only?: boolean },
+) {
+  const sql = createClient(varName, url, connection);
   const resolved = sql.options.host;
   if (resolved.length !== 1 || resolved[0] !== expectedHost) {
     console.error(
@@ -254,7 +285,7 @@ async function main(): Promise<void> {
   process.once('SIGTERM', () => onInterrupt('SIGTERM'));
 
   const devSql = await openClient('PROBE_DEV_URL', devUrl, DEV_HOST);
-  const mainSql = await openClient('PROBE_MAIN_URL', mainUrl, MAIN_HOST);
+  const mainSql = await openClient('PROBE_MAIN_URL', mainUrl, MAIN_HOST, MAIN_SESSION_READ_ONLY);
 
   let exitCode = 1;
   // The `finally` below runs unconditionally, including when the INSERT itself
