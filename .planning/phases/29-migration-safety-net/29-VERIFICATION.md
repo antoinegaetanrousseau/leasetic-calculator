@@ -25,7 +25,7 @@ overrides_applied: 0
 | 4 | Local development reads and writes the Neon `development` branch, not production | ✓ VERIFIED (endpoint separation only — see notes) | Live run: `npm run check:local-db-branch` → `OK: local DATABASE_URL → Neon development branch (ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech)`, exit 0. `.env.example:24-38` mandates this endpoint and forbids the production one explicitly. The stronger claim — "a query run locally returns zero production partner rows" / "a write made locally does not appear in production" — was **not empirically tested** (ISOLATION-PROBE-29 was skipped, then attempted and blocked by a frozen credential on the fork snapshot; see Known Weak Link below). |
 | 5 | Phase 20 locked rule 3 unchanged — migrations fan out only via `db-migrate.yml`, no local `db:migrate` path introduced | ✓ VERIFIED | `git diff --exit-code <pre-phase-29-commit>..HEAD -- .github/workflows/db-migrate.yml` exits 0 (byte-identical; file's last touch was `e2417a9`, 2026-05-27, pre-Phase-29). `grep -v '^#' .github/workflows/ci.yml \| grep -c 'db:migrate'` → `1` (the pre-existing ephemeral-branch apply step, unchanged position). `check:local-db-branch` not wired into `.github/workflows/ci.yml` (`grep -c "check:local-db-branch" .github/workflows/ci.yml` → 0), confirming it stayed local-only as designed. `.env.example` documents only the `db-migrate.yml` dispatch path, never a local invocation. |
 
-**Score:** 5/5 truths verified (truth 4 verified on the narrower, architecturally-inferred basis described below, not the stronger empirical claim in the original roadmap wording)
+**Score:** 5/5 truths verified (truth 4 verified on the narrower, architecturally-inferred basis described below, not the stronger empirical claim in the original roadmap wording) [Updated 2026-09-05, Phase 36 / CLOSE-05: truth 4's narrower basis was revisited by a SQL-level sentinel probe — see the `### Update 2026-09-05` subsection under "Known Weak Link" below.]
 
 ### Requirements Coverage
 
@@ -102,9 +102,25 @@ Given ROADMAP success criterion 4 is worded as "a query run locally returns zero
 
 This is recorded as a **WARNING-level residual gap**, not a BLOCKER: the phase's technical deliverables (guard scripts, corrected `.env.example`, CI wiring) are all real and independently verified; only the strongest empirical form of the INFRA-05 claim remains open, and it is openly acknowledged rather than papered over by any of the phase's own documentation.
 
+### Update 2026-09-05 — SQL-level sentinel probe run (Phase 36, CLOSE-05 / D-36-03)
+
+**Why the original blocker did not apply:** the app-level probe recounted above failed at Better Auth login because the `development` branch is a copy-on-write fork frozen at 2026-05-27, and its credential hashes predate every password rotation since. A SQL-level probe never touches Better Auth — it writes and reads via a raw Postgres client — so the login blocker is bypassed, not solved.
+
+**Probe shape:** a uniquely-labelled sentinel row was written to `schema_meta` on the `development` branch with a raw client, followed by a single `SELECT count(*)` existence check for that sentinel against `main`, followed by deletion of the sentinel in the same run's `finally` block.
+
+**Observed verdict:** **ISOLATED**, exit `0`. Copied verbatim from `.planning/phases/36-gate-repair-planning-record-hygiene/36-PROBE-TRANSCRIPT.md`: the main-side count for sentinel `isolation-probe-36-a72d43b9-7b3d-44c6-bab2-19a6b588665a` was `0`; the development-side read-back was `1` (implicit — the script only reaches the main-side check when its own dev-side read-back equals exactly `1`). No `WARNING: cleanup deleted N row(s)` line appeared, confirming the sentinel was deleted from `development` in the same run and nothing was left behind.
+
+**What this moves above:** the item listed under "What is genuinely NOT proven" — "that a row written against the `development` branch's compute endpoint is actually unreachable from the production Vercel deployment's runtime" — is now **partially observed**, not fully closed. The probe observes endpoint-to-endpoint invisibility at one instant, for one table (`schema_meta`), through the pooled endpoints. It does **not** audit Neon's storage layer directly — it relies on Neon's compute-endpoint routing, not a control-plane inspection of the underlying copy-on-write storage branches themselves — and it says **nothing** about the Vercel production runtime's own connection routing beyond the fact that it shares the same `main` endpoint this probe queried.
+
+**Residual severity, re-classified:** the August `WARNING-level residual gap, not a BLOCKER` classification above is superseded as of this date. The residual is now an **INFORMATIONAL-level residual gap, not a BLOCKER**: the weaker claim (endpoint separation, fail-closed guard) was already fully verified in Phase 29 and again in plan 36-04's synthetic self-tests; this run adds the stronger, previously-missing claim (observed write-isolation) on top of it, without eliminating the narrower residuals named above (single instant, single table, no storage-layer audit, no exercise of the Vercel runtime beyond the shared endpoint).
+
+Dated 2026-09-05, Phase 36 / CLOSE-05.
+
 ## Human Verification Required
 
 None required to close this verification. The one item that would fully close INFRA-05 empirically — running ISOLATION-PROBE-29 after restoring a `development`-branch login — is a *future, optional* action already documented as a cheap upgrade path in 29-02-SUMMARY.md and 29-SECURITY.md's Accepted Risks Log. It does not block Phase 29's status and is not newly discovered by this verification.
+
+**Update 2026-09-05 (Phase 36 / CLOSE-05):** the empirical action described above was performed — not via the app-level path this paragraph names, but via a cheaper, different path (a SQL-level sentinel probe that never touches Better Auth login). See the `### Update 2026-09-05` subsection under "Known Weak Link" above for the outcome and its exact scope.
 
 ## Gaps Summary
 
@@ -112,7 +128,7 @@ No blocking gaps. All three requirements (INFRA-04, INFRA-05, INFRA-06) have rea
 
 - INFRA-04 correctly carries zero Phase 29 work, and the underlying Phase 20 claim was independently re-confirmed still true in the current codebase (`db-migrate.yml` untouched since 2026-05-27, all three branch secrets referenced).
 - INFRA-06's two defects (dead filter pattern, journal-blind migrator) are both fixed, both independently reproduced live by this verifier (orphan probe, dead-pattern coverage against Phase 30's own new migration), and the anti-rot guard genuinely runs on every PR via `build-test`, not just when a migration changes.
-- INFRA-05's local-runtime mandate and fail-closed guard are real and live-verified; the one open item is the empirical write-isolation proof, which is a known, transparently-documented residual risk (not a defect introduced or hidden by this phase) rather than a missing deliverable.
+- INFRA-05's local-runtime mandate and fail-closed guard are real and live-verified; the one open item is the empirical write-isolation proof, which is a known, transparently-documented residual risk (not a defect introduced or hidden by this phase) rather than a missing deliverable. **Update 2026-09-05 (Phase 36 / CLOSE-05):** this open item was closed by a SQL-level sentinel probe — see the `### Update 2026-09-05` subsection above. Verdict: ISOLATED. The residual is now informational, not a blocker.
 
 No anti-patterns, no stub code, no unresolved debt markers, no orphaned requirements, no key-link failures found in this phase's artifacts.
 
