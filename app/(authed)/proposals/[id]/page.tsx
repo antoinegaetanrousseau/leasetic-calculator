@@ -37,14 +37,26 @@ interface PageProps {
 
 export default async function ProposalDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const { session } = await requireUser();
+  const { session, role } = await requireUser();
   const lang = await getCurrentLang();
 
   const proposal = await getProposalById(id);
 
-  // D-18 obscurity: not-found OR not-owned both return 404.
-  // Hard-purged (deleted_at > 30d) rows will have been deleted from DB by Plan 08-14's CLI.
-  if (!proposal || proposal.userId !== session.user.id) {
+  // D-18 obscurity: not-found OR not-owned both return the same 404 for
+  // non-admin callers, unchanged. Hard-purged (deleted_at > 30d) rows will
+  // have been deleted from DB by Plan 08-14's CLI.
+  //
+  // D-37-01 / GAP-01: an admin bypasses the ownership arm — matching the
+  // precedent Phase 18 D-11 already set for `app/(authed)/proposals/page.tsx`'s
+  // admin user-id list override. Absence is still absence: `!proposal` stays
+  // an independent short-circuit ahead of the role check, so an admin
+  // requesting a nonexistent id gets the same 404 as everyone else.
+  //
+  // T-37-01-01: `role` MUST come from `requireUser()` (server-derived,
+  // per-request DB read) — NEVER from route params, the query string, request
+  // headers, or a client prop.
+  const isAdmin = role === 'admin';
+  if (!proposal || (!isAdmin && proposal.userId !== session.user.id)) {
     notFound();
   }
 

@@ -12,6 +12,12 @@ import type { ProposalRow } from '@/db/schema';
 
 vi.mock('server-only', () => ({}));
 
+vi.mock('next/navigation', () => ({
+  notFound: vi.fn(() => {
+    throw new Error('NEXT_NOT_FOUND');
+  }),
+}));
+
 const {
   requireUserMock,
   getCurrentLangMock,
@@ -92,7 +98,10 @@ beforeEach(() => {
   requireUserMock.mockReset();
   getCurrentLangMock.mockReset();
   getProposalByIdMock.mockReset();
-  requireUserMock.mockResolvedValue({ session: { user: { id: 'user-1', email: 'u@e.com' } } });
+  requireUserMock.mockResolvedValue({
+    session: { user: { id: 'user-1', email: 'u@e.com' } },
+    role: 'partner',
+  });
   getCurrentLangMock.mockResolvedValue('fr');
 });
 
@@ -141,5 +150,58 @@ describe('/proposals/[id] page.tsx — Plan 14-06 D-28 StatusChip in header', ()
     // Proposal detail is partner-facing; commission must NOT leak.
     expect(html, 'detail page must not surface commission_pct').not.toMatch(/\bcommission_pct\b/i);
     expect(html, 'detail page must not surface _pct field-key suffix').not.toMatch(/_pct\b/);
+  });
+});
+
+describe('/proposals/[id] page.tsx — GAP-01 / D-37-01 admin oversight bypass', () => {
+  it('Case 1: admin + proposal owned by a different user id -> the page renders (no notFound)', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'admin-1', email: 'admin@e.com' } },
+      role: 'admin',
+    });
+    getProposalByIdMock.mockResolvedValue(
+      makeProposal({ userId: 'user-2', inputs: { ...makeProposal().inputs, clientCo: 'Other Partner Client SAS' } }),
+    );
+
+    const tree = await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) });
+    const { container } = render(tree);
+
+    expect(container.textContent).toContain('Other Partner Client SAS');
+  });
+
+  it('Case 2: partner + proposal owned by a different user id -> notFound() is taken', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'user-1', email: 'u@e.com' } },
+      role: 'partner',
+    });
+    getProposalByIdMock.mockResolvedValue(makeProposal({ userId: 'user-2' }));
+
+    await expect(
+      ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) }),
+    ).rejects.toThrow('NEXT_NOT_FOUND');
+  });
+
+  it('Case 3: sales + proposal owned by a different user id -> notFound() is taken (bypass is admin-only)', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'sales-1', email: 's@e.com' } },
+      role: 'sales',
+    });
+    getProposalByIdMock.mockResolvedValue(makeProposal({ userId: 'user-2' }));
+
+    await expect(
+      ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) }),
+    ).rejects.toThrow('NEXT_NOT_FOUND');
+  });
+
+  it('Case 4: admin + getProposalById resolves null -> notFound() is taken (absence is not bypassable)', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'admin-1', email: 'admin@e.com' } },
+      role: 'admin',
+    });
+    getProposalByIdMock.mockResolvedValue(null);
+
+    await expect(
+      ProposalDetailPage({ params: Promise.resolve({ id: 'does-not-exist' }) }),
+    ).rejects.toThrow('NEXT_NOT_FOUND');
   });
 });
