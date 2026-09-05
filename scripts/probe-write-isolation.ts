@@ -40,11 +40,21 @@
  * Phase 29's artifacts, so it prints hostnames, the sentinel label, counts and
  * verdicts ONLY — never a full connection string, username or password. The
  * `main`-side client (bound to the const `mainSql`) executes exactly one
- * read-only statement — `SELECT count(*) ... WHERE label = <sentinel>` — and
- * never reads customer data; no INSERT, UPDATE, DELETE or DDL is ever issued on
- * `mainSql`, and that session is additionally read-only at the SERVER (see
- * `MAIN_SESSION_READ_ONLY`) so the property is a database constraint and not
- * merely a naming convention. Every caught error — including anything that
+ * statement — `SELECT count(*), current_setting('transaction_read_only') ...
+ * WHERE label = <sentinel>` — returning a count and a GUC value, never a row of
+ * `schema_meta`; no INSERT, UPDATE, DELETE or DDL is ever issued on `mainSql`.
+ *
+ * What the read-only control actually guarantees, stated precisely: the
+ * `default_transaction_read_only` startup parameter is REQUESTED on that
+ * connection (see `MAIN_SESSION_READ_ONLY`), and the single statement above
+ * then VERIFIES in-band that the server applied it. Requesting alone would
+ * prove nothing — a pgbouncer-family pooler can accept the connection and
+ * silently discard the parameter, yielding a read-write session with no error
+ * raised. If `transaction_read_only` does not come back `on`, the run refuses
+ * to certify and exits non-zero. So the guarantee is: this run either observed
+ * a read-only session or failed — it never assumes one.
+ *
+ * Every caught error — including anything that
  * escapes `main()` — goes through `safeErrorMessage`, which prints `err.message`
  * only and redacts both `postgres://` and `postgresql://` URLs, bare
  * `user:pass@` fragments, and the two supplied URLs verbatim. `main()` is never
@@ -63,9 +73,13 @@
  *   3. Each hostname must equal, exactly, the endpoint in
  *      `docs/operations/neon-branch-routing.md` — never a prefix match.
  *   4. After construction, the DRIVER's own resolved host must equal the same
- *      value, so the guard and the connect path can never diverge (this also
- *      neutralises postgres.js's `PGHOST` fallback).
- *   5. Cleanup must be confirmed: if the sentinel's DELETE cannot be shown to
+ *      value (compared case-insensitively on both sides), so the guard and the
+ *      connect path can never diverge — this also neutralises postgres.js's
+ *      `PGHOST` fallback.
+ *   5. The `main` session must report `transaction_read_only = on`, proven
+ *      in-band by the one statement it issues. A pooler that silently discarded
+ *      the startup parameter is caught here rather than assumed away.
+ *   6. Cleanup must be confirmed: if the sentinel's DELETE cannot be shown to
  *      have removed exactly one row, the run exits non-zero even when the
  *      isolation verdict itself was PASS.
  *
@@ -180,24 +194,34 @@ function safeErrorMessage(err: unknown): string {
  * `err.message` is ever printed here, via `safeErrorMessage`.
  */
 /**
- * Startup parameters that make the `main` (production) session read-only at the
- * SERVER, so any future write on that client errors instead of succeeding.
+ * Startup parameter REQUESTING that the `main` (production) session be
+ * read-only at the server, so any future write on that client errors instead of
+ * succeeding.
  *
- * Until now the "exactly one read-only statement on `mainSql`" property was
- * enforced only by the source reading correctly today — a later edit adding a
- * second statement is a one-line change against production with nothing but a
- * lexical convention in its way. D-36-03 treats reading production from a local
- * machine as the thing INFRA-05 forbids; that exception deserves a mechanical
- * floor. postgres.js merges this straight into the StartupMessage
- * (`postgres/src/connection.js:970`).
+ * Why a mechanical floor is wanted at all: the "exactly one read-only statement
+ * on `mainSql`" property was otherwise enforced only by the source reading
+ * correctly today — a later edit adding a second statement is a one-line change
+ * against production with nothing but a lexical convention in its way. D-36-03
+ * treats reading production from a local machine as the thing INFRA-05 forbids;
+ * that exception deserves better than a naming convention.
  *
- * Ideally pair this with a dedicated read-only Neon role in the PROBE_MAIN_URL
- * slot; this is the floor that holds even when the operator supplies the owner
- * role, which is what happens in practice.
+ * Why REQUESTING is not the same as HAVING, which is the whole point of the
+ * in-band check on the `mainSql` statement. postgres.js does genuinely put this
+ * in the StartupMessage (`postgres/src/connection.js:970`), and there are three
+ * possible outcomes, not two:
  *
- * If a pooled endpoint ever refuses this startup parameter the run fails closed
- * (connection error, exit 1) rather than silently connecting read-write — in
- * that case use the branch's direct (non-pooled) endpoint for the main slot.
+ *   - honoured  → `transaction_read_only` reports `on`; the floor is real.
+ *   - refused   → the connection errors; the run fails closed. Safe.
+ *   - DISCARDED → a pgbouncer-family pooler accepts the connection, drops the
+ *                 parameter (`ignore_startup_parameters`, or not carrying it in
+ *                 `track_extra_parameters`), raises NO error, and hands back a
+ *                 read-write session. Nothing about sending the parameter
+ *                 detects this — only reading the setting back does.
+ *
+ * The third branch is why this constant is not, by itself, a guarantee, and why
+ * the header does not claim it is. Ideally pair it with a dedicated read-only
+ * Neon role in the PROBE_MAIN_URL slot; this is the floor that holds even when
+ * the operator supplies the owner role, which is what happens in practice.
  */
 const MAIN_SESSION_READ_ONLY = { default_transaction_read_only: true } as const;
 
@@ -357,12 +381,35 @@ async function main(): Promise<void> {
       );
       exitCode = 1;
     } else {
+      // Still exactly ONE statement on `mainSql`, still returning a count and a
+      // GUC value rather than any row of `schema_meta`. Folding
+      // `current_setting('transaction_read_only')` into the statement the run
+      // was always going to issue makes the session prove its own read-only-ness
+      // as a side effect — see `MAIN_SESSION_READ_ONLY` for why sending the
+      // startup parameter is not, on its own, evidence that it took effect.
       const [mainResult] = await mainSql`
-        SELECT count(*)::int AS n FROM schema_meta WHERE label = ${sentinel}
+        SELECT count(*)::int AS n, current_setting('transaction_read_only') AS ro
+        FROM schema_meta WHERE label = ${sentinel}
       `;
       const mainCount = mainResult?.n ?? 0;
+      const mainReadOnly = mainResult?.ro === undefined ? 'unknown' : String(mainResult.ro);
 
-      if (mainCount === 0) {
+      if (mainReadOnly !== 'on') {
+        console.error(
+          `ERROR: the session on ${mainHost} is NOT read-only `
+          + `(transaction_read_only = ${mainReadOnly}) — refusing to certify this run.`,
+        );
+        console.error(
+          '  The default_transaction_read_only startup parameter was sent but not honoured. A '
+          + 'pgbouncer-family pooler can accept the connection and silently discard it '
+          + '(ignore_startup_parameters / track_extra_parameters), which raises no error.',
+        );
+        console.error(
+          '  Use the branch\'s direct (non-pooled) endpoint for PROBE_MAIN_URL, or supply a '
+          + 'role that is read-only at the database.',
+        );
+        exitCode = 1;
+      } else if (mainCount === 0) {
         console.log(`PASS: sentinel ${sentinel} is absent from ${mainHost} — ISOLATED.`);
         exitCode = 0;
       } else {
