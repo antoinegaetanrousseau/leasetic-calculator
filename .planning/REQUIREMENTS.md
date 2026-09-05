@@ -78,7 +78,7 @@ stops existing.
 - [ ] **GAP-02**: Every icon-only dialog close control announces an accessible name in the viewer's
   language — the shared `dialog.tsx` primitive currently hardcodes English `"Close"` in a
   French-default product.
-- [ ] **GAP-03**: Phase 35's two INFO findings are resolved — the redundant `!isAdmin` check beside
+- [x] **GAP-03**: Phase 35's two INFO findings are resolved — the redundant `!isAdmin` check beside
   an already-null-gated `momentum` value is removed, and `BADGE_THRESHOLDS` is no longer exported as
   a mutable object.
 - [ ] **GAP-04**: The "Charger plus" pagination control and the `.btn-out` class agree with the app's
@@ -169,7 +169,7 @@ stops existing.
 | CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
 | GAP-01 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
-| GAP-03 | Phase 37 — CRM Stack Closure | Pending |
+| GAP-03 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-04 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
 | GAP-05 | Phase 39 — Operational & Credential Gates | Pending |
 | OPS-01 | Phase 39 — Operational & Credential Gates | Pending |

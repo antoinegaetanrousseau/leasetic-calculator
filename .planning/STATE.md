@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T20:17:22.327Z"
+last_updated: "2026-09-05T20:29:16.480Z"
 last_activity: 2026-09-05
 progress:
   total_phases: 25
   completed_phases: 8
   total_plans: 64
-  completed_plans: 60
+  completed_plans: 61
   percent: 32
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 37 (crm-stack-closure) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-09-05
 
@@ -474,6 +474,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 36 P05 | ~8min | 2 tasks | 1 file |
 | Phase 36 P06 | ~35min | 3 tasks | 4 files |
 | Phase 37 P01 | 25min | 3 tasks | 3 files |
+| Phase 37 P02 | 15min | 3 tasks | 3 files |
 
 ## Decisions
 
@@ -626,6 +627,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 37]: D-37-01: admin bypass expressed as isAdmin = role === 'admin' guarding the ownership check; !proposal stays an independent short-circuit so absence is never bypassable
 - [Phase 37]: D-37-02: ADMIN-09 envelope needed no adjustment for /proposals/[id] (structurally commission-free); the 20th grep gate is a regression guard, pinned with committed positive + negative non-vacuity controls
 - [Phase 37]: Consolidated tests/admin-09-grep-contracts.test.ts's two duplicate vi.mock('@/lib/auth/require', ...) factories into one exporting both requireAdmin and requireUser
+- [Phase 37]: D-37-05 / IN-01: dropped the redundant !isAdmin from the momentum render gate, keeping isAdmin as the single source of truth at the data layer
+- [Phase 37]: D-37-05 / IN-02: froze BADGE_THRESHOLDS at both nesting levels via nested Object.freeze calls plus a Readonly nested Record type
 
 ### Blockers
 

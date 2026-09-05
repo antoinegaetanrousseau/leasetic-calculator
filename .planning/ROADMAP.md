@@ -830,12 +830,12 @@ client, momentum — is walked, evidenced and free of the gaps its own phase def
      null-gated `momentum` value is removed, and `BADGE_THRESHOLDS` is no longer exported as a
      mutable object — with the momentum card rendering identically before and after.
 
-**Plans:** 1/5 plans executed
+**Plans:** 2/5 plans executed
 Plans:
 **Wave 1**
 
 - [x] 37-01-PLAN.md — wave 1 — GAP-01: server-derived `role === 'admin'` bypass on `/proposals/[id]` (D-37-01) plus a 20th ADMIN-09 grep gate over that surface, proven non-vacuous (D-37-02)
-- [ ] 37-02-PLAN.md — wave 1 — GAP-03: remove the redundant `!isAdmin` beside the null-gated `momentum`, deep-freeze `BADGE_THRESHOLDS`, with byte-identical render diffs as acceptance (D-37-05)
+- [x] 37-02-PLAN.md — wave 1 — GAP-03: remove the redundant `!isAdmin` beside the null-gated `momentum`, deep-freeze `BADGE_THRESHOLDS`, with byte-identical render diffs as acceptance (D-37-05)
 - [ ] 37-03-PLAN.md — wave 1 — CLOSE-04: full goal-backward `34-VERIFICATION.md` re-derived against the codebase for FICHE-01..05 and ACTV-01..05 (D-37-03)
 - [ ] 37-04-PLAN.md — wave 1 — CLOSE-04: scoped `34-REVIEW.md` over authorization/ownership, the `relationship_events` write path and the server actions, with its scope declared (D-37-03)
 
@@ -978,7 +978,7 @@ archived where the tooling expects to find them.
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
-| 37. CRM Stack Closure | v1.8 | 1/5 | In Progress|  |
+| 37. CRM Stack Closure | v1.8 | 2/5 | In Progress|  |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 0/? | Not started | - |
 | 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
