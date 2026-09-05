@@ -29,8 +29,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 36 — Gate Repair & Planning-Record Hygiene (not started)
 Plan: —
-Status: Roadmapped — awaiting `/gsd-plan-phase 36`
-Last activity: 2026-09-05 — v1.8 ROADMAP written (5 phases, 36-40)
+Status: Context gathered — awaiting `/gsd-plan-phase 36`
+Last activity: 2026-09-05 — Phase 36 context gathered (`36-CONTEXT.md`, 7 decisions)
 
 **v1.8 phase order and why:**
 
