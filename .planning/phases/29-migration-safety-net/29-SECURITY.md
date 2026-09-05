@@ -29,7 +29,7 @@ created: 2026-08-31
 | T-29-04 | Information disclosure | mitigate | **CLOSED** | `grep -n 'DATABASE_URL\|process.env\|\$DATABASE' scripts/check-migration-journal-sync.sh scripts/check-db-smoke-filter.sh` → no matches. Neither guard reads any env var; both operate on working-tree files (`ci.yml`, `_journal.json`, `drizzle/*.sql`) only. |
 | T-29-SC | Tampering | accept | **CLOSED** (recorded below) | `git diff b42c9c3~1 HEAD -- package.json` shows only `scripts` block entries added (`check:migration-journal-sync`, `check:db-smoke-filter`, `check:local-db-branch`); no `dependencies`/`devDependencies` changes. All three guard scripts grepped for install commands (`npm install`, `pip install`, `cargo install`, `apt-get`, `brew install`) — none found. Acceptance recorded in the Accepted Risks Log below. |
 | T-29-05 | Tampering | mitigate | **CLOSED** | `scripts/check-local-db-branch.sh` exits 1 when the host resolves to `ep-icy-boat-alx5o1tz-pooler...` — reproduced live with a synthetic `.env.local` in an isolated scratch directory (never touching the real file): produced `ERROR: local DATABASE_URL → Neon main branch (...) — PRODUCTION`, exit 1. Live run of `npm run check:local-db-branch` against the real (unopened) `.env.local` confirms current state resolves to the `development` endpoint: `OK: local DATABASE_URL → Neon development branch (ep-polished-band-alphc576-pooler...)`, exit 0. |
-| T-29-06 | Information disclosure | ~~mitigate~~ → **accept** (re-classified 2026-08-31) | **CLOSED** (recorded below) | Originally `mitigate`, requiring the ISOLATION-PROBE-29 empirical write test. That probe was never run: first deliberately skipped, then **blocked** — the `development` branch is a fork snapshot taken 2026-05-27, so its credential hashes are frozen at that date and login fails (`[Better Auth]: Invalid password`, ×4). Consciously re-classified to `accept` by the plan owner, per the remedy path this file itself specified. What remains verified: `check:local-db-branch` confirms endpoint separation (development ≠ production hostname), and the guard fails closed on the production endpoint. What remains unproven: that a local write is empirically invisible from the production deployment. Rationale recorded in the Accepted Risks Log below. |
+| T-29-06 | Information disclosure | ~~mitigate~~ → **accept** (re-classified 2026-08-31) — revisited 2026-09-05, see § T-29-06 Revisit below. | **CLOSED** (recorded below) | Originally `mitigate`, requiring the ISOLATION-PROBE-29 empirical write test. That probe was never run: first deliberately skipped, then **blocked** — the `development` branch is a fork snapshot taken 2026-05-27, so its credential hashes are frozen at that date and login fails (`[Better Auth]: Invalid password`, ×4). Consciously re-classified to `accept` by the plan owner, per the remedy path this file itself specified. What remains verified: `check:local-db-branch` confirms endpoint separation (development ≠ production hostname), and the guard fails closed on the production endpoint. What remains unproven: that a local write is empirically invisible from the production deployment. Rationale recorded in the Accepted Risks Log below. |
 | T-29-07 | Information disclosure | mitigate | **CLOSED** | Re-verified against the CURRENT script state (post `bbc7e70`/`213f09e` fixes), not the pre-fix version. Live credential-leak probe run in an isolated scratch dir with a synthetic secret (`SUPERSECRET123`, `neondb_owner`, full `postgres://...` string) piped through the script pointed at the production hostname: output contained zero occurrences of the password, username, or `postgres://` scheme — only the bare hostname and static messaging. `grep -n 'source \|^\. \|mapfile\|readarray'` across the script → no matches, confirming it never sources `.env.local`. |
 | T-29-08 | Elevation of privilege | mitigate | **CLOSED** | `.env.example:35-38` restates Phase 20 locked rule 3 inline at the repoint point ("Pointing local dev at `development` does NOT create a local migration path... migrations fan out ONLY via `db-migrate.yml`"). `grep -n "db:migrate" .env.example scripts/check-local-db-branch.sh` → no matches for a literal local invocation (the only workflow reference is `db-migrate.yml`, which does not match the `db:migrate` pattern). |
 | T-29-09 | Repudiation | accept | **CLOSED** (recorded below) | Same evidence as T-29-03 — `db-migrate.yml` confirmed as the sole fan-out path, byte-identical to HEAD, single `db:migrate` invocation total across `ci.yml`. Acceptance recorded in the Accepted Risks Log below. |
@@ -60,7 +60,7 @@ T-29-06 from accepted-risk to empirically-closed. It is not required for the cur
 | T-29-03 | Ad-hoc migration application outside `db-migrate.yml` remains structurally possible (anyone with local `DATABASE_URL_MAIN` and shell access could run `db:migrate` by hand) but is unchanged risk carried forward from Phase 20 locked rule 3, which keeps an audit trail via GitHub Actions run history and a required-reviewer gate for `branch=main`. This plan introduces no new invocation path; the single-invocation count was independently re-verified. | Phase 29 plan author (pre-existing Phase 20 acceptance, restated) | 2026-08-31 |
 | T-29-09 | Same rationale as T-29-03 — `db-migrate.yml` remains the single fan-out path with its audit trail intact. | Phase 29 plan author (pre-existing Phase 20 acceptance, restated) | 2026-08-31 |
 | T-29-SC | No package manager installs introduced by either plan; both guards use only bash builtins + coreutils/grep/sed/awk, verified via package.json diff and script content grep. Supply-chain risk from this phase is nil by construction. | Phase 29 plan author | 2026-08-31 |
-| T-29-06 | **Re-classified from `mitigate` to `accept`.** The declared mitigation required the ISOLATION-PROBE-29 empirical write test; that test could not be performed. It was first skipped by choice, then became *blocked*: the `development` branch is a copy-on-write fork snapshot taken 2026-05-27, so its Better Auth credential hashes are frozen at that date and current passwords are rejected (`[Better Auth]: Invalid password`, ×4 in the dev server log). This is a direct downstream consequence of the separately-accepted stale-fork-snapshot decision in 29-02 (option (a)). **Accepted basis:** Neon's documented copy-on-write branch isolation, plus two independently verified facts — the local `DATABASE_URL` resolves to `ep-polished-band-alphc576-pooler…` (development), and `check:local-db-branch` fails closed on the production endpoint (exercised with a synthetic production hostname → exit 1). **Residual risk:** isolation is inferred from platform architecture rather than observed end-to-end; a defect in Neon's branch isolation would not have been caught by this phase. **Cheap upgrade path:** restore a `development`-branch login (`grant-admin.ts` issues an invitation URL) and run the probe, which would move this from accepted to empirically closed. | Antoine (plan owner) — explicit re-classification decision, 2026-08-31 | 2026-08-31 |
+| T-29-06 | **Re-classified from `mitigate` to `accept`.** The declared mitigation required the ISOLATION-PROBE-29 empirical write test; that test could not be performed. It was first skipped by choice, then became *blocked*: the `development` branch is a copy-on-write fork snapshot taken 2026-05-27, so its Better Auth credential hashes are frozen at that date and current passwords are rejected (`[Better Auth]: Invalid password`, ×4 in the dev server log). This is a direct downstream consequence of the separately-accepted stale-fork-snapshot decision in 29-02 (option (a)). **Accepted basis:** Neon's documented copy-on-write branch isolation, plus two independently verified facts — the local `DATABASE_URL` resolves to `ep-polished-band-alphc576-pooler…` (development), and `check:local-db-branch` fails closed on the production endpoint (exercised with a synthetic production hostname → exit 1). **Residual risk:** isolation is inferred from platform architecture rather than observed end-to-end; a defect in Neon's branch isolation would not have been caught by this phase. **Cheap upgrade path:** restore a `development`-branch login (`grant-admin.ts` issues an invitation URL) and run the probe, which would move this from accepted to empirically closed. **Update 2026-09-05:** a second, cheaper upgrade path existed and was taken — a SQL-level sentinel probe that never touches Better Auth login at all, sidestepping the frozen-credential blocker entirely. It was run on 2026-09-05 and yielded verdict ISOLATED; see § T-29-06 Revisit below for the resulting disposition. | Antoine (plan owner) — explicit re-classification decision, 2026-08-31 | 2026-08-31 |
 
 ---
 
@@ -87,6 +87,10 @@ Per audit instructions, the CURRENT state of the guard scripts was audited, not 
 
 **Closed:** 10/10 | **Open:** 0/10 | **Accepted risks:** 4 (T-29-03, T-29-06, T-29-09, T-29-SC)
 
+**Update 2026-09-05 (Phase 36 / CLOSE-05):** the accepted-risk count above is the 2026-08-31
+figure. As of this date, T-29-06 moved from accepted risk to empirically-closed mitigation — see
+§ T-29-06 Revisit below. **Accepted risks as of 2026-09-05: 3** (T-29-03, T-29-09, T-29-SC).
+
 Phase 29 is secured. T-29-06 — the sole blocker at first audit — was resolved on 2026-08-31 by the
 second of the two remedy paths this document originally specified: a conscious, documented
 re-classification from `mitigate` to `accept` by the plan owner, with rationale in the Accepted
@@ -95,6 +99,11 @@ separation is real and independently confirmed, but the empirical write-isolatio
 originally demanded remains unproven and is now carried as an accepted risk rather than a
 satisfied mitigation.
 
+**Update 2026-09-05 (Phase 36 / CLOSE-05):** the preceding paragraph's framing is superseded. T-29-06
+was subsequently closed on evidence via a SQL-level sentinel probe (verdict ISOLATED, exit 0) that
+sidestepped the Better Auth blocker entirely — see § T-29-06 Revisit below for the full disposition
+and its precisely-scoped residual.
+
 Nine of the ten threats are closed on verification rather than acceptance of that kind — every
 `mitigate` threat was exercised with a synthetic negative-case probe (dead pattern, orphan file,
 dangling journal entry, production hostname, missing userinfo) and confirmed to fail closed with
@@ -102,6 +111,43 @@ no credential leakage. The three other accept-disposition threats (T-29-03, T-29
 T-29-SC supply chain) are unchanged risks carried forward from Phase 20 or nil-by-construction.
 
 All other 9 threats (including the two accept-disposition repudiation threats and the supply-chain accept) are verified CLOSED against live command output, not documentation or intent — every `mitigate` threat was exercised with a synthetic negative-case probe (dead pattern, orphan file, dangling journal entry, production hostname, missing userinfo) and confirmed to fail closed with no credential leakage.
+
+---
+
+## T-29-06 Revisit — 2026-09-05 (Phase 36, CLOSE-05 / D-36-03)
+
+D-36-03 required T-29-06 to be revisited in light of an observed result, not silently flipped.
+This section is that revisit — explicit, dated, and attributed — and it preserves the 2026-08-31
+acceptance as history rather than erasing it.
+
+**What happened:** a SQL-level sentinel probe was run on 2026-09-05, per Phase 36 plan 36-05.
+Full transcript at `.planning/phases/36-gate-repair-planning-record-hygiene/36-PROBE-TRANSCRIPT.md`;
+outcome also folded into `29-VERIFICATION.md`'s `### Update 2026-09-05` subsection under "Known
+Weak Link — INFRA-05 Evidentiary Basis".
+
+**A second, distinct upgrade path.** The Accepted Risks Log above (2026-08-31 entry) names one
+upgrade path: restore a `development`-branch login via `grant-admin.ts` and run the original
+app-level ISOLATION-PROBE-29. That path remains blocked — the `development` branch's Better Auth
+credential hashes are still frozen at the 2026-05-27 fork date. The path actually taken on
+2026-09-05 is a **second, cheaper** one: a SQL-level probe that never touches Better Auth at all,
+writing and reading a sentinel row directly against Postgres. Because it does not authenticate
+through the app, it was never blocked by the frozen-credential problem and required no restoration
+of the `development`-branch login.
+
+**Resulting disposition — a decision, not an inference:** the probe's verdict was **ISOLATED**
+(exit 0; sentinel `isolation-probe-36-a72d43b9-7b3d-44c6-bab2-19a6b588665a` absent from `main`).
+Accordingly, T-29-06's disposition moves from `accept` to **mitigate — empirically closed**.
+
+The new residual is stated precisely, not left implicit: this closure rests on **one instant, one
+table (`schema_meta`), observed endpoint-to-endpoint through the pooled Neon hosts**. It does not
+constitute a storage-layer audit of Neon's copy-on-write branch architecture, and it does not
+exercise the Vercel production runtime's own connection routing beyond the fact that the runtime
+shares the same `main` endpoint this probe queried. A future defect in Neon's branch isolation, or
+a Vercel runtime misconfigured to point at a different endpoint than the one this probe used, would
+not have been caught by this observation. This is why the disposition is "empirically closed" for
+the specific claim tested, not a blanket isolation guarantee.
+
+**Who decided and when:** Antoine (plan owner), 2026-09-05.
 
 ---
 *Audited: 2026-08-31*
