@@ -608,18 +608,22 @@ function makeGate13Proposal(): ProposalRow {
       loyerHT: '2500',
     },
     paramsSnapshot: null,
-    pdfGeneratedAt: createdAt,
     pdfBlobKey: 'key',
-    pdfBlobUrl: 'https://example.com/p.pdf',
-    schemaVersion: 1,
+    pdfSha256: null,
+    pdfSizeBytes: null,
+    pdfGeneratedAt: createdAt,
+    schemaVersion: '1.0.0',
     language: 'fr',
     status: 'active',
     idempotencyKey: 'idem-gate13',
     deletedAt: null,
+    duplicatedFromId: null,
     createdAt,
-    updatedAt: createdAt,
-    completedSteps: 3,
-  } as ProposalRow;
+    clientRelationshipId: null,
+    outcome: null,
+    outcomeDate: null,
+    outcomeReason: null,
+  };
 }
 
 describe('Gate 13: /proposals/[id] admin bypass — ZERO commission leakage (D-37-02)', () => {
