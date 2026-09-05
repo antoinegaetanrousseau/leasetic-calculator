@@ -6,9 +6,17 @@
  * suite carried — pointed at the new markup, and sharpened where the new
  * markup allows a sharper claim. Nothing was deleted because an element
  * moved: the D-11 parity assertion, the "all nine rungs present" assertion,
- * the both-footer-lines assertion and the no-controls / no-other-partners
+ * the both-footer-STRINGS assertion and the no-controls / no-other-partners
  * vocabulary guards all still run, and three of them now assert more than
  * they did before.
+ *
+ * Retargeted again 2026-09-05 for the compaction pass. D-14/D-16 require both
+ * footer statements to RENDER unconditionally — not to occupy a line-box
+ * each — so the two-<p> assertion became a both-strings-in-one-element
+ * assertion, which is strictly stronger: it pins the content AND the fact
+ * that they now share one line. Case 13 is new and guards the operator's
+ * layout instruction (three axis panels, one row of three columns) so a
+ * later edit cannot silently restack them.
  *
  * Fixtures for `badgeProgress` are built with `deriveBadgeProgress` from
  * `@/lib/momentum/badges` (35-01) rather than a hand-typed ladder, so the
@@ -97,7 +105,7 @@ describe('MomentumCard — GAME-01..05', () => {
     expect(rest?.className).not.toMatch(/font-bold|font-semibold/);
   });
 
-  it('3. Both permanent footer lines render in the zero AND the non-zero streak state (D-14/D-16)', () => {
+  it('3. Both permanent footer STRINGS render in the zero AND the non-zero streak state (D-14/D-16)', () => {
     for (const streakWeeks of [0, 3]) {
       const { container, unmount } = render(
         <MomentumCard
@@ -112,6 +120,25 @@ describe('MomentumCard — GAME-01..05', () => {
       expect(container.textContent).toContain(
         'Seules les propositions démarrées depuis une fiche client sont suivies ici.',
       );
+
+      // The compaction pass merged the two <p> elements into one line. What
+      // D-14/D-16 require is that both STATEMENTS render unconditionally, not
+      // that each gets its own line-box — so this now pins both strings to a
+      // single footnote element, which also proves the merge actually
+      // happened and that neither string was abridged to make room.
+      const footnotes = container.querySelectorAll('[data-testid="momentum-footnote"]');
+      expect(footnotes.length).toBe(1);
+      const footnote = footnotes[0];
+      expect(footnote.textContent).toContain('Activité suivie depuis septembre 2026.');
+      expect(footnote.textContent).toContain(
+        'Seules les propositions démarrées depuis une fiche client sont suivies ici.',
+      );
+      // The separator is decoration, so it is hidden from assistive tech and
+      // must never be the thing carrying meaning between the two statements.
+      const separator = Array.from(footnote.querySelectorAll('span')).find(
+        (el) => el.textContent === '·',
+      );
+      expect(separator?.getAttribute('aria-hidden')).toBe('true');
       unmount();
     }
   });
@@ -460,6 +487,46 @@ describe('MomentumCard — GAME-01..05', () => {
     expect(container.textContent).toContain('Your tiers');
     expect(container.textContent).toContain('Gold (25 client(s))');
     expect(container.textContent).not.toContain('dashboard.momentum.');
+  });
+
+  it('13. Compaction layout: three axis panels in one row of three columns, stacking on narrow viewports', () => {
+    const { container } = render(
+      <MomentumCard
+        lang="fr"
+        streakWeeks={3}
+        movements={EMPTY_MOVEMENTS}
+        badgeProgress={ZERO_BADGE_PROGRESS}
+        trackedSinceLabel="septembre 2026"
+      />,
+    );
+    const grid = container.querySelector('[data-testid="momentum-axis-grid"]');
+    expect(grid).toBeTruthy();
+    // One card per axis, all three direct children of the same grid.
+    expect(grid?.querySelectorAll('[data-testid="momentum-axis"]').length).toBe(3);
+    // Three columns from `sm` up, one column below it — the operator's
+    // "one row of three columns, stacking gracefully on narrow viewports".
+    expect(grid?.className).toContain('sm:grid-cols-3');
+    expect(grid?.className).toContain('grid-cols-1');
+
+    // Within a column the three rungs stack unconditionally, so a criterion
+    // never has to truncate to fit a third of the card's width. jsdom has no
+    // layout engine, so this asserts the CLASS contract rather than a
+    // measured box — the measured check lives in the browser pass.
+    for (const axis of Array.from(container.querySelectorAll('[data-testid="momentum-axis"]'))) {
+      const list = axis.querySelector('ul');
+      expect(list?.className).toContain('grid-cols-1');
+      expect(list?.className).not.toMatch(/grid-cols-[23]/);
+      expect(list?.querySelectorAll('[data-testid="momentum-rung"]').length).toBe(3);
+    }
+
+    // Nothing was bought with a truncation, an ellipsis or an overflow clip
+    // on a criterion — the exact thing GAME-03/D-13 forbids.
+    for (const rung of Array.from(container.querySelectorAll('[data-testid="momentum-rung"]'))) {
+      expect(rung.className).not.toMatch(/truncate|line-clamp|text-ellipsis|overflow-hidden/);
+      const label = rung.querySelector('span:last-child');
+      expect(label?.className).not.toMatch(/truncate|line-clamp|text-ellipsis/);
+      expect((label?.textContent ?? '').trim().length).toBeGreaterThan(0);
+    }
   });
 
   it('11. Server-component posture: no "use client" directive in the source', () => {

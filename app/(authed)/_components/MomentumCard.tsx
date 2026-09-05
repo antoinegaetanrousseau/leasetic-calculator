@@ -89,7 +89,7 @@ export interface MomentumCardProps {
  * directly. Do not make any part of this depend on the row.
  */
 const ROW_LINK_CLASSNAME =
-  'flex min-w-0 items-center gap-3 border-b border-border px-3 py-2.5 text-inherit no-underline transition-colors last:border-b-0 hover:bg-[var(--hover-overlay)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset';
+  'flex min-w-0 items-center gap-2.5 border-b border-border px-2.5 py-1.5 text-inherit no-underline transition-colors last:border-b-0 hover:bg-[var(--hover-overlay)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset';
 
 /**
  * Axis iconography (D-19a). Reused from the existing Iconly vocabulary in
@@ -116,9 +116,13 @@ const TIER_COLOR: Record<BadgeTierId, string> = {
   gold: 'var(--tier-gold)',
 };
 
-/** Section-label treatment, shared by "Cette semaine" and "Vos paliers". */
+/**
+ * Section-label treatment, shared by "Cette semaine" and "Vos paliers", and
+ * matched to the axis eyebrows so the whole card reads as one instrument
+ * panel rather than three stacked blocks with three label sizes.
+ */
 const SECTION_LABEL_CLASSNAME =
-  'text-[12px] font-semibold tracking-[0.02em] text-muted-foreground';
+  'text-[10.5px] font-bold uppercase tracking-[0.07em] text-muted-foreground';
 
 /** Card-internal panel chrome: an inset surface one step off `--card`. */
 const PANEL_CLASSNAME =
@@ -218,6 +222,16 @@ function splitStreakSentence(sentence: string): { head: string; rest: string } {
  * One axis's ladder: header (icon + label + progress figure), a progress
  * track toward the next unearned threshold, and the three rungs.
  *
+ * DENSITY (operator, 2026-09-05). Three of these sit side by side in one
+ * row of three columns, so each gets roughly a third of the card's width
+ * instead of all of it. The rungs therefore stack INSIDE the column
+ * (`grid-cols-1`, unconditionally) rather than sitting three-across: at
+ * ~190px a column still fits the longest criterion ("Bronze (12
+ * semaine(s))") on one line, which is the property GAME-03/D-13 actually
+ * requires. Nothing here truncates, hides, locks or collapses a criterion
+ * to buy that space — the height came out of padding, leading and type
+ * size, and every one of the nine rungs is still fully readable.
+ *
  * The "next threshold" is the FIRST unearned tier in the ladder's own order.
  * When every rung is earned there is no next threshold, so the track renders
  * full and the figure is replaced by the all-earned line rather than an
@@ -254,13 +268,17 @@ function BadgeAxisRow({ axis, lang }: { axis: BadgeAxisProgress; lang: Lang }) {
     : `${axisLabel} — ${progressText}`;
 
   return (
-    <div data-testid="momentum-axis" data-axis={axis.axis} className={cn(PANEL_CLASSNAME, 'p-3')}>
-      <div className="flex items-center gap-2">
-        <AxisIcon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-        <span className="text-[11.8px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
+    <div
+      data-testid="momentum-axis"
+      data-axis={axis.axis}
+      className={cn(PANEL_CLASSNAME, 'min-w-0 p-2')}
+    >
+      <div className="flex items-center gap-1.5">
+        <AxisIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+        <span className="min-w-0 truncate text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
           {axisLabel}
         </span>
-        <span className="ml-auto shrink-0 text-[12px] font-semibold tabular-nums text-foreground">
+        <span className="ml-auto shrink-0 text-[11px] font-semibold tabular-nums text-foreground">
           <span aria-hidden>{progressText}</span>
           <span className="sr-only">{spokenProgress}</span>
         </span>
@@ -270,7 +288,7 @@ function BadgeAxisRow({ axis, lang }: { axis: BadgeAxisProgress; lang: Lang }) {
           already states it in text, so this adds no second announcement. */}
       <div
         data-testid="momentum-track"
-        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[var(--momentum-track)]"
+        className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-[var(--momentum-track)]"
       >
         <div
           className="h-full rounded-full"
@@ -279,8 +297,9 @@ function BadgeAxisRow({ axis, lang }: { axis: BadgeAxisProgress; lang: Lang }) {
       </div>
 
       {/* GAME-03 / D-13: all three rungs, always, criteria legible. One
-          column on narrow viewports so a criterion never has to truncate. */}
-      <ul className="mt-2.5 grid list-none grid-cols-1 gap-1.5 p-0 sm:grid-cols-3">
+          column at every width — the axis panel is itself a column now, so
+          a criterion never has to truncate or wrap awkwardly to fit. */}
+      <ul className="mt-1.5 grid list-none grid-cols-1 gap-1 p-0">
         {axis.tiers.map((tier) => {
           const color = TIER_COLOR[tier.tier];
           return (
@@ -290,7 +309,7 @@ function BadgeAxisRow({ axis, lang }: { axis: BadgeAxisProgress; lang: Lang }) {
               data-tier={tier.tier}
               data-earned={tier.earned ? 'true' : 'false'}
               className={cn(
-                'flex items-start gap-1.5 rounded-lg border px-2 py-1.5 text-[12px] leading-[1.35]',
+                'flex items-start gap-1.5 rounded-md border px-1.5 py-1 text-[12px] leading-[1.3]',
                 tier.earned ? 'font-semibold' : 'border-border font-normal text-muted-foreground',
               )}
               style={
@@ -305,7 +324,7 @@ function BadgeAxisRow({ axis, lang }: { axis: BadgeAxisProgress; lang: Lang }) {
             >
               {tier.earned ? (
                 <>
-                  <CheckCircleIcon className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <CheckCircleIcon className="mt-px h-3 w-3 shrink-0" aria-hidden />
                   <span className="sr-only">
                     {t('dashboard.momentum.badge.earnedMarker', lang)}
                   </span>
@@ -316,7 +335,7 @@ function BadgeAxisRow({ axis, lang }: { axis: BadgeAxisProgress; lang: Lang }) {
                 // no ban glyph: a restriction affordance would contradict
                 // GAME-03's "aim at the next rung" framing.
                 <span
-                  className="mt-[3px] h-2.5 w-2.5 shrink-0 rounded-full border"
+                  className="mt-[3px] h-2 w-2 shrink-0 rounded-full border"
                   style={{ borderColor: `color-mix(in oklab, ${color} 60%, transparent)` }}
                   aria-hidden
                 />
@@ -348,105 +367,133 @@ export function MomentumCard({
   const { head, rest } = splitStreakSentence(streakSentence);
 
   return (
-    <Card className="mt-0 mb-6">
+    <Card size="sm" className="mt-0 mb-6">
       <CardHeader>
         <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
           {t('dashboard.momentum.title', lang)}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-5">
+      <CardContent className="flex flex-col gap-3">
         {/* Part 1 — the streak, as the card's headline figure (D-12, D-19a).
             Rendered through one code path in both states: an active streak
-            and the zero-state invitation get the same two-line shape. */}
-        <section className={cn(PANEL_CLASSNAME, 'px-4 py-4 sm:px-5 sm:py-5')}>
-          <p className="m-0 text-[11.8px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
+            and the zero-state invitation get the same shape.
+
+            DENSITY: this was a five-line stacked block (eyebrow over a 26px
+            figure over the break condition, at 20px padding). It is now one
+            baseline-aligned strip — the figure keeps the display weight that
+            D-19a asked for, but stops spending three line-boxes and 40px of
+            padding to say one sentence. `flex-wrap` lets it fall to two
+            lines on a narrow viewport instead of overflowing. */}
+        <section
+          className={cn(
+            PANEL_CLASSNAME,
+            'flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 px-3 py-2',
+          )}
+        >
+          <p className="m-0 text-[10.5px] font-bold uppercase tracking-[0.07em] text-muted-foreground">
             {t('dashboard.momentum.streak.label', lang)}
           </p>
           <p
             data-testid="momentum-streak-head"
-            className="m-0 mt-1.5 text-[26px] font-bold leading-[1.15] tracking-[-0.015em] text-foreground"
+            className="m-0 text-[19px] font-bold leading-[1.2] tracking-[-0.015em] text-foreground"
           >
             {head}
           </p>{' '}
           {rest !== '' && (
             <p
               data-testid="momentum-streak-rest"
-              className="m-0 mt-1.5 text-[13.5px] leading-[1.45] text-muted-foreground"
+              className="m-0 text-[12px] leading-[1.4] text-muted-foreground"
             >
               {rest}
             </p>
           )}
         </section>
 
-        {/* Part 2 — this week's movements (D-09, D-10). */}
-        <section className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className={SECTION_LABEL_CLASSNAME}>
-              {t('dashboard.momentum.thisWeek', lang)}
-            </span>
-            {movements.total > 0 && (
-              <span className="rounded-full bg-[var(--momentum-track)] px-2 py-0.5 text-[11px] font-semibold tabular-nums text-foreground">
-                {movements.total}
+        {/* Parts 2 and 3 sit SIDE BY SIDE from `xl` up, so the card's height
+            is the taller of the two rather than their sum — the single
+            largest saving available without hiding a rung. Below `xl` they
+            stack in source order (movements, then ladder), which is also the
+            reading order on a phone. */}
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] xl:gap-4">
+          {/* Part 2 — this week's movements (D-09, D-10). */}
+          <section className="flex min-w-0 flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <span className={SECTION_LABEL_CLASSNAME}>
+                {t('dashboard.momentum.thisWeek', lang)}
               </span>
-            )}
-          </div>
-          <div className={cn(PANEL_CLASSNAME, 'overflow-hidden')}>
-            {movements.rows.length === 0 ? (
-              <p className="m-0 px-3 py-3 text-[14.5px] text-muted-foreground">
-                {t('dashboard.momentum.empty', lang)}
-              </p>
-            ) : (
-              movements.rows.map((row) => {
-                const { full, detail } = movementCopy(row, lang);
-                return (
-                  <Link
-                    key={row.eventId}
-                    href={`/clients/${row.relationshipId}`}
-                    data-testid="momentum-row"
-                    aria-label={full}
-                    className={ROW_LINK_CLASSNAME}
-                  >
-                    <span className="min-w-0 flex-1 truncate text-[14.5px] font-medium text-foreground">
-                      {row.companyName}
-                    </span>
-                    <span className="shrink-0 text-[13px] text-muted-foreground">{detail}</span>
-                  </Link>
-                );
-              })
-            )}
-            {movements.total > movements.rows.length && (
-              <p className="m-0 border-t border-border px-3 py-2 text-[13px] text-muted-foreground">
-                {t('dashboard.momentum.moreCount', lang).replace(
-                  '{0}',
-                  String(movements.total - movements.rows.length),
-                )}
-              </p>
-            )}
-          </div>
-        </section>
+              {movements.total > 0 && (
+                <span className="rounded-full bg-[var(--momentum-track)] px-1.5 py-px text-[10.5px] font-semibold tabular-nums text-foreground">
+                  {movements.total}
+                </span>
+              )}
+            </div>
+            <div className={cn(PANEL_CLASSNAME, 'overflow-hidden')}>
+              {movements.rows.length === 0 ? (
+                <p className="m-0 px-2.5 py-2 text-[13px] text-muted-foreground">
+                  {t('dashboard.momentum.empty', lang)}
+                </p>
+              ) : (
+                movements.rows.map((row) => {
+                  const { full, detail } = movementCopy(row, lang);
+                  return (
+                    <Link
+                      key={row.eventId}
+                      href={`/clients/${row.relationshipId}`}
+                      data-testid="momentum-row"
+                      aria-label={full}
+                      className={ROW_LINK_CLASSNAME}
+                    >
+                      <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground">
+                        {row.companyName}
+                      </span>
+                      <span className="shrink-0 text-[12px] text-muted-foreground">{detail}</span>
+                    </Link>
+                  );
+                })
+              )}
+              {movements.total > movements.rows.length && (
+                <p className="m-0 border-t border-border px-2.5 py-1.5 text-[12px] text-muted-foreground">
+                  {t('dashboard.momentum.moreCount', lang).replace(
+                    '{0}',
+                    String(movements.total - movements.rows.length),
+                  )}
+                </p>
+              )}
+            </div>
+          </section>
 
-        {/* Part 3 — badge ladder, always fully rendered (GAME-03, D-13). */}
-        <section className="flex flex-col gap-2">
-          <span className={SECTION_LABEL_CLASSNAME}>
-            {t('dashboard.momentum.badge.sectionLabel', lang)}
-          </span>
-          <div className="flex flex-col gap-2.5">
-            {badgeProgress.map((axis) => (
-              <BadgeAxisRow key={axis.axis} axis={axis} lang={lang} />
-            ))}
-          </div>
-        </section>
-
-        {/* Footer — two permanent lines, always rendered, never conditional
-            on streakWeeks or movements.length (D-14, D-16). */}
-        <div className="flex flex-col gap-1">
-          <p className="m-0 text-xs text-muted-foreground">
-            {t('dashboard.momentum.trackedSince', lang).replace('{0}', trackedSinceLabel)}
-          </p>
-          <p className="m-0 text-xs text-muted-foreground">
-            {t('dashboard.momentum.disclosure', lang)}
-          </p>
+          {/* Part 3 — badge ladder, always fully rendered (GAME-03, D-13).
+              One row of three columns from `sm` up, one card per axis;
+              stacked below that. All nine rungs render in every layout. */}
+          <section className="flex min-w-0 flex-col gap-1.5">
+            <span className={SECTION_LABEL_CLASSNAME}>
+              {t('dashboard.momentum.badge.sectionLabel', lang)}
+            </span>
+            <div
+              data-testid="momentum-axis-grid"
+              className="grid grid-cols-1 gap-2 sm:grid-cols-3"
+            >
+              {badgeProgress.map((axis) => (
+                <BadgeAxisRow key={axis.axis} axis={axis} lang={lang} />
+              ))}
+            </div>
+          </section>
         </div>
+
+        {/* Footer — both permanent statements, always rendered, never
+            conditional on streakWeeks or movements.length (D-14, D-16).
+            They now share ONE line separated by a `·` at a smaller size:
+            the requirement is that both statements render unconditionally,
+            not that each occupies its own line-box. Neither string is
+            abridged, reworded or dropped. */}
+        <p
+          data-testid="momentum-footnote"
+          className="m-0 text-[11px] leading-[1.45] text-muted-foreground"
+        >
+          {t('dashboard.momentum.trackedSince', lang).replace('{0}', trackedSinceLabel)}{' '}
+          <span aria-hidden>·</span>{' '}
+          {t('dashboard.momentum.disclosure', lang)}
+        </p>
       </CardContent>
     </Card>
   );
