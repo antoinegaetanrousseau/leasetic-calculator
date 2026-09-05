@@ -40,26 +40,42 @@
  * Phase 29's artifacts, so it prints hostnames, the sentinel label, counts and
  * verdicts ONLY — never a full connection string, username or password. The
  * `main`-side client (bound to the const `mainSql`) executes exactly one
- * statement — `SELECT count(*), current_setting('transaction_read_only') ...
- * WHERE label = <sentinel>` — returning a count and a GUC value, never a row of
- * `schema_meta`; no INSERT, UPDATE, DELETE or DDL is ever issued on `mainSql`.
+ * statement — `SELECT count(*), current_setting('transaction_read_only'),
+ * has_table_privilege(...) ... WHERE label = <sentinel>` — returning a count, a
+ * GUC value and a boolean, never a row of `schema_meta`; no INSERT, UPDATE,
+ * DELETE or DDL is ever issued on `mainSql`.
  *
- * What the read-only control actually guarantees, stated precisely: the
- * `default_transaction_read_only` startup parameter is REQUESTED on that
- * connection (see `MAIN_SESSION_READ_ONLY`), and the single statement above
- * then MEASURES in-band whether the server applied it. Requesting alone would
- * prove nothing — a proxy or pooler can accept the connection and silently
- * discard the parameter, yielding a read-write session with no error raised.
+ * What the read-only control actually guarantees, stated precisely: the single
+ * statement above MEASURES, in-band, two independent server-side facts about the
+ * session it is running in — whether the transaction is read-only, and whether
+ * the connected role holds any write privilege on `schema_meta`. Both are read
+ * back from the server; neither is inferred from what the client asked for. The
+ * `default_transaction_read_only` startup parameter is also REQUESTED (see
+ * `MAIN_SESSION_READ_ONLY`), but requesting proves nothing on its own — a proxy
+ * or pooler can accept the connection, silently drop the parameter, and hand
+ * back a read-write session with no error raised.
  *
- * On Neon it IS discarded: observed 2026-09-05 against the real `main` branch
- * on the pooled endpoint AND on the direct one, both reporting
- * `transaction_read_only = off`. So the run WARNS rather than refuses, and this
- * script makes no claim that the session is read-only at the server. The
- * properties it does guarantee are the D-36-03 ones — inline-only URLs, exactly
- * one read-only statement on `mainSql`, guaranteed `finally` cleanup,
- * hostname-only output — none of which depend on the GUC. The floor that would
- * actually hold is a read-only Neon ROLE in the PROBE_MAIN_URL slot; that is
- * credential work and belongs with OPS-01 in Phase 39.
+ * On Neon that parameter IS dropped: observed 2026-09-05 against the real `main`
+ * branch on the pooled endpoint AND on the direct one, both reporting
+ * `transaction_read_only = off`. Sending it is therefore belt, not floor.
+ *
+ * THE FLOOR IS THE ROLE, NOT THE PARAMETER. `PROBE_MAIN_URL` must carry the
+ * dedicated read-only role created by `docs/operations/probe-readonly-role.md`,
+ * which holds the floor in two independent places, both at the DATABASE:
+ *
+ *   - `ALTER ROLE ... SET default_transaction_read_only = true` — stored in
+ *     `pg_db_role_setting` and applied by Postgres itself at session start, so
+ *     unlike the startup parameter there is nothing for the proxy to forward or
+ *     drop. This is why a role default works where the parameter does not.
+ *   - `GRANT SELECT ON schema_meta` and nothing else — no INSERT, UPDATE or
+ *     DELETE anywhere in the database, so a write is refused on privilege even
+ *     if the setting above were ever lost.
+ *
+ * Because those hold without this script's cooperation, gate 5 fails closed
+ * again (see SAFETY GATES below): a run that reaches production with a session
+ * able to write to it is refused, not warned about. It warned rather than
+ * refused between `c76c294` and the introduction of that role, when no input
+ * existed that could make it pass.
  *
  * Every caught error — including anything that
  * escapes `main()` — goes through `safeErrorMessage`, which prints `err.message`
@@ -87,11 +103,14 @@
  *      value (compared case-insensitively on both sides), so the guard and the
  *      connect path can never diverge — this also neutralises postgres.js's
  *      `PGHOST` fallback.
- *   5. The `main` session's `transaction_read_only` setting is MEASURED in-band
- *      by the one statement it issues, and reported. This gate WARNS, it does
- *      not fail closed — Neon discards the startup parameter on both endpoint
- *      types (observed 2026-09-05), and the isolation verdict does not depend
- *      on it. See the branch itself for the full rationale.
+ *   5. The `main` session must be incapable of writing to production, MEASURED
+ *      in-band by the one statement it issues: `transaction_read_only` must
+ *      report `on`, AND the connected role must hold none of INSERT / UPDATE /
+ *      DELETE on `schema_meta`. Either one failing REFUSES the run — the
+ *      isolation verdict is withheld rather than certified. Supply the
+ *      dedicated read-only role (`docs/operations/probe-readonly-role.md`);
+ *      the owner role fails this gate by design. See the branch itself for why
+ *      this is a refusal again after a spell as a warning.
  *   6. Cleanup must be confirmed: if the sentinel's DELETE cannot be shown to
  *      have removed exactly one row, the run exits non-zero even when the
  *      isolation verdict itself was PASS.
@@ -114,6 +133,15 @@
  *   PROBE_DEV_URL="$PROBE_DEV_URL" PROBE_MAIN_URL="$PROBE_MAIN_URL" npm run probe:write-isolation
  *   unset PROBE_DEV_URL PROBE_MAIN_URL
  *
+ * WHICH CREDENTIAL GOES IN WHICH SLOT
+ *   PROBE_DEV_URL  — an ordinary read-write role on `development`. It has to be
+ *                    able to write: the sentinel INSERT and its cleanup DELETE
+ *                    both run on this client.
+ *   PROBE_MAIN_URL — the DEDICATED READ-ONLY ROLE on `main`, created once by
+ *                    `docs/operations/probe-readonly-role.md`. Not the owner
+ *                    role: gate 5 refuses any session on `main` that could
+ *                    write, and the owner role can.
+ *
  * The expected endpoints, for reference (hostnames only, never credentials):
  *   dev  → ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech
  *          ep-polished-band-alphc576.c-3.eu-central-1.aws.neon.tech        (direct)
@@ -122,15 +150,17 @@
  *
  * Either form works for either slot. Both are accepted because the direct
  * endpoint was, briefly, believed to be the fix for gate 5 — it is not.
- * Measured 2026-09-05 against the real `main` branch:
+ * Measured 2026-09-05 against the real `main` branch, with the owner role:
  *
  *   pooled endpoint -> transaction_read_only = off
  *   direct endpoint -> transaction_read_only = off
  *
- * Neon discards `default_transaction_read_only` on BOTH, so switching endpoint
- * type changes nothing about gate 5 (which now warns rather than refuses). The
- * dev slot is normally pooled simply because that is the value already sitting
- * in the local test-env file.
+ * Neon drops the `default_transaction_read_only` STARTUP PARAMETER on BOTH, so
+ * switching endpoint type does nothing for gate 5. What fixes it is the role,
+ * not the endpoint: a role carrying that setting as a role default has it
+ * applied by the server itself, on either endpoint type. The dev slot is
+ * normally pooled simply because that is the value already sitting in the local
+ * test-env file.
  *
  * TESTING THIS SCRIPT'S OWN GATES — READ BEFORE WRITING A TEST INPUT
  * Known residual, deliberately not designed away (no parse-only mode exists;
@@ -179,7 +209,12 @@ const MAIN_POOLED: string = 'ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.ne
  * against the real `main` pooled endpoint on 2026-09-05 — the run refused, and
  * the refusal message told the operator to use the direct endpoint, which the
  * allow-list then rejected. The advice was unreachable. Accepting the direct
- * hostname makes the documented remedy actually usable.
+ * hostname made that remedy reachable — and the remedy then turned out not to
+ * work, because the direct endpoint drops the parameter too and the real fix is
+ * a read-only ROLE rather than an endpoint type. Both hostnames stay accepted
+ * regardless: either endpoint is a legitimate way to reach its branch, and
+ * narrowing the set back would only re-create the trap where the script's own
+ * printed advice cannot be followed.
  *
  * This derivation strips the literal `-pooler` from the first label only, and
  * asserts it changed something — a hostname that does not match the expected
@@ -214,6 +249,10 @@ function usage(): void {
   );
   console.error(
     `  PROBE_MAIN_URL must resolve to a Neon main (production) endpoint (${MAIN_HOSTS.join(' or ')}).`,
+  );
+  console.error(
+    '  PROBE_MAIN_URL must carry the dedicated read-only role from '
+    + 'docs/operations/probe-readonly-role.md — gate 5 refuses a session that can write.',
   );
 }
 
@@ -325,10 +364,17 @@ function safeErrorMessage(err: unknown): string {
  *                 read-write session. Nothing about sending the parameter
  *                 detects this — only reading the setting back does.
  *
- * The third branch is why this constant is not, by itself, a guarantee, and why
- * the header does not claim it is. Ideally pair it with a dedicated read-only
- * Neon role in the PROBE_MAIN_URL slot; this is the floor that holds even when
- * the operator supplies the owner role, which is what happens in practice.
+ * On Neon the third branch is what actually happens, on both endpoint types
+ * (observed 2026-09-05). So this constant is kept as BELT — it costs nothing to
+ * send and would take effect on a platform that forwards it — but it is not the
+ * floor, and gate 5 never passes on the strength of it merely having been sent.
+ *
+ * The floor is the dedicated read-only role in the PROBE_MAIN_URL slot
+ * (`docs/operations/probe-readonly-role.md`), which carries the same setting as
+ * a ROLE DEFAULT that Postgres applies at session start — nothing for the proxy
+ * to forward, so nothing for it to drop — and additionally holds no write
+ * privilege anywhere in the database. Gate 5 measures both of those in-band and
+ * refuses if either is missing.
  */
 const MAIN_SESSION_READ_ONLY = { default_transaction_read_only: true } as const;
 
@@ -495,53 +541,90 @@ async function main(): Promise<void> {
       // as a side effect — see `MAIN_SESSION_READ_ONLY` for why sending the
       // startup parameter is not, on its own, evidence that it took effect.
       const [mainResult] = await mainSql`
-        SELECT count(*)::int AS n, current_setting('transaction_read_only') AS ro
+        SELECT count(*)::int AS n,
+               current_setting('transaction_read_only') AS ro,
+               (has_table_privilege('schema_meta', 'INSERT')
+                 OR has_table_privilege('schema_meta', 'UPDATE')
+                 OR has_table_privilege('schema_meta', 'DELETE')) AS can_write
         FROM schema_meta WHERE label = ${sentinel}
       `;
       const mainCount = mainResult?.n ?? 0;
       const mainReadOnly = mainResult?.ro === undefined ? 'unknown' : String(mainResult.ro);
+      // Fail closed on a missing column. `undefined` means the statement did not
+      // return what this gate reads, which is exactly the moment not to certify.
+      const mainCanWrite = mainResult?.can_write !== false;
+      const mainWriteLabel = mainResult?.can_write === undefined
+        ? 'unknown'
+        : String(mainResult.can_write);
 
-      // Gate 5 WARNS, it does not refuse. Rationale, recorded because the
-      // opposite choice was tried first and had to be reversed:
+      // Gate 5 REFUSES. It spent a spell as a warning (`c76c294`) and is a
+      // refusal again; both decisions are recorded, because the reasoning behind
+      // each is easy to lose and the reversal looks like a flip-flop without it.
       //
-      // The read-only session is defence-in-depth added during code review
-      // (WR-05). It is NOT one of D-36-03's constraints, which are: both URLs
-      // inline-only, exactly one read-only statement on `mainSql`, guaranteed
-      // `finally` cleanup, and hostname-only output. All four hold whatever this
-      // GUC reports.
-      //
-      // Observed 2026-09-05 against the real `main` branch, both endpoint types:
+      // WHY IT WAS DOWNGRADED. The gate asks whether the `main` session can write
+      // to production, and the only mechanism the script had for making the
+      // answer "no" was the `default_transaction_read_only` STARTUP PARAMETER —
+      // which Neon drops. Observed 2026-09-05 against the real `main` branch, on
+      // both endpoint types:
       //   pooled (ep-icy-boat-alx5o1tz-pooler...)  -> transaction_read_only = off
       //   direct (ep-icy-boat-alx5o1tz...)         -> transaction_read_only = off
-      // So this is not a pgbouncer artifact and the "use the direct endpoint"
+      // So it is not a pgbouncer artifact, and the "use the direct endpoint"
       // remedy does not work. Neon appears to forward only an allowlist of
-      // startup parameters through its proxy, which fronts both endpoint types.
-      // That is inference from two observations, not a documented Neon behaviour.
+      // startup parameters through its proxy, which fronts both endpoint types —
+      // inference from two observations, not documented Neon behaviour. With no
+      // input that could ever satisfy it, refusing left the probe unable to
+      // answer the question it exists to answer; a control that can never pass
+      // gets deleted in frustration rather than respected.
       //
-      // Refusing here made the probe unable to answer the question it exists to
-      // answer, on this platform, ever — a control that can never pass is one
-      // that gets deleted in frustration rather than respected. The floor that
-      // actually holds is a read-only Neon ROLE in the PROBE_MAIN_URL slot; that
-      // is credential work and belongs with OPS-01 in Phase 39.
-      if (mainReadOnly !== 'on') {
-        console.warn(
-          `WARNING: the session on ${mainHost} is NOT read-only `
-          + `(transaction_read_only = ${mainReadOnly}).`,
+      // WHY IT REFUSES AGAIN. That is no longer true. The read-only role created
+      // by `docs/operations/probe-readonly-role.md` puts the property in the
+      // DATABASE rather than in a startup parameter — a role-default
+      // `default_transaction_read_only` that Postgres applies at session start
+      // with no proxy in the path, plus SELECT-only grants — so the gate now has
+      // an input that passes on its own terms, and the owner role is the only
+      // thing it turns away.
+      //
+      // It measures the two independently, and either failing withholds the
+      // verdict:
+      //   ro        — this session's own `transaction_read_only`.
+      //   can_write — whether this role holds INSERT/UPDATE/DELETE on
+      //               `schema_meta`. Not redundant with `ro`: it survives the
+      //               setting being lost or reset mid-session, and it is what
+      //               actually separates the read-only role from the owner role.
+      //
+      // Both ride on the statement the run was always going to issue, so `mainSql`
+      // still executes exactly ONE statement. The price is that the gate is
+      // evaluated AFTER the sentinel is written to `development` rather than
+      // before it — cheap, because the `finally` block removes that row on every
+      // path, and the alternative is a second statement on the production client,
+      // which is the thing this script most wants to avoid.
+      //
+      // Failing here withholds the ISOLATION verdict even though that verdict
+      // does not depend on the session being read-only. That is deliberate: the
+      // run's contract is that production was read by a session which could not
+      // have written to it, and a run that cannot show that has not met its
+      // contract, whatever it happened to observe.
+      if (mainReadOnly !== 'on' || mainCanWrite) {
+        console.error(
+          `ERROR: the session on ${mainHost} is able to write to production — `
+          + 'refusing to certify this run.',
         );
-        console.warn(
-          '  The default_transaction_read_only startup parameter was sent but not honoured. '
-          + 'Observed on 2026-09-05 for BOTH the pooled and the direct Neon endpoint, so this '
-          + 'is not a pooler-only artifact and switching endpoint type does not fix it.',
+        console.error(
+          `  transaction_read_only = ${mainReadOnly} (expected on); write privilege on `
+          + `schema_meta = ${mainWriteLabel} (expected false).`,
         );
-        console.warn(
-          '  The isolation verdict below is still valid — it rests on the sentinel comparison, '
-          + 'not on this setting. What is NOT guaranteed is the defence-in-depth floor: a future '
-          + 'edit adding a write to `mainSql` would not be stopped by the server. Supply a role '
-          + 'that is read-only at the database to close that gap (Phase 39, OPS-01).',
+        console.error(
+          '  PROBE_MAIN_URL must carry the dedicated read-only role, not the owner role. The '
+          + 'default_transaction_read_only startup parameter cannot substitute for it: Neon '
+          + 'drops that parameter on both the pooled and the direct endpoint (observed '
+          + '2026-09-05), so the floor has to hold at the database.',
         );
-      }
-
-      if (mainCount === 0) {
+        console.error(
+          '  Create the role once (docs/operations/probe-readonly-role.md), put its connection '
+          + 'string in PROBE_MAIN_URL, and re-run.',
+        );
+        exitCode = 1;
+      } else if (mainCount === 0) {
         console.log(`PASS: sentinel ${sentinel} is absent from ${mainHost} — ISOLATED.`);
         exitCode = 0;
       } else {
