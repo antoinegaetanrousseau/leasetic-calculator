@@ -1,7 +1,7 @@
 ---
 phase: 33-pipeline
 verified: 2026-09-03T15:31:12Z
-status: human_needed
+status: passed
 score: 5/5 must-haves verified in code — 2 with voided acceptance evidence
 verified_at_commit: 8b5847008ed3d61e68abe193b587d3c39861f424
 overrides_applied: 0
@@ -36,6 +36,11 @@ human_verification:
       (MarkWonDialog.test.tsx still vi.mocks '@/lib/pipeline/actions' —
       the exact structural blind spot CR-01 named). A grep cannot decide
       whether a Server Function's return value round-trips in production.
+    superseded_by: >-
+      Addendum 2026-09-06, Item 1 — CLOSED. Re-walked against the production build
+      (npm run start), via agent browser automation at the operator's direction, not
+      human-observed. Dialog stayed open, typed values survived, button relabelled to
+      "Enregistrer le SIREN et confirmer", DB confirms the write was blocked.
   - test: >-
       On the same seeded development branch, open /clients/[id] for the
       relationship carrying fixture 08a (validityDays 15, ageDays 40) and
@@ -54,6 +59,9 @@ human_verification:
       step-14 row expired) but the step was not re-walked. Unit tests pin
       deriveProposalOutcome and the control's four states; only a live
       seeded row proves the fixture actually reaches the state.
+    superseded_by: >-
+      Addendum 2026-09-03 — CLOSED by Antoine's operator re-walk ("steps 3, 10 and 14
+      all pass now"). Observed on the repaired fixture.
   - test: >-
       On /pipeline (desktop), focus a card with the keyboard, press Space
       to start a dnd-kit keyboard drag, then press ArrowRight, then Space.
@@ -68,6 +76,11 @@ human_verification:
       did not choose. Acceptance step 5 was re-scripted (commit 54450d6)
       to the plain arrow path only, so the interaction between the two
       keyboard mechanisms was never walked.
+    superseded_by: >-
+      Addendum 2026-09-06, Item 3 — CLOSED. Space -> ArrowRight -> Space walked via agent
+      browser automation at the operator's direction, not human-observed, against the
+      production build. Card moved exactly one lane; DB before/after shows exactly one
+      stage-change event.
   - test: >-
       On /pipeline (desktop), drag a card with the mouse and release it
       over the "Signé" or "Débloqué" lane.
@@ -81,6 +94,9 @@ human_verification:
       isReservedStage branch — and its toast — never run. D-09.1 names a
       silent snap-back as worse than a lane that reads as unreachable.
       Acceptance steps 3/4/8 covered the static muting, not drop feedback.
+    superseded_by: >-
+      Addendum 2026-09-03 — CLOSED by Antoine's operator re-walk ("steps 3, 10 and 14
+      all pass now"), backed by the WR-01 code fix in 52d03e1.
   - test: >-
       Decide whether migration 0009 is applied to the Neon `main` (and
       `preview`) branches before /pipeline is exposed to real users.
@@ -94,6 +110,11 @@ human_verification:
       branch; none is true in production until 0009 lands there. This is a
       documented, deliberate deferral, not a phase gap — but it is an
       operator decision that must not be forgotten.
+    superseded_by: >-
+      Addendum 2026-09-06 — explicitly NOT closed. Restated as a deliberate, still-open,
+      non-blocking deferral owned by the v1.6 milestone close (Phase 40 / CLOSE-06).
+      status: passed below is scoped to the criteria CLOSE-03 names (items 1 and 3) and
+      does not represent this item as resolved.
 deferred:
   - truth: >-
       Nothing writes `signé`/`débloqué`; the contract tool will. When it
@@ -386,3 +407,95 @@ Unchanged: a deliberate deferral to milestone close.
 
 Gates at `52d03e1`: `lint:check` 0, `typecheck` 0, `test` 0 (1817 passed, 38
 skipped), `build` 0.
+
+---
+
+## Addendum — 2026-09-06, Phase 37 consolidated walk
+
+**Provenance note, stated plainly:** items 1 and 3 below were walked via **agent browser
+automation (Claude in Chrome)**, at the operator's explicit direction, during Phase 37's
+consolidated CLOSE-01/CLOSE-03 session (D-37-04) — the same session that closed
+`30-UAT.md`'s four pending scenarios. This is **not human-observed**. It is a materially
+different evidentiary standard than the 2026-09-03 addendum above, where Antoine
+personally re-walked steps 3, 10 and 14 ("steps 3, 10 and 14 all pass now"). Every claim
+below states this distinction rather than implying a human watched the screen.
+
+All six items were executed against a **PRODUCTION BUILD** (`npm run build && npm run
+start`, Next 16.2.4) on `http://localhost:3001`, against the Neon **development** branch
+(`ep-polished-band-alphc576-pooler`) — verified by `npm run check:local-db-branch` and by
+resolving env through `@next/env` under `NODE_ENV=production`.
+
+### Item 1 (step 10, D-08's gate) — CLOSED, now against the production build
+
+This supersedes the 2026-09-03 "PARTIALLY CLOSED" entry above, which recorded the walk as
+passing but performed against `next dev` — exactly the residual risk this report asked to
+be re-checked.
+
+Walked on the siren-less legacy company Pépinières Vaugelas, via the proposal action
+"Marquer gagné" on `LC-SEED-PIPE-06a` (the gate is on marking a PROPOSAL won, per D-08 —
+not on the relationship stage selector, which offers no "Gagné" option). Entered date
+`04/09/2026` and motif `WALK-D08-CHECK-37`, then submitted.
+
+**The dialog STAYED OPEN.** Both typed values survived verbatim: date still `04/09/2026`,
+motif still `WALK-D08-CHECK-37`. The SIREN banner appeared: "Cette société n'a pas de
+SIREN enregistré. Ajoutez-en un pour confirmer." A SIREN field appeared with helper text
+"9 chiffres, sans espaces." The submit button was **relabelled from "Marquer gagné" to
+"Enregistrer le SIREN et confirmer"** — this is the literal relabelled text observed.
+
+Database confirms the gate genuinely BLOCKED the write rather than merely showing a
+banner: `LC-SEED-PIPE-06a` remained `status: active, outcome: null, outcome_reason: null,
+outcome_date: null`, and the company's `siren` remained `null`.
+
+This closes the "against `next dev`, not the production build" residual. Performed via
+`npm run start`, not `next dev` — the distinction this item exists to test.
+
+### Item 3 (Space → ArrowRight → Space) — CLOSED, measured not eyeballed
+
+Card "Atelier Verrier Lumière" was focused in the Prospect lane, then Space → ArrowRight →
+Space. Space picked it up; ArrowRight previewed it at the top of Qualifié with a greyed
+ghost left in Prospect and lane counts unchanged (4 / 7) — nothing committed yet; the final
+Space dropped it. After the drop: Prospect 4 → **3**, Qualifié 7 → **8**, card seated in
+Qualifié.
+
+Database evidence, read directly from the development branch before and after: before
+`stage=prospect, all_events=0, stage_changed=0`; after `stage=qualifie, all_events=1,
+stage_changed=1`. **Exactly one write.**
+
+This confirms — rather than re-derives — `PipelineBoard.test.tsx` Test 9b and the
+`52d03e1` WR-02 fix: the component's direct arrow path stands down while `data-dragging`
+is true, so dnd-kit owns the arrows during a live drag, and the browser confirms exactly
+one write occurs in a real production build. The walk artifact was cleaned up afterward:
+Atelier Verrier Lumière was restored to `stage=prospect` with its walk-created
+`stage_changed` event removed (verified: `atelier_stage=prospect, atelier_events=0`), and
+the pipeline seeder re-runs clean at `+0 / +0 / +0`.
+
+### Item 5 (migration 0009 on `main` / `preview`) — explicitly restated, still open, non-blocking
+
+**This item is NOT closed by this addendum and must not be read as resolved.** It remains
+a deliberate, documented deferral to milestone close, exactly as recorded in the
+2026-09-03 addendum above and in `33-02-SUMMARY.md`. Production (`main`) has NOT been
+migrated; the Neon `preview` branch has not been migrated either. Nothing in this phase is
+true in production until 0009 lands there.
+
+This item is owned by the **v1.6 milestone close (Phase 40 / CLOSE-06)**, not by Phase 37,
+and Phase 37 does not run any migration command against any environment — the plan that
+produced this addendum (`37-05-PLAN.md`) forbids `db:migrate`, `db:migrate:dry-run` and
+`drizzle-kit push` outright. `status: passed` below refers specifically to the criteria
+**CLOSE-03** names — the keyboard drag (item 3) and the production-build D-08 gate (item
+1) — with item 5 outstanding by design, carried forward rather than dropped.
+
+### Status change
+
+Frontmatter `status:` moves from `human_needed` to **`passed`**. Both items 1 and 3 — the
+two `human_verification` entries CLOSE-03 names — are now closed. Items 2 and 4 from the
+frontmatter's `human_verification` array were already superseded by the 2026-09-03
+addendum's operator re-walk ("steps 3, 10 and 14 all pass now" — closing step 14/item 2
+and the reserved-lane drop/item 4). Item 5 is superseded by nothing; it is carried forward
+explicitly, as stated above, as an open non-blocking deferral to Phase 40.
+
+This closes **CLOSE-03**: `33-VERIFICATION.md` reaches `status: passed`, with the
+keyboard-drag and production-build items closed and item 5's deferral stated rather than
+swept away.
+
+Gates at this walk (see `37-05-SUMMARY.md` for the full run): no source code changed in
+this addendum's own scope (Task 3 of `37-05-PLAN.md` is documents only).
