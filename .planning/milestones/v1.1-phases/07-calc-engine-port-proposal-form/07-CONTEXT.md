@@ -155,8 +155,8 @@ CALC-05 says "all v10 self-check fixtures (`assertCalc 6/6`, `assertEscape 8/8`,
 - `vitest.config.*` — Phase 5's Vitest config; Phase 7 adds the golden corpus test file under the same harness.
 
 ### Open questions (none blocking)
-- Open Q2 ("v10 client_name field") — RESOLVED 2026-05-08 in 07-UI-SPEC §1.4 / D-7-06 / D-7-NN. No action needed.
-- Seed coefficient canonical values (D-2 placeholder) — Antoine to provide before Phase 8 ships; CUT-06 verifies. Does not block Phase 7 plans.
+- Open Q2 ("v10 client_name field") — RESOLVED 2026-05-08 in .planning/milestones/v1.1-phases/07-calc-engine-port-proposal-form/07-UI-SPEC.md §1.4 / D-7-06 / D-7-NN. No action needed.
+- Seed coefficient canonical values (D-2 placeholder) — Antoine to provide before Phase 8 ships; CUT-06 verifies. Does not block Phase 7 plans. — DEFERRED — CUT-06 banner on first admin edit (Phase 10) — see .planning/STATE.md § Deferred Items and .planning/milestones/v1.1-REQUIREMENTS.md CUT-06.
 
 </canonical_refs>
 

@@ -176,12 +176,12 @@ Turn Phase 7's no-op submit (D-7-07) into a real persistence + PDF pipeline. A p
 </deferred>
 
 <open_questions>
-## Open Questions Carried Forward (resolve before relevant phase)
+## Open Questions Carried Forward (resolve before relevant phase) — statuses recorded inline 2026-09-05 (Phase 36, HOUSE-02)
 
-- **Open Q1 (Cutover ownership)** — Antoine vs Thomas for partner comms (Phase 10 — fire request now).
-- **Open Q3 (Legal counsel sign-off on 10-year retention — DATA-11)** — gates Phase 10 CUT-09. Recommend Antoine fires the legal-counsel ask alongside Phase 8 planning so the answer is in hand by Phase 10. Phase 8 itself is unblocked because soft-delete hard-purge handles the 30-day window without needing legal yet.
-- **Open Q5 (OVH side stack — managed Postgres + S3-compatible)** — gates Phase 10 CUT-04. Recommend Antoine fires the Leasétic IT ask alongside Phase 8 planning.
-- **Phase 7 carry-over: Antoine's canonical coefficients** — Phase 8 is unblocked (D-D1 ships placeholders; Phase 9 admin-edits before partner onboarding). Antoine's extraction work can happen any time before first partner onboard date. NOT a Phase 8 blocker.
+- **Open Q1 (Cutover ownership)** — Antoine vs Thomas for partner comms (Phase 10 — fire request now). — RESOLVED — Phase 10 D-10-21, Antoine owns partner comms. See .planning/STATE.md § Deferred Items.
+- **Open Q3 (Legal counsel sign-off on 10-year retention — DATA-11)** — gates Phase 10 CUT-09. Recommend Antoine fires the legal-counsel ask alongside Phase 8 planning so the answer is in hand by Phase 10. Phase 8 itself is unblocked because soft-delete hard-purge handles the 30-day window without needing legal yet. — DEFERRED — pending Thomas's reply, acknowledged in .planning/milestones/v1.1-MILESTONE-AUDIT.md under `deferred_acknowledged`; still carried, now owned by .planning/REQUIREMENTS.md OPS-04 (Phase 39).
+- **Open Q5 (OVH side stack — managed Postgres + S3-compatible)** — gates Phase 10 CUT-04. Recommend Antoine fires the Leasétic IT ask alongside Phase 8 planning. — DEFERRED — September 2026, CUT-09 capability shipped; still carried, now owned by .planning/REQUIREMENTS.md OPS-03 (Phase 39).
+- **Phase 7 carry-over: Antoine's canonical coefficients** — Phase 8 is unblocked (D-D1 ships placeholders; Phase 9 admin-edits before partner onboarding). Antoine's extraction work can happen any time before first partner onboard date. NOT a Phase 8 blocker. — DEFERRED — same item as .planning/milestones/v1.1-phases/07-calc-engine-port-proposal-form/07-CONTEXT.md's seed-coefficient bullet, resolving to the same CUT-06 reference.
 
 </open_questions>
 

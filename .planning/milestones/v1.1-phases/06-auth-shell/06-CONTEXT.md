@@ -158,8 +158,8 @@ Deliver the authentication system and bilingual themed app shell that wrap every
 - `scripts/migrate.ts` — pattern for the new `scripts/grant-admin.ts` (typed confirmation gate, postgres-js client, masked URL logging)
 - `eslint.config.mjs` — extend with the new no-hardcoded-jsx-strings rule (D-26)
 
-### Open questions (per STATE.md and REQUIREMENTS.md — do NOT block on these)
-- Auth library version pinning matrix (Open Q4) — must be locked the moment Phase 6 plans are written. The planner must pin: `better-auth`, `@better-auth/drizzle-adapter` (or whatever the official Drizzle adapter package name is), `@node-rs/argon2`, `next` (already 16.2.4), `react` (already 19.0.0).
+### Open questions (per STATE.md and REQUIREMENTS.md — do NOT block on these) — all resolved, see annotations
+- Auth library version pinning matrix (Open Q4) — must be locked the moment Phase 6 plans are written. The planner must pin: `better-auth`, `@better-auth/drizzle-adapter` (or whatever the official Drizzle adapter package name is), `@node-rs/argon2`, `next` (already 16.2.4), `react` (already 19.0.0). — RESOLVED 2026-05-08 — see .planning/STATE.md § Decisions Log.
 
 </canonical_refs>
 
