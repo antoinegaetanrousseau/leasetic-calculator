@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: executing
-last_updated: "2026-09-05T08:36:19.802Z"
+status: verifying
+last_updated: "2026-09-05T09:24:57.059Z"
 last_activity: 2026-09-05
 progress:
   total_phases: 20
-  completed_phases: 18
+  completed_phases: 19
   total_plans: 97
-  completed_plans: 96
-  percent: 90
+  completed_plans: 97
+  percent: 95
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 35 (sales-motivation) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
 reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
 FICHE-01..05 / ACTV-01..05 stay OPEN until that checkpoint is approved.
@@ -430,6 +430,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 35 P02 | ~20min | 2 tasks | 3 files |
 | Phase 35 P03 | ~35min | 3 tasks | 3 files |
 | Phase 35 P04 | ~30min | 3 tasks | 2 files |
+| Phase 35 P05 | ~45min | 3 tasks | 2 files |
 
 ## Decisions
 
@@ -565,6 +566,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 35]: MomentumCard.movements is one WeeklyMovements object ({rows,total}), not a bare array plus a separate count prop
 - [Phase 35]: 35-04: GROUP BY ordinal (sql`1`), not a repeated sql fragment object, for GROUP BY correctness under real Postgres
 - [Phase 35]: 35-04: sql.json(obj), never JSON.stringify(obj) cast to ::jsonb, to avoid double-encoding jsonb payloads
+- [Phase 35]: 35-05: Test 6's blanket role-comparison source regex narrowed to a behavioural assertion — D-15 requires the one role branch the blanket regex would have forbidden
+- [Phase 35]: 35-05: isAdmin derived once from requireUser()'s role; momentum queries nested behind isAdmin ? null : Promise.all([...]) so an admin's request never resolves them (D-15), never a requireRelationshipHolder()/requireAdmin() call
 
 ### Blockers
 
