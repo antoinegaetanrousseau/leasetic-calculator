@@ -114,9 +114,11 @@ stops existing.
   carry their real resolved-or-deferred status.
 - [x] **HOUSE-03**: The stale `[~]` markers on CALC-07 and PROP-01 read `[x]`, and
   `scripts/seed-partner-launch.ts` is reachable through an npm script rather than by path.
-- [ ] **HOUSE-04**: The 18 dead vendored ReUI blocks (816K, zero imports) carry a recorded
-  keep-or-delete decision with its rationale, superseding the provisional "Delete nothing yet"
-  of 2026-08-31.
+- [ ] **HOUSE-04**: The 25 dead vendored ReUI block directories (152 files, 1.1M, zero imports)
+  carry a recorded keep-or-delete decision with its rationale, superseding the provisional
+  "Delete nothing yet" of 2026-08-31. (The 18 blocks / 816K figures came from the 2026-08-31
+  audit, written before Phase 34 plan 34-03 vendored `solution-crm-1`…`solution-crm-6` and
+  `solution-users-2`.)
 
 ---
 
@@ -143,7 +145,9 @@ stops existing.
   on a surface that searches company name and SIREN. Reviewed by Antoine 2026-09-02 and **accepted as
   shipped**; kept as a recorded observation in `30-UAT.md`, not an action item.
 - **Deleting the vendored ReUI blocks** — HOUSE-04 makes the call. If the call is "delete", the
-  deletion is its own work, not this milestone's.
+  deletion is its own work, not this milestone's. *(Amended 2026-09-05 by D-36-02: the call is
+  delete, and the deletion was performed in Phase 36 plan 36-03 rather than deferred — see
+  `docs/design/reui-blocks-audit.md` and `.planning/ROADMAP.md` § Phase 36 criterion 4.)*
 - **Any new product capability** — no new tables, no new surfaces, no new user-facing features.
 - **Changing the calculation formula or tranche boundaries** — frozen (continuing constraint).
 - **Removing the "commission invisible" rule** — non-negotiable (continuing constraint).
