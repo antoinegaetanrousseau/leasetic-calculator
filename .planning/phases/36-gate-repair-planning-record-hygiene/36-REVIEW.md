@@ -1,7 +1,9 @@
 ---
 phase: 36-gate-repair-planning-record-hygiene
 reviewed: 2026-09-05T15:28:37Z
+rereviewed: 2026-09-05T15:57:21Z
 depth: standard
+iteration: 2
 files_reviewed: 5
 files_reviewed_list:
   - scripts/probe-write-isolation.ts
@@ -10,6 +12,11 @@ files_reviewed_list:
   - tests/server-action-error-contracts.test.ts
   - docs/design/reui-blocks-audit.md
 findings:
+  critical: 0
+  warning: 3
+  info: 6
+  total: 9
+findings_iteration_1:
   critical: 4
   warning: 5
   info: 5
@@ -402,3 +409,214 @@ which costs nothing and makes each line self-correcting.
 _Reviewed: 2026-09-05T15:28:37Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
+
+---
+
+# Re-Review — 2026-09-05T15:57:21Z (iteration 2)
+
+**Scope:** `scripts/probe-write-isolation.ts` only (223 → 425 lines). `package.json`,
+`tests/container-radius.test.ts`, `tests/server-action-error-contracts.test.ts` and
+`docs/design/reui-blocks-audit.md` are byte-identical to iteration 1 and are not re-reviewed.
+
+**Verdict:** all four Criticals and all five Warnings from iteration 1 are **closed**, each
+re-verified by independent reproduction rather than by reading the fix report. Three new Warnings
+and two new Info items arise from the ~200 lines of new code. Nothing found is Critical, so no
+production-touching defect blocks the file — but `status` stays `issues_found` because Warnings
+survive.
+
+## Method (independent, off-network)
+
+I did not reuse the fixer's harness. I generated a variant copy of the shipped file with both
+allow-listed hostnames rewritten to RFC-2606 `.invalid` names via `sed`, verified `0` occurrences
+of `neon.tech` in it before running anything, and drove the **whole** script — not extracted
+functions — with nine hostile inputs plus a local silent TCP listener for the signal test. All
+credentials synthetic. No real endpoint was contacted at any point; the variant physically cannot
+reach one. Both temp files were deleted; `git status --porcelain` is empty.
+
+## Iteration-1 findings: verification results
+
+| ID | Verdict | Evidence |
+|---|---|---|
+| CR-01 | **Closed** | `postgres://fakeuser:fake@PwSecret123@dev-probe.invalid/neondb` now yields `dev host: dev-probe.invalid` and proceeds; the old extractor returned `PwSecret123@dev-probe.invalid` and printed it. Consolidated leak scan over **8** hostile inputs: `0` occurrences of any password, username or URL substring in any output. |
+| CR-02 | **Closed, both layers** | `#` in password → `ERROR: could not parse a hostname out of PROBE_DEV_URL.` (gate 2 catches it before construction). Out-of-range port → same, no `input:` dump. And the path that still reaches the eager parse — an invalid percent-escape, `pa%zzSecret`, which `new URL` accepts but `postgres.js`'s own `decodeURIComponent` rejects — is caught by `createClient` and printed as `ERROR: the postgres driver rejected PROBE_DEV_URL: URI malformed`, exit 1. That input would previously have escaped `main()` bare. |
+| CR-03 | **Closed, both layers** | Layer 1: the scheme-less `fakeuser:fakepass123@dev-probe.invalid/neondb` (the exact false-PASS input) now returns `null` → refusal. Layer 2 independently verified against inputs layer 1 lets through: uppercase host is refused **by the driver-host assertion**, proving `openClient` genuinely fires (see NEW-01). Multihost `a,b` refused; `?host=` in the query string does **not** redirect the driver (run targeted the dev host, `ENOTFOUND dev-probe.invalid`) — confirmed against `parseOptions`, where query params only feed the `defaults` keys, never `host`. |
+| CR-04 | **Closed** | `postgresql://…` → `[redacted]`; `POSTGRES://…` → `[redacted]` (case-insensitive); bare `//user:pass@host` → `//[redacted]@host`; full supplied URL → `[redacted]` via the verbatim scrub. The scrub reads `process.env` only as a search needle and never prints it. See NEW-05 for the one over-claim in the fix report's table. |
+| WR-01 | **Closed** | Both cleanup-failure branches now set `exitCode = 1` (lines 384, 388) and the wrong-count branch prints `Marking this run FAILED: cleanup could not be confirmed.` Keeping the `WARNING: cleanup deleted N row(s)` wording verbatim was the right call — `36-PROBE-TRANSCRIPT.md` cites the absence of that exact string as its cleanup proof. |
+| WR-02 | **Closed** | `inserted` flag verified end-to-end: a run whose INSERT fails now prints `NOTE: cleanup DELETE could not run (…), but no sentinel was ever written — nothing to clean up.` instead of the old false `WARNING: … verify by hand.` |
+| WR-03 | **Closed** | Driven against a local accept-and-never-reply socket, then `SIGINT`: prints `INTERRUPTED (SIGINT) — the sentinel may still exist on …` plus the exact `DELETE FROM schema_meta WHERE label = '…';`, exit **130**. The coordinator's specific worry does not materialise: the handler does no async work, uses `process.once` per signal, and cannot double-execute (the first invocation calls `process.exit`). No unhandled rejection appeared. The interpolated label is a `randomUUID`, so the printed SQL carries no injection surface. |
+| WR-04 | **Closed** | The RUN block is now the `read -rs` hidden-prompt form with an explicit shell-history/argv rationale; no `PROBE_*='postgres://…'` assignment shape remains anywhere in the file. |
+| WR-05 | **Applied, but the control is unproven — see NEW-02.** | The startup parameter is genuinely sent on the `main` client only (`connection.js:970` merges `options.connection` into the StartupMessage). What is not established is that it takes effect. |
+
+## D-36-03 constraint re-check (mechanical, run by me)
+
+| Constraint | Result |
+|---|---|
+| No env file read | `0` matches for `dotenv` / `readFileSync` / `readFile(` / local dotenv filenames; the only two `import` statements in the file are `node:crypto` and `postgres` |
+| `import './_load-env'` absent, do-not-"fix" directive intact | `0` code-level `_load-env` imports (the 2 grep hits are both docblock prose); directive present |
+| Both URLs inline-only | Unchanged — `process.env.PROBE_DEV_URL` / `PROBE_MAIN_URL` and nothing else |
+| `main` issues exactly one read-only `SELECT count(*)` on the sentinel | Held — `mainSql` on exactly 3 code lines (140 / 162 / 216 after comment-stripping), `mainSql.end(` once, `0` write verbs on a `mainSql` template, and the SELECT is parameterised on the sentinel and returns a count, never rows |
+| Sentinel deleted in a guaranteed `finally` | Held, and now failure-signalling (WR-01) and interrupt-recoverable (WR-03) |
+| Both clients closed | Held; refusal inside `openClient` also closes its own client before exiting |
+| Output hostname-only | Held — `0` credential occurrences across 8 hostile inputs |
+
+## New Warnings
+
+### NEW-01: Uppercase hostnames now trip the driver-divergence **security alarm** — and IN-02 is not resolved
+
+**File:** `scripts/probe-write-isolation.ts:140-145` (case-fold) vs `:243` (case-sensitive assertion)
+
+**Issue:** `extractHostname` lowercases the host (line 143, added for IN-02), but `openClient`
+compares the driver's resolved host with `!==` against the same constant. `postgres:` is not a
+WHATWG "special" scheme, so the driver preserves the case it was given. A URL with any uppercase in
+the host therefore passes gates 2 and 3 and is then rejected by gate 4. Reproduced:
+
+```
+PROBE_DEV_URL=postgres://fakeuser:UpperCasePw@DEV-PROBE.INVALID/neondb
+dev host:  dev-probe.invalid
+ERROR: the postgres driver resolved a different host for PROBE_DEV_URL than the allow-list accepted — refusing.
+exit=1
+```
+
+Two consequences. First, the fix report's claim that IN-02 was "**Incidentally resolved** by CR-01"
+is **not true of the shipped file** — the input is still refused, just later and after a client has
+been constructed. Second, and worse: gate 4's message is the one alarm in this script that means
+"the guard and the connect path disagree, something is routing you somewhere unexpected." Firing it
+for a benign DNS-case difference trains the operator to dismiss precisely the signal that must
+never be dismissed. Fail-closed, hence Warning and not Critical.
+
+**Fix:** one line — compare on the same footing the guard used:
+
+```ts
+if (resolved.length !== 1 || resolved[0].toLowerCase() !== expectedHost) {
+```
+
+### NEW-02: The server-side read-only control is unverified in the direction that matters, yet the header states it as fact
+
+**File:** `scripts/probe-write-isolation.ts:45-47` (header claim), `:182-202` (`MAIN_SESSION_READ_ONLY`), `:323`
+
+**Issue:** I confirmed the parameter is really transmitted: `StartupMessage()` at
+`node_modules/postgres/src/connection.js:970` merges `options.connection` into the startup packet,
+and it is passed only on the `main` client. The header then concludes that the session is
+"read-only at the SERVER … so the property is a database constraint and not merely a naming
+convention" (lines 45-47).
+
+That conclusion does not follow from what has been tested. The fixer's residual note addresses only
+the branch where the pooler **refuses** the parameter — which does fail closed, since the error
+surfaces on the `mainSql` SELECT and is caught into `exitCode = 1`. The untested branch is the
+opposite one: a pgbouncer-family pooler with the parameter in `ignore_startup_parameters`
+**silently discards** it, and one that does not carry it in `track_extra_parameters` may not apply
+it to the pooled server connection at all. Both produce no error and no signal — a session that is
+read-write while the contract docblock asserts a database constraint. `36-PROBE-TRANSCRIPT.md`
+predates this change, so no run has ever exercised it, and the next real run will carry an
+untested connection-parameter change into a production connection.
+
+This is the same defect class as iteration-1's CR-01/02/04: a comment-block-as-contract asserting a
+property the code does not establish.
+
+**Fix (preferred — makes the control self-proving without breaking the three-code-line `mainSql`
+contract):** fold the check into the single existing statement. It stays one statement, still
+returns only a count and a GUC value, and still reads no customer data:
+
+```ts
+const [mainResult] = await mainSql`
+  SELECT count(*)::int AS n, current_setting('transaction_read_only') AS ro
+  FROM schema_meta WHERE label = ${sentinel}
+`;
+if (mainResult?.ro !== 'on') {
+  console.error('ERROR: the main session is NOT read-only — the pooler ignored the startup parameter.');
+  exitCode = 1;
+}
+```
+
+**Fix (minimum):** downgrade lines 45-47 from an asserted control to a documented residual —
+"requested at startup; whether the pooled endpoint honours it is unverified" — so the header stops
+claiming more than the code proves.
+
+### NEW-03: No parse-only mode — the gates cannot be exercised without connecting, and that has already caused an unintended live connection
+
+**File:** `scripts/probe-write-isolation.ts:322-323`
+
+**Issue:** Assessing the fixer's disclosure, which the coordinator passed on: while demonstrating
+the CR-01 fix it ran the script with the real allow-listed hostnames and a synthetic username, and
+because a correct fix makes that input *pass*, the script opened a socket to the Neon
+**development** pooled endpoint and was rejected at auth (`password authentication failed for user
+'fakeuser'`). No write, no read, `main` never contacted, nothing left behind — the harm is nil.
+
+The ergonomics defect it reveals is real, and the fixes made it slightly sharper: gates 2-4 are now
+permissive about well-formed input by design, so any credential-shaped test input that exercises
+the *hostname* logic necessarily proceeds to a connection attempt. Testing the safety gates of a
+production-touching script should not require either editing the two host constants or opening a
+socket to a live endpoint. It is only luck that the slot involved was `development` — the identical
+mistake with `PROBE_MAIN_URL` opens a socket to production.
+
+**Fix:** add an explicit no-connect mode that exits after gate 4, which also gives the operator a
+rehearsal before the real run:
+
+```ts
+if (process.env.PROBE_PARSE_ONLY) {
+  console.log('PARSE-ONLY: both URLs passed every gate; no connection attempted.');
+  process.exit(0);
+}
+```
+
+Place it immediately after the two `openClient` calls so gate 4 is still exercised, and document it
+in the RUN block alongside the `read -rs` form.
+
+## New Info
+
+### NEW-04: A credential-less URL is now accepted where the previous parser refused it
+
+**File:** `scripts/probe-write-isolation.ts:132-145`
+
+**Issue:** The old extractor required an `@` and returned `null` without one; `check-local-db-branch.sh:54-62`
+refuses the same case explicitly ("no user@host segment (missing credentials)"). The URL-based
+parser has no such requirement, so `postgres://dev-probe.invalid/neondb` passes every gate and
+proceeds to connect — reproduced. `postgres.js` then fills the gap from `url.username ||
+env.PGUSERNAME || env.PGUSER || osUsername()` and `url.password || env.PGPASSWORD` (`index.js:439,469`).
+Gate 4 neutralises the `PGHOST` fallback, as the header says, but the user/password fallbacks
+remain live on a run the header describes as fully inline. Impact is low — the verdict stays sound
+because the host is still the allow-listed one — but it is a silent loosening relative to both the
+previous behaviour and the shell analog.
+
+**Fix:** `if (!parsed.username) return null;` inside `extractHostname`, matching the shell guard.
+
+### NEW-05: The fix report's redaction table over-claims one row, and a scheme-less `user:pass@` fragment is still unredacted
+
+**File:** `scripts/probe-write-isolation.ts:162-171`
+
+**Issue:** Row 5 of the fix report's CR-04 table claims `password authentication failed
+(SuperSecretPw123)` is redacted "via the env scrub". Re-run with the env vars holding realistic
+values (full URLs, as the script requires), it is not: the verbatim scrub matches the whole URL,
+never the password alone. Verified:
+
+```
+in:  password authentication failed for user "fakeuser" (MainSecret)
+out: password authentication failed for user "fakeuser" (MainSecret)     ← unchanged
+in:  bare fragment user:Secret123@main-probe.invalid without scheme
+out: bare fragment user:Secret123@main-probe.invalid without scheme      ← unchanged
+```
+
+Neither is reachable from `postgres.js` today — its own error constructors embed `host:port` only
+(`errors.js:16-27`) and `PostgresError` copies a server message that never contains the client
+password — so this is an accuracy defect in the record, not a live leak. Worth correcting because
+the record is what a future maintainer will trust instead of re-testing.
+
+**Fix:** drop the `//` requirement from the second pattern (`/(?:\/\/)?[^\s/@]{1,64}:[^\s/@]{1,64}@/g`),
+and correct the row in `36-REVIEW-FIX.md`.
+
+## Iteration-1 Info items: current status
+
+- **IN-01** (unreachable transposition check, `: string` widening) — survives, unchanged, still Info.
+- **IN-02** (uppercase hostnames refused) — **not resolved**; superseded by NEW-01, which promotes
+  it to Warning because the failure now presents as the driver-divergence alarm.
+- **IN-03** (`process.exit()` can truncate piped output) — survives with a wider surface: **11**
+  `process.exit` call sites now, up from 9.
+- **IN-04** (unreachable `return;` after `process.exit(1)`) — survives on the six original branches;
+  `createClient` / `openClient` correctly add none.
+- **IN-05** (`reui-blocks-audit.md` body figures) — survives; that file was not touched.
+
+---
+
+_Re-reviewed: 2026-09-05T15:57:21Z_
+_Reviewer: Claude (gsd-code-reviewer)_
+_Depth: standard — iteration 2_
