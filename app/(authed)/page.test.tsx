@@ -32,6 +32,9 @@ const {
   countDraftsMock,
   buildListResponseMock,
   listRelanceMock,
+  listWeeklyMovementsMock,
+  listProgressWeekKeysMock,
+  getBadgeCountsMock,
   callOrder,
 } = vi.hoisted(() => {
   const order: string[] = [];
@@ -43,6 +46,12 @@ const {
     countDraftsMock: vi.fn(),
     buildListResponseMock: vi.fn(),
     listRelanceMock: vi.fn(),
+    // Phase 35 Plan 05 — the three momentum queries, mocked at the barrel
+    // (same reasoning as listRelanceMock above: page.tsx imports from
+    // '@/lib/db/queries', never the sibling module directly).
+    listWeeklyMovementsMock: vi.fn(),
+    listProgressWeekKeysMock: vi.fn(),
+    getBadgeCountsMock: vi.fn(),
     callOrder: order,
   };
 });
@@ -102,6 +111,19 @@ vi.mock('@/lib/db/queries', () => ({
     callOrder.push('listRelationshipsNeedingFollowUp');
     return listRelanceMock(...args);
   },
+  // Phase 35 Plan 05 — the momentum queries, mocked at the same barrel.
+  listWeeklyMovementsForOwner: (...args: unknown[]) => {
+    callOrder.push('listWeeklyMovementsForOwner');
+    return listWeeklyMovementsMock(...args);
+  },
+  listProgressWeekKeysForOwner: (...args: unknown[]) => {
+    callOrder.push('listProgressWeekKeysForOwner');
+    return listProgressWeekKeysMock(...args);
+  },
+  getBadgeCountsForOwner: (...args: unknown[]) => {
+    callOrder.push('getBadgeCountsForOwner');
+    return getBadgeCountsMock(...args);
+  },
 }));
 
 // Import AFTER all mocks are in place.
@@ -128,6 +150,7 @@ beforeEach(() => {
   callOrder.length = 0;
   requireUserMock.mockResolvedValue({
     session: { user: { id: USER_ID, email: 'jane@example.com', displayName: DISPLAY_NAME } },
+    role: 'partner',
   });
   getCurrentLangMock.mockResolvedValue('fr');
   countThisMonthMock.mockResolvedValue(0);
@@ -135,6 +158,12 @@ beforeEach(() => {
   countDraftsMock.mockResolvedValue(0);
   buildListResponseMock.mockResolvedValue({ rows: [], hasMore: false, nextCursor: null });
   listRelanceMock.mockResolvedValue([]);
+  // Phase 35 Plan 05 — safe momentum defaults so every pre-existing test
+  // still renders (a real partner with zero history, D-13's ladder-unlit
+  // zero state).
+  listWeeklyMovementsMock.mockResolvedValue({ rows: [], total: 0 });
+  listProgressWeekKeysMock.mockResolvedValue([]);
+  getBadgeCountsMock.mockResolvedValue({ distinctClients: 0, wins: 0 });
 });
 
 afterEach(() => {
@@ -359,20 +388,211 @@ describe('Partner Home / — à relancer card (ACTV-04/05, D-20)', () => {
   it('Test 6: an admin (owning no relationships) gets the page with no card and no role branch', async () => {
     requireUserMock.mockResolvedValue({
       session: { user: { id: 'user-admin', email: 'admin@example.com', displayName: 'Root' } },
+      role: 'admin',
     });
     listRelanceMock.mockResolvedValue([]);
 
     const node = await HomePage();
     const { container } = render(node);
     expect(container.querySelectorAll('[data-testid="relance-row"]').length).toBe(0);
+    // The chase list's admin behaviour still falls out of owning nothing,
+    // NOT out of a role branch: it is called unconditionally, with the
+    // admin's own id, and still returns [] (T-34-09-03).
     expect(listRelanceMock).toHaveBeenCalledWith('user-admin', 5);
 
-    // The admin case must fall out of owning nothing, NOT out of a branch:
-    // a branch would be a second surface to secure (T-34-09-03).
     // Resolved from the vitest cwd (the repo root), not from import.meta.url:
     // under the jsdom environment that URL is not a file: URL.
     const src = readFileSync(join(process.cwd(), 'app', '(authed)', 'page.tsx'), 'utf8');
     expect(src).not.toMatch(/requireAdmin/);
-    expect(src).not.toMatch(/role\s*[!=]==/);
+    // Phase 35 Plan 05 — the blanket `expect(src).not.toMatch(/role\s*[!=]==/)`
+    // this test used to assert is RETIRED, not weakened: it was written to
+    // prove the chase list's admin behaviour comes from owning nothing, not
+    // from a role branch, and that intent is still fully covered by the
+    // `toHaveBeenCalledWith('user-admin', 5)` assertion above. Phase 35 D-15
+    // now REQUIRES a role branch for the momentum surface (see the
+    // "momentum card" describe block below) — a blanket source regex
+    // forbidding ANY role comparison would contradict that requirement and
+    // would have to be deleted outright to let this phase ship. Narrowing it
+    // to the behavioural assertion it always stood for keeps the original
+    // guarantee (chase list has no role branch) testable while making room
+    // for the one role branch this phase deliberately adds elsewhere.
+  });
+});
+
+/**
+ * Phase 35 Plan 05 — the momentum card call site (GAME-01..05, D-15/D-17).
+ *
+ * The threat these tests exist for is the one place in the whole phase an
+ * admin could see something they must not: an admin's genuinely-empty
+ * momentum result is indistinguishable from a real partner's zero-history
+ * zero state, so "query and render nothing" is asserted at BOTH the query
+ * level (toHaveBeenCalledTimes(0)) and the DOM level (the zero-state copy
+ * itself must be absent, not just "no rows").
+ */
+function makeMomentumRow(over: Partial<{
+  eventId: string;
+  relationshipId: string;
+  companyName: string;
+  kind: 'stage_changed' | 'proposal_finalized';
+  toStage: string | null;
+  occurredAt: Date;
+}> = {}) {
+  return {
+    eventId: over.eventId ?? 'event-1',
+    relationshipId: over.relationshipId ?? 'rel-momentum-1',
+    companyName: over.companyName ?? 'Gamma SAS',
+    kind: over.kind ?? 'stage_changed',
+    toStage: over.toStage ?? 'qualifie',
+    occurredAt: over.occurredAt ?? new Date('2026-09-02T10:00:00Z'),
+  };
+}
+
+describe('Partner Home / — momentum card (GAME-01..05, D-15/D-17)', () => {
+  it('Admin: no momentum query fires and no momentum node renders', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'user-admin', email: 'admin@example.com', displayName: 'Root' } },
+      role: 'admin',
+    });
+
+    const node = await HomePage();
+    const { container } = render(node);
+
+    expect(listWeeklyMovementsMock).toHaveBeenCalledTimes(0);
+    expect(listProgressWeekKeysMock).toHaveBeenCalledTimes(0);
+    expect(getBadgeCountsMock).toHaveBeenCalledTimes(0);
+
+    // dashboard.momentum.title FR = 'VOTRE PROGRESSION'
+    expect(container.textContent).not.toContain('VOTRE PROGRESSION');
+    expect(container.querySelectorAll('[data-testid="momentum-row"]').length).toBe(0);
+    // The zero-state invitation copy specifically — asserting its absence,
+    // not merely "no rows", is the GAME-04-adjacent tell D-15 exists to
+    // prevent: a rendered zero-state ladder would tell an admin the feature
+    // exists and would apply to them if they held relationships.
+    expect(container.textContent).not.toContain(
+      'Pas encore de série. Faites avancer un dossier cette semaine pour démarrer une série.',
+    );
+  });
+
+  it('Partner: all three momentum queries fire exactly once, with the session id', async () => {
+    await HomePage();
+
+    expect(listWeeklyMovementsMock).toHaveBeenCalledTimes(1);
+    expect(listProgressWeekKeysMock).toHaveBeenCalledTimes(1);
+    expect(getBadgeCountsMock).toHaveBeenCalledTimes(1);
+
+    // First argument is the SESSION user id — never a search param or a
+    // header (mirrors the existing T-34-09-02 assertion for the chase list).
+    expect(listWeeklyMovementsMock.mock.calls[0][0]).toBe(USER_ID);
+    expect(listProgressWeekKeysMock.mock.calls[0][0]).toBe(USER_ID);
+    expect(getBadgeCountsMock.mock.calls[0][0]).toBe(USER_ID);
+  });
+
+  it('The week window argument is a Monday 00:00 Europe/Paris half-open range', async () => {
+    await HomePage();
+
+    const [, week] = listWeeklyMovementsMock.mock.calls[0];
+    expect(week.end.getTime()).toBeGreaterThan(week.start.getTime());
+
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Paris',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(week.start);
+    const get = (type: string) => parts.find((p) => p.type === type)?.value;
+
+    expect(get('weekday')).toBe('Monday');
+    expect(get('hour')).toBe('00');
+    expect(get('minute')).toBe('00');
+    expect(get('second')).toBe('00');
+  });
+
+  it('One round of queries: the momentum calls join the same Promise.all as the rest', async () => {
+    // Same macrotask technique as the "à relancer" Test 2: if the momentum
+    // queries were awaited separately, their call would land after
+    // buildListResponse had already settled.
+    buildListResponseMock.mockImplementation(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+      callOrder.push('buildListResponse:resolved');
+      return { rows: [], hasMore: false, nextCursor: null };
+    });
+
+    await HomePage();
+
+    const resolvedIdx = callOrder.indexOf('buildListResponse:resolved');
+    const movementsIdx = callOrder.indexOf('listWeeklyMovementsForOwner');
+    const weekKeysIdx = callOrder.indexOf('listProgressWeekKeysForOwner');
+    const badgeIdx = callOrder.indexOf('getBadgeCountsForOwner');
+
+    expect(movementsIdx).toBeGreaterThanOrEqual(0);
+    expect(weekKeysIdx).toBeGreaterThanOrEqual(0);
+    expect(badgeIdx).toBeGreaterThanOrEqual(0);
+    expect(resolvedIdx).toBeGreaterThan(movementsIdx);
+    expect(resolvedIdx).toBeGreaterThan(weekKeysIdx);
+    expect(resolvedIdx).toBeGreaterThan(badgeIdx);
+  });
+
+  it('requireUser is still the first await with the momentum queries present', async () => {
+    await HomePage();
+    const userIdx = callOrder.indexOf('requireUser');
+    const movementsIdx = callOrder.indexOf('listWeeklyMovementsForOwner');
+    expect(userIdx).toBe(0);
+    expect(movementsIdx).toBeGreaterThan(userIdx);
+  });
+
+  it('Placement (D-17, A-1): the momentum card renders after the relance rows and before the recent-proposals rows', async () => {
+    listRelanceMock.mockResolvedValue([
+      makeFollowUp({ relationshipId: 'rel-1', companyName: 'Alpha SAS' }),
+    ]);
+    listWeeklyMovementsMock.mockResolvedValue({ rows: [makeMomentumRow()], total: 1 });
+    buildListResponseMock.mockResolvedValue({
+      rows: [1].map(makeRow),
+      hasMore: false,
+      nextCursor: null,
+    });
+
+    const node = await HomePage();
+    const { container } = render(node);
+
+    const relanceRows = Array.from(container.querySelectorAll('[data-testid="relance-row"]'));
+    const momentumRows = Array.from(container.querySelectorAll('[data-testid="momentum-row"]'));
+    const firstProposalRow = container.querySelector('a[href^="/proposals/prop-"]');
+    expect(relanceRows.length).toBe(1);
+    expect(momentumRows.length).toBe(1);
+    expect(firstProposalRow).not.toBeNull();
+
+    // DOCUMENT_POSITION_FOLLOWING (4) — momentum comes after relance...
+    expect(
+      relanceRows[0].compareDocumentPosition(momentumRows[0]) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // ...and before the recent-proposals row.
+    expect(
+      momentumRows[0].compareDocumentPosition(firstProposalRow!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('GAME-05 regression: the pre-existing surfaces render unaffected by the momentum defaults', async () => {
+    listRelanceMock.mockResolvedValue([
+      makeFollowUp({ relationshipId: 'rel-1', companyName: 'Alpha SAS' }),
+    ]);
+    countThisMonthMock.mockResolvedValue(7);
+    countTotalMock.mockResolvedValue(42);
+    countDraftsMock.mockResolvedValue(3);
+
+    const node = await HomePage();
+    const { container } = render(node);
+
+    const tiles = Array.from(container.querySelectorAll('[role="group"]'));
+    const aria = tiles.map((el) => el.getAttribute('aria-label'));
+    expect(aria.some((s) => s?.includes(': 7'))).toBe(true);
+    expect(aria.some((s) => s?.includes(': 42'))).toBe(true);
+    expect(aria.some((s) => s?.includes(': 3'))).toBe(true);
+
+    const relanceRows = Array.from(container.querySelectorAll('[data-testid="relance-row"]'));
+    expect(relanceRows.length).toBe(1);
+    expect(container.textContent).toContain('À relancer');
   });
 });
