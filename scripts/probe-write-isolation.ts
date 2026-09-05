@@ -237,6 +237,22 @@ async function main(): Promise<void> {
   console.log(`main host: ${mainHost}`);
   console.log(`sentinel:  ${sentinel}`);
 
+  // `finally` does not run on SIGINT/SIGTERM, so a probe interrupted during the
+  // `main`-side query (the slowest step — a cold Neon compute can take seconds)
+  // would leave the sentinel on `development` with nothing but the label
+  // printed above to recover it from. Print the exact recovery statement
+  // instead of relying on the operator having scrolled back. Deliberately does
+  // NOT attempt the DELETE itself: async work in a signal handler racing
+  // `process.exit` cannot be relied on, and a half-run cleanup that reports
+  // success would be worse than an explicit instruction.
+  const onInterrupt = (signal: string): void => {
+    console.error(`\nINTERRUPTED (${signal}) — the sentinel may still exist on ${devHost}.`);
+    console.error(`  Remove it by hand: DELETE FROM schema_meta WHERE label = '${sentinel}';`);
+    process.exit(130);
+  };
+  process.once('SIGINT', () => onInterrupt('SIGINT'));
+  process.once('SIGTERM', () => onInterrupt('SIGTERM'));
+
   const devSql = await openClient('PROBE_DEV_URL', devUrl, DEV_HOST);
   const mainSql = await openClient('PROBE_MAIN_URL', mainUrl, MAIN_HOST);
 
