@@ -1,14 +1,23 @@
 /**
  * Phase 35 Plan 03 Task 3 — `MomentumCard` render tests (GAME-01..05).
  *
+ * Retargeted 2026-09-05 for D-19a (the gamified visual treatment that
+ * supersedes D-19). Every guard below is the SAME guard the pre-redesign
+ * suite carried — pointed at the new markup, and sharpened where the new
+ * markup allows a sharper claim. Nothing was deleted because an element
+ * moved: the D-11 parity assertion, the "all nine rungs present" assertion,
+ * the both-footer-lines assertion and the no-controls / no-other-partners
+ * vocabulary guards all still run, and three of them now assert more than
+ * they did before.
+ *
  * Fixtures for `badgeProgress` are built with `deriveBadgeProgress` from
  * `@/lib/momentum/badges` (35-01) rather than a hand-typed ladder, so the
  * ladder under test is the real one.
  *
  * `render` from `@testing-library/react` is used (not `renderToString`,
  * `RelanceCard.test.tsx`'s choice) because several cases here need to
- * inspect `className` attributes on rendered elements, which a string
- * renderer cannot query.
+ * inspect `className` and `style` attributes on rendered elements, which a
+ * string renderer cannot query.
  */
 import { describe, expect, it, afterEach } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
@@ -58,7 +67,7 @@ describe('MomentumCard — GAME-01..05', () => {
     expect(container.textContent).toContain('VOTRE PROGRESSION');
   });
 
-  it('2. Active streak (D-12) renders the full sentence, bolding only the number+unit fragment', () => {
+  it('2. Active streak (D-12) renders the full sentence, weighting only the number+unit fragment', () => {
     const { container } = render(
       <MomentumCard
         lang="fr"
@@ -68,47 +77,40 @@ describe('MomentumCard — GAME-01..05', () => {
         trackedSinceLabel="septembre 2026"
       />,
     );
+    // The whole sentence still reads as one sentence, even though D-19a now
+    // splits it across a display line and a supporting line.
     expect(container.textContent).toContain(
       "3 semaine(s). Un dossier doit avancer d'ici dimanche.",
     );
 
-    const boldSpan = Array.from(container.querySelectorAll('span')).find((el) =>
-      el.textContent?.includes('3 semaine(s).'),
-    );
-    expect(boldSpan).toBeTruthy();
-    expect(boldSpan?.className).toContain('font-semibold');
+    const head = container.querySelector('[data-testid="momentum-streak-head"]');
+    expect(head?.textContent).toBe('3 semaine(s).');
+    expect(head?.className).toContain('font-bold');
 
-    const restSpan = Array.from(container.querySelectorAll('span')).find(
-      (el) => el.textContent?.trim() === "Un dossier doit avancer d'ici dimanche.",
-    );
-    expect(restSpan).toBeTruthy();
-    expect(restSpan?.className).not.toContain('font-semibold');
+    // D-12: the break condition is present and unweighted — it is
+    // information, not an alarm, so it must never carry the display weight.
+    const rest = container.querySelector('[data-testid="momentum-streak-rest"]');
+    expect(rest?.textContent).toBe("Un dossier doit avancer d'ici dimanche.");
+    expect(rest?.className).not.toMatch(/font-bold|font-semibold/);
   });
 
-  it('3. The credibility line renders in BOTH the zero and the non-zero streak state', () => {
-    const zero = render(
-      <MomentumCard
-        lang="fr"
-        streakWeeks={0}
-        movements={EMPTY_MOVEMENTS}
-        badgeProgress={ZERO_BADGE_PROGRESS}
-        trackedSinceLabel="septembre 2026"
-      />,
-    );
-    expect(zero.container.textContent).toContain('Activité suivie depuis septembre 2026.');
-    zero.unmount();
-
-    const active = render(
-      <MomentumCard
-        lang="fr"
-        streakWeeks={3}
-        movements={EMPTY_MOVEMENTS}
-        badgeProgress={ZERO_BADGE_PROGRESS}
-        trackedSinceLabel="septembre 2026"
-      />,
-    );
-    expect(active.container.textContent).toContain('Activité suivie depuis septembre 2026.');
-    active.unmount();
+  it('3. Both permanent footer lines render in the zero AND the non-zero streak state (D-14/D-16)', () => {
+    for (const streakWeeks of [0, 3]) {
+      const { container, unmount } = render(
+        <MomentumCard
+          lang="fr"
+          streakWeeks={streakWeeks}
+          movements={EMPTY_MOVEMENTS}
+          badgeProgress={ZERO_BADGE_PROGRESS}
+          trackedSinceLabel="septembre 2026"
+        />,
+      );
+      expect(container.textContent).toContain('Activité suivie depuis septembre 2026.');
+      expect(container.textContent).toContain(
+        'Seules les propositions démarrées depuis une fiche client sont suivies ici.',
+      );
+      unmount();
+    }
   });
 
   it('4. The under-report disclosure is permanent, with no icon and no warning-coloured class', () => {
@@ -122,14 +124,13 @@ describe('MomentumCard — GAME-01..05', () => {
           trackedSinceLabel="septembre 2026"
         />,
       );
-      expect(container.textContent).toContain(
-        'Seules les propositions démarrées depuis une fiche client sont suivies ici.',
-      );
       const disclosureEl = Array.from(container.querySelectorAll('p')).find((el) =>
         el.textContent?.includes('Seules les propositions'),
       );
+      expect(disclosureEl).toBeTruthy();
       expect(disclosureEl?.querySelector('svg')).toBeNull();
       expect(disclosureEl?.className).not.toMatch(/destructive|text-red|text-amber|text-orange/);
+      expect(disclosureEl?.getAttribute('style')).toBeNull();
       unmount();
     }
   });
@@ -182,8 +183,25 @@ describe('MomentumCard — GAME-01..05', () => {
     // Headline assertion: the two rows' className attributes are STRING-EQUAL.
     expect(links[0].className).toBe(links[1].className);
 
+    // SHARPENED for D-19a. The redesign introduced inline `style` and tier
+    // colour to this component; a movement row must reach NEITHER. A tier
+    // colour (or any colour at all) on a Perdu row is penalty framing under
+    // another name, so the rows are asserted to be entirely unstyled —
+    // including their descendants, which carry the visible text.
+    for (const link of links) {
+      expect(link.getAttribute('style')).toBeNull();
+      for (const el of Array.from(link.querySelectorAll('*'))) {
+        expect(el.getAttribute('style')).toBeNull();
+      }
+      expect(link.innerHTML).not.toMatch(/--tier-/);
+    }
+    // Descendant markup is identical too, once the two rows' own hrefs,
+    // company-independent labels and keys are set aside: they differ only
+    // where the copy contract says they differ (the stage label).
+    expect(links[0].querySelectorAll('*').length).toBe(links[1].querySelectorAll('*').length);
+
     const anyDestructive = Array.from(container.querySelectorAll('*')).some((el) =>
-      /destructive|text-red|text-amber|text-orange/.test(el.className ?? ''),
+      /destructive|text-red|text-amber|text-orange/.test(String(el.className ?? '')),
     );
     expect(anyDestructive).toBe(false);
 
@@ -195,7 +213,7 @@ describe('MomentumCard — GAME-01..05', () => {
     }
   });
 
-  it('7. Badge ladder readability (GAME-03): all 9 rungs present, monotonic earned markers', () => {
+  it('7. Badge ladder readability (GAME-03): all 9 rungs present and legible, earned or not', () => {
     const zero = render(
       <MomentumCard
         lang="fr"
@@ -205,11 +223,26 @@ describe('MomentumCard — GAME-01..05', () => {
         trackedSinceLabel="septembre 2026"
       />,
     );
-    // All nine tier entries render — three axes, each with bronze/silver/gold.
+    const zeroRungs = Array.from(
+      zero.container.querySelectorAll('[data-testid="momentum-rung"]'),
+    );
+    expect(zeroRungs.length).toBe(9);
+    expect(zero.container.querySelectorAll('[data-testid="momentum-axis"]').length).toBe(3);
+
     for (const tierLabel of ['Bronze', 'Argent', 'Or']) {
       expect(zero.container.textContent?.match(new RegExp(tierLabel, 'g'))?.length).toBe(3);
     }
-    expect(zero.container.querySelectorAll('svg').length).toBe(0);
+
+    // D-19a explicitly forbids hiding an unearned criterion behind an
+    // "unlock" affordance. Every rung's threshold text must therefore be
+    // present and non-empty even when nothing is earned.
+    for (const rung of zeroRungs) {
+      expect(rung.getAttribute('data-earned')).toBe('false');
+      expect((rung.textContent ?? '').trim().length).toBeGreaterThan(0);
+    }
+    expect(zero.container.textContent).toContain('Or (25 client(s))');
+    expect(zero.container.textContent).toContain('Or (15 victoire(s))');
+    expect(zero.container.textContent).toContain('Or (12 semaine(s))');
     zero.unmount();
 
     const richBadges = deriveBadgeProgress(
@@ -225,9 +258,63 @@ describe('MomentumCard — GAME-01..05', () => {
         trackedSinceLabel="septembre 2026"
       />,
     );
-    // 25 clients earns all three clients rungs (bronze=3, silver=10, gold=25) — monotonic.
-    expect(rich.container.querySelectorAll('svg').length).toBe(3);
+    // 25 clients earns all three clients rungs (bronze=3, silver=10, gold=25)
+    // — monotonic, and still exactly nine rungs on the page.
+    expect(rich.container.querySelectorAll('[data-testid="momentum-rung"]').length).toBe(9);
+    const earned = Array.from(
+      rich.container.querySelectorAll('[data-testid="momentum-rung"][data-earned="true"]'),
+    );
+    expect(earned.length).toBe(3);
+    expect(earned.map((el) => el.getAttribute('data-tier'))).toEqual([
+      'bronze',
+      'silver',
+      'gold',
+    ]);
+    const clientsAxis = rich.container.querySelector('[data-axis="clients"]');
+    expect(
+      clientsAxis?.querySelectorAll('[data-testid="momentum-rung"][data-earned="true"]').length,
+    ).toBe(3);
+    // The unearned axes keep every criterion readable alongside the earned ones.
+    expect(rich.container.textContent).toContain('Bronze (1 victoire(s))');
     rich.unmount();
+  });
+
+  it('7b. D-19a progress indication: a fraction toward the next rung, and a graceful all-earned state', () => {
+    const partial = render(
+      <MomentumCard
+        lang="fr"
+        streakWeeks={0}
+        movements={EMPTY_MOVEMENTS}
+        badgeProgress={deriveBadgeProgress(
+          { distinctClients: 4, wins: 0 },
+          { currentWeeks: 0, longestWeeks: 0 },
+        )}
+        trackedSinceLabel="septembre 2026"
+      />,
+    );
+    const clientsAxis = partial.container.querySelector('[data-axis="clients"]');
+    // 4 clients: bronze (3) earned, next rung is silver (10).
+    expect(clientsAxis?.textContent).toContain('4 / 10');
+    expect(clientsAxis?.querySelector('[data-testid="momentum-track"] > div')).toBeTruthy();
+    partial.unmount();
+
+    const maxed = render(
+      <MomentumCard
+        lang="fr"
+        streakWeeks={0}
+        movements={EMPTY_MOVEMENTS}
+        badgeProgress={deriveBadgeProgress(
+          { distinctClients: 40, wins: 0 },
+          { currentWeeks: 0, longestWeeks: 0 },
+        )}
+        trackedSinceLabel="septembre 2026"
+      />,
+    );
+    const maxedAxis = maxed.container.querySelector('[data-axis="clients"]');
+    // No next threshold exists, so no invented "40 / 40" fraction is shown.
+    expect(maxedAxis?.textContent).toContain('Tous les paliers atteints');
+    expect(maxedAxis?.textContent).not.toMatch(/\d+ \/ \d+/);
+    maxed.unmount();
   });
 
   it('8. GAME-04 vocabulary guard: no comparative/ranking wording anywhere on the card', () => {
@@ -235,8 +322,11 @@ describe('MomentumCard — GAME-01..05', () => {
       <MomentumCard
         lang="fr"
         streakWeeks={3}
-        movements={EMPTY_MOVEMENTS}
-        badgeProgress={ZERO_BADGE_PROGRESS}
+        movements={{ rows: [makeRow({ eventId: 'e1', relationshipId: 'r1' })], total: 1 }}
+        badgeProgress={deriveBadgeProgress(
+          { distinctClients: 12, wins: 6 },
+          { currentWeeks: 3, longestWeeks: 7 },
+        )}
         trackedSinceLabel="septembre 2026"
       />,
     );
@@ -245,19 +335,31 @@ describe('MomentumCard — GAME-01..05', () => {
     expect(container.textContent).not.toMatch(
       /classement|leaderboard|moyenne|average|percentile|rank|top \d|par rapport|compared/i,
     );
+    // SHARPENED for D-19a: the redesign added trophy-adjacent vocabulary
+    // pressure. Nothing on this card may name a peer, a team, or a position.
+    expect(container.textContent).not.toMatch(
+      /équipe|team|collègue|colleague|meilleur|best|podium|\bvs\b|autres partenaires/i,
+    );
   });
 
-  it('9. GAME-05 / D-08 / D-16: zero buttons, zero onClick handlers, no dismiss affordance', () => {
+  it('9. GAME-05 / D-08 / D-16: zero controls — no button, no dismiss, no collapse affordance', () => {
     const { container } = render(
       <MomentumCard
         lang="fr"
         streakWeeks={1}
-        movements={EMPTY_MOVEMENTS}
+        movements={{ rows: [makeRow({ eventId: 'e1', relationshipId: 'r1' })], total: 1 }}
         badgeProgress={ZERO_BADGE_PROGRESS}
         trackedSinceLabel="septembre 2026"
       />,
     );
     expect(container.querySelectorAll('button').length).toBe(0);
+    expect(container.querySelectorAll('[role="button"]').length).toBe(0);
+    expect(container.querySelectorAll('input, select, details, summary').length).toBe(0);
+    // Every interactive node on this card is a movement row link and nothing
+    // else — no "voir tout", no opt-out, no expander.
+    const anchors = Array.from(container.querySelectorAll('a'));
+    expect(anchors.length).toBe(1);
+    expect(anchors[0].getAttribute('data-testid')).toBe('momentum-row');
   });
 
   it('10. EN parity: EN strings render, and no dictionary key name leaks through', () => {
@@ -272,6 +374,10 @@ describe('MomentumCard — GAME-01..05', () => {
     );
     expect(container.textContent).toContain('No streak yet. Advance a deal this week to start one.');
     expect(container.textContent).toContain('Only proposals started from a client page are tracked here.');
+    // The D-19a labels are dictionary-backed in EN too.
+    expect(container.textContent).toContain('Current streak');
+    expect(container.textContent).toContain('Your tiers');
+    expect(container.textContent).toContain('Gold (25 client(s))');
     expect(container.textContent).not.toContain('dashboard.momentum.');
   });
 
@@ -281,5 +387,27 @@ describe('MomentumCard — GAME-01..05', () => {
       'utf8',
     );
     expect(src).not.toMatch(/use client/);
+  });
+
+  it('12. Tier colour comes from tokens, never from a hex literal in the component', () => {
+    const src = readFileSync(
+      join(process.cwd(), 'app', '(authed)', '_components', 'MomentumCard.tsx'),
+      'utf8',
+    );
+    // D-19a authorised tier colour; UIC-03 still requires it to live in the
+    // design system, not scattered through a component.
+    expect(src).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    for (const token of ['--tier-bronze', '--tier-silver', '--tier-gold']) {
+      expect(src).toContain(token);
+    }
+
+    // And the tokens are declared for BOTH themes, so nothing on this card
+    // inherits a light-theme colour in dark mode.
+    const globals = readFileSync(join(process.cwd(), 'app', 'globals.css'), 'utf8');
+    const darkBlock = globals.match(/html\[data-theme="dark"\]\s*\{([\s\S]*?)\n\}/)?.[1] ?? '';
+    for (const token of ['--tier-bronze', '--tier-silver', '--tier-gold']) {
+      expect(globals).toContain(`${token}:`);
+      expect(darkBlock).toContain(`${token}:`);
+    }
   });
 });
