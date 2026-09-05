@@ -151,6 +151,13 @@ function extractHostname(url: string): string | null {
     return null;
   }
   if (parsed.protocol !== 'postgres:' && parsed.protocol !== 'postgresql:') return null;
+  // Require credentials in the URL, matching `check-local-db-branch.sh:54-62`
+  // ("no user@host segment (missing credentials)"). Without this the URL parser
+  // happily accepts `postgres://host/db`, and postgres.js then fills the gap
+  // from `env.PGUSERNAME` / `env.PGUSER` / `osUsername()` and `env.PGPASSWORD`
+  // (`index.js:439,469`) — live env fallbacks on a run this header describes as
+  // "both connection strings arrive inline".
+  if (!parsed.username) return null;
   // `postgres:` is not a WHATWG "special" scheme, so the host is parsed as an
   // opaque host and is NOT case-folded — fold it here so an operator pasting a
   // URL with any uppercase in the host is not refused over DNS case.
