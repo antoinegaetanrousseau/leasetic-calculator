@@ -109,10 +109,30 @@ function extractHostname(url: string): string | null {
   return host && HOSTNAME_RE.test(host) ? host : null;
 }
 
-/** Strip a caught error down to a bounded, credential-free message. */
+/**
+ * Strip a caught error down to a bounded, credential-free message.
+ *
+ * This is the last line of defence for every `catch` in this file and for the
+ * terminal handler at the bottom, so its coverage is deliberately maximal:
+ *
+ *  1. Both accepted schemes. Neon's connection panel emits `postgresql://`,
+ *     and postgres.js accepts it, so a `postgres://`-only pattern let the
+ *     commonest real-world form straight through. Case-insensitive too.
+ *  2. Any bare `//user:pass@` userinfo fragment, which is not anchored on a
+ *     scheme at all — errors routinely quote the authority without it.
+ *  3. A verbatim scrub of the two URLs the operator actually supplied. Pattern
+ *     matching can always be out-thought; an exact-string replacement of the
+ *     known secrets cannot miss, whatever shape the driver embedded them in.
+ */
 function safeErrorMessage(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err);
-  return raw.replace(/postgres:\/\/[^\s]*/g, '[redacted]');
+  let out = raw
+    .replace(/postgres(?:ql)?:\/\/\S*/gi, '[redacted]')
+    .replace(/\/\/[^\s/@]*:[^\s/@]*@/g, '//[redacted]@');
+  for (const secret of [process.env.PROBE_DEV_URL, process.env.PROBE_MAIN_URL]) {
+    if (secret) out = out.split(secret).join('[redacted]');
+  }
+  return out;
 }
 
 /**
