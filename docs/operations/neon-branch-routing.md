@@ -71,6 +71,10 @@ the GitHub repo is migrated or the Neon project is recreated:
     ephemeral branch creation in `ci.yml`'s `db-smoke` job)
 - **Branch protection on `main`:** `db-smoke — migration apply gate` and
   `typecheck / lint / grep / test / build` are both required status checks.
+- **Roles on `main`:** besides `neondb_owner`, the `main` branch carries
+  `probe_readonly` — a SELECT-only, read-only-by-default role used solely by
+  `scripts/probe-write-isolation.ts`. It is created by SQL, not through the Neon
+  Console; see [`probe-readonly-role.md`](./probe-readonly-role.md).
 
 ## Branch creation procedure (re-do or 4th branch)
 
