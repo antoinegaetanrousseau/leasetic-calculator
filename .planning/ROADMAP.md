@@ -129,7 +129,7 @@ that fixes the related surface rather than being pooled into one verification ph
 continues from Phase 35 (Phase 32 was removed and Phase 31.1 was an insertion — neither advances
 the count).
 
-- [ ] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had
+- [x] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had (completed 2026-09-05)
 - [ ] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404
 - [ ] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose
 - [ ] **Phase 39: Operational & Credential Gates** — the shared admin password retired, `last_login_at` actually written, `trustedOrigins` explicit, OVH and retention closable by a recorded decision
@@ -780,7 +780,7 @@ of v1.8 depends on this one, because every later phase closes by showing a clean
   5. `29-VALIDATION.md` exists and records Phase 29's Nyquist coverage, and INFRA-05's
      write-isolation is either empirically probed against the Neon `development` branch or recorded
      as an architectural inference that is the final answer, with that limitation stated in the file.
-**Plans:** 5/6 plans executed
+**Plans:** 6/6 plans complete
 **Wave 1**
 
 - [x] 36-01-PLAN.md — HOUSE-01 lint-gate closure by evidence + HOUSE-02 in-place annotation of the four stale CONTEXT open-question blocks, plus the heading retitle in `31-CONTEXT.md` and the prose fix in `36-CONTEXT.md` that clear the real audit detector (wave 1)
@@ -797,7 +797,7 @@ of v1.8 depends on this one, because every later phase closes by showing a clean
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 36-06-PLAN.md — CLOSE-05c: probe outcome written into `29-VERIFICATION.md` and `29-SECURITY.md` T-29-06, and `29-VALIDATION.md` created (wave 4)
+- [x] 36-06-PLAN.md — CLOSE-05c: probe outcome written into `29-VERIFICATION.md` and `29-SECURITY.md` T-29-06, and `29-VALIDATION.md` created (wave 4)
 
 ### Phase 37: CRM Stack Closure
 
@@ -966,7 +966,7 @@ archived where the tooling expects to find them.
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
-| 36. Gate Repair & Planning-Record Hygiene | v1.8 | 5/6 | In Progress|  |
+| 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 0/? | Not started | - |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 0/? | Not started | - |
 | 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |

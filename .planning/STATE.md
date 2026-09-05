@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T15:06:06.000Z"
-last_activity: 2026-09-05 -- Phase 36 plan 05 executed (CLOSE-05 probe run for real, part 2 of 3, verdict ISOLATED)
+last_updated: "2026-09-05T15:45:00.000Z"
+last_activity: 2026-09-05 -- Phase 36 plan 06 executed (CLOSE-05 probe outcome folded into 29-VERIFICATION.md/29-SECURITY.md, 29-VALIDATION.md created, part 3 of 3 — Phase 36 complete)
 progress:
   total_phases: 25
-  completed_phases: 7
-  total_plans: 59
-  completed_plans: 59
-  percent: 28
+  completed_phases: 8
+  total_plans: 60
+  completed_plans: 60
+  percent: 32
 ---
 
 # State — Matrice Commerciale
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 36 — Gate Repair & Planning-Record Hygiene (in progress)
-Plan: 05/06 complete
-Status: Executing
-Last activity: 2026-09-05 -- Phase 36 plan 05 executed (CLOSE-05 probe run for real, part 2 of 3, verdict ISOLATED)
+Phase: 36 — Gate Repair & Planning-Record Hygiene (complete)
+Plan: 06/06 complete
+Status: Executing — Phase 36 complete, Phase 37 (CRM Stack Closure) next
+Last activity: 2026-09-05 -- Phase 36 plan 06 executed (CLOSE-05 probe outcome folded into 29-VERIFICATION.md/29-SECURITY.md, 29-VALIDATION.md created, part 3 of 3 — Phase 36 complete)
 
 **v1.8 phase order and why:**
 
@@ -472,6 +472,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 36 P03 | 12min | 3 tasks | 155 files |
 | Phase 36 P04 | ~7min | 2 tasks | 2 files |
 | Phase 36 P05 | ~8min | 2 tasks | 1 file |
+| Phase 36 P06 | ~35min | 3 tasks | 4 files |
 
 ## Decisions
 
@@ -620,6 +621,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 36]: scripts/probe-write-isolation.ts built (CLOSE-05 part 1 of 3, D-36-03) — deliberately does NOT import ./_load-env; reads PROBE_DEV_URL/PROBE_MAIN_URL inline, full-hostname allow-list checked before any client is constructed, mainSql (main/production client) restricted to a single read-only SELECT count(*) plus its own end() — verified greppable at exactly 3 code-line occurrences. Three synthetic self-tests (unconfigured, wrong dev hostname, transposed variables) all refuse before connecting, zero credential leakage. No real database contacted; plan 36-05 performs the operator-supervised real run.
 - [Phase 36]: DEV_HOST/MAIN_HOST in probe-write-isolation.ts declared with explicit `: string` type (not inferred literal type) — TypeScript otherwise narrows both after the sequential mismatch-and-exit guards and flags the devHost===mainHost transposition-equality check as a compile error (no overlap between literal types), even though it is the correct runtime check (Rule 1 auto-fix)
 - [Phase 36]: CLOSE-05 part 2 of 3 — operator ran scripts/probe-write-isolation.ts for real against the Neon development/main branches (D-36-03). Verdict ISOLATED, exit 0, sentinel isolation-probe-36-a72d43b9-7b3d-44c6-bab2-19a6b588665a deleted cleanly. A live (non-synthetic) attempt with the development URL in the PROBE_MAIN_URL slot was refused by the exact-hostname allow-list before any client was constructed — the first real-credential exercise of that gate. Recorded verbatim, credential-free, in 36-PROBE-TRANSCRIPT.md; production credential never reached the agent (hidden `read -rs` shell prompt, unset after run). 29-VERIFICATION.md/29-SECURITY.md/29-VALIDATION.md and the CLOSE-05 checkbox are explicitly plan 36-06's job, not touched here.
+- [Phase 36]: CLOSE-05 part 3 of 3 (D-36-03/D-36-04, plan 36-06, Phase 36 complete) — 29-VERIFICATION.md's Known Weak Link section, Score line, Human Verification Required and Gaps Summary amended additively with the 2026-09-05 ISOLATED verdict, residual re-classified WARNING→INFORMATIONAL; 29-SECURITY.md gained a dated `## T-29-06 Revisit` moving T-29-06 from accept to mitigate — empirically closed, attributed `Antoine (plan owner), 2026-09-05`, naming the second (SQL-level, Better-Auth-free) upgrade path distinct from the blocked grant-admin.ts path; 29-VALIDATION.md created (136 lines) with `nyquist_compliant: not-derivable` — Phase 29 ran with `workflow.research: false` and produced no 29-RESEARCH.md, so no Nyquist dimensions exist to reconstruct honestly, recorded as a measurement gap (not coverage gap) against the phase's 5/5 verified must-haves. All August 2026-08-31 text preserved verbatim (grep-count parity checked against pre-edit HEAD before each commit). CLOSE-05 flipped complete in REQUIREMENTS.md.
 
 ### Blockers
 
