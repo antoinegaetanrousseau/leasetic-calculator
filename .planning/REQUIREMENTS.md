@@ -54,7 +54,7 @@ stops existing.
 - [ ] **CLOSE-03**: Phase 33's residual human items are walked — the Space → ArrowRight → Space
   keyboard drag produces exactly one write, and D-08's gate is confirmed against a **production
   build** rather than `next dev` — leaving `33-VERIFICATION.md` at `status: passed`.
-- [ ] **CLOSE-04**: Phase 34 has a goal-backward `34-VERIFICATION.md` and a `34-REVIEW.md`; it
+- [x] **CLOSE-04**: Phase 34 has a goal-backward `34-VERIFICATION.md` and a `34-REVIEW.md`; it
   shipped 13 plans with neither.
 - [x] **CLOSE-05**: Phase 29 has a `29-VALIDATION.md` recording Nyquist coverage, and INFRA-05's
   write-isolation is either empirically probed or its architectural-inference basis is recorded as
@@ -162,7 +162,7 @@ stops existing.
 | CLOSE-01 | Phase 37 — CRM Stack Closure | Pending |
 | CLOSE-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
 | CLOSE-03 | Phase 37 — CRM Stack Closure | Pending |
-| CLOSE-04 | Phase 37 — CRM Stack Closure | Pending |
+| CLOSE-04 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-05 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | CLOSE-06 | Phase 40 — Milestone Record Closure | Pending |
 | CLOSE-07 | Phase 40 — Milestone Record Closure | Pending |

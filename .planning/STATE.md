@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T20:47:04.784Z"
+last_updated: "2026-09-05T20:59:25.178Z"
 last_activity: 2026-09-05
 progress:
   total_phases: 25
   completed_phases: 8
   total_plans: 64
-  completed_plans: 62
+  completed_plans: 63
   percent: 32
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 37 (crm-stack-closure) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-09-05
 
@@ -476,6 +476,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 37 P01 | 25min | 3 tasks | 3 files |
 | Phase 37 P02 | 15min | 3 tasks | 3 files |
 | Phase 37 P03 | ~55min | 2 tasks | 2 files |
+| Phase 37 P04 | 50min | 2 tasks | 1 files |
 
 ## Decisions
 
@@ -631,6 +632,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 37]: D-37-05 / IN-01: dropped the redundant !isAdmin from the momentum render gate, keeping isAdmin as the single source of truth at the data layer
 - [Phase 37]: D-37-05 / IN-02: froze BADGE_THRESHOLDS at both nesting levels via nested Object.freeze calls plus a Readonly nested Record type
 - [Phase 37]: Phase 34 verification (37-03): status passed, 10/10 must-haves, verified_at_commit 5753d22 — The solution-users-2 artifact discrepancy (11 files claimed by 34-03-SUMMARY.md, absent from disk) was traced to Phase 36's own recorded HOUSE-04 deletion, not a Phase 34 gap.
+- [Phase 37]: 34-REVIEW.md landed (0 Critical / 1 Warning / 1 Info); CLOSE-04 marked complete now that both 34-VERIFICATION.md and 34-REVIEW.md exist.
 
 ### Blockers
 
