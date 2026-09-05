@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-04T23:56:37.220Z"
-last_activity: 2026-09-04
+last_updated: "2026-09-05T00:07:30.402Z"
+last_activity: 2026-09-05
 progress:
   total_phases: 20
   completed_phases: 18
   total_plans: 97
-  completed_plans: 94
+  completed_plans: 95
   percent: 90
 ---
 
@@ -28,12 +28,12 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 35 (sales-motivation) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
 reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
 FICHE-01..05 / ACTV-01..05 stay OPEN until that checkpoint is approved.
-Last activity: 2026-09-04
+Last activity: 2026-09-05
 
 ## Deferred Items
 
@@ -428,6 +428,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 34 P12 | 21min | 3 tasks | 10 files |
 | Phase 35 P01 | ~20min | 2 tasks | 5 files |
 | Phase 35 P02 | ~20min | 2 tasks | 3 files |
+| Phase 35 P03 | ~35min | 3 tasks | 3 files |
 
 ## Decisions
 
@@ -559,6 +560,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 35]: summarizeStreaks currentWeeks two-branch rule: alive if the previous week has progress and current week is empty; longestWeeks is an independent max-over-history scan so a broken current streak never erases the longest-ever consistency badge (D-07/A-5)
 - [Phase 35]: GAME-01/02/03 requirement checkboxes left OPEN after 35-01 (pure logic only, no query layer, no UI) — following this project's established FICHE/ACTV precedent (Phase 34), requirements mark-complete is deferred to the plan that actually grounds the observable behavior (35-05, MomentumCard wired onto the home page)
 - [Phase 35]: isProgressEvent excludes toStage='perdu' explicitly (D-11 gaming-route closure); no new index added over relationship_events_relationship_id_occurred_at_idx (near-empty table, D-23 holds)
+- [Phase 35]: nowMs dropped from MomentumCardProps — all dates derived server-side before the component is reached; 35-05 must not pass nowMs into MomentumCard
+- [Phase 35]: MomentumCard.movements is one WeeklyMovements object ({rows,total}), not a bare array plus a separate count prop
 
 ### Blockers
 
