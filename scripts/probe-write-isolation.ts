@@ -287,8 +287,15 @@ async function main(): Promise<void> {
           `WARNING: cleanup deleted ${deleteResult.count} row(s) for sentinel ${sentinel} `
           + `on ${devHost} (expected 1) — verify by hand.`,
         );
+        // D-36-03 requires that nothing be left behind on `development`. A run
+        // that cannot prove that has not met its own contract, so it fails —
+        // the exit code the operator reports must not say 0 while a sentinel
+        // may still exist.
+        console.error('  Marking this run FAILED: cleanup could not be confirmed.');
+        exitCode = 1;
       }
     } catch (cleanupErr) {
+      exitCode = 1;
       console.error(
         `WARNING: cleanup DELETE failed for sentinel ${sentinel} on ${devHost}: `
         + `${safeErrorMessage(cleanupErr)} — verify by hand.`,
