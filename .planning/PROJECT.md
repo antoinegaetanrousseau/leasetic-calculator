@@ -292,6 +292,14 @@ All 6 active v1.5 requirements shipped — 2 phases (26–27); 1 descoped (ROWAC
 - ✓ Per-row Archive on active/expired `/proposals` rows + Restore in the Archivées view; instant in-place refresh + toast; drafts keep Edit + Archive + Delete; ADMIN-09 19-gate grep suite green — v1.5 (ROWACT-01/03/04/05)
 - ✓ Status pill renders full-label, content-hugging, aligned on the home "Propositions récentes" list and the `/proposals` table, light + dark (human-verified) — v1.5 (UIFIX-02/03)
 
+### Validated (shipped in v1.7)
+
+- **GAME-01**: A partner sees what moved in their own book recently — stage advances and proposals finalized, with when — read from the relationship timeline rather than a second record. _Validated in Phase 35: Sales Motivation._
+- **GAME-02**: A partner sees a streak of consecutive weeks of real progress, and can see what would break the current one before it breaks. _Validated in Phase 35._
+- **GAME-03**: A partner earns badges for own-book milestones, and every criterion — earned or not — is readable rather than guessed at. _Validated in Phase 35._
+- **GAME-04**: No surface lets a partner learn anything about another partner's book, including by inference from a count, rank, total or wording. _Validated in Phase 35, and proven at runtime: `momentum.isolation.integration.test.ts` was run against real Postgres with 3/3 mutation evidence — deleting the owner predicate makes exactly that suite fail._
+- **GAME-05**: A partner who ignores all of it is not penalised; pipeline, conversion rate and follow-up list behave exactly as before. _Validated in Phase 35._
+
 ### Active (next milestone)
 
 None yet — defined at `/gsd-new-milestone`. Candidate scope carried forward below.
@@ -420,4 +428,6 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-08-31 at v1.6 milestone start (CRM Foundation). Since v1.5: Phase 28 (ReUI / base-maia design-system migration, 24 commits, retro-documented — PR #6 open, not yet merged). 1213 tests passing. v1.6 turns the quoting extranet into a CRM that replaces HubSpot: shared company registry + private per-partner relationships, two-source reconciliation, pipeline and activity. Next: `/gsd-plan-phase 29`.*
+*Last updated: 2026-09-05 at v1.7 milestone completion (Sales Motivation). Since v1.6: Phase 35 shipped momentum, weekly streaks and a 3x3 badge ladder on the partner home page, derived at read time from Phase 34's `relationship_events` — no new table, no migration, no awarding job. 2320 tests passing. Verification passed 9/9 must-haves; security audit closed 21/21 threats.*
+
+*Two things from Phase 35 worth carrying forward: (1) the phase's real-Postgres isolation suite caught two production-shipping bugs that 2297 mocked-driver tests could not — a mocked test proves a WHERE clause was COMPOSED, never that it FILTERS; (2) the card's visual-restraint decision (D-19) was reversed post-execution by operator review and amended to D-19a in `35-CONTEXT.md`, with GAME-04's no-leaderboard rule explicitly held as a privacy property rather than a style budget.*
