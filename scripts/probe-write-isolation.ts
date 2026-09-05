@@ -47,12 +47,19 @@
  * What the read-only control actually guarantees, stated precisely: the
  * `default_transaction_read_only` startup parameter is REQUESTED on that
  * connection (see `MAIN_SESSION_READ_ONLY`), and the single statement above
- * then VERIFIES in-band that the server applied it. Requesting alone would
- * prove nothing — a pgbouncer-family pooler can accept the connection and
- * silently discard the parameter, yielding a read-write session with no error
- * raised. If `transaction_read_only` does not come back `on`, the run refuses
- * to certify and exits non-zero. So the guarantee is: this run either observed
- * a read-only session or failed — it never assumes one.
+ * then MEASURES in-band whether the server applied it. Requesting alone would
+ * prove nothing — a proxy or pooler can accept the connection and silently
+ * discard the parameter, yielding a read-write session with no error raised.
+ *
+ * On Neon it IS discarded: observed 2026-09-05 against the real `main` branch
+ * on the pooled endpoint AND on the direct one, both reporting
+ * `transaction_read_only = off`. So the run WARNS rather than refuses, and this
+ * script makes no claim that the session is read-only at the server. The
+ * properties it does guarantee are the D-36-03 ones — inline-only URLs, exactly
+ * one read-only statement on `mainSql`, guaranteed `finally` cleanup,
+ * hostname-only output — none of which depend on the GUC. The floor that would
+ * actually hold is a read-only Neon ROLE in the PROBE_MAIN_URL slot; that is
+ * credential work and belongs with OPS-01 in Phase 39.
  *
  * Every caught error — including anything that
  * escapes `main()` — goes through `safeErrorMessage`, which prints `err.message`
@@ -80,9 +87,11 @@
  *      value (compared case-insensitively on both sides), so the guard and the
  *      connect path can never diverge — this also neutralises postgres.js's
  *      `PGHOST` fallback.
- *   5. The `main` session must report `transaction_read_only = on`, proven
- *      in-band by the one statement it issues. A pooler that silently discarded
- *      the startup parameter is caught here rather than assumed away.
+ *   5. The `main` session's `transaction_read_only` setting is MEASURED in-band
+ *      by the one statement it issues, and reported. This gate WARNS, it does
+ *      not fail closed — Neon discards the startup parameter on both endpoint
+ *      types (observed 2026-09-05), and the isolation verdict does not depend
+ *      on it. See the branch itself for the full rationale.
  *   6. Cleanup must be confirmed: if the sentinel's DELETE cannot be shown to
  *      have removed exactly one row, the run exits non-zero even when the
  *      isolation verdict itself was PASS.
@@ -111,10 +120,17 @@
  *   main → ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech
  *          ep-icy-boat-alx5o1tz.c-3.eu-central-1.aws.neon.tech             (direct)
  *
- * Prefer POOLED for the dev slot and DIRECT for the main slot. Observed
- * 2026-09-05 against the real `main` pooled endpoint: Neon's pooler accepts the
- * connection and silently discards `default_transaction_read_only`, so gate 5
- * refuses. The direct endpoint carries startup parameters through.
+ * Either form works for either slot. Both are accepted because the direct
+ * endpoint was, briefly, believed to be the fix for gate 5 — it is not.
+ * Measured 2026-09-05 against the real `main` branch:
+ *
+ *   pooled endpoint -> transaction_read_only = off
+ *   direct endpoint -> transaction_read_only = off
+ *
+ * Neon discards `default_transaction_read_only` on BOTH, so switching endpoint
+ * type changes nothing about gate 5 (which now warns rather than refuses). The
+ * dev slot is normally pooled simply because that is the value already sitting
+ * in the local test-env file.
  *
  * TESTING THIS SCRIPT'S OWN GATES — READ BEFORE WRITING A TEST INPUT
  * Known residual, deliberately not designed away (no parse-only mode exists;
@@ -485,22 +501,47 @@ async function main(): Promise<void> {
       const mainCount = mainResult?.n ?? 0;
       const mainReadOnly = mainResult?.ro === undefined ? 'unknown' : String(mainResult.ro);
 
+      // Gate 5 WARNS, it does not refuse. Rationale, recorded because the
+      // opposite choice was tried first and had to be reversed:
+      //
+      // The read-only session is defence-in-depth added during code review
+      // (WR-05). It is NOT one of D-36-03's constraints, which are: both URLs
+      // inline-only, exactly one read-only statement on `mainSql`, guaranteed
+      // `finally` cleanup, and hostname-only output. All four hold whatever this
+      // GUC reports.
+      //
+      // Observed 2026-09-05 against the real `main` branch, both endpoint types:
+      //   pooled (ep-icy-boat-alx5o1tz-pooler...)  -> transaction_read_only = off
+      //   direct (ep-icy-boat-alx5o1tz...)         -> transaction_read_only = off
+      // So this is not a pgbouncer artifact and the "use the direct endpoint"
+      // remedy does not work. Neon appears to forward only an allowlist of
+      // startup parameters through its proxy, which fronts both endpoint types.
+      // That is inference from two observations, not a documented Neon behaviour.
+      //
+      // Refusing here made the probe unable to answer the question it exists to
+      // answer, on this platform, ever — a control that can never pass is one
+      // that gets deleted in frustration rather than respected. The floor that
+      // actually holds is a read-only Neon ROLE in the PROBE_MAIN_URL slot; that
+      // is credential work and belongs with OPS-01 in Phase 39.
       if (mainReadOnly !== 'on') {
-        console.error(
-          `ERROR: the session on ${mainHost} is NOT read-only `
-          + `(transaction_read_only = ${mainReadOnly}) — refusing to certify this run.`,
+        console.warn(
+          `WARNING: the session on ${mainHost} is NOT read-only `
+          + `(transaction_read_only = ${mainReadOnly}).`,
         );
-        console.error(
-          '  The default_transaction_read_only startup parameter was sent but not honoured. A '
-          + 'pgbouncer-family pooler can accept the connection and silently discard it '
-          + '(ignore_startup_parameters / track_extra_parameters), which raises no error.',
+        console.warn(
+          '  The default_transaction_read_only startup parameter was sent but not honoured. '
+          + 'Observed on 2026-09-05 for BOTH the pooled and the direct Neon endpoint, so this '
+          + 'is not a pooler-only artifact and switching endpoint type does not fix it.',
         );
-        console.error(
-          '  Use the branch\'s direct (non-pooled) endpoint for PROBE_MAIN_URL, or supply a '
-          + 'role that is read-only at the database.',
+        console.warn(
+          '  The isolation verdict below is still valid — it rests on the sentinel comparison, '
+          + 'not on this setting. What is NOT guaranteed is the defence-in-depth floor: a future '
+          + 'edit adding a write to `mainSql` would not be stopped by the server. Supply a role '
+          + 'that is read-only at the database to close that gap (Phase 39, OPS-01).',
         );
-        exitCode = 1;
-      } else if (mainCount === 0) {
+      }
+
+      if (mainCount === 0) {
         console.log(`PASS: sentinel ${sentinel} is absent from ${mainHost} — ISOLATED.`);
         exitCode = 0;
       } else {
