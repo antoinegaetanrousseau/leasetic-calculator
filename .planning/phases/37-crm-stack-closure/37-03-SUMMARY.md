@@ -112,6 +112,7 @@ None - no external service configuration required.
 - `34-VERIFICATION.md` now exists and can be cited by Phase 40's formal v1.6 close.
 - Plan 37-04 (the scoped Phase 34 code review) can proceed independently; this verification touched no Phase 34 source code, requirement checkboxes, or Phase 38/39/40 artifacts (`git status --porcelain` after the commit shows only `34-VERIFICATION.md` under this plan's changes).
 - No blockers for 37-05's consolidated operator walk — the four `30-UAT.md` scenarios (2, 9, 10, 12) this verification deliberately did not claim remain correctly reserved for that plan.
+- **CLOSE-04 deliberately NOT marked complete by this plan.** `.planning/REQUIREMENTS.md` line 57 defines CLOSE-04 as needing BOTH `34-VERIFICATION.md` *and* `34-REVIEW.md` ("it shipped 13 plans with neither"). This plan delivers only the verification half; plan 37-04 owns the scoped code review (`34-REVIEW.md`, per D-37-03). `requirements.mark-complete` was intentionally skipped here rather than rounding CLOSE-04 up to done on half its evidence — 37-04 should run `requirements.mark-complete CLOSE-04` once `34-REVIEW.md` also lands.
 
 ---
 *Phase: 37-crm-stack-closure*
