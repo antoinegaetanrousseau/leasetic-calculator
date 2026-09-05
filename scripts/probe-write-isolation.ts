@@ -70,8 +70,12 @@
  *      bare DNS hostname. A hand-rolled substring split is NOT used: it folded
  *      credential material into the "hostname" and accepted scheme-less strings
  *      the driver routed elsewhere.
- *   3. Each hostname must equal, exactly, the endpoint in
- *      `docs/operations/neon-branch-routing.md` — never a prefix match.
+ *   3. Each hostname must equal, exactly, one of the two hostnames its branch
+ *      is published under — the pooled endpoint from
+ *      `docs/operations/neon-branch-routing.md` or the direct (non-pooled) form
+ *      of the same endpoint. Exact equality against a two-element set; never a
+ *      prefix match. The two branches' sets are disjoint, so supplying a dev
+ *      hostname in the main slot is still refused.
  *   4. After construction, the DRIVER's own resolved host must equal the same
  *      value (compared case-insensitively on both sides), so the guard and the
  *      connect path can never diverge — this also neutralises postgres.js's
@@ -88,7 +92,7 @@
  * harmless, and `/healthz` reads it with `.limit(0)` (`src/lib/health.ts:47-56`),
  * so a transient sentinel row cannot affect the health check.
  *
- * RUN (both URLs MUST be pooled `-pooler` connection strings)
+ * RUN (each URL must be that branch's pooled OR direct connection string)
  * Do NOT put the production password on the command line: that writes it into
  * shell history and into the process's `/proc`-visible argv for the duration of
  * the run. Read both values into hidden prompts, pass them through the
@@ -103,7 +107,14 @@
  *
  * The expected endpoints, for reference (hostnames only, never credentials):
  *   dev  → ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech
+ *          ep-polished-band-alphc576.c-3.eu-central-1.aws.neon.tech        (direct)
  *   main → ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech
+ *          ep-icy-boat-alx5o1tz.c-3.eu-central-1.aws.neon.tech             (direct)
+ *
+ * Prefer POOLED for the dev slot and DIRECT for the main slot. Observed
+ * 2026-09-05 against the real `main` pooled endpoint: Neon's pooler accepts the
+ * connection and silently discards `default_transaction_read_only`, so gate 5
+ * refuses. The direct endpoint carries startup parameters through.
  *
  * TESTING THIS SCRIPT'S OWN GATES — READ BEFORE WRITING A TEST INPUT
  * Known residual, deliberately not designed away (no parse-only mode exists;
@@ -123,8 +134,8 @@
  * opens a socket to production.
  *
  * So: to test the gates, copy this file and rewrite both host constants to
- * RFC-2606 `.invalid` names, then assert on the copy that the `DEV_HOST` and
- * `MAIN_HOST` lines both end in `.invalid` before running anything. (Do not
+ * RFC-2606 `.invalid` names, then assert on the copy that the `DEV_POOLED` and
+ * `MAIN_POOLED` lines both end in `.invalid` before running anything. (Do not
  * assert "zero matches for the real domain" — this paragraph mentions it, so
  * that check fails on its own prose.) DNS never resolves `.invalid`, so the
  * copy physically cannot reach an endpoint even when input passes every gate.
@@ -137,8 +148,45 @@ import postgres from 'postgres';
 // Full hostnames from docs/operations/neon-branch-routing.md. Matched by exact
 // equality only — never a prefix or `startsWith` — so a lookalike host sharing
 // an endpoint-ID prefix is rejected as unrecognised rather than misclassified.
-const DEV_HOST: string = 'ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech';
-const MAIN_HOST: string = 'ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech';
+const DEV_POOLED: string = 'ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech';
+const MAIN_POOLED: string = 'ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech';
+
+/**
+ * Neon exposes each endpoint at two hostnames: the pooled one (with a `-pooler`
+ * suffix on the endpoint-ID label) and the direct one without it. Only the
+ * pooled hostnames are recorded in `docs/operations/neon-branch-routing.md`,
+ * because pooled is what the application uses (routing rule 2).
+ *
+ * The direct hostname is accepted here as well, for one specific reason: a
+ * pgbouncer-family pooler can silently discard the `default_transaction_read_only`
+ * startup parameter (see MAIN_SESSION_READ_ONLY below), and this was observed
+ * against the real `main` pooled endpoint on 2026-09-05 — the run refused, and
+ * the refusal message told the operator to use the direct endpoint, which the
+ * allow-list then rejected. The advice was unreachable. Accepting the direct
+ * hostname makes the documented remedy actually usable.
+ *
+ * This derivation strips the literal `-pooler` from the first label only, and
+ * asserts it changed something — a hostname that does not match the expected
+ * shape fails loudly at module load rather than silently widening the
+ * allow-list to a value nobody intended.
+ */
+function directOf(pooled: string): string {
+  const direct = pooled.replace(/^([^.]*)-pooler\./, '$1.');
+  if (direct === pooled) {
+    throw new Error(
+      `probe-write-isolation: expected a '-pooler' suffix on the first label of '${pooled}'. `
+      + 'The allow-list derivation is stale — check docs/operations/neon-branch-routing.md.',
+    );
+  }
+  return direct;
+}
+
+// Each branch accepts exactly two hostnames. Membership is tested by exact
+// equality against these frozen arrays — still never a prefix match, and the
+// two sets are disjoint, so a dev hostname supplied in the main slot (or vice
+// versa) is still refused.
+const DEV_HOSTS: readonly string[] = Object.freeze([DEV_POOLED, directOf(DEV_POOLED)]);
+const MAIN_HOSTS: readonly string[] = Object.freeze([MAIN_POOLED, directOf(MAIN_POOLED)]);
 
 function usage(): void {
   console.error(
@@ -146,10 +194,10 @@ function usage(): void {
     + 'npm run probe:write-isolation',
   );
   console.error(
-    `  PROBE_DEV_URL must resolve to the Neon development endpoint (${DEV_HOST}).`,
+    `  PROBE_DEV_URL must resolve to a Neon development endpoint (${DEV_HOSTS.join(' or ')}).`,
   );
   console.error(
-    `  PROBE_MAIN_URL must resolve to the Neon main (production) endpoint (${MAIN_HOST}).`,
+    `  PROBE_MAIN_URL must resolve to a Neon main (production) endpoint (${MAIN_HOSTS.join(' or ')}).`,
   );
 }
 
@@ -312,17 +360,17 @@ function createClient(
 async function openClient(
   varName: string,
   url: string,
-  expectedHost: string,
+  expectedHosts: readonly string[],
   connection?: { default_transaction_read_only?: boolean },
 ) {
   const sql = createClient(varName, url, connection);
   const resolved = sql.options.host;
-  if (resolved.length !== 1 || resolved[0].toLowerCase() !== expectedHost) {
+  if (resolved.length !== 1 || !expectedHosts.includes(resolved[0].toLowerCase())) {
     console.error(
       `ERROR: the postgres driver resolved a different host for ${varName} than the `
       + 'allow-list accepted — refusing.',
     );
-    console.error(`  Expected the driver to target exactly one host: ${expectedHost}`);
+    console.error(`  Expected the driver to target exactly one of: ${expectedHosts.join(', ')}`);
     await sql.end({ timeout: 5 });
     process.exit(1);
   }
@@ -353,15 +401,15 @@ async function main(): Promise<void> {
     return;
   }
 
-  if (devHost !== DEV_HOST) {
+  if (!DEV_HOSTS.includes(devHost)) {
     console.error(`ERROR: PROBE_DEV_URL resolves to an unrecognised host: ${devHost}`);
-    console.error(`  Expected exactly: ${DEV_HOST}`);
+    console.error(`  Expected exactly one of: ${DEV_HOSTS.join(', ')}`);
     process.exit(1);
     return;
   }
-  if (mainHost !== MAIN_HOST) {
+  if (!MAIN_HOSTS.includes(mainHost)) {
     console.error(`ERROR: PROBE_MAIN_URL resolves to an unrecognised host: ${mainHost}`);
-    console.error(`  Expected exactly: ${MAIN_HOST}`);
+    console.error(`  Expected exactly one of: ${MAIN_HOSTS.join(', ')}`);
     process.exit(1);
     return;
   }
@@ -396,8 +444,8 @@ async function main(): Promise<void> {
   process.once('SIGINT', () => onInterrupt('SIGINT'));
   process.once('SIGTERM', () => onInterrupt('SIGTERM'));
 
-  const devSql = await openClient('PROBE_DEV_URL', devUrl, DEV_HOST);
-  const mainSql = await openClient('PROBE_MAIN_URL', mainUrl, MAIN_HOST, MAIN_SESSION_READ_ONLY);
+  const devSql = await openClient('PROBE_DEV_URL', devUrl, DEV_HOSTS);
+  const mainSql = await openClient('PROBE_MAIN_URL', mainUrl, MAIN_HOSTS, MAIN_SESSION_READ_ONLY);
 
   let exitCode = 1;
   // The `finally` below runs unconditionally, including when the INSERT itself
