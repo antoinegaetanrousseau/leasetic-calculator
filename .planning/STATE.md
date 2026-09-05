@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T13:56:23.547Z"
-last_activity: 2026-09-05 -- Phase 36 planning complete
+last_updated: "2026-09-05T14:13:34.080Z"
+last_activity: 2026-09-05 -- Phase 36 plan 01 executed (HOUSE-01/HOUSE-02 closed)
 progress:
   total_phases: 25
   completed_phases: 7
   total_plans: 59
-  completed_plans: 53
+  completed_plans: 54
   percent: 28
 ---
 
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 36 — Gate Repair & Planning-Record Hygiene (not started)
-Plan: —
-Status: Ready to execute
-Last activity: 2026-09-05 -- Phase 36 planning complete
+Phase: 36 — Gate Repair & Planning-Record Hygiene (in progress)
+Plan: 01/06 complete
+Status: Executing
+Last activity: 2026-09-05 -- Phase 36 plan 01 executed (HOUSE-01/HOUSE-02 closed)
 
 **v1.8 phase order and why:**
 
@@ -467,6 +467,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 35 P03 | ~35min | 3 tasks | 3 files |
 | Phase 35 P04 | ~30min | 3 tasks | 2 files |
 | Phase 35 P05 | ~45min | 3 tasks | 2 files |
+| Phase 36 P01 | ~35min | 3 tasks | 6 files |
 
 ## Decisions
 
@@ -604,6 +605,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 35]: 35-04: sql.json(obj), never JSON.stringify(obj) cast to ::jsonb, to avoid double-encoding jsonb payloads
 - [Phase 35]: 35-05: Test 6's blanket role-comparison source regex narrowed to a behavioural assertion — D-15 requires the one role branch the blanket regex would have forbidden
 - [Phase 35]: 35-05: isAdmin derived once from requireUser()'s role; momentum queries nested behind isAdmin ? null : Promise.all([...]) so an admin's request never resolves them (D-15), never a requireRelationshipHolder()/requireAdmin() call
+- [Phase 36]: HOUSE-01 closed by re-run evidence in deferred-items.md, no eslint.config.mjs change (D-36-01)
+- [Phase 36]: 06/07/08/31-CONTEXT.md stale open questions annotated RESOLVED/DEFERRED in place, verdicts traced to STATE.md v1.1-close table and 31-*-SUMMARY.md (D-36-05, HOUSE-02)
+- [Phase 36]: 31-CONTEXT.md Open Questions heading retitled (not appended) and 36-CONTEXT.md's D-36-05 wording fixed, clearing scanContextQuestions false positives on both files
 
 ### Blockers
 
