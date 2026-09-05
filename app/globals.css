@@ -121,6 +121,41 @@
   --topbar-h:       52px;
   --footer-h:       48px;
 
+  /* ── Phase 35 (D-19a) — badge tier identity ────────────────────────────
+     bronze / silver / gold for the momentum card's badge rungs. These are
+     SURFACE-SCOPED additions, not a change to the brand palette:
+     `--brand-accent` and every ReUI token above are untouched, and
+     `MomentumCard` is the only reader.
+
+     Every value clears WCAG AA (4.5:1) as text against `--card` AND against
+     its own 12%-tinted rung tile — measured, not eyeballed:
+       bronze #9c4d1c  6.01:1 on --card, 5.07:1 on the tile
+       silver #566575  5.98:1 on --card, 5.09:1 on the tile
+       gold   #7a6600  5.63:1 on --card, 4.79:1 on the tile
+
+     A bright, literal gold cannot clear 4.5:1 on a white card, so the light
+     triplet is the antique register — hue separation, not brightness, is
+     what keeps bronze and gold apart here (25° vs 78°). The dark triplet
+     below has the headroom to read as actual metal.
+
+     D-11: tier colour is for badge rungs ONLY. A movement row must never
+     read these tokens — a coloured movement row is penalty framing under
+     another name. */
+  --tier-bronze:    #9c4d1c;
+  --tier-silver:    #566575;
+  --tier-gold:      #7a6600;
+
+  /* Neutral chrome for the momentum card's inset panels and progress
+     tracks: a translucent wash that composites over --card, so one card
+     surface can hold three nested panels without a stack of opaque greys.
+     Spelled as literal rgb()/alpha rather than a color-mix() of --foreground
+     on purpose — lightningcss emits a `var(--foreground)` (fully OPAQUE)
+     fallback for color-mix() behind an @supports guard, which would paint
+     these panels solid black on an older engine. Same rgb(x / a) shape
+     --shadow-card above already uses. */
+  --momentum-panel: rgb(0 0 0 / 0.035);
+  --momentum-track: rgb(0 0 0 / 0.10);
+
   color-scheme: light;
 }
 
@@ -185,6 +220,20 @@ html[data-theme="dark"] {
   --invert:                  var(--color-zinc-700);
 
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 14px rgb(0 0 0 / 0.25);
+  /* Phase 35 (D-19a) — badge tier identity, dark. Same measurement
+     discipline as the light triplet, against --card (#1e1e1e) and the
+     12%-tinted rung tile:
+       bronze #e3a173   7.63:1 on --card, 6.09:1 on the tile
+       silver #c3cdd8  10.36:1 on --card, 7.86:1 on the tile
+       gold   #e8c05a   9.62:1 on --card, 7.47:1 on the tile
+     The panel/track washes flip polarity here — white over the dark card
+     instead of black over the light one. */
+  --tier-bronze:    #e3a173;
+  --tier-silver:    #c3cdd8;
+  --tier-gold:      #e8c05a;
+  --momentum-panel: rgb(255 255 255 / 0.04);
+  --momentum-track: rgb(255 255 255 / 0.12);
+
   color-scheme: dark;
 }
 /* Brand palette --navy/--green/--gd/--gl/--teal/--gold/--danger preserved across themes */
