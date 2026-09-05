@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T15:45:00.000Z"
-last_activity: 2026-09-05 -- Phase 36 plan 06 executed (CLOSE-05 probe outcome folded into 29-VERIFICATION.md/29-SECURITY.md, 29-VALIDATION.md created, part 3 of 3 — Phase 36 complete)
+last_updated: "2026-09-05T19:43:38.727Z"
+last_activity: 2026-09-05 -- Phase 37 planning complete
 progress:
   total_phases: 25
   completed_phases: 8
-  total_plans: 60
-  completed_plans: 60
+  total_plans: 64
+  completed_plans: 59
   percent: 32
 ---
 
@@ -29,8 +29,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 37 — CRM Stack Closure (context gathered)
 Plan: 06/06 complete
-Status: Context gathered — awaiting `/gsd-plan-phase 37 --skip-ui`
-Last activity: 2026-09-05 — Phase 36 complete (verification passed); Phase 37 context gathered (6 decisions)
+Status: Ready to execute
+Last activity: 2026-09-05 -- Phase 37 planning complete
 
 **v1.8 phase order and why:**
 
