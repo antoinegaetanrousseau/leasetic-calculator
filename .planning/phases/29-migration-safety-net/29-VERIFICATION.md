@@ -116,6 +116,30 @@ This is recorded as a **WARNING-level residual gap**, not a BLOCKER: the phase's
 
 Dated 2026-09-05, Phase 36 / CLOSE-05.
 
+### Update 2026-09-05 (later same day) — confirming run on the fully-hardened script
+
+The observation above was made a second time, on the same date, using the fully-hardened,
+gate-5-downgraded revision of the script (`c76c294`) rather than the pre-hardening revision
+(`e68b3a3`) the first observation used. Full transcript at
+`.planning/phases/36-gate-repair-planning-record-hygiene/36-PROBE-TRANSCRIPT.md`, `## Second run —
+2026-09-05` section; disposition closed in `36-VERIFICATION.md`'s own re-verification section (W-01).
+
+Two prior attempts in that same session refused to certify — `transaction_read_only = off` on the
+`main` session, observed on both the pooled and the direct (non-pooled) endpoint — before the
+operator made a deliberate, documented decision to downgrade that specific gate from a refusal to a
+warning. The confirming attempt then printed the same `PASS: ... — ISOLATED` line, exit 0, with the
+warning attached rather than a silent pass.
+
+**This strengthens, without widening, the evidentiary basis above.** It remains one point-in-time
+observation of one sentinel row in one table (`schema_meta`), through Neon's compute-endpoint
+routing — now made **twice**, by two different script revisions, against two different `main`
+endpoint forms (pooled, then direct). It does not newly prove storage-layer isolation or exercise
+the Vercel production runtime's own connection routing; those residuals, stated in the Update
+2026-09-05 subsection above, still hold unchanged. The read-only session floor (WR-05, measured
+in-band by NEW-02) is now confirmed unavailable on Neon for both endpoint types — see
+`29-SECURITY.md`'s T-29-06 Revisit for the full disposition of that specific gap and its remaining
+owner (Phase 39 / OPS-01).
+
 ## Human Verification Required
 
 None required to close this verification. The one item that would fully close INFRA-05 empirically — running ISOLATION-PROBE-29 after restoring a `development`-branch login — is a *future, optional* action already documented as a cheap upgrade path in 29-02-SUMMARY.md and 29-SECURITY.md's Accepted Risks Log. It does not block Phase 29's status and is not newly discovered by this verification.

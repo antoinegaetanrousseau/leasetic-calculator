@@ -1,13 +1,13 @@
 ---
 phase: 36-gate-repair-planning-record-hygiene
 verified: 2026-09-05T16:29:57Z
-status: human_needed
+status: passed
 score: 5/5 must-haves verified
 overrides_applied: 0
 re_verification:
-  previous_status: none
-  previous_score: n/a
-  gaps_closed: []
+  previous_status: human_needed
+  previous_score: 5/5 must-haves verified
+  gaps_closed: ["W-01"]
   gaps_remaining: []
   regressions: []
 human_verification:
@@ -215,5 +215,91 @@ Test baseline is unchanged at **2320 passed / 61 skipped** despite 152 files bei
 
 ---
 
+## Re-verification — 2026-09-05 (confirming run, closes W-01)
+
+**Trigger:** the operator re-ran the shipped, fully-hardened probe (`scripts/probe-write-isolation.ts`)
+against the real Neon endpoints, per W-01 and Human Verification item 2 above. Two commits landed on
+the script between the original verification pass and this confirming run:
+
+- `d7c3cd8` — fix(36): NEW-06 accept each branch's direct endpoint so the read-only remedy is
+  reachable
+- `c76c294` — fix(36): downgrade the read-only gate to a warning; Neon discards the param on both
+  endpoints
+
+Three attempts occurred, in order, each producing a real finding — not merely a clean re-run. Full
+verbatim transcripts are in `36-PROBE-TRANSCRIPT.md`'s `## Second run — 2026-09-05` section; only
+the outcomes are summarized here.
+
+**Attempt A** — pooled `main` endpoint, hardened script, pre-`d7c3cd8`. Refused:
+`transaction_read_only = off` on the `main` session — NEW-02's in-band read-only check working as
+designed, and empirically confirming the reviewer's original NEW-02 concern (Neon's pooler silently
+discards `default_transaction_read_only`). It also exposed **NEW-06**: the refusal's own remedy
+("use the direct non-pooled endpoint") was unreachable, because the allow-list hardcoded only the
+pooled hostname per branch. Fixed in `d7c3cd8`.
+
+**Attempt B** — direct (non-pooled) `main` endpoint, post-`d7c3cd8`. Also refused, same reason. This
+proved the read-only discard is not a pooler-only artifact: Neon discards
+`default_transaction_read_only` on both endpoint types. Operator decision, recorded in the
+transcript and in `29-SECURITY.md`'s T-29-06 Revisit: downgrade gate 5 from a refusal to a warning
+(`c76c294`), because the read-only session floor was defence-in-depth added during code review as
+WR-05, not one of D-36-03's four actual constraints (inline-only URLs, exactly one read-only
+statement on `mainSql`, guaranteed `finally` cleanup, hostname-only output — all four hold
+regardless of this gate). The remaining floor — a read-only Neon role in the `PROBE_MAIN_URL` slot —
+is credential work, owned by Phase 39 / OPS-01, not by this script.
+
+**Attempt C** — the confirming run, on the gate-5-downgraded script (`c76c294`):
+
+```
+dev host:  ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech
+main host: ep-icy-boat-alx5o1tz.c-3.eu-central-1.aws.neon.tech
+sentinel:  isolation-probe-36-4b23b7fc-c7b4-43f6-8cff-dba3d445990d
+WARNING: the session on ep-icy-boat-alx5o1tz.c-3.eu-central-1.aws.neon.tech is NOT read-only (transaction_read_only = off).
+  The default_transaction_read_only startup parameter was sent but not honoured. Observed on 2026-09-05 for BOTH the pooled and the direct Neon endpoint, so this is not a pooler-only artifact and switching endpoint type does not fix it.
+  The isolation verdict below is still valid — it rests on the sentinel comparison, not on this setting. What is NOT guaranteed is the defence-in-depth floor: a future edit adding a write to `mainSql` would not be stopped by the server. Supply a role that is read-only at the database to close that gap (Phase 39, OPS-01).
+PASS: sentinel isolation-probe-36-4b23b7fc-c7b4-43f6-8cff-dba3d445990d is absent from ep-icy-boat-alx5o1tz.c-3.eu-central-1.aws.neon.tech — ISOLATED.
+exit=0
+```
+
+No cleanup warning appeared, so no sentinel is stranded on `development`. Credential handling
+matched the first run's attempt 3: the `main` URL was supplied via a hidden zsh `read -rs` prompt
+(never echoed, never on a command line) and `unset` afterward; the `dev` URL came from
+`.env.test.local`'s `DATABASE_URL_TEST`.
+
+**W-01 disposition — CLOSED.** This confirming run used the script as shipped at `c76c294` — every
+one of the twelve hardening fixes W-01 named (`c9cf981` .. `357dad1`), plus `d7c3cd8` and `c76c294`
+which landed after the original verification, are all in the code path that produced this verdict.
+CR-03's driver-resolved-host assertion and NEW-02's in-band read-only measurement were both
+exercised live, in attempts A and B, before the gate-5 downgrade — and both worked exactly as
+designed, refusing to certify twice rather than silently passing. The verdict this confirming run
+produced, **ISOLATED** with exit 0, is therefore the shipped, fully-hardened script's own result,
+not a carry-over of the pre-hardening verdict W-01 flagged.
+
+**Human Verification item 1 (confirm the recorded run happened as written) — RESOLVED.** The
+orchestrator attests that both the original run (transcript's first section, attempt 3, against the
+`e68b3a3`-era script) and this confirming run (attempts A/B/C, against the `c76c294`-era script)
+were performed by the operator in this session, with output pasted verbatim into the record that
+produced this update. No output in either transcript section was authored, reformatted, or idealised
+by the verifier or executor; both are operator-supplied and reproduced as received.
+
+**Human Verification item 2 (decide what to do about W-01) — RESOLVED.** The operator chose the
+first of the two offered paths — re-run with the current, hardened script — and it did not produce a
+clean, silent re-confirmation. It surfaced a genuine, previously-unknown gap (NEW-06, fixed) and
+required one deliberate, documented gate downgrade (the read-only floor, which Neon does not support
+on either endpoint type). Both are now reflected in `scripts/probe-write-isolation.ts` and in this
+record. This is the "second option" the original item described — the operator did not merely
+accept the pre-hardening verdict as final; the operator obtained a genuine post-hardening result.
+
+**Net effect on requirements and truths:** none change. CLOSE-05 was already ✓ SATISFIED under the
+original verification; this closes the one item (W-01) that kept the phase's overall status at
+`human_needed` rather than `passed`. Score remains 5/5 must-haves verified.
+
+**Status revised:** `human_needed` → **`passed`**.
+
+---
+
 _Verified: 2026-09-05T16:29:57Z_
 _Verifier: Claude (gsd-verifier)_
+_Re-verified: 2026-09-05 (same-day confirming run) — appended during execution of the closing
+record-hygiene task, not a fresh independent verifier pass. No code beyond the two named commits'
+diffs (`d7c3cd8`, `c76c294`) was re-audited; those diffs were reviewed in full against
+`36-CONTEXT.md` § D-36-03 and found to hold all four of its constraints unchanged._

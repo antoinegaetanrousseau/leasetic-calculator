@@ -147,6 +147,18 @@ a Vercel runtime misconfigured to point at a different endpoint than the one thi
 not have been caught by this observation. This is why the disposition is "empirically closed" for
 the specific claim tested, not a blanket isolation guarantee.
 
+**Residual update — 2026-09-05 (same day, confirming run).** The read-only session floor described
+above as defence-in-depth (WR-05, measured in-band by NEW-02) was confirmed **not available** on the
+Neon platform this probe runs against: the `default_transaction_read_only` startup parameter is sent
+but discarded, observed on both the pooled endpoint and the direct (non-pooled) endpoint. This does
+**not** affect T-29-06's closure above, which rests entirely on the sentinel comparison — a write to
+`development`, an absence check on `main` — not on the read-only setting of the `main` session.
+`scripts/probe-write-isolation.ts` was updated (`d7c3cd8` to make each branch's direct endpoint
+reachable, `c76c294` to downgrade this specific gate from a refusal to a warning) so that a control
+which can never pass on this platform is not simply deleted, but stays visible as a warning. The
+remaining hardening — a read-only Neon role supplied in the `PROBE_MAIN_URL` slot, which WOULD hold
+where the startup parameter does not — is owned by Phase 39, OPS-01, and is not performed here.
+
 **Who decided and when:** Antoine (plan owner), 2026-09-05.
 
 ---
