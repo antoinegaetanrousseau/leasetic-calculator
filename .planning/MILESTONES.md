@@ -1,5 +1,63 @@
 # Milestones — Matrice Commerciale
 
+## v1.7 Sales Motivation (Shipped: 2026-09-05)
+
+**Scope:** Phase 35 only — 1 phase, 5 plans, 13 tasks, 35 commits.
+**Source diff:** 15 files changed, +3,085 / −10.
+**Timeline:** 2026-09-04 23:35 → 2026-09-05 12:37 (~13 hours).
+**Requirements:** GAME-01..GAME-05 — 5/5 validated.
+
+**Delivered:** a partner sees their own book gaining momentum on the home page —
+what moved this week, a weekly streak with its break condition stated, and a
+3×3 badge ladder — all derived from Phase 34's `relationship_events` at read
+time, with no new table, no migration and no awarding job.
+
+**Key accomplishments:**
+
+- **35-01** — pure Europe/Paris Mon–Sun week window (DST-safe via `@date-fns/tz`
+  TZDate), the streak fold that preserves a longest-ever record across a broken
+  current streak, and the badge tier ladder as operator-editable constants. 30
+  unit tests, zero database or clock coupling.
+- **35-02** — the owner-scoped read layer: three functions deriving momentum,
+  progress weeks and badge counts from `relationship_events`, each carrying the
+  CRM-02 owner predicate in the SAME statement as the data it selects.
+- **35-03** — 19 `dashboard.momentum.*` dictionary entries in fr and en, and the
+  `MomentumCard` server component.
+- **35-04** — a skip-by-default real-Postgres isolation suite that, on its first
+  real run, **caught two production-shipping bugs that 2297 mocked-driver tests
+  could not**: `listProgressWeekKeysForOwner` threw on every real call (a GROUP BY
+  functional-dependency mismatch from reusing a parameterized `sql` fragment in
+  both SELECT and GROUP BY), and a jsonb double-encoding defect. Full mutation
+  evidence recorded — removing the owner predicate, the Perdu exclusion, or the
+  window's exclusivity each produced a specific named test failure.
+- **35-05** — the admin-gated call site: an admin's request resolves no momentum
+  query and renders no momentum DOM (D-15), one shared clock read drives the
+  week window, and the card sits between "à relancer" and recent proposals.
+  Human-verified live and approved.
+- **Post-execution amendment (D-19a)** — the visual-restraint decision was
+  reversed after operator review of the live surface, amended in `35-CONTEXT.md`
+  and `35-UI-SPEC.md`, and the card rebuilt with tier identity, progress tracks
+  and badge tiles, then compacted to ~36% of its original height. GAME-04's
+  no-leaderboard rule was explicitly held throughout as a privacy property
+  rather than a style budget.
+
+**Gates:** verification passed 9/9 must-haves · code review no blockers
+(2 WARNINGs fixed, 2 INFO deliberately left) · security audit 21/21 threats
+closed, `threats_open: 0` · 2,320 tests passing · typecheck, `eslint
+--max-warnings=0` and build all clean.
+
+**Known deferred items at close:** 8 (see STATE.md § Deferred Items). None
+originate from v1.7 — all are inherited v1.0–v1.6 artifacts. Genuinely open:
+Phase 30's 4 pending UAT scenarios and two `human_needed` verifications
+(31.1, 33).
+
+**Archive note:** `milestones/v1.7-ROADMAP.md` and `v1.7-REQUIREMENTS.md` are
+FULL snapshots at v1.7 close, not v1.7-scoped extracts — v1.6 was never
+archived, and all 35 phase directories remain in `.planning/phases/`. The
+archiving CLI attributed every phase on disk to this milestone; those figures
+(19 phases / 97 plans / 178 tasks) were incorrect and have been replaced by the
+scope stated above.
+
 ## v1.5 — Proposal List Actions & Pill Fix
 
 **Shipped:** 2026-05-30
@@ -36,9 +94,11 @@ tokens stayed frozen.
 - Code review (Phase 27, standard depth): 0 critical / 0 warning / 2 info (inert CSS, non-blocking).
 
 ### Known gaps
+
 None — all active v1.5 requirements satisfied. (Teal rebrand BRAND-01/02/03 remains shelved as Future Requirements, descoped since v1.4 Phase 25.)
 
 ### Archive
+
 - `milestones/v1.5-ROADMAP.md` · `milestones/v1.5-REQUIREMENTS.md`
 
 ---

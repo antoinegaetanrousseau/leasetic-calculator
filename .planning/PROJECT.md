@@ -136,7 +136,16 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 
 ---
 
-## Current Milestone: v1.6 — CRM Foundation
+## ✅ v1.6 — CRM Foundation — SHIPPED 2026-09-04
+## ✅ v1.7 — Sales Motivation — SHIPPED 2026-09-05
+
+**v1.7 delivered:** a partner sees their own book gaining momentum on the home page — what moved this week, a weekly streak with its break condition always stated, and a 3×3 badge ladder — all derived from v1.6's `relationship_events` at read time. No new table, no migration, no awarding job. Phase 35 alone: 5 plans, 13 tasks, 2,320 tests passing, verification 9/9, security 21/21.
+
+**Next milestone: not yet scoped.** Run `/gsd-new-milestone`. The strongest candidate already recorded in Phase 35's Deferred Ideas is **"Encours total"** — portfolio value charted month over month — flagged there as possibly *a stronger motivator than streaks or badges, needing no gamification vocabulary at all*. It depends on signed contract amounts, so it waits on the in-house contract tool fed by SIREN.
+
+---
+
+## v1.6 — CRM Foundation (detail)
 
 **Goal:** Give client data its own life independent of proposals — a shared company registry with private per-partner relationships — so the extranet can become the CRM that replaces HubSpot.
 

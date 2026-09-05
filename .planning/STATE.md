@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: milestone_complete
-last_updated: 2026-09-05T10:36:45.586Z
-last_activity: 2026-09-05
+status: Awaiting next milestone
+last_updated: "2026-09-05T10:42:49.072Z"
+last_activity: 2026-09-05 — Milestone v1.7 completed and archived
 progress:
   total_phases: 20
   completed_phases: 19
   total_plans: 97
-  completed_plans: 180
+  completed_plans: 97
   percent: 95
-stopped_at: Milestone complete (Phase 35 was final phase)
 ---
 
 # State — Matrice Commerciale
@@ -28,13 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 35
-Plan: Not started
-Status: Milestone complete
-Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
-reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
-FICHE-01..05 / ACTV-01..05 stay OPEN until that checkpoint is approved.
-Last activity: 2026-09-05
+Phase: Milestone v1.7 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-09-05 — Milestone v1.7 completed and archived
 
 ## Deferred Items
 
@@ -50,6 +46,30 @@ work — none are v1.4 or v1.5 functional gaps (v1.4 audit passed 19/19; v1.5 ph
 | context_question | Phase 06 — `06-CONTEXT.md` (1 open Q, v1.1-era, shipped) | open |
 | context_question | Phase 07 — `07-CONTEXT.md` (2 open Qs, v1.1-era, shipped) | open |
 | context_question | Phase 08 — `08-CONTEXT.md` (3 open Qs, v1.1-era, shipped) | open |
+
+### Re-acknowledged at v1.7 close (2026-09-05)
+
+All of the above carried forward unchanged, plus the items that accrued during
+v1.6. **None originate from v1.7** — that milestone is Phase 35 alone, which
+closed with verification passed 9/9, code review clear of blockers, and a
+security audit closing 21/21 threats.
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 30 — `30-UAT.md` | testing (4 pending scenarios) |
+| verification_gap | Phase 31.1 — `31.1-VERIFICATION.md` | human_needed |
+| verification_gap | Phase 33 — `33-VERIFICATION.md` | human_needed |
+| context_question | Phase 31 — `31-CONTEXT.md` (3 open Qs: re-run idempotency, canonical name selection) | open |
+
+The four v1.1-era CONTEXT questions above were already traced to RESOLVED or
+formally-DEFERRED outcomes at the v1.1 close (see the v1.1 Deferred Items
+section further down this file) — they persist only because the
+`<open_questions>` text in those archived files was never updated. The audit
+scans the whole `.planning/` tree rather than the closing milestone's phase
+range, so they resurface at every close.
+
+Genuinely open and worth closing: **Phase 30's 4 pending UAT scenarios** and the
+**two `human_needed` verifications (31.1, 33)**.
 
 ## Phase 22 Performance Metrics
 
