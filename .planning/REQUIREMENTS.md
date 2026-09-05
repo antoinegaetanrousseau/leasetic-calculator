@@ -112,7 +112,7 @@ stops existing.
 - [x] **HOUSE-02**: A milestone audit no longer re-reports resolved v1.1-era questions — the
   `<open_questions>` blocks in `06-CONTEXT.md`, `07-CONTEXT.md`, `08-CONTEXT.md` and `31-CONTEXT.md`
   carry their real resolved-or-deferred status.
-- [ ] **HOUSE-03**: The stale `[~]` markers on CALC-07 and PROP-01 read `[x]`, and
+- [x] **HOUSE-03**: The stale `[~]` markers on CALC-07 and PROP-01 read `[x]`, and
   `scripts/seed-partner-launch.ts` is reachable through an npm script rather than by path.
 - [ ] **HOUSE-04**: The 18 dead vendored ReUI blocks (816K, zero imports) carry a recorded
   keep-or-delete decision with its rationale, superseding the provisional "Delete nothing yet"
@@ -174,7 +174,7 @@ stops existing.
 | OPS-04 | Phase 39 — Operational & Credential Gates | Pending |
 | HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
-| HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+| HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-04 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
 
 **Coverage: 21/21 requirements mapped to exactly one phase — no orphans, no duplicates.**
