@@ -34,6 +34,7 @@ import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import type { PartnerRow } from '@/lib/db/queries/partners';
 import type { CoefficientHistoryListRow } from '@/lib/db/queries/coefficient-history';
+import type { ProposalRow } from '@/db/schema';
 
 vi.mock('server-only', () => ({}));
 
@@ -65,8 +66,17 @@ vi.mock('@/lib/admin', async (importOriginal) => {
 // live DB connection, so each helper must be stubbed. The mocks all return
 // values that exercise the FULL render path (5 stat values + 5 activity
 // rows) — maximizing the surface scanned by the grep contract.
+// Consolidated single factory (D-37-02 / Task 2): this file previously
+// registered TWO separate mock factories for the `@/lib/auth/require` module
+// path — both mocking `requireAdmin` only, with the second (near the bottom
+// of the file) shadowing the first because Vitest resolves same-path mock
+// factories by hoist order. Gate 13 below renders `/proposals/[id]`, which
+// calls `requireUser()`, not `requireAdmin()` — so both exports now live in
+// this ONE factory. Every pre-existing gate (1-12) was re-run after this
+// merge and still passes.
 vi.mock('@/lib/auth/require', () => ({
-  requireAdmin: vi.fn(async () => ({ session: { user: { id: 'admin-1' } } })),
+  requireAdmin: vi.fn(async () => ({ session: { user: { id: 'admin-1', role: 'admin' } } })),
+  requireUser: vi.fn(async () => ({ session: { user: { id: 'admin-1' } }, role: 'admin' })),
 }));
 vi.mock('@/lib/db/queries/partner-aggregates', () => ({
   getActivePartnerCount: vi.fn(async () => 7),
@@ -113,6 +123,30 @@ vi.mock('@/lib/db/queries/coefficient-history', () => ({
   })),
 }));
 
+// Gate 13 (D-37-02) — /proposals/[id] additional mocking surface. Neither of
+// these is mocked anywhere else in this file: no existing gate (1-12) touches
+// the `(authed)` tree, only the `(admin)` tree.
+const { getProposalByIdMock } = vi.hoisted(() => ({ getProposalByIdMock: vi.fn() }));
+vi.mock('@/lib/db/queries', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/db/queries')>();
+  return {
+    ...actual,
+    getProposalById: getProposalByIdMock,
+  };
+});
+vi.mock('@/components/proposals/EmbeddedPdfPreview', () => ({
+  EmbeddedPdfPreview: () => null,
+}));
+vi.mock('@/components/proposals/DeleteButtonClient', () => ({
+  DeleteButtonClient: () => null,
+}));
+vi.mock('@/components/proposals/RestoreButtonClient', () => ({
+  RestoreButtonClient: () => null,
+}));
+vi.mock('@/components/proposal/CopyRefButton', () => ({
+  CopyRefButton: () => null,
+}));
+
 // Test file lives at tests/; app/ is the sibling at repo root. Use relative paths
 // because the @/* tsconfig alias maps only to src/* (the app/ directory is not aliased).
 // Phase 18 Plan 03 D-14 — Surface 1 now imports PartnersList (renamed from
@@ -122,6 +156,8 @@ import { CreatePartnerForm } from '../app/(admin)/[adminSegment]/partners/new/Cr
 import { PartnerRowActions } from '../app/(admin)/[adminSegment]/partners/_components/PartnerRowActions';
 import AdminHomePage from '../app/(admin)/[adminSegment]/page';
 import { CoefficientHistoryList } from '../app/(admin)/[adminSegment]/history/CoefficientHistoryList';
+// D-37-02 / Gate 13 — the surface that has just become admin-reachable (GAP-01).
+import ProposalDetailPage from '../app/(authed)/proposals/[id]/page';
 
 // ── Fixtures (small / deterministic / no commission values) ─────────────────
 
@@ -525,13 +561,100 @@ describe('Gate 12: LcReferencesList — empty states, ZERO commission leakage', 
   });
 });
 
-// ── auth/require mock for the admin home server-component test ──────────────
-// Hoist this above the imports above? vi.mock calls are hoisted automatically.
-// (Defined here for readability; the hoist makes it apply before the imports.)
-vi.mock('@/lib/auth/require', () => ({
-  requireAdmin: vi.fn().mockResolvedValue({ session: { user: { id: 'admin-1', role: 'admin' } } }),
-}));
+// ── Gate 13: Phase 37 Plan 01 — /proposals/[id] admin bypass (D-37-01/D-37-02) ─
+// Verified 2026-09-05 (37-CONTEXT.md): the page renders zero `commission`
+// matches and never reads `params_snapshot` — the envelope needed NO
+// adjustment. This gate exists as a REGRESSION GUARD because GAP-01 just made
+// the surface admin-reachable; it is a non-exempt gate (not added to the D-30
+// exception list above).
+//
+// Non-vacuity (37-CONTEXT.md's "recurring defect shape" — a guard that does
+// not guard): a positive control asserts the render is non-empty and carries
+// real fixture markers BEFORE the absence assertion runs, so an empty/error
+// render cannot pass this gate for the wrong reason. A negative control (its
+// own `it()` below) proves `assertNoCommissionLeakage` actually throws on
+// commission-bearing HTML.
 
+/** Maximum-render-surface fixture for /proposals/[id] (Gate 13). */
+function makeGate13Proposal(): ProposalRow {
+  const createdAt = new Date('2026-05-01T10:00:00Z');
+  return {
+    id: 'prop-gate13',
+    // Owned by a DIFFERENT user than the mocked admin session ('admin-1') —
+    // the gate must render via the D-37-01 admin bypass path, not the owner path.
+    userId: 'user-owner-2',
+    lcRef: 'L-2026-GATE13',
+    inputs: {
+      partnerCo: 'Partner Co SARL',
+      partnerName: 'Jean Partner',
+      clientCo: 'Gate13 Client Corp',
+      clientName: 'Marie Client',
+      clientRole: 'Directrice Achats',
+      clientTel: '0102030405',
+      clientEmail: 'marie.client@example.com',
+      clientSiren: '123456789',
+      slb: true,
+      evalParc: true,
+      projectDesc: 'Renouvellement du parc informatique',
+      partnerRef: 'REF-GATE13-001',
+      amountHT: '100000',
+      durationMonths: 60,
+      validityDays: 30,
+    },
+    computed: {
+      state: 'computed',
+      trancheKey: 'A',
+      coeff: '2.5000',
+      loyerHT: '2500',
+    },
+    paramsSnapshot: null,
+    pdfGeneratedAt: createdAt,
+    pdfBlobKey: 'key',
+    pdfBlobUrl: 'https://example.com/p.pdf',
+    schemaVersion: 1,
+    language: 'fr',
+    status: 'active',
+    idempotencyKey: 'idem-gate13',
+    deletedAt: null,
+    createdAt,
+    updatedAt: createdAt,
+    completedSteps: 3,
+  } as ProposalRow;
+}
+
+describe('Gate 13: /proposals/[id] admin bypass — ZERO commission leakage (D-37-02)', () => {
+  it('renders the admin-reachable detail page over a maximum-surface fixture with ZERO commission tokens', async () => {
+    getProposalByIdMock.mockResolvedValue(makeGate13Proposal());
+
+    const tree = await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-gate13' }) });
+    const html = renderToString(tree);
+
+    // Positive control (committed): the render must be non-empty and must carry
+    // at least two distinct fixture markers from the render path. A silent
+    // degrade to an empty/error shell fails HERE, first — the absence
+    // assertion below cannot pass vacuously.
+    expect(html.length, 'Gate 13: rendered HTML must be non-empty').toBeGreaterThan(0);
+    expect(html, 'Gate 13: rendered HTML must contain the fixture clientCo marker').toContain(
+      'Gate13 Client Corp',
+    );
+    expect(html, 'Gate 13: rendered HTML must contain the fixture partnerRef marker').toContain(
+      'REF-GATE13-001',
+    );
+
+    assertNoCommissionLeakage(html, '/proposals/[id] detail page (admin bypass path)');
+  });
+
+  it('negative control: assertNoCommissionLeakage THROWS on commission-bearing HTML', () => {
+    expect(() =>
+      assertNoCommissionLeakage('<td>commission_pct</td>', 'negative control'),
+    ).toThrow();
+    expect(() =>
+      assertNoCommissionLeakage('<td>taux_pct</td>', 'negative control'),
+    ).toThrow();
+  });
+});
+
+// ── i18n mock for the admin home + /proposals/[id] server-component tests ───
 vi.mock('@/lib/i18n', async () => {
   const real = await vi.importActual<typeof import('@/lib/i18n/dictionaries')>(
     '@/lib/i18n/dictionaries',
