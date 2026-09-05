@@ -128,6 +128,9 @@ Deferred Ideas.
   standard type, brand green only where it already signals action. The content
   carries the motivation, not the styling — two loud cards on one page and
   neither wins.
+  **SUPERSEDED 2026-09-05 by D-19a — see § Amendments (2026-09-05) at the end
+  of this document. The reasoning above is retained as the record of why the
+  original bet was made, not as a live constraint.**
 - **D-20:** **Home page only.** The pipeline board keeps exactly the two
   motivating elements Phase 33 D-11 gave it. No duplicated streak on the board,
   nothing on the client page.
@@ -290,6 +293,73 @@ decision the same day: **defer them, keep Phase 35 scoped.** None is lost.
 - **Clients récents** with avatar initials and inline search.
 
 </deferred>
+
+---
+
+## Amendments (2026-09-05)
+
+Recorded after Phase 35's five plans were executed and verified, during the
+`35-05` human-verification checkpoint. The operator reviewed the live rendered
+surface and requested a change of visual direction. This section supersedes the
+decisions it names; everything not named here remains binding.
+
+### D-19a — Gamified visual treatment (supersedes D-19)
+
+**Decision (operator, 2026-09-05):** the momentum card adopts a **full gamified
+visual treatment** — tier-identified badge tiles, iconography, per-axis progress
+indication and greater prominence — in the visual language of the two reference
+dashboards supplied at the checkpoint.
+
+**Why the original bet was reversed:** D-19 wagered that restraint would let the
+content carry the motivation. Against the live surface that half-held. The
+restraint itself was not the problem — the *absence of structure* was: the
+three-axis ladder rendered as three run-on text lines of the form
+`Bronze (3 client(s)) · Argent (10 client(s)) · Or (25 client(s))`, which reads
+as unformatted output rather than as a designed surface. The operator judged
+that a surface whose entire purpose is motivation cannot be the least-designed
+element on the page.
+
+**What this authorises:** colour beyond `--foreground`/`--muted-foreground`,
+tier-identity colour and iconography for bronze/silver/gold, progress tracks,
+badge tiles, and a visual weight for this card at or above `RelanceCard`'s.
+The § Color "accent reserved for: nothing" budget in `35-UI-SPEC.md` is lifted
+for this surface.
+
+### What remains binding — NOT amended
+
+These were re-confirmed at the same checkpoint and are unchanged. Three of them
+are requirements or privacy properties rather than matters of taste, and cannot
+be traded against visual direction:
+
+- **GAME-04 / CRM-02 / D-21 — no leaderboard, no ranking, no cross-partner
+  comparison, no aggregate of anyone else's book.** Explicitly excluded when the
+  operator chose this direction. Both reference dashboards centre a leaderboard
+  ("Sales Leaderboard", "Top Performer", "Top Team Members"); that element is
+  unbuildable here for the reason § Phase Boundary already gives, and Phase 30
+  treats counts, totals and wording as leaking by inference. 35-04's mutation
+  suite exists to keep this property true.
+- **GAME-03 / D-13 — all nine rungs stay readable whether earned or not**, and
+  the zero state is the same ladder unlit. Richer tiles must not hide unearned
+  criteria behind an "unlock" affordance; a criterion that cannot be read cannot
+  be aimed at.
+- **D-11 — no penalty framing.** A backwards move and a move to Perdu still
+  render identically to a forward move: no destructive colour, no down-arrow, no
+  qualifier. Tier colour is for badge rungs, never for movement rows.
+- **D-12 — the streak states its break condition plainly and always**, in a good
+  week and a bad week alike.
+- **D-14 / D-16 — both footer lines render unconditionally**, and there is no
+  opt-out, no dismiss, no engagement gate.
+- **D-15 — the surface stays absent (not empty) for admins.** Verified against
+  the live admin view on 2026-09-05.
+- **D-03 / D-23 — no persistence, no migration, no new column.** The redesign is
+  confined to the component, the dictionary and their tests; the query layer
+  `src/lib/db/queries/momentum.ts` is not touched — 35-04 proved its contract
+  against real Postgres and that evidence must not be invalidated by a restyle.
+
+**Scope of the resulting work:** `app/(authed)/_components/MomentumCard.tsx`,
+`src/lib/i18n/dictionaries.ts`, `app/(authed)/_components/MomentumCard.test.tsx`.
+No data-layer change is required — `BadgeAxisProgress` already carries `value`
+alongside its tier ladder, so progress indication needs no new query.
 
 ---
 

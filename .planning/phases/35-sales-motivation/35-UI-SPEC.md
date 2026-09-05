@@ -170,6 +170,12 @@ exhaustive per-surface reserve list.
 
 **Accent reserved for: nothing. This card introduces zero new brand-accent usage.**
 
+> **SUPERSEDED 2026-09-05 — see § Amendment (2026-09-05) at the end of this document.**
+> The zero-accent budget below was lifted for this surface when the operator reversed D-19
+> after reviewing the live render. The paragraphs that follow are retained as the record of
+> the original reasoning. **The D-11 paragraph at the end of this section is NOT superseded**
+> — movement rows still carry no destructive colour and no penalty framing.
+
 This is a **stricter** budget than the page's own precedent — `MetricTile`'s `variant="total"`
 already renders `text-primary` for a metric value one section above this card — and the stricter
 budget is deliberate, not an oversight: D-19 says brand green is reserved for "where it **already
@@ -516,3 +522,43 @@ rather than duplicating the stage vocabulary a second time.
 - [ ] Dimension 6 Registry Safety: PASS
 
 **Approval:** pending
+
+---
+
+## Amendment (2026-09-05)
+
+Recorded at the `35-05` human-verification checkpoint, after the operator reviewed the live
+rendered surface. Authorising decision: **D-19a** in `35-CONTEXT.md` § Amendments (2026-09-05),
+which supersedes D-19.
+
+### What changes
+
+This surface adopts a **gamified visual treatment**. Specifically authorised, where the original
+document forbade them:
+
+- **Tier identity colour** for bronze / silver / gold badge rungs, and icons carrying that identity.
+- **Badge tiles** — each axis's ladder rendered as structured tiles or rows, not as an inline
+  run of `·`-separated text spans.
+- **Per-axis progress indication** against the next threshold, driven by the `value` field
+  `BadgeAxisProgress` already carries. No new query, no new field, no migration.
+- **Greater prominence** for the card overall, and for the streak figure in particular.
+
+### What does NOT change
+
+- **§ Access & Non-Leakage Contract stands in full.** No leaderboard, no ranking, no
+  cross-partner comparison, no aggregate — a requirement (GAME-04/CRM-02), not a style budget.
+- **All nine rungs stay readable earned or unearned** (GAME-03/D-13). Tier colour may distinguish
+  earned from unearned; it may not hide an unearned criterion.
+- **The D-11 paragraph in § Color stands.** A backwards move and a move to Perdu render
+  identically to a forward move — no `--destructive`, no muted red, no down-arrow. Tier colour
+  applies to badge rungs only, never to movement rows.
+- **§ Copywriting Contract is unchanged**, including D-12's always-visible break condition and
+  the two permanent footer lines (D-14/D-16).
+- **Contrast:** every new colour must clear WCAG AA against `--card` in both themes. The brand
+  palette is unchanged; tier colours are additions to this surface, not new global tokens.
+
+### Scope
+
+`app/(authed)/_components/MomentumCard.tsx`, `src/lib/i18n/dictionaries.ts`, and
+`app/(authed)/_components/MomentumCard.test.tsx`. `app/(authed)/page.tsx` keeps the D-15 admin
+gate exactly as 35-05 shipped it, and `src/lib/db/queries/momentum.ts` is not touched.
