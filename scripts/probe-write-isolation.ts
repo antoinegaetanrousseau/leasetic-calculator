@@ -241,11 +241,18 @@ async function main(): Promise<void> {
   const mainSql = await openClient('PROBE_MAIN_URL', mainUrl, MAIN_HOST);
 
   let exitCode = 1;
+  // The `finally` below runs unconditionally, including when the INSERT itself
+  // threw (bad credentials, TLS failure, table missing). In that case the
+  // cleanup DELETE correctly affects 0 rows and there is nothing to verify —
+  // warning about it would send the operator to hand-inspect a database over a
+  // non-event, and would dilute the one signal the transcript relies on.
+  let inserted = false;
 
   try {
     await devSql`
       INSERT INTO schema_meta (label, note) VALUES (${sentinel}, ${note})
     `;
+    inserted = true;
 
     const [devReadBack] = await devSql`
       SELECT count(*)::int AS n FROM schema_meta WHERE label = ${sentinel}
@@ -282,7 +289,7 @@ async function main(): Promise<void> {
       const deleteResult = await devSql`
         DELETE FROM schema_meta WHERE label = ${sentinel}
       `;
-      if (deleteResult.count !== 1) {
+      if (inserted && deleteResult.count !== 1) {
         console.error(
           `WARNING: cleanup deleted ${deleteResult.count} row(s) for sentinel ${sentinel} `
           + `on ${devHost} (expected 1) — verify by hand.`,
@@ -295,11 +302,18 @@ async function main(): Promise<void> {
         exitCode = 1;
       }
     } catch (cleanupErr) {
-      exitCode = 1;
-      console.error(
-        `WARNING: cleanup DELETE failed for sentinel ${sentinel} on ${devHost}: `
-        + `${safeErrorMessage(cleanupErr)} — verify by hand.`,
-      );
+      if (inserted) {
+        exitCode = 1;
+        console.error(
+          `WARNING: cleanup DELETE failed for sentinel ${sentinel} on ${devHost}: `
+          + `${safeErrorMessage(cleanupErr)} — verify by hand.`,
+        );
+      } else {
+        console.error(
+          `NOTE: cleanup DELETE could not run (${safeErrorMessage(cleanupErr)}), but no `
+          + 'sentinel was ever written — nothing to clean up.',
+        );
+      }
     }
 
     try {
