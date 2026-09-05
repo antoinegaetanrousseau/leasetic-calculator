@@ -1262,6 +1262,33 @@ export const dictionaries = {
     'dashboard.relance.due': 'Le {0}',
     'dashboard.relance.overdue': 'En retard',
     'dashboard.relance.stale': 'Sans activité depuis {0} jour(s)',
+
+    // Phase 35 — MomentumCard on the home page (GAME-01..05). The
+    // under-report disclosure is PERMANENT and unconditional (operator
+    // instruction, 2026-09-04): the surface discloses the tracking gap in
+    // every state rather than fixing the wizard's client-attachment flow,
+    // which is out of scope for this phase.
+    'dashboard.momentum.title': 'VOTRE PROGRESSION',
+    'dashboard.momentum.streak.active': "{0} semaine(s). Un dossier doit avancer d'ici dimanche.",
+    'dashboard.momentum.streak.zero':
+      'Pas encore de série. Faites avancer un dossier cette semaine pour démarrer une série.',
+    'dashboard.momentum.trackedSince': 'Activité suivie depuis {0}.',
+    'dashboard.momentum.thisWeek': 'Cette semaine',
+    'dashboard.momentum.empty': 'Aucun mouvement cette semaine.',
+    'dashboard.momentum.moreCount': '+ {0} autres mouvements cette semaine',
+    'dashboard.momentum.move.stageChanged': '{0} → {1}, {2}',
+    'dashboard.momentum.move.proposalFinalized': '{0} — proposition envoyée, {1}',
+    'dashboard.momentum.badge.axis.clients': 'CLIENTS',
+    'dashboard.momentum.badge.axis.wins': 'VICTOIRES',
+    'dashboard.momentum.badge.axis.consistency': 'RÉGULARITÉ',
+    'dashboard.momentum.badge.tier.bronze': 'Bronze',
+    'dashboard.momentum.badge.tier.silver': 'Argent',
+    'dashboard.momentum.badge.tier.gold': 'Or',
+    'dashboard.momentum.badge.entry.clients': '{0} ({1} client(s))',
+    'dashboard.momentum.badge.entry.wins': '{0} ({1} victoire(s))',
+    'dashboard.momentum.badge.entry.consistency': '{0} ({1} semaine(s))',
+    'dashboard.momentum.disclosure':
+      'Seules les propositions démarrées depuis une fiche client sont suivies ici.',
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
@@ -2410,6 +2437,27 @@ export const dictionaries = {
     'dashboard.relance.due': 'On {0}',
     'dashboard.relance.overdue': 'Overdue',
     'dashboard.relance.stale': 'No activity for {0} day(s)',
+
+    // Phase 35 — MomentumCard EN mirror.
+    'dashboard.momentum.title': 'YOUR PROGRESS',
+    'dashboard.momentum.streak.active': '{0} week(s). A deal must advance by Sunday.',
+    'dashboard.momentum.streak.zero': 'No streak yet. Advance a deal this week to start one.',
+    'dashboard.momentum.trackedSince': 'Activity tracked since {0}.',
+    'dashboard.momentum.thisWeek': 'This week',
+    'dashboard.momentum.empty': 'No movement this week.',
+    'dashboard.momentum.moreCount': '+ {0} more this week',
+    'dashboard.momentum.move.stageChanged': '{0} → {1}, {2}',
+    'dashboard.momentum.move.proposalFinalized': '{0} — proposal sent, {1}',
+    'dashboard.momentum.badge.axis.clients': 'CLIENTS',
+    'dashboard.momentum.badge.axis.wins': 'WINS',
+    'dashboard.momentum.badge.axis.consistency': 'CONSISTENCY',
+    'dashboard.momentum.badge.tier.bronze': 'Bronze',
+    'dashboard.momentum.badge.tier.silver': 'Silver',
+    'dashboard.momentum.badge.tier.gold': 'Gold',
+    'dashboard.momentum.badge.entry.clients': '{0} ({1} client(s))',
+    'dashboard.momentum.badge.entry.wins': '{0} ({1} win(s))',
+    'dashboard.momentum.badge.entry.consistency': '{0} ({1} week(s))',
+    'dashboard.momentum.disclosure': 'Only proposals started from a client page are tracked here.',
   },
 } as const;
 
