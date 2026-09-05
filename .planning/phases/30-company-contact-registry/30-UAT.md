@@ -206,6 +206,23 @@ note: |
   `app/api/proposals/[id]/pdf/route.ts:28` still carried the flat
   `if (!proposal || proposal.userId !== userId)` check that D-37-01 removed from the page.
   Confirmed empirically via `GET /api/proposals/17d8cc9e-.../pdf` -> `{"error":"not_found"}`.
+
+  **Correction, 2026-09-06 (post-fix browser confirmation).** The root-cause attribution
+  above is partly wrong and is left in place rather than rewritten, because the correction
+  is the more useful record. `pdf/route.ts` returns the identical `{"error":"not_found"}`
+  body from TWO places: the ownership check (step 3) and `!proposal.pdfBlobKey` (step 5).
+  Every seeded `LC-SEED-PIPE-*` proposal has a NULL `pdf_blob_key`, so the 404 observed on
+  LC-SEED-PIPE-05b was step 5 — a fixture with no generated PDF — not the ownership check.
+  The two causes are indistinguishable from the response body alone, and the attribution was
+  made from reading the code rather than from isolating the branch.
+
+  The ownership defect was nevertheless real, and the fix is confirmed working end to end:
+  as admin, `/proposals/f54f6b24-509b-4222-8a67-8053112221ae` (LC-2026-002, owned by
+  delphine.specht, `pdf_blob_key` NOT NULL) now renders the actual PDF in the APERÇU PDF
+  panel. The pre-fix behaviour on that same proposal is pinned by
+  `app/api/proposals/[id]/pdf/route.test.ts` Test 3, which fails
+  `AssertionError: expected 404 to be 200` when the flat check is restored. A live pre-fix
+  reproduction against a PDF-bearing proposal was never captured.
   Fixed during this phase, at the operator's explicit decision, in commit `7999759`
   "fix(37-01): extend the D-37-01 admin bypass to the PDF route (GAP-01)" — the guard now
   mirrors the page exactly (server-derived role, `!proposal` an independent short-circuit,

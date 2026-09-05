@@ -1,14 +1,14 @@
 ---
-status: partial
+status: resolved
 phase: 37-crm-stack-closure
 source: [37-VERIFICATION.md]
 started: 2026-09-06T01:35:00Z
-updated: 2026-09-06T01:35:00Z
+updated: 2026-09-06T01:52:00Z
 ---
 
 ## Current Test
 
-[awaiting verification]
+[complete]
 
 ## Tests
 
@@ -51,14 +51,32 @@ how_to_run: |
   `.env.production.local` — it will report "development" even when a production build is
   connected to PRODUCTION. That guard defect is filed separately as Phase 39 / OPS work.
 
-result: [pending]
+result: pass
+verified: |
+  2026-09-06, agent browser automation (Claude in Chrome) at the operator's direction, against
+  a production build (`npm run build && npm run start`, Next 16.2.4) on http://localhost:3001,
+  Neon development branch, with `.env.production.local` moved aside for the duration.
+
+  Signed in as antoine.rousseau@leasetic.com (ADMIN). Opened
+  /proposals/f54f6b24-509b-4222-8a67-8053112221ae — LC-2026-002, owned by
+  delphine.specht@leasetic.com, NOT the admin. The APERÇU PDF panel rendered the ACTUAL PDF
+  ("LEASÉTIC — Proposition de location financière", montant 123 000,00 €, loyer 3 068,48 €)
+  with the PDF viewer's download and print controls. No `{"error":"not_found"}`.
+
+  CORRECTION captured while closing this item: the original walk attributed the not_found on
+  LC-SEED-PIPE-05b to the ownership check, but that route emits the same body from
+  `!proposal.pdfBlobKey` (step 5) as from the ownership arm (step 3), and every seeded
+  LC-SEED-PIPE-* proposal has a NULL pdf_blob_key. The observed 404 was almost certainly step 5.
+  The ownership defect was still real — pinned by route.test.ts Test 3, which fails
+  `expected 404 to be 200` with the flat check restored — and the fixed path is now confirmed
+  live. A live PRE-fix reproduction against a PDF-bearing proposal was never captured.
 
 ## Summary
 
 total: 1
-passed: 0
+passed: 1
 issues: 0
-pending: 1
+pending: 0
 skipped: 0
 blocked: 0
 

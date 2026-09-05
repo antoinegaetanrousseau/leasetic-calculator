@@ -1,10 +1,11 @@
 ---
 phase: 37-crm-stack-closure
 verified: 2026-09-05T23:29:56Z
-status: human_needed
+status: passed
 score: 5/5 roadmap success criteria verified (with 1 outstanding human-verification item and 3 non-blocking code-review Warnings surfaced for operator awareness)
 verified_at_commit: bd5c20747ef52bc4943e89efd39366a7fd75c445
 overrides_applied: 0
+human_verification_resolved: 2026-09-06 — see 37-HUMAN-UAT.md (result: pass). The admin PDF render was confirmed live on LC-2026-002 (owned by delphine.specht, pdf_blob_key NOT NULL). A correction was recorded: the walk's original not_found on LC-SEED-PIPE-05b was the `!pdfBlobKey` branch, not the ownership branch — both emit the same body. The ownership fix remains correct and is now confirmed end to end.
 human_verification:
   - test: "Load /proposals/{id} as an admin (any proposal not owned by the admin) in a browser after the 7999759 PDF-route fix, and confirm the APERÇU PDF panel renders the actual PDF (not `{\"error\":\"not_found\"}`), and both 'Voir le PDF' and 'Télécharger le PDF' succeed."
     expected: "PDF preview and both download/view actions work for the admin, matching the page-level bypass that already works."
