@@ -1278,6 +1278,11 @@ export const dictionaries = {
     'dashboard.momentum.moreCount': '+ {0} autres mouvements cette semaine',
     'dashboard.momentum.move.stageChanged': '{0} → {1}, {2}',
     'dashboard.momentum.move.proposalFinalized': '{0} — proposition envoyée, {1}',
+    // WR-01/WR-02 fallback: a `stage_changed` row whose `toStage` (an
+    // unvalidated jsonb value) is missing or outside the PipelineStage
+    // vocabulary. Deliberately neutral — D-11 forbids penalty framing, so an
+    // unrecognised destination reads as plain movement, never as a problem.
+    'dashboard.momentum.move.generic': '{0} — dossier mis à jour, {1}',
     'dashboard.momentum.badge.axis.clients': 'CLIENTS',
     'dashboard.momentum.badge.axis.wins': 'VICTOIRES',
     'dashboard.momentum.badge.axis.consistency': 'RÉGULARITÉ',
@@ -2458,6 +2463,7 @@ export const dictionaries = {
     'dashboard.momentum.moreCount': '+ {0} more this week',
     'dashboard.momentum.move.stageChanged': '{0} → {1}, {2}',
     'dashboard.momentum.move.proposalFinalized': '{0} — proposal sent, {1}',
+    'dashboard.momentum.move.generic': '{0} — deal updated, {1}',
     'dashboard.momentum.badge.axis.clients': 'CLIENTS',
     'dashboard.momentum.badge.axis.wins': 'WINS',
     'dashboard.momentum.badge.axis.consistency': 'CONSISTENCY',

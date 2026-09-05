@@ -25,6 +25,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { deriveBadgeProgress } from '@/lib/momentum/badges';
 import type { MomentumRow, WeeklyMovements } from '@/lib/momentum/types';
+import type { PipelineStage } from '@/lib/pipeline/stages';
 import { MomentumCard } from './MomentumCard';
 
 afterEach(() => {
@@ -42,7 +43,9 @@ function makeRow(over: Partial<MomentumRow> & { eventId: string; relationshipId:
     relationshipId: over.relationshipId,
     companyName: over.companyName ?? 'Alpha SAS',
     kind: over.kind ?? 'stage_changed',
-    toStage: over.toStage ?? 'negociation',
+    // `??` would swallow an EXPLICIT null, which is exactly the shape test
+    // 6b needs to exercise — so honour the key's presence, not its truthiness.
+    toStage: 'toStage' in over ? (over.toStage ?? null) : 'negociation',
     occurredAt: over.occurredAt ?? new Date('2026-09-08T10:00:00Z'), // a Tuesday
   };
 }
@@ -211,6 +214,84 @@ describe('MomentumCard — GAME-01..05', () => {
     for (const forbidden of ['reculé', 'perdu son', 'attention', '⚠']) {
       expect(container.textContent).not.toContain(forbidden);
     }
+  });
+
+  it('6b. WR-01/WR-02 — a stage_changed row with a missing or unknown toStage degrades, never crashes and never mislabels', () => {
+    // WR-01: `toStage: null` on a `stage_changed` row previously fell through
+    // to the `proposal_finalized` copy — a confident, WRONG sentence about
+    // the partner's own book. WR-02: an unrecognised value previously reached
+    // `t(undefined)` and threw a TypeError during the whole HomePage render.
+    const rows: MomentumRow[] = [
+      makeRow({ eventId: 'evt-null', relationshipId: 'rel-null', companyName: 'Nullco', toStage: null }),
+      makeRow({
+        eventId: 'evt-unknown',
+        relationshipId: 'rel-unknown',
+        companyName: 'Legacyco',
+        // Deliberately outside PipelineStage: `toStage` is typed from an
+        // unvalidated jsonb cast, so the type is a claim, not a guarantee.
+        toStage: 'archived_2019' as PipelineStage,
+      }),
+      makeRow({ eventId: 'evt-ok', relationshipId: 'rel-ok', companyName: 'Okco', toStage: 'negociation' }),
+    ];
+
+    // Does not throw — the headline WR-02 claim.
+    const { container } = render(
+      <MomentumCard
+        lang="fr"
+        streakWeeks={1}
+        movements={{ rows, total: 3 }}
+        badgeProgress={ZERO_BADGE_PROGRESS}
+        trackedSinceLabel="septembre 2026"
+      />,
+    );
+
+    const links = Array.from(container.querySelectorAll('[data-testid="momentum-row"]'));
+    expect(links.length).toBe(3);
+
+    // Both degraded rows render the neutral generic sentence...
+    expect(links[0].getAttribute('aria-label')).toBe('Nullco — dossier mis à jour, mardi');
+    expect(links[1].getAttribute('aria-label')).toBe('Legacyco — dossier mis à jour, mardi');
+    // ...and NOT the proposal-finalization copy (WR-01's silent mislabel).
+    for (const link of links.slice(0, 2)) {
+      expect(link.getAttribute('aria-label')).not.toContain('proposition envoyée');
+    }
+    // No dictionary key or `undefined` leaked into the visible text.
+    expect(container.textContent).not.toContain('undefined');
+    expect(container.textContent).not.toContain('dashboard.momentum.');
+
+    // A valid neighbour still renders its real stage label.
+    expect(links[2].getAttribute('aria-label')).toBe('Okco → Négociation, mardi');
+
+    // D-11 still holds across the degraded path: identical chrome, no style.
+    expect(links[0].className).toBe(links[2].className);
+    for (const link of links) {
+      expect(link.getAttribute('style')).toBeNull();
+    }
+  });
+
+  it('6c. A genuine proposal_finalized row is unaffected by the toStage guard', () => {
+    const { container } = render(
+      <MomentumCard
+        lang="fr"
+        streakWeeks={1}
+        movements={{
+          rows: [
+            makeRow({
+              eventId: 'evt-prop',
+              relationshipId: 'rel-prop',
+              companyName: 'Propco',
+              kind: 'proposal_finalized',
+              toStage: null,
+            }),
+          ],
+          total: 1,
+        }}
+        badgeProgress={ZERO_BADGE_PROGRESS}
+        trackedSinceLabel="septembre 2026"
+      />,
+    );
+    const link = container.querySelector('[data-testid="momentum-row"]');
+    expect(link?.getAttribute('aria-label')).toBe('Propco — proposition envoyée, mardi');
   });
 
   it('7. Badge ladder readability (GAME-03): all 9 rungs present and legible, earned or not', () => {

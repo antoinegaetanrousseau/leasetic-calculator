@@ -11,7 +11,7 @@ import {
   UsersIcon,
   type IconProps,
 } from '@/components/ui/icons';
-import { STAGE_DICT_KEY } from '@/lib/pipeline/stages';
+import { STAGE_DICT_KEY, type PipelineStage } from '@/lib/pipeline/stages';
 import { MOMENTUM_TIME_ZONE } from '@/lib/momentum/window';
 import type {
   BadgeAxisId,
@@ -125,6 +125,28 @@ const PANEL_CLASSNAME =
   'rounded-container-xs border border-border bg-[var(--momentum-panel)]';
 
 /**
+ * WR-01 / WR-02 GUARD (2026-09-05 code review).
+ *
+ * `MomentumRow.toStage` is typed `PipelineStage | null`, but that type is a
+ * CLAIM about a jsonb value, not a fact the database enforces:
+ * `src/lib/db/queries/momentum.ts` casts `payload->>'toStage'` straight
+ * through with no validation. Legacy rows, a future write path, a manual
+ * edit or a migration artifact can all put a string outside the vocabulary
+ * behind that type — and because this is a Server Component rendered inline
+ * in `HomePage`, an unguarded `t(STAGE_DICT_KEY[unknown])` throws during the
+ * render of the whole page, not just this card.
+ *
+ * The membership test is DERIVED from `STAGE_DICT_KEY` rather than restated,
+ * so a stage added to `src/lib/pipeline/stages.ts` is recognised here with no
+ * second list to keep in sync.
+ */
+const KNOWN_STAGES: ReadonlySet<string> = new Set(Object.keys(STAGE_DICT_KEY));
+
+function isKnownStage(value: string | null | undefined): value is PipelineStage {
+  return typeof value === 'string' && KNOWN_STAGES.has(value);
+}
+
+/**
  * Builds the full copy-contract sentence and its row-detail fragment for one
  * movement row. `full` is the complete sentence (used as the row's
  * `aria-label`, per the copy contract); `detail` is `full` with the company
@@ -142,14 +164,25 @@ function movementCopy(row: MomentumRow, lang: Lang): { full: string; detail: str
   });
 
   let full: string;
-  if (row.kind === 'stage_changed' && row.toStage) {
+  if (row.kind === 'proposal_finalized') {
+    full = t('dashboard.momentum.move.proposalFinalized', lang)
+      .replace('{0}', row.companyName)
+      .replace('{1}', weekday);
+  } else if (isKnownStage(row.toStage)) {
+    // `row.kind === 'stage_changed'` and the destination is a stage this
+    // build actually knows how to name.
     const stageLabel = t(STAGE_DICT_KEY[row.toStage], lang);
     full = t('dashboard.momentum.move.stageChanged', lang)
       .replace('{0}', row.companyName)
       .replace('{1}', stageLabel)
       .replace('{2}', weekday);
   } else {
-    full = t('dashboard.momentum.move.proposalFinalized', lang)
+    // WR-01 / WR-02. A `stage_changed` row with a missing or unrecognised
+    // `toStage` degrades to a neutral movement sentence: it is NOT relabelled
+    // as a proposal finalization (WR-01's silent mislabel) and it never
+    // reaches `t(undefined)` (WR-02's whole-page TypeError). D-11 still
+    // holds — this fallback carries no qualifier and no penalty framing.
+    full = t('dashboard.momentum.move.generic', lang)
       .replace('{0}', row.companyName)
       .replace('{1}', weekday);
   }
