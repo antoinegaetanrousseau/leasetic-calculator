@@ -978,7 +978,7 @@ archived where the tooling expects to find them.
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
-| 37. CRM Stack Closure | v1.8 | 5/5 | Complete   | 2026-09-05 |
+| 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 0/? | Not started | - |
 | 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
