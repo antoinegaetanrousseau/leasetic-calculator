@@ -830,7 +830,14 @@ client, momentum — is walked, evidenced and free of the gaps its own phase def
      null-gated `momentum` value is removed, and `BADGE_THRESHOLDS` is no longer exported as a
      mutable object — with the momentum card rendering identically before and after.
 
-**Plans:** TBD
+**Plans:** 5 plans in 2 waves
+
+Plans:
+- [ ] 37-01-PLAN.md — wave 1 — GAP-01: server-derived `role === 'admin'` bypass on `/proposals/[id]` (D-37-01) plus a 20th ADMIN-09 grep gate over that surface, proven non-vacuous (D-37-02)
+- [ ] 37-02-PLAN.md — wave 1 — GAP-03: remove the redundant `!isAdmin` beside the null-gated `momentum`, deep-freeze `BADGE_THRESHOLDS`, with byte-identical render diffs as acceptance (D-37-05)
+- [ ] 37-03-PLAN.md — wave 1 — CLOSE-04: full goal-backward `34-VERIFICATION.md` re-derived against the codebase for FICHE-01..05 and ACTV-01..05 (D-37-03)
+- [ ] 37-04-PLAN.md — wave 1 — CLOSE-04: scoped `34-REVIEW.md` over authorization/ownership, the `relationship_events` write path and the server actions, with its scope declared (D-37-03)
+- [ ] 37-05-PLAN.md — wave 2 — CLOSE-01 + CLOSE-03: one consolidated operator walk of six items after all code lands; `30-UAT.md` to `pending: 0`, `33-VERIFICATION.md` to `status: passed` (D-37-04)
 
 **UI hint:** yes
 
