@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T14:13:34.080Z"
-last_activity: 2026-09-05 -- Phase 36 plan 01 executed (HOUSE-01/HOUSE-02 closed)
+last_updated: "2026-09-05T14:19:29.121Z"
+last_activity: 2026-09-05 -- Phase 36 plan 02 executed (HOUSE-03 closed)
 progress:
   total_phases: 25
   completed_phases: 7
   total_plans: 59
-  completed_plans: 54
-  percent: 28
+  completed_plans: 55
+  percent: 29
 ---
 
 # State — Matrice Commerciale
@@ -28,9 +28,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 36 — Gate Repair & Planning-Record Hygiene (in progress)
-Plan: 01/06 complete
+Plan: 02/06 complete
 Status: Executing
-Last activity: 2026-09-05 -- Phase 36 plan 01 executed (HOUSE-01/HOUSE-02 closed)
+Last activity: 2026-09-05 -- Phase 36 plan 02 executed (HOUSE-03 closed)
 
 **v1.8 phase order and why:**
 
@@ -468,6 +468,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 35 P04 | ~30min | 3 tasks | 2 files |
 | Phase 35 P05 | ~45min | 3 tasks | 2 files |
 | Phase 36 P01 | ~35min | 3 tasks | 6 files |
+| Phase 36 P02 | ~18min | 2 tasks | 2 files |
 
 ## Decisions
 
@@ -608,6 +609,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 36]: HOUSE-01 closed by re-run evidence in deferred-items.md, no eslint.config.mjs change (D-36-01)
 - [Phase 36]: 06/07/08/31-CONTEXT.md stale open questions annotated RESOLVED/DEFERRED in place, verdicts traced to STATE.md v1.1-close table and 31-*-SUMMARY.md (D-36-05, HOUSE-02)
 - [Phase 36]: 31-CONTEXT.md Open Questions heading retitled (not appended) and 36-CONTEXT.md's D-36-05 wording fixed, clearing scanContextQuestions false positives on both files
+- [Phase 36]: CALC-07/PROP-01 flipped [~]→[x] at all 4 sites in v1.1-REQUIREMENTS.md (body + traceability row each) with Phase 8 named as completing phase and a `(flipped 2026-09-05, Phase 36 HOUSE-03 / D-36-06)` attribution; line-345 PROP-01 rationale prose reconciled rather than left silent (D-36-06, HOUSE-03)
+- [Phase 36]: db:seed:partner-launch npm script added with no baked-in CONFIRM=/INITIAL_PASSWORD= prefix — those env vars are the operator's authorization gate, not a dry-run safety switch (D-36-07, HOUSE-03); verified live against probe@test.leasetic.com with no DB client ever constructed
 
 ### Blockers
 
