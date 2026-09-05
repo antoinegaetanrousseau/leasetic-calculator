@@ -775,9 +775,9 @@ of v1.8 depends on this one, because every later phase closes by showing a clean
 
 **Plans:** 6 plans (4 waves)
 
-- [ ] 36-01-PLAN.md — HOUSE-01 lint-gate closure by evidence + HOUSE-02 in-place annotation of the four stale CONTEXT open-question blocks (wave 1)
+- [ ] 36-01-PLAN.md — HOUSE-01 lint-gate closure by evidence + HOUSE-02 in-place annotation of the four stale CONTEXT open-question blocks, plus the heading retitle in `31-CONTEXT.md` and the prose fix in `36-CONTEXT.md` that clear the real audit detector (wave 1)
 - [ ] 36-02-PLAN.md — HOUSE-03: CALC-07/PROP-01 `[~]`→`[x]` at all four sites + `db:seed:partner-launch` npm script (wave 1)
-- [ ] 36-03-PLAN.md — HOUSE-04: dated delete decision record, then deletion of `src/components/blocks/` and the two dead test refs (wave 1)
+- [ ] 36-03-PLAN.md — HOUSE-04: dated delete decision record, deletion of `src/components/blocks/` and the two dead test refs, and the dated D-36-02 amendment to `.planning/REQUIREMENTS.md` § Out of Scope + HOUSE-04 figures (wave 1)
 - [ ] 36-04-PLAN.md — CLOSE-05a: `scripts/probe-write-isolation.ts` sentinel probe + `probe:write-isolation` entry, with all D-36-03 safety gates self-tested synthetically (wave 2)
 - [ ] 36-05-PLAN.md — CLOSE-05b: operator runs the probe against the real Neon branches; credential-free transcript recorded (wave 3, blocking human checkpoint)
 - [ ] 36-06-PLAN.md — CLOSE-05c: probe outcome written into `29-VERIFICATION.md` and `29-SECURITY.md` T-29-06, and `29-VALIDATION.md` created (wave 4)
