@@ -653,6 +653,7 @@ and can correct any of it without leaving the page.
 **Plans:** 13/13 plans complete
 
 Plans:
+
 - [x] 34-01-PLAN.md — wave 1 — data foundation: the three D-01 tiers, `relationship_events`, migration 0010, the full dictionary namespace
 - [x] 34-02-PLAN.md — wave 1 — registry module: the measured lookup, D-05's identity assertion, the label tables, and D-23's SIREN convergence
 - [x] 34-03-PLAN.md — wave 1 — ReUI blocks `solution-crm-5` + `solution-users-2`, and a font/vendoring integrity gate
@@ -686,6 +687,7 @@ phase's own work touches):
 **Requirements:** GAME-01, GAME-02, GAME-03, GAME-04, GAME-05 — written 2026-09-04, see `.planning/REQUIREMENTS.md`
 
 **Decisions already taken (2026-09-04), so planning does not reopen them:**
+
   - **Only real progress counts** — a stage advance or a finalized proposal. Notes and next-action dates do not, or a partner keeps a streak alive by typing.
   - **Streaks are weekly.** A leasing deal moves every few weeks; a daily streak would sit at zero for nearly everyone and read as an accusation.
   - **Badges are DERIVED from the event timeline, not persisted.** No awarding job and no new write path — which matters because `neon-http` has no transactions, so an award could never be made atomic with the event that earned it. Changing a criterion re-reads history correctly instead of leaving stale awards behind.
@@ -701,6 +703,7 @@ phase's own work touches):
      every partner. Phase 35 must treat "no history yet" as the NORMAL first
      state and read as encouraging rather than as an empty accusation — not as
      an edge case discovered late.
+
   2. **Only proposals started from a client page carry a client link.**
      `proposals.client_relationship_id` is set by the D-30 / CRM-05 path
      (`/proposals/new/parametres?clientRelationshipId=…`, which the client page
@@ -731,6 +734,7 @@ explicitly OUT of scope for this phase. This decision is settled; do not reopen.
 **Plans:** 5/5 plans complete
 
 Plans:
+
 - [x] 35-01-PLAN.md — momentum domain logic: the one Europe/Paris Mon–Sun week window, the streak fold, the badge ladder, and the shared contracts both wave-2 plans compile against (wave 1)
 - [x] 35-02-PLAN.md — owner-scoped read layer over `relationship_events`: movements, progress week keys, badge counts; owner predicate in the same statement, no write path (wave 2)
 - [x] 35-03-PLAN.md — the 19 `dashboard.momentum.*` fr/en keys and the `MomentumCard` server component: one Card, three parts, two permanent footer lines (wave 2)
@@ -758,28 +762,41 @@ of v1.8 depends on this one, because every later phase closes by showing a clean
      `.claude/worktrees/*` copies contribute none of the 559 current findings, and whatever removes
      them (deletion or an ignore rule) is written down so a future worktree cannot silently
      reintroduce the same noise.
+
   2. A milestone audit run across `.planning/` reports no open v1.1-era question: the
      `<open_questions>` blocks in `06-CONTEXT.md`, `07-CONTEXT.md`, `08-CONTEXT.md` and
      `31-CONTEXT.md` each carry their real resolved-or-deferred status with the outcome named.
+
   3. CALC-07 and PROP-01 read `[x]` rather than `[~]`, and `scripts/seed-partner-launch.ts` is
      reachable through an npm script rather than by path.
+
   4. The dead vendored ReUI blocks carry a dated delete decision with its rationale, superseding the
      provisional "Delete nothing yet" of 2026-08-31, and `src/components/blocks/` is gone while
      `src/components/reui/` is untouched. *(Amended 2026-09-05 by D-36-02: the call is delete and the
      deletion is performed in this phase, superseding this criterion's original "recorded as separate
      work" clause. Measured scope is 25 block directories / 152 files / 1.1M — the 18 blocks / 816K in
      the original wording is the 2026-08-31 audit count, taken before Phase 34 vendored seven more.)*
+
   5. `29-VALIDATION.md` exists and records Phase 29's Nyquist coverage, and INFRA-05's
      write-isolation is either empirically probed against the Neon `development` branch or recorded
      as an architectural inference that is the final answer, with that limitation stated in the file.
-
 **Plans:** 6 plans (4 waves)
+**Wave 1**
 
 - [ ] 36-01-PLAN.md — HOUSE-01 lint-gate closure by evidence + HOUSE-02 in-place annotation of the four stale CONTEXT open-question blocks, plus the heading retitle in `31-CONTEXT.md` and the prose fix in `36-CONTEXT.md` that clear the real audit detector (wave 1)
 - [ ] 36-02-PLAN.md — HOUSE-03: CALC-07/PROP-01 `[~]`→`[x]` at all four sites + `db:seed:partner-launch` npm script (wave 1)
 - [ ] 36-03-PLAN.md — HOUSE-04: dated delete decision record, deletion of `src/components/blocks/` and the two dead test refs, and the dated D-36-02 amendment to `.planning/REQUIREMENTS.md` § Out of Scope + HOUSE-04 figures (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 36-04-PLAN.md — CLOSE-05a: `scripts/probe-write-isolation.ts` sentinel probe + `probe:write-isolation` entry, with all D-36-03 safety gates self-tested synthetically (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 36-05-PLAN.md — CLOSE-05b: operator runs the probe against the real Neon branches; credential-free transcript recorded (wave 3, blocking human checkpoint)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 36-06-PLAN.md — CLOSE-05c: probe outcome written into `29-VERIFICATION.md` and `29-SECURITY.md` T-29-06, and `29-VALIDATION.md` created (wave 4)
 
 ### Phase 37: CRM Stack Closure
@@ -796,15 +813,19 @@ client, momentum — is walked, evidenced and free of the gaps its own phase def
      reaches the proposal detail page instead of a 404, and a recorded decision states whether the
      ADMIN-09 commission-invisibility envelope needs adjusting for a surface that renders more inputs
      than the row/list view — with the 19-gate grep-contract suite green either way.
+
   2. `30-UAT.md` reads `pending: 0`: scenarios 2 (Clients nav per role), 9 (admin relationship
      detail), 10 (sales-role parity and admin exclusion) and 12 (no regression) are walked and
      recorded, with scenario 9 walking the click-through of criterion 1 rather than the dead end it
      hits today.
+
   3. `33-VERIFICATION.md` reads `status: passed`: a Space → ArrowRight → Space keyboard drag on the
      pipeline board produces exactly one write, and D-08's gate is confirmed against a **production
      build**, not `next dev`.
+
   4. Phase 34 has a goal-backward `34-VERIFICATION.md` and a `34-REVIEW.md` — it shipped 13 plans
      with neither.
+
   5. Phase 35's two INFO findings are gone: the redundant `!isAdmin` check beside an already
      null-gated `momentum` value is removed, and `BADGE_THRESHOLDS` is no longer exported as a
      mutable object — with the momentum card rendering identically before and after.
@@ -827,12 +848,15 @@ files.
   1. `31.1-VERIFICATION.md` reads `status: passed`: on first paint in dark theme the shell renders
      the six pinned Colibris tokens with no flash of light chrome, and the PDF/print surface still
      renders white-on-`#1a2832` in dark mode.
+
   2. Phase 28's browser-verification backlog is walked in light **and** dark with each result
      recorded — wizard step 1, `/proposals`, coefficients history, `/parametres`, and the six
      `PartnersList` / `LcReferencesList` padding sites.
+
   3. Every icon-only dialog close control announces an accessible name in the viewer's language —
      the shared `dialog.tsx` primitive no longer hardcodes English `"Close"` in a French-default
      product, verified in FR and EN.
+
   4. The "Charger plus" pagination control and `.btn-out` agree with the app's declared conventions —
      on-grid padding and the standard focus treatment — or `UI-CONVENTIONS.md` records the `0.6rem`
      vertical padding and the third hardcoded focus shadow as a dated, deliberate exception.
@@ -856,17 +880,21 @@ runs against the finished surfaces, matching the Phase 21 precedent.
   1. Neither admin can sign in with the shared `leasetic2026` password, and each holds an individual
      strong credential — evidenced by a successful sign-in with the new credential and a failed one
      with the old.
+
   2. The admin partners list shows a real last-login date for an account that has just signed in:
      `users.last_login_at` is **written** at login, not only read, so rows stop showing `—`. The
      rotation walk in criterion 1 is the evidence.
+
   3. Better Auth `trustedOrigins` is explicitly configured rather than left to its default, and the
      "SameSite=Lax + `__Secure-` cookies are the real CSRF defence" reasoning inherited since v1.2 is
      either re-affirmed with a date or revised — with Phase 20's middleware Origin gate still
      rejecting an untrusted Origin.
+
   4. OPS-03 is closed either way: `scripts/smoke-ovh.ts` has run against a real OVH target with its
      result recorded, **or** — if no target is provided — a dated decision re-dates or cancels the
      September-2026 cutover and names who owns the next step. An unanswered external party leaves
      this requirement closed, not open.
+
   5. OPS-04 is closed either way: DATA-11's 10-year PDF retention carries Thomas's written legal
      sign-off, **or** — absent his reply — a dated interim decision naming who accepts the risk and
      until when. Same rule: silence from the external party still closes the item.
@@ -886,10 +914,13 @@ archived where the tooling expects to find them.
   1. `MILESTONES.md` carries a v1.6 entry describing what actually shipped (Phases 29, 30, 31, 31.1,
      33, 34 — Phase 32 removed), and both `milestones/v1.6-ROADMAP.md` and
      `milestones/v1.6-REQUIREMENTS.md` snapshots are present.
+
   2. A v1.6 milestone audit has been re-run against the finished milestone — the existing one was
      written on 2026-09-01, before Phases 31/33/34 — and its findings are recorded.
+
   3. `ROADMAP.md` no longer shows v1.6 as IN PROGRESS while its own milestone list calls it shipped,
      and Phase 28 carries a milestone in the phase table instead of appearing nowhere in it.
+
   4. Phases 28-35 are archived into their `milestones/v{X.Y}-phases/` directories, and
      `.planning/phases/` holds only the phases a current or future milestone still needs.
 
