@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T14:36:10.726Z"
-last_activity: 2026-09-05 -- Phase 36 plan 03 executed (HOUSE-04 closed)
+last_updated: "2026-09-05T14:52:00.000Z"
+last_activity: 2026-09-05 -- Phase 36 plan 04 executed (CLOSE-05 probe built, part 1 of 3)
 progress:
   total_phases: 25
   completed_phases: 7
   total_plans: 59
-  completed_plans: 56
+  completed_plans: 58
   percent: 28
 ---
 
@@ -28,9 +28,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 36 — Gate Repair & Planning-Record Hygiene (in progress)
-Plan: 03/06 complete
+Plan: 04/06 complete
 Status: Executing
-Last activity: 2026-09-05 -- Phase 36 plan 03 executed (HOUSE-04 closed)
+Last activity: 2026-09-05 -- Phase 36 plan 04 executed (CLOSE-05 probe built, part 1 of 3)
 
 **v1.8 phase order and why:**
 
@@ -470,6 +470,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 36 P01 | ~35min | 3 tasks | 6 files |
 | Phase 36 P02 | ~18min | 2 tasks | 2 files |
 | Phase 36 P03 | 12min | 3 tasks | 155 files |
+| Phase 36 P04 | ~7min | 2 tasks | 2 files |
 
 ## Decisions
 
@@ -615,6 +616,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 36]: D-36-02 executed: deleted all 25 dead vendored ReUI block directories (152 files, 1.1M) rather than deferring, since reinstall is one command
 - [Phase 36]: eslint.config.mjs left untouched for HOUSE-04; two inert 'src/components/blocks/**' ignores recorded as a known residual in docs/design/reui-blocks-audit.md
 - [Phase 36]: .planning/REQUIREMENTS.md amended in place for D-36-02 (original text preserved); HOUSE-04 figures corrected to measured 25/152/1.1M
+- [Phase 36]: scripts/probe-write-isolation.ts built (CLOSE-05 part 1 of 3, D-36-03) — deliberately does NOT import ./_load-env; reads PROBE_DEV_URL/PROBE_MAIN_URL inline, full-hostname allow-list checked before any client is constructed, mainSql (main/production client) restricted to a single read-only SELECT count(*) plus its own end() — verified greppable at exactly 3 code-line occurrences. Three synthetic self-tests (unconfigured, wrong dev hostname, transposed variables) all refuse before connecting, zero credential leakage. No real database contacted; plan 36-05 performs the operator-supervised real run.
+- [Phase 36]: DEV_HOST/MAIN_HOST in probe-write-isolation.ts declared with explicit `: string` type (not inferred literal type) — TypeScript otherwise narrows both after the sequential mismatch-and-exit guards and flags the devHost===mainHost transposition-equality check as a compile error (no overlap between literal types), even though it is the correct runtime check (Rule 1 auto-fix)
 
 ### Blockers
 
