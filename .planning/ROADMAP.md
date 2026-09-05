@@ -763,14 +763,24 @@ of v1.8 depends on this one, because every later phase closes by showing a clean
      `31-CONTEXT.md` each carry their real resolved-or-deferred status with the outcome named.
   3. CALC-07 and PROP-01 read `[x]` rather than `[~]`, and `scripts/seed-partner-launch.ts` is
      reachable through an npm script rather than by path.
-  4. The 18 dead vendored ReUI blocks (816K, zero imports) carry a dated keep-or-delete decision with
-     its rationale, superseding the provisional "Delete nothing yet" of 2026-08-31 — and if the call
-     is delete, the deletion is recorded as separate work rather than performed here.
+  4. The dead vendored ReUI blocks carry a dated delete decision with its rationale, superseding the
+     provisional "Delete nothing yet" of 2026-08-31, and `src/components/blocks/` is gone while
+     `src/components/reui/` is untouched. *(Amended 2026-09-05 by D-36-02: the call is delete and the
+     deletion is performed in this phase, superseding this criterion's original "recorded as separate
+     work" clause. Measured scope is 25 block directories / 152 files / 1.1M — the 18 blocks / 816K in
+     the original wording is the 2026-08-31 audit count, taken before Phase 34 vendored seven more.)*
   5. `29-VALIDATION.md` exists and records Phase 29's Nyquist coverage, and INFRA-05's
      write-isolation is either empirically probed against the Neon `development` branch or recorded
      as an architectural inference that is the final answer, with that limitation stated in the file.
 
-**Plans:** TBD
+**Plans:** 6 plans (4 waves)
+
+- [ ] 36-01-PLAN.md — HOUSE-01 lint-gate closure by evidence + HOUSE-02 in-place annotation of the four stale CONTEXT open-question blocks (wave 1)
+- [ ] 36-02-PLAN.md — HOUSE-03: CALC-07/PROP-01 `[~]`→`[x]` at all four sites + `db:seed:partner-launch` npm script (wave 1)
+- [ ] 36-03-PLAN.md — HOUSE-04: dated delete decision record, then deletion of `src/components/blocks/` and the two dead test refs (wave 1)
+- [ ] 36-04-PLAN.md — CLOSE-05a: `scripts/probe-write-isolation.ts` sentinel probe + `probe:write-isolation` entry, with all D-36-03 safety gates self-tested synthetically (wave 2)
+- [ ] 36-05-PLAN.md — CLOSE-05b: operator runs the probe against the real Neon branches; credential-free transcript recorded (wave 3, blocking human checkpoint)
+- [ ] 36-06-PLAN.md — CLOSE-05c: probe outcome written into `29-VERIFICATION.md` and `29-SECURITY.md` T-29-06, and `29-VALIDATION.md` created (wave 4)
 
 ### Phase 37: CRM Stack Closure
 
