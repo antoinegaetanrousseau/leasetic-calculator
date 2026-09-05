@@ -133,6 +133,39 @@ function createClient(varName: string, url: string) {
   }
 }
 
+/**
+ * Construct a client and then prove the DRIVER resolved the very host the
+ * allow-list accepted.
+ *
+ * `extractHostname` and `postgres()` are two parsers, and a guard that
+ * validates a string the driver does not use is no guard at all: postgres.js
+ * derives its target as `o.hostname || o.host || multihost || url.hostname ||
+ * env.PGHOST || 'localhost'` (`postgres/src/index.js:437`), so a URL could pass
+ * the allow-list and connect somewhere else entirely — writing the sentinel to
+ * whatever local/`$PGHOST` database answered, reading it back, and emitting a
+ * false `PASS ... ISOLATED`. Asserting `sql.options.host` after construction is
+ * what makes the two permanently inseparable, and it also neutralises the
+ * driver's `PGHOST` fallback on a run the header describes as "both connection
+ * strings arrive inline".
+ *
+ * The resolved host is deliberately NOT echoed: on a malformed URL it can be a
+ * fragment of the credential.
+ */
+async function openClient(varName: string, url: string, expectedHost: string) {
+  const sql = createClient(varName, url);
+  const resolved = sql.options.host;
+  if (resolved.length !== 1 || resolved[0] !== expectedHost) {
+    console.error(
+      `ERROR: the postgres driver resolved a different host for ${varName} than the `
+      + 'allow-list accepted — refusing.',
+    );
+    console.error(`  Expected the driver to target exactly one host: ${expectedHost}`);
+    await sql.end({ timeout: 5 });
+    process.exit(1);
+  }
+  return sql;
+}
+
 async function main(): Promise<void> {
   const devUrl = process.env.PROBE_DEV_URL;
   const mainUrl = process.env.PROBE_MAIN_URL;
@@ -184,8 +217,8 @@ async function main(): Promise<void> {
   console.log(`main host: ${mainHost}`);
   console.log(`sentinel:  ${sentinel}`);
 
-  const devSql = createClient('PROBE_DEV_URL', devUrl);
-  const mainSql = createClient('PROBE_MAIN_URL', mainUrl);
+  const devSql = await openClient('PROBE_DEV_URL', devUrl, DEV_HOST);
+  const mainSql = await openClient('PROBE_MAIN_URL', mainUrl, MAIN_HOST);
 
   let exitCode = 1;
 
