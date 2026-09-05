@@ -67,9 +67,10 @@ function collectSourceFiles(relativeDir: string, excludeDirs: string[]): string[
 
 // ── Assertion 1 allow-list — the literal sweep ──────────────────────────
 //
-// Excluded directories: vendored ReUI reference blocks (never imported —
-// 31.1-04-PLAN.md § Scope line).
-const EXCLUDED_DIRS = ['src/components/blocks'];
+// The vendored ReUI reference blocks that used to be excluded here were
+// deleted 2026-09-05 (Phase 36, HOUSE-04) — see
+// docs/design/reui-blocks-audit.md for the decision record.
+const EXCLUDED_DIRS: string[] = [];
 
 // Named single-file exceptions, each with its own reason.
 const NAMED_EXCEPTIONS = [

@@ -42,7 +42,10 @@ function collectSourceFiles(dir: string, out: string[] = []): string[] {
     const full = join(dir, entry);
     // Vendored code is re-imported wholesale on upgrade and is excluded from
     // ESLint for the same reason; house rules bind at call sites instead.
-    if (full.includes('components/reui') || full.includes('components/blocks')) continue;
+    // (The vendored blocks half of this skip was removed 2026-09-05 when the
+    // dead blocks tree was deleted — Phase 36, HOUSE-04; see
+    // docs/design/reui-blocks-audit.md.)
+    if (full.includes('components/reui')) continue;
     if (full.includes('components/ui/')) continue;
     if (statSync(full).isDirectory()) {
       collectSourceFiles(full, out);
