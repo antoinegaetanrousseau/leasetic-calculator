@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-05T14:19:29.121Z"
-last_activity: 2026-09-05 -- Phase 36 plan 02 executed (HOUSE-03 closed)
+last_updated: "2026-09-05T14:36:10.726Z"
+last_activity: 2026-09-05 -- Phase 36 plan 03 executed (HOUSE-04 closed)
 progress:
   total_phases: 25
   completed_phases: 7
   total_plans: 59
-  completed_plans: 55
-  percent: 29
+  completed_plans: 56
+  percent: 28
 ---
 
 # State — Matrice Commerciale
@@ -28,9 +28,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 36 — Gate Repair & Planning-Record Hygiene (in progress)
-Plan: 02/06 complete
+Plan: 03/06 complete
 Status: Executing
-Last activity: 2026-09-05 -- Phase 36 plan 02 executed (HOUSE-03 closed)
+Last activity: 2026-09-05 -- Phase 36 plan 03 executed (HOUSE-04 closed)
 
 **v1.8 phase order and why:**
 
@@ -469,6 +469,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 35 P05 | ~45min | 3 tasks | 2 files |
 | Phase 36 P01 | ~35min | 3 tasks | 6 files |
 | Phase 36 P02 | ~18min | 2 tasks | 2 files |
+| Phase 36 P03 | 12min | 3 tasks | 155 files |
 
 ## Decisions
 
@@ -611,6 +612,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 36]: 31-CONTEXT.md Open Questions heading retitled (not appended) and 36-CONTEXT.md's D-36-05 wording fixed, clearing scanContextQuestions false positives on both files
 - [Phase 36]: CALC-07/PROP-01 flipped [~]→[x] at all 4 sites in v1.1-REQUIREMENTS.md (body + traceability row each) with Phase 8 named as completing phase and a `(flipped 2026-09-05, Phase 36 HOUSE-03 / D-36-06)` attribution; line-345 PROP-01 rationale prose reconciled rather than left silent (D-36-06, HOUSE-03)
 - [Phase 36]: db:seed:partner-launch npm script added with no baked-in CONFIRM=/INITIAL_PASSWORD= prefix — those env vars are the operator's authorization gate, not a dry-run safety switch (D-36-07, HOUSE-03); verified live against probe@test.leasetic.com with no DB client ever constructed
+- [Phase 36]: D-36-02 executed: deleted all 25 dead vendored ReUI block directories (152 files, 1.1M) rather than deferring, since reinstall is one command
+- [Phase 36]: eslint.config.mjs left untouched for HOUSE-04; two inert 'src/components/blocks/**' ignores recorded as a known residual in docs/design/reui-blocks-audit.md
+- [Phase 36]: .planning/REQUIREMENTS.md amended in place for D-36-02 (original text preserved); HOUSE-04 figures corrected to measured 25/152/1.1M
 
 ### Blockers
 

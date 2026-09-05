@@ -114,7 +114,7 @@ stops existing.
   carry their real resolved-or-deferred status.
 - [x] **HOUSE-03**: The stale `[~]` markers on CALC-07 and PROP-01 read `[x]`, and
   `scripts/seed-partner-launch.ts` is reachable through an npm script rather than by path.
-- [ ] **HOUSE-04**: The 25 dead vendored ReUI block directories (152 files, 1.1M, zero imports)
+- [x] **HOUSE-04**: The 25 dead vendored ReUI block directories (152 files, 1.1M, zero imports)
   carry a recorded keep-or-delete decision with its rationale, superseding the provisional
   "Delete nothing yet" of 2026-08-31. (The 18 blocks / 816K figures came from the 2026-08-31
   audit, written before Phase 34 plan 34-03 vendored `solution-crm-1`…`solution-crm-6` and
@@ -179,7 +179,7 @@ stops existing.
 | HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
-| HOUSE-04 | Phase 36 — Gate Repair & Planning-Record Hygiene | Pending |
+| HOUSE-04 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 
 **Coverage: 21/21 requirements mapped to exactly one phase — no orphans, no duplicates.**
 
