@@ -764,7 +764,7 @@ Plans:
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
-| 35. Sales Motivation | v1.7 | 5/5 | Complete   | 2026-09-05 |
+| 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
 
 ---
 

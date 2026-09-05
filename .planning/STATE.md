@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
-status: verifying
-last_updated: "2026-09-05T09:24:57.059Z"
+status: milestone_complete
+last_updated: 2026-09-05T10:36:45.586Z
 last_activity: 2026-09-05
 progress:
   total_phases: 20
   completed_phases: 19
   total_plans: 97
-  completed_plans: 97
+  completed_plans: 180
   percent: 95
+stopped_at: Milestone complete (Phase 35 was final phase)
 ---
 
 # State — Matrice Commerciale
@@ -23,13 +24,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 35 — sales-motivation
+**Current focus:** Milestone complete
 
 ## Current Position
 
-Phase: 35 (sales-motivation) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
+Phase: 35
+Plan: Not started
+Status: Milestone complete
 Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
 reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
 FICHE-01..05 / ACTV-01..05 stay OPEN until that checkpoint is approved.
