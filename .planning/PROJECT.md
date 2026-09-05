@@ -141,7 +141,46 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 
 **v1.7 delivered:** a partner sees their own book gaining momentum on the home page — what moved this week, a weekly streak with its break condition always stated, and a 3×3 badge ladder — all derived from v1.6's `relationship_events` at read time. No new table, no migration, no awarding job. Phase 35 alone: 5 plans, 13 tasks, 2,320 tests passing, verification 9/9, security 21/21.
 
-**Next milestone: not yet scoped.** Run `/gsd-new-milestone`. The strongest candidate already recorded in Phase 35's Deferred Ideas is **"Encours total"** — portfolio value charted month over month — flagged there as possibly *a stronger motivator than streaks or badges, needing no gamification vocabulary at all*. It depends on signed contract amounts, so it waits on the in-house contract tool fed by SIREN.
+**Next milestone: v1.8 — Deferred Items** (scoped 2026-09-05, see below). The strongest *capability* candidate already recorded in Phase 35's Deferred Ideas is **"Encours total"** — portfolio value charted month over month — flagged there as possibly *a stronger motivator than streaks or badges, needing no gamification vocabulary at all*. It depends on signed contract amounts, so it waits on the in-house contract tool fed by SIREN.
+
+---
+
+## 🚧 Current Milestone: v1.8 — Deferred Items
+
+**Goal:** Close the accumulated deferred backlog from v1.0-v1.7 — verification debt, known
+functional gaps, and the pre-onboarding operational gates — so that no shipped milestone still
+carries an unclosed item, with emphasis on what phases 28-35 left open.
+
+**Why now:** v1.7 closed with 8 deferred items, none of which originated in v1.7 — all are
+inherited v1.0-v1.6 artifacts. Two of them (Phase 30's `/proposals/[id]` admin bypass, the
+Phase 28 browser-verification backlog) were explicitly assigned to later phases that have since
+shipped without picking them up. The backlog is now rotting rather than draining, and one item
+(admin password rotation) gates real-partner onboarding.
+
+**Target areas:**
+
+- **Verification & closure debt** — Phase 30's 4 pending UAT scenarios, the `human_needed`
+  verifications on 31.1 and 33, Phase 34's entirely missing VERIFICATION/REVIEW artifacts,
+  Phase 29's unmeasured Nyquist coverage, and the formal close + archive of v1.6 (git-tagged,
+  but never written into MILESTONES.md and audited only in its half-built state).
+- **Functional gaps** — the admin oversight click-through that 404s at `/proposals/[id]`,
+  Phase 35's two INFO findings, the hardcoded English dialog close label in a French-default
+  product, `.btn-out`'s off-grid padding and third focus treatment, and `users.last_login_at`
+  never being written.
+- **Operational gates** — admin password rotation (blocks first real-partner onboarding),
+  Better Auth `trustedOrigins` hardening, the September-2026 OVH smoke deploy, and DATA-11's
+  legal sign-off on 10-year PDF retention.
+- **Housekeeping** — the stray `.claude/worktrees/*` copies that put 559 phantom errors into
+  `lint:check`, the stale `<open_questions>` and `[~]` markers that resurface at every
+  milestone audit, and a recorded decision on the 18 dead vendored ReUI blocks.
+
+**How human verification is handled:** operator-walk items attach to whichever phase touches
+that surface, rather than being pooled into one verification phase — so each area is verified
+as it is fixed.
+
+**Explicitly NOT in this milestone:** new product capability. No new tables, no new surfaces,
+no formula changes. Deferred *capability* (contract-tool integration, HubSpot retirement,
+teal rebrand, Encours total, mobile layout) stays in "Deferred to next milestone" below.
 
 ---
 
@@ -309,9 +348,11 @@ All 6 active v1.5 requirements shipped — 2 phases (26–27); 1 descoped (ROWAC
 - **GAME-04**: No surface lets a partner learn anything about another partner's book, including by inference from a count, rank, total or wording. _Validated in Phase 35, and proven at runtime: `momentum.isolation.integration.test.ts` was run against real Postgres with 3/3 mutation evidence — deleting the owner predicate makes exactly that suite fail._
 - **GAME-05**: A partner who ignores all of it is not penalised; pipeline, conversion rate and follow-up list behave exactly as before. _Validated in Phase 35._
 
-### Active (next milestone)
+### Active (v1.8 — Deferred Items)
 
-None yet — defined at `/gsd-new-milestone`. Candidate scope carried forward below.
+Defined in `.planning/REQUIREMENTS.md` for milestone v1.8. This milestone carries no new
+product capability — every requirement traces to an item already deferred by a shipped
+milestone (v1.0-v1.7). Candidate *capability* scope for v1.9+ is carried forward below.
 
 ### Deferred to next milestone
 
@@ -440,3 +481,5 @@ This document evolves at phase transitions and milestone boundaries.
 *Last updated: 2026-09-05 at v1.7 milestone completion (Sales Motivation). Since v1.6: Phase 35 shipped momentum, weekly streaks and a 3x3 badge ladder on the partner home page, derived at read time from Phase 34's `relationship_events` — no new table, no migration, no awarding job. 2320 tests passing. Verification passed 9/9 must-haves; security audit closed 21/21 threats.*
 
 *Two things from Phase 35 worth carrying forward: (1) the phase's real-Postgres isolation suite caught two production-shipping bugs that 2297 mocked-driver tests could not — a mocked test proves a WHERE clause was COMPOSED, never that it FILTERS; (2) the card's visual-restraint decision (D-19) was reversed post-execution by operator review and amended to D-19a in `35-CONTEXT.md`, with GAME-04's no-leaderboard rule explicitly held as a privacy property rather than a style budget.*
+
+*Updated 2026-09-05 at v1.8 milestone start (Deferred Items). Scope is the inherited backlog: verification debt (Phase 30 UAT, 31.1/33 human checks, Phase 34's missing artifacts, v1.6's formal close), functional gaps (admin bypass on `/proposals/[id]`, Phase 35 INFOs, i18n'd dialog close, `.btn-out`, `last_login_at`), operational gates (admin password rotation, `trustedOrigins`, OVH smoke, DATA-11), and housekeeping (stray worktrees, stale planning markers, dead ReUI blocks). No new capability.*
