@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: CRM Foundation
 status: executing
-last_updated: "2026-09-05T00:07:30.402Z"
+last_updated: "2026-09-05T08:36:19.802Z"
 last_activity: 2026-09-05
 progress:
   total_phases: 20
   completed_phases: 18
   total_plans: 97
-  completed_plans: 95
+  completed_plans: 96
   percent: 90
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 35 (sales-motivation) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Antoine's to walk. Fixtures are on the Neon `development` branch; `npm run db:seed:fiche-fixtures`
 reprints the partner accounts, the two reserved SIRENs and every `/clients/<id>`. Requirements
@@ -429,6 +429,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 35 P01 | ~20min | 2 tasks | 5 files |
 | Phase 35 P02 | ~20min | 2 tasks | 3 files |
 | Phase 35 P03 | ~35min | 3 tasks | 3 files |
+| Phase 35 P04 | ~30min | 3 tasks | 2 files |
 
 ## Decisions
 
@@ -562,6 +563,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 35]: isProgressEvent excludes toStage='perdu' explicitly (D-11 gaming-route closure); no new index added over relationship_events_relationship_id_occurred_at_idx (near-empty table, D-23 holds)
 - [Phase 35]: nowMs dropped from MomentumCardProps — all dates derived server-side before the component is reached; 35-05 must not pass nowMs into MomentumCard
 - [Phase 35]: MomentumCard.movements is one WeeklyMovements object ({rows,total}), not a bare array plus a separate count prop
+- [Phase 35]: 35-04: GROUP BY ordinal (sql`1`), not a repeated sql fragment object, for GROUP BY correctness under real Postgres
+- [Phase 35]: 35-04: sql.json(obj), never JSON.stringify(obj) cast to ::jsonb, to avoid double-encoding jsonb payloads
 
 ### Blockers
 

@@ -146,3 +146,7 @@ DATABASE_URL=$DEV_DB_URL DATABASE_URL_TEST=$DEV_DB_URL npx vitest run \
 ---
 *Phase: 35-sales-motivation*
 *Completed: 2026-09-05*
+
+## Self-Check: PASSED
+
+All 3 created/modified files found on disk (`momentum.isolation.integration.test.ts`, `momentum.ts`, `35-04-SUMMARY.md`); all 4 commits (`baa77ed`, `06197fc`, `ada695e`, `a824fb7`) found in git log.
