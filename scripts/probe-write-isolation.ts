@@ -104,6 +104,32 @@
  * The expected endpoints, for reference (hostnames only, never credentials):
  *   dev  → ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech
  *   main → ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech
+ *
+ * TESTING THIS SCRIPT'S OWN GATES — READ BEFORE WRITING A TEST INPUT
+ * Known residual, deliberately not designed away (no parse-only mode exists;
+ * adding one would widen the surface of a production-touching script). There is
+ * no way to exercise the hostname gates without opening a socket, because a
+ * CORRECT guard is precisely one that lets well-formed, credential-shaped input
+ * through — so any input that tests the hostname logic proceeds to a connection
+ * attempt on gate 5.
+ *
+ * The consequence is not hypothetical. While demonstrating the CR-01 fix, an
+ * agent ran this script with the REAL allow-listed hostnames and a synthetic
+ * username; because the fix made that input pass, the script opened a socket to
+ * the Neon `development` pooled endpoint and was rejected at auth
+ * (`password authentication failed for user 'fakeuser'`). No write, no read,
+ * `main` never contacted, nothing left behind — but only because the slot
+ * involved was `development`. The identical mistake in the PROBE_MAIN_URL slot
+ * opens a socket to production.
+ *
+ * So: to test the gates, copy this file and rewrite both host constants to
+ * RFC-2606 `.invalid` names, then assert on the copy that the `DEV_HOST` and
+ * `MAIN_HOST` lines both end in `.invalid` before running anything. (Do not
+ * assert "zero matches for the real domain" — this paragraph mentions it, so
+ * that check fails on its own prose.) DNS never resolves `.invalid`, so the
+ * copy physically cannot reach an endpoint even when input passes every gate.
+ * For a full end-to-end run, point the rewritten constants at a local socket.
+ * Never use the real hostnames to test guard logic.
  */
 import { randomUUID } from 'node:crypto';
 import postgres from 'postgres';
