@@ -174,17 +174,27 @@ function extractHostname(url: string): string | null {
  *  1. Both accepted schemes. Neon's connection panel emits `postgresql://`,
  *     and postgres.js accepts it, so a `postgres://`-only pattern let the
  *     commonest real-world form straight through. Case-insensitive too.
- *  2. Any bare `//user:pass@` userinfo fragment, which is not anchored on a
- *     scheme at all — errors routinely quote the authority without it.
+ *  2. Any `user:pass@` userinfo fragment, with or WITHOUT the leading `//`.
+ *     Errors routinely quote the authority without a scheme, and requiring the
+ *     `//` left the bare form untouched.
  *  3. A verbatim scrub of the two URLs the operator actually supplied. Pattern
  *     matching can always be out-thought; an exact-string replacement of the
  *     known secrets cannot miss, whatever shape the driver embedded them in.
+ *     Note its limit: it matches the whole URL, so it does NOT catch a password
+ *     quoted on its own. Stage 2 is what covers `user:pass@` fragments, and no
+ *     stage catches a bare password in isolation — postgres.js does not produce
+ *     one today (`errors.js:16-27` embeds `host:port` only, and `PostgresError`
+ *     copies a server message that never contains the client password), but the
+ *     limit is worth knowing rather than assuming away.
  */
 function safeErrorMessage(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err);
   let out = raw
     .replace(/postgres(?:ql)?:\/\/\S*/gi, '[redacted]')
-    .replace(/\/\/[^\s/@]*:[^\s/@]*@/g, '//[redacted]@');
+    .replace(
+      /(\/\/)?[^\s/@]{1,64}:[^\s/@]{1,64}@/g,
+      (_match, slashes: string | undefined) => `${slashes ?? ''}[redacted]@`,
+    );
   for (const secret of [process.env.PROBE_DEV_URL, process.env.PROBE_MAIN_URL]) {
     if (secret) out = out.split(secret).join('[redacted]');
   }
