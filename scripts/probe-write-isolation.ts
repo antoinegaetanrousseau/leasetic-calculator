@@ -42,19 +42,54 @@
  * `main`-side client (bound to the const `mainSql`) executes exactly one
  * read-only statement — `SELECT count(*) ... WHERE label = <sentinel>` — and
  * never reads customer data; no INSERT, UPDATE, DELETE or DDL is ever issued on
- * `mainSql`. Any caught error is printed via `err.message` with a `postgres://`
- * substring stripped, because postgres.js errors can embed the connection
- * string.
+ * `mainSql`, and that session is additionally read-only at the SERVER (see
+ * `MAIN_SESSION_READ_ONLY`) so the property is a database constraint and not
+ * merely a naming convention. Every caught error — including anything that
+ * escapes `main()` — goes through `safeErrorMessage`, which prints `err.message`
+ * only and redacts both `postgres://` and `postgresql://` URLs, bare
+ * `user:pass@` fragments, and the two supplied URLs verbatim. `main()` is never
+ * invoked bare: Node's default unhandled-rejection handler prints the error
+ * OBJECT, and `ERR_INVALID_URL` carries the offending URL on an `input`
+ * property.
+ *
+ * SAFETY GATES (each one fails closed; nothing is echoed back from the input)
+ *   1. Both URLs must be present, or the run refuses (this is the intended
+ *      failure when no env file is read — see the `_load-env` note above).
+ *   2. Each URL must parse as an absolute `postgres:`/`postgresql:` URL under
+ *      the platform parser — the SAME parser postgres.js uses — and yield a
+ *      bare DNS hostname. A hand-rolled substring split is NOT used: it folded
+ *      credential material into the "hostname" and accepted scheme-less strings
+ *      the driver routed elsewhere.
+ *   3. Each hostname must equal, exactly, the endpoint in
+ *      `docs/operations/neon-branch-routing.md` — never a prefix match.
+ *   4. After construction, the DRIVER's own resolved host must equal the same
+ *      value, so the guard and the connect path can never diverge (this also
+ *      neutralises postgres.js's `PGHOST` fallback).
+ *   5. Cleanup must be confirmed: if the sentinel's DELETE cannot be shown to
+ *      have removed exactly one row, the run exits non-zero even when the
+ *      isolation verdict itself was PASS.
  *
  * WHY `schema_meta`
  * It is a bootstrap marker table (`src/db/schema.ts`) where a stray row is
  * harmless, and `/healthz` reads it with `.limit(0)` (`src/lib/health.ts:47-56`),
  * so a transient sentinel row cannot affect the health check.
  *
- * RUN (copy-pasteable; both URLs MUST be pooled `-pooler` connection strings)
- *   PROBE_DEV_URL='postgres://<dev-user>:<dev-pass>@ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require' \
- *   PROBE_MAIN_URL='postgres://<main-user>:<main-pass>@ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require' \
- *   npm run probe:write-isolation
+ * RUN (both URLs MUST be pooled `-pooler` connection strings)
+ * Do NOT put the production password on the command line: that writes it into
+ * shell history and into the process's `/proc`-visible argv for the duration of
+ * the run. Read both values into hidden prompts, pass them through the
+ * environment, and unset them immediately — this is the form the recorded run
+ * in `.planning/phases/36-gate-repair-planning-record-hygiene/36-PROBE-TRANSCRIPT.md`
+ * actually used:
+ *
+ *   read -rs -p 'dev  pooled URL: ' PROBE_DEV_URL;  echo
+ *   read -rs -p 'main pooled URL: ' PROBE_MAIN_URL; echo
+ *   PROBE_DEV_URL="$PROBE_DEV_URL" PROBE_MAIN_URL="$PROBE_MAIN_URL" npm run probe:write-isolation
+ *   unset PROBE_DEV_URL PROBE_MAIN_URL
+ *
+ * The expected endpoints, for reference (hostnames only, never credentials):
+ *   dev  → ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech
+ *   main → ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech
  */
 import { randomUUID } from 'node:crypto';
 import postgres from 'postgres';
