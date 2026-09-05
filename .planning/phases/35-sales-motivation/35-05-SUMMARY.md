@@ -132,3 +132,7 @@ None — no external service configuration required. No new dependency installed
 ---
 *Phase: 35-sales-motivation*
 *Completed: 2026-09-05*
+
+## Self-Check: PASSED
+
+Both modified files (`app/(authed)/page.tsx`, `app/(authed)/page.test.tsx`) found on disk; all 3 commits (`f614308`, `b3d9794`, `4e3d60c`) found in git log.
