@@ -2,6 +2,7 @@
 
 **Gathered:** 2026-09-05
 **Status:** Ready for planning
+**Amended:** 2026-09-05 — three figures corrected against the live tree after pattern mapping (block count, open-question shapes, marker line numbers). See `36-PATTERNS.md`.
 
 <domain>
 ## Phase Boundary
@@ -41,8 +42,17 @@ their own areas — do not reach into them.
   audit doc's own: reinstall is one command (`npx shadcn@latest add @reui/<block-name>`),
   so there is no cost to deleting and no value in keeping one "just in case" beyond the
   note already written in `docs/design/reui-blocks-audit.md`.
-  - Scope of deletion: `src/components/blocks/` only — 18 blocks, 104 files, 816K,
-    zero imports from anywhere outside that directory.
+  - Scope of deletion: `src/components/blocks/` only — **25 block directories, 152 files,
+    1.1M** (verified 2026-09-05), zero imports from anywhere outside that directory.
+    **The audit doc's "18 blocks / 104 files / 816K" is stale**: it was written 2026-08-31,
+    before Phase 34 plan 34-03 vendored seven more (`solution-crm-1`…`solution-crm-6`,
+    `solution-users-2`). All seven are equally unimported, so deletion stays safe — but the
+    decision record must state the real figures, not the audit's.
+  - Two test files reference the directory as an **exclusion path**, not an import:
+    `tests/container-radius.test.ts:72` (`EXCLUDED_DIRS`) and
+    `tests/server-action-error-contracts.test.ts:45` (a `full.includes(...)` skip). Neither
+    breaks when the directory disappears, but both become dead references — remove the
+    `blocks` entry from each, keeping the `components/reui` half of the second one intact.
   - **`src/components/reui/` is NOT touched.** Those are live primitives (`alert`, `badge`,
     `cascader`, `data-grid`, `filters`, `frame`, `gantt`, `icon-stack`, `kanban`,
     `phone-input`, `stepper`, `timeline`) and several are wired into shipped surfaces.
@@ -98,8 +108,11 @@ their own areas — do not reach into them.
   the resolutions already traced in `.planning/STATE.md` § Deferred Items. The file should
   tell the truth to a human reader, not merely fall outside a scanner's path.
 
-  Four files: `06-CONTEXT.md` (1 question), `07-CONTEXT.md` (2), `08-CONTEXT.md` (3),
-  `31-CONTEXT.md` (3 — re-run idempotency, canonical name selection). Note that 06/07/08
+  Four files, and **they use three different shapes** — verified 2026-09-05, do not assume
+  a uniform `<open_questions>` tag: `08-CONTEXT.md` has a real `<open_questions>` XML block
+  (4 bullets, not 3); `06-CONTEXT.md` and `07-CONTEXT.md` use a `### Open questions` heading
+  nested inside `<canonical_refs>`; `31-CONTEXT.md` has **5** questions under a markdown
+  heading inside its `<deferred>` block, with no `<open_questions>` tag at all. Note that 06/07/08
   moved into `.planning/milestones/v1.1-phases/` during the 2026-09-05 cleanup; only
   `31-CONTEXT.md` is still under `.planning/phases/`. Archiving is **not** accepted as a
   substitute for annotating — the questions are stale wherever they sit.
@@ -107,6 +120,11 @@ their own areas — do not reach into them.
 - **D-36-06: Flip the two `[~]` markers to `[x]` in the same in-place manner**, naming the
   phase that resolved each: CALC-07 and PROP-01 in
   `.planning/milestones/v1.1-REQUIREMENTS.md`, both satisfied by Phase 8 work.
+  **Four line edits, not two** (verified 2026-09-05): the requirement bodies at lines 81 and
+  86, and the traceability rows at lines 283 (CALC-07) and **285** (PROP-01) which repeat
+  "Partial" independently. Line 345 additionally carries prose arguing PROP-01's partial
+  status — the plan must state explicitly whether that prose is reconciled or left as a
+  historical note.
 
 - **D-36-07: Give `scripts/seed-partner-launch.ts` an npm script**, following the existing
   naming convention in `package.json` (`db:backfill:coefficient-history`,
