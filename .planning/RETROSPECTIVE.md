@@ -2,6 +2,84 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
+## Milestone: v1.7 — Sales Motivation
+
+**Shipped:** 2026-09-05
+**Phases:** 1 (Phase 35) | **Plans:** 5 | **Tasks:** 13 | **Commits:** 35
+
+### What Was Built
+
+Momentum, weekly streaks and a 3×3 badge ladder on the partner home page, derived
+from v1.6's `relationship_events` at read time. No new table, no migration, no
+awarding job — changing a badge criterion re-reads history instead of leaving
+stale awards behind.
+
+### What Worked
+
+- **Interface-first wave 1.** 35-01 shipped only types and pure functions, which
+  let the SQL plan (35-02) and the React plan (35-03) be planned as siblings —
+  neither had to guess the other's shape because both compiled against the same
+  `types.ts`.
+- **A plan whose deliverable was evidence, not code.** 35-04's stated output was
+  "removing the owner predicate makes exactly this test fail", not "the test
+  passes". That framing is why it was run for real rather than written and
+  skipped.
+- **Amending the contract instead of just editing the code.** When D-19 was
+  reversed mid-flight, the amendment went into 35-CONTEXT.md and 35-UI-SPEC.md
+  before any component change, so later audits verify against what shipped.
+
+### What Was Inefficient
+
+- **The checkpoint for a test database cost a full round trip** — and then a
+  second one, because the agent asked the operator to `export` in their own
+  shell, which never reaches an agent's Bash tool. The working channel is a
+  gitignored file sourced inline. Now recorded.
+- **Two UI iterations.** The first restrained version was judged unfinished; the
+  gamified rebuild was judged too tall. Both were avoidable with a rendered
+  preview before the human-verify checkpoint rather than after.
+- **The archiving CLI mis-scoped this milestone**, attributing all 35 phase
+  directories on disk to v1.7 and emitting several literal `One-liner:` parse
+  failures. Corrected by hand. Root cause: no phase directory has ever been
+  archived, and v1.6 was never formally closed.
+
+### Patterns Established
+
+- **Real-Postgres integration suites for isolation-critical queries.**
+  Skip-by-default behind `DATABASE_URL_TEST`, hand-invoked, never wired to CI.
+- **Mutation testing as the acceptance criterion** for a security-relevant
+  query: break it, watch the named test fail, restore, verify `git diff
+  --exit-code` clean.
+- **Superseded-decision blocks** in CONTEXT/UI-SPEC that retain the original
+  reasoning as a record while marking it no longer binding.
+
+### Key Lessons
+
+1. **A mocked test proves a WHERE clause was COMPOSED, never that it FILTERS.**
+   2297 mocked-driver tests, a clean typecheck and a clean lint all passed
+   against a query that threw on every real call. This is now the third
+   production defect in this repo of exactly that shape.
+2. **A type is a claim about the database, not a fact it enforces.** `toStage`
+   is typed `PipelineStage | null` and sourced from unvalidated jsonb; the
+   review found that an unexpected value would crash the entire home page,
+   because the guard lived in a different module's Zod schema.
+3. **Restraint without structure reads as unfinished.** The final card is both
+   more visually expressive *and* shorter than the restrained one it replaced —
+   304px vs 836px. Density came from layout, not from hiding content.
+4. **A mitigation pinned to a literal count has a short shelf life.** A threat's
+   mitigation was "`grep -c` pins the dictionary at 38 entries"; a same-day
+   redesign made it 50. The property survived only because a behavioural test
+   also enforced it.
+
+### Cost Observations
+
+- Model mix: orchestration on Opus, all executors and auditors on Sonnet
+- Sessions: 1 (~13 hours wall-clock, heavily checkpoint-bound)
+- Notable: the two most valuable outputs — the isolation suite's bug catches and
+  the code review's crash finding — both came from agents told to look for a
+  *specific* failure class rather than to "review the code".
+
+---
+
 ## Milestone: v1.5 — Proposal List Actions & Pill Fix
 
 **Shipped:** 2026-05-30
