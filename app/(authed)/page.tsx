@@ -14,10 +14,18 @@ import {
   countTotal,
   countDrafts,
 } from '@/lib/db/queries/proposal-aggregates';
-import { listRelationshipsNeedingFollowUp } from '@/lib/db/queries';
+import {
+  listRelationshipsNeedingFollowUp,
+  listWeeklyMovementsForOwner,
+  listProgressWeekKeysForOwner,
+  getBadgeCountsForOwner,
+} from '@/lib/db/queries';
 import { buildListResponse } from '@/lib/api/proposals/list';
 import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
 import { RelanceCard } from './_components/RelanceCard';
+import { MomentumCard } from './_components/MomentumCard';
+import { currentWeekWindow, formatTrackedSinceFragment } from '@/lib/momentum/window';
+import { summarizeStreaks, deriveBadgeProgress } from '@/lib/momentum/badges';
 
 /**
  * Read the current timestamp. Extracted to a module-level async helper so the
@@ -33,7 +41,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Accueil — Leasétic Matrice' };
 
 export default async function HomePage() {
-  const { session } = await requireUser();
+  const { session, role } = await requireUser();
   const lang = await getCurrentLang();
 
   const u = session.user as {
@@ -44,8 +52,25 @@ export default async function HomePage() {
   };
   const displayName = u.displayName ?? u.name ?? u.email;
   const userId = u.id;
+  // D-15: this surface is hidden entirely for admins, before any momentum
+  // query runs. This differs from the "à relancer" call below, whose admin
+  // behaviour correctly falls out of owning nothing: an admin's genuinely
+  // empty momentum result would be indistinguishable from a real partner's
+  // zero-history zero state (D-13's ladder-unlit invitation copy), which is
+  // itself a GAME-04-adjacent tell. So the role is checked BEFORE the
+  // queries fire, not after, by never evaluating them for an admin.
+  const isAdmin = role === 'admin';
 
-  const [countThisMonthVal, countTotalVal, countDraftsVal, recentList, relanceRows] =
+  // Read the clock ONCE, here on the server, BEFORE the queries: the
+  // momentum week window is now a query argument (D-10), and every derived
+  // value — the streak, the movements list, the credibility line — must
+  // flow from this single read so they cannot disagree. The follow-up
+  // labels below also derive from this same instant, same reason
+  // `ProposalRow` takes `nowMs` rather than reading the clock during render.
+  const nowMs = await getNowMs();
+  const week = currentWeekWindow(nowMs);
+
+  const [countThisMonthVal, countTotalVal, countDraftsVal, recentList, relanceRows, momentumData] =
     await Promise.all([
       countThisMonth(userId),
       countTotal(userId),
@@ -61,13 +86,36 @@ export default async function HomePage() {
       // admin simply owns no relationships and receives an empty list. Branching
       // on the role would create a second surface to secure for no gain.
       listRelationshipsNeedingFollowUp(userId, 5),
+      // D-15: the ternary means an admin's request never even RESOLVES these
+      // three calls — not merely discards their result. Nesting keeps the
+      // page at one round of queries (the discipline this comment block
+      // states) while keeping the outer tuple typing intact.
+      isAdmin ? null : Promise.all([
+        listWeeklyMovementsForOwner(userId, week, 5),
+        listProgressWeekKeysForOwner(userId),
+        getBadgeCountsForOwner(userId),
+      ]),
     ]);
 
   const recentRows = recentList.rows.slice(0, 5);
-  // Read the clock ONCE, here on the server: the follow-up labels are derived
-  // from it, and deriving them during a client render would tie them to the
-  // visitor's clock instead of ours (the same reason ProposalRow takes nowMs).
-  const nowMs = await getNowMs();
+
+  // Fold the momentum query results (35-02) through the pure streak/badge
+  // logic (35-01) into MomentumCard's props — only when the ternary above
+  // actually produced data, i.e. never for an admin.
+  const momentum = (() => {
+    if (!momentumData) return null;
+    const [movements, weekKeys, counts] = momentumData;
+    const streaks = summarizeStreaks(weekKeys, nowMs);
+    return {
+      streakWeeks: streaks.currentWeeks,
+      movements,
+      // The consistency axis reads streaks.longestWeeks (via
+      // deriveBadgeProgress), never currentWeeks — a broken current streak
+      // must not erase a milestone already reached (D-07, UI-SPEC A-5).
+      badgeProgress: deriveBadgeProgress(counts, streaks),
+      trackedSinceLabel: formatTrackedSinceFragment(lang),
+    };
+  })();
 
   return (
     <div>
@@ -106,6 +154,14 @@ export default async function HomePage() {
       </div>
 
       <RelanceCard rows={relanceRows} lang={lang} nowMs={nowMs} />
+
+      {!isAdmin && momentum && <MomentumCard
+        lang={lang}
+        streakWeeks={momentum.streakWeeks}
+        movements={momentum.movements}
+        badgeProgress={momentum.badgeProgress}
+        trackedSinceLabel={momentum.trackedSinceLabel}
+      />}
 
       {recentRows.length === 0 ? (
         <Card className="mt-0">
