@@ -43,6 +43,21 @@ PATTERNS=(
 #
 # The storage/db adapter directories are excluded via pathspec rather than the
 # previous post-grep on path prefixes — same effect, expressed once.
+#
+# `*.integration.test.ts` is excluded for the reason layer 1 already records in
+# eslint.config.mjs: an integration test opens a RAW client to seed fixtures and
+# to verify results independently of the code under test, because checking a row
+# with the same abstraction that wrote it proves nothing. BOOT-06 protects the
+# portability of SHIPPED code, and a test file never ships. Deliberately narrow:
+# `*.integration.test.ts` only, never `*.test.ts`.
+#
+# This mirrors an exclusion layer 1 has had all along. Without it the two halves
+# of one rule disagreed, and the guard failed on `src/lib/crm/`'s integration
+# test while ESLint passed it — the five integration tests under
+# `src/lib/db/queries/` escaped only because the adapter exclusion above happened
+# to cover them. Note the pathspecs use git's default (non-glob) magic, matching
+# the `src/*.ts` patterns above, so `*` spans `/` and the exclusion reaches any
+# depth.
 # ---------------------------------------------------------------------------
 readarray -t FILES < <(
   git ls-files -- \
@@ -50,6 +65,8 @@ readarray -t FILES < <(
     'app/*.ts' 'app/*.tsx' 'app/*.js' 'app/*.mjs' 'app/*.cjs' \
     ':(exclude)src/lib/storage/**' \
     ':(exclude)src/lib/db/**' \
+    ':(exclude)src/*.integration.test.ts' \
+    ':(exclude)app/*.integration.test.ts' \
     2>/dev/null || true
 )
 
