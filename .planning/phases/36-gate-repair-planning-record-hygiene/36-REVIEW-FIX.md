@@ -693,3 +693,42 @@ f93478b docs(36): NEW-03 record why the gates cannot be tested without a socket
 _Fixed: 2026-09-05T17:52:00Z (iteration 1), 2026-09-05T18:40:00Z (iteration 2)_
 _Fixer: Claude (gsd-code-fixer)_
 _Iteration: 2_
+
+---
+
+## Post-fix note — the `mainSql` count criterion is under-specified (orchestrator, 2026-09-05)
+
+Plan `36-04`'s acceptance criterion reads:
+
+```
+test "$(grep -v "^\s*\*" <file> | grep -c 'mainSql')" = "3"
+```
+
+Against the file as it now stands that command returns **4**, and would fail. This is a
+defect in the *measurement*, not in the code:
+
+| Line | Form | Counts as code? |
+|---|---|---|
+| 42, 45, 245, 252 | `*` block-comment continuation | no — stripped by the criterion |
+| **400** | `const mainSql = await openClient(...)` | **yes — declaration** |
+| 427 | `// Still exactly ONE statement on \`mainSql\`, ...` | no — but NOT stripped by the criterion |
+| **433** | `const [mainResult] = await mainSql\`` | **yes — the single SELECT** |
+| **508** | `await mainSql.end({ timeout: 5 })` | **yes — the close** |
+
+The contract the criterion exists to enforce — `mainSql` appears in exactly three
+*executable* lines, one of them the sole read-only statement — **holds**. Stripping both
+comment forms returns 3:
+
+```
+grep -v '^\s*\*' <file> | grep -v '^\s*//' | grep -c 'mainSql'   →   3
+```
+
+**Deliberately NOT done:** rewording line 427 to avoid the literal `mainSql`. The
+iteration-1 review established that the security commentary is required to name the
+identifier and "must not be contorted to satisfy a count" — that reasoning applies to a
+`//` comment as much as to the docblock. Editing prose to satisfy a grep would make the
+count pass while making the file worse, which is the failure mode this phase exists to
+close.
+
+The corrected command above is the one to use in any future verification of this file.
+`mainSql.end(` = 1 and zero write verbs on a `mainSql` template both still hold as written.
