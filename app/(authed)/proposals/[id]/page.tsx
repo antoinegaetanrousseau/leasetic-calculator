@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AlertTriangleIcon, CopyIcon, DownloadIcon } from '@/components/ui/icons';
 import { requireUser } from '@/lib/auth/require';
+import { resolveProposalAccess } from '@/lib/auth/proposal-access';
 import { getCurrentLang, t } from '@/lib/i18n';
 import type { Lang, DictKey } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate, formatNumber } from '@/lib/i18n/format';
@@ -52,28 +53,19 @@ export default async function ProposalDetailPage({ params }: PageProps) {
   // an independent short-circuit ahead of the role check, so an admin
   // requesting a nonexistent id gets the same 404 as everyone else.
   //
-  // T-37-01-01: `role` MUST come from `requireUser()` (server-derived,
-  // per-request DB read) — NEVER from route params, the query string, request
-  // headers, or a client prop.
-  const isAdmin = role === 'admin';
-  if (!proposal || (!isAdmin && proposal.userId !== session.user.id)) {
+  // WR-02: the ownership+bypass rule lives in ONE place — `resolveProposalAccess`. It used to
+  // be written out here and again in the PDF route, and the two drifted inside a single phase.
+  //
+  // T-37-01-01: `role` MUST come from `requireUser()` (server-derived, per-request DB read) —
+  // NEVER from route params, the query string, request headers, or a client prop.
+  //
+  // `!proposal` stays an INDEPENDENT short-circuit here (D-37-01): absence beats role, so an
+  // admin requesting a nonexistent id gets the same 404 as everyone else. The helper is
+  // fail-closed on null too, so this is belt and braces, not a lone defence.
+  const { canView, isOwner } = resolveProposalAccess(proposal, { id: session.user.id, role });
+  if (!proposal || !canView) {
     notFound();
   }
-
-  // WR-01 (37-REVIEW.md): the write-side controls below are gated on OWNERSHIP, not on
-  // `!isAdmin`. The handlers they invoke are themselves owner-scoped —
-  // `softDeleteProposal` / `restoreProposal` filter on `eq(proposals.userId, userId)`
-  // (src/lib/db/queries/proposals.ts), and the `?duplicate=` prefill only spreads the
-  // source's `inputs` when the source's userId matches the session — so gating the UI on
-  // the same predicate keeps affordance and capability in step.
-  //
-  // `!isAdmin` would have been wrong: an admin who OWNS a proposal must keep Duplicate and
-  // Delete/Restore on it. Read-only applies to the D-37-01 oversight path specifically —
-  // an admin looking at someone else's proposal — not to admins generally.
-  //
-  // Widening the handlers so an admin can delete or duplicate another partner's proposal
-  // is a separate decision with its own blast radius; it is deliberately NOT taken here.
-  const isOwner = proposal.userId === session.user.id;
 
   const inputs = proposal.inputs as Record<string, unknown>;
   const computed = proposal.computed as Record<string, unknown>;

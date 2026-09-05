@@ -131,6 +131,31 @@ If admin duplicate/delete/restore is intended to work later, that needs its own 
 own tests — until then, hiding the controls for the bypass path prevents a silently-broken and a
 silently-wrong action from being offered.
 
+### WR-02 — RESOLVED 2026-09-06 (commit follows this review)
+
+**Status: fixed.** The rule now lives once, in `src/lib/auth/proposal-access.ts`
+(`resolveProposalAccess`), and both surfaces call it. No hand-written `role === 'admin'` copy
+remains in either file.
+
+The helper returns BOTH facts rather than the single boolean this review suggested, because
+after WR-01 each call site needs two: `canView` (owner OR admin — the D-37-01 oversight bypass)
+and `isOwner` (ownership only — what the write handlers actually honour). A boolean-only helper
+would have centralised one half and left the other duplicated.
+
+`!proposal` deliberately stays an inline short-circuit at each call site: CONTEXT.md D-37-01
+requires absence to beat role independently of any role reasoning, and keeping it visible is also
+what preserves TypeScript's narrowing. The helper is fail-closed on null as well, so it is belt
+and braces rather than a lone defence.
+
+Verified load-bearing, not decorative: mutating the single rule (`canView: isOwner || isAdmin`
+-> `canView: isOwner`) fails 6 tests across all three surfaces at once — the helper's own
+role x ownership matrix, the PDF route's Test 3, and the page's Case 1 plus WR-01 a/b. 10 new
+tests cover the full matrix including absence and role-allowlist cases.
+
+---
+
+#### Original finding (retained for the record)
+
 ### WR-02: The ownership+bypass guard is duplicated verbatim across two files with no shared helper
 
 **File:** `app/(authed)/proposals/[id]/page.tsx:58-61` and `app/api/proposals/[id]/pdf/route.ts:19-46`

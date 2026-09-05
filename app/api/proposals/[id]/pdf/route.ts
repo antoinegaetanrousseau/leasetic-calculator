@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { requireUser } from '@/lib/auth/require';
+import { requireUser, type Role } from '@/lib/auth/require';
+import { resolveProposalAccess } from '@/lib/auth/proposal-access';
 import { getProposalById } from '@/lib/db/queries';
 import { storage } from '@/lib/storage';
 
@@ -16,12 +17,10 @@ export async function GET(_req: NextRequest, ctx: RouteParams) {
   // T-37-01-01: `role` MUST come from `requireUser()` (server-derived,
   // per-request DB read) — NEVER from route params, the query string, request
   // headers, or a client-supplied value.
-  let userId: string;
-  let isAdmin = false;
+  let viewer: { id: string; role: Role };
   try {
     const { session, role } = await requireUser();
-    userId = session.user.id;
-    isAdmin = role === 'admin';
+    viewer = { id: session.user.id, role };
   } catch {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
@@ -32,16 +31,14 @@ export async function GET(_req: NextRequest, ctx: RouteParams) {
 
   // Step 3: 404 obscurity for not-found OR not-owned (D-18).
   //
-  // D-37-01 / GAP-01: an admin bypasses the ownership arm, mirroring
-  // `app/(authed)/proposals/[id]/page.tsx`. Without this the detail page opens
-  // for an admin while its PDF preview, "Voir le PDF" and "Télécharger le PDF"
-  // all 404 — the page renders the raw `{"error":"not_found"}` body into the
-  // APERÇU PDF panel. Observed during the Phase 37 operator walk.
+  // D-37-01 / GAP-01: an admin bypasses the ownership arm so the oversight click-through
+  // reaches the PDF, not a 404. WR-02: that rule is `resolveProposalAccess`, shared with
+  // `app/(authed)/proposals/[id]/page.tsx` — this route previously carried its own copy and
+  // was left behind when the page's copy changed.
   //
-  // Absence is still absence: `!proposal` stays an independent short-circuit
-  // ahead of the role check, so an admin requesting a nonexistent id gets the
-  // same 404 as everyone else.
-  if (!proposal || (!isAdmin && proposal.userId !== userId)) {
+  // Absence is still absence: `!proposal` stays an independent short-circuit ahead of the
+  // role check, so an admin requesting a nonexistent id gets the same 404 as everyone else.
+  if (!proposal || !resolveProposalAccess(proposal, viewer).canView) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
 
