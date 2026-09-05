@@ -1,11 +1,37 @@
 # ReUI Pro blocks — audit
 
+> **Decision: DELETED 2026-09-05** (Antoine, 2026-09-05 — D-36-02, Phase 36 HOUSE-04)
+>
+> The vendored tree at `src/components/blocks/` was deleted in full: **25 block
+> directories, 152 files, 1.1M**, measured at execution time on 2026-09-05. The
+> `18 blocks / 104 files / 816K` figures in the body below are the 2026-08-31 audit
+> count, taken **before** Phase 34 plan 34-03 vendored seven more blocks
+> (`solution-crm-1`, `solution-crm-2`, `solution-crm-3`, `solution-crm-4`,
+> `solution-crm-5`, `solution-crm-6`, `solution-users-2`). The body's figures stay as
+> the historical record; this note is the current truth.
+>
+> Rationale, in one sentence: reinstall is one command, so there is no cost to
+> deleting and no value in keeping any block "just in case" beyond this document.
+> Reinstall command: `npx shadcn@latest add @reui/<block-name>`.
+>
+> **Not deleted:** `src/components/reui/` and `src/components/ui/` are live and
+> untouched.
+>
+> **Known residual:** the two `'src/components/blocks/**'` entries in
+> `eslint.config.mjs`'s `ignores` arrays (lines 37 and 139) are left in place —
+> Phase 36 does not edit that file. They are now inert globs matching nothing,
+> recorded here so a future maintainer removes them deliberately rather than
+> discovering them as mystery cruft.
+>
+> The mapping, the two structural constraints (Frame vs Card) and the mis-picks
+> below are exactly what makes this deletion reversible.
+
 > Audited 2026-08-31 against the live ReUI registry (Pro licence, `REUI_LICENSE_KEY`).
 > Written because the finding is not visible from the tree: **all 18 vendored blocks
 > under `src/components/blocks/` are dead.** Nothing outside that directory imports
 > any of them. 816K across 104 files, zero wired.
 
-Nothing was deleted. This is the record so the mapping, the two structural
+Nothing was deleted. (True as of 2026-08-31; superseded by the decision record above.) This is the record so the mapping, the two structural
 blockers, and the mis-picks do not have to be rediscovered.
 
 ## Reinstalling is one command
