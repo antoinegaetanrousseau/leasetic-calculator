@@ -163,6 +163,20 @@ export async function listWeeklyMovementsForOwner(
  * is Monday-based, which is why the keys returned here are directly
  * comparable to `weekKeyFromMs` / `shiftWeekKey` output.
  *
+ * GROUP BY is ordinal (`sql\`1\``), not the repeated `weekKeyExpr`
+ * fragment (35-04 integration-suite finding, caught only against real
+ * Postgres — the mocked-driver unit tests below cannot see this class of
+ * defect at all, same lesson as
+ * `relationship-events.insert.integration.test.ts`'s header comment).
+ * Reusing the same JS `sql` object in both `.select()` and `.groupBy()`
+ * still emits TWO separate bind parameters for `MOMENTUM_TIME_ZONE` (one
+ * per template evaluation) — Postgres's GROUP BY functional-dependency
+ * check compares parsed parameter *nodes*, not runtime values, so it saw
+ * two syntactically different expressions and rejected `occurred_at` as
+ * ungrouped even though both parameters always carry the same value.
+ * `GROUP BY 1` grouping by the SELECT list's ordinal position sidesteps
+ * the mismatch entirely.
+ *
  * The fold in `@/lib/momentum/badges` owns ordering and dedup — this
  * function returns whatever the database returns, unmodified.
  */
@@ -183,7 +197,7 @@ export async function listProgressWeekKeysForOwner(ownerId: string): Promise<str
       eq(schema.clientRelationships.ownerId, ownerId),
       IS_PROGRESS_EVENT,
     ))
-    .groupBy(weekKeyExpr);
+    .groupBy(sql`1`);
 
   return rows.map((r) => r.weekKey);
 }
