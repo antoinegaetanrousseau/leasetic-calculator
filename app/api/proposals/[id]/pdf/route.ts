@@ -12,10 +12,16 @@ interface RouteParams { params: Promise<{ id: string }> }
 
 export async function GET(_req: NextRequest, ctx: RouteParams) {
   // Step 1: auth.
+  //
+  // T-37-01-01: `role` MUST come from `requireUser()` (server-derived,
+  // per-request DB read) — NEVER from route params, the query string, request
+  // headers, or a client-supplied value.
   let userId: string;
+  let isAdmin = false;
   try {
-    const { session } = await requireUser();
+    const { session, role } = await requireUser();
     userId = session.user.id;
+    isAdmin = role === 'admin';
   } catch {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
@@ -25,7 +31,17 @@ export async function GET(_req: NextRequest, ctx: RouteParams) {
   const proposal = await getProposalById(id);
 
   // Step 3: 404 obscurity for not-found OR not-owned (D-18).
-  if (!proposal || proposal.userId !== userId) {
+  //
+  // D-37-01 / GAP-01: an admin bypasses the ownership arm, mirroring
+  // `app/(authed)/proposals/[id]/page.tsx`. Without this the detail page opens
+  // for an admin while its PDF preview, "Voir le PDF" and "Télécharger le PDF"
+  // all 404 — the page renders the raw `{"error":"not_found"}` body into the
+  // APERÇU PDF panel. Observed during the Phase 37 operator walk.
+  //
+  // Absence is still absence: `!proposal` stays an independent short-circuit
+  // ahead of the role check, so an admin requesting a nonexistent id gets the
+  // same 404 as everyone else.
+  if (!proposal || (!isAdmin && proposal.userId !== userId)) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
 
