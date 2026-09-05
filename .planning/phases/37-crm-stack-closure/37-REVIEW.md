@@ -56,6 +56,31 @@ gate ran into and fixed for its own file, but which was left in place in `page.t
 
 ## Warnings
 
+### WR-01 — RESOLVED 2026-09-06 (commit follows this review)
+
+**Status: fixed.** Duplicate and Delete/Restore are now gated on `isOwner`
+(`proposal.userId === session.user.id`) in `app/(authed)/proposals/[id]/page.tsx`, not on
+`!isAdmin` as this review suggested. The suggested `!isAdmin` gate would have been a regression:
+admins DO own proposals (e.g. LC-2026-002, LC-2026-003 under antoine.rousseau), and it would
+have stripped their own Duplicate/Delete controls. `isOwner` is also the exact predicate the
+handlers already filter on, so affordance and capability now move together.
+
+Download is deliberately NOT gated — `/api/proposals/[id]/pdf` honours the D-37-01 admin bypass
+since `7999759`, so oversight keeps read access to the document.
+
+Four tests added, proven non-vacuous: with the gate neutralised to `true`, "WR-01 a" and
+"WR-01 b" fail (`not to contain 'Dupliquer'`; `expected <button> to be null`). Note the first
+draft of those tests asserted on the French labels 'Supprimer'/'Restaurer' and was VACUOUS —
+`DeleteButtonClient`/`RestoreButtonClient` are mocked to stubs in that test file, so those
+strings never reach the DOM. The assertions were moved onto the stub testids.
+
+Widening the handlers so an admin can delete or duplicate another partner's proposal remains an
+open, separate decision — deliberately not taken.
+
+---
+
+#### Original finding (retained for the record)
+
 ### WR-01: Admin viewing another user's proposal sees action buttons that either silently fail or silently produce garbage data
 
 **File:** `app/(authed)/proposals/[id]/page.tsx:339-374`

@@ -60,6 +60,21 @@ export default async function ProposalDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  // WR-01 (37-REVIEW.md): the write-side controls below are gated on OWNERSHIP, not on
+  // `!isAdmin`. The handlers they invoke are themselves owner-scoped —
+  // `softDeleteProposal` / `restoreProposal` filter on `eq(proposals.userId, userId)`
+  // (src/lib/db/queries/proposals.ts), and the `?duplicate=` prefill only spreads the
+  // source's `inputs` when the source's userId matches the session — so gating the UI on
+  // the same predicate keeps affordance and capability in step.
+  //
+  // `!isAdmin` would have been wrong: an admin who OWNS a proposal must keep Duplicate and
+  // Delete/Restore on it. Read-only applies to the D-37-01 oversight path specifically —
+  // an admin looking at someone else's proposal — not to admins generally.
+  //
+  // Widening the handlers so an admin can delete or duplicate another partner's proposal
+  // is a separate decision with its own blast radius; it is deliberately NOT taken here.
+  const isOwner = proposal.userId === session.user.id;
+
   const inputs = proposal.inputs as Record<string, unknown>;
   const computed = proposal.computed as Record<string, unknown>;
   const isDeleted = proposal.deletedAt !== null;
@@ -356,22 +371,30 @@ export default async function ProposalDetailPage({ params }: PageProps) {
               {t('proposal.detail.action.download', lang)}
             </a>
 
-            {/* Duplicate — Plan 08-13 owns the prefill side (PROP-21 entry point) */}
-            <Link
-              href={`/proposals/new?duplicate=${proposal.id}`}
-              className="btn-navy"
-              style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
-            >
-              <CopyIcon size={17} />
-              {t('proposal.detail.action.duplicate', lang)}
-            </Link>
-
-            {/* Delete (active) / Restore (soft-deleted) — Plan 08-12 wires the server actions */}
-            {isDeleted ? (
-              <RestoreButtonClient proposalId={proposal.id} lang={lang} />
-            ) : (
-              <DeleteButtonClient proposalId={proposal.id} lang={lang} />
+            {/* Duplicate — Plan 08-13 owns the prefill side (PROP-21 entry point).
+                Owner-only (WR-01): for a non-owning admin the `?duplicate=` handler skips the
+                prefill and silently creates a stray EMPTY draft under the admin's own account,
+                with no error shown. */}
+            {isOwner && (
+              <Link
+                href={`/proposals/new?duplicate=${proposal.id}`}
+                className="btn-navy"
+                style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
+              >
+                <CopyIcon size={17} />
+                {t('proposal.detail.action.duplicate', lang)}
+              </Link>
             )}
+
+            {/* Delete (active) / Restore (soft-deleted) — Plan 08-12 wires the server actions.
+                Owner-only (WR-01): both routes match zero rows for a non-owning admin and
+                return 404, so the button could only ever produce an error toast. */}
+            {isOwner &&
+              (isDeleted ? (
+                <RestoreButtonClient proposalId={proposal.id} lang={lang} />
+              ) : (
+                <DeleteButtonClient proposalId={proposal.id} lang={lang} />
+              ))}
           </div>
         </aside>
       </div>

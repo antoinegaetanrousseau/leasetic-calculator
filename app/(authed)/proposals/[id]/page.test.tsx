@@ -205,3 +205,83 @@ describe('/proposals/[id] page.tsx — GAP-01 / D-37-01 admin oversight bypass',
     ).rejects.toThrow('NEXT_NOT_FOUND');
   });
 });
+
+describe('/proposals/[id] page.tsx — WR-01 owner-gated write controls', () => {
+  // The write-side controls are gated on OWNERSHIP, not on `!isAdmin`. Their handlers are
+  // owner-scoped one layer down, so a non-owning admin could only ever get an error toast
+  // (Delete/Restore) or a silent stray empty draft (Duplicate). Download is NOT gated —
+  // `/api/proposals/[id]/pdf` honours the D-37-01 admin bypass since commit 7999759.
+
+  // DeleteButtonClient / RestoreButtonClient are mocked to stubs at the top of this file, so
+  // their French labels never reach the DOM — asserting on 'Supprimer' / 'Restaurer' would be
+  // VACUOUS and would pass against the unfixed page. Assert on the stub testids instead.
+  const DUPLICATE = 'Dupliquer';
+  const DELETE_STUB = '[data-testid="delete-btn-stub"]';
+  const RESTORE_STUB = '[data-testid="restore-btn-stub"]';
+  const DOWNLOAD_HREF = '/api/proposals/prop-1/pdf';
+
+  it('WR-01 a: non-owning admin sees NO Duplicate and NO Delete', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'admin-1', email: 'admin@e.com' } },
+      role: 'admin',
+    });
+    getProposalByIdMock.mockResolvedValue(makeProposal({ userId: 'user-2' }));
+
+    const { container } = render(
+      await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) }),
+    );
+
+    expect(container.textContent).not.toContain(DUPLICATE);
+    expect(container.querySelector(DELETE_STUB)).toBeNull();
+    // Non-vacuity: the page really did render, and Download is still offered.
+    expect(container.innerHTML).toContain(DOWNLOAD_HREF);
+  });
+
+  it('WR-01 b: non-owning admin on a DELETED proposal sees NO Restore', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'admin-1', email: 'admin@e.com' } },
+      role: 'admin',
+    });
+    getProposalByIdMock.mockResolvedValue(
+      makeProposal({ userId: 'user-2', deletedAt: new Date('2026-09-01T00:00:00Z') }),
+    );
+
+    const { container } = render(
+      await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) }),
+    );
+
+    expect(container.querySelector(RESTORE_STUB)).toBeNull();
+    expect(container.innerHTML).toContain(DOWNLOAD_HREF);
+  });
+
+  it('WR-01 c: an admin who OWNS the proposal KEEPS Duplicate and Delete', async () => {
+    // This is the case a `!isAdmin` gate would have broken. Admins do own proposals.
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'admin-1', email: 'admin@e.com' } },
+      role: 'admin',
+    });
+    getProposalByIdMock.mockResolvedValue(makeProposal({ userId: 'admin-1' }));
+
+    const { container } = render(
+      await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) }),
+    );
+
+    expect(container.textContent).toContain(DUPLICATE);
+    expect(container.querySelector(DELETE_STUB)).not.toBeNull();
+  });
+
+  it('WR-01 d: the owning partner is unaffected — Duplicate and Delete still render', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'user-1', email: 'u@e.com' } },
+      role: 'partner',
+    });
+    getProposalByIdMock.mockResolvedValue(makeProposal({ userId: 'user-1' }));
+
+    const { container } = render(
+      await ProposalDetailPage({ params: Promise.resolve({ id: 'prop-1' }) }),
+    );
+
+    expect(container.textContent).toContain(DUPLICATE);
+    expect(container.querySelector(DELETE_STUB)).not.toBeNull();
+  });
+});
