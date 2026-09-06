@@ -84,18 +84,10 @@
  */
 import './_load-env';
 import { neon } from '@neondatabase/serverless';
-import { NEON_ENDPOINTS } from './_neon-endpoints';
+import { isDevelopmentTarget, developmentTargetRefusalMessage } from './_development-target';
 
 /** Marks every timeline event this script owns, inside `payload->>'fixture'`. */
 const FIXTURE_PREFIX = 'seed-fiche-';
-
-/**
- * Neon endpoints this script must never touch, derived from
- * scripts/_neon-endpoints.list (D-05, D-05a) — see that file for the
- * bug_011 hostname-not-host rule. There is deliberately no override env var:
- * a fixture seeder running against production is never correct.
- */
-const FORBIDDEN_TARGETS = NEON_ENDPOINTS.filter((e) => e.branch !== 'development');
 
 /**
  * Real, currently-active, obviously-public French SIRENs. Each was verified with
@@ -537,15 +529,11 @@ async function main(): Promise<void> {
     fail('DATABASE_URL is malformed.');
   }
 
-  const forbidden = FORBIDDEN_TARGETS.find((e) => hostname.startsWith(e.prefix));
-  if (forbidden) {
-    fail(
-      'refusing to seed fixtures into ' +
-        forbidden.scope +
-        ' (' +
-        hostname +
-        '). This script is development-only and has no override flag.',
-    );
+  // ALLOWLIST, never a denylist (39-REVIEW CR-03): an endpoint absent from
+  // scripts/_neon-endpoints.list is PRODUCTION, per that file's own header. See
+  // scripts/_development-target.ts for the two bypasses a denylist left open.
+  if (!isDevelopmentTarget(hostname)) {
+    fail(developmentTargetRefusalMessage(hostname));
   }
   console.log('[seed-fiche] target host: ' + hostname);
 

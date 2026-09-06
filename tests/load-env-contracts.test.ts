@@ -186,6 +186,7 @@ describe('load-env contracts (D-03 sequencing + probe-write-isolation exemption)
     const PHASE_39_SCRIPT_FILES = [
       'scripts/_neon-endpoints.ts',
       'scripts/_neon-target.ts',
+      'scripts/_development-target.ts',
       'scripts/seed-fiche-fixtures.ts',
       'scripts/seed-pipeline-fixtures.ts',
       'scripts/seed-reconciliation-fixtures.ts',

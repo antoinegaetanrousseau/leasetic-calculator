@@ -40,11 +40,18 @@ how to recover a lagging branch, and the free-tier limits to stay under.
 
 `scripts/_neon-endpoints.list` is the machine-readable counterpart of the table above — the
 single declarative source of Neon endpoint identity. It is read by
-`scripts/check-local-db-branch.sh`, `scripts/_neon-target.ts`, `scripts/_db-branch-guard.ts`,
+`scripts/check-local-db-branch.sh`, `scripts/_neon-target.ts`, `scripts/_db-branch-guard.ts` and
+`scripts/_development-target.ts` — the last of which is the shared write-target ALLOWLIST that
 `scripts/seed-fiche-fixtures.ts`, `scripts/seed-pipeline-fixtures.ts` and
-`scripts/seed-reconciliation-fixtures.ts` — six consumers, none of which declares its own copy
-(D-05a). Update the table above and the `.list` file together whenever a branch is recreated or
-a new one is added.
+`scripts/seed-reconciliation-fixtures.ts` all gate on, so the seeders hold no copy of the table
+themselves (D-05a). Update the table above and the `.list` file together whenever a branch is
+recreated or a new one is added.
+
+The seeders gate on an **allowlist**, not a denylist: a host that is not the `development`
+endpoint (or local Postgres) is refused, so an endpoint id absent from the `.list` — a
+recreated `main`, for instance — is treated as PRODUCTION exactly as the `.list` header
+requires. Comparison is case-insensitive, because `postgres:` is a non-special URL scheme and
+`new URL()` therefore leaves the host's case untouched while DNS ignores it.
 
 The one standing exception: `scripts/probe-write-isolation.ts` keeps its own inline
 exact-hostname constants under the Phase 36 D-36-03 exemption that D-05a upholds, because an
