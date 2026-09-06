@@ -12,7 +12,7 @@
 # precedence than `.env.local` and the guard never looked at it. See
 # docs/operations/neon-branch-routing.md for the full branch/endpoint
 # table, and scripts/_env-precedence.ts for the TypeScript twin of the candidate order
-# reproduced below (tests/db-guard-fixtures.test.ts, plan 39-05, is the differential
+# reproduced below (tests/db-guard-differential.test.ts, plan 39-05, is the differential
 # test that fails if the two diverge).
 #
 # THE SUBTLE HALF OF THE FIX: this script does NOT trust its own ambient $NODE_ENV.
