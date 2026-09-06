@@ -230,6 +230,7 @@ export const dictionaries = {
     'common.yes': 'Oui',
     'common.no': 'Non',
     'common.ht': '€ HT',
+    'common.close.aria': 'Fermer',
 
     // ── Phase 6 — Auth screens (60 new keys per 06-UI-SPEC.md table) ──────────
     'auth.signin.title': 'Connexion',
@@ -1513,6 +1514,7 @@ export const dictionaries = {
     'common.yes': 'Yes',
     'common.no': 'No',
     'common.ht': '€ ex-VAT',
+    'common.close.aria': 'Close',
 
     // ── Phase 6 EN counterparts (60 new keys) ─────────────────────────────────
     'auth.signin.title': 'Sign in',
