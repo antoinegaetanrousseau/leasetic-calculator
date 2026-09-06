@@ -48,7 +48,7 @@ stops existing.
 - [x] **CLOSE-01**: Phase 30's four pending UAT scenarios (2 — Clients nav per role; 9 — admin
   relationship detail; 10 — sales-role parity and admin exclusion; 12 — no regression) are walked
   and recorded, leaving `30-UAT.md` at `pending: 0`.
-- [ ] **CLOSE-02**: Phase 31.1's two human checks are performed — the dark-theme shell renders the
+- [x] **CLOSE-02**: Phase 31.1's two human checks are performed — the dark-theme shell renders the
   six pinned Colibris tokens with no flash of light chrome on first paint, and the PDF surface still
   renders white-on-`#1a2832` in dark mode — leaving `31.1-VERIFICATION.md` at `status: passed`.
 - [x] **CLOSE-03**: Phase 33's residual human items are walked — the Space → ArrowRight → Space
@@ -65,7 +65,7 @@ stops existing.
   no longer showing v1.6 as IN PROGRESS while its milestone list calls it shipped.
 - [ ] **CLOSE-07**: Phase 28 is attributed to a milestone in `ROADMAP.md`'s phase table, and
   phases 28–35 are archived into their `milestones/v{X.Y}-phases/` directories.
-- [ ] **CLOSE-08**: Phase 28's browser-verification backlog is walked — wizard step 1, `/proposals`,
+- [x] **CLOSE-08**: Phase 28's browser-verification backlog is walked — wizard step 1, `/proposals`,
   coefficients history, `/parametres`, and the six `PartnersList` / `LcReferencesList` padding
   sites — in light and dark.
 
@@ -180,13 +180,13 @@ stops existing.
 | Requirement | Phase | Status |
 |---|---|---|
 | CLOSE-01 | Phase 37 — CRM Stack Closure | Complete |
-| CLOSE-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
+| CLOSE-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | CLOSE-03 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-04 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-05 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | CLOSE-06 | Phase 40 — Milestone Record Closure | Pending |
 | CLOSE-07 | Phase 40 — Milestone Record Closure | Pending |
-| CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
+| CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-01 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-03 | Phase 37 — CRM Stack Closure | Complete |

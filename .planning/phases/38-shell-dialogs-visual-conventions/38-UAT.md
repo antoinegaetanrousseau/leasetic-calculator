@@ -1,9 +1,9 @@
 ---
-status: partial
+status: resolved
 phase: 38-shell-dialogs-visual-conventions
 source: [31.1-VERIFICATION.md, 28-01-SUMMARY.md, 38-03-PLAN.md, 38-04-PLAN.md]
 started: 2026-09-06T13:05:00Z
-updated: 2026-09-06T13:12:00Z
+updated: 2026-09-06T14:35:00Z
 database: development
 database_reason: |
   Neon `development` branch (`ep-polished-band-alphc576-pooler`), with
@@ -28,8 +28,9 @@ database_reason: |
 
 ## Current Test
 
-CLOSE-02, CLOSE-08 and GAP-02's verification legs all walked. Awaiting operator adjudication
-(plan 38-04 Task 3) before ticking requirements and restoring the environment.
+[complete] — operator approved the walk and its triage 2026-09-06. CLOSE-02, CLOSE-08, GAP-02 and
+GAP-04 ticked in REQUIREMENTS.md. GAP-02 observations 3-4 recorded as blocked-by-design (CRM-02's
+admin refusal), not as passes.
 
 ## Environment
 
