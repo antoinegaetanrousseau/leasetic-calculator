@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
-status: executing
-last_updated: "2026-09-06T08:54:42.638Z"
+status: ready_to_plan
+last_updated: 2026-09-06T15:05:51.550Z
 last_activity: 2026-09-06
 progress:
   total_phases: 25
   completed_phases: 9
   total_plans: 68
-  completed_plans: 66
+  completed_plans: 69
   percent: 36
+stopped_at: Phase 38 complete (4/4) — ready to discuss Phase 39
 ---
 
 # State — Matrice Commerciale
@@ -23,13 +24,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 38 — shell-dialogs-visual-conventions
+**Current focus:** Phase 39 — operational & credential gates
 
 ## Current Position
 
-Phase: 38 (shell-dialogs-visual-conventions) — EXECUTING
-Plan: 3 of 4
-Status: Ready to execute
+Phase: 39
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-09-06
 
 **v1.8 phase order and why:**

@@ -1,9 +1,9 @@
 ---
 phase: 38-shell-dialogs-visual-conventions
 verified: 2026-09-06T17:00:00Z
-status: gaps_found
-score: 2/5 must-haves fully verified (2 partially verified with legitimate but real coverage gaps, 1 failed)
-overrides_applied: 0
+status: passed
+score: 3/5 fully verified + 2 accepted under recorded operator override (the failed gap was fixed after this report; see Post-Verification Resolution)
+overrides_applied: 2
 gaps:
   - truth: "Every defect the CLOSE-08/CLOSE-02 walk found is either fixed in-phase or filed as a requirement — none left as an unrouted observation (38-04-PLAN.md must_have)"
     status: failed
@@ -247,3 +247,55 @@ well-written disclosure substitute for coverage.
 
 _Verified: 2026-09-06T17:00:00Z_
 _Verifier: Claude (gsd-verifier)_
+
+
+---
+
+## Post-Verification Resolution — 2026-09-06
+
+This report is left **unedited above** so the record shows what the verifier actually found. What
+changed afterwards is recorded here, not by rewriting the findings.
+
+### Gap 1 (status: failed) — FIXED, the verifier was correct
+
+The verifier was right and the execution was wrong: `38-UAT.md` claimed F-38-03 and F-38-06 were
+"filed for a later phase" while nothing was ever added to `REQUIREMENTS.md`. A UAT footnote saying
+"filed" is not filing. Now genuinely filed, in the project's established ledger:
+
+- **HOUSE-05** — `ProposalForm` is dead code (exported, never rendered). Carries the two
+  consequences the walk found: D-38-04's premise "every CLOSE-08 surface renders a `.btn-out`" is
+  false for wizard step 1, and the `grep -rl` blast-radius counts (21/3/19/32) measure
+  files-containing-a-string, not rendered surfaces.
+- **HOUSE-06** — `38-WALK-SURFACES.md` describes two pagination controls as "per-row links";
+  observing them needs a multi-page dataset.
+
+Both mapped to Phase 40. Coverage 22/22 -> 24/24. `38-UAT.md`'s finding statuses now carry the real
+IDs instead of the aspirational "open — filed for a later phase".
+
+### Gaps 2 and 3 (status: partial) — ACCEPTED UNDER OPERATOR OVERRIDE
+
+Operator decision, 2026-09-06, after being shown exactly what was and was not observed. **These
+gaps are accepted, not closed.** Nothing below is a claim that the missing observations were made.
+
+**Not observed, and why each is structurally blocked in this environment:**
+
+| Unobserved | Blocker |
+|---|---|
+| Wizard step 1, dark theme | The wizard mints a draft and consumes an LC reference on entry (F-38-04). A dark pass would create a second stray row; the operator declined. |
+| LC-references "Charger plus", both themes | Rendered only inside `{nextCursor && ...}`. The dataset is 16 rows on a single page, so the control does not exist to be measured. |
+| `dialog.tsx` close control, FR and EN | Every `dialog.tsx` consumer lives under `/clients/*`, which `requireRelationshipHolder()` refuses admins by design (CRM-02) — confirmed live (404). `MergeDialog`'s reconciliation queue is empty. Reaching it needs a relationship-holder session, not an admin one. |
+
+**Why the override is judged acceptable rather than a shortcut:**
+
+1. None of the three is a defect or a failure — each is an access-control design decision, a data
+   precondition, or a side effect the operator explicitly ruled on.
+2. The underlying *code* for both partial criteria is verified by other means: criterion 3's
+   primitive edit is byte-identical across `dialog.tsx` and `sheet.tsx`, pinned by
+   `tests/dialog-close-label.test.ts`, and the sheet exercised that exact call path live in both
+   languages; criterion 2's shared CSS rule was measured directly on five other rendered surfaces.
+3. Nothing was misreported as a pass at any point. `38-UAT.md` recorded all three as
+   "not observable" / "blocked" while they were still open.
+
+**Carried forward, not dropped.** A future verification of these three needs: a relationship-holder
+login, a disposable database, and a multi-page LC dataset. HOUSE-06 already records the
+multi-page-dataset precondition.
