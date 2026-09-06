@@ -166,7 +166,15 @@ describe('load-env contracts (D-03 sequencing + probe-write-isolation exemption)
     ).toEqual(EXPECTED_LOAD_ENV_CONSUMERS);
   });
 
-  it('Contract 5: no console.* call in the loader or the guard interpolates a credential', () => {
+  // COARSE BACKSTOP ONLY (39-REVIEW WR-08). This gate inspects the single line
+  // containing the `console.*` call, so it cannot see a credential assembled in a helper
+  // — `defaultOnRefuse` is `console.error(message)` and the message is built in
+  // `buildRefusalMessage` several lines away. Verified: injecting `resolution.url` into
+  // that helper leaves this contract GREEN. The real proof is behavioural and lives in
+  // `tests/db-branch-guard.test.ts` ("no refusal or warning output carries credential
+  // material"), which asserts the actual emitted string for every refuse verdict and
+  // fails on that same injection. Keep both; do not treat this one as sufficient.
+  it('Contract 5 (backstop): no console.* call in the loader or the guard interpolates a credential', () => {
     const interpolatesCredential = /\$\{[^}]*\b(url|DATABASE_URL|password)\b[^}]*\}/i;
     const rawConnectionString = /postgres:\/\//i;
 

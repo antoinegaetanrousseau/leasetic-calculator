@@ -9,7 +9,7 @@
  * `process.cwd()`-relative or a real repo `.env*` file; every fixture lives under a
  * `mkdtempSync` temp directory that is removed in `afterEach`.
  */
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -223,6 +223,105 @@ describe('assertSafeDatabaseTarget', () => {
     });
 
     expect(refuseCalls).toBe(0);
+  });
+
+  /**
+   * 39-REVIEW WR-08. `tests/load-env-contracts.test.ts` Contract 5 filters to lines
+   * matching `console.*(` and then tests THAT SAME LINE for an interpolated credential.
+   * `defaultOnRefuse` is `console.error(message)`, and the message is assembled in
+   * `buildRefusalMessage` several lines away — so any future edit that folds
+   * `resolution.url` into that helper is invisible to the grep, which would keep
+   * reporting D-07/D-08 as enforced. The comment "the guard's output is expected to be
+   * pasted into a transcript" makes that false assurance load-bearing.
+   *
+   * These cases assert the OUTPUT instead of the source text, for every refuse verdict
+   * reached through a file rather than only the production one. The grep stays as a
+   * coarse backstop.
+   */
+  describe('D-07/D-08 behavioural: no refusal or warning output carries credential material', () => {
+    const REFUSAL_CASES = [
+      {
+        verdict: 'refuse-production',
+        contents: `DATABASE_URL=${urlFor(PRODUCTION_HOST)}\n`,
+        expectInMessage: PRODUCTION_HOST,
+      },
+      {
+        verdict: 'refuse-unrecognised',
+        contents: `DATABASE_URL=${urlFor('ep-some-future-branch-abc123-pooler.c-3.eu-central-1.aws.neon.tech')}\n`,
+        expectInMessage: 'ep-some-future-branch-abc123-pooler.c-3.eu-central-1.aws.neon.tech',
+      },
+      {
+        // refuse-malformed reached THROUGH A FILE — the path a real operator hits, and
+        // the one where classifyDatabaseTarget returns hostname '' so the message is
+        // assembled down a different branch of buildRefusalMessage. The value must have
+        // no parseable scheme at all: `postgres-fixture:` WOULD parse (a scheme may
+        // contain '-'), yielding refuse-unrecognised rather than refuse-malformed.
+        verdict: 'refuse-malformed',
+        contents: 'DATABASE_URL=not-a-url-MUSTNOTAPPEAR\n',
+        expectInMessage: 'malformed',
+      },
+    ];
+
+    for (const testCase of REFUSAL_CASES) {
+      it(`${testCase.verdict}: the message names the target and leaks no credential`, () => {
+        const dir = makeTempDir();
+        writeFileSync(join(dir, '.env.local'), testCase.contents);
+
+        let capturedMessage = '';
+        expect(() => {
+          assertSafeDatabaseTarget({
+            cwd: dir,
+            nodeEnv: 'development',
+            processEnv: { NODE_ENV: 'development' },
+            onRefuse: (message: string): never => {
+              capturedMessage = message;
+              throw new Error('refused');
+            },
+          });
+        }).toThrow('refused');
+
+        expect(capturedMessage).toContain(testCase.expectInMessage);
+        expect(capturedMessage).toContain('.env.local');
+        expect(capturedMessage).not.toContain('MUSTNOTAPPEAR');
+        expect(capturedMessage).not.toContain('fixture:fixture');
+        expect(capturedMessage).not.toContain('postgres://');
+      });
+    }
+
+    it('warn-preview: warns without refusing, naming the host and no credential', () => {
+      const dir = makeTempDir();
+      writeFileSync(join(dir, '.env.local'), `DATABASE_URL=${urlFor(PREVIEW_HOST)}\n`);
+
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      let refuseCalls = 0;
+      // Snapshot the recorded calls BEFORE restoring: mockRestore() also resets the
+      // mock's state, so reading warnSpy.mock.calls afterwards always sees an empty array
+      // and the assertion would pass or fail for the wrong reason.
+      let warnCalls: unknown[][] = [];
+      try {
+        assertSafeDatabaseTarget({
+          cwd: dir,
+          nodeEnv: 'development',
+          processEnv: { NODE_ENV: 'development' },
+          onRefuse: (): never => {
+            refuseCalls += 1;
+            throw new Error('should not refuse');
+          },
+        });
+      } finally {
+        warnCalls = warnSpy.mock.calls.map((call) => [...call]);
+        warnSpy.mockRestore();
+      }
+
+      expect(refuseCalls).toBe(0);
+      expect(warnCalls).toHaveLength(1);
+      const warning = warnCalls[0].join(' ');
+      expect(warning).toContain(PREVIEW_HOST);
+      expect(warning).toContain('.env.local');
+      expect(warning).not.toContain('MUSTNOTAPPEAR');
+      expect(warning).not.toContain('fixture:fixture');
+      expect(warning).not.toContain('postgres://');
+    });
   });
 
   it('does not refuse a temp dir with only .env.local (development host) and nodeEnv development', () => {
