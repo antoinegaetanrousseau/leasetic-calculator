@@ -257,4 +257,19 @@ export const CASES: readonly GuardCase[] = [
     files: { '.env.local': `DATABASE_URL=${urlFor('localhost', 5432)}\n` },
     expect: { kind: 'ok', host: 'localhost', source: '.env.local' },
   },
+  {
+    // 39-REVIEW CR-01. Rotating a connection string by APPENDING the new value and
+    // leaving the old line above it is an ordinary operator action. dotenv.parse()
+    // builds an object, so the LAST assignment in a file wins; a reader that took the
+    // FIRST matching line reported the stale development host and exited 0 while every
+    // TS consumer (and `next build`/`next start`) opened production — the OPS-05
+    // incident verbatim, one file instead of two. Within-file last-wins and
+    // across-file first-wins are independent rules; this case pins the former.
+    name: 'CR-01 within one file the LAST DATABASE_URL wins: stale development line above a production line, nodeEnv development',
+    nodeEnv: 'development',
+    files: {
+      '.env.local': `DATABASE_URL=${urlFor(DEVELOPMENT_HOST)}\nOTHER=1\nDATABASE_URL=${urlFor(PRODUCTION_HOST)}\n`,
+    },
+    expect: { kind: 'error', host: PRODUCTION_HOST, source: '.env.local', contains: ['PRODUCTION'] },
+  },
 ];

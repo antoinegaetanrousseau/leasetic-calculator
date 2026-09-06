@@ -112,13 +112,21 @@ if [ -n "${DATABASE_URL:-}" ]; then
   source="process.env"
 else
   for f in "${files_found[@]}"; do
-    # Extract the first line matching DATABASE_URL=..., tolerating an optional leading
+    # Extract the LAST line matching DATABASE_URL=..., tolerating an optional leading
     # `export ` and optional surrounding single/double quotes. The `^\s*#` alternative
     # is intentionally NOT part of the DATABASE_URL match — the pattern already
     # requires the line to start (after optional whitespace) with `export ` or the key
     # itself, so a commented-out `# DATABASE_URL=...` line never matches, agreeing with
     # dotenv.parse() (via scripts/_env-precedence.ts), which also ignores it.
-    raw_line=$(grep -E '^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=' "$f" | head -n 1 || true)
+    #
+    # `tail -n 1`, NOT `head -n 1` (39-REVIEW CR-01): WITHIN one file the LAST
+    # assignment wins, because dotenv.parse() builds an object and a later key
+    # overwrites an earlier one. ACROSS files the FIRST file still wins — that is the
+    # `break` below, and the two rules are independent. Taking the first line here
+    # reproduced OPS-05 inside a single file: appending a rotated DATABASE_URL without
+    # deleting the stale line above it made this guard print the old development host
+    # and exit 0 while every TS consumer opened the new production one.
+    raw_line=$(grep -E '^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=' "$f" | tail -n 1 || true)
     if [ -z "$raw_line" ]; then
       continue
     fi
