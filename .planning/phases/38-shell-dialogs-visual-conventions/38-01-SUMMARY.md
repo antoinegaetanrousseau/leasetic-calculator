@@ -134,3 +134,12 @@ GAP-02 is closed at the source level. Plan 38-04's browser walk (D-38-12) is the
 ---
 *Phase: 38-shell-dialogs-visual-conventions*
 *Completed: 2026-09-06*
+
+## Self-Check: PASSED
+
+- FOUND: src/lib/i18n/dom-lang.ts
+- FOUND: tests/dialog-close-label.test.ts
+- FOUND: .planning/phases/38-shell-dialogs-visual-conventions/38-01-SUMMARY.md
+- FOUND: f3d5680 (Task 1 commit)
+- FOUND: cdaa900 (Task 2 commit)
+- FOUND: 09d5975 (Summary commit)
