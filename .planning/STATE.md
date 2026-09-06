@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-06T16:57:00.527Z"
-last_activity: 2026-09-06 -- Phase 39 planning complete
+last_updated: "2026-09-06T17:19:10.184Z"
+last_activity: 2026-09-06
 progress:
   total_phases: 25
   completed_phases: 10
   total_plans: 73
-  completed_plans: 68
+  completed_plans: 69
   percent: 40
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 39 — operational & credential gates
+**Current focus:** Phase 39 — database-guard-correctness
 
 ## Current Position
 
-Phase: 39
-Plan: Not started
+Phase: 39 (database-guard-correctness) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-09-06 -- Phase 39 planning complete
+Last activity: 2026-09-06
 
 **v1.8 phase order and why:**
 
@@ -480,6 +480,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 37 P05 | ~40min | 1 tasks | 3 files |
 | Phase 38 P01 | 8min | 2 tasks | 6 files |
 | Phase 38 P02 | 18m | 3 tasks | 4 files |
+| Phase 39 P01 | 17min | 3 tasks | 7 files |
 
 ## Decisions
 
@@ -644,6 +645,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 38]: GAP-04 escape hatch not taken; padding+focus fix branch implemented per D-38-13/A-38-03
 - [Phase 38]: No new --focus-ring token minted; six selectors repoint at existing --ring token per A-38-03
 - [Phase 38]: LoadMoreButton aria-label deleted rather than made dynamic; visible text is the accessible name
+- [Phase 39]: Explicit node:url URL class (not global URL) in scripts/_neon-endpoints.ts, because Vitest's jsdom environment shims globalThis.URL to resolve relative refs against http://localhost:3000/ instead of the file: base
+- [Phase 39]: Exhaustive survivor grep for the production endpoint literal returns six accounted-for files, not five as Task 3 originally stated -- tests/neon-endpoints.test.ts needs the literal to assert data integrity, same class as tests/neon-target.test.ts
 
 ### Blockers
 

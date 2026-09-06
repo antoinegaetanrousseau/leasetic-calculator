@@ -946,11 +946,11 @@ are already captured — Phase 40's planner MUST read
 **Canonical refs:** `.planning/phases/39-database-guard-correctness/39-CONTEXT.md` (D-01–D-08),
 `scripts/check-local-db-branch.sh`, `scripts/_load-env.ts`, `scripts/seed-fiche-fixtures.ts` ~L533.
 
-**Plans:** 5 plans in 3 waves
+**Plans:** 1/5 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 39-01-PLAN.md — Single declarative Neon endpoint source; fold in all three hardcoded copies (D-05) — wave 1
+- [x] 39-01-PLAN.md — Single declarative Neon endpoint source; fold in all three hardcoded copies (D-05) — wave 1
 - [ ] 39-02-PLAN.md — `scripts/_env-precedence.ts`: the one TypeScript notion of dotenv file order and effective DATABASE_URL (D-02) — wave 1
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -1069,7 +1069,7 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
-| 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
+| 39. Operational & Credential Gates | v1.8 | 1/5 | In Progress|  |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 
 ---
