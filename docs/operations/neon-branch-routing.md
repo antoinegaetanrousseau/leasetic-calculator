@@ -53,10 +53,24 @@ recreated `main`, for instance — is treated as PRODUCTION exactly as the `.lis
 requires. Comparison is case-insensitive, because `postgres:` is a non-special URL scheme and
 `new URL()` therefore leaves the host's case untouched while DNS ignores it.
 
+The consumers share the table but deliberately do **not** share one matching algorithm, and it
+is worth knowing which is which before reading a verdict:
+
+| Consumer | Predicate |
+| --- | --- |
+| `scripts/_neon-target.ts`, `scripts/_db-branch-guard.ts` | `hostname.startsWith(record.prefix)`, behind an exact `.neon.tech` suffix pre-gate |
+| `scripts/check-local-db-branch.sh`, `scripts/_development-target.ts` | exact equality against the record's full `hostname` |
+
+Exact equality is the stricter of the two: a host that shares an endpoint-id prefix but sits on
+a different pooler or domain is refused as unrecognised rather than being credited with that
+record's branch. The prefix form tolerates such a host. Both directions are safe against the
+production endpoint, and `tests/db-guard-differential.test.ts` Agreement 5 asserts the two
+halves reach the same verdict on every case in the shared matrix — so if the tolerance ever
+starts to matter, a test says so rather than a deploy.
+
 The one standing exception: `scripts/probe-write-isolation.ts` keeps its own inline
-exact-hostname constants under the Phase 36 D-36-03 exemption that D-05a upholds, because an
-exact-hostname gate is stricter than this file's prefix match — a reader who greps for an
-endpoint id and finds it there is not looking at drift.
+exact-hostname constants under the Phase 36 D-36-03 exemption that D-05a upholds — a reader who
+greps for an endpoint id and finds it there is not looking at drift.
 
 ### The local DATABASE_URL guard (OPS-05)
 

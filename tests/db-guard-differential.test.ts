@@ -5,6 +5,14 @@
  * hostname, same source-file attribution — including the `NODE_ENV=test` exclusion and
  * the `process.env` case.
  *
+ * It also compares the two halves' VERDICT about the host they resolved (Agreement 5,
+ * 39-REVIEW WR-01), not just which file won. That half of the proof was missing: the
+ * bash guard classifies by exact `hostname` equality against the shared record table
+ * while `classifyDatabaseTarget` classifies by `startsWith(prefix)` behind a
+ * `.neon.tech` suffix pre-gate, and those are genuinely different predicates. Agreeing
+ * on the hostname while disagreeing on whether that hostname is production is exactly
+ * the drift this suite exists to prevent.
+ *
  * WHY THIS SUITE EXISTS: OPS-05 leaves two resolvers by necessity. D-01 keeps the guard
  * in bash so no `tsx` startup is added to every build, and a bash script cannot import a
  * TypeScript module — so a single shared implementation is not an option. D-02 makes
@@ -24,6 +32,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { envFileOrder, resolveDatabaseUrl } from '../scripts/_env-precedence';
+import { classifyDatabaseTarget } from '../scripts/_db-branch-guard';
 import {
   CASES,
   DEVELOPMENT_HOST,
@@ -51,6 +60,46 @@ function toProcessEnv(env: Record<string, string> = {}): NodeJS.ProcessEnv {
  *   - `... (from SOURCE) ...` — the no-user@host-segment error, which has no hostname.
  * Deliberately narrow and anchored on the `from` fragment rather than a whole-line match.
  */
+/**
+ * The verdict classes the two halves are compared on (39-REVIEW WR-01).
+ *
+ * Until this existed the suite compared only `resolveDatabaseUrl` — WHICH FILE won and
+ * WHICH HOST it named — and never the VERDICT either half reaches about that host. That
+ * left the actual classification untested across two genuinely different predicates over
+ * the same table: `scripts/check-local-db-branch.sh` matches a record by exact `hostname`
+ * equality, while `classifyDatabaseTarget` matches by `startsWith(prefix)` behind a
+ * `.neon.tech` suffix pre-gate. Agreeing on the hostname while disagreeing on what that
+ * hostname MEANS is precisely the drift OPS-05 set out to end.
+ *
+ * Deliberately COARSE. The two halves word their output differently on purpose (D-07),
+ * and refusing for slightly different stated reasons is not drift — one half passing
+ * while the other refuses is. `refuse` therefore covers refuse-production,
+ * refuse-unrecognised and refuse-malformed alike; the exact hostname is pinned
+ * separately by Agreement 2.
+ */
+type VerdictClass = 'skip' | 'no-value' | 'ok' | 'warn' | 'refuse';
+
+function bashVerdictClass(stdout: string): VerdictClass {
+  if (/^SKIP:/.test(stdout)) return 'skip';
+  if (stdout.includes('no DATABASE_URL found in any candidate file')) return 'no-value';
+  if (/^OK:/.test(stdout)) return 'ok';
+  if (/^WARN:/.test(stdout)) return 'warn';
+  if (/^ERROR:/.test(stdout)) return 'refuse';
+  throw new Error(`bash guard stdout matched no known verdict shape: ${JSON.stringify(stdout.slice(0, 120))}`);
+}
+
+function tsVerdictClass(tsResult: ReturnType<typeof resolveDatabaseUrl>): VerdictClass {
+  // Mirrors assertSafeDatabaseTarget's own order: SKIP rule first, then "nothing
+  // resolved", then the classification.
+  if (tsResult.filesFound.length === 0) return 'skip';
+  if (!tsResult.resolution) return 'no-value';
+
+  const { verdict } = classifyDatabaseTarget(tsResult.resolution.url);
+  if (verdict === 'ok-development' || verdict === 'ok-local-postgres') return 'ok';
+  if (verdict === 'warn-preview') return 'warn';
+  return 'refuse';
+}
+
 function parseHostAndSource(stdout: string): { host?: string; source?: string } {
   const withHost = /\(([^()]+)\)\s+from\s+(\S+?)[.,]?(?:\s|$)/.exec(stdout);
   if (withHost) {
@@ -100,6 +149,21 @@ describe('bash guard vs TypeScript resolver agreement (D-02)', () => {
           expect(tsResult.resolution).toBeNull();
           expect(tsResult.filesFound.length).toBeGreaterThan(0);
         }
+
+        // Agreement 5 (WR-01): the two halves reach the same VERDICT about the host
+        // they agreed on, not merely the same host. This is what covers the fact that
+        // bash classifies by exact hostname equality while classifyDatabaseTarget
+        // classifies by startsWith(prefix) — two different predicates over one table.
+        const bashClass = bashVerdictClass(bashResult.stdout);
+        expect(
+          bashClass,
+          'the bash guard and classifyDatabaseTarget disagree about what this host MEANS. ' +
+            'One of them is now wrong about whether the next command may open this database.',
+        ).toBe(tsVerdictClass(tsResult));
+
+        // Agreement 6: the exit status is consistent with that verdict class. A refusal
+        // that exits 0 is a fail-open; an OK that exits non-zero blocks a legitimate build.
+        expect(bashResult.status === 0).toBe(bashClass === 'ok' || bashClass === 'warn' || bashClass === 'skip');
       } finally {
         cleanupFixtureDir(dir);
       }
