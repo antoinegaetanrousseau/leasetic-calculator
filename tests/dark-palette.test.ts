@@ -8,7 +8,8 @@
  * screenshot (`31.1-UI-SPEC.md` § Dark Mode). This suite is the automated
  * copy of that constraint:
  *
- *   1. the print/PDF surface still forces white in dark mode
+ *   1. the print/PDF surface rule is still DECLARED for dark mode (it is dead CSS
+ *      today — see F-38-01 and the SCOPE comment on that assertion below)
  *   2. the no-flash theme-restoration mechanism is untouched
  *   3. the dark selector mechanism (not its values) is unchanged
  *   4. the six sampled shell-surface roles carry their sampled values

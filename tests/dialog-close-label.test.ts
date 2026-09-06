@@ -64,7 +64,10 @@ function readStripped(relativePath: string): string {
 // `Close` — both files legitimately contain `DialogClose`, `SheetClose`,
 // `showCloseButton` and `data-slot="dialog-close"`/`"sheet-close"`, so a
 // bare-token match would be permanently red.
-const HARDCODED_CLOSE_SPAN_RX = /className="sr-only">Close</;
+// Whitespace-tolerant (WR-01, phase 38 review). A re-import that reformats the JSX —
+// exactly the event this guard exists to catch — would otherwise slip past a regex
+// requiring zero whitespace around the literal.
+const HARDCODED_CLOSE_SPAN_RX = /className="sr-only">\s*Close\s*</;
 
 describe('dialog/sheet close-button accessible name (GAP-02, D-38-11)', () => {
   it.each([
@@ -111,12 +114,12 @@ describe('dialog/sheet close-button accessible name (GAP-02, D-38-11)', () => {
       stripped,
       'src/components/ui/sidebar.tsx carries a hardcoded <SheetTitle>Sidebar</SheetTitle> again ' +
         '(F-38-05). It must read shell.sidebar.title from the FR/EN dictionary.',
-    ).not.toMatch(/<SheetTitle>Sidebar<\/SheetTitle>/);
+    ).not.toMatch(/<SheetTitle>\s*Sidebar\s*<\/SheetTitle>/);
     expect(
       stripped,
       'src/components/ui/sidebar.tsx carries a hardcoded English SheetDescription again ' +
         '(F-38-05). It must read shell.sidebar.description from the FR/EN dictionary.',
-    ).not.toMatch(/<SheetDescription>Displays the mobile sidebar\.<\/SheetDescription>/);
+    ).not.toMatch(/<SheetDescription>\s*Displays the mobile sidebar\.\s*<\/SheetDescription>/);
   });
 
   it('sidebar.tsx reads its sheet title/description from the dictionary via resolveDomLang()', () => {

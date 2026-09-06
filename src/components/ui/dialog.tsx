@@ -118,7 +118,13 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close render={<Button variant="outline" />}>
-          Close
+          {/* Reuses common.close.aria deliberately (IN-02, phase 38 review): here the
+              string is the button's VISIBLE text, and that text is also its accessible
+              name, so the value is identical. A second key with the same value would
+              only invite the two drifting apart. This branch has no callers today
+              (showCloseButton defaults to false on DialogFooter), but leaving an English
+              literal in the file GAP-02 just fixed is how the next one gets missed. */}
+          {t('common.close.aria', resolveDomLang())}
         </DialogPrimitive.Close>
       )}
     </div>
