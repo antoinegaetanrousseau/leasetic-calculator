@@ -404,6 +404,31 @@ icon-button pairs follow the same rule, not a looser one.
 
 ---
 
+## UIC-11 — Focus ring: `var(--ring)` via the two-layer shadow; never hardcode a focus colour.
+
+**Status:** Ratified rule, phase 38, 2026-09-06
+**Recorded in:** `38-UI-SPEC.md` § Focus Treatment
+
+**Rule.** Any `:focus-visible` or `:focus-within` treatment that renders a coloured ring uses
+`outline: none` plus a two-layer `box-shadow` whose inner layer is `0 0 0 2px var(--ring)` and
+whose outer layer is `0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent)`:
+
+```css
+outline: none;
+box-shadow: 0 0 0 2px var(--ring),
+            0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
+```
+
+`--ring` is already declared in both themes in `app/globals.css`. A component-local hardcoded
+`rgba(...)` or other literal focus colour is a violation, not a case-by-case styling choice.
+
+The raw `box-shadow` form (rather than `button.tsx`'s `focus-visible:border-ring` Tailwind utility)
+exists because two of the six selectors this rule was ratified against declare `border: none`, so
+a border-based treatment would collapse to the halo alone on those two — the utility form is not
+universally applicable across every selector this rule governs.
+
+---
+
 ## Plan-authoring note: grep-based acceptance criteria measure prose too
 
 An acceptance criterion of the shape `grep -c "someCall(" src/foo.ts` returns a
