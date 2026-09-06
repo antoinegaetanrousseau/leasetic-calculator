@@ -103,7 +103,7 @@ stops existing.
 - [ ] **OPS-04**: DATA-11's 10-year PDF retention carries a recorded legal position — Thomas's
   sign-off, or an explicit interim decision naming who accepts the risk until it arrives.
   *External dependency — must be closable by a recorded decision.*
-- [ ] **OPS-05**: `scripts/check-local-db-branch.sh` validates the `DATABASE_URL` the command that
+- [x] **OPS-05**: `scripts/check-local-db-branch.sh` validates the `DATABASE_URL` the command that
   is about to run will actually open, instead of parsing `.env.local` unconditionally. The guard
   hardcodes `ENV_FILE=".env.local"`, but `@next/env` resolves `.env.$NODE_ENV.local` at HIGHER
   precedence and is first-writer-wins — so under `npm run build` / `npm run start` a
@@ -213,7 +213,7 @@ stops existing.
 | OPS-02 | Phase 40 — Milestone Record Closure | Pending |
 | OPS-03 | Phase 40 — Milestone Record Closure | Pending |
 | OPS-04 | Phase 40 — Milestone Record Closure | Pending |
-| OPS-05 | Phase 39 — Database Guard Correctness | Pending |
+| OPS-05 | Phase 39 — Database Guard Correctness | Complete |
 | HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
