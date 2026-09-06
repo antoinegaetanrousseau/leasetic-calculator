@@ -117,6 +117,18 @@ fi
 #     closing partner is missing turns a broken line into a confident, wrong answer;
 #   - an unquoted value ends at the first `#` (dotenv's `[^#\r\n]+`), so an inline
 #     comment never becomes part of the connection string. Inside quotes, `#` is data.
+# Strips leading and trailing whitespace (including a trailing CR from a CRLF file).
+# Used on every `_neon-endpoints.list` field so the bash reader and the TS parser treat
+# an accidentally-padded record identically.
+trim_field() {
+  local s
+  s=$1
+  s=${s%$'\r'}
+  s=${s#"${s%%[![:space:]]*}"}
+  s=${s%"${s##*[![:space:]]}"}
+  printf '%s' "$s"
+}
+
 extract_env_value() {
   local v
   v=$(printf '%s' "$1" | sed -E 's/^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=//')
@@ -251,13 +263,62 @@ branch=""
 if [ "$host" = "localhost" ] || [ "$host" = "127.0.0.1" ]; then
   verdict="localhost"
 else
-  while IFS='|' read -r prefix hostname record_branch scope; do
-    case "$prefix" in
+  # The record table is VALIDATED, not merely read (39-REVIEW WR-09). The TS parser
+  # (`parseNeonEndpointList`) throws at module load on a malformed record; this reader
+  # silently tolerated records it rejects — three fields, five fields, an invalid branch
+  # name (which fell through to `unrecognised`) — and dropped the final record entirely
+  # if the file ever lost its trailing newline, because `read` returns non-zero on a last
+  # partial line. A single mis-edit therefore produced "TS crashes, bash quietly runs with
+  # a different table", which is the divergence class this phase exists to eliminate.
+  #
+  # The whole file is validated on every run rather than stopping at the first hostname
+  # match, so the two halves fail on the same input regardless of which record matched.
+  # Fields are trimmed before use, matching the TS parser, so an accidental space around
+  # a separator degrades identically on both sides instead of only one.
+  line_no=0
+  while IFS='|' read -r field_1 field_2 field_3 field_4 || [ -n "$field_1" ]; do
+    line_no=$((line_no + 1))
+
+    record_prefix=$(trim_field "$field_1")
+    # Comment/blank decided on the TRIMMED first field, so an indented comment line is
+    # skipped here exactly as it is by the TS parser.
+    case "$record_prefix" in
       ''|'#'*) continue ;;
     esac
-    if [ "$host" = "$hostname" ]; then
+
+    record_hostname=$(trim_field "$field_2")
+    record_branch=$(trim_field "$field_3")
+    record_scope=$(trim_field "$field_4")
+
+    # More than four fields: the surplus folds into the last variable, separator and all.
+    case "$record_scope" in
+      *'|'*)
+        echo "ERROR: $endpoints_file:$line_no: expected 4 |-separated fields, got more."
+        exit 1
+        ;;
+    esac
+    if [ -z "$record_hostname" ] || [ -z "$record_branch" ] || [ -z "$record_scope" ]; then
+      echo "ERROR: $endpoints_file:$line_no: expected 4 non-empty |-separated fields (prefix|hostname|branch|scope)."
+      exit 1
+    fi
+    case "$record_branch" in
+      main|preview|development) ;;
+      *)
+        echo "ERROR: $endpoints_file:$line_no: invalid branch \"$record_branch\" (must be one of main, preview, development)."
+        exit 1
+        ;;
+    esac
+    # The quoted expansion is a LITERAL in a case pattern; only the trailing * is a glob.
+    case "$record_hostname" in
+      "$record_prefix"*) ;;
+      *)
+        echo "ERROR: $endpoints_file:$line_no: hostname \"$record_hostname\" does not start with prefix \"$record_prefix\"."
+        exit 1
+        ;;
+    esac
+
+    if [ -z "$branch" ] && [ "$host" = "$record_hostname" ]; then
       branch="$record_branch"
-      break
     fi
   done < "$endpoints_file"
 
