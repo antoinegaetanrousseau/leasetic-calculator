@@ -132,7 +132,7 @@ the count).
 - [x] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had (completed 2026-09-05)
 - [x] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404 (completed 2026-09-05)
 - [x] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose (completed 2026-09-06; verification passed with 2 recorded operator overrides — the `dialog.tsx` FR/EN observation and the wizard/pagination dark passes were structurally blocked, not skipped: see 38-VERIFICATION.md § Post-Verification Resolution)
-- [ ] **Phase 39: Database Guard Correctness** — the local DB guard can no longer report OK while the command it guards would open the production branch, and the two divergent env resolvers are reconciled and pinned
+- [x] **Phase 39: Database Guard Correctness** — the local DB guard can no longer report OK while the command it guards would open the production branch, and the two divergent env resolvers are reconciled and pinned (completed 2026-09-06)
 - [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived, and the five stale operational requirements corrected against what actually shipped
 
 ---
@@ -946,7 +946,7 @@ are already captured — Phase 40's planner MUST read
 **Canonical refs:** `.planning/phases/39-database-guard-correctness/39-CONTEXT.md` (D-01–D-08),
 `scripts/check-local-db-branch.sh`, `scripts/_load-env.ts`, `scripts/seed-fiche-fixtures.ts` ~L533.
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 Plans:
 **Wave 1**
 
@@ -960,7 +960,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 39-05-PLAN.md — Fixture test (D-06) + differential test (D-02) + routing-doc cross-link — wave 3
+- [x] 39-05-PLAN.md — Fixture test (D-06) + differential test (D-02) + routing-doc cross-link — wave 3
 
 **Wave order is load-bearing, not a scheduling preference.** D-03: correcting `_load-env.ts` makes
 14 write-capable `tsx` entry points start honouring `.env.production.local`, so guard coverage must
@@ -1069,7 +1069,7 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
-| 39. Operational & Credential Gates | v1.8 | 4/5 | In Progress|  |
+| 39. Operational & Credential Gates | v1.8 | 5/5 | Complete   | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 
 ---

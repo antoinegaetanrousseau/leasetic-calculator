@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
-status: executing
-last_updated: "2026-09-06T18:06:14.440Z"
+status: verifying
+last_updated: "2026-09-06T18:25:01.963Z"
 last_activity: 2026-09-06
 progress:
   total_phases: 25
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 73
-  completed_plans: 72
-  percent: 40
+  completed_plans: 73
+  percent: 44
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 39 (database-guard-correctness) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-06
 
 **v1.8 phase order and why:**
@@ -484,6 +484,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 39 P02 | 11min | 2 tasks | 2 files |
 | Phase 39 P03 | 20min | 3 tasks | 5 files |
 | Phase 39 P04 | 35m | 2 tasks | 2 files |
+| Phase 39 P05 | ~25min | 3 tasks | 5 files |
 
 ## Decisions
 
@@ -654,6 +655,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 39-02]: EnvResolution.source and the 'process.env' sentinel value are mandated by the plan's interface contract; two acceptance-criteria greps (grep -Ec ... outputs 0) conflict with those mandatory identifiers and cannot both pass — documented as a plan inconsistency rather than weakened — Renaming the field or obfuscating the literal to dodge the grep would break the frozen downstream contract consumed by 39-03/39-04/39-05, which is worse than a literal grep count of 3 and 1 respectively
 - [Phase 39]: D-03 sequencing edit (precedence fix + guard call in _load-env.ts) landed in one commit; Contract 1 grep-contract proven to bite via negative control
 - [Phase 39]: 39-04: replaced .env.local-only bash guard with full @next/env candidate-order resolution + scripts/_neon-endpoints.list classification; prebuild/prestart hooks now gate npm run build/start with --node-env production — Direct fix for the 2026-09-06 incident (D-01, D-04, D-05, D-07)
+- [Phase 39]: D-08 no-credential-leak invariant checks for postgres://fixture rather than a bare postgres:// substring, since the guard's own no-user@host error legitimately prints a credential-free usage-hint template
 
 ### Blockers
 
