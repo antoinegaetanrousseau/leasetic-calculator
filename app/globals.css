@@ -376,7 +376,7 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 0.6rem 1.5rem;
+    padding: 0.5rem 1.5rem;
     border-radius: 9999px;
     font-family: inherit;
     font-size: 14px;
@@ -395,7 +395,8 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
   .btn-navy:focus-visible,
   .btn-out:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+    box-shadow: 0 0 0 2px var(--ring),
+                0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
   }
   .btn-green:disabled,
   .btn-navy:disabled,
@@ -440,7 +441,9 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
   }
   .search-bar:focus-within {
     border-color: var(--teal);
-    box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.12);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--ring),
+                0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
   }
   .search-bar input {
     flex: 1; border: none; outline: none;
@@ -464,7 +467,8 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
   }
   .admin-nav-card:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+    box-shadow: 0 0 0 2px var(--ring),
+                0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
   }
 
   .history-diff-item {
@@ -513,7 +517,8 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
   /* === Phase 11 Stepper focus ring (UI-SPEC §6.2 — matches .btn-green:focus-visible pattern) === */
   .stepper-circle:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(45, 122, 140, 0.18);
+    box-shadow: 0 0 0 2px var(--ring),
+                0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
   }
 
   /* === Phase 15 public-page logo sizing (PUB-01, PUB-02 — UI-SPEC §6.3, D-08) === */
