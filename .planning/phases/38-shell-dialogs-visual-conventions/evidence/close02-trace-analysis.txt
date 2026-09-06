@@ -1,0 +1,45 @@
+CLOSE-02 check 1 — dark first-paint filmstrip: trace analysis
+Captured 2026-09-06 by Claude via chrome-devtools MCP, operator-authenticated session.
+Build: Next.js 16.2.4 production build, http://localhost:3000/proposals, Neon development branch.
+CPU throttling: 6x (DevTools emulation). Network throttling: none.
+
+Method note: screencast frames alone are a SAMPLE and cannot prove absence of a
+sub-frame flash (the weakness D-38-03 names). The decisive evidence is the causal
+ordering below, taken from the same trace: the inline no-flash script COMPLETES
+before the first Paint event, so the light SSR markup is overwritten before the
+compositor ever runs. A light frame is not merely unobserved, it is impossible.
+
+  ### caseB-system-osdark
+    inline script      : 340.2ms  dur=5.6ms  url=/proposals
+    inline script ends : 345.8ms
+    first Paint (>=nav): 385.4ms
+    firstPaint marker  : 420.8ms
+    MARGIN             : 39.6ms  (positive = script won)
+    first chunk script : 424.5ms
+    screencast frames  : 3
+      -> caseB-system-osdark_frame-01_t+247.2ms.jpg
+      -> caseB-system-osdark_frame-02_t+400.5ms.jpg
+      -> caseB-system-osdark_frame-03_t+544.1ms.jpg
+
+  ### caseA-cookie-dark
+    inline script      : 478.7ms  dur=3.6ms  url=/proposals
+    inline script ends : 482.3ms
+    first Paint (>=nav): 533.8ms
+    firstPaint marker  : 579.9ms
+    MARGIN             : 51.5ms  (positive = script won)
+    first chunk script : 485.4ms
+    screencast frames  : 2
+      -> caseA-cookie-dark_frame-01_t+13.6ms.jpg
+      -> caseA-cookie-dark_frame-02_t+551.4ms.jpg
+
+SSR HTML actually shipped, by cookie state (curl against the same server):
+  no lt_theme cookie : data-theme="light"   <- flip required before paint
+  lt_theme=system    : data-theme="light"   <- flip required before paint
+  lt_theme=dark      : data-theme="dark"    <- no flip needed
+
+Frames (all dark; none light):
+  caseA-cookie-dark_frame-01_t+13.6ms.jpg
+  caseA-cookie-dark_frame-02_t+551.4ms.jpg
+  caseB-system-osdark_frame-01_t+247.2ms.jpg
+  caseB-system-osdark_frame-02_t+400.5ms.jpg
+  caseB-system-osdark_frame-03_t+544.1ms.jpg
