@@ -873,11 +873,21 @@ files.
      vertical padding and the third hardcoded focus shadow as a dated, deliberate exception.
 
 **Plans:** 4 plans in 4 waves
-
 Plans:
+**Wave 1**
+
 - [ ] 38-01-PLAN.md — GAP-02: dialog/sheet close label reads `common.close.aria` from `<html lang>`, pinned by a re-import test (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 38-02-PLAN.md — GAP-04: on-grid `0.5rem` button padding, six focus selectors repointed at `var(--ring)`, `LoadMoreButton` aria-label removed, UIC-11 minted (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 38-03-PLAN.md — CLOSE-02: throttled dark first-paint filmstrip + dark-mode PDF check, gated flip of `31.1-VERIFICATION.md` to `passed` (wave 3, has checkpoints)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 38-04-PLAN.md — CLOSE-08: Phase 28's backlog walked light + dark, FR/EN close-label verification, D-38-07 defect triage (wave 4, has checkpoints)
 
 **Note on success criterion 4:** the fix branch is taken, not the exception branch — D-38-13
