@@ -140,6 +140,23 @@ stops existing.
   audit, written before Phase 34 plan 34-03 vendored `solution-crm-1`…`solution-crm-6` and
   `solution-users-2`.)
 
+- [ ] **HOUSE-05**: `src/components/proposal/ProposalForm.tsx` exports a `ProposalForm` component
+  that is never rendered — a repo-wide search for `<ProposalForm` finds only two hits, both inside
+  that file's own comments. Only `ProposalFormProvider` (the RHF context) is imported, by
+  `app/(authed)/proposals/new/parametres/page.tsx`. Either delete the component and its action row,
+  or record why it is retained. *Found 2026-09-06 by the Phase 38 CLOSE-08 walk (F-38-03). Two
+  consequences are already recorded there: 38-CONTEXT.md D-38-04's premise "every CLOSE-08 surface
+  renders a `.btn-out`" is FALSE for wizard step 1, and the `grep -rl` blast-radius counts
+  (21/3/19/32) measure files-containing-a-string rather than rendered surfaces.*
+
+- [ ] **HOUSE-06**: `.planning/phases/38-shell-dialogs-visual-conventions/38-WALK-SURFACES.md`
+  Table 1 describes `PartnersList.tsx:213` and `LcReferencesList.tsx:167` as a "per-row link". Both
+  are the "Charger plus" **pagination control**, rendered only inside `{nextCursor && ...}`, so
+  neither renders on a single-page dataset — which is why the Phase 38 walk could not observe them.
+  Correct the description, and note that verifying those sites needs a multi-page dataset. Same
+  applies to `HistoryTable.tsx:169` and `LoadMoreButton`. *Found 2026-09-06 (F-38-06). Not a code
+  defect — the shared CSS rule was measured on other rendered `.btn-out` instances.*
+
 ---
 
 ## Future Requirements (deferred beyond v1.8)
@@ -201,8 +218,10 @@ stops existing.
 | HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-04 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
+| HOUSE-05 | Phase 40 — Milestone Record Closure | Pending |
+| HOUSE-06 | Phase 40 — Milestone Record Closure | Pending |
 
-**Coverage: 22/22 requirements mapped to exactly one phase — no orphans, no duplicates.**
+**Coverage: 24/24 requirements mapped to exactly one phase — no orphans, no duplicates.**
 
 | Phase | Requirements | Count |
 |---|---|---|
@@ -210,6 +229,6 @@ stops existing.
 | 37 — CRM Stack Closure | CLOSE-01, CLOSE-03, CLOSE-04, GAP-01, GAP-03 | 5 |
 | 38 — Shell, Dialogs & Visual Conventions | CLOSE-02, CLOSE-08, GAP-02, GAP-04 | 4 |
 | 39 — Operational & Credential Gates | OPS-01, OPS-02, OPS-03, OPS-04, OPS-05, GAP-05 | 6 |
-| 40 — Milestone Record Closure | CLOSE-06, CLOSE-07 | 2 |
+| 40 — Milestone Record Closure | CLOSE-06, CLOSE-07, HOUSE-05, HOUSE-06 | 4 |
 
 *Traceability filled 2026-09-05 by the roadmapper. Phase details in `.planning/ROADMAP.md`.*

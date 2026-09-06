@@ -397,7 +397,7 @@ unedited — it is a historical record; this entry is the correction.
 
 ### F-38-03 — `ProposalForm` is dead code, and CLOSE-08 surface #1 was mis-mapped
 
-status: open — filed for a later phase (D-38-07: needs a component change, not a CSS/token/i18n edit)
+status: filed as HOUSE-05 (Phase 40) — D-38-07: needs a component change, not a CSS/token/i18n edit
 found_by: CLOSE-08 walk, surface #1
 severity: low runtime risk, moderate planning-record risk
 
@@ -473,7 +473,7 @@ FR now announces "Barre latérale" / "Affiche la barre latérale mobile."; EN an
 
 ### F-38-06 — `38-WALK-SURFACES.md` describes pagination controls as "per-row" links
 
-status: open — documentation correction, low priority
+status: filed as HOUSE-06 (Phase 40) — documentation correction, low priority
 found_by: CLOSE-08 walk, surfaces 5c and 3
 
 Table 1 describes `PartnersList.tsx:213` and `LcReferencesList.tsx:167` as a "per-row link". Both

@@ -131,7 +131,7 @@ the count).
 
 - [x] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had (completed 2026-09-05)
 - [x] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404 (completed 2026-09-05)
-- [x] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose (completed 2026-09-06)
+- [ ] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose (all 4 plans complete 2026-09-06; verification returned `gaps_found` — two disclosed coverage gaps await an operator decision, see 38-VERIFICATION.md)
 - [ ] **Phase 39: Operational & Credential Gates** — the shared admin password retired, `last_login_at` actually written, `trustedOrigins` explicit, OVH and retention closable by a recorded decision, and the local DB guard no longer passing while the server serves production
 - [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived
 
