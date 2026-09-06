@@ -22,7 +22,17 @@
  * tests to volatile output shapes, and D-07 has just changed what this guard prints.
  */
 import { afterEach, describe, expect, it } from 'vitest';
-import { CASES, cleanupFixtureDir, makeFixtureDir, runGuard } from './_db-guard-fixtures';
+import { chmodSync } from 'node:fs';
+import { join } from 'node:path';
+import {
+  CASES,
+  DEVELOPMENT_HOST,
+  PRODUCTION_HOST,
+  cleanupFixtureDir,
+  makeFixtureDir,
+  runGuard,
+  urlFor,
+} from './_db-guard-fixtures';
 
 let dir: string | undefined;
 
@@ -97,6 +107,41 @@ describe('check-local-db-branch.sh exit codes (D-06)', () => {
       // actual embedded fixture credential instead.
       expect(combined).not.toMatch(/postgres:\/\/fixture/);
     }
+  });
+
+  /**
+   * 39-REVIEW WR-03. `grep ... || true` cannot distinguish exit 1 ("no match", benign)
+   * from exit >= 2 ("could not read the file", not benign). When the HIGHER-precedence
+   * candidate is unreadable, the extracted line was empty, the loop moved on, and the
+   * guard reported the LOWER-precedence file's value as the verdict — a root-owned or
+   * restrictive-mode `.env.production.local` (dropped in by a container, or by a `sudo
+   * vercel env pull`) turned the guard into a green light for a production build.
+   *
+   * Lives outside the shared CASES matrix on purpose: the differential suite feeds every
+   * CASES entry to `resolveDatabaseUrl`, whose `readFileSync` would throw on a
+   * mode-000 file, so this case is not expressible as a two-sided agreement.
+   */
+  it('WR-03: refuses instead of falling through when a higher-precedence env file cannot be read', () => {
+    // Root can read a mode-000 file, so the premise does not hold there.
+    if (typeof process.getuid === 'function' && process.getuid() === 0) return;
+
+    dir = makeFixtureDir({
+      '.env.production.local': `DATABASE_URL=${urlFor(PRODUCTION_HOST)}\n`,
+      '.env.local': `DATABASE_URL=${urlFor(DEVELOPMENT_HOST)}\n`,
+    });
+    chmodSync(join(dir, '.env.production.local'), 0o000);
+
+    const result = runGuard(dir, 'production');
+
+    expect(
+      result.status,
+      'An unreadable higher-precedence env file must refuse, not fall through to the next ' +
+        'candidate. Falling through reports a development host while the guarded command opens ' +
+        'whatever the unreadable file actually contained.',
+    ).not.toBe(0);
+    expect(result.stdout).toMatch(/^ERROR:/);
+    expect(result.stdout).toContain('.env.production.local');
+    expect(result.stdout).not.toContain(DEVELOPMENT_HOST);
   });
 
   it('every ok/warn/error-with-source case names its source file with a "from <source>" fragment (D-07)', () => {

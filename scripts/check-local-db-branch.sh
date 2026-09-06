@@ -126,7 +126,27 @@ else
     # reproduced OPS-05 inside a single file: appending a rotated DATABASE_URL without
     # deleting the stale line above it made this guard print the old development host
     # and exit 0 while every TS consumer opened the new production one.
-    raw_line=$(grep -E '^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=' "$f" | tail -n 1 || true)
+    #
+    # The exit status is branched on explicitly rather than swallowed with `|| true`
+    # (39-REVIEW WR-03). grep exits 1 for "no match" (benign — fall through to the next
+    # candidate) but >= 2 for "could not read the file", and `|| true` collapsed the two:
+    # an unreadable HIGHER-precedence file left raw_line empty, the loop continued, and
+    # the guard reported the LOWER-precedence file's development host and exited 0 while
+    # the guarded command opened whatever the unreadable file actually held. A
+    # root-owned or restrictive-mode `.env.production.local` — dropped in by a container
+    # or a `sudo vercel env pull` — is enough to trigger it. Under `pipefail` the
+    # command substitution already surfaces grep's status through the `tail` on its
+    # right, so `$?` here IS grep's status.
+    set +e
+    raw_line=$(grep -E '^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=' "$f" | tail -n 1)
+    grep_status=$?
+    set -e
+    if [ "$grep_status" -gt 1 ]; then
+      echo "ERROR: candidate env file '$f' exists but could not be read — refusing to fall through."
+      echo "  A higher-precedence file that cannot be read may name a different database than the"
+      echo "  one this guard would otherwise report. Fix its permissions, then re-run."
+      exit 1
+    fi
     if [ -z "$raw_line" ]; then
       continue
     fi
