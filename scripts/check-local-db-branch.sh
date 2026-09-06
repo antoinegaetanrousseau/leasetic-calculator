@@ -102,6 +102,44 @@ if [ "${#files_found[@]}" -eq 0 ]; then
   exit 0
 fi
 
+# Extracts the VALUE from a matched `DATABASE_URL=` line, following dotenv.parse()'s
+# own semantics (39-REVIEW WR-04). This is the second parser in the system by necessity
+# — a bash script cannot import the TS one — so every rule below exists because the two
+# were measured to disagree on an input a real `.env.local` can contain. Each is pinned
+# by a case in tests/_db-guard-fixtures.ts, which runs THIS binary against
+# dotenv.parse() and fails if they ever diverge again.
+#
+#   - a trailing CR (a CRLF file) is not part of the value: dotenv's value pattern
+#     excludes \r outright;
+#   - the captured value is trimmed BEFORE deciding whether it is quoted, matching
+#     dotenv's order of operations;
+#   - quotes are stripped ONLY when both are present. Stripping a leading quote whose
+#     closing partner is missing turns a broken line into a confident, wrong answer;
+#   - an unquoted value ends at the first `#` (dotenv's `[^#\r\n]+`), so an inline
+#     comment never becomes part of the connection string. Inside quotes, `#` is data.
+extract_env_value() {
+  local v
+  v=$(printf '%s' "$1" | sed -E 's/^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=//')
+  v=${v%$'\r'}
+  v=${v#"${v%%[![:space:]]*}"}
+  v=${v%"${v##*[![:space:]]}"}
+  case "$v" in
+    \'*\')
+      v=${v#\'}
+      v=${v%\'}
+      ;;
+    \"*\")
+      v=${v#\"}
+      v=${v%\"}
+      ;;
+    *)
+      v=${v%%#*}
+      v=${v%"${v##*[![:space:]]}"}
+      ;;
+  esac
+  printf '%s' "$v"
+}
+
 value=""
 source=""
 
@@ -150,10 +188,7 @@ else
     if [ -z "$raw_line" ]; then
       continue
     fi
-    # Strip the key= prefix (including optional 'export '), then strip optional
-    # surrounding quotes.
-    candidate_value=$(printf '%s' "$raw_line" | sed -E 's/^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=//')
-    candidate_value=$(printf '%s' "$candidate_value" | sed -E "s/^['\"]//; s/['\"][[:space:]]*\$//")
+    candidate_value=$(extract_env_value "$raw_line")
     if [ -n "$candidate_value" ]; then
       value="$candidate_value"
       source="$f"
@@ -181,11 +216,23 @@ case "$value" in
     ;;
 esac
 
-# Derive the hostname: the substring between '@' and the following '/' or ':'. The `:`
-# in this character class is bash's equivalent of URL.hostname over URL.host — `host`
+# Derive the hostname the way Node's URL parser does (39-REVIEW WR-04), in two steps:
+#
+#   1. isolate the AUTHORITY — everything after the scheme, up to the first '/', '?' or
+#      '#'. Stopping at '?' and '#' as well as '/' matters: a connection string with a
+#      query but no path (`postgres://user:pass@host?sslmode=require`) otherwise leaves
+#      the whole query glued to the hostname, which both misclassifies the host and
+#      PRINTS the query — a credential-adjacent disclosure this guard must never make.
+#   2. within that authority, drop everything up to the LAST '@'. The userinfo
+#      delimiter is the last '@' before the authority ends, not the first '@' in the
+#      string: a password containing '@' is legal, and taking the first one put this
+#      guard on a different hostname than every TS consumer.
+#
+# The trailing ':' strip is bash's equivalent of URL.hostname over URL.host — `host`
 # carries the port, so an explicit `:5432` would slip past a check that stripped only
-# at `/` (bug_011). Do not drop it.
-host=$(printf '%s' "$value" | sed -E 's#^[^@]*@##; s#[/:].*$##')
+# at '/' (bug_011). Do not drop it.
+authority=$(printf '%s' "$value" | sed -E 's!^[a-zA-Z][a-zA-Z0-9+.-]*://!!; s![/?#].*$!!')
+host=$(printf '%s' "$authority" | sed -E 's!^.*@!!; s!:.*$!!')
 
 if [ -z "$host" ]; then
   echo "ERROR: could not parse a hostname out of DATABASE_URL (from $source)."

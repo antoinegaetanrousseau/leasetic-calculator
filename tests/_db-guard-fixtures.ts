@@ -272,4 +272,63 @@ export const CASES: readonly GuardCase[] = [
     },
     expect: { kind: 'error', host: PRODUCTION_HOST, source: '.env.local', contains: ['PRODUCTION'] },
   },
+
+  // ---------------------------------------------------------------------------------
+  // 39-REVIEW WR-04. The bash guard extracts its value with grep+sed while the TS half
+  // uses dotenv.parse(), and the two are separate parsers. These four shapes are the
+  // ones where they measurably disagreed; each is an ordinary thing to find in a real
+  // `.env.local`, and each is now decided by the differential suite (which runs the REAL
+  // binary against the REAL resolver) rather than by nobody.
+  // ---------------------------------------------------------------------------------
+  {
+    // Node ends the authority at the first `/`, `?` or `#` and takes the LAST `@`
+    // WITHIN it as the userinfo delimiter; the sed pipeline took the FIRST `@` in the
+    // whole string. An `@` in the password therefore put the two halves on different
+    // hostnames — verified: TS resolved the development host, bash derived
+    // `ssword@ep-polished-...` and refused it as unrecognised.
+    name: 'WR-04 dotenv parity: a password containing @ (Node takes the LAST @ in the authority)',
+    nodeEnv: 'development',
+    files: {
+      '.env.local': `DATABASE_URL=postgres://fixture:p@ssword@${DEVELOPMENT_HOST}/db?${FIXTURE_QUERY}\n`,
+    },
+    expect: { kind: 'ok', host: DEVELOPMENT_HOST, source: '.env.local' },
+  },
+  {
+    // A connection string with a query but no path. The old derivation stripped at `/`
+    // or `:` only, so `?sslmode=require&secretmarker=...` stayed glued to the hostname:
+    // the guard both misclassified the host AND printed the query string, which is the
+    // D-08 disclosure surface the MUSTNOTAPPEAR marker exists to detect.
+    name: 'WR-04 dotenv parity: connection string with a query but no path',
+    nodeEnv: 'development',
+    files: {
+      '.env.local': `DATABASE_URL=postgres://fixture:fixture@${DEVELOPMENT_HOST}?${FIXTURE_QUERY}\n`,
+    },
+    expect: { kind: 'ok', host: DEVELOPMENT_HOST, source: '.env.local' },
+  },
+  {
+    // A CRLF file (an env file edited on Windows, or pasted through a tool that
+    // normalises line endings). dotenv's value pattern excludes `\r` outright; the sed
+    // left it attached, so the hostname carried a trailing carriage return and matched
+    // no record. Combined here with an inline `#` comment, which dotenv also excludes
+    // from an unquoted value and the sed did not.
+    name: 'WR-04 dotenv parity: CRLF line ending plus an inline # comment',
+    nodeEnv: 'development',
+    files: {
+      '.env.local': `DATABASE_URL=postgres://fixture:fixture@${DEVELOPMENT_HOST} # rotated 2026-09-06\r\n`,
+    },
+    expect: { kind: 'ok', host: DEVELOPMENT_HOST, source: '.env.local' },
+  },
+  {
+    // An unmatched quote. dotenv requires BOTH quotes before it strips either, so the
+    // value keeps its stray leading `'` and fails to parse as a URL — refuse-malformed.
+    // The two independent sed substitutions stripped a leading quote regardless of
+    // whether a closing one existed, turning a broken line into a confident OK. Both
+    // halves must refuse; that they word the refusal differently is not drift.
+    name: 'WR-04 dotenv parity: an unmatched leading quote must not be stripped',
+    nodeEnv: 'development',
+    files: {
+      '.env.local': `DATABASE_URL='postgres://fixture:fixture@${DEVELOPMENT_HOST}/db?${FIXTURE_QUERY}\n`,
+    },
+    expect: { kind: 'error', source: '.env.local', contains: ['unrecognised'] },
+  },
 ];
