@@ -946,7 +946,19 @@ are already captured — Phase 40's planner MUST read
 **Canonical refs:** `.planning/phases/39-database-guard-correctness/39-CONTEXT.md` (D-01–D-08),
 `scripts/check-local-db-branch.sh`, `scripts/_load-env.ts`, `scripts/seed-fiche-fixtures.ts` ~L533.
 
-**Plans:** TBD
+**Plans:** 5 plans in 3 waves
+
+Plans:
+- [ ] 39-01-PLAN.md — Single declarative Neon endpoint source; fold in all three hardcoded copies (D-05) — wave 1
+- [ ] 39-02-PLAN.md — `scripts/_env-precedence.ts`: the one TypeScript notion of dotenv file order and effective DATABASE_URL (D-02) — wave 1
+- [ ] 39-03-PLAN.md — Correct `_load-env.ts` precedence AND wire the shared TS guard in the same edit; pin the D-03 sequencing invariant — wave 2
+- [ ] 39-04-PLAN.md — Rewrite the bash guard to validate the effective resolved DATABASE_URL; gate build/start via `prebuild`/`prestart` (D-01, D-04, D-07) — wave 2
+- [ ] 39-05-PLAN.md — Fixture test (D-06) + differential test (D-02) + routing-doc cross-link — wave 3
+
+**Wave order is load-bearing, not a scheduling preference.** D-03: correcting `_load-env.ts` makes
+14 write-capable `tsx` entry points start honouring `.env.production.local`, so guard coverage must
+land with or before the resolver fix. Plan 39-03 satisfies that by making both changes in one task,
+and `tests/load-env-contracts.test.ts` Contract 1 fails if a later edit separates them.
 
 ### Phase 40: Milestone Record Closure
 
