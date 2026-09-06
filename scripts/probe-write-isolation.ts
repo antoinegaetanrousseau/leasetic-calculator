@@ -26,14 +26,26 @@
  * `scripts/check-local-db-branch.sh`.
  *
  * THE `_load-env` DIVERGENCE — READ BEFORE "FIXING" THIS
- * Every other `scripts/*.ts` entry point begins `import './_load-env'`. This one
- * deliberately does NOT, because that shared loader reads the developer's local
- * dotenv-style file on disk, and D-36-03 forbids this probe from reading any env
- * file — the developer's local file is exactly the thing this probe must never
- * silently pick up a stored credential from. Both connection strings arrive
- * inline on the invocation via `PROBE_DEV_URL` and `PROBE_MAIN_URL`. DO NOT add
- * `import './_load-env'` back to "fix" a missing-env-var failure — that failure
- * is the intended fail-safe behaviour (see Behaviour below), not a bug.
+ * Every other `scripts/*.ts` entry point begins with the shared loader's
+ * side-effect import. This one deliberately does NOT, because that shared loader
+ * reads the developer's local dotenv-style file on disk, and D-36-03 forbids this
+ * probe from reading any env file — the developer's local file is exactly the
+ * thing this probe must never silently pick up a stored credential from. Both
+ * connection strings arrive inline on the invocation via `PROBE_DEV_URL` and
+ * `PROBE_MAIN_URL`. DO NOT re-add the shared loader's import to "fix" a
+ * missing-env-var failure — that failure is the intended fail-safe behaviour
+ * (see Behaviour below), not a bug.
+ *
+ * Phase 39 extended `scripts/_load-env.ts` with `assertSafeDatabaseTarget()`
+ * (D-03), the shared write-target guard every other `tsx` entry point now gets
+ * for free through that one import. This probe is nonetheless still exempt: it
+ * must never read a stored credential (D-36-03), so it cannot adopt the shared
+ * loader that the guard rides on. Its own SAFETY GATES 2-4 below — an absolute
+ * `postgres:`/`postgresql:` URL parse, exact equality against a two-element
+ * published-hostname set (never a prefix match), and a driver-resolved-host
+ * re-comparison — are a STRICTER gate than the shared guard's prefix match
+ * against `NEON_ENDPOINTS`. `tests/load-env-contracts.test.ts` Contract 3 fails
+ * if the shared loader's import is ever added back to this file.
  *
  * Security note (hostname-only output)
  * This script's output is expected to be pasted into a transcript and into
