@@ -947,12 +947,19 @@ are already captured — Phase 40's planner MUST read
 `scripts/check-local-db-branch.sh`, `scripts/_load-env.ts`, `scripts/seed-fiche-fixtures.ts` ~L533.
 
 **Plans:** 5 plans in 3 waves
-
 Plans:
+**Wave 1**
+
 - [ ] 39-01-PLAN.md — Single declarative Neon endpoint source; fold in all three hardcoded copies (D-05) — wave 1
 - [ ] 39-02-PLAN.md — `scripts/_env-precedence.ts`: the one TypeScript notion of dotenv file order and effective DATABASE_URL (D-02) — wave 1
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 39-03-PLAN.md — Correct `_load-env.ts` precedence AND wire the shared TS guard in the same edit; pin the D-03 sequencing invariant — wave 2
 - [ ] 39-04-PLAN.md — Rewrite the bash guard to validate the effective resolved DATABASE_URL; gate build/start via `prebuild`/`prestart` (D-01, D-04, D-07) — wave 2
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 39-05-PLAN.md — Fixture test (D-06) + differential test (D-02) + routing-doc cross-link — wave 3
 
 **Wave order is load-bearing, not a scheduling preference.** D-03: correcting `_load-env.ts` makes

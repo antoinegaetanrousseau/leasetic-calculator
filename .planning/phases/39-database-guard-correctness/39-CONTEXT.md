@@ -105,45 +105,45 @@ re-measured.
 
 ### OPS-01 / GAP-05 — verify and close, do not rebuild  `[→ PHASE 40]`
 
-- **D-09:** OPS-01 is closed by the Phase 21 record; this phase **verifies and ticks it**, pointing
+- **D-09 [deferred]:** OPS-01 is closed by the Phase 21 record; this phase **verifies and ticks it**, pointing
   at `docs/operations/phase-21-gate-evidence.md` § GATE-01 rather than re-running a rotation. The
   user chose to trust that record rather than re-verify with a live sign-in.
-- **D-10:** GAP-05 is likewise **verification-only** — confirm `updateLastLoginAt` fires and rows
+- **D-10 [deferred]:** GAP-05 is likewise **verification-only** — confirm `updateLastLoginAt` fires and rows
   show a real date, and correct the requirement's "written nowhere" wording.
-- **D-11:** Should a rotation ever be needed again, the mechanism is the **`/parametres`
+- **D-11 [deferred]:** Should a rotation ever be needed again, the mechanism is the **`/parametres`
   self-service flow** (what Phase 21 actually used — "no admin↔admin fallback was used"), NOT a
   new reset-token script. `createPasswordReset()` exists at `src/lib/auth/actions.ts:174` as the
   admin↔admin fallback.
 
 ### OPS-03 — OVH cutover  `[→ PHASE 40]`
 
-- **D-12:** Closed by **dated decision, not by an attempted run.** The blocker is that no OVH
+- **D-12 [deferred]:** Closed by **dated decision, not by an attempted run.** The blocker is that no OVH
   environment is provisioned — not that nobody ran a command. `scripts/smoke-ovh.ts` (358 lines,
   7-step black-box lifecycle) stays ready and unrun. Rejected: rehearsing against the Vercel
   deployment, which would prove the harness works but not portability, and would create/delete a
   real proposal in production.
-- **D-13:** The cutover is **re-dated to December 2026**, with **Antoine owning the next step**:
+- **D-13 [deferred]:** The cutover is **re-dated to December 2026**, with **Antoine owning the next step**:
   provisioning an OVH-compatible target (Node + Postgres + S3-compatible) so the script has
   something to run against.
 
 ### OPS-02 — CSRF position  `[→ PHASE 40]`
 
-- **D-14:** The inherited framing is **revised, not re-affirmed**. The original claim — "SameSite=Lax
+- **D-14 [deferred]:** The inherited framing is **revised, not re-affirmed**. The original claim — "SameSite=Lax
   + `__Secure-` cookies are the ACTUAL CSRF defence" — was the justification for *deferring*
   `trustedOrigins`. Phase 20-01 shipped the allow-list anyway, so the accurate dated position
   (2026-09-06) is **defence in depth: both layers are present, and neither is claimed to make the
   other unnecessary.** The old hierarchy is retired.
-- **D-15:** **ROADMAP criterion 3 is corrected in place** to name what actually enforces the
+- **D-15 [deferred]:** **ROADMAP criterion 3 is corrected in place** to name what actually enforces the
   allow-list — Better Auth rejecting a request whose Origin is not in `trustedOrigins` — and that
   is what gets verified. Explicitly rejected: building the missing middleware gate (a new
   capability, duplicating Better Auth, against `proxy.ts`'s deliberate minimalism per PITFALLS
   §1.5) and leaving the roadmap misdescribing the system.
-- **D-16:** Verification asserts **list membership**, matching `trusted-origins.test.ts`'s existing
+- **D-16 [deferred]:** Verification asserts **list membership**, matching `trusted-origins.test.ts`'s existing
   approach. Phase 20's research established that Better Auth's rejection *status code* varies
   between rejection paths and point releases, so asserting the response shape is deliberately
   avoided as forward-incompatible.
 
-- **D-05a (operator decision, 2026-09-06, taken during planning):** D-05 named two consumers
+- **D-05a:** *(operator decision, 2026-09-06, taken during planning)* D-05 named two consumers
   because only two were known when it was written. Planning found the forbidden-endpoint table
   declared in **six** places: `scripts/check-local-db-branch.sh` (bash `case` arms),
   `scripts/seed-fiche-fixtures.ts:96`, `scripts/seed-pipeline-fixtures.ts:67`,
