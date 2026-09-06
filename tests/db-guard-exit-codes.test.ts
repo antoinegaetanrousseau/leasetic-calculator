@@ -148,7 +148,13 @@ describe('check-local-db-branch.sh exit codes (D-06)', () => {
     let assertedAtLeastOne = false;
     for (const testCase of CASES) {
       if (testCase.expect.kind === 'skip') continue;
-      const source = testCase.expect.kind === 'error' ? testCase.expect.source : testCase.expect.source;
+      // `source` is optional on the 'error' variant and required on the others, but the
+      // property access is identical either way — the discriminated union already
+      // narrows it. This used to be a ternary whose two arms were the same expression
+      // (39-REVIEW WR-11), which read as though a lost narrowing were still doing
+      // something. The `continue` below is the only branch that matters: it skips the
+      // error cases that intentionally declare no source.
+      const source = testCase.expect.source;
       if (!source) continue;
 
       const caseDir = makeFixtureDir(testCase.files);
