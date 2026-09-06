@@ -132,7 +132,7 @@ the count).
 - [x] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had (completed 2026-09-05)
 - [x] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404 (completed 2026-09-05)
 - [ ] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose
-- [ ] **Phase 39: Operational & Credential Gates** — the shared admin password retired, `last_login_at` actually written, `trustedOrigins` explicit, OVH and retention closable by a recorded decision
+- [ ] **Phase 39: Operational & Credential Gates** — the shared admin password retired, `last_login_at` actually written, `trustedOrigins` explicit, OVH and retention closable by a recorded decision, and the local DB guard no longer passing while the server serves production
 - [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived
 
 ---
@@ -872,7 +872,17 @@ files.
      on-grid padding and the standard focus treatment — or `UI-CONVENTIONS.md` records the `0.6rem`
      vertical padding and the third hardcoded focus shadow as a dated, deliberate exception.
 
-**Plans:** TBD
+**Plans:** 4 plans in 4 waves
+
+Plans:
+- [ ] 38-01-PLAN.md — GAP-02: dialog/sheet close label reads `common.close.aria` from `<html lang>`, pinned by a re-import test (wave 1)
+- [ ] 38-02-PLAN.md — GAP-04: on-grid `0.5rem` button padding, six focus selectors repointed at `var(--ring)`, `LoadMoreButton` aria-label removed, UIC-11 minted (wave 2)
+- [ ] 38-03-PLAN.md — CLOSE-02: throttled dark first-paint filmstrip + dark-mode PDF check, gated flip of `31.1-VERIFICATION.md` to `passed` (wave 3, has checkpoints)
+- [ ] 38-04-PLAN.md — CLOSE-08: Phase 28's backlog walked light + dark, FR/EN close-label verification, D-38-07 defect triage (wave 4, has checkpoints)
+
+**Note on success criterion 4:** the fix branch is taken, not the exception branch — D-38-13
+rejects recording `0.6rem` as a dated exception and A-38-03 (operator, 2026-09-06) retires the
+teal focus literals in favour of the existing `--ring` token. No `--focus-ring` token is minted.
 
 **UI hint:** yes
 
@@ -885,7 +895,7 @@ answers on OVH and retention — with the two externally dependent items closabl
 decision rather than left hanging on someone else's reply.
 **Depends on:** Phase 36 (clean lint gate). Ordered after Phases 37 and 38 so the credential rotation
 runs against the finished surfaces, matching the Phase 21 precedent.
-**Requirements:** OPS-01, OPS-02, OPS-03, OPS-04, GAP-05
+**Requirements:** OPS-01, OPS-02, OPS-03, OPS-04, OPS-05, GAP-05
 **Success Criteria** (what must be TRUE):
 
   1. Neither admin can sign in with the shared `leasetic2026` password, and each holds an individual
@@ -909,6 +919,18 @@ runs against the finished surfaces, matching the Phase 21 precedent.
   5. OPS-04 is closed either way: DATA-11's 10-year PDF retention carries Thomas's written legal
      sign-off, **or** — absent his reply — a dated interim decision naming who accepts the risk and
      until when. Same rule: silence from the external party still closes the item.
+
+  6. `npm run check:local-db-branch` cannot report OK while the command it guards would connect to
+     the production branch. Either it resolves env exactly as `@next/env` does — `.env.$NODE_ENV.local`
+     over `.env.local` over `.env.$NODE_ENV` over `.env`, first-writer-wins, with `.env.local`
+     excluded outright when `NODE_ENV=test` — or, preferably, it validates the effective resolved
+     `DATABASE_URL` for the command about to run, following the `scripts/seed-fiche-fixtures.ts`
+     model (`new URL(url).hostname` matched against a forbidden-endpoint list, so the connection the
+     process will actually open is what gets checked, not a file that may be overridden). Evidence:
+     with a `.env.production.local` naming `ep-icy-boat-alx5o1tz-pooler` present, the guard FAILS
+     under `NODE_ENV=production` and passes once it is gone. `npm run build` and `npm run start` are
+     gated behind the guard. Both existing security properties survive the rewrite: no credential is
+     ever printed, and no env file is ever `source`d.
 
 **Plans:** TBD
 
