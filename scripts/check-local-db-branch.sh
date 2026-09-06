@@ -102,6 +102,18 @@ if [ "${#files_found[@]}" -eq 0 ]; then
   exit 0
 fi
 
+# Strips leading and trailing whitespace (including a trailing CR from a CRLF file).
+# Used on every `_neon-endpoints.list` field so the bash reader and the TS parser treat
+# an accidentally-padded record identically.
+trim_field() {
+  local s
+  s=$1
+  s=${s%$'\r'}
+  s=${s#"${s%%[![:space:]]*}"}
+  s=${s%"${s##*[![:space:]]}"}
+  printf '%s' "$s"
+}
+
 # Extracts the VALUE from a matched `DATABASE_URL=` line, following dotenv.parse()'s
 # own semantics (39-REVIEW WR-04). This is the second parser in the system by necessity
 # — a bash script cannot import the TS one — so every rule below exists because the two
@@ -117,18 +129,6 @@ fi
 #     closing partner is missing turns a broken line into a confident, wrong answer;
 #   - an unquoted value ends at the first `#` (dotenv's `[^#\r\n]+`), so an inline
 #     comment never becomes part of the connection string. Inside quotes, `#` is data.
-# Strips leading and trailing whitespace (including a trailing CR from a CRLF file).
-# Used on every `_neon-endpoints.list` field so the bash reader and the TS parser treat
-# an accidentally-padded record identically.
-trim_field() {
-  local s
-  s=$1
-  s=${s%$'\r'}
-  s=${s#"${s%%[![:space:]]*}"}
-  s=${s%"${s##*[![:space:]]}"}
-  printf '%s' "$s"
-}
-
 extract_env_value() {
   local v
   v=$(printf '%s' "$1" | sed -E 's/^[[:space:]]*(export[[:space:]]+)?DATABASE_URL=//')
