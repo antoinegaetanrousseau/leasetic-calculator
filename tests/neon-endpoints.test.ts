@@ -41,6 +41,50 @@ describe('parseNeonEndpointList', () => {
     expect(records[0].scope).toBe('PRODUCTION');
     expect(records[0].scope.endsWith('\r')).toBe(false);
   });
+
+  /**
+   * 39-REVIEW CR-02. `.list` is hand-edited by an operator whenever a branch is
+   * recreated, and both TS consumers match with `hostname.startsWith(record.prefix)`
+   * and take the FIRST `find()` hit. `''.startsWith` is true for EVERY string, so a
+   * single record with an empty first field classifies every Neon host — production
+   * included — as whatever branch that record names. These cases pin the parser as the
+   * place those invariants fail closed, for every consumer at once, rather than being
+   * asserted only of the currently-committed file (which cannot catch the bad edit).
+   */
+  describe('record invariants (fail closed)', () => {
+    it('throws on an empty prefix rather than accepting a record that matches every host', () => {
+      expect(() => parseNeonEndpointList('|ep-x-pooler.neon.tech|development|DEV\n')).toThrow(/:1:/);
+      expect(() => parseNeonEndpointList('|ep-x-pooler.neon.tech|development|DEV\n')).toThrow(/empty/i);
+    });
+
+    it('throws on an empty hostname', () => {
+      expect(() => parseNeonEndpointList('ep-x||development|DEV\n')).toThrow(/empty/i);
+    });
+
+    it('throws on an empty scope', () => {
+      expect(() => parseNeonEndpointList('ep-x|ep-x-pooler.neon.tech|development|\n')).toThrow(/empty/i);
+    });
+
+    it('throws when the hostname does not start with its own prefix', () => {
+      expect(() =>
+        parseNeonEndpointList('ep-x|ep-y-pooler.neon.tech|development|DEV\n'),
+      ).toThrow(/does not start with prefix/i);
+    });
+
+    it('throws when a prefix overlaps an earlier record, since first-find would shadow it', () => {
+      const contents =
+        'ep-a|ep-a-pooler.neon.tech|main|PRODUCTION\n' + 'ep-a-longer|ep-a-longer-pooler.neon.tech|development|DEV\n';
+      expect(() => parseNeonEndpointList(contents)).toThrow(/:2:/);
+      expect(() => parseNeonEndpointList(contents)).toThrow(/overlap/i);
+    });
+
+    it('accepts the well-formed shape these guards protect', () => {
+      const records = parseNeonEndpointList(
+        'ep-a|ep-a-pooler.neon.tech|main|PRODUCTION\nep-b|ep-b-pooler.neon.tech|development|DEV\n',
+      );
+      expect(records).toHaveLength(2);
+    });
+  });
 });
 
 describe('NEON_ENDPOINTS (real file)', () => {
