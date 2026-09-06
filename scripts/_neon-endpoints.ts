@@ -53,7 +53,15 @@ export function parseNeonEndpointList(contents: string): NeonEndpointRecord[] {
     if (trimmed === '') continue;
     if (trimmed.startsWith('#')) continue;
 
-    const fields = rawLine.split('|');
+    // Split the TRIMMED line and trim every field (39-REVIEW WR-10). `trimmed` gated the
+    // blank/comment skips above while `rawLine` produced the fields, so a data line with
+    // one leading space yielded `prefix: ' ep-icy-boat-...'` — which then matched
+    // nothing, making the record effectively invisible and silently degrading a known
+    // endpoint to `refuse-unrecognised`. Safe by accident, and only in that direction.
+    // A trailing space produced a padded `scope` that reached operator-facing messages.
+    // `scripts/check-local-db-branch.sh` trims each field the same way, so a padded
+    // record now behaves identically on both sides instead of on only one.
+    const fields = trimmed.split('|').map((field) => field.trim());
     if (fields.length !== 4) {
       throw new Error(
         `scripts/_neon-endpoints.list:${String(lineNumber)}: expected 4 |-separated fields, got ${String(fields.length)}`,

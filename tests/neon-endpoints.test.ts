@@ -78,6 +78,29 @@ describe('parseNeonEndpointList', () => {
       expect(() => parseNeonEndpointList(contents)).toThrow(/overlap/i);
     });
 
+    /**
+     * 39-REVIEW WR-10. The blank/comment skips were decided on the TRIMMED line while the
+     * fields came from the UNTRIMMED one, so a data line with a leading space produced
+     * `prefix: ' ep-...'`, matched nothing, and made the record invisible — silently
+     * degrading a known endpoint to refuse-unrecognised.
+     */
+    it('parses a data line with leading whitespace as a real record, not an invisible one', () => {
+      const records = parseNeonEndpointList('  ep-a|ep-a-pooler.neon.tech|main|PRODUCTION\n');
+      expect(records).toHaveLength(1);
+      expect(records[0].prefix).toBe('ep-a');
+      expect('ep-a-pooler.neon.tech'.startsWith(records[0].prefix)).toBe(true);
+    });
+
+    it('trims whitespace padding around separators out of every field', () => {
+      const records = parseNeonEndpointList(' ep-a | ep-a-pooler.neon.tech | main | PRODUCTION \n');
+      expect(records[0]).toEqual({
+        prefix: 'ep-a',
+        hostname: 'ep-a-pooler.neon.tech',
+        branch: 'main',
+        scope: 'PRODUCTION',
+      });
+    });
+
     it('accepts the well-formed shape these guards protect', () => {
       const records = parseNeonEndpointList(
         'ep-a|ep-a-pooler.neon.tech|main|PRODUCTION\nep-b|ep-b-pooler.neon.tech|development|DEV\n',
