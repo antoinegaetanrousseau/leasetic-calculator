@@ -131,7 +131,7 @@ the count).
 
 - [x] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had (completed 2026-09-05)
 - [x] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404 (completed 2026-09-05)
-- [ ] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose
+- [x] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose (completed 2026-09-06)
 - [ ] **Phase 39: Operational & Credential Gates** — the shared admin password retired, `last_login_at` actually written, `trustedOrigins` explicit, OVH and retention closable by a recorded decision, and the local DB guard no longer passing while the server serves production
 - [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived
 
@@ -872,7 +872,7 @@ files.
      on-grid padding and the standard focus treatment — or `UI-CONVENTIONS.md` records the `0.6rem`
      vertical padding and the third hardcoded focus shadow as a dated, deliberate exception.
 
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 **Wave 1**
 
@@ -888,7 +888,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 38-04-PLAN.md — CLOSE-08: Phase 28's backlog walked light + dark, FR/EN close-label verification, D-38-07 defect triage (wave 4, has checkpoints)
+- [x] 38-04-PLAN.md — CLOSE-08: Phase 28's backlog walked light + dark, FR/EN close-label verification, D-38-07 defect triage (wave 4, has checkpoints)
 
 **Note on success criterion 4:** the fix branch is taken, not the exception branch — D-38-13
 rejects recording `0.6rem` as a dated exception and A-38-03 (operator, 2026-09-06) retires the
@@ -1011,7 +1011,7 @@ archived where the tooling expects to find them.
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
-| 38. Shell, Dialogs & Visual Conventions | v1.8 | 3/4 | In Progress|  |
+| 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete   | 2026-09-06 |
 | 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 
