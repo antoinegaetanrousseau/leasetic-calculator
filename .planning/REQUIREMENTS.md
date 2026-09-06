@@ -208,12 +208,12 @@ stops existing.
 | GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-03 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-04 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
-| GAP-05 | Phase 39 — Operational & Credential Gates | Pending |
-| OPS-01 | Phase 39 — Operational & Credential Gates | Pending |
-| OPS-02 | Phase 39 — Operational & Credential Gates | Pending |
-| OPS-03 | Phase 39 — Operational & Credential Gates | Pending |
-| OPS-04 | Phase 39 — Operational & Credential Gates | Pending |
-| OPS-05 | Phase 39 — Operational & Credential Gates | Pending |
+| GAP-05 | Phase 40 — Milestone Record Closure | Pending |
+| OPS-01 | Phase 40 — Milestone Record Closure | Pending |
+| OPS-02 | Phase 40 — Milestone Record Closure | Pending |
+| OPS-03 | Phase 40 — Milestone Record Closure | Pending |
+| OPS-04 | Phase 40 — Milestone Record Closure | Pending |
+| OPS-05 | Phase 39 — Database Guard Correctness | Pending |
 | HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
@@ -228,7 +228,7 @@ stops existing.
 | 36 — Gate Repair & Planning-Record Hygiene | HOUSE-01, HOUSE-02, HOUSE-03, HOUSE-04, CLOSE-05 | 5 |
 | 37 — CRM Stack Closure | CLOSE-01, CLOSE-03, CLOSE-04, GAP-01, GAP-03 | 5 |
 | 38 — Shell, Dialogs & Visual Conventions | CLOSE-02, CLOSE-08, GAP-02, GAP-04 | 4 |
-| 39 — Operational & Credential Gates | OPS-01, OPS-02, OPS-03, OPS-04, OPS-05, GAP-05 | 6 |
-| 40 — Milestone Record Closure | CLOSE-06, CLOSE-07, HOUSE-05, HOUSE-06 | 4 |
+| 39 — Database Guard Correctness | OPS-05 | 1 |
+| 40 — Milestone Record Closure | CLOSE-06, CLOSE-07, GAP-05, HOUSE-05, HOUSE-06, OPS-01, OPS-02, OPS-03, OPS-04 | 9 |
 
 *Traceability filled 2026-09-05 by the roadmapper. Phase details in `.planning/ROADMAP.md`.*

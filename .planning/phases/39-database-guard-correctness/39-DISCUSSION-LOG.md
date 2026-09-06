@@ -1,7 +1,12 @@
-# Phase 39: Operational & Credential Gates — Discussion Log
+# Phase 39: Database Guard Correctness — Discussion Log
 
 **Date:** 2026-09-06
 **Mode:** default (interactive, 4 areas selected)
+
+> **Post-discussion re-scope (operator decision, 2026-09-06).** After this discussion the operator
+> folded the record corrections into Phase 40 and kept Phase 39 to OPS-05 alone. Areas 1, 3 and 4
+> below therefore document decisions that now belong to **Phase 40**; area 2 is Phase 39's entire
+> scope. The phase was renamed and its directory moved to `39-database-guard-correctness`.
 
 > Human reference only — downstream agents read `39-CONTEXT.md`, not this file.
 

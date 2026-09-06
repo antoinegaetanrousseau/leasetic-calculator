@@ -1,4 +1,4 @@
-# Phase 39: Operational & Credential Gates - Context
+# Phase 39: Database Guard Correctness - Context
 
 **Gathered:** 2026-09-06
 **Status:** Ready for planning
@@ -13,18 +13,24 @@ six items were already closed or misdescribed — the requirement text and ROADM
 picture that Phases 20 and 21 overtook months ago. See `<stale_premises>` below; every entry was
 verified against the codebase or a committed evidence document, not inferred.
 
-**What this phase actually delivers:**
+**Phase re-scoped and renamed 2026-09-06, by operator decision taken after this discussion.**
+The verify-and-close and record-correction work moved to **Phase 40 (Milestone Record Closure)**,
+where the record work already lives. Phase 39 is now exactly one engineering item.
 
-1. **BUILD** — OPS-05: a database guard that cannot report OK while the command it guards would
-   open the production branch. This is the only substantial engineering in the phase, and it is
-   the only item whose description is current (filed 2026-09-06).
-2. **VERIFY-AND-CLOSE** — OPS-01, OPS-04, GAP-05 and OPS-02's code half. Confirm each against the
-   codebase and the Phase 21 evidence, tick it with a pointer to where it was actually closed, and
-   **correct the requirement text so the ledger stops lying**.
-3. **RECORD** — the OVH cutover re-date (OPS-03) and OPS-02's revised CSRF position, both dated.
+**What this phase delivers — OPS-05 only:**
 
-**Explicitly NOT in scope:** adding a middleware Origin gate (see D-14), changing DATA-11's
-retention behaviour, and any new product capability.
+A database guard that cannot report OK while the command it guards would open the production
+branch, with the two divergent env resolvers reconciled and pinned by a differential test. This is
+the only item in the original Phase 39 whose description was current (it was filed 2026-09-06,
+the day before planning).
+
+**Moved to Phase 40** — OPS-01, OPS-02, OPS-03, OPS-04, GAP-05. The decisions governing them were
+taken in THIS discussion and are preserved below as **D-09 through D-16**, marked `[→ PHASE 40]`.
+**Phase 40's planner MUST read this file** — those decisions are not repeated in Phase 40's own
+context, and the `<stale_premises>` table below is the evidence base for all five.
+
+**Explicitly NOT in scope:** anything in the moved set, adding a middleware Origin gate (D-15),
+changing DATA-11's retention behaviour, and any new product capability.
 
 </domain>
 
@@ -60,7 +66,7 @@ re-measured.
 <decisions>
 ## Implementation Decisions
 
-### OPS-05 — the database guard (the phase's real build)
+### OPS-05 — the database guard  `[PHASE 39 — the whole phase]`
 
 - **D-01:** The guard **stays in bash**. It stops parsing `.env.local` and instead reproduces
   `@next/env`'s file order in shell, then validates the **effective resolved** `DATABASE_URL` by
@@ -97,7 +103,7 @@ re-measured.
 - **D-08:** Both existing security properties are preserved without exception: **no credential is
   ever printed, and no env file is ever `source`d.**
 
-### OPS-01 / GAP-05 — verify and close, do not rebuild
+### OPS-01 / GAP-05 — verify and close, do not rebuild  `[→ PHASE 40]`
 
 - **D-09:** OPS-01 is closed by the Phase 21 record; this phase **verifies and ticks it**, pointing
   at `docs/operations/phase-21-gate-evidence.md` § GATE-01 rather than re-running a rotation. The
@@ -109,7 +115,7 @@ re-measured.
   new reset-token script. `createPasswordReset()` exists at `src/lib/auth/actions.ts:174` as the
   admin↔admin fallback.
 
-### OPS-03 — OVH cutover
+### OPS-03 — OVH cutover  `[→ PHASE 40]`
 
 - **D-12:** Closed by **dated decision, not by an attempted run.** The blocker is that no OVH
   environment is provisioned — not that nobody ran a command. `scripts/smoke-ovh.ts` (358 lines,
@@ -120,7 +126,7 @@ re-measured.
   provisioning an OVH-compatible target (Node + Postgres + S3-compatible) so the script has
   something to run against.
 
-### OPS-02 — CSRF position
+### OPS-02 — CSRF position  `[→ PHASE 40]`
 
 - **D-14:** The inherited framing is **revised, not re-affirmed**. The original claim — "SameSite=Lax
   + `__Secure-` cookies are the ACTUAL CSRF defence" — was the justification for *deferring*
@@ -142,7 +148,7 @@ re-measured.
 - Exact file format for D-05's endpoint list (JSON vs newline-delimited), and where it lives.
 - How the bash guard reproduces `@next/env` ordering internally, provided D-06's fixture test passes.
 - Wording of the corrected requirement/criterion text, provided it names the real mechanism and
-  cites where each item was actually closed.
+  cites where each item was actually closed. `[→ PHASE 40]`
 
 </decisions>
 
@@ -244,5 +250,5 @@ re-measured.
 
 ---
 
-*Phase: 39-Operational & Credential Gates*
+*Phase: 39-Database Guard Correctness (re-scoped 2026-09-06; D-09–D-16 moved to Phase 40)*
 *Context gathered: 2026-09-06*

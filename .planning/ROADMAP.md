@@ -132,8 +132,8 @@ the count).
 - [x] **Phase 36: Gate Repair & Planning-Record Hygiene** — `lint:check` reports only real errors again, the stale planning markers that resurface at every audit carry their real status, and Phase 29 gets the coverage record it never had (completed 2026-09-05)
 - [x] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404 (completed 2026-09-05)
 - [x] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose (completed 2026-09-06; verification passed with 2 recorded operator overrides — the `dialog.tsx` FR/EN observation and the wizard/pagination dark passes were structurally blocked, not skipped: see 38-VERIFICATION.md § Post-Verification Resolution)
-- [ ] **Phase 39: Operational & Credential Gates** — the shared admin password retired, `last_login_at` actually written, `trustedOrigins` explicit, OVH and retention closable by a recorded decision, and the local DB guard no longer passing while the server serves production
-- [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived
+- [ ] **Phase 39: Database Guard Correctness** — the local DB guard can no longer report OK while the command it guards would open the production branch, and the two divergent env resolvers are reconciled and pinned
+- [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived, and the five stale operational requirements corrected against what actually shipped
 
 ---
 
@@ -896,51 +896,55 @@ teal focus literals in favour of the existing `--ring` token. No `--focus-ring` 
 
 **UI hint:** yes
 
-### Phase 39: Operational & Credential Gates
+### Phase 39: Database Guard Correctness
 
 **Milestone:** v1.8 — Deferred Items
-**Goal:** The gates standing between this app and its first real partner are closed — individually
-held admin credentials, a login that actually records itself, an explicit CSRF position, and dated
-answers on OVH and retention — with the two externally dependent items closable by a recorded
-decision rather than left hanging on someone else's reply.
-**Depends on:** Phase 36 (clean lint gate). Ordered after Phases 37 and 38 so the credential rotation
-runs against the finished surfaces, matching the Phase 21 precedent.
-**Requirements:** OPS-01, OPS-02, OPS-03, OPS-04, OPS-05, GAP-05
+**Goal:** `npm run check:local-db-branch` cannot report OK while the command it guards would connect
+to the production branch, and the two divergent notions of "the effective DATABASE_URL" are
+reconciled into one behaviour that a test holds in place.
+**Depends on:** Phase 36 (clean lint gate).
+**Requirements:** OPS-05
+
+**Scope narrowed 2026-09-06.** This phase previously carried OPS-01 through OPS-04 and GAP-05. The
+Phase 39 discussion found all five already closed or misdescribed — OPS-01 and OPS-04 closed on
+2026-05-29 by Phase 21, GAP-05 wired since Phase 12, `trustedOrigins` configured since Phase 20-01,
+and the old criterion 3 citing a middleware Origin gate that does not exist. Those five became
+record corrections rather than engineering, and moved to Phase 40. The decisions taken about them
+are already captured — Phase 40's planner MUST read
+`.planning/phases/39-database-guard-correctness/39-CONTEXT.md` D-09 through D-16.
+
 **Success Criteria** (what must be TRUE):
 
-  1. Neither admin can sign in with the shared `leasetic2026` password, and each holds an individual
-     strong credential — evidenced by a successful sign-in with the new credential and a failed one
-     with the old.
+  1. With a `.env.production.local` naming `ep-icy-boat-alx5o1tz-pooler` present, the guard FAILS
+     under `NODE_ENV=production`, and passes once it is gone. Demonstrated by an automated fixture
+     test in CI using throwaway env files — never real credentials, never the repo's own `.env*`.
 
-  2. The admin partners list shows a real last-login date for an account that has just signed in:
-     `users.last_login_at` is **written** at login, not only read, so rows stop showing `—`. The
-     rotation walk in criterion 1 is the evidence.
+  2. The guard validates the **effective resolved** `DATABASE_URL` for the command about to run
+     (hostname matched against a forbidden-endpoint list, per the `scripts/seed-fiche-fixtures.ts`
+     model), rather than parsing `.env.local` unconditionally. It resolves env exactly as
+     `@next/env` does: `.env.$NODE_ENV.local` over `.env.local` over `.env.$NODE_ENV` over `.env`,
+     first-writer-wins, with `.env.local` excluded outright when `NODE_ENV=test`.
 
-  3. Better Auth `trustedOrigins` is explicitly configured rather than left to its default, and the
-     "SameSite=Lax + `__Secure-` cookies are the real CSRF defence" reasoning inherited since v1.2 is
-     either re-affirmed with a date or revised — with Phase 20's middleware Origin gate still
-     rejecting an untrusted Origin.
+  3. `scripts/_load-env.ts` follows that same precedence — its docstring already claims it does —
+     and a **differential test** asserts the bash guard and the TS loader resolve the same
+     `DATABASE_URL` for every case, so the two cannot drift apart silently.
 
-  4. OPS-03 is closed either way: `scripts/smoke-ovh.ts` has run against a real OVH target with its
-     result recorded, **or** — if no target is provided — a dated decision re-dates or cancels the
-     September-2026 cutover and names who owns the next step. An unanswered external party leaves
-     this requirement closed, not open.
+  4. `npm run build` and `npm run start` are gated behind the guard via `prebuild`/`prestart`,
+     without breaking Vercel's legitimate production builds. The write-capable `tsx` entry points
+     (`db:migrate`, the seeders, `purge:*`, `grant:admin`, `probe:write-isolation`) are gated too —
+     mandatory, because correcting `_load-env.ts` makes them start honouring
+     `.env.production.local`, so the resolver fix without this coverage would newly expose exactly
+     the scripts that mutate data.
 
-  5. OPS-04 is closed either way: DATA-11's 10-year PDF retention carries Thomas's written legal
-     sign-off, **or** — absent his reply — a dated interim decision naming who accepts the risk and
-     until when. Same rule: silence from the external party still closes the item.
+  5. The forbidden-endpoint prefixes live in one declarative source read by both the guard and
+     `seed-fiche-fixtures.ts`, carrying the `bug_011` note (`URL.hostname`, never `URL.host`).
 
-  6. `npm run check:local-db-branch` cannot report OK while the command it guards would connect to
-     the production branch. Either it resolves env exactly as `@next/env` does — `.env.$NODE_ENV.local`
-     over `.env.local` over `.env.$NODE_ENV` over `.env`, first-writer-wins, with `.env.local`
-     excluded outright when `NODE_ENV=test` — or, preferably, it validates the effective resolved
-     `DATABASE_URL` for the command about to run, following the `scripts/seed-fiche-fixtures.ts`
-     model (`new URL(url).hostname` matched against a forbidden-endpoint list, so the connection the
-     process will actually open is what gets checked, not a file that may be overridden). Evidence:
-     with a `.env.production.local` naming `ep-icy-boat-alx5o1tz-pooler` present, the guard FAILS
-     under `NODE_ENV=production` and passes once it is gone. `npm run build` and `npm run start` are
-     gated behind the guard. Both existing security properties survive the rewrite: no credential is
-     ever printed, and no env file is ever `source`d.
+  6. Both existing security properties survive: no credential is ever printed, and no env file is
+     ever `source`d. On success the guard prints the resolved hostname **and which env file supplied
+     it** — the fact whose absence made the 2026-09-06 incident confusing.
+
+**Canonical refs:** `.planning/phases/39-database-guard-correctness/39-CONTEXT.md` (D-01–D-08),
+`scripts/check-local-db-branch.sh`, `scripts/_load-env.ts`, `scripts/seed-fiche-fixtures.ts` ~L533.
 
 **Plans:** TBD
 
@@ -951,7 +955,13 @@ runs against the finished surfaces, matching the Phase 21 precedent.
 against its finished state rather than its half-built one, Phase 28 attributed, and phases 28-35
 archived where the tooling expects to find them.
 **Depends on:** Phases 36-39 — this phase records what they did, so it cannot run before them.
-**Requirements:** CLOSE-06, CLOSE-07
+**Requirements:** CLOSE-06, CLOSE-07, GAP-05, HOUSE-05, HOUSE-06, OPS-01, OPS-02, OPS-03, OPS-04
+
+**Scope widened 2026-09-06.** Absorbed five requirements from Phase 39 that turned out to be record
+corrections rather than engineering, plus HOUSE-05/06 filed by Phase 38. The decisions governing
+them were taken in the Phase 39 discussion — this phase's planner MUST read
+`.planning/phases/39-database-guard-correctness/39-CONTEXT.md` D-09 through D-16 and its
+`<stale_premises>` table before planning.
 **Success Criteria** (what must be TRUE):
 
   1. `MILESTONES.md` carries a v1.6 entry describing what actually shipped (Phases 29, 30, 31, 31.1,
@@ -966,6 +976,34 @@ archived where the tooling expects to find them.
 
   4. Phases 28-35 are archived into their `milestones/v{X.Y}-phases/` directories, and
      `.planning/phases/` holds only the phases a current or future milestone still needs.
+
+  5. The five stale operational requirements are corrected against what actually shipped, each
+     ticked with a pointer to where it was really closed rather than re-implemented:
+     **OPS-01** (both admins rotated off `leasetic2026` on 2026-05-29 —
+     `docs/operations/phase-21-gate-evidence.md` § GATE-01);
+     **OPS-04** (privacy notice published 2026-05-29; Phase 21 D-01 superseded the Thomas framing —
+     `docs/legal/privacy-coverage-confirmation.md`);
+     **GAP-05** (`updateLastLoginAt` wired to `session.create.after`, `src/lib/auth/index.ts:195`);
+     **OPS-02** (`trustedOrigins` configured in Phase 20-01, `src/lib/auth/index.ts:210`).
+     Their requirement text is amended so the ledger stops asserting things that are not true.
+
+  6. **OPS-02**'s inherited CSRF reasoning is revised rather than re-affirmed: the "SameSite=Lax +
+     `__Secure-` cookies are the ACTUAL defence" framing justified *deferring* `trustedOrigins`,
+     which Phase 20-01 then shipped anyway. The dated position records defence in depth, with
+     neither layer claimed to make the other unnecessary. Verification asserts allow-list
+     membership, not Better Auth's rejection status code (which varies by release).
+
+  7. **OPS-03** is closed by a dated decision: the September-2026 OVH cutover is re-dated to
+     **December 2026**, with Antoine owning the next step — provisioning an OVH-compatible target
+     (Node + Postgres + S3-compatible) so `scripts/smoke-ovh.ts` has something to run against. The
+     blocker is the environment, not the command.
+
+  8. **HOUSE-05** (`ProposalForm` is exported but never rendered) and **HOUSE-06**
+     (`38-WALK-SURFACES.md` calls two pagination controls "per-row links") are resolved or
+     explicitly re-deferred with a reason.
+
+  9. The prior ROADMAP criterion citing "Phase 20's middleware Origin gate" is corrected — no Origin
+     check exists in `proxy.ts`; the gate is Better Auth's `trustedOrigins`.
 
 **Plans:** TBD
 
