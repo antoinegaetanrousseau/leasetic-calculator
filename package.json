@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run check:local-db-branch -- --node-env production",
     "build": "next build",
+    "prestart": "npm run check:local-db-branch -- --node-env production",
     "start": "next start",
     "lint": "eslint .",
     "lint:check": "eslint . --max-warnings=0",
