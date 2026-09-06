@@ -36,6 +36,35 @@ how to recover a lagging branch, and the free-tier limits to stay under.
 | Preview      | `preview`   | `br-noisy-frost-alyzvg2s`       | `ep-delicate-night-als4ogpc-pooler.c-3.eu-central-1.aws.neon.tech` |
 | Development  | `development` | `br-tiny-hat-alk1dent`        | `ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech` |
 
+### Machine-readable counterpart
+
+`scripts/_neon-endpoints.list` is the machine-readable counterpart of the table above — the
+single declarative source of Neon endpoint identity. It is read by
+`scripts/check-local-db-branch.sh`, `scripts/_neon-target.ts`, `scripts/_db-branch-guard.ts`,
+`scripts/seed-fiche-fixtures.ts`, `scripts/seed-pipeline-fixtures.ts` and
+`scripts/seed-reconciliation-fixtures.ts` — six consumers, none of which declares its own copy
+(D-05a). Update the table above and the `.list` file together whenever a branch is recreated or
+a new one is added.
+
+The one standing exception: `scripts/probe-write-isolation.ts` keeps its own inline
+exact-hostname constants under the Phase 36 D-36-03 exemption that D-05a upholds, because an
+exact-hostname gate is stricter than this file's prefix match — a reader who greps for an
+endpoint id and finds it there is not looking at drift.
+
+### The local DATABASE_URL guard (OPS-05)
+
+`scripts/check-local-db-branch.sh` resolves the EFFECTIVE `DATABASE_URL` across the full
+`@next/env` candidate order, rather than parsing `.env.local` alone — a hardcoded single-file
+read is what let `.env.production.local` shadow `.env.local` unnoticed, the 2026-09-06 incident
+that OPS-05 closes. It takes `--node-env` because a lifecycle hook's own `NODE_ENV` is not
+necessarily the guarded command's: `npm run build` and `npm run start` are gated through
+`prebuild`/`prestart` hooks that invoke the guard with `--node-env production` before
+`next build`/`next start` themselves run. The guard no-ops (`SKIP`) when no `.env*` candidate
+file exists on disk at all — the condition that keeps Vercel's production builds and the
+`MIGRATE PROD` workflow working, since neither has a local env file to read. On success it names
+both the resolved hostname and the env file that supplied it, so a reader can answer "which file
+won?" without re-deriving it.
+
 ```
                     ┌─────────────────────────────────┐
                     │  Vercel project: leasetic-matrice │
