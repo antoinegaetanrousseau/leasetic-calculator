@@ -193,6 +193,79 @@ during discussion and is deferred in full — see `<deferred>`.
   It is included under D-38-07's bounded-triage rule as a label fix, in a file the phase is
   already editing.
 
+### AMENDMENT — 2026-09-06, after design-system review (during `/gsd-ui-phase 38`)
+
+Reviewing the Leasétic design-system handoff
+(`~/Downloads/Quote/_ds/leasetic-design-system-4b3fa15d-.../tokens/`) at the operator's request
+produced findings that **supersede D-38-14 and D-38-15**, and corrected two factual errors in
+D-38-13. Recorded here so downstream agents act on the corrected facts.
+
+- **A-38-01 (corrects D-38-13's blast radius).** `padding: 0.6rem 1.5rem` is declared on the
+  **shared** `.btn-green, .btn-navy, .btn-out` base rule (`app/globals.css:372-387`), not on
+  `.btn-out` alone. The change therefore affects **all three** button classes across **31 files**
+  (18 `.btn-green`, 2 `.btn-navy`, 18 `.btn-out`, overlapping), not the 17 `.btn-out` sites
+  D-38-13 states. The 0.5rem / ~36px target is unchanged; the surface count the walk must cover
+  is larger.
+
+- **A-38-02 (corrects D-38-13's height premise).** That same base rule declares `border: none`,
+  while `.btn-out` overrides it with `border: 1px solid var(--border)`. So `.btn-out` is already
+  ~2px taller than `.btn-green`/`.btn-navy` today — a second undeclared height inside the same
+  base rule. Any focus treatment relying on colouring a border will not work on the two
+  borderless classes.
+
+- **A-38-03 (SUPERSEDES D-38-14).** Do **not** mint a `--focus-ring` token. The design system's
+  focus token is `--border-focus: var(--color-brand-primary-700)` = `#0b935b`, and — decisively —
+  **the app already has `--ring: var(--brand-accent)` (`#01cc72`) declared in BOTH themes**
+  (`app/globals.css:52`, `:195`), consumed by **30 files** via
+  `focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50`.
+
+  GAP-04's "the standard focus treatment" therefore has an existing referent: `--ring`. The four
+  hardcoded `rgba(45,122,140,…)` teal literals are the deviation — that teal appears in neither
+  the design system nor the app's token layer. Minting `--focus-ring` would create a *third*
+  focus system.
+
+  **Operator decision (2026-09-06): retire the teal; point all four rules at `--ring`.**
+  No new token is introduced.
+
+  Measured non-text contrast (WCAG 1.4.11 needs ≥ 3.0), against every dark surface in
+  `html[data-theme="dark"]` — `--background` `#161616`, `--card` `#1e1e1e`, `--popover` `#171717`,
+  `--secondary`/`--accent`/`--muted-surface` `#262626`:
+
+  | Candidate | white | worst dark |
+  |---|---|---|
+  | `--ring` `#01cc72` **solid** | 2.13 | **7.12** |
+  | `--ring` `#01cc72` @50% (halo only) | 1.51 | 2.79 |
+  | DS `--border-focus` `#0b935b` solid | 3.93 | 3.85 |
+  | legacy teal @0.18 (today) | 1.27 | **1.19** |
+
+  Because of A-38-02, the treatment must not depend on a border. Use a two-layer `box-shadow`,
+  which works identically on all six selectors and — being a shadow — has **zero layout impact**,
+  so it does not disturb D-38-13's 36px height math:
+
+  ```css
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring),
+              0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
+  ```
+
+  `color-mix(in oklab, … , transparent)` is an idiom already in this file
+  (`app/globals.css:325`, the `--destructive` ring). The solid 2px inner ring is what carries the
+  contrast; the outer 5px halo is the soft edge. **Note: this changes ring geometry** from the
+  current `0 0 0 3px` — D-38-14's "geometry preserved" no longer holds, and the walk covers it.
+
+- **A-38-04 (amends D-38-15).** UIC-11 is still minted, but its content changes: it declares
+  *"focus uses `var(--ring)` via the two-layer shadow above; never hardcode a focus colour."*
+  It carries **no contrast-ratio clause**.
+
+- **A-38-05 (scope).** The design system is **explicitly light-mode-only** — `tokens/colors.css`
+  states `DARK MODE — PARKED`, and the `tokens/dark-mode.css` it points to is **not present in
+  the handoff**. The DS has no dark answer to give, which is why the dark value is derived from
+  the app's own `--ring` rather than from the DS.
+
+  **Operator decision (2026-09-06):** the divergence between the app's `--ring` (`#01cc72`) and
+  the DS's focus token (`#0b935b`) is **left as-is and deliberately not recorded** as a finding or
+  a backlog item. Do not raise it in UI-SPEC, UIC-11, or the deferred list.
+
 ### Claude's Discretion
 
 - **i18n key naming for the dialog close label.** Existing convention is a `.aria` suffix
