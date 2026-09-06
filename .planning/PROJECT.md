@@ -182,6 +182,27 @@ as it is fixed.
 no formula changes. Deferred *capability* (contract-tool integration, HubSpot retirement,
 teal rebrand, Encours total, mobile layout) stays in "Deferred to next milestone" below.
 
+**Progress (updated 2026-09-06):** phases 36, 37 and 38 complete; 39-40 remain.
+
+Phase 38 closed the shell/dialog/spacing area of the "functional gaps" and "verification debt"
+targets above: the hardcoded English dialog close label is localised, `.btn-out`'s off-grid padding
+is on-grid *and* now renders at 36px parity with `button.tsx`, the four hardcoded teal focus
+literals are retired onto `var(--ring)` (dark-theme focus contrast measured 1.19:1 -> 7.12-8.52:1),
+and Phase 31.1's long-owed `human_needed` verification is `passed` on real runtime evidence.
+
+Two things the phase surfaced are worth carrying as milestone-level knowledge:
+
+1. **The backlog's own surface map was partly wrong.** The CLOSE-08 walk found that
+   `ProposalForm` — cited as the wizard's `.btn-out` source — is dead code that never renders
+   (HOUSE-05), and that two "per-row link" sites are actually pagination controls needing a
+   multi-page dataset (HOUSE-06). Deferred-item descriptions written months earlier should be
+   re-measured before being planned against, not trusted.
+2. **Some verification is structurally blocked, not merely unscheduled.** `dialog.tsx`'s consumers
+   sit behind an access-control decision that refuses admins by design (CRM-02), the proposal
+   wizard cannot be opened without writing a draft, and a pagination control cannot be observed on
+   a single-page dataset. Closing those needs a relationship-holder login and a disposable
+   database — a milestone-level prerequisite, not something a phase can arrange for itself.
+
 ---
 
 ## v1.6 — CRM Foundation (detail)
