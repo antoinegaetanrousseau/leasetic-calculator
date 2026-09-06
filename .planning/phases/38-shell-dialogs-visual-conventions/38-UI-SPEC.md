@@ -15,8 +15,10 @@ created: 2026-09-06
 phase. `.planning/codebase/UI-CONVENTIONS.md` is canonical. This contract does not re-argue UIC-01
 (4px-multiple spacing), UIC-02 (four font weights), UIC-03 (60/30/10 color), UIC-04 (two disjoint
 radius tiers), UIC-07 (icon vocabulary), UIC-09 (Shell container) or UIC-10 (icon-only aria-label)
-— it cites them. The only place this phase does real design work is the dark-mode `--focus-ring`
-value (§ Focus Treatment), per `38-CONTEXT.md` D-38-14.
+— it cites them. The only place this phase does real design work is retiring the four hardcoded
+teal focus-ring literals in favour of the app's existing `--ring` token (§ Color, § Focus
+Treatment), per `38-CONTEXT.md`'s **AMENDMENT A-38-01…A-38-05** (2026-09-06, after design-system
+review — supersedes D-38-13's blast radius, D-38-14 and D-38-15).
 
 No new surface, no new component, no restyle beyond the four requirements (CLOSE-02, CLOSE-08,
 GAP-02, GAP-04). The app-wide small-components pass is explicitly deferred — see `38-CONTEXT.md`
@@ -53,24 +55,45 @@ GSD default). Cited, not re-derived:
 | 2xl | 28–32px | `.card` internal padding |
 | 3xl | 48px | Empty-state vertical band |
 
-**This phase's one spacing edit (D-38-13):** `.btn-out`'s vertical padding, `app/globals.css`
-lines ~374–405, changes `0.6rem` (9.6px — off the 4px grid, UIC-01 violation) → `0.5rem` (8px — on
-the 4px grid). This is not a fresh spacing decision; it is UIC-01 compliance plus alignment to
-`button.tsx`'s `default` (h-9 = 36px) size step, so `.btn-out` stops being a fourth, undeclared
-button height between `default` (36px) and `lg` (40px).
-
-`.btn-out` shares its rule block with `.btn-green` and `.btn-navy` (`app/globals.css:374`), so all
-three change together — this is intentional, not scope creep; they are one selector group.
+**This phase's one spacing edit (D-38-13, blast radius corrected by A-38-01):** the shared
+`.btn-green, .btn-navy, .btn-out` base rule's vertical padding (`app/globals.css:372–387`) changes
+`0.6rem` (9.6px — off the 4px grid, UIC-01 violation) → `0.5rem` (8px — on the 4px grid). This is
+not a fresh spacing decision; it is UIC-01 compliance plus alignment to `button.tsx`'s `default`
+(h-9 = 36px) size step, so the three legacy classes stop sitting at a fourth, undeclared button
+height between `default` (36px) and `lg` (40px). The 0.5rem / ~36px target itself is unchanged.
 
 **Height math:** `0.5rem × 2 (top+bottom) = 16px padding + ~20px line content ≈ 36px` — matches
 `button.tsx`'s `size-default` (`h-9` = 36px) exactly. `0.6rem` computed to ~39px, matching neither
 `default` (36px) nor `lg` (40px).
 
+**Corrected blast radius (A-38-01).** The padding declaration lives on the rule's **shared**
+selector list — `.btn-green, .btn-navy, .btn-out` — not on `.btn-out` alone. D-38-13's own text
+undercounted this, naming "17 call sites" for `.btn-out` only. The real blast radius is **31
+distinct files**: 18 using `.btn-green`, 2 using `.btn-navy`, 18 using `.btn-out` (some files use
+more than one class, so the totals overlap rather than sum to 31). **The CLOSE-08 browser walk
+must cover `.btn-green` and `.btn-navy` surfaces too, not only `.btn-out` ones** —
+`grep -rl "btn-green\|btn-navy" src app` before the walk to enumerate them; they include primary
+CTAs such as "Envoyer l'invitation" (`CreatePartnerForm.tsx`), "Enregistrer"
+(`CoefficientsEditor.tsx`, `SaveConfirmModal.tsx`), and the sign-in/reset submit buttons
+(`LoginForm.tsx`, `SetPasswordForm.tsx`).
+
+**A second, undeclared height — left as-is (A-38-02).** The shared base rule declares
+`border: none`, but `.btn-out` overrides it with `border: 1px solid var(--border)`. A 1px border
+on two opposite edges adds ~2px of rendered height, so `.btn-out` is already ~2px taller than
+`.btn-green`/`.btn-navy` today, independent of the 0.6rem→0.5rem change — a second undeclared
+height hiding inside the same shared rule. **This phase leaves that ~2px delta as-is and only
+records it; it does not equalise the three classes' heights.** GAP-04 names padding + focus
+treatment, not border-driven height parity between sibling classes, so full unification (dropping
+`.btn-out`'s border, or compensating its padding by ~1px) is out of this phase's scope and would
+be a future decision.
+
 **Exceptions:** none beyond the one above. `0.75rem`/44px was considered and rejected (D-38-13) —
 it is on-grid and meets WCAG 2.5.5, but introduces a *fourth* height taller than `lg`, making the
 undeclared-height problem worse rather than resolving it.
 
-**Call sites affected (18, all shrink ~3px vertically — enumerate for the browser walk):**
+**`.btn-out` call sites (18, a subset of the 31-file blast radius above — enumerated for the
+browser walk; `.btn-green`/`.btn-navy` call sites must be enumerated the same way before the walk,
+per A-38-01):**
 
 | # | File | Surface (CLOSE-08 walk relevance) |
 |---|---|---|
@@ -93,15 +116,17 @@ undeclared-height problem worse rather than resolving it.
 | 17 | `app/(admin)/[adminSegment]/companies/CompaniesList.tsx:146` | Not a CLOSE-08 named surface; incidental |
 | 18 | `app/(admin)/[adminSegment]/companies/review/PairReviewList.tsx:82` | Not a CLOSE-08 named surface; incidental |
 
-**Expected visual delta for a reviewer:** every `.btn-out` (secondary/outline button — "Annuler",
-"Exporter", "Charger plus", per-row "Voir →" links styled as `.btn-out`, etc.) sits ~3px shorter.
-On its own this is close to imperceptible; the thing to actually check per D-38-04's "fix first,
-then walk once" is **row alignment** — anywhere a `.btn-out` sits next to a real `Button` (e.g.
-Annuler/Envoyer pairs in `CreatePartnerForm.tsx`, `SaveConfirmModal.tsx`) or next to `.btn-green`/
-`.btn-navy` in the same row, confirm the pair is now the same height (36px), not that one shrank
-past the other. Before this fix, `.btn-out` (39px) was already taller than `Button`'s
-`size-default` (36px) sitting next to it in some rows — the walk should specifically look for a
-row where that mismatch is now gone.
+**Expected visual delta for a reviewer:** every `.btn-green`, `.btn-navy` and `.btn-out` instance
+(primary "Enregistrer"/"Envoyer" buttons, secondary "Annuler"/"Exporter"/"Charger plus" buttons,
+per-row "Voir →" links styled as `.btn-out`, etc.) sits ~3px shorter. On its own this is close to
+imperceptible; the thing to actually check per D-38-04's "fix first, then walk once" is **row
+alignment** — anywhere any of the three classes sits next to a real shadcn `Button` in the same
+row (e.g. Annuler/Envoyer pairs in `CreatePartnerForm.tsx`, `SaveConfirmModal.tsx`), confirm the
+pair is now the same height (36px), not that one shrank past the other. Before this fix,
+`.btn-out` specifically (39px, plus its ~2px border delta per A-38-02) was already taller than
+`Button`'s `size-default` (36px) sitting next to it in some rows — the walk should specifically
+look for a row where that mismatch is now gone, while noting `.btn-out`'s residual ~2px
+border-driven delta over `.btn-green`/`.btn-navy` is expected and not a defect (A-38-02).
 
 ---
 
@@ -123,8 +148,8 @@ re-derived. This phase makes zero typography changes. Body copy stays 14.5px / 4
 
 Per **UIC-03** (ratified exception — one accent, `--primary` = `--brand-accent` = `#01cc72`,
 60/30/10). Cited, not re-derived. This phase touches **zero** surface, background, or accent
-colors. The one color-adjacent change is the focus-ring token below, which is a UI-state
-indicator, not a surface/accent/dominant color per UIC-03's classification.
+colors. The one color-adjacent change is the focus treatment below, which repoints existing
+hardcoded literals at the app's already-declared `--ring` token — **no new token is introduced.**
 
 | Role | Value | Usage |
 |------|-------|-------|
@@ -133,56 +158,88 @@ indicator, not a surface/accent/dominant color per UIC-03's classification.
 | Accent (10%) | `--primary` = `--brand-accent` = `#01cc72`, unchanged in both themes | Reserved per each surface's own UIC-03 list — this phase renders no new accent usage |
 | Destructive | `--destructive` | Unchanged — this phase touches no destructive-action UI |
 
-**This phase's color-adjacent decision — `--focus-ring` (D-38-14, D-38-15):**
+**This phase's focus-treatment decision — retiring the teal, pointing at `--ring`** (supersedes
+D-38-14/D-38-15; see `38-CONTEXT.md` AMENDMENT A-38-01…A-38-05):
 
 Four hardcoded literals in `app/globals.css` share one fixed, theme-blind teal
 (`rgba(45, 122, 140, 0.18)` on `.btn-green/.btn-navy/.btn-out:focus-visible`,
 `.admin-nav-card:focus-visible`, `.stepper-circle:focus-visible`; `rgba(45, 122, 140, 0.12)` on
-`.search-bar:focus-within`) become a single **`--focus-ring`** custom property, declared once in
-`:root` and once in `html[data-theme="dark"]`, with the existing ring **geometry preserved
-unchanged**: `outline: none; box-shadow: 0 0 0 3px var(--focus-ring);`.
+`.search-bar:focus-within`). **No new `--focus-ring` token is minted.** The app already declares a
+focus token — `--ring: var(--brand-accent)` (`#01cc72`) — in **both** themes
+(`app/globals.css:52`, `:195`), already consumed by 30 files via
+`focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50`
+(`button.tsx`, `input.tsx`). GAP-04's "the standard focus treatment" refers to this existing
+mechanism; the four teal literals are the deviation from it, not a treatment that needed its own
+token. The operator decision (2026-09-06, A-38-03) is to retire the teal and point all six
+selectors at `--ring`.
 
-**Decision: the `.search-bar` 0.12 variant collapses into the same token — it does not stay
-distinct.** All five call sites (three in the `.btn-green/.btn-navy/.btn-out` group, plus
-`.admin-nav-card`, `.stepper-circle`, and `.search-bar`) read the same `--focus-ring` value per
-theme. Rationale: a second, weaker tier was never a stated design decision — it is an
-undocumented accident of `.search-bar` predating the others. UIC-11 (below) declares **one**
-focus-ring rule for the whole app; keeping a silent second tier would immediately violate the
-rule it mints. If `.search-bar`'s focus state is later judged too strong once boosted for dark
-mode, that is a new, separately-recorded exception — not the default assumed here.
+**Why not the shadcn border+halo pattern (`border-ring` + `ring-ring/50`) that `button.tsx`
+already uses?** Per A-38-02, the shared `.btn-green, .btn-navy, .btn-out` base rule
+(`app/globals.css:372–387`) declares `border: none`; only `.btn-out` overrides it with a real
+border. A treatment that depends on colouring a border would collapse to the halo alone on
+`.btn-green` and `.btn-navy` — and the halo-only contrast (measured below) is too weak on its own.
+The fix must not depend on a border existing.
 
-**Chosen values, with contrast reasoning (grounded in `app/globals.css`'s real tokens, not
-invented):**
+**Required CSS, applied identically to all six selectors**
+(`.btn-green/.btn-navy/.btn-out:focus-visible`, `.admin-nav-card:focus-visible`,
+`.stepper-circle:focus-visible`, `.search-bar:focus-within`):
 
-| Theme | `--focus-ring` | Reasoning |
+```css
+outline: none;
+box-shadow: 0 0 0 2px var(--ring),
+            0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
+```
+
+A solid 2px inner ring plus a 5px soft outer halo. `color-mix(in oklab, …, transparent)` is
+already an idiom in this file (`app/globals.css:325`, the `--destructive` ring) — this is not a
+new CSS pattern for the codebase. Because it is a `box-shadow`, not a `border`, it has **zero
+layout impact** and does not disturb D-38-13's 36px height math on any of the six selectors.
+
+**Geometry changes.** This replaces the current single-layer `0 0 0 3px` ring with a two-layer
+`2px solid + 5px halo` shape. D-38-14's "geometry preserved unchanged" no longer holds — the
+browser walk (CLOSE-02/CLOSE-08) covers the new geometry, not just the recolour.
+
+**Measured non-text contrast (WCAG 1.4.11 target ≥ 3.0), worst case across every dark surface in
+`html[data-theme="dark"]`** (`--background` #161616, `--card` #1e1e1e, `--popover` #171717,
+`--secondary`/`--accent`/`--muted-surface` #262626 — all four checked):
+
+| Candidate | white | worst dark |
 |---|---|---|
-| Light (`:root`) | `rgba(45, 122, 140, 0.18)` — **unchanged, incumbent value** | Carried forward as-is. Composited over `--background: oklch(1 0 0)` (pure white), this yields an effective color of approx. `rgb(217, 232, 234)` — measured non-text contrast ratio ≈ **1.26:1** against white. This is below WCAG 1.4.11's 3:1 non-text target, but D-38-14 scopes this phase's *new* visual decision to the **dark** value only; the light value is out of scope for a contrast remediation and is carried forward unchanged. Flagged here as a known limitation rather than silently inherited — a future phase should treat "raise the light ring's contrast" as its own decision, not bundle it into this one. |
-| Dark (`html[data-theme="dark"]`) | `rgba(45, 122, 140, 0.85)` | Composited over `--background: #161616`, the incumbent 0.18 alpha yields an effective color barely different from the background itself (measured contrast ≈ **1.19:1** — confirms D-38-14's "materially weaker" claim). Raising alpha to **0.85** yields effective `rgb(41, 105, 122)`-range color with measured contrast ≈ **3.0:1** against `--background` (#161616) and ≈ **3.0:1** against `--card` (#1e1e1e) — the two surfaces `.admin-nav-card` and `.stepper-circle` actually render on. 0.85 is the alpha at which both adjacent-surface contrasts independently clear WCAG 1.4.11's 3:1 non-text-contrast threshold; a lower value (tested: 0.6 → ≈2.1:1, 0.8 → ≈2.8:1) does not. |
+| `--ring` `#01cc72` solid (the 2px inner layer) | 2.13 | 7.12 |
+| `--ring` `#01cc72` @50% (the 5px halo alone) | 1.51 | 2.79 |
+| legacy teal @0.18 (today, for comparison) | 1.27 | 1.19 |
 
-**Geometry unchanged:** `0 0 0 3px` spread, `outline: none` companion rule — both preserved
-verbatim in both themes. Only the color/alpha channel is themed.
+The solid 2px inner ring is what carries the contrast (7.12:1 worst-case dark, clearing 3:1 with
+margin); the 5px outer halo is a soft edge layered on top of it, not the contrast-bearing layer on
+its own. These three rows are the measured evidence behind the CSS shape above; no further
+comparison or recommendation is drawn from them here.
 
-**Visual note for the executor:** 0.85 alpha reads as a substantially more solid teal ring than
-light mode's soft 0.18 glow — closer to a solid-looking 3px outline than a soft shadow. This is
-the intended, reasoned outcome of D-38-14 ("dark carries a stronger ring"), not an overshoot to
-correct. Do not average it down toward light's 0.18 without recomputing the contrast math above.
+**`.search-bar`'s 0.12 variant collapses into the same shared treatment — it does not stay a
+distinct, weaker tier.** All six selectors read the identical two-layer `var(--ring)` shadow. This
+carries forward unchanged from the original decision: a second, weaker tier was never a stated
+design decision — it was an undocumented accident of `.search-bar` predating the others — and
+UIC-11 (below) declares one focus treatment for the whole app.
 
 ---
 
-## Focus Treatment — UIC-11 (new rule, D-38-15)
+## Focus Treatment — UIC-11 (new rule, amended per A-38-04)
 
 Mint the following into `.planning/codebase/UI-CONVENTIONS.md` as **UIC-11**:
 
-> **UIC-11 — Focus ring: one token, per theme, no per-component variance.**
-> Any `:focus-visible` or `:focus-within` treatment that renders a colored ring reads
-> `var(--focus-ring)` at `box-shadow: 0 0 0 3px var(--focus-ring)` with `outline: none`. The token
-> is declared once per theme (`:root` and `html[data-theme="dark"]`). A component-local hardcoded
-> `rgba(...)` focus color is a violation, not a case-by-case styling choice. This does not govern
-> shadcn primitives that already use the `--ring` token via Tailwind's `ring-ring/50` utility
-> (e.g. `button.tsx`'s base class) — that is a separate, pre-existing mechanism tied to
-> `--brand-accent`, not a v10-era literal, and is out of scope for this rule.
+> **UIC-11 — Focus ring: `var(--ring)` via the two-layer shadow; never hardcode a focus colour.**
+> Any `:focus-visible` or `:focus-within` treatment that renders a colored ring uses:
+> ```css
+> outline: none;
+> box-shadow: 0 0 0 2px var(--ring),
+>             0 0 0 5px color-mix(in oklab, var(--ring) 50%, transparent);
+> ```
+> `--ring` is already declared in both themes (`app/globals.css:52`, `:195`). A component-local
+> hardcoded `rgba(...)` or other literal focus color is a violation, not a case-by-case styling
+> choice.
 
-This is the rule a future UI checker checks a fifth hardcoded ring against, per D-38-15.
+The rule carries **no contrast-ratio clause** — the measured evidence lives in the Color section
+above, not in the rule text itself. This is the rule a future UI checker checks a new hardcoded
+ring against.
 
 ---
 
@@ -284,15 +341,16 @@ cross-reference CONTEXT.md for the walk's operating constraints:
   pass signature.
 - **CLOSE-02's PDF check** — open a proposal's PDF/print preview while in dark mode; the surface
   must render pure white background / `#1a2832` text per `app/globals.css:214-218`'s
-  `[data-pdf-surface]` override, un-perturbed by the `--focus-ring` or any other token change in
-  this phase.
+  `[data-pdf-surface]` override, un-perturbed by the `--ring` focus-treatment change or any other
+  edit in this phase.
 - **Recording:** `38-UAT.md`, following the `37-HUMAN-UAT.md` table pattern (surface × theme ×
   result). Passing rows carry no screenshot; the filmstrip and any failure screenshots are
   committed as image files. `31.1-VERIFICATION.md`'s frontmatter `status: human_needed` flips to
   `status: passed` on both checks passing — this is the only cross-phase file this phase writes.
-- **CLOSE-08's surface list** (five surfaces + `.btn-out`'s 18 call sites above) is walked in both
-  light and dark **after** GAP-02/GAP-04 land (D-38-04's "fix first, then walk once" — the walk
-  certifies the shipped state, not a pre-fix state).
+- **CLOSE-08's surface list** (five surfaces + the full `.btn-green`/`.btn-navy`/`.btn-out` blast
+  radius above — 31 distinct files per A-38-01) is walked in both light and dark **after**
+  GAP-02/GAP-04 land (D-38-04's "fix first, then walk once" — the walk certifies the shipped
+  state, not a pre-fix state).
 - **Defect triage (D-38-07):** a token/spacing-literal/CSS-rule/i18n-string defect is fixed
   in-phase; anything needing a component change, a new primitive, or a data/logic change is filed
   as a requirement for a later phase. This is mechanical, not a judgment call.
@@ -302,10 +360,10 @@ cross-reference CONTEXT.md for the walk's operating constraints:
 ## Checker Sign-Off
 
 - [ ] Dimension 1 Copywriting: PASS — one new string (`common.close.aria`), FR/EN both recorded, `_EnHasAllFrKeys` enforces parity
-- [ ] Dimension 2 Visuals: PASS — `.btn-out` height delta documented with expected review focus (row alignment); dialog/sheet fix is visually inert by design
-- [ ] Dimension 3 Color: PASS — `--focus-ring` light unchanged (incumbent, limitation disclosed), dark value grounded in measured contrast against both `--background` and `--card`; UIC-03's accent budget untouched
+- [ ] Dimension 2 Visuals: PASS — `.btn-green`/`.btn-navy`/`.btn-out` height delta documented with expected review focus (row alignment); dialog/sheet fix is visually inert by design
+- [ ] Dimension 3 Color: PASS — focus treatment repoints six selectors at the existing `--ring` token (no new token minted), two-layer shadow contrast measured against all four dark surfaces; UIC-03's accent budget untouched
 - [ ] Dimension 4 Typography: PASS — zero typography changes; UIC-02 cited, not re-argued
-- [ ] Dimension 5 Spacing: PASS — `.btn-out` moves from an off-grid 9.6px to on-grid 8px per UIC-01, and onto `button.tsx`'s declared 36px height step; full call-site list enumerated
+- [ ] Dimension 5 Spacing: PASS — `.btn-green`/`.btn-navy`/`.btn-out` shared rule moves from an off-grid 9.6px to on-grid 8px per UIC-01, landing on `button.tsx`'s declared 36px height step; corrected 31-file blast radius enumerated (A-38-01), `.btn-out`'s residual border-driven height delta recorded and left as-is (A-38-02)
 - [ ] Dimension 6 Registry Safety: PASS — no third-party registry block introduced; vendored-file edits tracked via the existing re-import table + a new pinning test (D-38-11)
 
 **Approval:** pending
