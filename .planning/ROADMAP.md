@@ -872,11 +872,11 @@ files.
      on-grid padding and the standard focus treatment — or `UI-CONVENTIONS.md` records the `0.6rem`
      vertical padding and the third hardcoded focus shadow as a dated, deliberate exception.
 
-**Plans:** 4 plans in 4 waves
+**Plans:** 1/4 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 38-01-PLAN.md — GAP-02: dialog/sheet close label reads `common.close.aria` from `<html lang>`, pinned by a re-import test (wave 1)
+- [x] 38-01-PLAN.md — GAP-02: dialog/sheet close label reads `common.close.aria` from `<html lang>`, pinned by a re-import test (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -1011,7 +1011,7 @@ archived where the tooling expects to find them.
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
-| 38. Shell, Dialogs & Visual Conventions | v1.8 | 0/? | Not started | - |
+| 38. Shell, Dialogs & Visual Conventions | v1.8 | 1/4 | In Progress|  |
 | 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 

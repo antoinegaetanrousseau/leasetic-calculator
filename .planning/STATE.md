@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-06T08:32:25.496Z"
-last_activity: 2026-09-06 -- Phase 38 execution started
+last_updated: "2026-09-06T08:42:55.956Z"
+last_activity: 2026-09-06
 progress:
   total_phases: 25
   completed_phases: 9
   total_plans: 68
-  completed_plans: 64
+  completed_plans: 65
   percent: 36
 ---
 
@@ -28,9 +28,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 38 (shell-dialogs-visual-conventions) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 38
-Last activity: 2026-09-06 -- Phase 38 execution started
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-09-06
 
 **v1.8 phase order and why:**
 
@@ -478,6 +478,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 37 P03 | ~55min | 2 tasks | 2 files |
 | Phase 37 P04 | 50min | 2 tasks | 1 files |
 | Phase 37 P05 | ~40min | 1 tasks | 3 files |
+| Phase 38 P01 | 8min | 2 tasks | 6 files |
 
 ## Decisions
 
@@ -637,6 +638,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 37]: D-37-04 walk performed by agent browser automation, at operator's explicit direction, not human observation
 - [Phase 37]: 33-VERIFICATION.md item 5 (migration 0009 on main/preview) explicitly restated as open, non-blocking deferral owned by Phase 40/CLOSE-06, not silently dropped when status moved to passed
 - [Phase 37]: Admin PDF route defect found during the walk (missing D-37-01 bypass) fixed in commit 7999759 at the operator's explicit decision
+- [Phase 38-01]: common.close.aria added as a generic .aria-suffixed key rather than reusing auth.modal.button.close — 38-CONTEXT.md's Claude's-Discretion resolution: .aria suffix convention already established, keeps FR/EN parity compile-enforced
+- [Phase 38-01]: resolveDomLang() lives in src/lib/i18n/, not duplicated inline in dialog.tsx/sheet.tsx — keeps the vendored primitive diff to 3 changed lines per file (2 imports + 1 span), which is what makes the D-38-11 re-import row cheap to re-apply
 
 ### Blockers
 

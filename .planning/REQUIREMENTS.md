@@ -75,7 +75,7 @@ stops existing.
   proposals reaches the proposal detail page instead of a 404, with an explicit recorded decision on
   whether the ADMIN-09 commission-invisibility envelope needs adjusting for that surface (it renders
   more inputs than the row/list view).
-- [ ] **GAP-02**: Every icon-only dialog close control announces an accessible name in the viewer's
+- [x] **GAP-02**: Every icon-only dialog close control announces an accessible name in the viewer's
   language — the shared `dialog.tsx` primitive currently hardcodes English `"Close"` in a
   French-default product.
 - [x] **GAP-03**: Phase 35's two INFO findings are resolved — the redundant `!isAdmin` check beside
@@ -188,7 +188,7 @@ stops existing.
 | CLOSE-07 | Phase 40 — Milestone Record Closure | Pending |
 | CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
 | GAP-01 | Phase 37 — CRM Stack Closure | Complete |
-| GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
+| GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-03 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-04 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
 | GAP-05 | Phase 39 — Operational & Credential Gates | Pending |
