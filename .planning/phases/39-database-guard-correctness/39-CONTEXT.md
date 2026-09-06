@@ -143,6 +143,17 @@ re-measured.
   between rejection paths and point releases, so asserting the response shape is deliberately
   avoided as forward-incompatible.
 
+- **D-05a (operator decision, 2026-09-06, taken during planning):** D-05 named two consumers
+  because only two were known when it was written. Planning found the forbidden-endpoint table
+  declared in **six** places: `scripts/check-local-db-branch.sh` (bash `case` arms),
+  `scripts/seed-fiche-fixtures.ts:96`, `scripts/seed-pipeline-fixtures.ts:67`,
+  `scripts/seed-reconciliation-fixtures.ts:72`, `scripts/_neon-target.ts:~46`, and
+  `scripts/probe-write-isolation.ts` (inline exact-hostname gates). The operator chose to **fold
+  all five code copies onto the single declarative source**, extending D-05's named boundary to
+  match its stated intent. `probe-write-isolation.ts` keeps its Phase 36 D-36-03 exemption — its
+  inline exact-hostname gates are stricter than a prefix match, and it deliberately does not
+  import `_load-env`. This supersedes the two-consumer reading of D-05 and of ROADMAP criterion 5.
+
 ### Claude's Discretion
 
 - Exact file format for D-05's endpoint list (JSON vs newline-delimited), and where it lives.
