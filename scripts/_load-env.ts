@@ -16,17 +16,44 @@
  * environment variable from secrets, so finding no `.env` is harmless there. That
  * app-works / CI-works / local-script-fails asymmetry is why this went unnoticed.
  *
- * PRECEDENCE (verified against the installed dotenv 16.4.7, where `override`
- * defaults to false — the first value assigned to a key wins):
- *   1. the real process environment — CI secrets always win; nothing here clobbers them
- *   2. .env.local                   — the local developer's file
- *   3. .env                         — optional fallback, absent in this repo by design
- *
- * That is deliberately the same order Next.js applies, so a script and the app can
- * never disagree about the value of a key.
+ * PRECEDENCE (OPS-05, D-02 — corrected 2026-09-06; this module previously loaded
+ * only `.env.local` then `.env` while its docstring falsely claimed it matched
+ * Next.js)
+ * The real process environment outranks every file (CI secrets always win; nothing
+ * here clobbers them), and below that, the candidate file order is:
+ *   `.env.$NODE_ENV.local` -> `.env.local` -> `.env.$NODE_ENV` -> `.env`
+ * (with `.env.local` excluded outright when `NODE_ENV=test`, so a developer's
+ * local value can never leak into a test run). That order is NOT re-inlined
+ * here — `scripts/_env-precedence.ts`'s `envFileOrder` is the single place it is
+ * written down, and this module loops over its return value with dotenv's
+ * `config()` at its own default (a later file never replaces an already-set key,
+ * i.e. first-writer-wins).
  *
  * Do NOT "fix" a missing variable by committing a `.env` file — that would
  * duplicate secrets into a second location. Add it to `.env.local` instead.
+ *
+ * === WRITE-TARGET GUARD (OPS-05, D-03 — sequencing hazard, read before editing) ===
+ * Immediately after loading, this module calls `assertSafeDatabaseTarget()`
+ * (`scripts/_db-branch-guard.ts`) with no arguments, so it runs at module scope —
+ * before any consumer's first statement — for every one of the 14 `tsx`/config
+ * consumers that `import './_load-env'` (13 `scripts/*.ts` files plus
+ * `drizzle.config.ts`), through that single shared import.
+ *
+ * This is a no-op when NO `.env*` candidate file exists on disk (the SKIP rule in
+ * `scripts/_db-branch-guard.ts`), which is what keeps the `MIGRATE PROD` GitHub
+ * Action and CI's ephemeral-branch migration step working — neither has a local
+ * env file, so the guard silently passes there.
+ *
+ * D-03 IS A HARD ORDERING CONSTRAINT: correcting the precedence above WITHOUT this
+ * guard call would newly expose all 14 write-capable consumers to
+ * `.env.production.local`. The precedence fix and the guard call landed in the
+ * SAME edit by construction, and `tests/load-env-contracts.test.ts` Contract 1
+ * fails if a future edit ever removes the guard call while keeping the corrected
+ * precedence — do not separate them.
+ *
+ * `scripts/probe-write-isolation.ts` deliberately does NOT import this module and
+ * must NOT be "fixed" to do so (Phase 36 D-36-03: it must never read a stored env
+ * file). `tests/load-env-contracts.test.ts` Contract 3 pins that exemption.
  *
  * TWO RULES WHEN USING THIS
  *   - Keep it the FIRST import in the file. ES module imports evaluate in source
@@ -36,6 +63,11 @@
  *     scripts/migrate.ts. Run these via their npm scripts from the project root.
  */
 import { config } from 'dotenv';
+import { envFileOrder } from './_env-precedence';
+import { assertSafeDatabaseTarget } from './_db-branch-guard';
 
-config({ path: '.env.local' });
-config({ path: '.env' });
+for (const path of envFileOrder(process.env.NODE_ENV ?? 'development')) {
+  config({ path });
+}
+
+assertSafeDatabaseTarget();
