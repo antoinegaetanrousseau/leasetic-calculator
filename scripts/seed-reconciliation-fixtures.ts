@@ -60,19 +60,17 @@
  */
 import './_load-env';
 import { neon } from '@neondatabase/serverless';
+import { NEON_ENDPOINTS } from './_neon-endpoints';
 
 /** Marks every row this script owns. Insert skips these; --remove deletes these. */
 const FIXTURE_PREFIX = 'seed-recon-';
 
 /**
- * Neon endpoints this script must never touch, from
- * docs/operations/neon-branch-routing.md § Lifecycle. There is deliberately no
+ * Neon endpoints this script must never touch, derived from
+ * scripts/_neon-endpoints.list (D-05, D-05a). There is deliberately no
  * override env var: a fixture seeder running against production is never correct.
  */
-const FORBIDDEN_ENDPOINTS: ReadonlyArray<{ prefix: string; scope: string }> = [
-  { prefix: 'ep-icy-boat-alx5o1tz', scope: 'PRODUCTION (Neon branch `main`)' },
-  { prefix: 'ep-delicate-night-als4ogpc', scope: 'PREVIEW (Neon branch `preview`)' },
-];
+const FORBIDDEN_TARGETS = NEON_ENDPOINTS.filter((e) => e.branch !== 'development');
 
 type Fixture = {
   key: string;
@@ -232,9 +230,8 @@ async function main(): Promise<void> {
     fail('DATABASE_URL is not set.');
   }
 
-  // bug_011 discipline (see scripts/backfill-partner-type.ts): use URL.hostname,
-  // NOT URL.host — `host` includes the port, so a connection string carrying an
-  // explicit :5432 would not match a bare endpoint prefix and would slip the gate.
+  // bug_011 discipline (see scripts/_neon-endpoints.list and
+  // scripts/backfill-partner-type.ts) for the rule.
   let hostname: string;
   try {
     hostname = new URL(databaseUrl).hostname;
@@ -242,7 +239,7 @@ async function main(): Promise<void> {
     fail('DATABASE_URL is malformed.');
   }
 
-  const forbidden = FORBIDDEN_ENDPOINTS.find((e) => hostname.startsWith(e.prefix));
+  const forbidden = FORBIDDEN_TARGETS.find((e) => hostname.startsWith(e.prefix));
   if (forbidden) {
     fail(
       'refusing to seed fixtures into ' +
