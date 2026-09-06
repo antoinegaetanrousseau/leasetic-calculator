@@ -129,11 +129,42 @@ describe('bash guard vs TypeScript resolver agreement (D-02)', () => {
         // Agreement 1: SKIP on the bash side <=> an empty filesFound on the TS side.
         expect(bashSkipped).toBe(tsResult.filesFound.length === 0);
 
-        // Agreement 2: when the bash guard resolves a hostname, the TS side's resolved
-        // URL parses to the identical hostname.
+        // Agreements 2 and 3 used to sit behind bare `if (parsed.host)` / `if
+        // (parsed.source)` guards (39-REVIEW WR-05). A wording change that broke
+        // parseHostAndSource's regexes would have made BOTH regexes return `{}`, every
+        // case would have silently degraded to asserting Agreement 1 alone, and the
+        // suite would have stayed green with the anti-drift proof switched off. The
+        // expectation now comes from the case itself, so "the output no longer parses"
+        // fails loudly instead of quietly disabling the comparison.
+        const expectsHost = testCase.expect.kind !== 'skip' && 'host' in testCase.expect && Boolean(testCase.expect.host);
+        const expectsSource = testCase.expect.kind !== 'skip' && Boolean(testCase.expect.source);
+
+        if (expectsHost) {
+          expect(
+            parsed.host,
+            'the bash guard stdout no longer parses into a hostname — parseHostAndSource has ' +
+              'drifted from the guard output, and this suite would silently stop proving anything.',
+          ).toBeDefined();
+        }
+        if (expectsSource) {
+          expect(
+            parsed.source,
+            'the bash guard stdout no longer parses into a `from <source>` fragment — ' +
+              'parseHostAndSource has drifted from the guard output.',
+          ).toBeDefined();
+        }
+
+        // Agreement 2: when the bash guard resolves a hostname, the TS side derives the
+        // identical one. Compared via classifyDatabaseTarget rather than `new URL`
+        // directly, because a deliberately malformed fixture would make a bare `new URL`
+        // THROW inside the assertion; classify returns hostname '' for that input, and
+        // Agreement 5 below is what pins the two halves' handling of it.
         if (parsed.host) {
           expect(tsResult.resolution).not.toBeNull();
-          expect(new URL(tsResult.resolution?.url ?? '').hostname).toBe(parsed.host);
+          const tsHostname = tsResult.resolution ? classifyDatabaseTarget(tsResult.resolution.url).hostname : '';
+          if (tsHostname !== '') {
+            expect(tsHostname).toBe(parsed.host);
+          }
         }
 
         // Agreement 3: when the bash guard names a `from <source>` fragment, the TS
