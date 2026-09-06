@@ -120,6 +120,44 @@ describe('assertSafeDatabaseTarget', () => {
     expect(refuseCalls).toBe(0);
   });
 
+  /**
+   * 39-REVIEW WR-07. The SKIP rule is computed per-node-env, not per-machine.
+   * `envFileOrder('test')` excludes `.env.local` outright, so a machine holding ONLY
+   * `.env.local` has an empty candidate set under `NODE_ENV=test` and the guard returns
+   * silently — even with a production DATABASE_URL in the ambient environment, and even
+   * though a production env file may well be sitting right next to it on disk.
+   *
+   * This test does not endorse that; it PINS it, so the behaviour is a known position
+   * rather than something rediscovered during an incident. `scripts/_db-branch-guard.ts`
+   * carries the analysis: what the safe broadening looks like, and why the obvious one
+   * (skip only when no `.env*` exists at all) would break the MIGRATE PROD workflow,
+   * since `.env.example` is committed. If a future change makes this refuse, that is an
+   * IMPROVEMENT — update this test to expect the refusal.
+   */
+  it('KNOWN GAP (pinned): nodeEnv test with .env.local on disk skips, even with a production DATABASE_URL in processEnv', () => {
+    const dir = makeTempDir();
+    writeFileSync(join(dir, '.env.local'), `DATABASE_URL=${urlFor(DEVELOPMENT_HOST)}\n`);
+    writeFileSync(join(dir, '.env.production.local'), `DATABASE_URL=${urlFor(PRODUCTION_HOST)}\n`);
+
+    let refuseCalls = 0;
+    assertSafeDatabaseTarget({
+      cwd: dir,
+      nodeEnv: 'test',
+      processEnv: { NODE_ENV: 'test', DATABASE_URL: urlFor(PRODUCTION_HOST) },
+      onRefuse: (): never => {
+        refuseCalls += 1;
+        throw new Error('refused');
+      },
+    });
+
+    expect(
+      refuseCalls,
+      'The NODE_ENV=test SKIP gap has changed behaviour. If the guard now refuses here, that is ' +
+        'the WR-07 hardening landing — update this expectation and the analysis in ' +
+        'scripts/_db-branch-guard.ts together.',
+    ).toBe(0);
+  });
+
   it('refuses exactly once when .env.production.local (production host) is present and nodeEnv is production', () => {
     const dir = makeTempDir();
     writeFileSync(join(dir, '.env.production.local'), `DATABASE_URL=${urlFor(PRODUCTION_HOST)}\n`);

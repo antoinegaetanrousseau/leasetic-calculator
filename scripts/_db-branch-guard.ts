@@ -57,6 +57,32 @@
  *     ephemeral Neon branch action's output, again with no `.env*` file present
  * Deleting this rule would break all three. It is re-verified here, not assumed — see
  * `tests/db-branch-guard.test.ts`'s SKIP-rule case.
+ *
+ * KNOWN NARROWNESS OF THE SKIP RULE (39-REVIEW WR-07 — read before "fixing" it)
+ * The rule is computed against the candidate set for ONE node-env, not against the
+ * machine. `envFileOrder('test')` deliberately excludes `.env.local`, so on a developer
+ * machine holding only `.env.local` and `.env.production.local`, `filesFound` is empty
+ * under `NODE_ENV=test` and this guard returns silently — including when a production
+ * `DATABASE_URL` sits in the ambient environment. Reaching that state takes a manual
+ * `NODE_ENV=test npx tsx scripts/<something>.ts` with production credentials exported;
+ * no npm script in this repo does it, and `tests/db-branch-guard.test.ts` pins the
+ * behaviour so it is a known position rather than an accident.
+ *
+ * The obvious broadening — "skip only when NO `.env*` file exists in cwd" — is WRONG and
+ * must not be applied: `.env.example` IS committed to this repo, so every checkout has a
+ * matching file, and the guard would stop skipping inside the `MIGRATE PROD` workflow
+ * and CI's ephemeral-branch step, where `DATABASE_URL` is a production-scoped secret.
+ * That change would refuse the migration paths outright.
+ *
+ * The narrow, safe version is to base the SKIP decision (and only the SKIP decision) on
+ * the union order — the node-env order plus `.env.local` — while RESOLUTION keeps using
+ * `envFileOrder(nodeEnv)` so a local override still cannot leak into a test run. It is
+ * inert for every node-env except `test`, whose candidate set is the only one missing
+ * `.env.local`. It requires the matching change in `scripts/check-local-db-branch.sh`
+ * (two arrays: one for presence, one for resolution) or the differential suite's
+ * Agreement 1 breaks, and it flips the pinned "NODE_ENV=test with only .env.local
+ * present" case from SKIP to ERROR. Deliberately left for an operator decision rather
+ * than folded into a review-fix pass.
  */
 import { NEON_ENDPOINTS } from './_neon-endpoints';
 import { resolveDatabaseUrl } from './_env-precedence';
