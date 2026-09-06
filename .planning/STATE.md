@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-06T08:42:55.956Z"
+last_updated: "2026-09-06T08:54:42.638Z"
 last_activity: 2026-09-06
 progress:
   total_phases: 25
   completed_phases: 9
   total_plans: 68
-  completed_plans: 65
+  completed_plans: 66
   percent: 36
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 38 (shell-dialogs-visual-conventions) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-09-06
 
@@ -479,6 +479,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 37 P04 | 50min | 2 tasks | 1 files |
 | Phase 37 P05 | ~40min | 1 tasks | 3 files |
 | Phase 38 P01 | 8min | 2 tasks | 6 files |
+| Phase 38 P02 | 18m | 3 tasks | 4 files |
 
 ## Decisions
 
@@ -640,6 +641,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 37]: Admin PDF route defect found during the walk (missing D-37-01 bypass) fixed in commit 7999759 at the operator's explicit decision
 - [Phase 38-01]: common.close.aria added as a generic .aria-suffixed key rather than reusing auth.modal.button.close — 38-CONTEXT.md's Claude's-Discretion resolution: .aria suffix convention already established, keeps FR/EN parity compile-enforced
 - [Phase 38-01]: resolveDomLang() lives in src/lib/i18n/, not duplicated inline in dialog.tsx/sheet.tsx — keeps the vendored primitive diff to 3 changed lines per file (2 imports + 1 span), which is what makes the D-38-11 re-import row cheap to re-apply
+- [Phase 38]: GAP-04 escape hatch not taken; padding+focus fix branch implemented per D-38-13/A-38-03
+- [Phase 38]: No new --focus-ring token minted; six selectors repoint at existing --ring token per A-38-03
+- [Phase 38]: LoadMoreButton aria-label deleted rather than made dynamic; visible text is the accessible name
 
 ### Blockers
 

@@ -81,7 +81,7 @@ stops existing.
 - [x] **GAP-03**: Phase 35's two INFO findings are resolved — the redundant `!isAdmin` check beside
   an already-null-gated `momentum` value is removed, and `BADGE_THRESHOLDS` is no longer exported as
   a mutable object.
-- [ ] **GAP-04**: The "Charger plus" pagination control and the `.btn-out` class agree with the app's
+- [x] **GAP-04**: The "Charger plus" pagination control and the `.btn-out` class agree with the app's
   declared conventions — on-grid padding and the standard focus treatment — or the spec is updated to
   record a deliberate exception. Today `.btn-out` carries `0.6rem` vertical padding (9.6px, off the
   4px grid) and a third hardcoded focus shadow.
@@ -190,7 +190,7 @@ stops existing.
 | GAP-01 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-03 | Phase 37 — CRM Stack Closure | Complete |
-| GAP-04 | Phase 38 — Shell, Dialogs & Visual Conventions | Pending |
+| GAP-04 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-05 | Phase 39 — Operational & Credential Gates | Pending |
 | OPS-01 | Phase 39 — Operational & Credential Gates | Pending |
 | OPS-02 | Phase 39 — Operational & Credential Gates | Pending |

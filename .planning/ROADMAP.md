@@ -872,7 +872,7 @@ files.
      on-grid padding and the standard focus treatment — or `UI-CONVENTIONS.md` records the `0.6rem`
      vertical padding and the third hardcoded focus shadow as a dated, deliberate exception.
 
-**Plans:** 1/4 plans executed
+**Plans:** 2/4 plans executed
 Plans:
 **Wave 1**
 
@@ -880,7 +880,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 38-02-PLAN.md — GAP-04: on-grid `0.5rem` button padding, six focus selectors repointed at `var(--ring)`, `LoadMoreButton` aria-label removed, UIC-11 minted (wave 2)
+- [x] 38-02-PLAN.md — GAP-04: on-grid `0.5rem` button padding, six focus selectors repointed at `var(--ring)`, `LoadMoreButton` aria-label removed, UIC-11 minted (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -1011,7 +1011,7 @@ archived where the tooling expects to find them.
 | 35. Sales Motivation | v1.7 | 5/5 | Complete    | 2026-09-05 |
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
-| 38. Shell, Dialogs & Visual Conventions | v1.8 | 1/4 | In Progress|  |
+| 38. Shell, Dialogs & Visual Conventions | v1.8 | 2/4 | In Progress|  |
 | 39. Operational & Credential Gates | v1.8 | 0/? | Not started | - |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 
