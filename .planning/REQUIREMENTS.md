@@ -103,6 +103,26 @@ stops existing.
 - [ ] **OPS-04**: DATA-11's 10-year PDF retention carries a recorded legal position — Thomas's
   sign-off, or an explicit interim decision naming who accepts the risk until it arrives.
   *External dependency — must be closable by a recorded decision.*
+- [ ] **OPS-05**: `scripts/check-local-db-branch.sh` validates the `DATABASE_URL` the command that
+  is about to run will actually open, instead of parsing `.env.local` unconditionally. The guard
+  hardcodes `ENV_FILE=".env.local"`, but `@next/env` resolves `.env.$NODE_ENV.local` at HIGHER
+  precedence and is first-writer-wins — so under `npm run build` / `npm run start` a
+  `.env.production.local` shadows `.env.local` entirely and the guard prints
+  "OK: development branch" while the server is serving production. *Observed 2026-09-06 during
+  Phase 37 plan 37-05: `npm run check:local-db-branch` passed while `npm run start` ran against
+  `ep-icy-boat-alx5o1tz-pooler` — the exact endpoint the guard's own error branch labels
+  PRODUCTION. No writes occurred (sign-in failed at the CORS preflight, because that same file
+  inlines `NEXT_PUBLIC_APP_URL=https://leasetic-matrice.vercel.app` into the client bundle at build
+  time), but the next three walk steps would have written fixture data to the production branch.*
+  Note the same defect in a second place: `scripts/_load-env.ts` documents its precedence as
+  "deliberately the same order Next.js applies" but loads only `.env.local` then `.env`, omitting
+  `.env.$NODE_ENV.local` and `.env.$NODE_ENV` — its own docstring names `.env.production.local` as a
+  file this repo has, then never loads it. Every `tsx` entry point (`db:migrate`, the seeders,
+  `purge:*`, `grant:admin`, `probe:write-isolation`, `drizzle.config.ts`) inherits that. The
+  divergence currently falls the safe way — scripts stay on `.env.local` while the app followed
+  `.env.production.local` to production — which is why it went unnoticed. Closing OPS-05 should
+  leave ONE resolver shared by the guard and `_load-env.ts`, not a third independent notion of the
+  effective `DATABASE_URL`.
 
 ### Housekeeping (HOUSE)
 
@@ -176,19 +196,20 @@ stops existing.
 | OPS-02 | Phase 39 — Operational & Credential Gates | Pending |
 | OPS-03 | Phase 39 — Operational & Credential Gates | Pending |
 | OPS-04 | Phase 39 — Operational & Credential Gates | Pending |
+| OPS-05 | Phase 39 — Operational & Credential Gates | Pending |
 | HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-03 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-04 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 
-**Coverage: 21/21 requirements mapped to exactly one phase — no orphans, no duplicates.**
+**Coverage: 22/22 requirements mapped to exactly one phase — no orphans, no duplicates.**
 
 | Phase | Requirements | Count |
 |---|---|---|
 | 36 — Gate Repair & Planning-Record Hygiene | HOUSE-01, HOUSE-02, HOUSE-03, HOUSE-04, CLOSE-05 | 5 |
 | 37 — CRM Stack Closure | CLOSE-01, CLOSE-03, CLOSE-04, GAP-01, GAP-03 | 5 |
 | 38 — Shell, Dialogs & Visual Conventions | CLOSE-02, CLOSE-08, GAP-02, GAP-04 | 4 |
-| 39 — Operational & Credential Gates | OPS-01, OPS-02, OPS-03, OPS-04, GAP-05 | 5 |
+| 39 — Operational & Credential Gates | OPS-01, OPS-02, OPS-03, OPS-04, OPS-05, GAP-05 | 6 |
 | 40 — Milestone Record Closure | CLOSE-06, CLOSE-07 | 2 |
 
 *Traceability filled 2026-09-05 by the roadmapper. Phase details in `.planning/ROADMAP.md`.*

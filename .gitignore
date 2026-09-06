@@ -19,6 +19,14 @@ next-env.d.ts
 .env*.local
 .env.local.bak*
 
+# Any env file carrying a suffix AFTER `.local` — e.g. neutralising a pulled
+# Vercel production env by renaming `.env.production.local` to
+# `.env.production.local.DISABLED-for-local-walk`. Every rule above anchors on a
+# `.local` ENDING, so such a rename silently drops out of coverage and the file
+# reappears as untracked with live production credentials in it. The trailing `*`
+# keeps it ignored whatever suffix is appended.
+.env*.local*
+
 # Phase 31 — reconciliation dry-run reports (contain live client data, never commit)
 .reconcile/
 
