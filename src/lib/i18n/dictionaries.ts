@@ -288,6 +288,8 @@ export const dictionaries = {
     // detail-route leaves. Dictionary-keyed by design (no entity names in the
     // shell header — see 31.1-02-PLAN.md objective).
     'shell.topbar.toggleSidebar': 'Basculer la barre latérale',
+    'shell.sidebar.title': 'Barre latérale',
+    'shell.sidebar.description': 'Affiche la barre latérale mobile.',
     'shell.breadcrumb.clientDetail': 'Fiche client',
     'shell.breadcrumb.companyDetail': 'Fiche société',
     'shell.breadcrumb.proposalDetail': 'Proposition',
@@ -1570,6 +1572,8 @@ export const dictionaries = {
     'shell.topbar.admin.badge': 'ADMIN',
     // Phase 31.1 Plan 02 — D-06/D-07 EN counterparts.
     'shell.topbar.toggleSidebar': 'Toggle sidebar',
+    'shell.sidebar.title': 'Sidebar',
+    'shell.sidebar.description': 'Displays the mobile sidebar.',
     'shell.breadcrumb.clientDetail': 'Client record',
     'shell.breadcrumb.companyDetail': 'Company record',
     'shell.breadcrumb.proposalDetail': 'Proposal',

@@ -392,6 +392,18 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
     border-radius: 9999px;
     font-family: inherit;
     font-size: 14px;
+    /* Pin the line box so the rendered height is deterministic (UIC-11 / GAP-04,
+       corrected during the Phase 38 CLOSE-08 walk — see F-38-02 in 38-UAT.md).
+       These classes have NO fixed height, so height = padding + line box. Without
+       this the inherited body line-height (21.7px on 14px Inter) produced
+       8 + 21.7 + 8 = 37.7px, NOT the 36px that 38-02 claimed and that
+       button.tsx's `default` (h-9) actually renders — a 1.7px mismatch, and
+       3.7px for .btn-out. 20px is Tailwind's text-sm line box, i.e. the exact
+       value shadcn's own buttons use, so:
+         .btn-green / .btn-navy : 8 + 20 + 8      = 36px  (== button.tsx default)
+         .btn-out               : 36 + 1 + 1 bord = 38px  (A-38-02's expected ~2px delta)
+       Verified in-browser before and after the change. */
+    line-height: 20px;
     font-weight: 600;
     border: none;
     cursor: pointer;

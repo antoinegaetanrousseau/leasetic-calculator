@@ -28,8 +28,8 @@ database_reason: |
 
 ## Current Test
 
-CLOSE-02 complete (2/2 pass), F-38-01 resolved, 31.1-VERIFICATION.md flipped to passed 7/7.
-Next: plan 38-04 — the CLOSE-08 light+dark walk.
+CLOSE-02, CLOSE-08 and GAP-02's verification legs all walked. Awaiting operator adjudication
+(plan 38-04 Task 3) before ticking requirements and restoring the environment.
 
 ## Environment
 
@@ -222,8 +222,130 @@ verified: |
   dormant for a future HTML-based preview?), and dark-palette.test.ts is deliberately built as a
   tripwire whose own comments require "a conscious, deliberate test edit".
 
+## CLOSE-08 — Phase 28 browser-verification backlog
+
+Walked 2026-09-06 by Claude driving a DevTools-controlled Chrome against the operator-authenticated
+session in "Environment". Heights and focus geometry are **measured** via `getBoundingClientRect()`
+and `getComputedStyle()`, never judged by eye. Read-only except for one disclosed write (F-38-04).
+
+**All height figures below are POST-F-38-02-fix.** The walk found the legacy buttons rendering at
+37.7px rather than the 36px plan 38-02 claimed, fixed it in-phase, rebuilt, and re-measured. The
+pre-fix figures are kept in F-38-02 so the correction is auditable.
+
+| # | Surface | Route | Theme | `.btn-*` present | Measured | Result |
+|---|---|---|---|---|---|---|
+| 1 | Wizard step 1 | `/proposals/new/parametres` | light | **none** | 2 shadcn @ 36px; zero `.btn-*` in DOM | **not observable** — see F-38-03, F-38-04 |
+| 2 | Proposals list | `/proposals` | light | `.btn-out`, `.btn-green` | `.btn-out` 38px · `.btn-green` 36px | pass |
+| 2 | Proposals list | `/proposals` | dark | `.btn-out`, `.btn-green` | `.btn-out` 38px · `.btn-green` 36px (identical) | pass |
+| 3 | Coefficients | `/{admin}/coefficients` | light | `.btn-green` | `.btn-green` 36px | pass |
+| 3 | Coefficients | `/{admin}/coefficients` | dark | `.btn-green` | 36px (identical) | pass |
+| 4 | Paramètres | `/parametres` | light | `.btn-out`, `.btn-green` | `.btn-out` 38px · `.btn-green` 36px | pass |
+| 4 | Paramètres | `/parametres` | dark | `.btn-out`, `.btn-green` | identical | pass |
+| 5a | Partners list | `/{admin}/partners` | light | `.btn-green` | 36px | pass |
+| 5a | Partners list | `/{admin}/partners` | dark | `.btn-green` | 36px (identical) | pass |
+| 5b | Create-partner form | `/{admin}/partners/new` | light | `.btn-out`, `.btn-green` | `.btn-out` 38px @ top 1185.2 · `.btn-green` 36px @ top 1186.2 | pass — 1px offset is A-38-02's expected border delta |
+| 5c | LC references | `/{admin}/lc-references` | light | **none rendered** | 16 rows, zero `.btn-*` | **not observable** — pagination-conditional, see F-38-06 |
+| 6 | NotFoundCard | `/clients` (404 as admin) | dark | `.btn-green` | rendered | incidental pass |
+
+**Heights are theme-independent** — every dark row re-measured identically to its light row, which is
+expected (the padding/line-box rule carries no theme condition) and is recorded rather than assumed.
+
+### Row alignment
+
+The plan's acceptance criterion asked for measured legacy-vs-shadcn pairs. **No surface in this walk
+renders a legacy `.btn-*` in the same row as a shadcn `Button`** — the two populations are disjoint in
+practice. So the alignment claim is verified against the shadcn contract itself rather than a
+co-located pair:
+
+```
+shadcn Button `default` (h-9), measured in-page   : 36.0px   (line-height 20px)
+.btn-green / .btn-navy  after F-38-02 fix         : 36.0px   ← parity
+.btn-out                after F-38-02 fix         : 38.0px   ← +2px border (A-38-02: expected)
+```
+
+Before the fix these were 37.7px and 39.7px. Arithmetic, verified in-browser both ways:
+`8px pad + 20px line box + 8px pad = 36`; `.btn-out` adds `1px + 1px` border = 38.
+
+### Focus ring (UIC-11)
+
+Measured on `.btn-out` at `/parametres` under **real keyboard focus** (a `Tab` keypress, not
+`element.focus()` — `:focus-visible` does not match programmatic focus, and testing it that way
+returns an empty ring and looks like a defect):
+
+```
+:focus-visible          = true
+box-shadow: rgb(1,204,114) 0 0 0 2px,               <- solid 2px inner ring, --ring #01cc72
+            oklab(0.741781 -0.1679 0.0817899/0.5)
+                        0 0 0 5px                    <- 5px halo at 50% (color-mix layer)
+outline: none
+```
+
+Two-layer geometry confirmed, materially different from the retired flat
+`0 0 0 3px rgba(45,122,140,0.18)`. `.search-bar:focus-within` renders the **identical** ring and
+retains `border-color: var(--teal)` (`lab(48.496 0 0)`, matching the `--teal` token).
+
+**Measured contrast of the ring against the dark surfaces** (WCAG non-text minimum is 3.0):
+
+| Surface | New ring `#01cc72` | Retired ring `rgba(45,122,140,.18)` composited |
+|---|---|---|
+| `--background` `#161616` | **8.52:1** | 1.19:1 |
+| `--card` `#1e1e1e` | **7.84:1** | 1.20:1 |
+| sidebar-accent `#262626` | **7.12:1** | 1.19:1 |
+
+This reproduces 38-UI-SPEC.md's quoted 7.12:1 and 1.19:1 exactly. Note the retired figure is only
+1.19:1 once the 18% alpha is composited over the surface — comparing the *solid* `#2d7a8c` instead
+gives 3.08:1 and would have made the retired ring look acceptable. A-38-03's payoff is real and now
+measured, not quoted: the dark-theme focus indicator moved from **below** the WCAG non-text floor to
+roughly 2.4x above it.
+
+### Vertical rhythm
+
+No card, table row or button group showed disturbed spacing after the height change at either theme.
+The change reduced legacy button heights by ~1.7px (`.btn-green`/`.btn-navy`) and ~1.7px (`.btn-out`)
+from their pre-walk rendered values; nothing observed depended on the old height.
+
+---
+
+## GAP-02 — dialog close accessible name (FR/EN)
+
+D-38-12 asked for four observations: {dialog, sheet} x {fr, en}. **Two were obtained; two are
+blocked by an access-control design decision, not by a defect.**
+
+| # | Surface | `<html lang>` | Accessible name | Source of reading | Result |
+|---|---|---|---|---|---|
+| 1 | Mobile sidebar sheet — close button | `fr` | **`Fermer`** | DOM: `.sr-only` text, no `aria-label` override -> accname = content | pass |
+| 2 | Mobile sidebar sheet — close button | `en` | **`Close`** | same | pass |
+| 3 | `dialog.tsx` consumer — close button | `fr` | — | — | **blocked, not observable** |
+| 4 | `dialog.tsx` consumer — close button | `en` | — | — | **blocked, not observable** |
+
+**Why 3 and 4 are blocked.** Every `dialog.tsx` consumer in the codebase lives under `/clients/*`
+(`CreateClientDialog`, `EditRelationDialog`, `EditCompanyDialog`, `MarkWonDialog`, `MarkLostDialog`,
+`ContactFormDialog`, `NextActionDialog`) plus `MergeDialog` on the admin reconciliation queue.
+`/clients` calls `requireRelationshipHolder()`, which **refuses admins via `notFound()` by design**
+(CRM-02) — confirmed live: `/clients` returned "Page introuvable" for this ADMIN session. The
+reconciliation queue is empty, so `MergeDialog` has nothing to open. This is correct application
+behaviour, not a defect, and it is not something to work around by creating data.
+
+Mitigating evidence for the unobserved half, stated as mitigation rather than substitution:
+`dialog.tsx` and `sheet.tsx` carry the *byte-identical* edit
+(`{t('common.close.aria', resolveDomLang())}`), both are pinned by `tests/dialog-close-label.test.ts`,
+and the sheet observation exercises that exact call path at runtime in both languages.
+
+**`<html lang>` actually flips (D-38-09's precondition).** Observed directly: `fr` before, and `en`
+immediately after clicking EN in the user-menu `LocaleToggle`, with the UI re-rendering ("Mes
+propositions" -> "My proposals"). `setLang`'s `revalidatePath('/', 'layout')` keeps the attribute
+current, so `resolveDomLang()` has a correct value to read.
+
+**Visual contract (zero visual change) upheld** — the close control keeps its icon, `absolute top-4
+right-4` position, `icon-sm` size and `ghost` variant; only the `.sr-only` text changed.
+
+**Hydration warnings: none.** The console was checked with error+warn filters across the preserved
+navigation history while a sheet was open. Zero messages. Recorded explicitly per the plan, rather
+than left unmentioned.
+
 ## Summary
 
+CLOSE-02 (plan 38-03):
 total: 2
 passed: 2
 issues: 0
@@ -231,9 +353,147 @@ pending: 0
 skipped: 0
 blocked: 0
 
-Findings raised (not check failures): 1 — F-38-01 (resolved in-phase).
+CLOSE-08 + GAP-02 (plan 38-04):
+surfaces walked: 6 (of 7 named; 2 not observable)
+light rows: 7   dark rows: 4   (heights measured identical across themes)
+passed: 9
+not observable: 3 (wizard step 1, LC-references pagination control, dialog.tsx FR/EN)
+failed: 0
+
+Findings raised: 6 — F-38-01, F-38-02, F-38-05 resolved in-phase;
+F-38-03, F-38-06 filed as follow-ups; F-38-04 is a disclosed process finding.
 
 ## Gaps
+
+### F-38-02 — legacy `.btn-*` rendered at 37.7px, not the 36px plan 38-02 claimed
+
+status: resolved — fixed in-phase 2026-09-06 (D-38-07: a CSS rule)
+found_by: CLOSE-08 walk, row-alignment measurement
+severity: the substance of GAP-04's success criterion 4 — a fourth undeclared button height
+
+`38-02-SUMMARY.md` states twice that the `0.5rem` padding change lands the legacy classes "on the
+36px `default` step". Measured in the browser, they landed at **37.7px** (`.btn-green`/`.btn-navy`)
+and **39.7px** (`.btn-out`).
+
+Cause: these classes set padding but **no height and no line-height**, so height is content-driven.
+They inherited the body line box of **21.7px** (14px Inter), while shadcn's `text-sm` pins **20px**:
+
+    before:  8 + 21.7 + 8              = 37.7px   (+1.7px vs a real Button)
+             37.7 + 1 + 1 border       = 39.7px   (+3.7px)
+    after:   8 + 20   + 8              = 36.0px   (parity)
+             36 + 1 + 1 border         = 38.0px   (A-38-02's expected ~2px delta, now exact)
+
+So GAP-04's padding fix moved the height 3.2px closer but did not achieve the parity its own summary
+claims — the buttons remained a fourth undeclared height, which is precisely the defect GAP-04
+exists to remove. Fix applied: `line-height: 20px` on the shared
+`.btn-green, .btn-navy, .btn-out` rule (app/globals.css), with a comment recording the arithmetic
+and why 20px. Hypothesis was verified in-browser BEFORE editing (setting the property on live
+elements produced exactly 36/38) and re-verified after a rebuild against the served CSS.
+
+Note this does not invalidate 38-02's other work: `0.5rem` is still the correct on-grid padding per
+UIC-01, and the focus-ring half of GAP-04 was correct as shipped. `38-02-SUMMARY.md` is left
+unedited — it is a historical record; this entry is the correction.
+
+### F-38-03 — `ProposalForm` is dead code, and CLOSE-08 surface #1 was mis-mapped
+
+status: open — filed for a later phase (D-38-07: needs a component change, not a CSS/token/i18n edit)
+found_by: CLOSE-08 walk, surface #1
+severity: low runtime risk, moderate planning-record risk
+
+`38-WALK-SURFACES.md` Table 1 maps CLOSE-08 surface #1 (wizard step 1) to
+`src/components/proposal/ProposalForm.tsx` lines 537 (`.btn-out`) and 547 (`.btn-navy`).
+Wizard step 1 renders **zero** `.btn-*` elements — confirmed live
+(`document.querySelectorAll('[class*="btn-"]').length === 0`).
+
+`/proposals/new/parametres` is served by `page.tsx` + `ParametresFormCard.tsx` +
+`WizardStep1Wiring.tsx`. Those import only `ProposalFormProvider` (the RHF context) from
+`ProposalForm.tsx` — **never the `ProposalForm` component itself**. A repo-wide search for
+`<ProposalForm` finds only two hits, both inside `ProposalForm.tsx`'s own comments. The component
+and its action row are unrendered.
+
+Consequences worth recording:
+- 38-CONTEXT.md **D-38-04's premise is false for surface #1**: it asserts "every CLOSE-08 surface
+  renders a `.btn-out`", citing `ProposalForm.tsx:537` for the wizard. It does not.
+- The `grep -rl` blast-radius counts (21/3/19/32) count **files containing the class string**, not
+  rendered surfaces. They overstate GAP-04's true reach by at least this file.
+
+Recommended follow-up: delete `ProposalForm` (the component) or document why it is retained, and
+correct Table 1. Filed rather than fixed here because deleting an exported component is a component
+change, which D-38-07 routes out of phase.
+
+### F-38-04 — wizard step 1 is not observable read-only (disclosed write)
+
+status: disclosed — operator decided 2026-09-06 to leave the row in place
+found_by: CLOSE-08 walk, surface #1
+severity: process — invalidates the plan's read-only premise for one surface
+
+Navigating to `/proposals/new/parametres` **created a persisted draft**, before any interaction:
+
+    id         675135aa-f5ff-4cd3-94f1-7a0ef2439286
+    lc_ref     LC-2026-003        <- a sequential reference is consumed
+    status     draft
+    created_at 2026-09-06T13:28:55.910Z
+
+Confirmed by read-only query against the development branch. Draft count went 14 -> 15 (there was
+already a stray draft from 2026-09-03). Nothing was submitted; nothing existing was modified or
+deleted; the production branch was never opened.
+
+38-04-PLAN.md Task 1 says to "observe wizard step 1, never submit it", assuming observation is free.
+It is not: this wizard mints a draft and burns an LC reference on entry, so **CLOSE-08 surface #1
+cannot be walked read-only at all**. Operator decision: leave the row (deleting would be a second
+unapproved write, and deletion would not return the consumed reference), record it here, and do not
+re-enter the wizard for the dark pass. A later verification of this surface needs a disposable
+database.
+
+### F-38-05 — the mobile sidebar sheet announced hardcoded English on a `lang="fr"` page
+
+status: resolved — fixed in-phase 2026-09-06 (D-38-07: an i18n string)
+found_by: GAP-02 FR observation, via the DevTools accessibility tree
+severity: the same user-facing a11y defect GAP-02 was raised to fix
+
+Observed in the accessibility tree while `document.documentElement.lang` was `fr`:
+
+    dialog "Sidebar" description="Displays the mobile sidebar."
+    heading "Sidebar" level="2"
+
+`src/components/ui/sidebar.tsx:200-201` hardcoded `<SheetTitle>Sidebar</SheetTitle>` and
+`<SheetDescription>Displays the mobile sidebar.</SheetDescription>` inside an `sr-only`
+`SheetHeader`. GAP-02 fixed the close *button* in `dialog.tsx` and `sheet.tsx` and missed this
+header two lines away in the same vendored, **ESLint-excluded** `src/components/ui/**` directory —
+and it survived for exactly the reason GAP-02 did: `sr-only` text is announced to screen-reader
+users and seen by nobody else.
+
+Fix: added `shell.sidebar.title` / `shell.sidebar.description` (FR + EN) to `dictionaries.ts` and
+wired both through `t(..., resolveDomLang())`, the pattern 38-01 established. Extended
+`tests/dialog-close-label.test.ts` with three assertions, **mutation-tested for non-vacuity**:
+restoring the literal fails exactly the two new guards; reverting passes 8/8. Re-verified live —
+FR now announces "Barre latérale" / "Affiche la barre latérale mobile."; EN announces "Sidebar" /
+"Displays the mobile sidebar."
+
+### F-38-06 — `38-WALK-SURFACES.md` describes pagination controls as "per-row" links
+
+status: open — documentation correction, low priority
+found_by: CLOSE-08 walk, surfaces 5c and 3
+
+Table 1 describes `PartnersList.tsx:213` and `LcReferencesList.tsx:167` as a "per-row link". Both
+are the **"Charger plus" pagination control**, rendered only inside `{nextCursor && ...}`. With the
+current dataset (16 LC references, one page) they do not render at all, so those `.btn-out`
+instances could not be observed. Same applies to `HistoryTable.tsx:169` and `LoadMoreButton`.
+
+Not a code defect — the shared CSS rule governing them was measured directly on other rendered
+`.btn-out` instances — but the surface list should say "pagination control (conditional on
+`nextCursor`)" so a later walker knows it needs a multi-page dataset.
+
+### Method note — one near-miss false finding, recorded deliberately
+
+`.search-bar:focus-within` initially measured with an **empty** `box-shadow`, which looked like a
+broken focus ring. It was not: `.search-bar` carries `transition: box-shadow .15s`, and the reading
+was taken at t=0. Two animation frames in it read `0.24px` / `0.6px` at alpha `0.12` — exactly 16%
+of the way through a 150ms transition. Settled (400ms) it renders the full correct ring.
+
+Recorded because "focus ring missing on the search bar" would have been a plausible, confident and
+wrong entry in this table, and the same trap applies to any future walker measuring a transitioned
+property.
 
 ### F-38-01 — `[data-pdf-surface]` is dead CSS, and its test cannot detect that
 

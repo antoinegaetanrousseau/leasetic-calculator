@@ -18,6 +18,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
+import { t } from "@/lib/i18n/dictionaries"
+import { resolveDomLang } from "@/lib/i18n/dom-lang"
 import {
   Tooltip,
   TooltipContent,
@@ -197,8 +199,14 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            {/* i18n, not literals (F-38-05, Phase 38 CLOSE-08 walk). This header is
+                sr-only, so it is announced to screen-reader users and seen by nobody
+                else — which is exactly how it stayed English on a lang="fr" page.
+                Same defect class as GAP-02, in the same ESLint-excluded directory. */}
+            <SheetTitle>{t('shell.sidebar.title', resolveDomLang())}</SheetTitle>
+            <SheetDescription>
+              {t('shell.sidebar.description', resolveDomLang())}
+            </SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>

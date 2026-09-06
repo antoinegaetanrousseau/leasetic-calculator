@@ -28,6 +28,7 @@ const ROOT = path.resolve(__dirname, '..');
 const DIALOG = 'src/components/ui/dialog.tsx';
 const SHEET = 'src/components/ui/sheet.tsx';
 const DICTIONARIES = 'src/lib/i18n/dictionaries.ts';
+const SIDEBAR = 'src/components/ui/sidebar.tsx';
 
 /** Strip `//` line comments and `/* ... *‍/` block comments so a comment that
  * merely mentions a forbidden or required string cannot satisfy or trip an
@@ -90,6 +91,48 @@ describe('dialog/sheet close-button accessible name (GAP-02, D-38-11)', () => {
         'label. re-apply the row for this file from .planning/codebase/UI-CONVENTIONS.md\'s ' +
         '"Vendored ReUI modifications to re-apply after any re-import" table.',
     ).toContain("t('common.close.aria', resolveDomLang())");
+  });
+
+  /**
+   * F-38-05 — found by the Phase 38 CLOSE-08 browser walk, 2026-09-06.
+   *
+   * GAP-02 fixed the close BUTTON in dialog.tsx and sheet.tsx and missed the
+   * sr-only SheetHeader two lines away in sidebar.tsx, which announced the
+   * literal English "Sidebar" / "Displays the mobile sidebar." on a lang="fr"
+   * page. It survived for the same structural reason GAP-02 did — sr-only text
+   * is announced to screen-reader users and seen by nobody else, inside the
+   * ESLint-excluded src/components/ui/** directory. Observed in the DevTools
+   * accessibility tree as: dialog "Sidebar" description="Displays the mobile
+   * sidebar." while document.documentElement.lang was "fr".
+   */
+  it('sidebar.tsx does not hardcode the English sheet title/description', () => {
+    const stripped = readStripped(SIDEBAR);
+    expect(
+      stripped,
+      'src/components/ui/sidebar.tsx carries a hardcoded <SheetTitle>Sidebar</SheetTitle> again ' +
+        '(F-38-05). It must read shell.sidebar.title from the FR/EN dictionary.',
+    ).not.toMatch(/<SheetTitle>Sidebar<\/SheetTitle>/);
+    expect(
+      stripped,
+      'src/components/ui/sidebar.tsx carries a hardcoded English SheetDescription again ' +
+        '(F-38-05). It must read shell.sidebar.description from the FR/EN dictionary.',
+    ).not.toMatch(/<SheetDescription>Displays the mobile sidebar\.<\/SheetDescription>/);
+  });
+
+  it('sidebar.tsx reads its sheet title/description from the dictionary via resolveDomLang()', () => {
+    const stripped = readStripped(SIDEBAR);
+    expect(stripped, 'sidebar.tsx must call t(\'shell.sidebar.title\', resolveDomLang())')
+      .toContain("t('shell.sidebar.title', resolveDomLang())");
+    expect(stripped, 'sidebar.tsx must call t(\'shell.sidebar.description\', resolveDomLang())')
+      .toContain("t('shell.sidebar.description', resolveDomLang())");
+  });
+
+  it('dictionaries.ts carries both FR and EN values for shell.sidebar.* (F-38-05)', () => {
+    const stripped = readStripped(DICTIONARIES);
+    expect(stripped).toContain("'shell.sidebar.title': 'Barre latérale'");
+    expect(stripped).toContain("'shell.sidebar.description': 'Affiche la barre latérale mobile.'");
+    expect(stripped).toContain("'shell.sidebar.title': 'Sidebar'");
+    expect(stripped).toContain("'shell.sidebar.description': 'Displays the mobile sidebar.'");
   });
 
   it('dictionaries.ts carries both FR and EN values for common.close.aria', () => {
