@@ -84,19 +84,18 @@
  */
 import './_load-env';
 import { neon } from '@neondatabase/serverless';
+import { NEON_ENDPOINTS } from './_neon-endpoints';
 
 /** Marks every timeline event this script owns, inside `payload->>'fixture'`. */
 const FIXTURE_PREFIX = 'seed-fiche-';
 
 /**
- * Neon endpoints this script must never touch, from
- * docs/operations/neon-branch-routing.md § Lifecycle. There is deliberately no
- * override env var: a fixture seeder running against production is never correct.
+ * Neon endpoints this script must never touch, derived from
+ * scripts/_neon-endpoints.list (D-05, D-05a) — see that file for the
+ * bug_011 hostname-not-host rule. There is deliberately no override env var:
+ * a fixture seeder running against production is never correct.
  */
-const FORBIDDEN_ENDPOINTS: ReadonlyArray<{ prefix: string; scope: string }> = [
-  { prefix: 'ep-icy-boat-alx5o1tz', scope: 'PRODUCTION (Neon branch `main`)' },
-  { prefix: 'ep-delicate-night-als4ogpc', scope: 'PREVIEW (Neon branch `preview`)' },
-];
+const FORBIDDEN_TARGETS = NEON_ENDPOINTS.filter((e) => e.branch !== 'development');
 
 /**
  * Real, currently-active, obviously-public French SIRENs. Each was verified with
@@ -530,8 +529,7 @@ async function main(): Promise<void> {
     fail('DATABASE_URL is not set.');
   }
 
-  // bug_011 discipline: URL.hostname, never URL.host — `host` carries the port,
-  // so a connection string with an explicit :5432 would slip a prefix match.
+  // bug_011 discipline — see scripts/_neon-endpoints.list for the rule.
   let hostname: string;
   try {
     hostname = new URL(databaseUrl).hostname;
@@ -539,7 +537,7 @@ async function main(): Promise<void> {
     fail('DATABASE_URL is malformed.');
   }
 
-  const forbidden = FORBIDDEN_ENDPOINTS.find((e) => hostname.startsWith(e.prefix));
+  const forbidden = FORBIDDEN_TARGETS.find((e) => hostname.startsWith(e.prefix));
   if (forbidden) {
     fail(
       'refusing to seed fixtures into ' +

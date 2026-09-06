@@ -15,14 +15,16 @@
  * broad (any Neon host still requires confirmation for a write) while making
  * the message name the branch.
  *
- * Endpoint IDs come from docs/operations/neon-branch-routing.md § Lifecycle.
- * They are stable per Neon branch and change only if a branch is recreated —
- * in which case update the table below and the routing doc together.
+ * Endpoint IDs come from scripts/_neon-endpoints.list (D-05, D-05a) — the
+ * single declarative source of Neon endpoint identity, shared with the
+ * fixture seeders. That file and docs/operations/neon-branch-routing.md
+ * § Lifecycle are updated together whenever a branch is recreated.
  *
  * FAIL-SAFE: an unrecognised *.neon.tech host resolves to branch 'unknown' and
  * is reported with production severity. If we cannot prove which branch we are
  * pointed at, the only safe assumption is the most dangerous one.
  */
+import { NEON_ENDPOINTS } from './_neon-endpoints';
 
 export type NeonBranch = 'main' | 'preview' | 'development' | 'unknown';
 
@@ -43,12 +45,6 @@ export interface NeonTarget {
   label: string;
 }
 
-const ENDPOINTS: ReadonlyArray<{ prefix: string; branch: Exclude<NeonBranch, 'unknown'> }> = [
-  { prefix: 'ep-icy-boat-alx5o1tz', branch: 'main' },
-  { prefix: 'ep-delicate-night-als4ogpc', branch: 'preview' },
-  { prefix: 'ep-polished-band-alphc576', branch: 'development' },
-];
-
 export function resolveNeonTarget(hostname: string): NeonTarget {
   const isNeon = hostname.endsWith('.neon.tech');
   if (!isNeon) {
@@ -61,7 +57,7 @@ export function resolveNeonTarget(hostname: string): NeonTarget {
     };
   }
 
-  const match = ENDPOINTS.find((e) => hostname.startsWith(e.prefix));
+  const match = NEON_ENDPOINTS.find((e) => hostname.startsWith(e.prefix));
   if (!match) {
     return {
       hostname,
