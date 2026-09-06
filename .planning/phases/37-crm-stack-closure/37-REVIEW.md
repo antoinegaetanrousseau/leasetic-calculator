@@ -17,7 +17,7 @@ findings:
   warning: 3
   info: 0
   total: 3
-status: issues_found
+status: resolved
 ---
 
 # Phase 37: Code Review Report
@@ -179,6 +179,30 @@ export function canAccessProposal(
 ```
 and call it from both the page and the route so a future change to the bypass rule (e.g. adding
 another role) is a one-line, one-location edit instead of two greps.
+
+### WR-03 — RESOLVED 2026-09-06 (commit follows this review)
+
+**Status: fixed.** `makeProposal()` is rebuilt against the real `proposals` schema — all 21
+columns in schema order, `schemaVersion` a string, the three phantom columns gone, the seven
+missing ones added. The `as ProposalRow` cast is removed: the literal now satisfies the type
+unaided, and `...overrides` is spread onto a value already typed `ProposalRow` so it can no
+longer mask a defect in the base literal.
+
+Verified the type check actually validates now, by re-injecting each of the three mistakes the
+old fixture contained. All three are compile errors that previously passed silently:
+
+| Injected | Result |
+|---|---|
+| `pdfBlobUrl` (phantom column) | `TS2353: Object literal may only specify known properties` |
+| `schemaVersion: 1` (wrong type) | `TS2322: Type 'number' is not assignable to type 'string'` |
+| drop `outcomeReason` (missing column) | `TS2741: Property 'outcomeReason' is missing` |
+
+Same remediation as Gate 13's fixture in `tests/admin-09-grep-contracts.test.ts`. `tsc` is now
+the tripwire for schema/fixture drift in this file, which is what the cast was supposed to be.
+
+---
+
+#### Original finding (retained for the record)
 
 ### WR-03: `page.test.tsx`'s `makeProposal()` fixture does not match the real `ProposalRow` schema, and only compiles by defeating TypeScript's excess-property check
 

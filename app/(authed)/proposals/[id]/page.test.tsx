@@ -65,33 +65,57 @@ vi.mock('@/components/proposal/CopyRefButton', () => ({
 
 import ProposalDetailPage from './page';
 
+/**
+ * WR-03 (37-REVIEW.md): rebuilt against the REAL `proposals` schema.
+ *
+ * The previous fixture carried three columns that do not exist (`pdfBlobUrl`, `updatedAt`,
+ * `completedSteps`), typed `schemaVersion` as a number when the column is `text` with a semver
+ * CHECK, and omitted seven real columns. It type-checked only because the trailing
+ * `...overrides` spread widened the literal enough that the `as ProposalRow` cast stopped
+ * validating anything — the cast was silently defeated rather than doing its job.
+ *
+ * Two rules keep it honest from here:
+ *   1. NO `as ProposalRow` cast. The literal must satisfy `ProposalRow` unaided, so `tsc` fails
+ *      the moment the schema and this fixture disagree.
+ *   2. `...overrides` is applied to a value already typed `ProposalRow`, so it can no longer
+ *      mask an excess or missing property in the base literal.
+ *
+ * Same remediation already applied to Gate 13's fixture in
+ * `tests/admin-09-grep-contracts.test.ts`, whose earlier copy of this pattern was rejected by
+ * `tsc --noEmit` (TS2352) the moment the spread came off. All 21 columns are listed in schema
+ * order.
+ */
 function makeProposal(overrides: Partial<ProposalRow> = {}): ProposalRow {
   const createdAt = new Date('2026-05-01T10:00:00Z');
-  return {
+  const base: ProposalRow = {
     id: 'prop-1',
     userId: 'user-1',
+    status: 'active',
+    language: 'fr',
     lcRef: 'L-2026-001',
+    idempotencyKey: 'idem-1',
+    schemaVersion: '1.0.0',
     inputs: {
       clientCo: 'ACME Industries',
       amountHT: '100000',
       validityDays: 30,
       durationMonths: 60,
     },
-    computed: { state: 'computed', trancheKey: 'A', coeff: '2.5000', loyerHT: '2500' },
     paramsSnapshot: null,
-    pdfGeneratedAt: createdAt,
+    computed: { state: 'computed', trancheKey: 'A', coeff: '2.5000', loyerHT: '2500' },
     pdfBlobKey: 'key',
-    pdfBlobUrl: 'https://example.com/p.pdf',
-    schemaVersion: 1,
-    language: 'fr',
-    status: 'active',
-    idempotencyKey: 'idem-1',
+    pdfSha256: null,
+    pdfSizeBytes: null,
+    pdfGeneratedAt: createdAt,
     deletedAt: null,
+    duplicatedFromId: null,
     createdAt,
-    updatedAt: createdAt,
-    completedSteps: 3,
-    ...overrides,
-  } as ProposalRow;
+    clientRelationshipId: null,
+    outcome: null,
+    outcomeDate: null,
+    outcomeReason: null,
+  };
+  return { ...base, ...overrides };
 }
 
 beforeEach(() => {
