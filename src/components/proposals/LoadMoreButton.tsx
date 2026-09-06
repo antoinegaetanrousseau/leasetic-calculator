@@ -59,7 +59,6 @@ export function LoadMoreButton({
         className="btn-out"
         onClick={onClick}
         disabled={loading}
-        aria-label={t('proposal.list.load.more', lang)}
         style={{ opacity: loading ? 0.6 : 1 }}
       >
         {loading ? (
