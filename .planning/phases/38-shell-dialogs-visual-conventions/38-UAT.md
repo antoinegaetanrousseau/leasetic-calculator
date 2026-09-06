@@ -28,7 +28,8 @@ database_reason: |
 
 ## Current Test
 
-CLOSE-02 complete (2/2 pass). Awaiting Task 3 adjudication, then plan 38-04 (CLOSE-08 walk).
+CLOSE-02 complete (2/2 pass), F-38-01 resolved, 31.1-VERIFICATION.md flipped to passed 7/7.
+Next: plan 38-04 — the CLOSE-08 light+dark walk.
 
 ## Environment
 
@@ -230,13 +231,13 @@ pending: 0
 skipped: 0
 blocked: 0
 
-Findings raised (not check failures): 1 — F-38-01.
+Findings raised (not check failures): 1 — F-38-01 (resolved in-phase).
 
 ## Gaps
 
 ### F-38-01 — `[data-pdf-surface]` is dead CSS, and its test cannot detect that
 
-status: open — routing to be decided at 38-03 Task 3 adjudication
+status: resolved — fixed in-phase 2026-09-06 per D-38-07 (operator chose option (b))
 found_by: CLOSE-02 check 2, 2026-09-06
 severity: low functional risk, moderate false-confidence risk
 
@@ -255,3 +256,16 @@ Options considered:
   (b) keep both, add a comment marking the rule dormant and why;
   (c) file as a requirement for a later phase.
 D-38-07 mechanically classes "a CSS rule" as fix-in-phase, but does not disambiguate (a) vs (b).
+
+RESOLUTION — operator chose (b) at the 38-03 Task 3 checkpoint, 2026-09-06. Applied:
+  - app/globals.css: a DORMANT block comment above the rule stating it matches zero elements
+    today, why the white surface is actually correct (src/lib/pdf/styles.ts via Chrome's PDF
+    viewer), that retention is deliberate for a possible future HTML-based preview, and an
+    explicit "do not cite this rule as the reason the PDF renders white".
+  - tests/dark-palette.test.ts: a SCOPE comment above the assertion stating it checks only that
+    the rule TEXT exists and would stay green either way, pointing readers who want rendered-
+    output evidence at 38-UAT.md CLOSE-02 check 2. The test name was corrected from
+    "the print/PDF surface still forces white in dark mode" (a claim it does not test) to
+    "the print/PDF surface rule is still declared for dark mode" (what it does test).
+  Zero behaviour change; 6/6 assertions still pass. The tripwire is kept, the false confidence
+  is removed.

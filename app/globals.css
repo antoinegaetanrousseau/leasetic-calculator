@@ -289,7 +289,19 @@ body {
   body { display: block !important; }
 }
 
-/* PDF/print surface stays white in dark mode (data attribute marker for Phase 8) */
+/* PDF/print surface stays white in dark mode (data attribute marker for Phase 8).
+   DORMANT as of 2026-09-06 — see F-38-01 in
+   .planning/phases/38-shell-dialogs-visual-conventions/38-UAT.md.
+   This rule currently matches ZERO elements: nothing in src/ or app/ sets the
+   `data-pdf-surface` attribute (verified repo-wide, and in the live DOM:
+   document.querySelectorAll('[data-pdf-surface]').length === 0 on a proposal
+   detail page in dark theme). The PDF preview is a server-generated binary
+   rendered by Chrome's own PDF viewer, which app CSS cannot reach into; its
+   colours come from src/lib/pdf/styles.ts (ink '#1a2832'), which is why the
+   surface is correctly white in dark mode today by a different route.
+   RETAINED DELIBERATELY, not overlooked: if an HTML-based PDF/print preview is
+   ever reintroduced, this override and its guard should already be in place.
+   Do not cite this rule as the reason the PDF renders white — it is not. */
 html[data-theme="dark"] [data-pdf-surface] {
   background: #fff !important;
   color: #1a2832 !important;

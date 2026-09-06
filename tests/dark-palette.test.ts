@@ -65,7 +65,17 @@ function extractDarkBlock(css: string): string {
 const darkBlock = extractDarkBlock(globalsCss);
 
 describe('dark palette — invariant gate (Phase 31.1 Plan 05, ROADMAP criterion 7)', () => {
-  it('the print/PDF surface still forces white in dark mode (Phase 5 / Phase 8)', () => {
+  // SCOPE OF THIS ASSERTION — read before trusting it as coverage (F-38-01, Phase 38).
+  // This checks only that the RULE TEXT exists in globals.css. It is not, and cannot be,
+  // evidence that the rule takes effect: as of 2026-09-06 `data-pdf-surface` is set by no
+  // component in src/ or app/, so the rule matches zero elements and this test would stay
+  // green either way. The PDF preview's white surface actually comes from
+  // src/lib/pdf/styles.ts via Chrome's native PDF viewer, which app CSS cannot style.
+  // Kept because the rule is deliberately retained for a possible future HTML-based preview
+  // (see the DORMANT note above the rule in app/globals.css). If you are here because you
+  // want to prove the PDF renders white in dark mode, this test is the wrong instrument —
+  // that was verified by browser observation in 38-UAT.md, CLOSE-02 check 2.
+  it('the print/PDF surface rule is still declared for dark mode (Phase 5 / Phase 8)', () => {
     const pdfRuleMatch = globalsCss.match(
       /html\[data-theme="dark"\]\s*\[data-pdf-surface\]\s*\{([\s\S]*?)\}/,
     );
