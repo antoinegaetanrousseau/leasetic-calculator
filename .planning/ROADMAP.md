@@ -1069,7 +1069,7 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
-| 39. Operational & Credential Gates | v1.8 | 5/5 | Complete   | 2026-09-06 |
+| 39. Operational & Credential Gates | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 
 ---
