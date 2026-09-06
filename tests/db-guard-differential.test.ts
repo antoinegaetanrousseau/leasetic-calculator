@@ -32,7 +32,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { envFileOrder, resolveDatabaseUrl } from '../scripts/_env-precedence';
-import { classifyDatabaseTarget } from '../scripts/_db-branch-guard';
+import { assertSafeDatabaseTarget, classifyDatabaseTarget } from '../scripts/_db-branch-guard';
 import {
   CASES,
   DEVELOPMENT_HOST,
@@ -220,6 +220,54 @@ describe('bash guard vs TypeScript resolver agreement (D-02)', () => {
       expect(tsResult.filesFound).not.toContain('.env.local');
       expect(tsResult.resolution?.source).not.toBe('.env.local');
       expect(parsed.source).not.toBe('.env.local');
+    } finally {
+      cleanupFixtureDir(dir);
+    }
+  });
+
+  /**
+   * 39-REVIEW WR-06. The one place the two halves deliberately do NOT behave alike:
+   * candidate files exist, but none of them assigns DATABASE_URL. Bash exits 1; the TS
+   * guard returns silently and lets the consumer's own "DATABASE_URL is not set" check
+   * produce the error. Agreement 4 above only asserted that the TS RESOLUTION is null on
+   * that input — it never said what either half DOES about it, so the asymmetry was
+   * encoded as "expected" by omission rather than stated.
+   *
+   * This asserts it in both directions, so the day someone decides to align them, this
+   * test fails and forces the decision to be made deliberately rather than discovered in
+   * a build. The rationale for the TS side staying permissive is in
+   * `scripts/_db-branch-guard.ts` at the `!resolution` early return.
+   */
+  it('DELIBERATE ASYMMETRY: candidate files exist but define no DATABASE_URL — bash refuses, the TS guard defers', () => {
+    const dir = makeFixtureDir({ '.env.local': 'SOME_OTHER_VAR=x\n' });
+    try {
+      const bashResult = runGuard(dir, 'development', {});
+
+      expect(bashResult.status).not.toBe(0);
+      expect(bashResult.stdout).toContain('no DATABASE_URL found in any candidate file');
+
+      // The TS half: files on disk (so the SKIP rule does not apply), nothing resolved,
+      // and no refusal — the consumer's own missing-variable check owns that failure.
+      const tsResult = resolveDatabaseUrl({ cwd: dir, nodeEnv: 'development', processEnv: toProcessEnv() });
+      expect(tsResult.filesFound.length).toBeGreaterThan(0);
+      expect(tsResult.resolution).toBeNull();
+
+      let refuseCalls = 0;
+      assertSafeDatabaseTarget({
+        cwd: dir,
+        nodeEnv: 'development',
+        processEnv: toProcessEnv(),
+        onRefuse: (): never => {
+          refuseCalls += 1;
+          throw new Error('onRefuse should not have been called');
+        },
+      });
+      expect(
+        refuseCalls,
+        'The TS guard is intentionally permissive when no candidate file assigns DATABASE_URL. If ' +
+          'this now refuses, the two halves have been aligned — update this test and the rationale ' +
+          'in scripts/_db-branch-guard.ts together, rather than leaving the change undocumented.',
+      ).toBe(0);
     } finally {
       cleanupFixtureDir(dir);
     }

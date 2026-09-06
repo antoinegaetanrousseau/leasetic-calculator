@@ -188,6 +188,22 @@ export function assertSafeDatabaseTarget(opts?: {
   // Nothing resolved a DATABASE_URL even though candidate files exist on disk (e.g. none
   // of them set the key). Nothing to classify; a consumer's own "DATABASE_URL is not set"
   // check is the correct place for that failure, not this guard.
+  //
+  // THIS IS A DELIBERATE ASYMMETRY WITH THE BASH GUARD (39-REVIEW WR-06), not an
+  // oversight. `scripts/check-local-db-branch.sh` prints "no DATABASE_URL found in any
+  // candidate file" and EXITS 1 on the same input. The two are allowed to differ here
+  // because they answer different questions: the bash guard gates `npm run build`/`npm
+  // run start`, where an unresolvable DATABASE_URL is unambiguously a misconfigured
+  // machine and failing early is the kindest outcome; this guard runs at import time for
+  // 14 consumers whose own startup checks already report the missing variable with
+  // script-specific context. Refusing here would replace those specific messages with a
+  // generic one and give a database-safety guard authority over a configuration
+  // question it has no opinion about — there is no target to be unsafe ABOUT.
+  //
+  // The asymmetry is asserted in both directions by
+  // `tests/db-guard-differential.test.ts`'s DELIBERATE ASYMMETRY case, so aligning the
+  // two halves later is a decision someone has to make on purpose. Do not change one
+  // side without the other.
   if (!resolution) {
     return;
   }
