@@ -1,0 +1,32 @@
+# Neon endpoint identity — the single machine-readable source of truth (D-05, D-05a).
+#
+# docs/operations/neon-branch-routing.md § Lifecycle is the human-readable
+# counterpart of this file. Change both together whenever a branch is
+# recreated or a new one is added.
+#
+# Format: one record per non-comment, non-blank line, exactly four
+# `|`-separated fields, no spaces padding the separator:
+#
+#   prefix|hostname|branch|scope
+#
+#   prefix   — the endpoint id without the `-pooler...` suffix, used for
+#              startsWith prefix matching.
+#   hostname — the full pooled DNS name, used for exact-equality matching.
+#   branch   — exactly one of: main, preview, development.
+#   scope    — human-readable label, e.g. `PRODUCTION (Neon branch \`main\`)`.
+#
+# bug_011 discipline: match on URL.hostname, NEVER URL.host — `host` carries
+# the port, so a connection string with an explicit `:5432` would slip a
+# prefix match that was checking `host` instead of `hostname`. In bash the
+# equivalent discipline is stripping at `/` OR `:` before comparing
+# (see scripts/check-local-db-branch.sh).
+#
+# Consumers derive their own severity from the `branch` field. This file
+# carries no per-consumer policy — it is pure data.
+#
+# FAIL-SAFE: an endpoint id that does NOT appear in this file must be
+# treated as PRODUCTION by every consumer (see scripts/_neon-target.ts's
+# `branch: 'unknown'` + `isProductionSeverity: true` handling).
+ep-icy-boat-alx5o1tz|ep-icy-boat-alx5o1tz-pooler.c-3.eu-central-1.aws.neon.tech|main|PRODUCTION (Neon branch `main`)
+ep-delicate-night-als4ogpc|ep-delicate-night-als4ogpc-pooler.c-3.eu-central-1.aws.neon.tech|preview|PREVIEW (Neon branch `preview`)
+ep-polished-band-alphc576|ep-polished-band-alphc576-pooler.c-3.eu-central-1.aws.neon.tech|development|DEVELOPMENT (Neon branch `development`)
