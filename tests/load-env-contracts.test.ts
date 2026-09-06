@@ -72,8 +72,11 @@ describe('load-env contracts (D-03 sequencing + probe-write-isolation exemption)
     const hasCorrectedPrecedence = /envFileOrder\s*\(/.test(contents);
     // Anchored to the CALL, `assertSafeDatabaseTarget(`, not merely the import specifier —
     // an import with the call deleted would otherwise still contain the bare identifier
-    // and silently pass this gate.
-    const hasGuardCall = /assertSafeDatabaseTarget\s*\(\s*\)\s*;/.test(contents);
+    // and silently pass this gate. Deliberately NOT anchored to EMPTY parentheses: the
+    // guard is now handed the pre-load environment snapshot (39-REVIEW WR-02) so its
+    // refusal can name the file that caused it, and this contract is about the call
+    // EXISTING, not about its argument list.
+    const hasGuardCall = /assertSafeDatabaseTarget\s*\(/.test(contents);
 
     expect(
       hasCorrectedPrecedence,

@@ -34,10 +34,12 @@
  *
  * === WRITE-TARGET GUARD (OPS-05, D-03 — sequencing hazard, read before editing) ===
  * Immediately after loading, this module calls `assertSafeDatabaseTarget()`
- * (`scripts/_db-branch-guard.ts`) with no arguments, so it runs at module scope —
- * before any consumer's first statement — for every one of the 14 `tsx`/config
- * consumers that `import './_load-env'` (13 `scripts/*.ts` files plus
- * `drizzle.config.ts`), through that single shared import.
+ * (`scripts/_db-branch-guard.ts`), so it runs at module scope — before any consumer's
+ * first statement — for every one of the 14 `tsx`/config consumers that
+ * `import './_load-env'` (13 `scripts/*.ts` files plus `drizzle.config.ts`), through
+ * that single shared import. Its ONE argument is the PRE-load environment snapshot;
+ * see the comment on `preLoadEnv` below for why passing it is load-bearing rather
+ * than incidental (39-REVIEW WR-02).
  *
  * This is a no-op when NO `.env*` candidate file exists on disk (the SKIP rule in
  * `scripts/_db-branch-guard.ts`), which is what keeps the `MIGRATE PROD` GitHub
@@ -66,8 +68,19 @@ import { config } from 'dotenv';
 import { envFileOrder } from './_env-precedence';
 import { assertSafeDatabaseTarget } from './_db-branch-guard';
 
+// Snapshot the environment BEFORE any file is loaded (39-REVIEW WR-02). `config()`
+// WRITES process.env.DATABASE_URL, so a guard left to read the ambient environment
+// afterwards always takes resolveDatabaseUrl's `processEnv.DATABASE_URL` branch and
+// reports `source: 'process.env'` for every refusal — never the file that actually
+// caused it, which is precisely what D-07 exists to tell the operator. Handing the
+// guard the PRE-load snapshot makes it re-resolve through the file order and name the
+// winning file, while a DATABASE_URL that was genuinely already in the environment is
+// still present in the snapshot and still outranks every file, so the documented
+// precedence is unchanged. `tests/load-env-attribution.test.ts` pins both halves.
+const preLoadEnv: NodeJS.ProcessEnv = { ...process.env };
+
 for (const path of envFileOrder(process.env.NODE_ENV ?? 'development')) {
   config({ path });
 }
 
-assertSafeDatabaseTarget();
+assertSafeDatabaseTarget({ processEnv: preLoadEnv });
