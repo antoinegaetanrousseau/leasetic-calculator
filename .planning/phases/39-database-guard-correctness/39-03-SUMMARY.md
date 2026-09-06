@@ -142,7 +142,7 @@ None — no external service configuration required.
 
 ## Self-Check: PASSED
 
-All 5 created/modified files verified present on disk with expected content; all 3 task commit hashes (`fd4b93f`, `4005873`, `987854f`) verified present in `git log`.
+All 5 created/modified files verified present on disk with expected content; all 3 task commit hashes (`fd4b93f`, `4005873`, `987854f`) plus this summary's own commit (`7c3f894`) verified present in `git log`.
 
 ---
 *Phase: 39-database-guard-correctness*

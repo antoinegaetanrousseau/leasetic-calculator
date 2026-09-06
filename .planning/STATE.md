@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-06T17:33:49.143Z"
+last_updated: "2026-09-06T17:53:28.041Z"
 last_activity: 2026-09-06
 progress:
   total_phases: 25
   completed_phases: 10
   total_plans: 73
-  completed_plans: 70
+  completed_plans: 71
   percent: 40
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 39 (database-guard-correctness) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-09-06
 
@@ -482,6 +482,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 38 P02 | 18m | 3 tasks | 4 files |
 | Phase 39 P01 | 17min | 3 tasks | 7 files |
 | Phase 39 P02 | 11min | 2 tasks | 2 files |
+| Phase 39 P03 | 20min | 3 tasks | 5 files |
 
 ## Decisions
 
@@ -650,6 +651,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 39]: Exhaustive survivor grep for the production endpoint literal returns six accounted-for files, not five as Task 3 originally stated -- tests/neon-endpoints.test.ts needs the literal to assert data integrity, same class as tests/neon-target.test.ts
 - [Phase 39-02]: Routed scripts/_env-precedence.ts value extraction exclusively through dotenv.parse (never config()) so the TS loader (39-03) and this resolver cannot disagree — Load-bearing for plan 39-05's differential test, which compares the bash guard against this module
 - [Phase 39-02]: EnvResolution.source and the 'process.env' sentinel value are mandated by the plan's interface contract; two acceptance-criteria greps (grep -Ec ... outputs 0) conflict with those mandatory identifiers and cannot both pass — documented as a plan inconsistency rather than weakened — Renaming the field or obfuscating the literal to dodge the grep would break the frozen downstream contract consumed by 39-03/39-04/39-05, which is worse than a literal grep count of 3 and 1 respectively
+- [Phase 39]: D-03 sequencing edit (precedence fix + guard call in _load-env.ts) landed in one commit; Contract 1 grep-contract proven to bite via negative control
 
 ### Blockers
 

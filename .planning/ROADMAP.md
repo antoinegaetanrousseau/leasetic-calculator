@@ -946,7 +946,7 @@ are already captured — Phase 40's planner MUST read
 **Canonical refs:** `.planning/phases/39-database-guard-correctness/39-CONTEXT.md` (D-01–D-08),
 `scripts/check-local-db-branch.sh`, `scripts/_load-env.ts`, `scripts/seed-fiche-fixtures.ts` ~L533.
 
-**Plans:** 2/5 plans executed
+**Plans:** 3/5 plans executed
 Plans:
 **Wave 1**
 
@@ -955,7 +955,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 39-03-PLAN.md — Correct `_load-env.ts` precedence AND wire the shared TS guard in the same edit; pin the D-03 sequencing invariant — wave 2
+- [x] 39-03-PLAN.md — Correct `_load-env.ts` precedence AND wire the shared TS guard in the same edit; pin the D-03 sequencing invariant — wave 2
 - [ ] 39-04-PLAN.md — Rewrite the bash guard to validate the effective resolved DATABASE_URL; gate build/start via `prebuild`/`prestart` (D-01, D-04, D-07) — wave 2
 
 **Wave 3** *(blocked on Wave 2 completion)*
@@ -1069,7 +1069,7 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
-| 39. Operational & Credential Gates | v1.8 | 2/5 | In Progress|  |
+| 39. Operational & Credential Gates | v1.8 | 3/5 | In Progress|  |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 
 ---
