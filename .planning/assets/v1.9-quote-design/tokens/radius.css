@@ -1,0 +1,20 @@
+/* Leasetic Design System — corner radius tokens (v2)
+   Generous rounding throughout: pill controls + fields, 24px cards,
+   32–40px section shells (the reference's soft, contained look). */
+:root {
+  --radius-xs:   8px;
+  --radius-sm:   12px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-xl:   32px;
+  --radius-2xl:  40px;
+  --radius-pill: 999px;
+
+  --radius-card:    var(--radius-lg);  /* content cards */
+  --radius-shell:   var(--radius-xl);  /* full-width section shells, footer, hero */
+  --radius-control: var(--radius-pill); /* buttons */
+  --radius-field:   var(--radius-pill); /* single-line inputs/selects */
+  --radius-area:    var(--radius-md);   /* textareas */
+  --radius-chip:    var(--radius-pill);
+  --radius-tile:    var(--radius-sm);   /* small icon tiles */
+}

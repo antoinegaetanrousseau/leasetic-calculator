@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/leasetic-design-system-4b3fa15d-ffcb-48d8-a333-c563fea63600/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/leasetic-design-system-4b3fa15d-ffcb-48d8-a333-c563fea63600/tokens/colors.css">
+<link rel="stylesheet" href="_ds/leasetic-design-system-4b3fa15d-ffcb-48d8-a333-c563fea63600/tokens/typography.css">
+<link rel="stylesheet" href="_ds/leasetic-design-system-4b3fa15d-ffcb-48d8-a333-c563fea63600/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/leasetic-design-system-4b3fa15d-ffcb-48d8-a333-c563fea63600/tokens/radius.css">
+<link rel="stylesheet" href="_ds/leasetic-design-system-4b3fa15d-ffcb-48d8-a333-c563fea63600/tokens/shadow.css">
+<link rel="stylesheet" href="_ds/leasetic-design-system-4b3fa15d-ffcb-48d8-a333-c563fea63600/tokens/motion.css">
+<style>
+doc-page:not(:defined){visibility:hidden}
+body{margin:0}
+a{color:#06734a;text-decoration:none}
+a:hover{color:#025136}
+</style>
+<script src="_ds/leasetic-design-system-4b3fa15d-ffcb-48d8-a333-c563fea63600/_ds_bundle.js"></script>
+<script src="./doc-page.js"></script>
+</helmet>
+<doc-page size="a4">
+<section class="page" data-screen-label="Proposition FR" style="font-family:'Inter',sans-serif;color:#112C3B;padding:14mm 15mm 10mm;box-sizing:border-box;display:flex;flex-direction:column;font-size:9.5pt;line-height:1.45">
+
+<header style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+<img src="assets/leasetic-lockup-color.svg" alt="Leasetic" style="height:26px;width:auto;display:block">
+<div style="text-align:right;display:flex;flex-direction:column;gap:2px;min-width:0">
+<div style="font-size:7.5pt;letter-spacing:.06em;text-transform:uppercase;color:#3a6a75">Proposition n°</div>
+<div style="font-size:13pt;font-weight:600;letter-spacing:-.01em">{{ t.quoteNumber }}</div>
+<div style="font-size:8pt;color:#3a6a75">Établie le {{ t.quoteCreatedAt }}</div>
+</div>
+</header>
+
+<div style="height:2px;background:#112C3B;margin:10px 0 14px"></div>
+
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:14px">
+<div style="min-width:0">
+<h1 style="margin:0 0 4px;font-size:21pt;font-weight:600;letter-spacing:-.025em;line-height:1.1">Proposition de location financière</h1>
+<div style="font-size:10pt;color:#2A4F6E">{{ t.projectDescription }}</div>
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+<span style="border:1px solid #D6DCE5;border-radius:999px;padding:4px 11px;font-size:8pt;color:#2A4F6E">Réf. partenaire · {{ t.projectPartnerRef }}</span>
+<span style="border:1px solid #D6DCE5;border-radius:999px;padding:4px 11px;font-size:8pt;color:#2A4F6E">{{ t.financeTermMonths }} mois</span>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+<div style="background:#F8FAFF;border-radius:14px;padding:13px 15px">
+<div style="font-size:7.5pt;letter-spacing:.06em;text-transform:uppercase;color:#3a6a75;margin-bottom:8px">Société cliente</div>
+<div style="font-size:11pt;font-weight:600;letter-spacing:-.01em;margin-bottom:6px">{{ t.clientCompany }}</div>
+<div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:8.5pt;color:#2A4F6E;overflow-wrap:anywhere">
+<span style="color:#3a6a75">SIREN</span><span>{{ t.clientSiren }}</span>
+<span style="color:#3a6a75">SIRET</span><span>{{ t.clientSiret }}</span>
+<span style="color:#3a6a75">Destinataire</span><span>{{ t.clientContactName }}</span>
+<span style="color:#3a6a75">Fonction</span><span>{{ t.clientContactRole }}</span>
+<span style="color:#3a6a75">Téléphone</span><span>{{ t.clientContactPhone }}</span>
+<span style="color:#3a6a75">Email</span><span>{{ t.clientContactEmail }}</span>
+</div>
+</div>
+<div style="background:#F8FAFF;border-radius:14px;padding:13px 15px">
+<div style="font-size:7.5pt;letter-spacing:.06em;text-transform:uppercase;color:#3a6a75;margin-bottom:8px">Votre contact</div>
+<div style="font-size:11pt;font-weight:600;letter-spacing:-.01em;margin-bottom:6px">{{ t.advisorName }}</div>
+<div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:8.5pt;color:#2A4F6E;overflow-wrap:anywhere">
+<span style="color:#3a6a75">Fonction</span><span>{{ t.advisorRole }}</span>
+<span style="color:#3a6a75">Téléphone</span><span>{{ t.advisorPhone }}</span>
+<span style="color:#3a6a75">Email</span><span>{{ t.advisorEmail }}</span>
+<span style="color:#3a6a75">Partenaire</span><span>{{ t.partnerCompany }}</span>
+<span style="color:#3a6a75">Commercial</span><span>{{ t.partnerSalesRep }}</span>
+<span style="color:#3a6a75">Téléphone</span><span>{{ t.partnerPhone }}</span>
+</div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1.05fr 1.15fr;gap:10px;align-items:stretch;margin-bottom:14px">
+<div style="border:1.5px solid #112C3B;border-radius:14px;padding:20px;min-width:0;display:flex;flex-direction:column;justify-content:center">
+<div style="font-size:7.5pt;letter-spacing:.06em;text-transform:uppercase;color:#3a6a75;margin-bottom:6px">Loyer mensuel HT</div>
+<div style="font-size:21pt;font-weight:600;letter-spacing:-.03em;line-height:1.05;white-space:nowrap">{{ t.monthlyRent }}</div>
+<div style="font-size:9pt;color:#2A4F6E;margin-top:6px">sur {{ t.financeTermMonths }} mois, hors taxes</div>
+</div>
+<div style="background:#F8FAFF;border-radius:14px;padding:13px 15px;min-width:0">
+<div style="font-size:7.5pt;letter-spacing:.06em;text-transform:uppercase;color:#3a6a75;margin-bottom:9px">Conditions financières</div>
+<table style="width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse;font-size:9pt">
+<colgroup><col style="width:42%"><col style="width:58%"></colgroup>
+<tbody>
+<tr><td style="padding:5px 0;border-bottom:1px solid #D6DCE5;color:#2A4F6E">Montant financé HT</td><td style="padding:5px 0;border-bottom:1px solid #D6DCE5;text-align:right;font-weight:600;overflow-wrap:anywhere">{{ t.financeAmountExclVat }}</td></tr>
+<tr><td style="padding:5px 0;border-bottom:1px solid #D6DCE5;color:#2A4F6E">Durée de location</td><td style="padding:5px 0;border-bottom:1px solid #D6DCE5;text-align:right;font-weight:600;overflow-wrap:anywhere">{{ t.financeTermMonths }} mois</td></tr>
+<tr><td style="padding:5px 0;border-bottom:1px solid #D6DCE5;color:#2A4F6E">Coefficient appliqué</td><td style="padding:5px 0;border-bottom:1px solid #D6DCE5;text-align:right;font-weight:600;overflow-wrap:anywhere">{{ t.financeCoefficient }}</td></tr>
+<tr><td style="padding:5px 0;border-bottom:1px solid #D6DCE5;color:#2A4F6E">Loyer mensuel HT</td><td style="padding:5px 0;border-bottom:1px solid #D6DCE5;text-align:right;font-weight:600;overflow-wrap:anywhere">{{ t.financeMonthlyRentExclVat }}</td></tr>
+<tr><td style="padding:6px 0 0;font-weight:600">Total des loyers HT</td><td style="padding:6px 0 0;text-align:right;font-weight:600;overflow-wrap:anywhere">{{ t.financeTotalRentsExclVat }}</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div style="font-size:8pt;line-height:1.65;color:#2A4F6E;border-top:1px solid #D6DCE5;padding-top:10px;margin-bottom:12px">
+<span style="display:block;font-size:7.5pt;letter-spacing:.06em;text-transform:uppercase;color:#3a6a75;margin-bottom:4px">Conditions</span>
+Proposition valable jusqu’au {{ t.quoteValidUntil }} (30 jours), sous réserve de l’accord du comité des engagements de Leasetic. Document non contractuel. Les loyers sont exprimés hors taxes et hors prestations annexes. Le coefficient appliqué est susceptible d’évoluer en cas de modification du montant financé, de la durée ou des conditions de marché à la date de mise en loyer.
+</div>
+
+<div style="border:1px solid #D6DCE5;border-radius:14px;padding:16px 18px;margin-top:auto">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px">
+<div style="font-size:7.5pt;letter-spacing:.06em;text-transform:uppercase;color:#3a6a75">Acceptation du client</div>
+<div style="font-size:8pt;color:#3a6a75">Bon pour accord — signature et cachet de l’entreprise</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:16px;margin-bottom:14px">
+<div><div style="font-size:8pt;color:#3a6a75;margin-bottom:22px">Fait à</div><div style="border-bottom:1px solid #112C3B"></div></div>
+<div><div style="font-size:8pt;color:#3a6a75;margin-bottom:22px">Le</div><div style="border-bottom:1px solid #112C3B"></div></div>
+<div><div style="font-size:8pt;color:#3a6a75;margin-bottom:22px">Nom et qualité du signataire</div><div style="border-bottom:1px solid #112C3B"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1.5fr;gap:16px">
+<div><div style="font-size:8pt;color:#3a6a75;margin-bottom:30px">Signature</div><div style="border-bottom:1px solid #112C3B"></div></div>
+<div style="border:1px dashed #BAC4D0;border-radius:10px;height:54px;display:flex;align-items:flex-start;padding:8px 10px;box-sizing:border-box"><span style="font-size:8pt;color:#94A7B6">Cachet de l’entreprise</span></div>
+</div>
+</div>
+
+<footer style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:12px;padding-top:9px;border-top:1px solid #D6DCE5;font-size:6.8pt;line-height:1.5;color:#3a6a75">
+<div>
+<strong style="font-weight:600;color:#112C3B">Leasetic</strong> — SAS, société par actions simplifiée · 63 chemin des Arnis, 31130 Balma<br>
+SIREN 830 733 606 · SIRET (siège) 830 733 606 00040 · TVA FR06830733606
+</div>
+<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+<span>{{ t.quoteNumber }} · Page 1/1</span>
+<img src="assets/leasetic-icon-color.svg" alt="" style="height:18px;width:18px;opacity:.14;display:block">
+</div>
+</footer>
+
+</section>
+</doc-page>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+// Field tokens rendered verbatim so devs can see the data slots.
+// Replace `tok()` with real values (or drop this class) when wiring react-pdf.
+class Component extends DCLogic {
+  renderVals() {
+    const paths = {
+      quoteNumber: 'quote.number', quoteCreatedAt: 'quote.createdAt', quoteValidUntil: 'quote.validUntil',
+      projectDescription: 'project.description', projectPartnerRef: 'project.partnerRef',
+      clientCompany: 'client.company', clientSiren: 'client.siren', clientSiret: 'client.siret',
+      clientContactName: 'client.contactName', clientContactRole: 'client.contactRole',
+      clientContactPhone: 'client.contactPhone', clientContactEmail: 'client.contactEmail',
+      advisorName: 'advisor.name', advisorRole: 'advisor.role', advisorPhone: 'advisor.phone', advisorEmail: 'advisor.email',
+      partnerCompany: 'partner.company', partnerSalesRep: 'partner.salesRep', partnerPhone: 'partner.phone',
+      financeTermMonths: 'termMonths', financeAmountExclVat: 'amountExclVat',
+      financeCoefficient: 'coefficient', financeMonthlyRentExclVat: 'monthlyRent',
+      financeTotalRentsExclVat: 'totalRentsExclVat',
+      monthlyRent: 'monthlyRent',
+    };
+    const t = {};
+    for (const k in paths) t[k] = '{{ ' + paths[k] + ' }}';
+    return { t };
+  }
+}
+</script>
+</body>
+</html>

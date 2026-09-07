@@ -1,0 +1,271 @@
+/* Leasétic Design System — color tokens (v7, brand-ready rename)
+   Core: Leasétic Green #01CC72. Neutrals are a blue-gray ramp anchored on
+   ink #112C3B. Secondary family is the teal→navy "pine" ramp. Warm palette
+   tints (skin/orange/amber/sand/sage/emerald) serve illustration.
+
+   v7 CHANGELOG — THE RENAME. Figma is the naming source of truth:
+     green-*                  → brand-primary-*        (varies per brand)
+     pine-500..900            → brand-secondary-*      (varies per brand)
+     gray-*                   → neutral-*              (shared, never overridden)
+     skin/orange/amber/sand/
+     sage/emerald             → brand-palette-*        (varies per brand)
+     success/warning/danger/
+     info (+bg)               → feedback-*             (shared)
+   DELETED (true duplicates — same role AND same value):
+     lime-100..500 (clone of the green tints) · teal-500 (= brand-secondary-500)
+     blue-500 (= brand-secondary-700) · group-blue (= neutral-900)
+     the old partial `--color-neutral-200..800` block (its step numbers collided
+     with this scale; nothing consumed it)
+   ADDED (catching up to Figma):
+     viz-* chart hues · chart-series-1..6 + chart chrome · action-secondary
+     trio · border-ink · border-on-inverse · named border-inverse /
+     on-inverse-secondary primitives
+   A deprecated compatibility block at the end of this file keeps every old
+   name resolving. New code must use the new names; delete the block once the
+   websites and Colibris app are migrated.
+
+   ARCHITECTURE RULE (LEASETIC Group): everything that varies between brands
+   lives under brand-*. Everything else — neutral-*, feedback-*, viz-*,
+   spacing, radius, type — is shared and must never be overridden per brand.
+   To add a brand (e.g. Colibris): redefine ONLY the brand-* layer under
+   [data-brand="colibris"], then re-validate the chart palette (slot 1 follows
+   the brand).
+
+   STANDING BRAND DECISION (Antoine, 2026-07-31): anything on brand green
+   carries WHITE. White on #01CC72 measures 2.13:1 — below AA, and deliberate.
+   --text-on-brand / --icon-on-brand carry this decision; the accessible
+   alternatives are the secondary/ghost buttons (8.73:1) and the lime badge
+   (9.51:1). Reversing it is a one-line change to those two aliases.
+
+   Verified pairings (unchanged v6 ramp, OKLCH-built):
+     white on brand-primary-500     2.13  (deliberate exception, see above)
+     --text-link (primary-800)      5.90   --text-link-hover      9.41
+     --border-focus (primary-700)   3.93   --feedback-success     8.22 on bg
+     --text-action-secondary        8.73   --text-on-lime         9.51
+*/
+:root {
+  /* ---- Brand primary — Leasétic Green, OKLCH ramp 145°→162° ---- */
+  --color-brand-primary-50:  #f0fbf0;
+  --color-brand-primary-100: #def6e0;
+  --color-brand-primary-200: #baecc3;
+  --color-brand-primary-300: #92e3a7;
+  --color-brand-primary-400: #63d88c;
+  --color-brand-primary-500: #01cc72; /* brand core */
+  --color-brand-primary-600: #10b36a; /* hover */
+  --color-brand-primary-700: #0b935b; /* focus ring */
+  --color-brand-primary-800: #06734a; /* links on light */
+  --color-brand-primary-900: #025136; /* deepest; success text */
+
+  /* ---- Brand secondary — teal → navy ---- */
+  --color-brand-secondary-500: #339597; /* teal — decorative only as text */
+  --color-brand-secondary-600: #2a7e86;
+  --color-brand-secondary-700: #1d4f70; /* steel — safe text surface; secondary actions */
+  --color-brand-secondary-800: #163c56;
+  --color-brand-secondary-900: #112c3b; /* navy — same value as neutral-900, distinct ROLE */
+
+  /* ---- Neutrals — blue-gray ramp; shared across all brands ---- */
+  --color-neutral-0:   #ffffff;
+  --color-neutral-50:  #f8faff; /* sunken sections, footer shell */
+  --color-neutral-100: #eef2fa; /* field fill */
+  --color-neutral-200: #d6dce5; /* hairlines */
+  --color-neutral-300: #bac4d0; /* strong border */
+  --color-neutral-400: #94a7b6;
+  --color-neutral-500: #4f9395; /* teal-gray */
+  --color-neutral-600: #3a6a75; /* tertiary text, interactive borders */
+  --color-neutral-700: #2a4f6e; /* body copy */
+  --color-neutral-800: #1b3a4f;
+  --color-neutral-900: #112c3b; /* Ink */
+  --color-neutral-950: #0b1e2a;
+  --color-neutral-border-inverse:       #2a4459;
+  --color-neutral-on-inverse-secondary: #9fb0bd; /* 6.51:1 on ink */
+
+  --color-overlay-dark: #19213d;
+
+  /* ---- Brand palette — illustration/accent tints (vary per brand) ---- */
+  --color-brand-palette-skin-100: #ffeee4;
+  --color-brand-palette-skin-200: #ffe6d7;
+  --color-brand-palette-skin-300: #f9dfd0;
+  --color-brand-palette-skin-400: #e5c5ac;
+  --color-brand-palette-orange-500:  #e08530;
+  --color-brand-palette-amber-500:   #ebb236;
+  --color-brand-palette-sand-500:    #e3d5b1;
+  --color-brand-palette-sage-500:    #c8e2c8;
+  --color-brand-palette-emerald-500: #56b68e;
+
+  /* ---- Viz — chart hues, brand-invariant so series stay distinguishable.
+     Every hue traces to a GROUP brand: indigo is COLIBRIS's primary; amber,
+     steel and teal are brand hues re-stepped into the chart lightness band.
+     Dark-surface steps are listed beside each. ---- */
+  --color-viz-indigo-500: #4a3aff; /* COLIBRIS primary · dark #5b4cff */
+  --color-viz-amber-500:  #c9931d; /* brand amber, darkened · dark #ba8618 */
+  --color-viz-teal-500:   #0e9aa0; /* secondary teal, chroma-boosted · dark #12a8ae */
+  --color-viz-orange-500: #e08530; /* brand orange · dark #c06517 */
+  --color-viz-steel-500:  #2e74b5; /* secondary-700 hue, lightened · dark #3d80c4 */
+
+  /* ---- Decorative tints — card art washes only, never text surfaces ---- */
+  --tint-mint: #def6e0;
+  --tint-sage: #c8e2c8;
+  --tint-skin: #ffe6d7;
+  --tint-lime: #baecc3;
+
+  /* ---- Feedback — each fg clears 4.5:1 on its paired -bg ---- */
+  --color-feedback-success:    #025136; /* 8.22:1 */
+  --color-feedback-success-bg: #def6e0;
+  --color-feedback-warning:    #7d5307; /* 6.17:1 */
+  --color-feedback-warning-bg: #fdf4e1;
+  --color-feedback-danger:     #b83227; /* 5.36:1 */
+  --color-feedback-danger-bg:  #fdf0ee;
+  --color-feedback-info:       #1d4f70; /* 7.60:1 */
+  --color-feedback-info-bg:    #e4f2f2;
+
+  /* ---- Semantic aliases (components consume ONLY these) ---- */
+  --surface-page:        var(--color-neutral-0);
+  --surface-sunken:      var(--color-neutral-50);
+  --surface-card:        var(--color-neutral-0);
+  --surface-card-muted:  var(--color-neutral-50);
+  --surface-field:       var(--color-neutral-100);
+  --surface-inverse:     var(--color-neutral-900);
+  --surface-inverse-alt: var(--color-overlay-dark);
+  --surface-brand:       var(--color-brand-primary-500);
+  --surface-brand-hover: var(--color-brand-primary-600);
+  --overlay-scrim:       rgba(25, 33, 61, 0.55);
+
+  --text-primary:   var(--color-neutral-900); /* 14.51:1 on white */
+  --text-secondary: var(--color-neutral-700); /*  8.60:1 on white */
+  --text-tertiary:  var(--color-neutral-600); /*  6.00:1 on white */
+
+  /* WHITE by standing brand decision — 2.13:1, deliberate. See header. */
+  --text-on-brand: var(--color-neutral-0);
+  --icon-on-brand: var(--color-neutral-0);
+
+  --text-on-lime:              var(--color-neutral-900);        /* 9.51:1 on primary-300 */
+  --text-on-pine:              var(--color-brand-primary-200);  /* 6.60:1 on secondary-700 */
+  --text-on-inverse:           var(--color-neutral-0);
+  --text-on-inverse-secondary: var(--color-neutral-on-inverse-secondary);
+  --text-link:        var(--color-brand-primary-800); /* 5.90:1 on white */
+  --text-link-hover:  var(--color-brand-primary-900); /* 9.41:1 on white */
+
+  /* Secondary-action trio — deep teal-navy, 8.73:1. Green outline/ghost
+     buttons were rejected: they read as a weaker Primary. */
+  --text-action-secondary:   var(--color-brand-secondary-700);
+  --border-action-secondary: var(--color-brand-secondary-700);
+  --icon-action-secondary:   var(--color-brand-secondary-700);
+
+  /* WCAG 1.4.3 exempts inactive controls. Kept muted on purpose. */
+  --text-disabled: var(--color-neutral-500);
+
+  --border-default:     var(--color-neutral-200); /* decorative hairline */
+  --border-strong:      var(--color-neutral-300); /* decorative divider */
+  --border-interactive: var(--color-neutral-600); /* focusable boundary: 6.00:1 */
+  --border-inverse:     var(--color-neutral-border-inverse);
+  --border-focus:       var(--color-brand-primary-700); /* 3.93:1 */
+  --border-ink:         var(--color-neutral-900); /* ink-tone outline buttons */
+  --border-on-inverse:  var(--color-neutral-0);   /* apply at 40% opacity */
+
+  --icon-primary:   var(--color-neutral-900);
+  --icon-secondary: var(--color-neutral-500);
+  --icon-brand:     var(--color-brand-primary-500);
+
+  /* ---- Charts — validated categorical palette, fixed order, NEVER cycled.
+     Worst adjacent CVD ΔE 14.5 light / 17.3 dark (target ≥ 8). All-pairs
+     forms (scatter/bubble/choropleth/small multiples) cap at 3 series.
+     Slots 1 follows the brand — re-validate per brand mode. ---- */
+  --chart-series-1: var(--color-brand-primary-500);
+  --chart-series-2: var(--color-viz-indigo-500);
+  --chart-series-3: var(--color-viz-amber-500);
+  --chart-series-4: var(--color-viz-teal-500);
+  --chart-series-5: var(--color-viz-orange-500);
+  --chart-series-6: var(--color-viz-steel-500);
+  --chart-grid:     var(--color-neutral-200);
+  --chart-axis:     var(--color-neutral-300);
+  --chart-surface:  var(--color-neutral-0);
+}
+
+/* ============================================================================
+   DARK MODE — PARKED. This system is light-mode only for now.
+   The dark semantic aliases live in tokens/dark-mode.css, which is deliberately
+   NOT imported by styles.css, so no `.dark` / `data-theme="dark"` scope exists
+   and nothing can render dark — including a host that follows the OS setting.
+   To bring it back: @import "tokens/dark-mode.css" in styles.css.
+   The dark-only primitives below stay here: they are inert values that the
+   chart tokens reference, and they change nothing on their own.
+   ========================================================================== */
+:root {
+  /* dark-only primitive steps (shared with charts; see viz-* header note) */
+  --color-viz-green-dark:  #0fa862;
+  --color-viz-indigo-dark: #5b4cff;
+  --color-viz-amber-dark:  #ba8618;
+  --color-viz-teal-dark:   #12a8ae;
+  --color-viz-orange-dark: #c06517;
+  --color-viz-steel-dark:  #3d80c4;
+  --color-brand-secondary-300:  #6fa8dc; /* dark-mode secondary actions / info */
+  --color-feedback-danger-light: #f08c7d; /* dark-mode danger fg */
+}
+
+/* ============================================================================
+   DEPRECATED — compatibility aliases for the pre-v7 names.
+   Everything below resolves to the canonical tokens above. Do not use these in
+   new code; delete this block once ui_kits/, guidelines/ and the reference
+   pages are migrated. (The old partial --color-neutral-200..800 block is NOT
+   reproduced: its step numbers collide with the canonical neutral scale.)
+   ========================================================================== */
+:root {
+  --color-green-50:  var(--color-brand-primary-50);
+  --color-green-100: var(--color-brand-primary-100);
+  --color-green-200: var(--color-brand-primary-200);
+  --color-green-300: var(--color-brand-primary-300);
+  --color-green-400: var(--color-brand-primary-400);
+  --color-green-500: var(--color-brand-primary-500);
+  --color-green-600: var(--color-brand-primary-600);
+  --color-green-700: var(--color-brand-primary-700);
+  --color-green-800: var(--color-brand-primary-800);
+  --color-green-900: var(--color-brand-primary-900);
+
+  --color-gray-0:   var(--color-neutral-0);
+  --color-gray-50:  var(--color-neutral-50);
+  --color-gray-100: var(--color-neutral-100);
+  --color-gray-200: var(--color-neutral-200);
+  --color-gray-300: var(--color-neutral-300);
+  --color-gray-400: var(--color-neutral-400);
+  --color-gray-500: var(--color-neutral-500);
+  --color-gray-600: var(--color-neutral-600);
+  --color-gray-700: var(--color-neutral-700);
+  --color-gray-800: var(--color-neutral-800);
+  --color-gray-900: var(--color-neutral-900);
+  --color-gray-950: var(--color-neutral-950);
+
+  --color-lime-100: var(--color-brand-primary-100);
+  --color-lime-200: var(--color-brand-primary-200);
+  --color-lime-300: var(--color-brand-primary-300);
+  --color-lime-400: var(--color-brand-primary-400);
+  --color-lime-500: var(--color-brand-primary-500);
+
+  --color-pine-500: var(--color-brand-secondary-500);
+  --color-pine-600: var(--color-brand-secondary-600);
+  --color-pine-700: var(--color-brand-secondary-700);
+  --color-pine-800: var(--color-brand-secondary-800);
+  --color-pine-900: var(--color-brand-secondary-900);
+
+  --color-teal-500:  var(--color-brand-secondary-500);
+  --color-blue-500:  var(--color-brand-secondary-700);
+  --color-group-blue: var(--color-neutral-900);
+
+  --color-skin-100: var(--color-brand-palette-skin-100);
+  --color-skin-200: var(--color-brand-palette-skin-200);
+  --color-skin-300: var(--color-brand-palette-skin-300);
+  --color-skin-400: var(--color-brand-palette-skin-400);
+  --color-orange-500:  var(--color-brand-palette-orange-500);
+  --color-amber-500:   var(--color-brand-palette-amber-500);
+  --color-sand-500:    var(--color-brand-palette-sand-500);
+  --color-sage-500:    var(--color-brand-palette-sage-500);
+  --color-emerald-500: var(--color-brand-palette-emerald-500);
+
+  --color-success:    var(--color-feedback-success);
+  --color-success-bg: var(--color-feedback-success-bg);
+  --color-warning:    var(--color-feedback-warning);
+  --color-warning-bg: var(--color-feedback-warning-bg);
+  --color-danger:     var(--color-feedback-danger);
+  --color-danger-bg:  var(--color-feedback-danger-bg);
+  --color-info:       var(--color-feedback-info);
+  --color-info-bg:    var(--color-feedback-info-bg);
+}

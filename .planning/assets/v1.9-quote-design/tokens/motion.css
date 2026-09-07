@@ -1,0 +1,12 @@
+/* Leasetic Design System — motion tokens
+   Precise and restrained: no bounce/elastic easing, no infinite decorative
+   loops. Fades and short slides only. */
+:root {
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --ease-out:      cubic-bezier(0, 0, 0.2, 1);    /* @kind other */
+  --ease-in:       cubic-bezier(0.4, 0, 1, 1);    /* @kind other */
+
+  --duration-fast: 120ms; /* @kind other */
+  --duration-base: 200ms; /* @kind other */
+  --duration-slow: 360ms; /* @kind other */
+}

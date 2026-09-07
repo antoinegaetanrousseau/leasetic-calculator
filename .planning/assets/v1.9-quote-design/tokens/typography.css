@@ -1,0 +1,40 @@
+/* Leasetic Design System — typography tokens (v4)
+   Inter Tight — display/headings: large, quiet confidence, Medium weight,
+   tight tracking (the reference's big grotesque look), self-hosted.
+   Inter — body copy, UI labels, forms, self-hosted. */
+:root {
+  --font-display:  'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:     ui-monospace, 'SFMono-Regular', menlo, monospace;
+  --font-wordmark: 'DM Sans', 'Inter Tight', sans-serif; /* @kind font */
+
+  --fw-regular:  400; /* @kind font */
+  --fw-medium:   500; /* @kind font */
+  --fw-semibold: 600; /* @kind font */
+  --fw-bold:     700; /* @kind font */
+
+  --lh-tight:   1.08; /* @kind font */
+  --lh-snug:    1.22; /* @kind font */
+  --lh-normal:  1.45; /* @kind font */
+  --lh-relaxed: 1.6;  /* @kind font */
+
+  --tracking-display: -0.025em; /* @kind font */
+  --tracking-tight:   -0.015em; /* @kind font */
+  --tracking-normal:  0em;      /* @kind font */
+
+  /* Display scale — Inter Tight Medium (500); Semibold only for small headings */
+  --fs-display-2xl: 4.5rem;   /* 72px — hero statements */
+  --fs-display-xl:  3.5rem;   /* 56px — page titles */
+  --fs-display-lg:  2.75rem;  /* 44px — section titles */
+  --fs-display-md:  2.25rem;  /* 36px */
+  --fs-display-sm:  1.75rem;  /* 28px — card titles, stats */
+  --fs-heading-lg:  1.375rem; /* 22px */
+  --fs-heading-md:  1.125rem; /* 18px — compact card headings */
+
+  /* Body scale — Inter Regular/Medium */
+  --fs-body-lg:  1.125rem;  /* 18px — section ledes */
+  --fs-body-md:  1.0625rem; /* 17px — editorial "reading, not scanning" pace (Apple-informed) */
+  --fs-body-sm:  0.875rem;  /* 14px */
+  --fs-body-xs:  0.8125rem; /* 13px — badges, meta */
+  --fs-caption:  0.75rem;   /* 12px — UI chrome only */
+}
