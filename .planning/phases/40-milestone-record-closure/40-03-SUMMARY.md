@@ -148,3 +148,12 @@ Confirmed NO — the audit does not raise a false missing-plans gap against Phas
 ---
 *Phase: 40-milestone-record-closure*
 *Completed: 2026-09-07*
+
+## Self-Check: PASSED
+
+- FOUND: `.planning/milestones/v1.6-MILESTONE-AUDIT.md`
+- FOUND: `.planning/milestones/v1.6-MILESTONE-AUDIT-SUPERSEDED.md`
+- FOUND: `.planning/phases/40-milestone-record-closure/40-03-SUMMARY.md`
+- FOUND commit: `e796ecb` (Task 2 — fresh audit committed)
+- FOUND commit: `25e9cd0` (Task 3 — audit custody)
+- FOUND commit: `c8700bf` (this summary)
