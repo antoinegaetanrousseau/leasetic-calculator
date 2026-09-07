@@ -179,3 +179,11 @@ None — no external service configuration required.
 
 *Phase: 40-milestone-record-closure*
 *Completed: 2026-09-07*
+
+## Self-Check: PASSED
+
+- FOUND: `src/components/proposal/ProposalForm.tsx`
+- FOUND: `.planning/phases/40-milestone-record-closure/40-02-SUMMARY.md`
+- FOUND commit: `bf82050`
+- FOUND commit: `178eacd`
+- FOUND commit: `29da1d0`
