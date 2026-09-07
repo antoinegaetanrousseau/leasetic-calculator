@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-07T19:10:03.085Z"
+last_updated: "2026-09-07T19:25:46.275Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 25
   completed_phases: 11
   total_plans: 79
-  completed_plans: 74
+  completed_plans: 75
   percent: 44
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 40 (milestone-record-closure) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-09-07
 
@@ -486,6 +486,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 39 P04 | 35m | 2 tasks | 2 files |
 | Phase 39 P05 | ~25min | 3 tasks | 5 files |
 | Phase 40 P01 | 10min | 3 tasks | 2 files |
+| Phase 40 P02 | ~15min | 2 tasks | 5 files |
 
 ## Decisions
 
@@ -659,6 +660,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 39]: D-08 no-credential-leak invariant checks for postgres://fixture rather than a bare postgres:// substring, since the guard's own no-user@host error legitimately prints a credential-free usage-hint template
 - [Phase 40]: Phase 20 criterion 3 rewritten to name Better Auth trustedOrigins (src/lib/auth/index.ts:210) instead of a nonexistent middleware Origin gate; verification asserts allow-list membership, never a status code — D-15 (39-CONTEXT.md), executed Phase 40 plan 01
 - [Phase 40]: ROADMAP.md v1.6 header flipped to SHIPPED 2026-09-04; Phase 28 and Phase 31.1 progress-table rows added, attributing both to v1.6 — D-40-06/D-40-07, Phase 40 plan 01
+- [Phase 40-02]: Deleted the dead ProposalForm component per D-40-10 (HOUSE-05); ProposalFormProvider kept live
+- [Phase 40-02]: HOUSE-05 REQUIREMENTS.md checkbox left for Plan 40-04's amendment per this plan's own output spec — not marked complete by 40-02
+- [Phase 40-02]: npm run build verified locally by temporarily moving aside .env.local/.env.production.local (both route to Neon main), matching CI's no-candidate-file SKIP path for the OPS-05 DB guard; no DB accessed, files restored immediately
 
 ### Blockers
 
