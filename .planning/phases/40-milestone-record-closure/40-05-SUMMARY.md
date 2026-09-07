@@ -118,3 +118,15 @@ See `key-decisions` in frontmatter. In addition:
 ---
 *Phase: 40-milestone-record-closure*
 *Completed: 2026-09-07*
+
+## Self-Check: PASSED
+
+- FOUND: `.planning/MILESTONES.md`
+- FOUND: `.planning/milestones/v1.6-ROADMAP.md`
+- FOUND: `.planning/milestones/v1.6-REQUIREMENTS.md`
+- FOUND: `.planning/phases/40-milestone-record-closure/40-05-SUMMARY.md`
+- FOUND commit: `f11c7d2` (Task 1 — MILESTONES.md v1.6 entry)
+- FOUND commit: `7080edd` (Task 2 — v1.6-ROADMAP.md)
+- FOUND commit: `c4f74e7` (Task 3 — v1.6-REQUIREMENTS.md archive header)
+- FOUND commit: `0375388` (plan-metadata commit — SUMMARY + STATE + ROADMAP + REQUIREMENTS)
+- Confirmed pre-existing untracked files from the prior audit session (3 `*-VALIDATION.md`, `v1.8-MILESTONE-AUDIT.md`, 8 `tests/*` files) remain untouched and unstaged throughout
