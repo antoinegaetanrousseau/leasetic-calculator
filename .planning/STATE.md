@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
-status: executing
-last_updated: "2026-09-07T20:19:55.998Z"
+status: verifying
+last_updated: "2026-09-07T20:41:18.094Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 25
-  completed_phases: 11
-  total_plans: 79
-  completed_plans: 77
-  percent: 44
+  completed_phases: 5
+  total_plans: 26
+  completed_plans: 26
+  percent: 20
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 40 (milestone-record-closure) — EXECUTING
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-07
 
 **v1.8 phase order and why:**
@@ -493,6 +493,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 40 P04 | ~25min | 3 tasks | 3 files |
 | Phase 40-milestone-record-closure P03 | 25min | 3 tasks | 3 files |
 | Phase 40 P05 | 35m | 3 tasks | 3 files |
+| Phase 40 P06 | 55min | 3 tasks | 160 files |
 
 ## Decisions
 
@@ -675,6 +676,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 40]: v1.6-ROADMAP.md rebuilt from v1.1's scoped-extract shape (D-40-05), not v1.7's full-tree snapshot
 - [Phase 40]: Tests/typecheck/lint for the v1.6 MILESTONES.md entry measured live at git tag v1.6 via an isolated git worktree, not inherited from v1.5/v1.7 figures
 - [Phase 40]: CLOSE-06 marked complete: this plan supplied its last two clauses (MILESTONES.md entry + v1.6-ROADMAP.md); the audit re-run (40-03) and ROADMAP.md shipped-status fix (40-01) were already satisfied
+- [Phase 40]: Archived phases 28-35 by hand git mv against a written-first phase->milestone map, not the GSD archiving CLI (D-40-08) — the CLI mis-attributed every phase on disk in v1.7's close
+- [Phase 40]: D-40-09 amended in place: path-reference rewrite scope narrowed to Phase 40's own live docs plus forward-read refs in phases 36-39, excluding already-executed PLAN/SUMMARY/VERIFICATION/PATTERNS records in 36-39 (258 hits/32 files measured, vs 225/21 at planning time)
 
 ### Blockers
 

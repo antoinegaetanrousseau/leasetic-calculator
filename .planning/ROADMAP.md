@@ -133,7 +133,7 @@ the count).
 - [x] **Phase 37: CRM Stack Closure** — the v1.6/v1.7 surfaces are walked and evidenced, and the admin oversight click-through reaches the proposal instead of a 404 (completed 2026-09-05)
 - [x] **Phase 38: Shell, Dialogs & Visual Conventions** — dark-theme shell and PDF render verified, the Phase 28 browser backlog walked in light and dark, dialog close labels localised, `.btn-out` back on-grid or excepted on purpose (completed 2026-09-06; verification passed with 2 recorded operator overrides — the `dialog.tsx` FR/EN observation and the wizard/pagination dark passes were structurally blocked, not skipped: see 38-VERIFICATION.md § Post-Verification Resolution)
 - [x] **Phase 39: Database Guard Correctness** — the local DB guard can no longer report OK while the command it guards would open the production branch, and the two divergent env resolvers are reconciled and pinned (completed 2026-09-06)
-- [ ] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived, and the five stale operational requirements corrected against what actually shipped
+- [x] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived, and the five stale operational requirements corrected against what actually shipped (completed 2026-09-07)
 
 ---
 
@@ -1024,7 +1024,7 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
   9. The prior ROADMAP criterion citing "Phase 20's middleware Origin gate" is corrected — no Origin
      check exists in `proxy.ts`; the gate is Better Auth's `trustedOrigins`.
 
-**Plans:** 5/6 plans executed
+**Plans:** 6/6 plans complete
 Plans:
 **Wave 1**
 
@@ -1042,7 +1042,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 40-06-PLAN.md — archive phases 28-35, repair the three path-hardcoding test suites, close CLOSE-06/07 (wave 4)
+- [x] 40-06-PLAN.md — archive phases 28-35, repair the three path-hardcoding test suites, close CLOSE-06/07 (wave 4)
 
 ---
 
@@ -1090,7 +1090,7 @@ Plans:
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
-| 40. Milestone Record Closure | v1.8 | 5/6 | In Progress|  |
+| 40. Milestone Record Closure | v1.8 | 6/6 | Complete   | 2026-09-07 |
 
 ---
 
