@@ -1024,7 +1024,7 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
   9. The prior ROADMAP criterion citing "Phase 20's middleware Origin gate" is corrected — no Origin
      check exists in `proxy.ts`; the gate is Better Auth's `trustedOrigins`.
 
-**Plans:** 4/6 plans executed
+**Plans:** 5/6 plans executed
 Plans:
 **Wave 1**
 
@@ -1038,7 +1038,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 40-05-PLAN.md — v1.6 MILESTONES entry, scoped v1.6-ROADMAP.md extract, v1.6-REQUIREMENTS archive header (wave 3)
+- [x] 40-05-PLAN.md — v1.6 MILESTONES entry, scoped v1.6-ROADMAP.md extract, v1.6-REQUIREMENTS archive header (wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -1090,7 +1090,7 @@ Plans:
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
-| 40. Milestone Record Closure | v1.8 | 4/6 | In Progress|  |
+| 40. Milestone Record Closure | v1.8 | 5/6 | In Progress|  |
 
 ---
 

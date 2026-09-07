@@ -59,7 +59,7 @@ stops existing.
 - [x] **CLOSE-05**: Phase 29 has a `29-VALIDATION.md` recording Nyquist coverage, and INFRA-05's
   write-isolation is either empirically probed or its architectural-inference basis is recorded as
   the final answer with that limitation stated.
-- [ ] **CLOSE-06**: v1.6 is formally closed — a `MILESTONES.md` entry describing what actually
+- [x] **CLOSE-06**: v1.6 is formally closed — a `MILESTONES.md` entry describing what actually
   shipped, `milestones/v1.6-ROADMAP.md` and `v1.6-REQUIREMENTS.md` snapshots, an audit re-run
   against the finished milestone (the existing one predates phases 31/33/34), and `ROADMAP.md`
   no longer showing v1.6 as IN PROGRESS while its milestone list calls it shipped.
@@ -240,7 +240,7 @@ stops existing.
 | CLOSE-03 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-04 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-05 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
-| CLOSE-06 | Phase 40 — Milestone Record Closure | Pending |
+| CLOSE-06 | Phase 40 — Milestone Record Closure | Complete |
 | CLOSE-07 | Phase 40 — Milestone Record Closure | Pending |
 | CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-01 | Phase 37 — CRM Stack Closure | Complete |
