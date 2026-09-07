@@ -141,3 +141,64 @@ export function resolvePhaseDoc(
 export function readPhaseDoc(phaseNumber: number, filename: string): string {
   return readFileSync(resolvePhaseDoc(phaseNumber, filename), 'utf8');
 }
+
+/**
+ * Resolves the ONE requirement ledger containing `marker`, searching the live ledger first
+ * and then the milestone archives (newest first).
+ *
+ * ============================================================================
+ * WHY THIS EXISTS (added at the v1.8 milestone close)
+ * ============================================================================
+ * `/gsd-complete-milestone` archives `.planning/REQUIREMENTS.md` to
+ * `.planning/milestones/v{X.Y}-REQUIREMENTS.md` and then `git rm`s the live file, so the
+ * next milestone starts from a fresh ledger. Any suite that hardcodes
+ * `.planning/REQUIREMENTS.md` therefore goes red at every milestone close — not because a
+ * requirement regressed, but because the ledger was archived exactly as designed. That is
+ * what happened to `tests/phase-38-closure-artifacts.test.ts` when v1.8 closed.
+ *
+ * WHY THIS RETURNS ONE FILE AND NOT ALL OF THEM CONCATENATED. The first attempt at this
+ * helper joined every candidate ledger into one string. That resolves the ID lookup but
+ * destroys document structure: callers that extract a named section (`## Traceability`,
+ * `## Coverage`) then read the FIRST such section across eight concatenated milestones —
+ * v1.1's 108-requirement table instead of v1.8's 24 — and fail with a confusing count
+ * mismatch that looks like a requirements regression. A ledger is a structured document,
+ * so the caller must get exactly one.
+ *
+ * `marker` should identify the requirement whose ledger you want (e.g. the HOUSE-05 row).
+ * Throws loudly, naming every file searched, if no ledger matches — a genuinely missing
+ * requirement must not read as "file not found" from an opaque fs call.
+ */
+export function resolveRequirementLedger(
+  marker: RegExp,
+  opts: { repoRoot?: string } = {},
+): string {
+  const root = opts.repoRoot ?? REPO_ROOT;
+  const live = join(root, '.planning/REQUIREMENTS.md');
+  const archivesRoot = join(root, '.planning/milestones');
+
+  const candidates: string[] = [];
+  if (existsSync(live)) candidates.push(live);
+  if (existsSync(archivesRoot)) {
+    candidates.push(
+      ...readdirSync(archivesRoot, { withFileTypes: true })
+        .filter((e) => e.isFile() && /-REQUIREMENTS\.md$/.test(e.name))
+        .map((e) => join(archivesRoot, e.name))
+        .sort()
+        .reverse(),
+    );
+  }
+
+  for (const candidate of candidates) {
+    if (marker.test(readFileSync(candidate, 'utf8'))) return candidate;
+  }
+  throw new Error(
+    `No requirement ledger matching ${String(marker)} was found. Searched ${candidates.length} ` +
+      `ledger(s): ${JSON.stringify(candidates)}. The live ledger exists before a milestone close; ` +
+      'its archive exists after. If neither matches, the requirement is genuinely absent.',
+  );
+}
+
+/** Convenience wrapper: resolve + read as utf8. */
+export function readRequirementLedger(marker: RegExp): string {
+  return readFileSync(resolveRequirementLedger(marker), 'utf8');
+}

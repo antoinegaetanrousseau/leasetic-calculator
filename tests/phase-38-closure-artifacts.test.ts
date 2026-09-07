@@ -8,31 +8,38 @@
  * walk).
  *
  * ============================================================================
- * WHY THE 38-* PATHS ARE LITERAL, NOT ARCHIVE-RESOLVED
+ * WHY THE 38-* PATHS ARE ARCHIVE-RESOLVED (corrected at the v1.8 milestone close)
  * ============================================================================
- * `tests/_planning-docs.ts`'s `resolvePhaseDoc()` exists because CLOSE-07 (Phase 40) will
- * move phases 28-35 into `.planning/milestones/*-phases/`. Phase 38 is NOT in that 28-35
- * range, so a literal `.planning/phases/38-shell-dialogs-visual-conventions/...` path is
- * used for every 38-* document below. Using the archive resolver for a path CLOSE-07
- * structurally cannot move would be worse than a literal path, not better: if
- * `38-UAT.md` or `evidence/` ever genuinely disappeared, the archive-resilient resolver
- * would keep searching a second location that was never a valid home for it and could
- * mask the disappearance behind a misleading "not found in either location" message
- * pointing partly at the wrong place. `31.1-VERIFICATION.md`, by contrast, genuinely IS a
- * pre-CLOSE-07 phase (31.1) and DOES need `resolvePhaseDoc()` — see the CLOSE-02 describe
- * block below.
+ * This block previously argued that the 38-* paths should stay LITERAL, on the reasoning
+ * that `resolvePhaseDoc()` existed only for CLOSE-07's move of phases 28-35 and that
+ * Phase 38 "structurally cannot move". That reasoning was sound about CLOSE-07 and wrong
+ * about the general case: `/gsd-complete-milestone` archives EVERY phase of the closing
+ * milestone into `.planning/milestones/v{X.Y}-phases/`, so Phase 38 moved the moment v1.8
+ * closed — and these literal paths went red for a document that had not regressed.
+ *
+ * The lesson the old docblock got backwards: a phase directory's home is not fixed by its
+ * number being outside some other phase's migration range. Every phase eventually moves,
+ * at its own milestone close. The resolver's "not found in EITHER location" message is
+ * the correct failure for a genuinely missing document, and its "found in BOTH" throw
+ * still catches a half-completed migration — neither masks a real disappearance.
+ *
+ * `REQUIREMENTS.md` has the same property for the same reason: the milestone close
+ * archives it to `milestones/v{X.Y}-REQUIREMENTS.md` and removes the live file. See
+ * `readRequirementLedger()`.
  */
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { MILESTONE_ARCHIVES_DIR, readPhaseDoc, resolvePhaseDoc } from './_planning-docs';
+import {
+  MILESTONE_ARCHIVES_DIR,
+  readPhaseDoc,
+  readRequirementLedger,
+  resolvePhaseDoc,
+} from './_planning-docs';
 
-const REPO_ROOT = process.cwd();
-const PHASE_38_DIR = join(REPO_ROOT, '.planning/phases/38-shell-dialogs-visual-conventions');
-const UAT_PATH = join(PHASE_38_DIR, '38-UAT.md');
-const VERIFICATION_PATH = join(PHASE_38_DIR, '38-VERIFICATION.md');
-const EVIDENCE_DIR = join(PHASE_38_DIR, 'evidence');
-const REQUIREMENTS_PATH = join(REPO_ROOT, '.planning/REQUIREMENTS.md');
+const UAT_PATH = resolvePhaseDoc(38, '38-UAT.md');
+const VERIFICATION_PATH = resolvePhaseDoc(38, '38-VERIFICATION.md');
+const EVIDENCE_DIR = resolvePhaseDoc(38, 'evidence');
 
 function read(p: string): string {
   return readFileSync(p, 'utf8');
@@ -146,7 +153,7 @@ describe('CLOSE-02 — 31.1-VERIFICATION.md reads status: passed, earned by the 
 // ===========================================================================
 
 describe('CLOSE-08 — F-38-03/F-38-06 are genuinely filed in REQUIREMENTS.md (the verifier\'s Gap 1 defect, now fixed)', () => {
-  const requirements = read(REQUIREMENTS_PATH);
+  const requirements = readRequirementLedger(/^- \[[ x]\] \*\*HOUSE-05\*\*/m);
 
   it('a) HOUSE-05 and HOUSE-06 exist as real requirement rows AND in the traceability table, both mapped to Phase 40', () => {
     expect(
