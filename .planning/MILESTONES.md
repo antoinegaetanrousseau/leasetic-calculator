@@ -1,5 +1,12 @@
 # Milestones — Matrice Commerciale
 
+> **Record-completeness note (2026-09-07, Phase 40 D-40-04).** `v1.2` and `v1.3` still have
+> no entry in this file — both shipped in May 2026 (Phases 11-15 and 16-21 respectively) before
+> this ledger's discipline was established. Backfilling them was deliberately **not** done in
+> Phase 40: reconstructing two milestones' worth of narrative means mining roughly 30 phase
+> summaries for a milestone nobody is auditing, for record-keeping value only. Recorded here so
+> the omission is visible rather than silently inherited at the next audit.
+
 ## v1.7 Sales Motivation (Shipped: 2026-09-05)
 
 **Scope:** Phase 35 only — 1 phase, 5 plans, 13 tasks, 35 commits.
@@ -57,6 +64,138 @@ archived, and all 35 phase directories remain in `.planning/phases/`. The
 archiving CLI attributed every phase on disk to this milestone; those figures
 (19 phases / 97 plans / 178 tasks) were incorrect and have been replaced by the
 scope stated above.
+
+## v1.6 — CRM Foundation
+
+**Shipped:** 2026-09-04
+**Phases:** 6 (29, 30, 31, 31.1, 33, 34) | **Plans:** 48 | **Plan↔Summary parity:** 48/48
+**Requirements:** 34/34 satisfied (`v1.6-REQUIREMENTS.md`'s own Traceability section
+miscounts this as "31/31" over a 39-row table — see Known gaps at close)
+**Tests:** 2254 passing / 52 skipped (env-gated) / 0 failed, measured at git tag `v1.6` via an
+isolated worktree checkout (not inherited from v1.5's or v1.7's figures) · `tsc --noEmit` clean ·
+`eslint --max-warnings=0` clean
+**Git range:** `14d6996..bb91307` (362 commits since the v1.5 tag · code +166,235 / −5,059
+across 840 files)
+**Timeline:** 2026-08-31 → 2026-09-04 (5 days)
+**Known deferred items:** 4 at close — Phase 30's UAT (`30-UAT.md`, testing status, 4 pending
+scenarios), Phase 31.1's and Phase 33's `human_needed` verifications, and 3 open context
+questions on Phase 31's re-run idempotency / canonical-name selection (see `STATE.md` §
+Deferred Items). All four were carried forward through v1.7 close and closed inside v1.8
+(Phases 36-39).
+
+Phase 32 (HubSpot Import) is recorded as **Removed 2026-09-02** by operator decision —
+IMPORT-02/IMPORT-07 dropped with it, the number retained rather than reused (see ROADMAP.md §
+Phase 32 for the full rationale). Phase 28 (ReUI/base-maia design-system migration) is
+attributed to v1.6 but is retro-documented outside the GSD workflow (no PLAN, no
+VERIFICATION — see plan 40-01 / ROADMAP.md); it is named here for completeness but is not
+folded into the "6 phases" count above, which covers only the phases planned and verified
+through this workflow.
+
+### What shipped
+
+The CRM foundation: client data gets its own life independent of proposals. A shared
+`companies` registry (global fact) carries per-partner `client_relationships` (private,
+channel-conflict safe) and relationship-scoped `contacts`; `proposals` gains a nullable FK to
+a relationship. `proposals.inputs` stays byte-identical throughout — the CRM is strictly
+additive, never a relaxation of the snapshot invariant. A source-agnostic reconciliation
+engine backfilled every client already implied by existing proposals into real company +
+relationship records (dry-run-first, SIREN auto-merge, human-resolved name-only matches). A
+partner-advanced pipeline gives every relationship a stage and every proposal a won / lost /
+unanswered outcome, SIREN-gated at win. The fiche client page shows registry-sourced company
+identity (SIRENE-backed), per-section editing, and a single chronological timeline mixing
+manual notes with system events, driving a next-action "à relancer" list.
+
+### Key accomplishments
+
+- **Phase 29 — Migration Safety Net** — repaired the `db-smoke` path filter so the gate
+  actually fires on this repo's real migration paths (it was blind to the exact Phase 12
+  regression), added an anti-rot guard, and repointed local dev off the production Neon branch.
+- **Phase 30 — Company & Contact Registry** — `companies` (global) + `client_relationships`
+  (private, per-partner) + `contacts` (scoped to the relationship) schema and surfaces;
+  `proposals` gains a nullable FK; a new `sales` role added alongside `partner`/`admin` with
+  zero change to existing access.
+- **Phase 31 — Reconciliation Engine & Proposal Extraction** — a reusable, source-agnostic
+  dry-run-first dedup engine (SIREN auto-merge, name-normalized flagging, human-resolution UI)
+  that extracted every client already implied by `proposals.inputs` into real registry records
+  without altering a single proposal snapshot.
+- **Phase 31.1 — App Shell Refresh (inserted)** — the shell converged on the sibling Colibris
+  product: header breadcrumbs, header-owned collapse control, a 120px brand lockup, and a
+  two-tier radius scale that decouples container surfaces from controls.
+- **Phase 33 — Pipeline** — a partner-advanced stage on the relationship (late stages
+  system-owned, reserved for the future contract tool), a won/lost/unanswered outcome on the
+  proposal, and a SIREN-gated win that never blocks quoting.
+- **Phase 34 — Fiche client** — registry-backed company identity (SIRENE lookup + read-only
+  render + audited shared-field edits), per-section editing, a tabbed client page, and a
+  unified timeline mixing manual notes with automatically recorded system events.
+
+### Verification artifacts
+
+- `milestones/v1.6-ROADMAP.md` — v1.6-scoped roadmap extract (phases 29-34, prior milestones
+  collapsed)
+- `milestones/v1.6-REQUIREMENTS.md` — the 34-requirement traceability snapshot, now carrying
+  the standard archive header
+- `milestones/v1.6-MILESTONE-AUDIT.md` — the audit this entry's Known gaps section transcribes,
+  re-run 2026-09-07 against the finished milestone (34/34 requirements, 6/6 phases, 27/27
+  integration, 6/6 flows, `tech_debt`)
+- `milestones/v1.6-MILESTONE-AUDIT-SUPERSEDED.md` — the stale 2026-09-01 audit (revised
+  2026-09-02), preserved verbatim; it scored the milestone while phases 31/33/34 were still
+  unbuilt and its findings are withdrawn, superseded by the 2026-09-07 re-run above
+
+### Known gaps at close (acknowledged, not blocking)
+
+- **Record-integrity — Coverage miscount:** `v1.6-REQUIREMENTS.md` § Traceability claims
+  "Coverage: 31/31 (100%)" above a table listing 39 rows. The real v1.6 count is 34.
+- **Record-integrity — GAME-01..GAME-05 double-attributed:** these five requirements appear in
+  both `v1.6-REQUIREMENTS.md` and `v1.7-REQUIREMENTS.md`, mapped to Phase 35 in each.
+  `ROADMAP.md` assigns Phase 35 to v1.7; the v1.6 ledger over-scopes by five requirements —
+  the corrected v1.6 total is 34, matching the Requirements figure above.
+- **Record-integrity — SHELL-C1..SHELL-C7 have no REQ-ID:** Phase 31.1 delivered these seven
+  success criteria as phase-local criteria with no requirement ID in either milestone ledger.
+  The work is real and consumed (per the milestone audit's cross-phase integration check); it
+  is simply invisible to REQ-ID-based coverage accounting.
+- **Record-integrity — Phase 28 has no verification record:** no PLAN, no VERIFICATION.md —
+  only a retro-documented summary, outside the GSD workflow, recorded as such in ROADMAP.md.
+  Accepted by design, not a defect; noted so future audits stop re-raising it.
+- **Record-integrity — the archive pair was incomplete:** `.planning/milestones/v1.6-ROADMAP.md`
+  did not exist prior to this plan; `v1.6-REQUIREMENTS.md` existed alone. Closed by this plan
+  (40-05).
+- **INFRA-05 (Phase 29):** verified on an architectural-inference basis at the time; the
+  empirical write-isolation proof was explicitly not obtained (`29-VERIFICATION.md`). Closed
+  retroactively outside v1.6 by Phase 36's `scripts/probe-write-isolation.ts` (live-fire probe
+  against Neon main) and hardened again by Phase 39 (OPS-05).
+- **Phase 29 Nyquist:** `29-VALIDATION.md` records `nyquist_compliant: not-derivable`.
+- **Phase 30 — `30-UAT.md` reconciliation:** frontmatter status is still "testing"; its
+  "Current Test" block is stale (parked at test 2) and its Summary counts (passed 8 / issues 3 /
+  pending 4) do not reconcile with the 13 itemized results (12 pass + 1 fixed).
+  Documentation-quality only.
+- **Phase 30 — `admin.companies.search` copy:** placeholder text reads "client ou référence" on
+  a surface that searches company name and SIREN. Reviewed by Antoine 2026-09-02 and accepted
+  as shipped (recorded in `REQUIREMENTS.md` § Out of Scope).
+- **SHELL-C7 (Phase 31.1):** the dark-theme shell + PDF surface visual check could not be
+  closed inside v1.6 — the browser session dropped mid-check. Closed 2026-09-06 by Phase 38
+  CLOSE-02, evidenced in `38-UAT.md`.
+- **Phase 33 — voided acceptance evidence:** `33-VERIFICATION.md` scores 5/5 must-haves in code
+  but records 2 with voided acceptance evidence — the 33-09 acceptance table was not trusted
+  and the criteria were re-derived from `ROADMAP.md` instead.
+- **Phase 33 — unperformed verification:** a production-build check of the SIREN-gate dialog
+  (dialog stays open, retains typed date and reason, reveals the SIREN field) against a seeded
+  Neon development branch is recorded in `33-VERIFICATION.md` under `human_verification` and
+  was never run.
+- **Nyquist coverage:** 5 of 7 v1.6 phases have no VALIDATION.md — 28, 31, 31.1, 33, 34. Phase
+  30 is compliant; Phase 29 is partial (not-derivable).
+
+### Archive
+
+- `milestones/v1.6-ROADMAP.md` · `milestones/v1.6-REQUIREMENTS.md`
+- The six phase directories (29, 30, 31, 31.1, 33, 34) plus Phase 28 are to be archived to
+  `milestones/v1.6-phases/` by Phase 40 plan 40-06.
+- **Correcting the v1.7 entry's Archive note, without editing it:** the statement above, under
+  `## v1.7`, that "v1.6 was never archived, and all 35 phase directories remain in
+  `.planning/phases/`" describes the state **at v1.7 close** (2026-09-05), not the state now.
+  v1.6 **is** now formally archived with a milestone-scoped `ROADMAP.md` + `REQUIREMENTS.md`
+  pair, per this entry.
+
+---
 
 ## v1.5 — Proposal List Actions & Pill Fix
 
