@@ -85,24 +85,53 @@ stops existing.
   declared conventions — on-grid padding and the standard focus treatment — or the spec is updated to
   record a deliberate exception. Today `.btn-out` carries `0.6rem` vertical padding (9.6px, off the
   4px grid) and a third hardcoded focus shadow.
-- [ ] **GAP-05**: The admin accounts list shows a real last-login date for a partner who has signed
-  in — ADMIN-05's `users.last_login_at` is read by that page but written nowhere, so every row shows `—`.
+- [x] **GAP-05**: The admin accounts list shows a real last-login date for a partner who has signed
+  in — ADMIN-05's `users.last_login_at` is read by that page but ~~written nowhere, so every row
+  shows `—`~~ **retracted — see amendment below.** *(Amended 2026-09-07 by D-10: `last_login_at` IS
+  written. `updateLastLoginAt()` is wired to Better Auth's `session.create.after` hook and fires on
+  every successful login — see `src/lib/auth/index.ts:195` and `src/lib/auth/index.test.ts`. The
+  admin accounts list now shows a real date for any partner who has signed in.)*
 
 ### Operational Gates (OPS)
 
-- [ ] **OPS-01**: The shared `leasetic2026` admin password is retired and each admin holds an
+- [x] **OPS-01**: The shared `leasetic2026` admin password is retired and each admin holds an
   individual strong credential. *Flagged at the v1.1 close as required before the first real partner
-  is onboarded.*
-- [ ] **OPS-02**: Better Auth `trustedOrigins` is explicitly configured rather than left to its
+  is onboarded.* *(Amended 2026-09-07 by D-09: closed 2026-05-29. Both admins rotated off the shared
+  `leasetic2026` password to individual strong credentials via the `/parametres` self-service flow —
+  no admin↔admin fallback was used; the old password was tested and rejected, the new one verified —
+  see `docs/operations/phase-21-gate-evidence.md` § GATE-01. Per D-11, no reset-token script was
+  built or is needed: `createPasswordReset()` already exists at `src/lib/auth/actions.ts:174` as the
+  admin↔admin fallback, should a rotation ever be needed again.)*
+- [x] **OPS-02**: Better Auth `trustedOrigins` is explicitly configured rather than left to its
   default. Deferred since v1.2 on the grounds that SameSite=Lax + `__Secure-` cookies are the actual
-  CSRF defense — that reasoning is recorded or revised, not merely inherited.
-- [ ] **OPS-03**: `scripts/smoke-ovh.ts` has been executed against a real OVH target with its result
+  CSRF defense — that reasoning is recorded or revised, not merely inherited. *(Amended 2026-09-07 by
+  D-14/D-15/D-16: `trustedOrigins` was explicitly configured in Phase 20-01 — see
+  `src/lib/auth/index.ts:210` (`trustedOrigins: allowedOrigins`) and
+  `src/lib/auth/trusted-origins.test.ts` (asserts allow-list membership). The inherited "SameSite is
+  the actual defence" framing is revised, not re-affirmed: the accurate dated position is
+  **defence in depth** — both layers (SameSite=Lax + `__Secure-` cookies, and the Origin allow-list)
+  are present, and neither is claimed to make the other unnecessary. No middleware Origin gate exists
+  in `proxy.ts` (91 lines, coarse auth-cookie gate only) and none was built — Better Auth's own
+  allow-list enforcement on the incoming request Origin is the mechanism.)*
+- [x] **OPS-03**: `scripts/smoke-ovh.ts` has been executed against a real OVH target with its result
   recorded, **or** the OVH cutover is formally re-dated with a decision. The capability shipped in
   v1.1 against a "September 2026" date that has arrived. *External dependency — must be closable by
-  a recorded decision.*
-- [ ] **OPS-04**: DATA-11's 10-year PDF retention carries a recorded legal position — Thomas's
+  a recorded decision.* *(Amended 2026-09-07 by D-12/D-13/D-40-15: closed by the second branch — the
+  OVH cutover is formally re-dated to **December 2026**, with Antoine owning the next step of
+  provisioning an OVH-compatible target (Node + Postgres + S3-compatible object storage). The
+  blocker is that no OVH environment is provisioned, not that nobody ran a command;
+  `scripts/smoke-ovh.ts` (358 lines, 7-step black-box lifecycle) stays ready and deliberately unrun —
+  rehearsing it against the Vercel deployment was rejected, since it would prove the harness works
+  but not portability, and would create and delete a real proposal in production. The commitment is
+  carried forward in `.planning/todos/pending/ops-03-ovh-cutover-december-2026.md`.)*
+- [x] **OPS-04**: DATA-11's 10-year PDF retention carries a recorded legal position — Thomas's
   sign-off, or an explicit interim decision naming who accepts the risk until it arrives.
-  *External dependency — must be closable by a recorded decision.*
+  *External dependency — must be closable by a recorded decision.* *(Amended 2026-09-07 by the D-09
+  era / Phase 21 D-01: closed 2026-05-29. Phase 21 D-01 superseded the "ask Thomas" framing — Antoine
+  owns leasetic.fr directly, so publication of the updated privacy notice **is** the artifact; no
+  third-party sign-off is required. The notice is live with both additions (Vercel/Neon EU hosting,
+  10-year PDF retention citing French Commercial Code L123-22/L110-4) and the document's Status
+  reads Closed — see `docs/legal/privacy-coverage-confirmation.md`.)*
 - [x] **OPS-05**: `scripts/check-local-db-branch.sh` validates the `DATABASE_URL` the command that
   is about to run will actually open, instead of parsing `.env.local` unconditionally. The guard
   hardcodes `ENV_FILE=".env.local"`, but `@next/env` resolves `.env.$NODE_ENV.local` at HIGHER
@@ -208,11 +237,11 @@ stops existing.
 | GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-03 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-04 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
-| GAP-05 | Phase 40 — Milestone Record Closure | Pending |
-| OPS-01 | Phase 40 — Milestone Record Closure | Pending |
-| OPS-02 | Phase 40 — Milestone Record Closure | Pending |
-| OPS-03 | Phase 40 — Milestone Record Closure | Pending |
-| OPS-04 | Phase 40 — Milestone Record Closure | Pending |
+| GAP-05 | Phase 40 — Milestone Record Closure | Complete |
+| OPS-01 | Phase 40 — Milestone Record Closure | Complete |
+| OPS-02 | Phase 40 — Milestone Record Closure | Complete |
+| OPS-03 | Phase 40 — Milestone Record Closure | Complete |
+| OPS-04 | Phase 40 — Milestone Record Closure | Complete |
 | OPS-05 | Phase 39 — Database Guard Correctness | Complete |
 | HOUSE-01 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | HOUSE-02 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
