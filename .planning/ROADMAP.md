@@ -1024,7 +1024,7 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
   9. The prior ROADMAP criterion citing "Phase 20's middleware Origin gate" is corrected — no Origin
      check exists in `proxy.ts`; the gate is Better Auth's `trustedOrigins`.
 
-**Plans:** 2/6 plans executed
+**Plans:** 3/6 plans executed
 Plans:
 **Wave 1**
 
@@ -1034,7 +1034,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [ ] 40-03-PLAN.md — fresh `/gsd-audit-milestone v1.6` run and audit custody (wave 2, blocking human action)
-- [ ] 40-04-PLAN.md — requirement ledger corrections (OPS-01..04, GAP-05, HOUSE-05/06), OVH todo, HOUSE-06 errata (wave 2)
+- [x] 40-04-PLAN.md — requirement ledger corrections (OPS-01..04, GAP-05, HOUSE-05/06), OVH todo, HOUSE-06 errata (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -1090,7 +1090,7 @@ Plans:
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
-| 40. Milestone Record Closure | v1.8 | 2/6 | In Progress|  |
+| 40. Milestone Record Closure | v1.8 | 3/6 | In Progress|  |
 
 ---
 

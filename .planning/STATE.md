@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-07T19:25:46.275Z"
+last_updated: "2026-09-07T19:38:18.777Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 25
   completed_phases: 11
   total_plans: 79
-  completed_plans: 75
+  completed_plans: 76
   percent: 44
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 40 (milestone-record-closure) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-09-07
 
@@ -487,6 +487,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 39 P05 | ~25min | 3 tasks | 5 files |
 | Phase 40 P01 | 10min | 3 tasks | 2 files |
 | Phase 40 P02 | ~15min | 2 tasks | 5 files |
+| Phase 40 P04 | ~25min | 3 tasks | 3 files |
 
 ## Decisions
 
@@ -663,6 +664,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 40-02]: Deleted the dead ProposalForm component per D-40-10 (HOUSE-05); ProposalFormProvider kept live
 - [Phase 40-02]: HOUSE-05 REQUIREMENTS.md checkbox left for Plan 40-04's amendment per this plan's own output spec — not marked complete by 40-02
 - [Phase 40-02]: npm run build verified locally by temporarily moving aside .env.local/.env.production.local (both route to Neon main), matching CI's no-candidate-file SKIP path for the OPS-05 DB guard; no DB accessed, files restored immediately
+- [Phase 40]: OPS-01/02/03/04, GAP-05, HOUSE-05, HOUSE-06 amended in place in REQUIREMENTS.md (original text preserved, dated 2026-09-07 parentheticals citing verified evidence); December 2026 OVH cutover carried forward as a pending todo; 38-WALK-SURFACES.md corrected via a dated errata block, not an in-place Table 1 rewrite
 
 ### Blockers
 
