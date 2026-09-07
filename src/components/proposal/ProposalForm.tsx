@@ -28,10 +28,10 @@ export interface ProposalFormProviderProps {
 }
 
 /**
- * Hoists the RHF setup one level up so <ProposalForm> + <LiveLoyerPreview>
- * are siblings sharing a single FormProvider context (Plan 07-05 Path A).
- * The page Server Component wraps both children in this provider; each
- * child consumes the context via useFormContext().
+ * Hoists the RHF setup one level up so the parametres wizard step's children
+ * (WizardStep1Wiring, ParametresFormCard) share a single FormProvider
+ * context. app/(authed)/proposals/new/parametres/page.tsx wraps them in this
+ * provider; each child consumes the context via useFormContext().
  */
 export function ProposalFormProvider({
   prefill,

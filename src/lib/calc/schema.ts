@@ -3,7 +3,7 @@
  *
  * Single-source discipline (D-29 from Phase 6 / SHELL-11): the SAME schema is
  * imported by:
- *   1. Plan 07-04's <ProposalForm> via @hookform/resolvers/zod
+ *   1. ProposalFormProvider (src/components/proposal/ProposalForm.tsx) via @hookform/resolvers/zod
  *   2. The future Phase 8 POST /proposals server route (input parsing)
  *
  * Pure module — no 'use client' / 'use server' directives, no framework imports.

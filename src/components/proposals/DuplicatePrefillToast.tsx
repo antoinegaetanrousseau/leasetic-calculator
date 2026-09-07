@@ -15,9 +15,10 @@ export interface DuplicatePrefillToastProps {
  *   2. Strips the ?duplicate= flag from the URL via router.replace
  *      (so a refresh doesn't re-fire the toast + gives a cleaner URL).
  *
- * Note: ProposalForm captures duplicatedFromId via useState lazy init
- * (window.location.search at mount time) so the POST body still receives
- * the source ID even after this component strips the URL flag.
+ * Note: duplicate prefill is server-side (D-25), not a client POST-body
+ * field. app/(authed)/proposals/new/parametres/page.tsx reads ?duplicate=
+ * on the server and spreads the same-user source proposal's `inputs` into
+ * the new draft when it is minted, before this component ever mounts.
  *
  * The `fired` ref prevents the toast from re-firing on React Strict Mode's
  * double-invoke and on searchParams identity changes (T-08-13-04).

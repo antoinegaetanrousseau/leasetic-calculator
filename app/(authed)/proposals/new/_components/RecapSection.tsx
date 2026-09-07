@@ -84,9 +84,9 @@ export function RecapSection({
         }}
       >
         {/*
-          Header reuses the .ctitle / .dot pattern lifted verbatim from
-          src/components/proposal/ProposalForm.tsx:213-219. The .dot's
-          `background: var(--gd)` is the canonical accent treatment.
+          Header reuses the .ctitle / .dot pattern defined in
+          src/components/ui/SectionTitle.tsx (rules in app/globals.css). The
+          .dot's `background: var(--gd)` is the canonical accent treatment.
         */}
         <SectionTitle>{sectionTitle}</SectionTitle>
         {modifierLink && (

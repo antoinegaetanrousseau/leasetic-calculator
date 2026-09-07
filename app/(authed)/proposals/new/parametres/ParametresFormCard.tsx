@@ -47,7 +47,7 @@ import { SirenInput } from '@/components/proposal/SirenInput';
 import { YesNoToggle } from '@/components/proposal/YesNoToggle';
 
 // Match the ProposalFormProvider's input-side generic (the validity field is
-// optional because the schema applies .default(30) — see ProposalForm.tsx:36).
+// optional because the schema applies .default(30) — see ProposalForm.tsx:22).
 type ProposalFormValues = z.input<typeof proposalInputSchema>;
 
 const DURATION_OPTIONS = [
