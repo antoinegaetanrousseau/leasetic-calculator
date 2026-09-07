@@ -145,7 +145,22 @@ Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-fil
 
 ---
 
-## 🚧 Current Milestone: v1.8 — Deferred Items
+## ✅ v1.8 — Deferred Items — SHIPPED 2026-09-07
+
+**v1.8 delivered:** the inherited v1.0-v1.7 backlog is closed — no shipped milestone still
+carries an unclosed item. 5 phases (36-40), 26 plans, 62 tasks, 24/24 requirements, 209 commits
+over 3 days. A net *deletion* milestone: 215 code files changed, +7,186 / −28,079. The DB guard
+that reported OK while opening production now resolves the effective `DATABASE_URL` (OPS-05);
+the `/proposals/[id]` admin dead end is closed behind one shared access helper (GAP-01); 152 dead
+vendored files and a 449-line unreachable component are gone; and v1.6 is formally closed and
+re-audited against its finished state. Audit `milestones/v1.8-MILESTONE-AUDIT.md` — status
+`tech_debt`, no blockers. Two tracked todos carry into v1.9: WR-07 (a DB-guard fail-open under
+`NODE_ENV=test`, deliberately not accepted) and OPS-03 (the OVH cutover, re-dated to December
+2026). Verification 5/5 phases passed; 2572 tests.
+
+<details>
+<summary>Original v1.8 scope as planned 2026-09-05</summary>
+
 
 **Goal:** Close the accumulated deferred backlog from v1.0-v1.7 — verification debt, known
 functional gaps, and the pre-onboarding operational gates — so that no shipped milestone still
@@ -202,6 +217,8 @@ Two things the phase surfaced are worth carrying as milestone-level knowledge:
    wizard cannot be opened without writing a draft, and a pagination control cannot be observed on
    a single-page dataset. Closing those needs a relationship-holder login and a disposable
    database — a milestone-level prerequisite, not something a phase can arrange for itself.
+
+</details>
 
 ---
 
@@ -369,24 +386,34 @@ All 6 active v1.5 requirements shipped — 2 phases (26–27); 1 descoped (ROWAC
 - **GAME-04**: No surface lets a partner learn anything about another partner's book, including by inference from a count, rank, total or wording. _Validated in Phase 35, and proven at runtime: `momentum.isolation.integration.test.ts` was run against real Postgres with 3/3 mutation evidence — deleting the owner predicate makes exactly that suite fail._
 - **GAME-05**: A partner who ignores all of it is not penalised; pipeline, conversion rate and follow-up list behave exactly as before. _Validated in Phase 35._
 
-### Active (v1.8 — Deferred Items)
+### Validated (shipped in v1.8)
 
-Defined in `.planning/REQUIREMENTS.md` for milestone v1.8. This milestone carries no new
-product capability — every requirement traces to an item already deferred by a shipped
-milestone (v1.0-v1.7). Candidate *capability* scope for v1.9+ is carried forward below.
+v1.8 carried no new product capability — all 24 requirements traced to items already deferred by
+a shipped milestone (v1.0-v1.7). Full text archived in `milestones/v1.8-REQUIREMENTS.md`.
+
+- **HOUSE-01..04**: the gates and records every later phase relies on are trustworthy again — `lint:check` reports only real findings, stale planning markers carry their real status, and 25 dead vendored ReUI directories are gone on a dated decision. _Validated in Phase 36._
+- **CLOSE-05**: Phase 29 has the Nyquist record it never had, and INFRA-05 write-isolation was empirically probed against the real Neon branches (verdict ISOLATED). _Validated in Phase 36._
+- **CLOSE-01/03/04**: the v1.6/v1.7 surfaces are walked and evidenced — `30-UAT.md` at `pending: 0`, `33-VERIFICATION.md` passed, and Phase 34 finally given the VERIFICATION and REVIEW it shipped 13 plans without. _Validated in Phase 37._
+- **GAP-01**: an admin following the oversight click-through reaches the proposal instead of a 404 — read access widened, write controls gated on ownership, both decided in one shared helper. _Validated in Phase 37._
+- **GAP-03**: Phase 35's two INFO findings resolved with byte-identical render diffs. _Validated in Phase 37._
+- **CLOSE-02/08**: the dark-theme shell and PDF render are verified and Phase 28's browser backlog walked in light and dark. _Validated in Phase 38 — CLOSE-08 under a recorded operator override covering 2 structurally unobservable surfaces._
+- **GAP-02**: every icon-only dialog close control announces its name in the viewer's language, not hardcoded English. _Validated in Phase 38 — under operator override for the `dialog.tsx` consumer, which sits behind an admin-refusing route by design._
+- **GAP-04**: the legacy button rule is back on-grid and all six focus selectors read the app's `--ring` token; UIC-11 makes a future hardcoded ring a violation. _Validated in Phase 38._
+- **OPS-05**: `check:local-db-branch` can no longer report OK while the command it guards would open production — it resolves the effective `DATABASE_URL` exactly as `@next/env` does, from one declarative endpoint source, with a differential test pinning the bash guard and the TS resolver together. _Validated in Phase 39._
+- **CLOSE-06/07**: v1.6 formally closed and re-audited against its finished state; Phase 28 attributed; phases 28-35 archived. _Validated in Phase 40._
+- **GAP-05, OPS-01..04, HOUSE-05/06**: the stale operational ledger corrected against what actually shipped — each ticked with a pointer to where it was really closed rather than re-implemented. _Validated in Phase 40._
 
 ### Deferred to next milestone
 
 - [ ] Teal accent rebrand (`#2D7A8C`) — descoped from v1.4 Phase 25; needs splitting the overloaded `--gd` token into distinct accent (→ teal) vs. success (→ `#129657`) tokens, recoloring ~63 sites + hardcoded `rgba(18,150,87,…)` tints, then a fresh light+dark WCAG AA audit
-- [ ] OVH production deployment + smoke-deploy execution (September 2026 target; capability shipped in v1.1)
+- [ ] OVH production deployment + smoke-deploy execution — **re-dated to December 2026** by v1.8 (OPS-03); the blocker is the environment, not the command. Antoine owns provisioning a Node + Postgres + S3-compatible target. Tracked: `.planning/todos/pending/ops-03-ovh-cutover-december-2026.md`
 - [ ] Webhook notifications to Leasétic on each proposal generation
 - [ ] Mobile-optimized layout
 - [ ] Multi-language beyond FR + EN
-- [ ] Automated browser tests (Playwright or similar)
+- [ ] Automated browser tests (Playwright or similar) — v1.8 made the case concrete: three of its verification gaps were structurally blocked on not having a scriptable relationship-holder session and a disposable dataset
 - [ ] SMTP-driven self-service password reset
 - [ ] Sentry / APM observability beyond Vercel logs
 - [ ] Generic audit-log viewer beyond coefficient history
-- [ ] Admin cross-partner proposal read view
 - [ ] Wizard step-1 sticky-footer action bar / `beforeunload` warning / per-step tab titles
 - [ ] Phase 11 sidebar adminHrefs config-driven refactor
 - [ ] `/accounts` 308 redirect sunset (warm-cache window ≥1 milestone is met after v1.3)
@@ -416,13 +443,14 @@ milestone (v1.0-v1.7). Candidate *capability* scope for v1.9+ is carried forward
 
 ## Context
 
-- **Codebase (post-v1.1):** 16,139 LOC of TypeScript across `src/` + `app/` (.ts + .tsx); 4 Drizzle migrations; 4 deployed routes + 1 internal cron route; 263+ i18n keys × 2 languages
+- **Codebase (post-v1.8):** 86,524 LOC of non-test TypeScript across `src/` + `app/` (124,735 including tests); 11 Drizzle migrations. _(The 16,139 figure here was post-v1.1 and eight milestones stale.)_
 - **Tech stack:** Next.js 16 (App Router) + TypeScript + Drizzle ORM 0.45.2 + Neon Postgres + Vercel Blob + Better Auth 1.6.9 + argon2id + @react-pdf/renderer 4.5.1 + Tailwind v4 (custom CSS classes, no framework UI primitives) + Sonner + react-hook-form + Zod + Plus Jakarta Sans (self-hosted)
 - **Distribution:** hosted at `https://leasetic-matrice.vercel.app` — partners receive a one-time invitation URL via Antoine; admin-invited only (no self-signup, no SMTP)
 - **Global financial parameters:** single set of coefficients / commission_pct / max_amount / validity_days lives in the `global_params` append-only history table; admin-only edits via `/[adminSegment]/coefficients` create new rows (existing PDFs unchanged via `proposals.params_snapshot`)
 - **v10 retained as `Matrice_2026_THE_Leasetic-v10.html`** in repo root for reference (never distributed in production; CUT-01 / CUT-02 satisfied)
-- **Test strategy:** 399 Vitest tests in CI on every PR (typecheck + lint + grep gates + unit tests + build); manual smoke verification on Vercel after migration applies; `scripts/smoke-ovh.ts` ready for September 2026 OVH execution
-- **Verification policy:** `verifier_enabled: false` in `.planning/config.json` — per-phase formal VERIFICATION.md is skipped by design. Verification rigor comes from SUMMARY.md (per plan), REVIEW.md (Phases 8/9/10), REVIEW-FIX.md (Phases 9/10), SECURITY.md (Phases 9/10), and milestone-level audit (every milestone close)
+- **Test strategy:** 2,572 Vitest tests across 193 files in CI on every push and PR (typecheck + lint at `--max-warnings=0` + grep gates + unit tests + build + a db-smoke migration-apply gate); manual smoke verification on Vercel after migration applies; `scripts/smoke-ovh.ts` awaits a provisioned OVH target, re-dated to **December 2026** by v1.8 (OPS-03)
+- **Verification policy:** `workflow.verifier: true` — every phase now closes with a goal-backward VERIFICATION.md, plus REVIEW.md, and SECURITY.md / VALIDATION.md where the phase warrants them. _(This line previously read `verifier_enabled: false`; that stopped being true well before v1.8, whose five phases each carry one.)_ Verification reports are **dated observations, not live views**: v1.8's own audit misread `37-VERIFICATION.md` and reported a defect that had been fixed the day after that report was written. Reports whose subject changes later need an amendment section — the convention `38-VERIFICATION.md` and now `37-VERIFICATION.md` follow.
+- **CI parity:** a test that is not `git add`-ed does not skip in CI, it is absent — and CI still reports green. v1.8's audit found four such files (39 tests). Committing work is part of finishing it, not bookkeeping after it.
 
 ## Key decisions (running log)
 
@@ -508,3 +536,9 @@ This document evolves at phase transitions and milestone boundaries.
 *Updated 2026-09-07 at Phase 40 completion (Milestone Record Closure) — the last phase of v1.8. The planning record now matches what shipped: v1.6 is formally closed in `MILESTONES.md` with both archive snapshots, re-audited against its finished state (34/34 requirements, status `tech_debt`) with the half-built 2026-09-01 audit preserved as superseded, phases 28-35 archived into `milestones/v1.6-phases/` and `v1.7-phases/` as 152 `git mv` renames, and the five stale operational requirements amended in place with pointers to where they were really closed rather than re-implemented. No requirement row reads Pending. 2572 tests passing; verification 9/9.*
 
 *Two things from Phase 40 worth carrying forward: (1) four separate executors independently declined to run `requirements mark-complete` on their plan's frontmatter IDs — each read the requirement's full text, found it demanded artifacts a later plan owned, and left it pending; a plan's `requirements:` frontmatter declares relevance, not ownership. (2) Three test suites passed locally while importing a helper that was never committed — the post-merge gate caught it, not the executor's self-check, which is the difference between the tree the work was built in and the tree CI clones.*
+
+---
+
+*Updated 2026-09-07 at v1.8 milestone close (Deferred Items) — the inherited v1.0-v1.7 backlog is closed. 5 phases (36-40), 26 plans, 62 tasks, 24/24 requirements, 209 commits over 3 days, net −20,893 lines of code. Audit status `tech_debt`: no blockers, 5/5 phases verified, 12/12 integration seams, 3/3 E2E flows. Two tracked todos carry into v1.9 — WR-07 (a DB-guard fail-open under `NODE_ENV=test`, open and deliberately **not** accepted so it keeps resurfacing) and OPS-03 (the OVH cutover, re-dated to December 2026).*
+
+*Three things from v1.8 worth carrying forward. (1) **A test that is not committed is not a test.** Four files holding 39 regression guards passed locally and were recorded as green while CI never contained them — the guards this milestone built existed on one machine. (2) **A verification report is a dated observation, not a live view.** This milestone's own audit read `37-VERIFICATION.md` and reported WR-01 as a live defect; it had been fixed the following day in `c669d33`, and the report was never amended. On three-day milestones the record goes stale faster than anyone reads it, so reports whose subject changes need amendment sections. (3) **Some verification is structurally blocked, not merely unscheduled** — `dialog.tsx`'s consumers sit behind a route that refuses admins by design, the wizard cannot be opened without writing a draft, and a pagination control cannot be observed on a single-page dataset. Closing those needs a relationship-holder login and a disposable database: a milestone-level prerequisite, not something a phase can arrange for itself. It is the concrete argument for the deferred Playwright work.*

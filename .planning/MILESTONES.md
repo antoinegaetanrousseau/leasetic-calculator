@@ -1,11 +1,77 @@
 # Milestones — Matrice Commerciale
 
-> **Record-completeness note (2026-09-07, Phase 40 D-40-04).** `v1.2` and `v1.3` still have
-> no entry in this file — both shipped in May 2026 (Phases 11-15 and 16-21 respectively) before
-> this ledger's discipline was established. Backfilling them was deliberately **not** done in
-> Phase 40: reconstructing two milestones' worth of narrative means mining roughly 30 phase
-> summaries for a milestone nobody is auditing, for record-keeping value only. Recorded here so
-> the omission is visible rather than silently inherited at the next audit.
+## v1.8 Deferred Items (Shipped: 2026-09-07)
+
+**Phases completed:** 5 phases (36-40), 26 plans, 62 tasks
+**Timeline:** 2026-09-05 → 2026-09-07 (3 days, 209 commits)
+**Code delta:** 215 files, +7,186 / −28,079 — a net deletion milestone
+**Requirements:** 24/24 (22 satisfied outright, 2 under recorded operator override)
+
+**Delivered:** the accumulated v1.0-v1.7 deferred backlog is closed — verification debt,
+known functional gaps, operational gates and housekeeping — so no shipped milestone still
+carries an unclosed item. No new table, no new surface, no formula change.
+
+**Key accomplishments:**
+
+- **The DB guard can no longer lie (OPS-05).** `check-local-db-branch.sh` now resolves the
+  *effective* `DATABASE_URL` a command would actually see, across the full `@next/env`
+  candidate order, classified against a single declarative endpoint source shared by six
+  consumers — the direct fix for the 2026-09-06 incident where `.env.production.local`
+  silently outranked `.env.local`. Wired into `prebuild`/`prestart` and all 14 write-capable
+  `tsx` entry points, with a differential test proving the bash guard and the TypeScript
+  resolver agree on every case so they cannot drift apart.
+- **Closed the `/proposals/[id]` admin dead end (GAP-01)** that Phase 30 assigned to
+  "Phase 33/34" and neither picked up. A shared `resolveProposalAccess()` now guards the page
+  and the PDF route from one place; write controls are gated on ownership rather than role.
+- **Deleted 643 lines of dead code and 152 dead files** — 25 vendored ReUI block directories
+  (1.1M) and the unreachable 449-line `ProposalForm` component, each after a dated, reversible
+  decision record, with every stale citation repaired.
+- **Walked and evidenced the v1.6/v1.7 surfaces** that shipped without them: `30-UAT.md` to
+  `pending: 0`, `33-VERIFICATION.md` to `passed`, and Phase 34 given the `34-VERIFICATION.md`
+  and `34-REVIEW.md` it shipped 13 plans without.
+- **Localised the icon-only dialog close controls (GAP-02)** — the shared primitive no longer
+  hardcodes English `"Close"` in a French-default product — and moved the legacy button rule
+  on-grid with all six focus selectors repointed at the existing `--ring` token (GAP-04, UIC-11).
+- **Told the truth about v1.6 (CLOSE-06/07).** Formally closed with a MILESTONES entry, roadmap
+  and requirements snapshots, and a re-run audit against its finished state rather than the
+  half-built one the 2026-09-01 audit saw; phases 28-35 archived where the tooling expects them.
+
+**Audit:** `milestones/v1.8-MILESTONE-AUDIT.md` — status `tech_debt`. 24/24 requirements,
+5/5 phases verified, 12/12 integration seams, 3/3 E2E flows. No blockers.
+
+**Found and fixed during the audit:** four test files (39 tests enforcing GAP-04, CLOSE-01/03/04,
+HOUSE-03, HOUSE-04) were untracked in git and therefore absent from every CI checkout — they
+passed locally and were recorded as green while CI silently never ran them. Committed in
+`8b1bc8f`, proven executing in CI run 34162257978.
+
+**Corrected during the audit:** WR-01 was initially reported as the top live defect. It was
+already fixed on 2026-09-06 in `c669d33` (write controls gated on `isOwner`); the audit had read
+`37-VERIFICATION.md`'s description as current state, and that report — written the day before the
+fix — was never amended. Both records now carry the correction.
+
+### Known gaps at close
+
+Known deferred items at close: 4 (see STATE.md § Deferred Items, "Acknowledged at v1.8 close").
+Two are detector false positives (Phase 37/38 UAT files, both `resolved` with 0 pending
+scenarios). Two are deliberate pending todos:
+
+- **WR-07** — a fail-open still shipping in the guard OPS-05 exists to fix: under `NODE_ENV=test`,
+  `envFileOrder` excludes `.env.local`, so on a machine holding only `.env.local` and
+  `.env.production.local` the 14 `_load-env` consumers run unguarded. Open, tracked, and
+  **deliberately not accepted** — logging it as an accepted risk was declined on 2026-09-07 so it
+  keeps resurfacing until fixed. Pinned by a passing KNOWN-GAP test.
+- **OPS-03** — the OVH cutover, re-dated to December 2026 with Antoine owning provisioning of a
+  Node + Postgres + S3-compatible target. The blocker is the environment, not the command.
+
+Two requirements closed under a recorded operator override rather than outright: **CLOSE-08**
+(5 of 7 surfaces walked; wizard step 1 in dark and the LC "Charger plus" control were structurally
+unobservable) and **GAP-02** (code verified and tested, but `dialog.tsx`'s own consumer lives
+behind `/clients/*`, which refuses admins by design). Re-observing all three needs a
+relationship-holder login, a disposable database, and a multi-page LC dataset.
+
+Nyquist coverage is `partial`: Phase 39 compliant, Phases 36-38 deliberately manual-only, and
+Phase 40 has no `40-VALIDATION.md` — the one genuine Nyquist gap, closeable retroactively.
+
 
 ## v1.7 Sales Motivation (Shipped: 2026-09-05)
 
@@ -25,11 +91,14 @@ time, with no new table, no migration and no awarding job.
   TZDate), the streak fold that preserves a longest-ever record across a broken
   current streak, and the badge tier ladder as operator-editable constants. 30
   unit tests, zero database or clock coupling.
+
 - **35-02** — the owner-scoped read layer: three functions deriving momentum,
   progress weeks and badge counts from `relationship_events`, each carrying the
   CRM-02 owner predicate in the SAME statement as the data it selects.
+
 - **35-03** — 19 `dashboard.momentum.*` dictionary entries in fr and en, and the
   `MomentumCard` server component.
+
 - **35-04** — a skip-by-default real-Postgres isolation suite that, on its first
   real run, **caught two production-shipping bugs that 2297 mocked-driver tests
   could not**: `listProgressWeekKeysForOwner` threw on every real call (a GROUP BY
@@ -37,10 +106,12 @@ time, with no new table, no migration and no awarding job.
   both SELECT and GROUP BY), and a jsonb double-encoding defect. Full mutation
   evidence recorded — removing the owner predicate, the Perdu exclusion, or the
   window's exclusivity each produced a specific named test failure.
+
 - **35-05** — the admin-gated call site: an admin's request resolves no momentum
   query and renders no momentum DOM (D-15), one shared clock read drives the
   week window, and the card sits between "à relancer" and recent proposals.
   Human-verified live and approved.
+
 - **Post-execution amendment (D-19a)** — the visual-restraint decision was
   reversed after operator review of the live surface, amended in `35-CONTEXT.md`
   and `35-UI-SPEC.md`, and the card rebuilt with tier identity, progress tracks
@@ -110,20 +181,25 @@ manual notes with system events, driving a next-action "à relancer" list.
 - **Phase 29 — Migration Safety Net** — repaired the `db-smoke` path filter so the gate
   actually fires on this repo's real migration paths (it was blind to the exact Phase 12
   regression), added an anti-rot guard, and repointed local dev off the production Neon branch.
+
 - **Phase 30 — Company & Contact Registry** — `companies` (global) + `client_relationships`
   (private, per-partner) + `contacts` (scoped to the relationship) schema and surfaces;
   `proposals` gains a nullable FK; a new `sales` role added alongside `partner`/`admin` with
   zero change to existing access.
+
 - **Phase 31 — Reconciliation Engine & Proposal Extraction** — a reusable, source-agnostic
   dry-run-first dedup engine (SIREN auto-merge, name-normalized flagging, human-resolution UI)
   that extracted every client already implied by `proposals.inputs` into real registry records
   without altering a single proposal snapshot.
+
 - **Phase 31.1 — App Shell Refresh (inserted)** — the shell converged on the sibling Colibris
   product: header breadcrumbs, header-owned collapse control, a 120px brand lockup, and a
   two-tier radius scale that decouples container surfaces from controls.
+
 - **Phase 33 — Pipeline** — a partner-advanced stage on the relationship (late stages
   system-owned, reserved for the future contract tool), a won/lost/unanswered outcome on the
   proposal, and a SIREN-gated win that never blocks quoting.
+
 - **Phase 34 — Fiche client** — registry-backed company identity (SIRENE lookup + read-only
   render + audited shared-field edits), per-section editing, a tabbed client page, and a
   unified timeline mixing manual notes with automatically recorded system events.
@@ -132,11 +208,14 @@ manual notes with system events, driving a next-action "à relancer" list.
 
 - `milestones/v1.6-ROADMAP.md` — v1.6-scoped roadmap extract (phases 29-34, prior milestones
   collapsed)
+
 - `milestones/v1.6-REQUIREMENTS.md` — the 34-requirement traceability snapshot, now carrying
   the standard archive header
+
 - `milestones/v1.6-MILESTONE-AUDIT.md` — the audit this entry's Known gaps section transcribes,
   re-run 2026-09-07 against the finished milestone (34/34 requirements, 6/6 phases, 27/27
   integration, 6/6 flows, `tech_debt`)
+
 - `milestones/v1.6-MILESTONE-AUDIT-SUPERSEDED.md` — the stale 2026-09-01 audit (revised
   2026-09-02), preserved verbatim; it scored the milestone while phases 31/33/34 were still
   unbuilt and its findings are withdrawn, superseded by the 2026-09-07 re-run above
@@ -145,42 +224,53 @@ manual notes with system events, driving a next-action "à relancer" list.
 
 - **Record-integrity — Coverage miscount:** `v1.6-REQUIREMENTS.md` § Traceability claims
   "Coverage: 31/31 (100%)" above a table listing 39 rows. The real v1.6 count is 34.
+
 - **Record-integrity — GAME-01..GAME-05 double-attributed:** these five requirements appear in
   both `v1.6-REQUIREMENTS.md` and `v1.7-REQUIREMENTS.md`, mapped to Phase 35 in each.
   `ROADMAP.md` assigns Phase 35 to v1.7; the v1.6 ledger over-scopes by five requirements —
   the corrected v1.6 total is 34, matching the Requirements figure above.
+
 - **Record-integrity — SHELL-C1..SHELL-C7 have no REQ-ID:** Phase 31.1 delivered these seven
   success criteria as phase-local criteria with no requirement ID in either milestone ledger.
   The work is real and consumed (per the milestone audit's cross-phase integration check); it
   is simply invisible to REQ-ID-based coverage accounting.
+
 - **Record-integrity — Phase 28 has no verification record:** no PLAN, no VERIFICATION.md —
   only a retro-documented summary, outside the GSD workflow, recorded as such in ROADMAP.md.
   Accepted by design, not a defect; noted so future audits stop re-raising it.
+
 - **Record-integrity — the archive pair was incomplete:** `.planning/milestones/v1.6-ROADMAP.md`
   did not exist prior to this plan; `v1.6-REQUIREMENTS.md` existed alone. Closed by this plan
   (40-05).
+
 - **INFRA-05 (Phase 29):** verified on an architectural-inference basis at the time; the
   empirical write-isolation proof was explicitly not obtained (`29-VERIFICATION.md`). Closed
   retroactively outside v1.6 by Phase 36's `scripts/probe-write-isolation.ts` (live-fire probe
   against Neon main) and hardened again by Phase 39 (OPS-05).
+
 - **Phase 29 Nyquist:** `29-VALIDATION.md` records `nyquist_compliant: not-derivable`.
 - **Phase 30 — `30-UAT.md` reconciliation:** frontmatter status is still "testing"; its
   "Current Test" block is stale (parked at test 2) and its Summary counts (passed 8 / issues 3 /
   pending 4) do not reconcile with the 13 itemized results (12 pass + 1 fixed).
   Documentation-quality only.
+
 - **Phase 30 — `admin.companies.search` copy:** placeholder text reads "client ou référence" on
   a surface that searches company name and SIREN. Reviewed by Antoine 2026-09-02 and accepted
   as shipped (recorded in `REQUIREMENTS.md` § Out of Scope).
+
 - **SHELL-C7 (Phase 31.1):** the dark-theme shell + PDF surface visual check could not be
   closed inside v1.6 — the browser session dropped mid-check. Closed 2026-09-06 by Phase 38
   CLOSE-02, evidenced in `38-UAT.md`.
+
 - **Phase 33 — voided acceptance evidence:** `33-VERIFICATION.md` scores 5/5 must-haves in code
   but records 2 with voided acceptance evidence — the 33-09 acceptance table was not trusted
   and the criteria were re-derived from `ROADMAP.md` instead.
+
 - **Phase 33 — unperformed verification:** a production-build check of the SIREN-gate dialog
   (dialog stays open, retains typed date and reason, reveals the SIREN field) against a seeded
   Neon development branch is recorded in `33-VERIFICATION.md` under `human_verification` and
   was never run.
+
 - **Nyquist coverage:** 5 of 7 v1.6 phases have no VALIDATION.md — 28, 31, 31.1, 33, 34. Phase
   30 is compliant; Phase 29 is partial (not-derivable).
 
@@ -189,6 +279,7 @@ manual notes with system events, driving a next-action "à relancer" list.
 - `milestones/v1.6-ROADMAP.md` · `milestones/v1.6-REQUIREMENTS.md`
 - The six phase directories (29, 30, 31, 31.1, 33, 34) plus Phase 28 are to be archived to
   `milestones/v1.6-phases/` by Phase 40 plan 40-06.
+
 - **Correcting the v1.7 entry's Archive note, without editing it:** the statement above, under
   `## v1.7`, that "v1.6 was never archived, and all 35 phase directories remain in
   `.planning/phases/`" describes the state **at v1.7 close** (2026-09-05), not the state now.

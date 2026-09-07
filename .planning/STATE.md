@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
-status: milestone_complete
-last_updated: 2026-09-07T21:00:03.555Z
-last_activity: 2026-09-07
+status: Awaiting next milestone
+last_updated: "2026-09-07T21:30:01.358Z"
+last_activity: 2026-09-07 — Milestone v1.8 completed and archived
 progress:
   total_phases: 25
   completed_phases: 5
   total_plans: 26
   completed_plans: 26
   percent: 20
-stopped_at: Milestone complete (Phase 40 was final phase)
 ---
 
 # State — Matrice Commerciale
@@ -28,26 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 40
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-09-07
-
-**v1.8 phase order and why:**
-
-| Phase | Requirements | Why here |
-|---|---|---|
-| 36 — Gate Repair & Planning-Record Hygiene | HOUSE-01..04, CLOSE-05 | FIRST — every later phase proves itself against `lint:check`, which currently reports 559 phantom errors from stray worktrees |
-| 37 — CRM Stack Closure | CLOSE-01, CLOSE-03, CLOSE-04, GAP-01, GAP-03 | The v1.6/v1.7 surfaces; CLOSE-01's UAT test 9 walks straight into GAP-01's `/proposals/[id]` dead end, so they close together |
-| 38 — Shell, Dialogs & Visual Conventions | CLOSE-02, CLOSE-08, GAP-02, GAP-04 | One light+dark operator walk over the shell, dialogs and padding sites, with the two CSS/primitive gaps fixed in the same pass |
-| 39 — Operational & Credential Gates | OPS-01..04, GAP-05 | The rotation walk is the evidence that `last_login_at` writes; OPS-03/04 close on a recorded decision when the external party is silent |
-| 40 — Milestone Record Closure | CLOSE-06, CLOSE-07 | LAST — it records what phases 36-39 did, and archives phases 28-35 |
-
-**Phases 28-35 were archived on 2026-09-07** by Phase 40 plan 40-06 to
-`.planning/milestones/v1.6-phases/` (28, 29, 30, 31, 31.1, 33, 34) and
-`.planning/milestones/v1.7-phases/` (35). See
-`.planning/phases/40-milestone-record-closure/40-ARCHIVE-MAP.md` for the full
-phase→milestone map and the measured evidence behind the path-reference rewrite boundary.
+Phase: Milestone v1.8 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-09-07 — Milestone v1.8 completed and archived
 
 ## Deferred Items
 
@@ -87,6 +70,43 @@ range, so they resurface at every close.
 
 Genuinely open and worth closing: **Phase 30's 4 pending UAT scenarios** and the
 **two `human_needed` verifications (31.1, 33)**.
+
+### Acknowledged at v1.8 close (2026-09-07)
+
+**Every item deferred at the v1.7 close above is now closed by v1.8** — Phase 30's 4 pending UAT
+scenarios (CLOSE-01), Phase 31.1 (CLOSE-02), Phase 33 (CLOSE-03), and the four v1.1-era CONTEXT
+questions (HOUSE-02, whose annotations the real `scanContextQuestions` detector now confirms
+clean). The v1.1 Deferred Items table further down this file is likewise closed out: admin
+password rotation → OPS-01, `trustedOrigins` → OPS-02, `users.last_login_at` → GAP-05, the
+`seed-partner-launch` npm script and the stale `[~]` markers → HOUSE-03, OVH cutover → OPS-03.
+Closing that inherited backlog was v1.8's entire purpose.
+
+Four items were open at this close, none of them a v1.8 functional gap:
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 37 — `37-HUMAN-UAT.md` | resolved (0 pending scenarios — detector false positive) |
+| uat_gap | Phase 38 — `38-UAT.md` | resolved (0 pending scenarios — detector false positive) |
+| todo | `ops-03-ovh-cutover-december-2026.md` | pending (deliberate — December 2026, Antoine owns provisioning) |
+| todo | `wr-07-db-guard-skip-rule.md` | pending (deliberate — open and explicitly NOT accepted) |
+
+The two `uat_gap` rows are scanner noise: both files read `status: resolved` with
+`open_scenario_count: 0`. The detector flags the presence of a UAT file rather than unresolved
+scenarios within it.
+
+**The one item that genuinely matters:** WR-07, a fail-open still shipping in the DB guard OPS-05
+exists to fix. Under `NODE_ENV=test`, `envFileOrder` excludes `.env.local`, so on a machine
+holding only `.env.local` and `.env.production.local` the 14 `import './_load-env'` consumers run
+unguarded. It is open, tracked, and **deliberately not accepted** — the security auditor proposed
+logging it as an accepted risk and that was declined on 2026-09-07 precisely so it keeps
+resurfacing at every close until fixed. Pinned by a passing KNOWN-GAP test at
+`tests/db-branch-guard.test.ts:137`. It carries into v1.9.
+
+Corrected at this close: **WR-01 is not open.** The v1.8 audit initially ranked it as the top live
+defect, reading `37-VERIFICATION.md`'s description as current state. It was fixed 2026-09-06 in
+`c669d33` — both write controls gated on `isOwner` — one day after that report was written and
+never amended. See `37-VERIFICATION.md` § Post-Verification Amendment and
+`.planning/v1.8-MILESTONE-AUDIT.md` tech debt item 1.
 
 ## Phase 22 Performance Metrics
 
