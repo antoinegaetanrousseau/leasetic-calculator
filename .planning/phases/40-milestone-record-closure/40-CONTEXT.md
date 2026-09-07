@@ -187,9 +187,14 @@ component). Everything else is prose, ticks, snapshots and file moves.
   `leasetic2026` on 2026-05-29, old password tested and rejected.
 - `docs/legal/privacy-coverage-confirmation.md` — OPS-04: notice published 2026-05-29, Status Closed.
 - `src/lib/auth/index.ts:195` — GAP-05: `updateLastLoginAt` wired to `session.create.after`.
-- `src/lib/auth/index.ts:210` + `trusted-origins.test.ts` — OPS-02: `trustedOrigins` configured in
-  Phase 20-01. Verification asserts **list membership**, never a status code (D-16).
-- `src/proxy.ts` — 91 lines, coarse auth-cookie gate, **no Origin check** — the fact D-15 corrects.
+- `src/lib/auth/index.ts:210` + ~~`trusted-origins.test.ts`~~ *(Corrected 2026-09-07 by the Phase 40
+  planning review: `trusted-origins.test.ts` was cited as a bare filename and had been expanded
+  elsewhere in these plans to `tests/trusted-origins.test.ts`, which does not exist — the file is
+  `src/lib/auth/trusted-origins.test.ts`.)* — OPS-02: `trustedOrigins` configured in Phase 20-01.
+  Verification asserts **list membership**, never a status code (D-16).
+- ~~`src/proxy.ts`~~ *(Corrected 2026-09-07 by the Phase 40 planning review: `src/proxy.ts` does not
+  exist — the file is `proxy.ts` at the repo root.)* — 91 lines, coarse auth-cookie gate, **no
+  Origin check** — the fact D-15 corrects.
 - `scripts/smoke-ovh.ts` — OPS-03: 358 lines, 7-step lifecycle, stays ready and unrun.
 
 ### HOUSE-05 / HOUSE-06 surfaces

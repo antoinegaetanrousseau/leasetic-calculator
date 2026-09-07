@@ -67,7 +67,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 - [x] **Phase 17: Partner Surfaces** — Partner Home dashboard (hero + MetricTiles + Propositions récentes), /proposals table with Archivées pill, full wizard redesign (3 steps + validity relocation + LC reference reservation); light+dark pair verified (completed 2026-05-24)
 - [x] **Phase 18: Admin Surfaces + Help Center** — Admin Home enhancement (hero + stats + CTA), Partners list styled table + AccountsList→PartnersList rename, Créer partenaire form refresh, Coefficients warning banner + history card refresh, Aide / Help Center (landing + Commencer ici starter article); light+dark pair verified; topbar route-awareness + 4 visual gaps closed; wizard step-1 CTA fixed (partnerCo fallback + validityDays whitelist clamp) (completed 2026-05-25)
 - [x] **Phase 19: New Capabilities** — Per-partner XLSX export (ADMIN-09 clean, grep-contract suite extended to gate 10), centralized LC reference dashboard (cross-partner, admin-only, grep-contract suite extended to gates 11+12)
-- [x] **Phase 20: Infra Hardening** — Neon 3-branch split (per-scope DATABASE_URL), post-deploy DB-smoke CI step, Better Auth trustedOrigins middleware gate (completed 2026-05-27)
+- [x] **Phase 20: Infra Hardening** — Neon 3-branch split (per-scope DATABASE_URL), post-deploy DB-smoke CI step, Better Auth trustedOrigins gate (completed 2026-05-27)
 - [x] **Phase 21: Partner-Onboarding Gates** — Admin password rotation (shared `leasetic2026` → individual strong), privacy policy confirmation with Thomas; final phase before first real partner (completed 2026-05-29)
 
 **Shipped:** 2026-05-29 · **Plans:** 27 · **Tests:** 1122/1122 passing · **Commits:** 175
@@ -237,14 +237,14 @@ the count).
 
 ### Phase 20: Infra Hardening
 
-**Goal:** Resolve the three Tier-2 infrastructure deferred items: Neon 3-branch split, post-deploy DB-smoke CI step, and Better Auth `trustedOrigins` middleware gate.
+**Goal:** Resolve the three Tier-2 infrastructure deferred items: Neon 3-branch split, post-deploy DB-smoke CI step, and Better Auth `trustedOrigins` gate.
 **Depends on:** Phase 16 (no functional dependency; can run in parallel with 17/18, but ordered after to let design phases ship first and avoid migration noise)
 **Requirements:** INFRA-01, INFRA-02, INFRA-03
 **Success Criteria** (what must be TRUE):
 
   1. Vercel production scope uses the Neon `main` branch endpoint, preview scope uses `preview`, development scope uses `development`; each scope's `DATABASE_URL` env var points to the corresponding Neon pooled endpoint; a PR against a development branch can no longer accidentally touch production data.
   2. A GitHub Actions CI step runs a real-Postgres smoke on every PR touching `drizzle/migrations/*.sql` or `drizzle/meta/_journal.json`, using a Neon ephemeral branch; the step fails (and blocks merge) if the schema cannot be applied cleanly.
-  3. A middleware-level Origin gate on `/api/auth/sign-in/*` mutations hard-blocks requests whose `Origin` header is not in the `trustedOrigins` list; verified by a test that sends an untrusted Origin and asserts a non-2xx response.
+  3. Better Auth's `trustedOrigins` option, configured at `src/lib/auth/index.ts:210` (Phase 20-01), rejects requests whose `Origin` header is not in the configured allow-list; verified by `src/lib/auth/trusted-origins.test.ts`, which asserts allow-list membership rather than asserting anything about the rejection response itself. *(Corrected 2026-09-07 by D-15 (Phase 39 context, executed in Phase 40): this criterion previously described a middleware-level Origin gate on `/api/auth/sign-in/*` that hard-blocks untrusted-Origin requests — no such middleware exists anywhere in `proxy.ts` (91 lines, coarse auth-cookie gate only, no Origin read), and Better Auth's rejection behavior varies between rejection paths and point releases, so verification deliberately checks allow-list membership instead — see `proxy.ts`, `src/lib/auth/index.ts:210` and `src/lib/auth/trusted-origins.test.ts`.)*
 
 **Plans:** 3/3 plans complete
 
