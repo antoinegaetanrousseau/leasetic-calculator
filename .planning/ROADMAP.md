@@ -1025,13 +1025,23 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
      check exists in `proxy.ts`; the gate is Better Auth's `trustedOrigins`.
 
 **Plans:** 6 plans (4 waves)
-
 Plans:
+**Wave 1**
+
 - [ ] 40-01-PLAN.md — ROADMAP truth pass: v1.6 header flip, Phase 28 + 31.1 progress rows, Phase 20 criterion 3 correction (wave 1)
 - [ ] 40-02-PLAN.md — HOUSE-05: delete the dead ProposalForm component and repair its four stale citations (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 40-03-PLAN.md — fresh `/gsd-audit-milestone v1.6` run and audit custody (wave 2, blocking human action)
 - [ ] 40-04-PLAN.md — requirement ledger corrections (OPS-01..04, GAP-05, HOUSE-05/06), OVH todo, HOUSE-06 errata (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 40-05-PLAN.md — v1.6 MILESTONES entry, scoped v1.6-ROADMAP.md extract, v1.6-REQUIREMENTS archive header (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 40-06-PLAN.md — archive phases 28-35, repair the three path-hardcoding test suites, close CLOSE-06/07 (wave 4)
 
 ---
