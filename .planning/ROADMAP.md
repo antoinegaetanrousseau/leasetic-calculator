@@ -1077,9 +1077,11 @@ Plans:
 | 25. Admin-Home Labels & Pill Fix | v1.4 | 2/2 | Complete | 2026-05-30 |
 | 26. Active/Expired Row Actions | v1.5 | 3/3 | Complete    | 2026-05-30 |
 | 27. Status-Pill Rendering Fix | v1.5 | 2/2 | Complete    | 2026-05-30 |
+| 28. ReUI / base-maia Design-System Migration | v1.6 | — | Complete (retro-documented, outside workflow) | 2026-08-31 |
 | 29. Migration Safety Net | v1.6 | 2/2 | Complete    | 2026-08-31 |
 | 30. Company & Contact Registry | v1.6 | 9/9 | Complete    | 2026-09-02 |
 | 31. Reconciliation Engine & Proposal Extraction | v1.6 | 8/8 | Complete   | 2026-09-02 |
+| 31.1. App Shell Refresh (INSERTED) | v1.6 | 7/7 | Complete | 2026-09-02 |
 | 32. HubSpot Import | v1.6 | — | **Removed** | 2026-09-02 |
 | 33. Pipeline | v1.6 | 9/9 | Complete    | 2026-09-03 |
 | 34. Fiche client | v1.6 | 13/13 | Complete    | 2026-09-04 |
@@ -1087,7 +1089,7 @@ Plans:
 | 36. Gate Repair & Planning-Record Hygiene | v1.8 | 6/6 | Complete   | 2026-09-05 |
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
-| 39. Operational & Credential Gates | v1.8 | 5/5 | Complete    | 2026-09-06 |
+| 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
 
 ---
