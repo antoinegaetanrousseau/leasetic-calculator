@@ -8,7 +8,7 @@
 - ✅ **v1.3 — Design Refresh + Partner-Onboarding Ready** — Phases 16-21 (shipped 2026-05-29) — see `milestones/v1.3-ROADMAP.md`
 - ✅ **v1.4 — Partner Types, Admin Dual-View & Rebrand** — Phases 22-25 (shipped 2026-05-30) — see `milestones/v1.4-ROADMAP.md`
 - ✅ **v1.5 — Proposal List Actions & Pill Fix** — Phases 26-27 (shipped 2026-05-30) — see `milestones/v1.5-ROADMAP.md`
-- ✅ **v1.6 — CRM Foundation** — Phases 29-34 (shipped 2026-09-04) — CRM registry, proposal reconciliation, pipeline, activity — *never formally archived; captured in `milestones/v1.7-ROADMAP.md`*
+- ✅ **v1.6 — CRM Foundation** — Phases 29-34 (shipped 2026-09-04) — CRM registry, proposal reconciliation, pipeline, activity — see `milestones/v1.6-ROADMAP.md`
 - ✅ **v1.7 — Sales Motivation** — Phase 35 (shipped 2026-09-05) — momentum, weekly streaks and a 3×3 badge ladder derived from the activity timeline; own-book only by construction (CRM-02) — see `milestones/v1.7-ROADMAP.md`
 - 🚧 **v1.8 — Deferred Items** — Phases 36-40 (started 2026-09-05) — closes the inherited v1.0-v1.7 backlog: verification debt, functional gaps, operational gates, housekeeping. No new capability.
 
@@ -99,7 +99,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 
 </details>
 
-### 🚧 v1.6 — CRM Foundation (Phases 29-34) — IN PROGRESS
+### ✅ v1.6 — CRM Foundation (Phases 29-34) — SHIPPED 2026-09-04
 
 Client data gets its own life independent of proposals — a shared company registry with
 private per-partner relationships — so the extranet can become the CRM that replaces HubSpot.
