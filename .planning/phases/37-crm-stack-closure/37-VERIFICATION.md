@@ -137,3 +137,36 @@ No roadmap success criterion failed. No must-have artifact is missing or stubbed
 
 _Verified: 2026-09-05T23:29:56Z_
 _Verifier: Claude (gsd-verifier)_
+
+---
+
+## Post-Verification Amendment — 2026-09-07 (v1.8 milestone audit)
+
+This report is left **unedited above**, so the record shows what the verifier found on
+2026-09-05. What changed afterwards is recorded here.
+
+### WR-01 — FIXED 2026-09-06, one day after this report was written
+
+Everything above describes WR-01 (the Download / Duplicate / Delete / Restore stack rendering
+unconditionally on `/proposals/[id]` for a non-owning admin) as a live, unresolved defect
+surfaced "as an operator decision point rather than as a blocking gap." It was fixed the next
+day in commit `c669d33` — `fix(37): gate proposal write controls on ownership, not role (WR-01)`
+— and this report was never amended, so it has been asserting an open defect ever since.
+
+**What shipped:** Duplicate (`page.tsx:370`) and Delete/Restore (`page.tsx:384`) are both gated
+on `isOwner`, each carrying an inline comment naming WR-01 and the specific failure it prevents.
+`isOwner` is destructured from the shared `resolveProposalAccess()` at line 65 — the same helper
+that grants the admin *read* bypass — so the read-widening and the write-gating are decided in
+one place and cannot drift.
+
+**The fix deliberately departs from the one this report recommended.** The suggestion above was
+`!isAdmin`; the implementation uses `isOwner`. `!isAdmin` would have been a regression — admins
+own proposals of their own, and gating on role would have stripped their Duplicate and Delete
+controls on those. Ownership is the correct predicate; role was never the right question.
+
+**Pinned by:** `app/(authed)/proposals/[id]/page.test.tsx` and
+`src/lib/auth/proposal-access.test.ts`.
+
+Recorded during the v1.8 milestone audit, which read this report's WR-01 section as current
+state and reported a live defect that had already been fixed. See
+`.planning/v1.8-MILESTONE-AUDIT.md` tech debt item 1.
