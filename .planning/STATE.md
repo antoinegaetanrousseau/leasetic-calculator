@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Deferred Items
 status: executing
-last_updated: "2026-09-07T18:58:25.950Z"
-last_activity: 2026-09-07 -- Phase 40 planning complete
+last_updated: "2026-09-07T19:10:03.085Z"
+last_activity: 2026-09-07
 progress:
   total_phases: 25
   completed_phases: 11
   total_plans: 79
-  completed_plans: 73
+  completed_plans: 74
   percent: 44
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 40 — milestone record closure
+**Current focus:** Phase 40 — milestone-record-closure
 
 ## Current Position
 
-Phase: 40
-Plan: Not started
+Phase: 40 (milestone-record-closure) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-09-07 -- Phase 40 planning complete
+Last activity: 2026-09-07
 
 **v1.8 phase order and why:**
 
@@ -485,6 +485,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 39 P03 | 20min | 3 tasks | 5 files |
 | Phase 39 P04 | 35m | 2 tasks | 2 files |
 | Phase 39 P05 | ~25min | 3 tasks | 5 files |
+| Phase 40 P01 | 10min | 3 tasks | 2 files |
 
 ## Decisions
 
@@ -656,6 +657,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 39]: D-03 sequencing edit (precedence fix + guard call in _load-env.ts) landed in one commit; Contract 1 grep-contract proven to bite via negative control
 - [Phase 39]: 39-04: replaced .env.local-only bash guard with full @next/env candidate-order resolution + scripts/_neon-endpoints.list classification; prebuild/prestart hooks now gate npm run build/start with --node-env production — Direct fix for the 2026-09-06 incident (D-01, D-04, D-05, D-07)
 - [Phase 39]: D-08 no-credential-leak invariant checks for postgres://fixture rather than a bare postgres:// substring, since the guard's own no-user@host error legitimately prints a credential-free usage-hint template
+- [Phase 40]: Phase 20 criterion 3 rewritten to name Better Auth trustedOrigins (src/lib/auth/index.ts:210) instead of a nonexistent middleware Origin gate; verification asserts allow-list membership, never a status code — D-15 (39-CONTEXT.md), executed Phase 40 plan 01
+- [Phase 40]: ROADMAP.md v1.6 header flipped to SHIPPED 2026-09-04; Phase 28 and Phase 31.1 progress-table rows added, attributing both to v1.6 — D-40-06/D-40-07, Phase 40 plan 01
 
 ### Blockers
 

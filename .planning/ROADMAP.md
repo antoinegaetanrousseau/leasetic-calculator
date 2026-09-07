@@ -1024,11 +1024,11 @@ them were taken in the Phase 39 discussion — this phase's planner MUST read
   9. The prior ROADMAP criterion citing "Phase 20's middleware Origin gate" is corrected — no Origin
      check exists in `proxy.ts`; the gate is Better Auth's `trustedOrigins`.
 
-**Plans:** 6 plans (4 waves)
+**Plans:** 1/6 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 40-01-PLAN.md — ROADMAP truth pass: v1.6 header flip, Phase 28 + 31.1 progress rows, Phase 20 criterion 3 correction (wave 1)
+- [x] 40-01-PLAN.md — ROADMAP truth pass: v1.6 header flip, Phase 28 + 31.1 progress rows, Phase 20 criterion 3 correction (wave 1)
 - [ ] 40-02-PLAN.md — HOUSE-05: delete the dead ProposalForm component and repair its four stale citations (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -1090,7 +1090,7 @@ Plans:
 | 37. CRM Stack Closure | v1.8 | 5/5 | Complete    | 2026-09-05 |
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
-| 40. Milestone Record Closure | v1.8 | 0/? | Not started | - |
+| 40. Milestone Record Closure | v1.8 | 1/6 | In Progress|  |
 
 ---
 
