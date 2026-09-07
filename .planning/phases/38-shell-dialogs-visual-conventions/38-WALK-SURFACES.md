@@ -108,3 +108,31 @@ in a different row than its file's separate `.btn-out` "Charger plus" control be
 38-UI-SPEC.md's "real shadcn Button" phrasing describes these `.btn-out`/`.btn-green` legacy pairs
 loosely; the actual row-alignment risk is between the two legacy classes' own heights, corrected
 here.
+
+---
+
+## 2026-09-07 errata — Phase 40, HOUSE-06
+
+**HOUSE-06 correction (pagination controls, Table 1 rows 2, 3 and 5).** Table 1 above describes
+`PartnersList.tsx:213` and `LcReferencesList.tsx:167` (row 5) as a "per-row link". That language
+does not match what either site renders. Along with `HistoryTable.tsx:169` (row 3) and
+`LoadMoreButton` (row 2, `src/components/proposals/LoadMoreButton.tsx`), all **four** sites are the
+same thing: a **"Charger plus" pagination control**, rendered only inside `{nextCursor && ...}`.
+None of the four renders on a single-page dataset, which is exactly why the Phase 38 walk that
+produced Table 1 could not observe them as rendered surfaces — the walk measured real, rendered
+`.btn-out` instances, and a pagination control gated on `nextCursor` simply does not appear when
+there is only one page of results. Verifying these four sites needs a multi-page dataset. Per
+D-40-14, this correction is the closure — a follow-up item to actually observe them rendered
+against a multi-page dataset was considered and deliberately not filed (see
+`.planning/phases/40-milestone-record-closure/40-CONTEXT.md` Deferred Ideas). The original Table 1
+rows above are left exactly as written; this block corrects the description without editing them.
+
+**HOUSE-05 cross-reference (Table 1 row 1).** Row 1 cites
+`src/components/proposal/ProposalForm.tsx` `.btn-out` (line 537, Cancel) and `.btn-navy` (line 547,
+submit) as wizard step 1's rendered surface. Plan 40-02 deleted that component on 2026-09-07 as
+HOUSE-05's resolution (commits `bf82050`, `178eacd`) — `ProposalFormProvider` was kept, but
+`ProposalForm` itself (and its `.btn-out`/`.btn-navy` action row) is gone, so those two line
+citations now point into removed code. This is the same finding already recorded as F-38-03:
+38-CONTEXT.md D-38-04's premise "every CLOSE-08 surface renders a `.btn-out`" is FALSE for wizard
+step 1. This paragraph is a distinct finding from the HOUSE-06 pagination correction above and is
+not merged with it.
