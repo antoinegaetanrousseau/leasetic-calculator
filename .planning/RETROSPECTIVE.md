@@ -2,6 +2,115 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
+## Milestone: v1.8 — Deferred Items
+
+**Shipped:** 2026-09-07
+**Phases:** 5 (36-40) | **Plans:** 26 | **Tasks:** 62 | **Commits:** 209
+
+### What Was Built
+
+Nothing new — that was the point. v1.8 closed the accumulated v1.0-v1.7 deferred backlog so no
+shipped milestone still carries an unclosed item. It is a net *deletion* milestone: 215 code
+files changed, +7,186 / −28,079.
+
+- **Phase 36** — made the gates trustworthy again: `lint:check` back to zero findings, four stale
+  v1.1-era `<open_questions>` blocks annotated with their real outcomes, 25 dead vendored ReUI
+  directories (152 files, 1.1M) deleted on a dated decision, and INFRA-05's write isolation
+  empirically probed against the real Neon branches rather than inferred.
+- **Phase 37** — closed the `/proposals/[id]` admin dead end that Phase 30 assigned to
+  "Phase 33/34" and neither picked up, walked the v1.6/v1.7 surfaces to `pending: 0`, and gave
+  Phase 34 the VERIFICATION and REVIEW it had shipped 13 plans without.
+- **Phase 38** — localised the icon-only dialog close labels, moved the legacy button rule on-grid
+  and repointed all six focus selectors at `--ring`, and walked Phase 28's browser backlog in both
+  themes.
+- **Phase 39** — rewrote the local DB guard so it validates the *effective resolved*
+  `DATABASE_URL` for the command about to run, from one declarative endpoint source, with a
+  differential test pinning the bash guard and the TypeScript resolver together.
+- **Phase 40** — made the planning record tell the truth: v1.6 formally closed and re-audited
+  against its finished state, Phase 28 attributed, phases 28-35 archived.
+
+### What Worked
+
+- **Ordering the milestone so the gates land first.** Phase 36 shipped a clean `lint:check`
+  before anything else, and every later phase proved itself against it. Sequencing by
+  *what later work needs in order to be provable* beat sequencing by size or risk.
+- **Verifiers that attack the phase's own claims.** Phase 38's verifier caught that
+  `38-UAT.md` said two findings were "filed for a later phase" while nothing had reached
+  REQUIREMENTS.md — *"A UAT footnote that says 'filed' is not filing."* Those became HOUSE-05 and
+  HOUSE-06, went to Phase 40, and Phase 40 closed them. Coverage 22/22 → 24/24. That loop closing
+  inside one milestone is the clearest evidence the verification layer earns its cost.
+- **Recording overrides as accepted-not-closed.** Phase 38's operator override says in its own
+  words *"These gaps are accepted, not closed. Nothing below is a claim that the missing
+  observations were made."* Six weeks from now that sentence is worth more than a green checkmark.
+- **Declining to accept a risk on purpose.** The security auditor proposed logging WR-07 as an
+  accepted risk. That was declined specifically so it keeps resurfacing at every close while the
+  fail-open still ships. Accepting it would have bought silence, not safety.
+
+### What Was Inefficient
+
+- **Four test files were never committed.** 39 tests enforcing GAP-04, CLOSE-01/03/04, HOUSE-03
+  and HOUSE-04 passed locally, were recorded as `✅ green` in the VALIDATION coverage tables, and
+  were absent from every CI checkout — not skipped, absent, with CI still reporting green. The
+  milestone audit found them; `40-VERIFICATION.md` had already flagged one. The regression guards
+  this milestone built existed on one machine for three days.
+- **A verification report went stale in 24 hours and nobody amended it.** WR-01 was fixed on
+  2026-09-06 in `c669d33`; `37-VERIFICATION.md`, written the previous evening, still described it
+  as a live defect awaiting an operator decision. The milestone audit read that description as
+  current state and reported a defect that did not exist — then ranked it first in its tech debt.
+- **The generated MILESTONES entry needed a full rewrite.** `milestone.complete` dumps every plan
+  one-liner verbatim; two summaries had non-one-liner values (`PASS`, `five findings`) and one was
+  multi-line, breaking the list. The template's own instruction is 4-6 curated accomplishments.
+- **The audit ran twice.** The first pass ran mid-milestone, before Phase 40 existed, and scored
+  nine requirements as unsatisfied-by-definition. Cheap to redo, but the run had no chance of
+  being right.
+
+### Patterns Established
+
+- **Post-Verification Amendment sections.** Started by `38-VERIFICATION.md` (recording an operator
+  override without rewriting the findings) and now used by `37-VERIFICATION.md` (recording a fix
+  that landed after the report). Leave the original findings unedited; append what changed.
+- **One declarative source read by every consumer.** `scripts/_neon-endpoints.list` replaced five
+  divergent hardcoded endpoint tables, with a data-integrity test as the regression net and one
+  documented, test-enforced exemption.
+- **Differential tests where two implementations must agree.** The bash guard and the TypeScript
+  resolver are proven to resolve the same `DATABASE_URL` for every case, so they cannot drift
+  apart silently — the failure mode that caused the 2026-09-06 incident in the first place.
+- **Correcting a ledger with dated amendments rather than edits.** Phase 40 amended OPS-01..04 and
+  GAP-05 in place with "Amended 2026-09-07" parentheticals and the original text preserved, and
+  closed HOUSE-06 with an errata block rather than editing the walk's evidence table.
+
+### Key Lessons
+
+1. **A test that is not committed is not a test.** CI does a plain checkout: an untracked test
+   file does not skip, it is absent, and the build stays green. Add "does `git status` show
+   untracked test files?" to phase close, not just to milestone audit.
+2. **Verification reports are dated observations, not live views.** On a three-day milestone the
+   record goes stale faster than anyone re-reads it. Anything that reads a report as current state
+   — including a milestone audit — must re-derive from code before reporting a live defect.
+3. **A narrowly-worded success criterion passes while the change's blast radius escapes it.**
+   GAP-01's criterion covered *reaching* the proposal page; it said nothing about what an admin
+   could then do there. The gap was caught by the code review, not by criterion-matching.
+4. **Some verification is structurally blocked, not merely unscheduled.** A route that refuses
+   admins by design, a wizard that writes a draft on entry, a pagination control that needs a
+   multi-page dataset. Those need a relationship-holder login and a disposable database — a
+   milestone-level prerequisite, not something a phase can arrange for itself. This is the
+   concrete argument for the long-deferred Playwright work.
+5. **Backlogs drain when a milestone is dedicated to them.** v1.7 closed with 8 deferred items,
+   none originating in v1.7; two had been explicitly assigned to later phases that shipped without
+   picking them up. Every one of those is now closed, along with the v1.1 close's entire deferred
+   table. Assigning debt to "a later phase" did not work; assigning it to a milestone did.
+
+### Cost Observations
+
+- Model mix: `balanced` profile — orchestration on Opus, verification/review/integration subagents
+  on Sonnet
+- Timeline: 3 days (2026-09-05 → 2026-09-07), 209 commits, ~2-3 phases/day
+- Notable: the highest-value findings of the milestone came from adversarial re-derivation, not
+  from gates. All four CI gates were green while 39 tests were missing from CI and a stale report
+  asserted a defect that had been fixed.
+
+---
+
 ## Milestone: v1.7 — Sales Motivation
 
 **Shipped:** 2026-09-05
@@ -226,6 +335,7 @@ removal), and admin-home label/pill polish. Teal rebrand descoped mid-milestone.
 |-----------|----------|--------|------------|
 | v1.0 | ~10 | 4 | Established GSD discipline; 4 phases over ~4 days (Apr 26 → Apr 30); no per-phase REVIEW/SECURITY (single-file scope didn't warrant it) |
 | v1.1 | ~15 | 6 | Added per-phase REVIEW (Phases 8/9/10) + SECURITY (Phases 9/10); Generator/Verifier separation paid off in 21 caught findings |
+| v1.8 | ~12 | 5 | First milestone dedicated entirely to draining deferred debt; VERIFICATION on every phase, Nyquist VALIDATION records, and a milestone audit that fixed a CI-parity blocker inside itself |
 
 ### Cumulative Quality
 
@@ -233,9 +343,15 @@ removal), and admin-home label/pill polish. Teal rebrand descoped mid-milestone.
 |-----------|-------|----------|-------------------|
 | v1.0 | On-load self-checks (assertCalc 6/6 + assertEscape 8/8 + assertValidity 6/6) running in browser at page load; no automated CI | n/a (no CI) | Manual test runbooks only |
 | v1.1 | 399 Vitest tests + Drizzle migration discipline + ESLint + 3 CI grep gates + PDF byte-determinism gate + Neon DB round-trip on `/healthz` | typecheck + lint + tests + build on every PR | First automated test suite; first CI |
+| v1.8 | 2,572 Vitest tests across 193 files; 20 ADMIN-09 grep gates; DB-guard fixture + differential suites | typecheck + lint (`--max-warnings=0`) + grep + tests + build + db-smoke on every push and PR | Differential testing between a bash and a TypeScript implementation; CI-parity as an explicit audit check |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. **Adapter discipline with mechanical enforcement beats convention** — v1.0's "send the file" model had no enforcement needed because there was no abstraction layer; v1.1's OVH-portability claim only holds because ESLint + CI grep gates *can't* drift. Future milestones with multi-environment claims should establish the gates Day 1.
 2. **`params_snapshot` and `audit_log` as invariants-by-data-shape** generalize. Anywhere the spec says "old artifacts stay unchanged even when X edits," the cheapest implementation is "copy the relevant state into the artifact at creation time." Cheaper than enforcement code paths; impossible to accidentally break.
-3. **Manual test runbooks survive into the AI-paired workflow.** v1.0's PARITY-AUDIT / SEC-TEST runbooks were the only verification path; v1.1 has Vitest + CI but still relies on Antoine-eyes-on-Vercel for visual confirmation. Both regimes coexist comfortably. Don't drop manual checklists when adding automation.
+3. **Green gates are not coverage — check what CI actually ran.** (v1.8) Four test files holding
+   39 regression guards were untracked, so CI never contained them and still reported success.
+   Every gate was green throughout. Gate output tells you what passed, not what was measured.
+4. **Assign debt to a milestone, not to "a later phase."** (v1.8) Items handed to "Phase 33/34"
+   were still open two milestones later; a milestone dedicated to the backlog closed all 24.
+5. **Manual test runbooks survive into the AI-paired workflow.** v1.0's PARITY-AUDIT / SEC-TEST runbooks were the only verification path; v1.1 has Vitest + CI but still relies on Antoine-eyes-on-Vercel for visual confirmation. Both regimes coexist comfortably. Don't drop manual checklists when adding automation.
