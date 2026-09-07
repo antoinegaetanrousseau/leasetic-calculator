@@ -112,4 +112,31 @@ proposal into it.
 
 ## Traceability
 
-*(Filled by the roadmapper.)*
+| Requirement | Phase | Status |
+|---|---|---|
+| DOC-01 | Phase 43 — New PDF Layout | Pending |
+| DOC-02 | Phase 43 — New PDF Layout | Pending |
+| DOC-03 | Phase 43 — New PDF Layout | Pending |
+| DOC-04 | Phase 43 — New PDF Layout | Pending |
+| DOC-05 | Phase 43 — New PDF Layout | Pending |
+| DOC-06 | Phase 43 — New PDF Layout | Pending |
+| DOC-07 | Phase 43 — New PDF Layout | Pending |
+| DOC-08 | Phase 43 — New PDF Layout | Pending |
+| DOC-09 | Phase 41 — Typography Migration | Pending |
+| DOC-10 | Phase 43 — New PDF Layout | Pending |
+| DOC-11 | Phase 43 — New PDF Layout | Pending |
+| DOC-12 | Phase 43 — New PDF Layout | Pending |
+| DOC-13 | Phase 43 — New PDF Layout | Pending |
+| FIELD-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| FIELD-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| FIELD-03 | Phase 43 — New PDF Layout | Pending |
+| PROF-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| PROF-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| PROF-03 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| MIG-01 | Phase 44 — Backfill Migration | Pending |
+| MIG-02 | Phase 44 — Backfill Migration | Pending |
+| MIG-03 | Phase 44 — Backfill Migration | Pending |
+| MIG-04 | Phase 44 — Backfill Migration | Pending |
+| MIG-05 | Phase 44 — Backfill Migration | Pending |
+
+**Coverage:** 24/24 requirements mapped (100%). No orphans, no double-mapping.

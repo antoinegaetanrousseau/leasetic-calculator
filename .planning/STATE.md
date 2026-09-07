@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
-status: planning
-last_updated: "2026-09-07T22:09:09.950Z"
-last_activity: 2026-09-07
+status: roadmapped
+last_updated: "2026-09-08T00:00:00.000Z"
+last_activity: 2026-09-08
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Milestone complete
+**Current focus:** v1.9 — PDF Proposal Redesign roadmapped (4 phases, 41-44); ready for `/gsd-plan-phase 41`.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 41 — Typography Migration (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-09-07 — Milestone v1.9 started
+Status: Roadmapped — 4 phases (41-44), 24/24 requirements mapped, 100% coverage
+Last activity: 2026-09-08 — v1.9 ROADMAP.md created; awaiting `/gsd-plan-phase 41`
 
 ## Deferred Items
 
@@ -182,6 +182,8 @@ v1.1 ████████████████████ 6/6 phases com
 ## Accumulated Context
 
 ### Roadmap Evolution
+
+- v1.9 (PDF Proposal Redesign) roadmapped 2026-09-08 — 4 phases, 41-44, continuing from Phase 40 (v1.8 close). All 24 requirements (DOC-01..13, FIELD-01..03, PROF-01..03, MIG-01..05) mapped 1:1, no orphans. Research was skipped deliberately — `.planning/assets/v1.9-quote-design/Quote-{FR,EN}-A.dc.html` are the pixel spec. Sequencing derived from the codebase, not preference: Phase 41 isolates the font swap (Plus Jakarta Sans -> Inter) alone, because a past `shadcn init` broke self-hosted font registration in this exact place; Phase 42 captures the new data (client SIRET, partner phone, advisor fonction/téléphone) the redesigned cards need, independent of the font work; Phase 43 builds the full layout against both — carrying DOC-12 (ADMIN-09 commission invisibility) and DOC-13 (byte-determinism fixture regeneration) as finishing gates rather than separate phases, since they're standing constraints on the finished PDF, not their own deliverable; Phase 44 (the backfill) runs last and alone because it is the milestone's one irreversible step and cannot run before the document it re-renders proposals into is correct.
 
 - v1.8 (Deferred Items) roadmapped 2026-09-05 — 5 phases, 36-40. Numbering continues from Phase 35: Phase 32 was removed and Phase 31.1 was an insertion, so neither advances the count. Human-verification items were deliberately NOT pooled into one verification phase — each attaches to the phase that fixes the surface it verifies (operator decision).
 

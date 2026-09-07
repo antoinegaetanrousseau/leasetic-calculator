@@ -11,6 +11,7 @@
 - ✅ **v1.6 — CRM Foundation** — Phases 29-34 (shipped 2026-09-04) — CRM registry, proposal reconciliation, pipeline, activity — see `milestones/v1.6-ROADMAP.md`
 - ✅ **v1.7 — Sales Motivation** — Phase 35 (shipped 2026-09-05) — momentum, weekly streaks and a 3×3 badge ladder derived from the activity timeline; own-book only by construction (CRM-02) — see `milestones/v1.7-ROADMAP.md`
 - ✅ **v1.8 — Deferred Items** — Phases 36-40 (shipped 2026-09-07) — closed the inherited v1.0-v1.7 backlog: verification debt, functional gaps, operational gates, housekeeping. No new capability — see `milestones/v1.8-ROADMAP.md`
+- 🚧 **v1.9 — PDF Proposal Redesign** — Phases 41-44 (in progress) — replaces the proposal PDF with the new Claude Design layout (branded header, two-column card grid, financial-conditions table, legal conditions, client signature block) and backfills every existing proposal into it
 
 ---
 
@@ -130,6 +131,18 @@ continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on 
 - [x] **Phase 40: Milestone Record Closure** — v1.6 formally closed and re-audited against its finished state, Phase 28 attributed, phases 28-35 archived, and the five stale operational requirements corrected against what actually shipped (completed 2026-09-07)
 
 </details>
+
+### 🚧 v1.9 — PDF Proposal Redesign (Phases 41-44) — IN PROGRESS
+
+Replaces the proposal PDF with the new Claude Design layout — branded lockup header, two-column
+card grid, financial-conditions table, legal conditions and a client signature block — and brings
+every existing proposal into it. Design spec: `.planning/assets/v1.9-quote-design/` (`Quote-FR-A.dc.html`
++ `Quote-EN-A.dc.html`, both authoritative pixel specs). Phase numbering continues from Phase 40.
+
+- [ ] **Phase 41: Typography Migration** — Inter replaces Plus Jakarta Sans in the PDF font-registration path, isolated from any layout or palette change
+- [ ] **Phase 42: Captured Data — Fields & Advisor Profile** — client SIRET + partner phone on the wizard, advisor fonction/téléphone on the account, one-time finalize-time profile gate
+- [ ] **Phase 43: New PDF Layout** — the full Claude Design layout (header, client/advisor cards, loyer hero, financial-conditions table, conditions paragraph, acceptance block, legal footer), bilingual, em-dash fallbacks, ADMIN-09 + byte-determinism held
+- [ ] **Phase 44: Backfill Migration** — every stored proposal PDF re-rendered into the new design, dry-run first, resumable, `params_snapshot`-driven figures — the milestone's one irreversible step, run last
 
 ---
 
@@ -747,6 +760,67 @@ Plans:
 
 ---
 
+### Phase 41: Typography Migration
+
+**Milestone:** v1.9 — PDF Proposal Redesign
+**Goal:** The PDF renders in Inter (the new design's typeface) with no font-registration regression, isolated from any layout or palette change — so the riskiest change in the milestone lands first and alone, in the exact place a past `shadcn init` broke the self-hosted Plus Jakarta Sans font.
+**Depends on:** Phase 40 (v1.8 close) — first phase of v1.9, no in-milestone dependency
+**Requirements:** DOC-09
+**Success Criteria** (what must be TRUE):
+  1. Every text node in a generated proposal PDF (FR and EN, every partner type) renders in Inter at the design's type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), with Plus Jakarta Sans fully retired from the PDF font-registration path.
+  2. No proposal PDF renders a missing-glyph/tofu character or throws a font-registration error.
+  3. The Inter and Inter Tight TTF files are committed into the repo as self-hosted assets (not remote-linked) — acquired from the design bundle's source handoff, since only the token CSS and SVGs were vendored into `.planning/assets/v1.9-quote-design/`.
+  4. The PDF's visual design, palette and content stay exactly as they are today — this phase touches font registration only — and the byte-determinism fixture is regenerated to reflect the font swap so CI stays green.
+**Plans:** TBD
+
+### Phase 42: Captured Data — Fields & Advisor Profile
+
+**Milestone:** v1.9 — PDF Proposal Redesign
+**Goal:** Proposals and partner accounts carry the new data the redesigned PDF needs — client SIRET, partner phone, and an advisor identity (fonction, téléphone) sourced from the creating user's account — so Phase 43 can build the "Société cliente" and "Votre contact" cards against real data rather than only em-dash fallbacks.
+**Depends on:** Nothing in-milestone (independent of Phase 41; both precede Phase 43)
+**Requirements:** FIELD-01, FIELD-02, PROF-01, PROF-02, PROF-03
+**Success Criteria** (what must be TRUE):
+  1. A partner filling the proposal wizard must supply the client's SIRET (validated as 14 digits) and the partner company's telephone before the proposal can be finalized; both persist in that proposal's immutable `inputs`.
+  2. A partner can view and set their own fonction and téléphone on `/parametres`, alongside the name and email already shown there.
+  3. A partner whose account is missing fonction or téléphone is stopped at proposal finalization with a message naming exactly what's missing and a link to `/parametres` — fixed once on the account, never re-prompted per proposal.
+  4. A newly finalized proposal's advisor name and email are sourced from the authenticated creating user's account rather than a free-typed field.
+**Plans:** TBD
+**UI hint:** yes
+
+### Phase 43: New PDF Layout
+
+**Milestone:** v1.9 — PDF Proposal Redesign
+**Goal:** The generated proposal PDF matches the Claude Design layout pixel-for-pixel in both languages — replacing the current single-page text-only document — while holding ADMIN-09 commission invisibility and byte-determinism as non-negotiable gates on the finished output.
+**Depends on:** Phase 41 (Inter must already be registered), Phase 42 (real SIRET / partner-phone / advisor data available — though the layout itself tolerates absence via em dashes, so it is not blocked on Phase 42 finishing first)
+**Requirements:** DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, DOC-06, DOC-07, DOC-08, DOC-10, DOC-11, DOC-12, DOC-13, FIELD-03
+**Success Criteria** (what must be TRUE):
+  1. A generated proposal PDF matches the design spec end to end: lockup header + proposition-number block over a 2px navy rule; 21pt two-line title with `Réf. partenaire` / term pills; a `SOCIÉTÉ CLIENTE` card and a `VOTRE CONTACT` card in the two-column key/value grid; a navy-outlined loyer hero beside the `CONDITIONS FINANCIÈRES` table ending in a bold **Total des loyers HT** (`monthlyRent × termMonths`); the conditions paragraph; a bottom-pinned acceptance/signature/company-stamp block; and a legal footer carrying the company registration line, proposal reference, page number and the 14%-opacity icon mark.
+  2. The conditions paragraph always states the proposal's actual `validityDays` (15 / 30 / 60) — never the design files' hardcoded "30 jours" / "30 days", which would contradict a 15-day proposal's own `validUntil` date.
+  3. A proposal whose committed `language` is English renders every label and the full legal paragraph from `Quote-EN-A.dc.html`; a French proposal renders `Quote-FR-A.dc.html`'s text — both from the same document component.
+  4. A field with no captured value — including SIRET/partner phone on proposals finalized before Phase 42, and advisor role/phone on any proposal — renders its label followed by an em dash rather than blank space or a thrown error, so every card keeps identical geometry regardless of which fields a given proposal carries.
+  5. No commission figure, rate or derived value appears anywhere in the rendered PDF, in either language, for any partner type (the existing 20-gate `tests/admin-09-grep-contracts.test.ts` suite and `src/lib/pdf/no-commission.test.ts` stay green); and re-rendering the same proposal twice produces byte-identical PDFs, with the committed fixture at `__pdf-fixtures__/expected.sha256.txt` regenerated via `scripts/update-pdf-fixture.ts` to reflect the new design.
+**Plans:** TBD
+**UI hint:** yes
+
+**Planning note:** `@react-pdf/renderer`'s SVG support is partial — the header lockup and footer icon mark may need a PNG or a hand-built vector rather than the source SVGs directly; confirm during planning rather than assuming direct `<Image>`/SVG support.
+
+### Phase 44: Backfill Migration
+
+**Milestone:** v1.9 — PDF Proposal Redesign
+**Goal:** Every previously stored proposal PDF is re-rendered in the new design, safely and irreversibly, so no partner-facing document is left in the retired layout.
+**Depends on:** Phase 43 (the new document must already render correctly before anything is bulk re-rendered into it)
+**Requirements:** MIG-01, MIG-02, MIG-03, MIG-04, MIG-05
+**Success Criteria** (what must be TRUE):
+  1. An operator can dry-run the backfill and see a count of proposals that would be re-rendered plus a list of any that would fail to render, without a single blob being written.
+  2. An operator can execute the backfill only behind the local-database guard and an explicit typed confirmation, and every stored proposal's PDF is re-rendered in the new design.
+  3. Every re-rendered PDF keeps its own committed `language` (no delivered document changes language at its existing reference) and reproduces the same financial figures as before, computed from that proposal's `params_snapshot` rather than current coefficients.
+  4. Interrupting the backfill mid-run and re-running it does not duplicate work or corrupt any proposal — already-migrated proposals are safely skipped or re-written to the identical result.
+**Plans:** TBD
+
+**Planning note:** this is the milestone's one irreversible step and the standing constraint it lifts — "Mutating already-saved PDFs" (see `.planning/REQUIREMENTS.md` § Rule lifted by this milestone). It must run last, behind Phase 39's DB guard, following the same gated `tsx` + `_load-env` entry-point pattern as every other write-capable script.
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -792,9 +866,15 @@ Plans:
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
+| 41. Typography Migration | v1.9 | 0/TBD | Not started | - |
+| 42. Captured Data — Fields & Advisor Profile | v1.9 | 0/TBD | Not started | - |
+| 43. New PDF Layout | v1.9 | 0/TBD | Not started | - |
+| 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
 
 ---
 
 *Last updated: 2026-08-31 — v1.6 ROADMAP created: 6 phases (29-34), 31/31 requirements mapped, 100% coverage. Phase 29 RESCOPED 2026-08-31 — the Neon 3-branch split already shipped in Phase 20 (the v1.3 carry-forward that claimed otherwise was stale); Phase 29 is now a small CI-filter repair and is NOT a blocking prerequisite. Phase 32 (HubSpot Import) has an open dependency on the unreadable `.xlsx` export file gating detailed design only. Next: `/gsd-plan-phase 29`.*
 
 *Updated 2026-09-07 — v1.8 (Deferred Items) SHIPPED: 5 phases (36-40), 26 plans, 62 tasks, 24/24 requirements. Audit `milestones/v1.8-MILESTONE-AUDIT.md` — status `tech_debt`, no blockers; one live defect (WR-07) and the OVH cutover (OPS-03) carry into v1.9 as tracked todos. Phase details archived to `milestones/v1.8-ROADMAP.md`. Next: `/gsd-new-milestone`.*
+
+*Updated 2026-09-08 — v1.9 (PDF Proposal Redesign) ROADMAP created: 4 phases (41-44), 24/24 requirements mapped, 100% coverage. Sequencing: Phase 41 (font, isolated) -> Phase 42 (new fields + advisor profile, independent of 41) -> Phase 43 (full layout, depends on 41+42, carries DOC-12/DOC-13 as finishing gates) -> Phase 44 (backfill, last, irreversible, depends on 43). Next: `/gsd-plan-phase 41`.*
