@@ -743,7 +743,7 @@ Plans:
 
 **UI hint:** yes
 
-> **Why this is not in v1.6.** Raised during Phase 33's discussion (2026-09-02) as motivational treatment for the pipeline board. Momentum turned out to require stage-change history with actor and timestamp — which *is* ACTV-02, and belongs to Phase 34 — so building it inside Phase 33 would have duplicated Phase 34's work or shipped against data that did not exist. Deferred deliberately so it lands on that foundation. See `.planning/phases/33-pipeline/33-CONTEXT.md` Deferred Ideas and `33-DISCUSSION-LOG.md` § Motivation.
+> **Why this is not in v1.6.** Raised during Phase 33's discussion (2026-09-02) as motivational treatment for the pipeline board. Momentum turned out to require stage-change history with actor and timestamp — which *is* ACTV-02, and belongs to Phase 34 — so building it inside Phase 33 would have duplicated Phase 34's work or shipped against data that did not exist. Deferred deliberately so it lands on that foundation. See `.planning/milestones/v1.6-phases/33-pipeline/33-CONTEXT.md` Deferred Ideas and `33-DISCUSSION-LOG.md` § Motivation.
 
 ---
 

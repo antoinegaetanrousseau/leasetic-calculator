@@ -63,8 +63,21 @@ stops existing.
   shipped, `milestones/v1.6-ROADMAP.md` and `v1.6-REQUIREMENTS.md` snapshots, an audit re-run
   against the finished milestone (the existing one predates phases 31/33/34), and `ROADMAP.md`
   no longer showing v1.6 as IN PROGRESS while its milestone list calls it shipped.
-- [ ] **CLOSE-07**: Phase 28 is attributed to a milestone in `ROADMAP.md`'s phase table, and
+  *(Amended 2026-09-07 by D-40-01/D-40-02/D-40-04/D-40-05/D-40-06: the v1.6 audit was re-run for
+  real against the finished milestone, the `MILESTONES.md` § v1.6 entry records what actually
+  shipped plus known-gaps-at-close, `milestones/v1.6-ROADMAP.md` and
+  `milestones/v1.6-REQUIREMENTS.md` were created as the scoped snapshot pair, the fresh audit
+  landed at `milestones/v1.6-MILESTONE-AUDIT.md` (re-run 2026-09-07), and `ROADMAP.md`'s v1.6
+  header was flipped from IN PROGRESS to shipped 2026-09-04 — see `.planning/MILESTONES.md` §
+  v1.6.)*
+- [x] **CLOSE-07**: Phase 28 is attributed to a milestone in `ROADMAP.md`'s phase table, and
   phases 28–35 are archived into their `milestones/v{X.Y}-phases/` directories.
+  *(Amended 2026-09-07 by D-40-07/D-40-08/D-40-09: Phase 28's `ROADMAP.md` progress row (added by
+  plan 40-01) attributes it to v1.6 with status `Complete (retro-documented, outside workflow)`;
+  phases 28, 29, 30, 31, 31.1, 33, 34 were `git mv`'d to `.planning/milestones/v1.6-phases/` and
+  phase 35 to `.planning/milestones/v1.7-phases/` — see
+  `.planning/phases/40-milestone-record-closure/40-ARCHIVE-MAP.md` for the full map and the
+  archived directories themselves for the moved files.)*
 - [x] **CLOSE-08**: Phase 28's browser-verification backlog is walked — wizard step 1, `/proposals`,
   coefficients history, `/parametres`, and the six `PartnersList` / `LcReferencesList` padding
   sites — in light and dark.
@@ -241,7 +254,7 @@ stops existing.
 | CLOSE-04 | Phase 37 — CRM Stack Closure | Complete |
 | CLOSE-05 | Phase 36 — Gate Repair & Planning-Record Hygiene | Complete |
 | CLOSE-06 | Phase 40 — Milestone Record Closure | Complete |
-| CLOSE-07 | Phase 40 — Milestone Record Closure | Pending |
+| CLOSE-07 | Phase 40 — Milestone Record Closure | Complete |
 | CLOSE-08 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |
 | GAP-01 | Phase 37 — CRM Stack Closure | Complete |
 | GAP-02 | Phase 38 — Shell, Dialogs & Visual Conventions | Complete |

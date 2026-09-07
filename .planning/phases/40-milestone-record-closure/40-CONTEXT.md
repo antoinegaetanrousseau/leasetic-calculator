@@ -96,6 +96,29 @@ component). Everything else is prose, ticks, snapshots and file moves.
   describe a directory layout that did not exist when they were written. (Same discipline as
   D-40-13's errata approach.) Note `.planning/phases/30-crm-foundation` appears twice and is
   **already** stale — the directory is `30-company-contact-registry`.
+  *(Amended 2026-09-07 by the Phase 40 planning review: "the v1.8 phase directories (36-40)"
+  clause above is narrowed. Path-reference rewriting inside that range now means **Phase 40's own
+  live documents, plus any forward-read reference inside phases 36-39** — not a blanket sweep of
+  every `.planning/phases/{28..35}/…` mention in phases 36-40's own PLAN, SUMMARY, VERIFICATION
+  and PATTERNS files. Already-executed **PLAN / SUMMARY / VERIFICATION / PATTERNS** records inside
+  phases 36-39 are explicitly **not** rewritten. Measured evidence at plan 40-06's Task 3: **258
+  hits across 32 files** inside the phase 36-40 directories (phase 36: 97 hits/10 files, phase 37:
+  102 hits/11 files, phase 38: 23 hits/4 files, phase 39: 0, phase 40: 36 hits/7 files) — this
+  differs from the 225-hits/21-files figure measured during planning, because Phase 40's own
+  artifacts (`40-06-PLAN.md` itself, and `40-ARCHIVE-MAP.md` created by 40-06's Task 1) did not
+  exist yet at planning time and both cite the pre-move paths by design, one as executing
+  instructions and one as an explicit before/after map. Of the 36 hits inside Phase 40's own
+  directory, none were rewritten: `40-01-PLAN.md` and `40-03-PLAN.md` are already-executed dated
+  records accurate to the pre-move layout at the time their acceptance criteria ran;
+  `40-ARCHIVE-MAP.md` deliberately lists both the old and new path in the same row; and
+  `40-DISCUSSION-LOG.md`/`40-PATTERNS.md`'s hits are the pre-existing stale `30-crm-foundation`
+  reference named above, already out of scope. The reason for the narrowing is the same objection
+  this decision already raises for archived documents: rewriting a dated executed record to
+  describe a directory layout that did not exist when it was written corrupts the record, and
+  nothing breaks by leaving it, because `tests/_planning-docs.ts`'s `resolvePhaseDoc()` resolves
+  every consumer by phase **number**, not by literal path. See
+  `.planning/phases/40-milestone-record-closure/40-ARCHIVE-MAP.md` § "Path-reference rewrite
+  disposition" for the full per-file breakdown.)*
 
 ### HOUSE-05 — dead ProposalForm  `[the only code change in this phase]`
 

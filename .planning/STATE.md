@@ -42,8 +42,11 @@ Last activity: 2026-09-07
 | 39 — Operational & Credential Gates | OPS-01..04, GAP-05 | The rotation walk is the evidence that `last_login_at` writes; OPS-03/04 close on a recorded decision when the external party is silent |
 | 40 — Milestone Record Closure | CLOSE-06, CLOSE-07 | LAST — it records what phases 36-39 did, and archives phases 28-35 |
 
-**Do not touch `.planning/phases/28..35` before Phase 40.** Archiving them is CLOSE-07's job,
-performed inside the milestone.
+**Phases 28-35 were archived on 2026-09-07** by Phase 40 plan 40-06 to
+`.planning/milestones/v1.6-phases/` (28, 29, 30, 31, 31.1, 33, 34) and
+`.planning/milestones/v1.7-phases/` (35). See
+`.planning/phases/40-milestone-record-closure/40-ARCHIVE-MAP.md` for the full
+phase→milestone map and the measured evidence behind the path-reference rewrite boundary.
 
 ## Deferred Items
 
