@@ -29,7 +29,7 @@ key-decisions:
 
 patterns-established: []
 
-requirements-completed: [CLOSE-06]
+requirements-completed: []  # CLOSE-06 intentionally NOT marked complete — see Decisions Made
 
 duration: 25min
 completed: 2026-09-07
@@ -61,6 +61,7 @@ completed: 2026-09-07
 - `.planning/milestones/v1.6-MILESTONE-AUDIT-SUPERSEDED.md` — the recovered 2026-09-01 audit body, verbatim, with a dated supersede header inserted below its frontmatter
 
 ## Decisions Made
+- **CLOSE-06 intentionally left `[ ]` pending in REQUIREMENTS.md**, despite this plan's frontmatter listing `requirements: [CLOSE-06]`. The requirement's full text demands a `MILESTONES.md` entry describing what shipped AND a `milestones/v1.6-ROADMAP.md` snapshot, neither of which this plan produces — those are plan 40-05's job (per this plan's own objective: "Plan 40-05 transcribes the findings"). This plan supplies one input CLOSE-06 needs (the re-run audit) but does not complete it. Per the explicit project constraint carried in this continuation's instructions ("CLOSE-06 and CLOSE-07 must remain pending"), `requirements.mark-complete CLOSE-06` was run, found to be premature on inspection, and reverted before the final commit — REQUIREMENTS.md is unchanged from its pre-plan state.
 - Supersede header placement: below the frontmatter's closing `---`, not above it, so any tool that expects YAML frontmatter at file position 1 still parses correctly. Header states the supersession date (2026-09-07), cites `D-40-01 (Phase 40)`, links to the replacement file, and gives a one-sentence reason (written before Phases 31/33/34 completed).
 - Confirmed the recovery source (`HEAD` vs. the plan-suggested `c34aa3c`) were byte-identical before using `HEAD` for the `git show` recovery, since no intervening commit had touched the file.
 
