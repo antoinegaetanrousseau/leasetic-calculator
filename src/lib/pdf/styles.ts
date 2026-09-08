@@ -5,7 +5,9 @@
  * literals. Keep this file in sync with the token spine in app/globals.css —
  * the comments cite the matching token name.
  *
- * Typography scale (UI-SPEC §3.3 + Path A trim): 8 / 9 / 10 / 22 / 32 pt.
+ * Typography scale (D-10, Claude Design layout, Phase 43): 6.8 / 7.5 / 8 / 8.5 /
+ * 9 / 9.5 / 10 / 11 / 13 / 21 pt. The pre-Phase-43 five-role scale (8/9/10/22/32pt)
+ * is fully retired.
  */
 
 // --- Phase 43 (D-10/D-11) unit rules for the design's token set below ---
@@ -22,12 +24,7 @@
 // `-.03em` at the 21pt hero value = `-0.63`.
 
 export const pdfColors = {
-  ink: '#1a2832',           // body text — matches [data-pdf-surface] dark fallback
-  muted: '#6e7191',         // captions / labels
   navy: '#112C3B',          // headings / big numbers — matches --navy (D-11: uppercased to match the design; same colour as today's '#112c3b')
-  border: '#d9dbe9',        // 1pt rules — matches --border light
-  green: '#129657',         // accent (loyer card border) — matches --gd. D-08: orphaned by the new navy-outlined hero; kept until 43-06 removes its last consumer.
-  greenTint: '#f0f9f4',     // 5% --gd flattened on white (loyer card bg). D-08: orphaned alongside `green`; kept until 43-06.
   surface: '#ffffff',       // page bg — PDF-print invariant
 
   // D-11 — the design's extended palette, transcribed from Quote-FR-A.dc.html / colors.css.
@@ -41,13 +38,9 @@ export const pdfColors = {
 } as const;
 
 export const pdfFontSizes = {
-  footer: 8,
-  caption: 9,
-  body: 10,
-  title: 22,             // wordmark + title + on-demand value
-  loyer: 32,             // big-number climax
-
   // D-10 — the design's ten-step type scale, transcribed from Quote-FR-A.dc.html / typography.css.
+  // Today's five legacy roles (footer/caption/body/title/loyer at 8/9/10/22/32) are replaced
+  // wholesale — 32pt disappears entirely, the hero drops to match the 21pt title.
   legalFooter: 6.8,      // legal footer line
   eyebrow: 7.5,           // uppercase eyebrows (PROPOSITION N°, card titles)
   pill: 8,                // pills, "Établie le", the conditions paragraph, acceptance labels
@@ -82,8 +75,15 @@ export const pdfPageMargins = {
 } as const;
 
 /**
- * D-10/D-11 — page-level values `<section class="page">` sets in the design
- * and that every block below inherits (base font size and line height).
+ * D-10/D-11 — page-level values `<section class="page">` sets in the design.
+ * `fontSize` is applied on `<Page>` directly. `lineHeight` is NOT applied at
+ * the `<Page>` (or any single shared ancestor) level — see the comment at
+ * `<Page style={{...}}>` in `document.tsx` for the reproduced
+ * @react-pdf/renderer 4.5.1 defect this works around (an inherited
+ * `lineHeight` anywhere in this document's ancestor chain silently drops
+ * every dynamic `render`-prop `<Text>`). Every Text node that needs this
+ * exact 1.45 value sets it explicitly; this constant documents the design's
+ * intended base value for that purpose and for any future consumer.
  */
 export const pdfPageBase = {
   fontSize: 9.5,

@@ -552,10 +552,10 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
         // contains text we can find.
         //
         // We avoid using visible-text-reconstruction for the positive
-        // control because @react-pdf/renderer's KeyValueRow component
-        // renders label + value in a flex row; glyphs from the two
-        // columns interleave in document order with kerning adjustments,
-        // scrambling any value's reconstructed text.
+        // control because the document's card/table label+value rows
+        // render as a flex row; glyphs from the two columns interleave
+        // in document order with kerning adjustments, scrambling any
+        // value's reconstructed text.
         expect(
           rawLatin1.includes('LC-12345'),
           `positive control: lcRef "LC-12345" should appear in PDF metadata`,

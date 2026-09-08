@@ -44,7 +44,7 @@ const SPACE = ' ';
  * comma, period, EUR symbol — pass through unchanged.
  *
  * Use this wrapper around every formatCurrency / formatNumber call that feeds
- * a `<Text>` or `KeyValueRow valueText` in document.tsx.
+ * a `<Text>` or a card/table row's value slot in document.tsx.
  */
 export function sanitizePdfNumber(value: string): string {
   // Two-pass replace: U+202F first, then U+00A0.
