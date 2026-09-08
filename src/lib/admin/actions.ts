@@ -274,8 +274,15 @@ export interface AdminCreateInvitationArgs {
   lastName?: string;
   companyName?: string;
   siret?: string;
+  // Phase 42 Plan 05 (D-13): the partner COMPANY's telephone. Maps to
+  // users.company_telephone. Kept named `phone` (not renamed) so the legacy
+  // CreatePartnerModal call site (D-10 shelf code) keeps compiling — this
+  // comment is what prevents the two telephone args from being confused.
   phone?: string;
   invitationMessage?: string;
+  // Phase 42 Plan 05 (D-19): the partner's OWN telephone. Maps to
+  // users.telephone, the single field PROF-02's finalization gate reads.
+  telephone?: string;
   // Phase 22 Plan 03 — PTYPE-01: partner_type persisted at invitation time.
   // ADMIN-09: this is a business-classification field, NOT a commission/rate value.
   partnerType?: 'Agent' | 'Commercial' | 'Partenaire';
@@ -299,6 +306,7 @@ function buildProfilePayload(
     'companyName',
     'siret',
     'phone',
+    'telephone',
     'invitationMessage',
   ];
   for (const f of fields) {

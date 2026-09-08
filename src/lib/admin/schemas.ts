@@ -58,18 +58,26 @@ export type CreatePartnerValues = z.infer<typeof createPartnerSchema>;
 
 /**
  * Phase 14 — /partners/new route 7-field form schema (UI-SPEC §5.1).
+ * Phase 42 Plan 05 (D-13/D-19) — `phone` loosened to optional and a new
+ * `telephone` field added; see the field-level comments below.
  *
  * Distinct from `createPartnerSchema` above (D-10 keeps CreatePartnerModal.tsx
  * as shelf code with its legacy 3-field shape). Both schemas coexist; the
  * server-side adminCreateInvitation accepts the union of both shapes via
  * optional fields.
  *
- * Validation rules (UI-SPEC §5.1):
+ * Validation rules (UI-SPEC §5.1, amended by Phase 42 Plan 05):
  *   - firstName/lastName: required, 1–100 chars
  *   - email: required, RFC-format
  *   - companyName: required, 1–200 chars
  *   - siret: OPTIONAL — empty string OR exactly 14 digits
- *   - phone: required, 6–20 chars from [0-9 +()-]
+ *   - phone: OPTIONAL — the partner **company's** telephone (D-13). Empty
+ *     string or 6–20 chars from [0-9 +()-]. Maps to `users.company_telephone`.
+ *     Never blocks finalization; the column ships nullable.
+ *   - telephone: OPTIONAL — the partner's **own** telephone (D-19). Same
+ *     permissive shape as `phone`. Maps to `users.telephone`, the single
+ *     field PROF-02's finalization gate reads. Admins populate it proactively
+ *     so no partner is interrupted mid-proposal by a gate they have never seen.
  *   - invitationMessage: OPTIONAL, max 1000 chars
  */
 export const createPartnerFormSchema = z.object({
@@ -85,10 +93,27 @@ export const createPartnerFormSchema = z.object({
     .regex(/^\d{14}$/, 'error.field.siret.invalid')
     .optional()
     .or(z.literal('')),
+  // FIELD-02 / D-13: the partner COMPANY's telephone — maps to
+  // users.company_telephone. Nullable by design (every existing partner
+  // account has none) and must never block anything, so it is optional here
+  // — mirrors the `siret` field's exact `.optional().or(z.literal(''))`
+  // shape immediately above. The permissive regex and its error message are
+  // unchanged from the previously-required shape (UI-SPEC: validation shape
+  // does not change, only optionality).
   phone: z
     .string()
-    .min(1, 'error.field.required')
-    .regex(/^[\d\s+()-]{6,20}$/, 'error.field.phone.invalid'),
+    .regex(/^[\d\s+()-]{6,20}$/, 'error.field.phone.invalid')
+    .optional()
+    .or(z.literal('')),
+  // PROF-01 / D-19: the partner's OWN telephone — maps to users.telephone,
+  // the single field PROF-02's finalization gate reads (D-17). Optional here
+  // too: admins fill it in proactively (D-19), it is never a hard gate on
+  // partner creation.
+  telephone: z
+    .string()
+    .regex(/^[\d\s+()-]{6,20}$/, 'error.field.phone.invalid')
+    .optional()
+    .or(z.literal('')),
   invitationMessage: z.string().max(1000, 'partners.new.message.tooLong').optional(),
   /**
    * PTYPE-01 / D-03 force-explicit-choice: NO .default() so parse() fails when

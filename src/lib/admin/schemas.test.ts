@@ -71,3 +71,59 @@ describe('createPartnerFormSchema (Phase 14 UI-SPEC §5.1)', () => {
     }
   });
 });
+
+describe('createPartnerFormSchema — Phase 42 Plan 05 (D-13 / D-19 telephone fields)', () => {
+  it('phone (company telephone, D-13) is optional — empty string succeeds', () => {
+    const r = createPartnerFormSchema.safeParse({ ...VALID, phone: '' });
+    expect(r.success).toBe(true);
+  });
+
+  it('phone (company telephone, D-13) is optional — omitted entirely succeeds', () => {
+    const { phone: _phone, ...rest } = VALID;
+    const r = createPartnerFormSchema.safeParse(rest);
+    expect(r.success).toBe(true);
+  });
+
+  it("phone still rejects a malformed value with 'error.field.phone.invalid'", () => {
+    const r = createPartnerFormSchema.safeParse({ ...VALID, phone: 'abc' });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      const phoneIssue = r.error.issues.find((i) => i.path[0] === 'phone');
+      expect(phoneIssue).toBeDefined();
+      expect(phoneIssue!.message).toBe('error.field.phone.invalid');
+    }
+  });
+
+  it('telephone (partner own telephone, D-19) is exposed on the parsed value when supplied', () => {
+    const r = createPartnerFormSchema.safeParse({ ...VALID, telephone: '06 12 34 56 78' });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.telephone).toBe('06 12 34 56 78');
+    }
+  });
+
+  it('telephone is optional — empty string and omitted both succeed', () => {
+    const rEmpty = createPartnerFormSchema.safeParse({ ...VALID, telephone: '' });
+    expect(rEmpty.success).toBe(true);
+    const rOmitted = createPartnerFormSchema.safeParse(VALID);
+    expect(rOmitted.success).toBe(true);
+  });
+
+  it('firstName/lastName/email/companyName/partnerType rules are unchanged', () => {
+    const rMissingRequired = createPartnerFormSchema.safeParse({
+      ...VALID,
+      firstName: '',
+      lastName: '',
+      email: '',
+      companyName: '',
+      partnerType: '' as never,
+    });
+    expect(rMissingRequired.success).toBe(false);
+    if (!rMissingRequired.success) {
+      const paths = rMissingRequired.error.issues.map((i) => i.path[0]);
+      expect(paths).toEqual(
+        expect.arrayContaining(['firstName', 'lastName', 'email', 'companyName', 'partnerType']),
+      );
+    }
+  });
+});
