@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
-status: verifying
-last_updated: "2026-09-08T09:18:31.275Z"
+status: ready_to_plan
+last_updated: 2026-09-08T09:28:29.322Z
 last_activity: 2026-09-08
 progress:
   total_phases: 24
@@ -11,6 +11,7 @@ progress:
   total_plans: 3
   completed_plans: 3
   percent: 4
+stopped_at: Phase 41 complete (3/3) — ready to discuss Phase 42
 ---
 
 # State — Matrice Commerciale
@@ -23,13 +24,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 41 — typography-migration
+**Current focus:** Phase 42 — captured data — fields & advisor profile
 
 ## Current Position
 
-Phase: 41 (typography-migration) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
+Phase: 42
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-09-08
 
 ## Deferred Items

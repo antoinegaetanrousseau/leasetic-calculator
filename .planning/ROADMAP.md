@@ -891,7 +891,7 @@ Plans:
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
-| 41. Typography Migration | v1.9 | 3/3 | Complete   | 2026-09-08 |
+| 41. Typography Migration | v1.9 | 3/3 | Complete    | 2026-09-08 |
 | 42. Captured Data — Fields & Advisor Profile | v1.9 | 0/TBD | Not started | - |
 | 43. New PDF Layout | v1.9 | 0/TBD | Not started | - |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
