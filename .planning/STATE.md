@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
-status: executing
-last_updated: "2026-09-08T08:47:23.382Z"
+status: verifying
+last_updated: "2026-09-08T09:18:31.275Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 0
+  completed_plans: 3
+  percent: 4
 ---
 
 # State — Matrice Commerciale
@@ -29,7 +29,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 41 (typography-migration) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-08
 
 ## Deferred Items
@@ -519,6 +519,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 40 P06 | 55min | 3 tasks | 160 files |
 | Phase 41 P01 | 4min | 2 tasks | 2 files |
 | Phase 41 P02 | 10min | 2 tasks | 14 files |
+| Phase 41 P03 | 25min | 3 tasks | 1 files |
 
 ## Decisions
 
@@ -708,6 +709,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: VERIFY-THEN-PIN-TO-v4.1 policy executed: releases/latest resolved to v4.1 (no drift), acquired v4.1 as pinned
 - [Phase ?]: Guard test and comment wording adjusted to avoid the literal string 'Jakarta' so the plan's own grep -ci jakarta acceptance gates return 0
 - [Phase ?]: npm run build verified locally by temporarily moving the gitignored, prod-pointing .env.production.local aside (mirrors CI's zero-env-file SKIP condition); no DB command run, file restored immediately
+- [Phase 41]: Human approval for D-11 recorded verbatim from Antoine, not workflow.auto_advance -- typography-migration phase closes on 41-03
+- [Phase 41]: Brand wordmark spelling (rendered LEASÉTIC, correct post-rebrand spelling is LEASETIC without the accent) deferred as out-of-scope for Phase 41 per D-01; tracked separately by Antoine as a repo-wide rebrand cleanup
 
 ### Blockers
 

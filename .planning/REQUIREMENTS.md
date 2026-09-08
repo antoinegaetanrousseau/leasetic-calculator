@@ -47,7 +47,7 @@ proposal into it.
 - [ ] **DOC-08**: The PDF shows a legal footer carrying the Leasetic company registration line
   (SAS, address, SIREN, SIRET, TVA) with the proposal reference, page number and the 14%-opacity
   icon mark on the right.
-- [ ] **DOC-09**: The PDF renders in Inter, replacing Plus Jakarta Sans, with no missing-glyph or
+- [x] **DOC-09**: The PDF renders in Inter, replacing Plus Jakarta Sans, with no missing-glyph or
   font-registration failure in any rendered proposal. *(Narrowed 2026-09-08 by Phase 41 D-02: the
   design's ten-step type scale moved to DOC-01 / Phase 43. Phase 41 keeps today's `pdfFontSizes`
   — 8 / 9 / 10 / 22 / 32pt — untouched per D-01.)*
@@ -139,7 +139,7 @@ proposal into it.
 | DOC-06 | Phase 43 — New PDF Layout | Pending |
 | DOC-07 | Phase 43 — New PDF Layout | Pending |
 | DOC-08 | Phase 43 — New PDF Layout | Pending |
-| DOC-09 | Phase 41 — Typography Migration | Pending |
+| DOC-09 | Phase 41 — Typography Migration | Complete |
 | DOC-10 | Phase 43 — New PDF Layout | Pending |
 | DOC-11 | Phase 43 — New PDF Layout | Pending |
 | DOC-12 | Phase 43 — New PDF Layout | Pending |

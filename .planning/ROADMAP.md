@@ -140,7 +140,7 @@ every existing proposal into it. Design spec: `.planning/assets/v1.9-quote-desig
 
 + `Quote-EN-A.dc.html`, both authoritative pixel specs). Phase numbering continues from Phase 40.
 
-- [ ] **Phase 41: Typography Migration** — Inter replaces Plus Jakarta Sans in the PDF font-registration path, isolated from any layout or palette change
+- [x] **Phase 41: Typography Migration** — Inter replaces Plus Jakarta Sans in the PDF font-registration path, isolated from any layout or palette change (completed 2026-09-08)
 - [ ] **Phase 42: Captured Data — Fields & Advisor Profile** — client SIRET + partner phone on the wizard, advisor fonction/téléphone on the account, one-time finalize-time profile gate
 - [ ] **Phase 43: New PDF Layout** — the full Claude Design layout (header, client/advisor cards, loyer hero, financial-conditions table, conditions paragraph, acceptance block, legal footer), bilingual, em-dash fallbacks, ADMIN-09 + byte-determinism held
 - [ ] **Phase 44: Backfill Migration** — every stored proposal PDF re-rendered into the new design, dry-run first, resumable, `params_snapshot`-driven figures — the milestone's one irreversible step, run last
@@ -780,7 +780,7 @@ Plans:
 > Phase 43 criterion 6. Criterion 3 previously asked for a second, display-weight typeface
 > that neither design file references (D-04).
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 **Wave 1**
 
@@ -789,7 +789,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 41-03-PLAN.md — Glyph-coverage + distinct-embedded-faces proof, full gate, human visual pass (D-09, D-10, D-11)
+- [x] 41-03-PLAN.md — Glyph-coverage + distinct-embedded-faces proof, full gate, human visual pass (D-09, D-10, D-11)
 
 ### Phase 42: Captured Data — Fields & Advisor Profile
 
@@ -891,7 +891,7 @@ Plans:
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
-| 41. Typography Migration | v1.9 | 2/3 | In Progress|  |
+| 41. Typography Migration | v1.9 | 3/3 | Complete   | 2026-09-08 |
 | 42. Captured Data — Fields & Advisor Profile | v1.9 | 0/TBD | Not started | - |
 | 43. New PDF Layout | v1.9 | 0/TBD | Not started | - |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
