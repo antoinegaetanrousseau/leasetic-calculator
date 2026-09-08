@@ -1,4 +1,4 @@
-import { SlidersIcon, UsersIcon, HistoryIcon, HashIcon } from '@/components/ui/icons';
+import { SlidersIcon, UsersIcon, HistoryIcon, HashIcon, PhoneIcon } from '@/components/ui/icons';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -56,6 +56,9 @@ interface PageProps {
  * commission" is the card title, not a commission VALUE — T-14-03-02 +
  * T-18-02-01 mitigations). Recent activity sentences reference modified
  * coefficients generically; no commission values cross the page surface.
+ * Phase 42 Plan 07 (T-42-07-D): the 5th AdminNavCard (advisor) reuses the
+ * same hero copy as the /advisor page itself — a chrome label naming a
+ * contact person, carrying no commission, rate or derived value.
  */
 export default async function AdminHomePage({ params }: PageProps) {
   const { adminSegment } = await params; // PITFALL §1.1
@@ -159,8 +162,13 @@ export default async function AdminHomePage({ params }: PageProps) {
         />
       </div>
 
-      {/* ── 3. AdminNavCard 4-up grid (Coefficients / Partenaires / Historique / Références LC) ── */}
-      {/* D-18 Phase 19 Plan 02: grid extended from 3→4 to add LC reference dashboard card. */}
+      {/* ── 3. AdminNavCard 5-up-wrapping grid (Coefficients / Partenaires / Historique / Références LC / Conseiller) ── */}
+      {/* D-18 Phase 19 Plan 02: grid extended from 3→4 to add LC reference dashboard card.
+          Phase 42 Plan 07: grid extended from 4→5 to add the advisor-identity card. The
+          `grid-cols-1 sm:grid-cols-2 xl:grid-cols-4` class string is unchanged — the 5th
+          card wraps to a second row at every breakpoint those responsive classes already
+          handle; changing the column count would shrink every existing card and is not a
+          change UI-SPEC ratified. */}
       <div
         className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
         style={{ gap: 24, marginBottom: 32 }}
@@ -195,6 +203,14 @@ export default async function AdminHomePage({ params }: PageProps) {
           description={t('admin.nav.lcReferences.description', lang)}
           href={`/${adminSegment}/lc-references`}
           icon={HashIcon}
+          openLabel={t('admin.nav.open', lang)}
+        />
+        <AdminNavCard
+          variant="advisor"
+          title={t('admin.advisor.hero.title', lang)}
+          description={t('admin.advisor.hero.subtitle', lang)}
+          href={`/${adminSegment}/advisor`}
+          icon={PhoneIcon}
           openLabel={t('admin.nav.open', lang)}
         />
       </div>

@@ -26,7 +26,7 @@
  * Phase 14 Test 5/6 (h1 text === "Administration" / "Manage…") still hold —
  * PageHero h1 props are asserted via the PageHero mock's data-attrs.
  */
-import { SlidersIcon, UsersIcon, HistoryIcon, HashIcon } from '@/components/ui/icons';
+import { SlidersIcon, UsersIcon, HistoryIcon, HashIcon, PhoneIcon } from '@/components/ui/icons';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, within } from '@testing-library/react';
 import type { ActivityRow } from '@/lib/db/queries/admin-activity';
@@ -299,30 +299,34 @@ describe('Admin Home page — Phase 18 rewrite (D-01..D-07, D-29)', () => {
     expect(tile.getAttribute('data-sublabel')).toBe('');
   });
 
-  it('Test 7: renders 4 AdminNavCards (coefficients / partners / history / lc-references) — D-18 Phase 19 Plan 02', async () => {
+  it('Test 7: renders 5 AdminNavCards (coefficients / partners / history / lc-references / advisor) — D-18 Phase 19 Plan 02 + Phase 42 Plan 07', async () => {
     const { container } = await renderPage();
     const cards = container.querySelectorAll('[data-testid^="navcard-"]');
-    expect(cards.length).toBe(4);
+    expect(cards.length).toBe(5);
     const coef = within(container).getByTestId('navcard-coefficients');
     const partners = within(container).getByTestId('navcard-partners');
     const history = within(container).getByTestId('navcard-history');
     const lcRefs = within(container).getByTestId('navcard-lc-references');
+    const advisor = within(container).getByTestId('navcard-advisor');
     expect(coef.getAttribute('data-href')).toBe(`/${SEG}/coefficients`);
     expect(partners.getAttribute('data-href')).toBe(`/${SEG}/partners`);
     expect(history.getAttribute('data-href')).toBe(`/${SEG}/history`);
     expect(lcRefs.getAttribute('data-href')).toBe(`/${SEG}/lc-references`);
+    expect(advisor.getAttribute('data-href')).toBe(`/${SEG}/advisor`);
     // Variant identity preserved
     expect(coef.getAttribute('data-variant')).toBe('coefficients');
     expect(partners.getAttribute('data-variant')).toBe('partners');
     expect(history.getAttribute('data-variant')).toBe('history');
     expect(lcRefs.getAttribute('data-variant')).toBe('lc-references');
-    // Icons preserved + new Hash icon
+    expect(advisor.getAttribute('data-variant')).toBe('advisor');
+    // Icons preserved + new Hash/Phone icons
     const calls = adminNavCardMock.mock.calls.map(([p]) => p);
     const byVariant = Object.fromEntries(calls.map((p) => [p.variant, p]));
     expect(byVariant.coefficients.icon).toBe(SlidersIcon);
     expect(byVariant.partners.icon).toBe(UsersIcon);
     expect(byVariant.history.icon).toBe(HistoryIcon);
     expect(byVariant['lc-references'].icon).toBe(HashIcon);
+    expect(byVariant.advisor.icon).toBe(PhoneIcon);
   });
 
   it('Test 8: Recent activity card renders header ACTIVITÉ RÉCENTE + Voir tout link → /<seg>/history', async () => {

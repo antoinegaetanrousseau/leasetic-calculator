@@ -4,16 +4,19 @@ import type { ComponentType } from 'react';
 /**
  * AdminNavCard — v1.2 navigation card primitive for admin home (COMP-04, UI-SPEC §6.5).
  *
- * 3 variants:
- *   - coefficients → accent var(--gd)   (green) — Sliders icon
- *   - partners     → accent var(--teal)         — Users icon
- *   - history      → accent var(--navy)         — History icon
+ * Variants:
+ *   - coefficients  → accent var(--gd)   (green) — Sliders icon
+ *   - partners      → accent var(--teal)         — Users icon
+ *   - history       → accent var(--navy)         — History icon
+ *   - lc-references → accent var(--teal)         — Hash icon
+ *   - advisor       → accent var(--navy)         — Phone icon (Phase 42 Plan 07,
+ *     reuses the exact `history` navy accent pair — no new color introduced)
  *
  * Server component. Renders Next.js <Link>; consumers pass i18n-resolved strings
  * + lucide icon component. Existing Phase 9 .admin-nav-card hover+focus CSS in
  * app/globals.css is reused (chained via .admin-nav-card-v2 for v1.2 layout).
  */
-type Variant = 'coefficients' | 'partners' | 'history' | 'lc-references';
+type Variant = 'coefficients' | 'partners' | 'history' | 'lc-references' | 'advisor';
 
 export interface AdminNavCardProps {
   title: string;
@@ -31,6 +34,7 @@ const ACCENT_BY_VARIANT: Record<Variant, { rgb: string; token: string }> = {
   partners: { rgb: '45, 122, 140', token: 'var(--teal)' },
   history: { rgb: '17, 44, 59', token: 'var(--navy)' },
   'lc-references': { rgb: '45, 122, 140', token: 'var(--teal)' },
+  advisor: { rgb: '17, 44, 59', token: 'var(--navy)' },
 };
 
 export function AdminNavCard({
