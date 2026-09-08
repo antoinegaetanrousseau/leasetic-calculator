@@ -23,6 +23,14 @@
  * `partnerCo` + `partnerName` are session-hydrated server-side (D-07) but are
  * persisted inside `inputs` — therefore they count as step-1-owned for the
  * change-detection predicate even though the partner cannot type them.
+ *
+ * Deliberately ABSENT from this list:
+ *   - `validityDays` — server-resolved from global_params (D-08). An admin
+ *     editing it must never invalidate a partner's completed steps.
+ *   - `partnerTel` — session-hydrated (Phase 42, FIELD-02 / D-11) and
+ *     re-resolved on every render, so including it would clear downstream
+ *     steps for every draft whose stored value is merely stale. Left out on
+ *     purpose; revisit if partner attribution ever becomes editable.
  */
 const STEP_1_KEYS = [
   'clientCo',
@@ -31,6 +39,7 @@ const STEP_1_KEYS = [
   'clientTel',
   'clientRole',
   'clientSiren',
+  'clientSiret',
   'partnerRef',
   'amountHT',
   'durationMonths',

@@ -38,6 +38,8 @@ function makeStep1Inputs(overrides: Record<string, unknown> = {}) {
     clientName: 'Alice',
     clientEmail: 'alice@example.com',
     clientTel: '0102030405',
+    clientSiren: '123456789',
+    clientSiret: '12345678900012',
     partnerRef: 'REF-1',
     amountHT: '75000',
     durationMonths: 48,
@@ -107,16 +109,35 @@ describe('Stepper behavior integration (D-20 / D-21 / D-22 / D-23)', () => {
   /**
    * Scenario 3 — D-21: editing an optional field also clears downstream.
    *
-   * The optional fields (clientRole, projectDesc, slb, evalParc) and
-   * clientSiren are step-1-owned per STEP_1_KEYS — adding one counts as an
-   * edit to step 1.
+   * The optional fields (clientRole, projectDesc, slb, evalParc) are
+   * step-1-owned per STEP_1_KEYS — adding one counts as an edit to step 1.
    */
-  it('D-21: editing clientSiren also clears downstream', () => {
+  it('D-21: adding an optional field (clientRole) also clears downstream', () => {
     const prev = makeStep1Inputs({ _completedSteps: [1, 2] });
     const next = makeStep1Inputs({
-      clientSiren: '123456789', // step-1-owned — partner adds it
+      clientRole: 'CTO', // step-1-owned — partner adds it
       _completedSteps: [1, 2],
     });
+
+    const derived = deriveCompletedSteps(prev, next, 1);
+    expect(derived).toEqual([1]);
+  });
+
+  /**
+   * Scenario 3b — D-21: the SIREN/SIRET pair both clear downstream.
+   *
+   * Phase 42 (FIELD-01 / D-04) made clientSiret a required sibling of
+   * clientSiren, and D-02 ties the two together (SIRET's first 9 digits ARE
+   * the SIREN). Re-pointing a proposal at a different establishment is a
+   * step-1 edit: steps 2 and 3 were computed and reviewed against the old
+   * identity, so their done-marks must not survive it.
+   */
+  it.each([
+    ['clientSiren', { clientSiren: '987654321', clientSiret: '98765432100012' }],
+    ['clientSiret', { clientSiret: '12345678900099' }],
+  ])('D-21: editing %s clears downstream', (_label, change) => {
+    const prev = makeStep1Inputs({ _completedSteps: [1, 2] });
+    const next = makeStep1Inputs({ ...change, _completedSteps: [1, 2] });
 
     const derived = deriveCompletedSteps(prev, next, 1);
     expect(derived).toEqual([1]);

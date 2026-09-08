@@ -20,6 +20,7 @@ describe('deriveCompletedSteps (D-21)', () => {
     durationMonths: 48,
     clientRole: 'CTO',
     clientSiren: '123456789',
+    clientSiret: '12345678900012',
     projectDesc: 'Project',
     slb: false,
     evalParc: false,
@@ -42,6 +43,16 @@ describe('deriveCompletedSteps (D-21)', () => {
   it('Test 3: prev._completedSteps=[1,2] + amountHT changed (step-1 field) + fromStep=1 → [1] (step-2 invalidated)', () => {
     const prev = { ...fullStep1, _completedSteps: [1, 2] };
     const next = { ...fullStep1, amountHT: '90000' };
+    const result = deriveCompletedSteps(prev, next, 1);
+    expect(result).toEqual([1]);
+  });
+
+  it('Test 3b: prev._completedSteps=[1,2] + clientSiret changed + fromStep=1 → [1] (step-2 invalidated)', () => {
+    // clientSiret is partner-typed client data, required since Phase 42
+    // (FIELD-01 / D-04). Changing the establishment behind a proposal must
+    // invalidate the downstream steps exactly as changing clientSiren does.
+    const prev = { ...fullStep1, _completedSteps: [1, 2] };
+    const next = { ...fullStep1, clientSiret: '12345678900099' };
     const result = deriveCompletedSteps(prev, next, 1);
     expect(result).toEqual([1]);
   });
