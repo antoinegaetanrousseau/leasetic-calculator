@@ -5,9 +5,9 @@ describe('i18n dictionary parity', () => {
   const frKeys = Object.keys(dictionaries.fr);
   const enKeys = Object.keys(dictionaries.en);
 
-  it('has at least 1011 keys per language (raised in Phase 42 for the SIRET / /parametres telephone+fonction / admin advisor / finalize-dialog / legacy-draft-toast / PDF partnerType-label namespaces)', () => {
-    expect(frKeys.length).toBeGreaterThanOrEqual(1011);
-    expect(enKeys.length).toBeGreaterThanOrEqual(1011);
+  it('has at least 1072 keys per language (raised in Phase 43 for the Claude Design PDF-layout namespace — pdf.header.*/pdf.pill.*/pdf.card.*/pdf.table.*/pdf.conditions.title/pdf.acceptance.*/pdf.footer.legal.*. Derivation: 1078 measured immediately after 43-03 Task 1 landed the new pairs, minus 6 — the five Phase-43-orphaned keys (pdf.tagline, pdf.section.project, pdf.ref.label, pdf.section.interests, pdf.footer.left) plus pdf.project.ref.prefix, all of which plans 43-05/43-06 delete alongside their last consumer. Set to the phase-FINAL count, not the post-Task-1 count, so this floor does not go red the moment those plans remove their group.)', () => {
+    expect(frKeys.length).toBeGreaterThanOrEqual(1072);
+    expect(enKeys.length).toBeGreaterThanOrEqual(1072);
   });
 
   it('every FR key exists in EN', () => {
@@ -617,7 +617,7 @@ describe('Phase 42 captured-data keys', () => {
     expect(en['partners.new.field.phone']).toBe('Company phone');
   });
 
-  it('pdf.partnerType.* carries the PDF-only FR/EN label pairs (D-16)', () => {
+  it('pdf.partnerType.* carries the PDF-only FR/EN label pairs (D-16) — deliberately retained without a PDF consumer as of Phase 43 (D-02)', () => {
     expect(en['pdf.partnerType.Commercial']).toBe('Sales Representative');
     expect(fr['pdf.partnerType.Agent']).toBe('Agent');
     expect(en['pdf.partnerType.Agent']).toBe('Agent');
@@ -628,5 +628,54 @@ describe('Phase 42 captured-data keys', () => {
   it('admin.advisor.hero.title spells the brand Leasetic with no accent (D-08)', () => {
     expect(fr['admin.advisor.hero.title']).toBe('Conseiller Leasetic');
     expect(en['admin.advisor.hero.title']).toBe('Leasetic advisor');
+  });
+});
+
+describe('Phase 43 — Claude Design layout copy (DOC-01..DOC-08, DOC-10)', () => {
+  // Use bracket access because dot-notation keys aren't valid identifiers.
+  const fr = dictionaries.fr as Record<string, string>;
+  const en = dictionaries.en as Record<string, string>;
+
+  it('the two card titles pin the design copy exactly (FR + EN)', () => {
+    expect(fr['pdf.card.client.title']).toBe('SOCIÉTÉ CLIENTE');
+    expect(en['pdf.card.client.title']).toBe('CLIENT COMPANY');
+    expect(fr['pdf.card.contact.title']).toBe('VOTRE CONTACT');
+    expect(en['pdf.card.contact.title']).toBe('YOUR CONTACT');
+  });
+
+  it('pdf.table.total pins the design copy exactly (FR + EN)', () => {
+    expect(fr['pdf.table.total']).toBe('Total des loyers HT');
+    expect(en['pdf.table.total']).toBe('Total rents excl. VAT');
+  });
+
+  it('pdf.acceptance.stamp pins the design copy exactly (FR + EN)', () => {
+    expect(fr['pdf.acceptance.stamp']).toBe('Cachet de l’entreprise');
+    expect(en['pdf.acceptance.stamp']).toBe('Company stamp');
+  });
+
+  it('pdf.footer.legal.line2 pins the SIREN/SIRET/VAT line exactly (FR + EN)', () => {
+    expect(fr['pdf.footer.legal.line2']).toBe(
+      'SIREN 830 733 606 · SIRET (siège) 830 733 606 00040 · TVA FR06830733606'
+    );
+    expect(en['pdf.footer.legal.line2']).toBe(
+      'SIREN 830 733 606 · SIRET (registered office) 830 733 606 00040 · VAT FR06830733606'
+    );
+  });
+
+  it('DOC-06: pdf.validity.caption interpolates {1} for the real validity period, never a hardcoded 30', () => {
+    for (const lang of ['fr', 'en'] as const) {
+      const value = t('pdf.validity.caption', lang);
+      expect(value).toContain('{1}');
+      expect(value).not.toContain('30 jours');
+      expect(value).not.toContain('30 days');
+    }
+  });
+
+  it('pdf.validity.caption spells the brand Leasetic with no accent, in either language (mirrors admin.advisor.hero.title)', () => {
+    expect(t('pdf.validity.caption', 'fr')).not.toMatch(/Leasétic/u);
+    expect(t('pdf.validity.caption', 'en')).not.toMatch(/Leasétic/u);
+    // The corrected spelling itself must still be present.
+    expect(t('pdf.validity.caption', 'fr')).toContain('Leasetic');
+    expect(t('pdf.validity.caption', 'en')).toContain('Leasetic');
   });
 });

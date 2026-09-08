@@ -469,10 +469,18 @@ export const dictionaries = {
     // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
     //     5 v10 keys reused per §7.9 — pdf.computed.duration.* + pdf.interests.* + pdf.computed.amount.label
     //     are NOT redeclared; consumers reference proposal.duree.* / proposal.interests.* / proposal.montant.label.)
+    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (D-06 — the design replaces
+    // the header region with the lockup)
     'pdf.tagline': 'Location financière IT',
     'pdf.title': 'Proposition de location financière',
+    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (the bare N° / No. prefix
+    // becomes pdf.header.proposition.eyebrow)
     'pdf.ref.label': 'N°',
+    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (D-06 — the PROJET section
+    // label is gone)
     'pdf.section.project': 'PROJET',
+    // Phase 43 orphan — deleted in plan 43-06 with its last consumer (D-05 — the SLB /
+    // évaluation-de-parc block is dropped)
     'pdf.section.interests': "POINTS D\u2019INTÉRÊT IDENTIFIÉS\u202f:",
     'pdf.project.placeholder': 'Projet non précisé',
     'pdf.project.ref.prefix': 'Réf. partenaire\u202f:',
@@ -481,6 +489,8 @@ export const dictionaries = {
     'pdf.loyer.subtext': 'sur {0} mois, hors taxes',
     'pdf.loyer.on.demand': 'Sur demande',
     'pdf.validity.caption': "Proposition valable jusqu\u2019au {0} ({1} jours), sous réserve de l\u2019accord du comité des engagements de Leasetic. Document non contractuel. Les loyers sont exprimés hors taxes et hors prestations annexes. Le coefficient appliqué est susceptible d\u2019évoluer en cas de modification du montant financé, de la durée ou des conditions de marché à la date de mise en loyer.",
+    // Phase 43 orphan — deleted in plan 43-06 with its last consumer (the N° {0} · Créée le {1}
+    // line becomes the legal footer)
     'pdf.footer.left': 'N° {0} · Créée le {1}',
 
     // Phase 43 — Claude Design layout copy (DOC-01, DOC-02, DOC-05, DOC-07, DOC-08), sourced
@@ -536,9 +546,13 @@ export const dictionaries = {
     'pdf.footer.legal.line2':
       'SIREN 830 733 606 · SIRET (siège) 830 733 606 00040 · TVA FR06830733606',
 
-    // Phase 42 — partnerType FR/EN label pairs, PDF-only per D-16. The admin and /parametres
-    // surfaces deliberately keep rendering the raw partnerType string (D-16 explicitly declines
-    // extending the translation there) — that inconsistency is a recorded Deferred item, not drift.
+    // D-02: orphaned by the Phase 43 card layout — the partner block gains no Fonction row
+    // (Quote-FR-A.dc.html:72-74 is Partenaire / Commercial / Téléphone only), so the PDF no
+    // longer consumes these three pairs. Retained (not deleted) because CONTEXT.md's Deferred
+    // Ideas lists translating partnerType on the admin and partner web surfaces as a live
+    // later decision. Originally shipped Phase 42, PDF-only per D-16; the admin and /parametres
+    // surfaces deliberately keep rendering the raw partnerType string (D-16 explicitly declined
+    // extending the translation there) — that inconsistency is now total under D-02.
     'pdf.partnerType.Agent': 'Agent',
     'pdf.partnerType.Commercial': 'Commercial',
     'pdf.partnerType.Partenaire': 'Partenaire',
@@ -1837,10 +1851,18 @@ export const dictionaries = {
 
     // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
     //     5 v10 keys reused per §7.9)
+    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (D-06 — the design replaces
+    // the header region with the lockup)
     'pdf.tagline': 'IT financial leasing',
     'pdf.title': 'Equipment lease financing proposal',
+    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (the bare N° / No. prefix
+    // becomes pdf.header.proposition.eyebrow)
     'pdf.ref.label': 'No.',
+    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (D-06 — the PROJET section
+    // label is gone)
     'pdf.section.project': 'PROJECT',
+    // Phase 43 orphan — deleted in plan 43-06 with its last consumer (D-05 — the SLB /
+    // évaluation-de-parc block is dropped)
     'pdf.section.interests': 'POINTS OF INTEREST IDENTIFIED:',
     'pdf.project.placeholder': 'Project not specified',
     'pdf.project.ref.prefix': 'Partner ref.:',
@@ -1849,6 +1871,8 @@ export const dictionaries = {
     'pdf.loyer.subtext': 'over {0} months, excl. taxes',
     'pdf.loyer.on.demand': 'On request',
     'pdf.validity.caption': "This proposal is valid until {0} ({1} days), subject to approval by Leasetic\u2019s credit committee. Non-contractual document. Rents are stated excluding taxes and excluding ancillary services. The applied coefficient may change if the financed amount, the term, or market conditions at the lease start date change.",
+    // Phase 43 orphan — deleted in plan 43-06 with its last consumer (the No. {0} · Created on
+    // {1} line becomes the legal footer)
     'pdf.footer.left': 'No. {0} \u00b7 Created on {1}',
 
     // Phase 43 — Claude Design layout copy (DOC-01, DOC-02, DOC-05, DOC-07, DOC-08), sourced
@@ -1904,9 +1928,13 @@ export const dictionaries = {
     'pdf.footer.legal.line2':
       'SIREN 830 733 606 · SIRET (registered office) 830 733 606 00040 · VAT FR06830733606',
 
-    // Phase 42 — partnerType FR/EN label pairs, PDF-only per D-16. The admin and /parametres
-    // surfaces deliberately keep rendering the raw partnerType string (D-16 explicitly declines
-    // extending the translation there) — that inconsistency is a recorded Deferred item, not drift.
+    // D-02: orphaned by the Phase 43 card layout — the partner block gains no Fonction row
+    // (Quote-FR-A.dc.html:72-74 is Partenaire / Commercial / Téléphone only), so the PDF no
+    // longer consumes these three pairs. Retained (not deleted) because CONTEXT.md's Deferred
+    // Ideas lists translating partnerType on the admin and partner web surfaces as a live
+    // later decision. Originally shipped Phase 42, PDF-only per D-16; the admin and /parametres
+    // surfaces deliberately keep rendering the raw partnerType string (D-16 explicitly declined
+    // extending the translation there) — that inconsistency is now total under D-02.
     'pdf.partnerType.Agent': 'Agent',
     'pdf.partnerType.Commercial': 'Sales Representative',
     'pdf.partnerType.Partenaire': 'Partner',
