@@ -79,7 +79,7 @@ proposal into it.
 
 ### Profile — advisor identity
 
-- [ ] **PROF-01**: A partner can set their own telephone on their account and sees their fonction,
+- [x] **PROF-01**: A partner can set their own telephone on their account and sees their fonction,
   name and email on the settings page; fonction is read-only. *(Restated 2026-09-08 by Phase 42 D-20 / D-14:
   "can set their fonction" is dropped — fonction is `users.partnerType`, admin-assigned
   and client-immutable by `input: false`.)*
@@ -163,7 +163,7 @@ proposal into it.
 | FIELD-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | FIELD-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | FIELD-03 | Phase 43 — New PDF Layout | Pending |
-| PROF-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| PROF-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | PROF-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | PROF-03 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
 | MIG-01 | Phase 44 — Backfill Migration | Pending |

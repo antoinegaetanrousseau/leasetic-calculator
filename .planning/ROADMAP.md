@@ -141,7 +141,7 @@ every existing proposal into it. Design spec: `.planning/assets/v1.9-quote-desig
 + `Quote-EN-A.dc.html`, both authoritative pixel specs). Phase numbering continues from Phase 40.
 
 - [x] **Phase 41: Typography Migration** — Inter replaces Plus Jakarta Sans in the PDF font-registration path, isolated from any layout or palette change (completed 2026-09-08)
-- [ ] **Phase 42: Captured Data — Fields & Advisor Profile** — client SIRET + partner phone on the wizard, advisor fonction/téléphone on the account, one-time finalize-time profile gate
+- [x] **Phase 42: Captured Data — Fields & Advisor Profile** — client SIRET + partner phone on the wizard, advisor fonction/téléphone on the account, one-time finalize-time profile gate (completed 2026-09-08)
 - [ ] **Phase 43: New PDF Layout** — the full Claude Design layout (header, client/advisor cards, loyer hero, financial-conditions table, conditions paragraph, acceptance block, legal footer), bilingual, em-dash fallbacks, ADMIN-09 + byte-determinism held
 - [ ] **Phase 44: Backfill Migration** — every stored proposal PDF re-rendered into the new design, dry-run first, resumable, `params_snapshot`-driven figures — the milestone's one irreversible step, run last
 
@@ -815,7 +815,7 @@ Plans:
 > sources the partner block instead (D-22/D-06). Authority:
 > `.planning/phases/42-captured-data-fields-advisor-profile/42-CONTEXT.md`.
 
-**Plans:** 9/10 plans executed
+**Plans:** 10/10 plans complete
 
 **Wave 1**
 
@@ -825,7 +825,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1)*
 
 - [x] 42-03-PLAN.md — clientSiret with the SIREN-prefix refine, optional partnerTel, and siege.siret in the registry parser
-- [ ] 42-04-PLAN.md — Better Auth additionalFields registration + /parametres telephone and read-only fonction
+- [x] 42-04-PLAN.md — Better Auth additionalFields registration + /parametres telephone and read-only fonction
 - [x] 42-05-PLAN.md — Admin partner form: company telephone persistence and the new partner telephone field
 - [x] 42-06-PLAN.md — Advisor singleton persistence: fixed-id query helpers, form schema, admin-gated action
 
@@ -931,7 +931,7 @@ D-16's PDF-only fonction translation, rendering the FR/EN label matching each pr
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
 | 41. Typography Migration | v1.9 | 3/3 | Complete    | 2026-09-08 |
-| 42. Captured Data — Fields & Advisor Profile | v1.9 | 9/10 | In Progress|  |
+| 42. Captured Data — Fields & Advisor Profile | v1.9 | 10/10 | Complete   | 2026-09-08 |
 | 43. New PDF Layout | v1.9 | 0/TBD | Not started | - |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
 

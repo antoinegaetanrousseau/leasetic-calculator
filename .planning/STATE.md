@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
-status: executing
-last_updated: "2026-09-08T15:59:32.818Z"
+status: verifying
+last_updated: "2026-09-08T17:07:49.814Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 13
-  completed_plans: 12
-  percent: 4
+  completed_plans: 13
+  percent: 8
 ---
 
 # State — Matrice Commerciale
@@ -27,9 +27,9 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 42 (Captured Data — Fields & Advisor Profile) — EXECUTING
+Phase: 42 (Captured Data — Fields & Advisor Profile) — COMPLETE
 Plan: 10 of 10
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-08
 
 ## Deferred Items
@@ -529,6 +529,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 42 P02 | ~4min active / ~2h41m elapsed | 3 tasks | 5 files |
 | Phase 42 P09 | ~40min | 2 tasks | 3 files |
 | Phase 42 P10 | ~35min | 3 tasks | 7 files |
+| Phase 42 P04 | ~8min | 2 tasks | 6 files |
 
 ## Decisions
 
@@ -736,6 +737,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 42-10]: D-05 legacy-draft pre-check runs before proposalInputSchema.parse (not inside the ZodError catch), so a missing clientSiret can never collapse into the generic ValidationFailed code
 - [Phase 42-10]: D-17/D-13 telephone gate fires only at finalization on the partner's own telephone; the admin-set company telephone never blocks finalization
 - [Phase 42-10]: D-18 missing-telephone failure surfaces as a Dialog with a /parametres CTA; the legacy-draft failure surfaces as a toast + redirect to step 1 -- the two never share UI
+- [Phase 42-04]: additionalFields input:false is the structural framework-level block against client writes for companyTelephone (D-13); input:true telephone validated client-side via optionalPhoneSchema before authClient.updateUser
+- [Phase 42-04]: Migration gate covering only the production Neon branch is insufficient once additionalFields are involved — every branch in use (main, development, preview) needs the migration before code registering new columns is exercised against it; development was unmigrated and broke localhost login post-deploy, fixed via DB Migrate run 34250717059; preview remains unmigrated, flagged for Phases 43/44
 
 ### Blockers
 
