@@ -170,6 +170,7 @@ function buildDraftInputs(fixture: { amountHT: string; durationMonths: 36 | 48 |
     partnerName: 'Bob Partner',
     clientCo: 'Acme Inc',
     clientSiren: '123456789',
+    clientSiret: '12345678900012', // Phase 42 Plan 03 (FIELD-01) — required, must match clientSiren prefix
     clientName: 'Alice',
     amountHT: fixture.amountHT,
     durationMonths: fixture.durationMonths,

@@ -101,6 +101,7 @@ const COMPLETE_INPUTS = {
   partnerName: 'Alice Partner',
   clientCo: 'CompanyX',
   clientSiren: '123456789',
+  clientSiret: '12345678900012', // Phase 42 Plan 03 (FIELD-01) — required, must match clientSiren prefix
   clientName: 'Bob Buyer',
   clientEmail: 'bob@companyx.example',
   clientTel: '01 23 45 67 89',

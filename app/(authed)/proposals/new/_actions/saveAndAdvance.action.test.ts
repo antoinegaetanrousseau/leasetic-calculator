@@ -38,6 +38,7 @@ const VALID_INPUTS = {
   partnerName: 'Bob Partner',
   clientCo: 'Acme Corp',
   clientSiren: '123456789',
+  clientSiret: '12345678900012', // Phase 42 Plan 03 (FIELD-01) — required, must match clientSiren prefix
   amountHT: '75000',
   durationMonths: 48 as const,
 };

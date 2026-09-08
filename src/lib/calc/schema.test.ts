@@ -28,6 +28,7 @@ describe('validityDaysSchema (v10 assertValidity port — CALC-05 2/3)', () => {
       partnerName: 'pn',
       clientCo: 'cc',
       clientSiren: '123456789',
+      clientSiret: '12345678900012',
       amountHT: '75000',
       durationMonths: 48,
     });
@@ -90,6 +91,7 @@ describe('durationMonthsSchema (v10 lines 577-581)', () => {
 describe('proposalInputSchema (PROP-06 + UI-SPEC §4 15-field inventory)', () => {
   const validBase = {
   clientSiren: '123 456 789',
+    clientSiret: '123 456 789 00012', // FIELD-01: prefix must match clientSiren (D-02)
     partnerCo: 'Société Informatique XY',
     partnerName: 'Antoine Rousseau',
     clientCo: 'ACME SARL', // PROP-06 required
@@ -181,10 +183,96 @@ describe('proposalInputSchema (PROP-06 + UI-SPEC §4 15-field inventory)', () =>
       partnerName: 'pn',
       clientCo: 'cc',
       clientSiren: '123456789',
+      clientSiret: '12345678900012',
       amountHT: '75000',
       durationMonths: 48,
     });
     expect(r.validityDays).toBe(30);
+  });
+});
+
+/**
+ * Phase 42 Plan 03 — FIELD-01 (client SIRET) / D-02 (SIRET-must-match-SIREN
+ * hard block) / D-04 (digits-only storage) / FIELD-02 (optional partnerTel).
+ *
+ * `requiredSiretSchema` mirrors `requiredSirenSchema`'s transform+refine
+ * chain (see the comment above it in schema.ts); the cross-field prefix
+ * match is `proposalInputSchema`'s first object-level `.refine()`, and its
+ * explicit `path: ['clientSiret']` (42-RESEARCH.md assumption A4) is what
+ * lets RHF's `zodResolver` bind the mismatch error to the SIRET field
+ * instead of the form root — asserted directly below rather than inferred.
+ */
+describe('clientSiret (FIELD-01 / D-02 / D-04)', () => {
+  const validBase = {
+    partnerCo: 'Société Informatique XY',
+    partnerName: 'Antoine Rousseau',
+    clientCo: 'ACME SARL',
+    clientSiren: '123456789',
+    clientSiret: '12345678900012',
+    amountHT: '75000',
+    durationMonths: 48 as const,
+    validityDays: 30 as const,
+  };
+
+  it('a proposal input without a clientSiret fails validation with error.field.required', () => {
+    const { clientSiret: _omit, ...withoutSiret } = validBase;
+    void _omit;
+    const r = proposalInputSchema.safeParse(withoutSiret);
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      expect(r.error.issues.map((i) => i.message)).toContain('error.field.required');
+    }
+  });
+
+  it('a clientSiret that is not 14 digits fails with error.field.siret.invalid', () => {
+    const r = proposalInputSchema.safeParse({ ...validBase, clientSiret: '123' });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      expect(r.error.issues.map((i) => i.message)).toContain('error.field.siret.invalid');
+    }
+  });
+
+  it('a valid clientSiret is stored digits-only, formatting stripped (D-04)', () => {
+    const r = proposalInputSchema.safeParse({
+      ...validBase,
+      clientSiren: '123456789',
+      clientSiret: '123 456 789 00012',
+    });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.clientSiret).toBe('12345678900012');
+    }
+  });
+
+  it('a clientSiret whose first 9 digits differ from clientSiren fails with error.field.siret.mismatch, path on clientSiret', () => {
+    const r = proposalInputSchema.safeParse({
+      ...validBase,
+      clientSiren: '123456789',
+      clientSiret: '99999999900012',
+    });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      expect(r.error.issues.map((i) => i.message)).toContain('error.field.siret.mismatch');
+      expect(r.error.issues[0].path).toEqual(['clientSiret']);
+    }
+  });
+
+  it('a proposal input with no partnerTel still parses — the company telephone never blocks validation', () => {
+    const { ...withoutPartnerTel } = validBase; // partnerTel already absent from validBase
+    expect(proposalInputSchema.safeParse(withoutPartnerTel).success).toBe(true);
+  });
+
+  it('a well-formed partnerTel "06 12 34 56 78" parses', () => {
+    const r = proposalInputSchema.safeParse({ ...validBase, partnerTel: '06 12 34 56 78' });
+    expect(r.success).toBe(true);
+  });
+
+  it('a malformed partnerTel "0612" fails with error.field.phone.invalid', () => {
+    const r = proposalInputSchema.safeParse({ ...validBase, partnerTel: '0612' });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      expect(r.error.issues.map((i) => i.message)).toContain('error.field.phone.invalid');
+    }
   });
 });
 
@@ -233,8 +321,21 @@ describe('requiredSirenSchema converges on normalizeSiren (D-23 / WR-15)', () =>
     validityDays: 30 as const,
   };
 
+  // FIELD-01 / D-02: proposalInputSchema now requires clientSiret AND its
+  // first 9 digits to equal clientSiren. This suite varies clientSiren, so
+  // clientSiret must be derived per-call to keep matching — otherwise every
+  // "success: true" assertion below would fail on the unrelated cross-field
+  // refine instead of exercising what this suite is actually about (SIREN
+  // normalisation). When the supplied siren doesn't normalise to exactly 9
+  // digits, the SIREN itself already fails first (before the refine ever
+  // runs), so the exact SIRET content is irrelevant in that branch.
+  const siretFor = (clientSiren: unknown): string => {
+    const digits = typeof clientSiren === 'string' ? clientSiren.replace(/\D/g, '') : '';
+    return digits.length === 9 ? `${digits}00012` : '00000000000000';
+  };
+
   const parseSiren = (clientSiren: unknown) =>
-    proposalInputSchema.safeParse({ ...base, clientSiren });
+    proposalInputSchema.safeParse({ ...base, clientSiren, clientSiret: siretFor(clientSiren) });
 
   const messages = (r: ReturnType<typeof parseSiren>) =>
     r.success ? [] : r.error.issues.map((i) => i.message);
@@ -286,6 +387,7 @@ describe('requiredSirenSchema converges on normalizeSiren (D-23 / WR-15)', () =>
     const parsed = proposalInputSchema.parse({
       ...base,
       clientSiren: '552 100 554',
+      clientSiret: '552 100 554 00012',
       clientName: 'Jean Dupont',
       clientTel: '06 12 34 56 78',
     });

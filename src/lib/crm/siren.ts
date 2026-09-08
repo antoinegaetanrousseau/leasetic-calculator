@@ -16,9 +16,22 @@
  * candidate falls through to name-based matching — which, per D-04, degrades
  * to a flagged pair for human review rather than an automatic merge.
  */
+
+/**
+ * Phase 42 Plan 03 (FIELD-01 / D-04) — the single digit-stripping step,
+ * pulled out of `normalizeSiren` so `requiredSiretSchema`
+ * (src/lib/calc/schema.ts) can reuse the exact same stripping rule for the
+ * 14-digit SIRET without writing a second `.replace(/\D/g, '')` under a new
+ * name. `normalizeSiren` layers its own 9-digit shape check on top of this;
+ * the SIRET schema layers a 14-digit check on top of the same primitive.
+ */
+export function stripNonDigits(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
 export function normalizeSiren(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
-  const digitsOnly = value.replace(/\D/g, '');
+  const digitsOnly = stripNonDigits(value);
   if (digitsOnly.length === 0) return undefined;
   return /^[0-9]{9}$/.test(digitsOnly) ? digitsOnly : undefined;
 }

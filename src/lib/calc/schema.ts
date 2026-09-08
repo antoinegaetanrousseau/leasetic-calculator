@@ -14,7 +14,7 @@
  * NOT on a coerced number, to keep the contract DB-numeric-compatible.
  */
 import { z } from 'zod';
-import { normalizeSiren } from '@/lib/crm/siren';
+import { normalizeSiren, stripNonDigits } from '@/lib/crm/siren';
 
 /**
  * v10 amount validation rules (Matrice_2026_THE_Leasetic-v10.html line 1712 +
@@ -100,6 +100,43 @@ const requiredSirenSchema = z
   });
 
 /**
+ * Phase 42 Plan 03 (FIELD-01 / D-01 / D-02 / D-04). The client's SIRET
+ * (14-digit establishment ID) — required at step 1 alongside `clientSiren`,
+ * registry-prefilled but always editable (D-01), with a silent fallback to
+ * manual entry when the registry cannot answer (D-03, handled upstream of
+ * this schema — nothing here notices the difference between a prefilled and
+ * a hand-typed value).
+ *
+ * Mirrors `requiredSirenSchema`'s chain exactly, reusing `stripNonDigits` —
+ * the same stripping step `normalizeSiren` performs internally — rather than
+ * writing a second digit-stripping regex under a new name. The blank-vs-
+ * malformed distinction that comment records above is preserved here too: a
+ * blank value fails `error.field.required` at `.min(1)`, before the
+ * transform ever runs; a provided-but-malformed value (wrong digit count
+ * after stripping) reaches the transform, then fails the shape refine below
+ * with `error.field.siret.invalid`.
+ *
+ * D-04: storage is digits-only, formatting stripped, so `proposals.inputs`
+ * never carries the display grouping ("123 456 789 00012") a partner or the
+ * registry prefill might type or return.
+ *
+ * The SIRET/SIREN cross-field match (D-02 — first 9 digits of the SIRET must
+ * equal `clientSiren`) is NOT enforced here — it is a two-field comparison,
+ * which is a genuinely different shape than this single-field schema, and is
+ * layered on as an object-level `.refine()` on `proposalInputSchema` below
+ * (Pattern 3, 42-RESEARCH.md), with an explicit `path` so the error binds to
+ * the SIRET field rather than the object root.
+ */
+const requiredSiretSchema = z
+  .string({ message: 'error.field.required' })
+  .trim()
+  .min(1, { message: 'error.field.required' })
+  .transform((v) => stripNonDigits(v))
+  .refine((v) => /^[0-9]{14}$/.test(v), {
+    message: 'error.field.siret.invalid',
+  });
+
+/**
  * Coefficient table validator (D-2 / CALC-04). Used by Phase-8's seed
  * migration to typecheck imported seed values, and by the calc engine's
  * boundary if a future caller wants to inject a runtime-loaded table.
@@ -123,31 +160,59 @@ export const coefficientsSchema = z.object({
  * the form's RHF resolver renders the message string directly, and the
  * inline-error <p role="alert"> calls t(message, lang).
  */
-export const proposalInputSchema = z.object({
-  // Partner card
-  partnerCo: z.string().min(1, { message: 'error.field.required' }),
-  partnerName: z.string().min(1, { message: 'error.field.required' }),
+export const proposalInputSchema = z
+  .object({
+    // Partner card
+    partnerCo: z.string().min(1, { message: 'error.field.required' }),
+    partnerName: z.string().min(1, { message: 'error.field.required' }),
+    // Phase 42 Plan 03 (FIELD-02 / D-11 / D-12 / D-13): the partner
+    // company's own telephone, session-hydrated into the draft the same way
+    // `companyName` -> `partnerCo` already is — never typed in the wizard,
+    // never read back from the form. Optional on purpose: the column ships
+    // nullable (D-13) and must never block finalization.
+    partnerTel: optionalPhoneSchema,
 
-  // Client destinataire card
-  clientCo: z.string().min(1, { message: 'error.field.client.co.required' }), // D-7-06 PROP-06
-  clientName: z.string().optional(),
-  clientRole: z.string().optional(),
-  clientTel: optionalPhoneSchema,
-  clientEmail: optionalEmailSchema,
-  clientSiren: requiredSirenSchema,
+    // Client destinataire card
+    clientCo: z.string().min(1, { message: 'error.field.client.co.required' }), // D-7-06 PROP-06
+    clientName: z.string().optional(),
+    clientRole: z.string().optional(),
+    clientTel: optionalPhoneSchema,
+    clientEmail: optionalEmailSchema,
+    clientSiren: requiredSirenSchema,
+    // D-04: SIRET is SIREN's sibling, right beside it, so the field order
+    // matches the form and the wizard's step-1 client card.
+    clientSiret: requiredSiretSchema,
 
-  // Intérêts exprimés card
-  slb: z.boolean().optional(),
-  evalParc: z.boolean().optional(),
+    // Intérêts exprimés card
+    slb: z.boolean().optional(),
+    evalParc: z.boolean().optional(),
 
-  // Paramètres du projet card
-  amountHT: amountHTSchema,
-  durationMonths: durationMonthsSchema,
-  projectDesc: z.string().optional(),
-  partnerRef: z.string().optional(),
+    // Paramètres du projet card
+    amountHT: amountHTSchema,
+    durationMonths: durationMonthsSchema,
+    projectDesc: z.string().optional(),
+    partnerRef: z.string().optional(),
 
-  // Right-column control (preview card)
-  validityDays: validityDaysSchema.default(30),
-});
+    // Right-column control (preview card)
+    validityDays: validityDaysSchema.default(30),
+  })
+  /**
+   * Phase 42 Plan 03 (FIELD-01 / D-02) — cross-field SIRET/SIREN match. The
+   * first object-level `.refine()` this schema has needed: every prior rule
+   * (including `requiredSirenSchema`) validates one field in isolation, but
+   * D-02 compares two. The explicit `path: ['clientSiret']` is what makes
+   * RHF's `zodResolver` bind the error to the SIRET `<FieldError>` instead of
+   * the form root — untested anywhere else in this repo (42-RESEARCH.md
+   * assumption A4), hence the dedicated `path` assertion in the test suite.
+   *
+   * Zod runs object-level refines only after every field-level parse
+   * succeeds, so this only ever fires once both `clientSiren` and
+   * `clientSiret` already passed their own shape checks — the ordering is
+   * automatic, not hand-coded.
+   */
+  .refine((data) => data.clientSiret.slice(0, 9) === data.clientSiren, {
+    message: 'error.field.siret.mismatch',
+    path: ['clientSiret'],
+  });
 
 export type ProposalInput = z.infer<typeof proposalInputSchema>;
