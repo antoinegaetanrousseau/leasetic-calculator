@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T14:18:58.435Z"
+last_updated: "2026-09-08T15:12:07.081Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 1
   total_plans: 13
-  completed_plans: 9
+  completed_plans: 10
   percent: 4
 ---
 
@@ -526,6 +526,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 42 P06 | 15min | 2 tasks | 10 files |
 | Phase 42 P07 | ~10min | 3 tasks | 6 files |
 | Phase 42 P08 | ~35min | 3 tasks | 7 files |
+| Phase 42 P02 | ~4min active / ~2h41m elapsed | 3 tasks | 5 files |
 
 ## Decisions
 
@@ -728,6 +729,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 42-07]: No breadcrumb on /{adminSegment}/advisor — matches the other top-level admin routes (coefficients, companies, lc-references), none of which link back to the admin home.
 - [Phase 42-07]: AdvisorForm calls adminUpdateAdvisor directly (no action prop) — this is a singleton settings screen, not a reusable create form.
 - [Phase 42-08]: WizardStep1Wiring.tsx's Suivant trigger array extended with clientSiret (Rule 2) so D-04's blocking requirement actually holds — Plan 42-08 files_modified omitted this file; saveAndAdvanceAction already re-validates server-side, but client-side inline blocking on Suivant needed the same fix
+- [Phase 42]: Phase 42 P02: Migration 0011 (users.telephone/company_telephone + leasetic_advisor) applied to production Neon main via MIGRATE PROD Actions run 34241648389 (both jobs green) — Structural checkpoint ordering avoids RESEARCH R2 Pitfall 1 outage; Plan 42-04 now unblocked to register Better Auth additionalFields
 
 ### Blockers
 
