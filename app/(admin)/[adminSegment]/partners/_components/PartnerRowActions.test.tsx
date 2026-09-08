@@ -7,6 +7,7 @@
  *   - Désactiver le compte        (status === 'active')
  *   - Réactiver le compte         (status === 'inactive')
  *   - Voir les propositions       (always, D-11 → /proposals?user_id={partnerId})
+ *   - Modifier le téléphone…      (always — Phase 42 follow-up, FIELD-02)
  *
  * Tests cover D-10 conditional visibility, D-11 href shape, a11y (aria-expanded,
  * Escape close), and the click-outside hook.
@@ -35,6 +36,10 @@ vi.mock('@/lib/admin', async (importOriginal) => {
     adminReissueInvitation: vi.fn(),
     // Phase 22 Plan 03: stub the new type-change action.
     adminUpdatePartnerType: vi.fn(),
+    // Phase 42 follow-up (FIELD-02): stub the company-telephone edit action.
+    // MUST be stubbed — the mock spreads ...actual, so an unstubbed export
+    // would load the real server action and reach requireAdmin().
+    adminUpdatePartnerCompanyTelephone: vi.fn(),
   };
 });
 
@@ -63,7 +68,9 @@ describe('PartnerRowActions — D-10 conditional menu items', () => {
     expect(trigger).not.toBeNull();
     fireEvent.click(trigger);
     const items = container.querySelectorAll('[role="menuitem"]');
-    expect(items.length).toBe(4);
+    // Phase 42 follow-up (FIELD-02): 4 -> 5. The company-telephone edit item
+    // is unconditional, so every status gains exactly one item.
+    expect(items.length).toBe(5);
     const labels = Array.from(items).map((i) => (i.textContent ?? '').trim());
     expect(labels.some((l) => l.includes("Renvoyer l'invitation"))).toBe(true);
     expect(labels.some((l) => l.includes('Voir les propositions'))).toBe(true);
@@ -89,7 +96,9 @@ describe('PartnerRowActions — D-10 conditional menu items', () => {
     const trigger = container.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement;
     fireEvent.click(trigger);
     const items = container.querySelectorAll('[role="menuitem"]');
-    expect(items.length).toBe(4);
+    // Phase 42 follow-up (FIELD-02): 4 -> 5. The company-telephone edit item
+    // is unconditional, so every status gains exactly one item.
+    expect(items.length).toBe(5);
     const labels = Array.from(items).map((i) => (i.textContent ?? '').trim());
     expect(labels.some((l) => l.startsWith('Désactiver'))).toBe(true);
     expect(labels.some((l) => l.includes('Voir les propositions'))).toBe(true);
@@ -112,7 +121,9 @@ describe('PartnerRowActions — D-10 conditional menu items', () => {
     const trigger = container.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement;
     fireEvent.click(trigger);
     const items = container.querySelectorAll('[role="menuitem"]');
-    expect(items.length).toBe(4);
+    // Phase 42 follow-up (FIELD-02): 4 -> 5. The company-telephone edit item
+    // is unconditional, so every status gains exactly one item.
+    expect(items.length).toBe(5);
     const labels = Array.from(items).map((i) => (i.textContent ?? '').trim());
     expect(labels.some((l) => l.startsWith('Réactiver'))).toBe(true);
     expect(labels.some((l) => l.includes('Voir les propositions'))).toBe(true);
@@ -180,5 +191,61 @@ describe('PartnerRowActions — D-10 a11y', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(container.querySelectorAll('[role="menuitem"]').length).toBe(0);
+  });
+});
+
+describe('PartnerRowActions — FIELD-02 company-telephone edit item', () => {
+  const baseProps = {
+    partnerId: 'p-1',
+    adminSegment: 'seg',
+    lang: 'fr' as const,
+    partnerEmail: 'alice@example.com',
+    partnerDisplayName: 'Alice Example',
+    partnerType: 'Partenaire' as const,
+  };
+
+  it('renders the edit-phone item for every account status', () => {
+    for (const status of ['active', 'invited', 'inactive'] as const) {
+      const { container, unmount } = render(
+        <PartnerRowActions {...baseProps} status={status} />,
+      );
+      fireEvent.click(container.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement);
+      const labels = Array.from(container.querySelectorAll('[role="menuitem"]')).map(
+        (i) => (i.textContent ?? '').trim(),
+      );
+      expect(
+        labels.some((l) => l.includes('Modifier le téléphone')),
+        `status "${status}" is missing the edit-phone item`,
+      ).toBe(true);
+      unmount();
+    }
+  });
+
+  it('prefills the prompt with the current company telephone', () => {
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue(null);
+    const { container } = render(
+      <PartnerRowActions {...baseProps} status="active" companyTelephone="01 23 45 67 89" />,
+    );
+    fireEvent.click(container.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement);
+    const item = Array.from(container.querySelectorAll('[role="menuitem"]')).find((i) =>
+      (i.textContent ?? '').includes('Modifier le téléphone'),
+    ) as HTMLButtonElement;
+    fireEvent.click(item);
+    expect(promptSpy).toHaveBeenCalledWith(expect.any(String), '01 23 45 67 89');
+    promptSpy.mockRestore();
+  });
+
+  it('passes an empty prefill when the partner has no company telephone', () => {
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue(null);
+    const { container } = render(
+      <PartnerRowActions {...baseProps} status="active" companyTelephone={null} />,
+    );
+    fireEvent.click(container.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement);
+    const item = Array.from(container.querySelectorAll('[role="menuitem"]')).find((i) =>
+      (i.textContent ?? '').includes('Modifier le téléphone'),
+    ) as HTMLButtonElement;
+    fireEvent.click(item);
+    expect(promptSpy).toHaveBeenCalledWith(expect.any(String), '');
+    promptSpy.mockRestore();
   });
 });

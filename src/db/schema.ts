@@ -68,8 +68,16 @@ export const users = pgTable('users', {
   // PTYPE-01: partner type dimension — Agent / Commercial / Partenaire.
   // DEFAULT 'Partenaire' ensures existing rows stay Partenaire on migration (PTYPE-02).
   partnerType: text('partner_type').notNull().default('Partenaire'),
-  // FIELD-02 / D-13: the partner company's telephone. Admin-write-only — set on the
-  // admin "create/edit partner" form (src/lib/admin/schemas.ts), never partner-editable.
+  // FIELD-02 / D-13: the partner company's telephone. Admin-write-only, never
+  // partner-editable (their own line is `telephone` below). Two write paths:
+  //   - set at invitation time on the admin /partners/new form
+  //     (`createPartnerFormSchema.phone` -> adminCreateInvitation)
+  //   - set or CLEARED afterwards via adminUpdatePartnerCompanyTelephone,
+  //     reachable from the ⋯ row menu on the admin partners list.
+  // The second path was added in a Phase 42 follow-up: this comment previously
+  // claimed a "create/edit partner form" that did not exist, so every partner
+  // invited before this column existed rendered an em dash for the Téléphone
+  // row of every PDF proposal with no way to fix it.
   // Nullable by design: every existing account has none, and this column never blocks
   // finalization (an absent value renders as an em dash per Phase 43 DOC-11). No CHECK
   // constraint — phone shape is validated at the Zod layer (optionalPhoneSchema).

@@ -948,6 +948,14 @@ export const dictionaries = {
     'admin.partners.type.change.confirm': 'Changer le type de ce partenaire modifiera l\'économie de ses futures propositions. Les propositions et PDFs déjà sauvegardés restent inchangés. Continuer ?',
     'admin.partners.action.changeType': 'Changer le type',
     'admin.partners.error.type_change': 'Erreur lors du changement de type. Réessayez.',
+    // FIELD-02 follow-up — admin edit of the partner COMPANY's telephone, the
+    // line the PDF proposal renders. Distinct from the partner's own
+    // téléphone, which they set themselves on /parametres.
+    'admin.partners.action.editPhone': 'Modifier le téléphone de la société',
+    'admin.partners.phone.change.prompt': 'Téléphone de la société — il apparaît sur les propositions PDF de ce partenaire. Laissez vide pour l\u2019effacer.',
+    'admin.partners.phone.change.success': 'Téléphone de la société mis à jour.',
+    'admin.partners.phone.change.cleared': 'Téléphone de la société effacé.',
+    'admin.partners.error.phone_change': 'Erreur lors de la mise à jour du téléphone. Réessayez.',
 
     // Coefficients warning banner (UI-SPEC rows 67-69; D-19/D-20)
     'admin.coefficients.warning.body': 'Modifier ces valeurs change le calcul de toutes les futures propositions. Les PDF déjà générés restent inchangés.',
@@ -2287,6 +2295,12 @@ export const dictionaries = {
     'admin.partners.type.change.confirm': "Changing this partner's type will affect the economics of their future proposals. Already saved proposals and PDFs remain frozen. Continue?",
     'admin.partners.action.changeType': 'Change type',
     'admin.partners.error.type_change': 'Error changing partner type. Please try again.',
+    // FIELD-02 follow-up — see the FR block for the company-vs-own distinction.
+    'admin.partners.action.editPhone': 'Edit company phone',
+    'admin.partners.phone.change.prompt': 'Company phone — it appears on this partner\u2019s PDF proposals. Leave empty to clear it.',
+    'admin.partners.phone.change.success': 'Company phone updated.',
+    'admin.partners.phone.change.cleared': 'Company phone cleared.',
+    'admin.partners.error.phone_change': 'Error updating the phone number. Please try again.',
 
     // Coefficients warning banner
     'admin.coefficients.warning.body': 'Changing these values affects calculations for all future proposals. Already-generated PDFs remain unchanged.',
