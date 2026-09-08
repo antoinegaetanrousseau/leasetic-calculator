@@ -48,9 +48,10 @@
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/proposal/PhoneInput';
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoaderIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
@@ -117,6 +118,9 @@ export function CreatePartnerForm({
       companyName: '',
       siret: '',
       phone: '',
+      // Phase 42 Plan 05 (D-19) — the partner's own telephone, controlled
+      // from first render so PhoneInput's Controller binding has a value.
+      telephone: '',
       invitationMessage: '',
     },
   });
@@ -254,6 +258,39 @@ export function CreatePartnerForm({
             )}
           </Field>
 
+          {/* ── telephone (partner's OWN, D-19) ──────────────────────────
+              Genuinely new field this phase adds — Controller-bound
+              PhoneInput (auto-formats), unlike Section 2's plain Input
+              company-phone field below. No required asterisk: the column
+              ships nullable and D-19 frames this as admins proactively
+              filling gaps, not a hard gate on partner creation. */}
+          <Field>
+            <FieldLabel htmlFor="cpf-telephone">
+              {t('partners.new.field.telephone', lang)}
+            </FieldLabel>
+            <Controller
+              control={control}
+              name="telephone"
+              render={({ field }) => (
+                <PhoneInput
+                  inputId="cpf-telephone"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder={t('partners.new.field.telephone.placeholder', lang)}
+                  ariaInvalid={errors.telephone ? true : undefined}
+                  ariaDescribedBy={errors.telephone ? 'cpf-telephone-error' : undefined}
+                  disabled={isSubmitting}
+                />
+              )}
+            />
+            {errors.telephone?.message && (
+              <FieldError id="cpf-telephone-error" role="alert">
+                {t(errors.telephone.message as DictKey, lang)}
+              </FieldError>
+            )}
+          </Field>
+
           {/* ── partnerType selector (PTYPE-01, D-03/D-04) ───────────────── */}
           <Field>
             <FieldLabel htmlFor="cpf-partnerType">
@@ -346,7 +383,6 @@ export function CreatePartnerForm({
           <Field>
             <FieldLabel htmlFor="cpf-phone">
               {t('partners.new.field.phone', lang)}
-              <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
             </FieldLabel>
             {/*
               UI-SPEC §5.1.3 recommends reusing <PhoneInput>. We use a plain
@@ -355,6 +391,9 @@ export function CreatePartnerForm({
               accepts a more permissive 6-20 char range (E.164 / international
               partners). Switching to PhoneInput would over-constrain the
               international case; keeping plain input + the schema regex.
+              Phase 42 Plan 05 (D-13): this IS the company telephone —
+              optional now (no asterisk), maps to users.company_telephone,
+              and never blocks finalization.
             */}
             <Input
               id="cpf-phone"

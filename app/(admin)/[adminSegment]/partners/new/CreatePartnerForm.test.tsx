@@ -86,7 +86,13 @@ function fillRequiredFields() {
   // Select 'Partenaire' to satisfy the required enum validation.
   fireEvent.change(screen.getByLabelText(/Type de partenaire/), { target: { value: 'Partenaire' } });
   fireEvent.input(screen.getByLabelText(/Société/), { target: { value: VALID.companyName } });
-  fireEvent.input(screen.getByLabelText(/Téléphone/), { target: { value: VALID.phone } });
+  // Phase 42 Plan 05: two "Téléphone" fields now exist on the form (company
+  // "Téléphone (société)" in Section 2 and the new personal "Téléphone" in
+  // Section 1) — an unqualified /Téléphone/ regex now matches both and
+  // throws. Target the company field by its exact label text.
+  fireEvent.input(screen.getByLabelText('Téléphone (société)'), {
+    target: { value: VALID.phone },
+  });
 }
 
 beforeEach(() => {
@@ -460,5 +466,135 @@ describe('CreatePartnerForm (D-07 + D-08 + UI-SPEC §5.1)', () => {
     const msg = String(toastErrorMock.mock.calls[0]![0]);
     // Generic error toast — FR "Erreur lors de la création. Réessayez."
     expect(msg).toMatch(/Erreur lors de la création/);
+  });
+
+  // ─── Phase 42 Plan 05 additions (D-13 / D-19 two telephone fields) ───────
+
+  describe('Phase 42 — two telephone fields (D-13 / D-19)', () => {
+    it('renders exactly two phone-ish inputs with differing accessible labels', () => {
+      render(
+        <CreatePartnerForm
+          lang="fr"
+          adminSegment="admin-secret"
+          createPartnerAction={vi.fn()}
+        />,
+      );
+
+      const companyPhone = screen.getByLabelText('Téléphone (société)');
+      const personalPhone = screen.getByLabelText('Téléphone');
+      expect(companyPhone).toBeDefined();
+      expect(personalPhone).toBeDefined();
+      expect(companyPhone).not.toBe(personalPhone);
+      expect(companyPhone.id).toBe('cpf-phone');
+      expect(personalPhone.id).toBe('cpf-telephone');
+    });
+
+    it('the company phone field renders with no required asterisk', () => {
+      render(
+        <CreatePartnerForm
+          lang="fr"
+          adminSegment="admin-secret"
+          createPartnerAction={vi.fn()}
+        />,
+      );
+      const companyPhoneLabel = document.querySelector('label[for="cpf-phone"]');
+      expect(companyPhoneLabel).not.toBeNull();
+      expect(companyPhoneLabel!.textContent).toBe('Téléphone (société)');
+    });
+
+    it('the new personal telephone field renders with no required asterisk', () => {
+      render(
+        <CreatePartnerForm
+          lang="fr"
+          adminSegment="admin-secret"
+          createPartnerAction={vi.fn()}
+        />,
+      );
+      const personalPhoneLabel = document.querySelector('label[for="cpf-telephone"]');
+      expect(personalPhoneLabel).not.toBeNull();
+      expect(personalPhoneLabel!.textContent).toBe('Téléphone');
+    });
+
+    it('the new telephone field renders inside Section 1, between email and partnerType', () => {
+      render(
+        <CreatePartnerForm
+          lang="fr"
+          adminSegment="admin-secret"
+          createPartnerAction={vi.fn()}
+        />,
+      );
+      const form = document.querySelector('form')!;
+      const ids = Array.from(form.querySelectorAll('input, select')).map((el) => el.id);
+      const emailIdx = ids.indexOf('cpf-email');
+      const telephoneIdx = ids.indexOf('cpf-telephone');
+      const partnerTypeIdx = ids.indexOf('cpf-partnerType');
+      expect(emailIdx).toBeGreaterThanOrEqual(0);
+      expect(telephoneIdx).toBeGreaterThan(emailIdx);
+      expect(partnerTypeIdx).toBeGreaterThan(telephoneIdx);
+    });
+
+    it('submitting with both phone fields blank succeeds — no validation block, action invoked', async () => {
+      const createPartnerAction = vi.fn().mockResolvedValue({
+        ok: true,
+        url: 'https://app/invite/blank-phones',
+        kind: 'invite',
+      });
+
+      render(
+        <CreatePartnerForm
+          lang="fr"
+          adminSegment="admin-secret"
+          createPartnerAction={createPartnerAction}
+        />,
+      );
+
+      // Fill everything EXCEPT the two phone fields (both left blank).
+      fireEvent.input(screen.getByLabelText(/Prénom/), { target: { value: VALID.firstName } });
+      fireEvent.input(screen.getByLabelText(/^Nom/), { target: { value: VALID.lastName } });
+      fireEvent.input(screen.getByLabelText(/^Email/), { target: { value: VALID.email } });
+      fireEvent.change(screen.getByLabelText(/Type de partenaire/), {
+        target: { value: 'Partenaire' },
+      });
+      fireEvent.input(screen.getByLabelText(/Société/), { target: { value: VALID.companyName } });
+
+      fireEvent.submit(screen.getByRole('button', { name: /Envoyer l'invitation/ }).closest('form')!);
+
+      await waitFor(() => {
+        expect(createPartnerAction).toHaveBeenCalledTimes(1);
+      });
+      const payload = createPartnerAction.mock.calls[0]![0];
+      expect(payload.phone === '' || payload.phone === undefined).toBe(true);
+      expect(payload.telephone === '' || payload.telephone === undefined).toBe(true);
+    });
+
+    it('submitting with both phone fields filled calls the action with both values', async () => {
+      const createPartnerAction = vi.fn().mockResolvedValue({
+        ok: true,
+        url: 'https://app/invite/both-phones',
+        kind: 'invite',
+      });
+
+      render(
+        <CreatePartnerForm
+          lang="fr"
+          adminSegment="admin-secret"
+          createPartnerAction={createPartnerAction}
+        />,
+      );
+
+      fillRequiredFields();
+      fireEvent.input(screen.getByLabelText('Téléphone'), {
+        target: { value: '0612345678' },
+      });
+
+      fireEvent.submit(screen.getByRole('button', { name: /Envoyer l'invitation/ }).closest('form')!);
+
+      await waitFor(() => {
+        expect(createPartnerAction).toHaveBeenCalledTimes(1);
+      });
+      const payload = createPartnerAction.mock.calls[0]![0];
+      expect(payload.phone).toBe(VALID.phone);
+      expect(payload.telephone).toBe('06 12 34 56 78');
+    });
   });
 });
