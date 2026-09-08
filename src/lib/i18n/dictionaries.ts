@@ -478,10 +478,63 @@ export const dictionaries = {
     'pdf.project.ref.prefix': 'Réf. partenaire\u202f:',
     'pdf.computed.coefficient.label': 'Coefficient appliqué',
     'pdf.loyer.label': 'LOYER MENSUEL HT',
-    'pdf.loyer.subtext': 'sur {0} mois',
+    'pdf.loyer.subtext': 'sur {0} mois, hors taxes',
     'pdf.loyer.on.demand': 'Sur demande',
-    'pdf.validity.caption': "Proposition valable jusqu\u2019au {0} ({1} jours), sous réserve de l\u2019accord du comité des engagements de Leasetic. Document non contractuel.",
+    'pdf.validity.caption': "Proposition valable jusqu\u2019au {0} ({1} jours), sous réserve de l\u2019accord du comité des engagements de Leasetic. Document non contractuel. Les loyers sont exprimés hors taxes et hors prestations annexes. Le coefficient appliqué est susceptible d\u2019évoluer en cas de modification du montant financé, de la durée ou des conditions de marché à la date de mise en loyer.",
     'pdf.footer.left': 'N° {0} · Créée le {1}',
+
+    // Phase 43 — Claude Design layout copy (DOC-01, DOC-02, DOC-05, DOC-07, DOC-08), sourced
+    // verbatim from Quote-FR-A.dc.html, grouped by section in the design's document order.
+    // Header (DOC-01)
+    'pdf.header.proposition.eyebrow': 'PROPOSITION N°',
+    'pdf.header.issued': 'Établie le {0}',
+    // Title and pills (DOC-01)
+    'pdf.pill.partnerRef': 'Réf. partenaire · {0}',
+    'pdf.pill.term': '{0} mois',
+    // Client card (DOC-02)
+    'pdf.card.client.title': 'SOCIÉTÉ CLIENTE',
+    'pdf.card.client.siren': 'SIREN',
+    'pdf.card.client.siret': 'SIRET',
+    'pdf.card.client.recipient': 'Destinataire',
+    'pdf.card.client.role': 'Fonction',
+    'pdf.card.client.phone': 'Téléphone',
+    'pdf.card.client.email': 'Email',
+    // Contact card (DOC-03, D-04 partner-first order — row LABELS keep the design's wording,
+    // only the block ORDER inverts; card title stays VOTRE CONTACT / YOUR CONTACT)
+    'pdf.card.contact.title': 'VOTRE CONTACT',
+    'pdf.card.contact.salesRep': 'Commercial',
+    'pdf.card.contact.partnerPhone': 'Téléphone',
+    // pdf.card.contact.advisorName has no design source: D-04 demotes the advisor's name from
+    // the design's 11pt headline to a key/value row, and a row needs a label. Wording matches
+    // the vocabulary Phase 42 shipped at admin.advisor.hero.title ('Conseiller Leasetic').
+    'pdf.card.contact.advisorName': 'Conseiller',
+    'pdf.card.contact.advisorRole': 'Fonction',
+    'pdf.card.contact.advisorPhone': 'Téléphone',
+    'pdf.card.contact.advisorEmail': 'Email',
+    // Financial table (DOC-05) — the "Coefficient appliqué" row reuses the existing
+    // pdf.computed.coefficient.label above; not redeclared here.
+    'pdf.table.title': 'CONDITIONS FINANCIÈRES',
+    'pdf.table.amount': 'Montant financé HT',
+    'pdf.table.term': 'Durée de location',
+    'pdf.table.monthlyRent': 'Loyer mensuel HT',
+    'pdf.table.total': 'Total des loyers HT',
+    // Conditions (DOC-06) — the paragraph itself is the re-valued pdf.validity.caption above
+    'pdf.conditions.title': 'CONDITIONS',
+    // Acceptance block (DOC-07)
+    'pdf.acceptance.title': 'ACCEPTATION DU CLIENT',
+    'pdf.acceptance.note': "Bon pour accord — signature et cachet de l\u2019entreprise",
+    'pdf.acceptance.place': 'Fait à',
+    'pdf.acceptance.date': 'Le',
+    'pdf.acceptance.signatory': 'Nom et qualité du signataire',
+    'pdf.acceptance.signature': 'Signature',
+    'pdf.acceptance.stamp': "Cachet de l\u2019entreprise",
+    // Legal footer (DOC-08) — the design renders the brand word in navy semibold and the rest
+    // in teal, so the first line is two nodes and therefore two keys.
+    'pdf.footer.legal.brand': 'Leasetic',
+    'pdf.footer.legal.rest':
+      ' — SAS, société par actions simplifiée · 63 chemin des Arnis, 31130 Balma',
+    'pdf.footer.legal.line2':
+      'SIREN 830 733 606 · SIRET (siège) 830 733 606 00040 · TVA FR06830733606',
 
     // Phase 42 — partnerType FR/EN label pairs, PDF-only per D-16. The admin and /parametres
     // surfaces deliberately keep rendering the raw partnerType string (D-16 explicitly declines
@@ -1785,18 +1838,71 @@ export const dictionaries = {
     // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
     //     5 v10 keys reused per §7.9)
     'pdf.tagline': 'IT financial leasing',
-    'pdf.title': 'Financial lease proposal',
+    'pdf.title': 'Equipment lease financing proposal',
     'pdf.ref.label': 'No.',
     'pdf.section.project': 'PROJECT',
     'pdf.section.interests': 'POINTS OF INTEREST IDENTIFIED:',
     'pdf.project.placeholder': 'Project not specified',
     'pdf.project.ref.prefix': 'Partner ref.:',
     'pdf.computed.coefficient.label': 'Applied coefficient',
-    'pdf.loyer.label': 'MONTHLY RENT (EX-VAT)',
-    'pdf.loyer.subtext': 'over {0} months',
+    'pdf.loyer.label': 'MONTHLY RENT EXCL. VAT',
+    'pdf.loyer.subtext': 'over {0} months, excl. taxes',
     'pdf.loyer.on.demand': 'On request',
-    'pdf.validity.caption': "Proposal valid until {0} ({1} days), subject to approval by Leas\u00e9tic's credit committee. Non-contractual document.",
+    'pdf.validity.caption': "This proposal is valid until {0} ({1} days), subject to approval by Leasetic\u2019s credit committee. Non-contractual document. Rents are stated excluding taxes and excluding ancillary services. The applied coefficient may change if the financed amount, the term, or market conditions at the lease start date change.",
     'pdf.footer.left': 'No. {0} \u00b7 Created on {1}',
+
+    // Phase 43 — Claude Design layout copy (DOC-01, DOC-02, DOC-05, DOC-07, DOC-08), sourced
+    // verbatim from Quote-EN-A.dc.html, grouped by section in the design's document order.
+    // Header (DOC-01)
+    'pdf.header.proposition.eyebrow': 'PROPOSAL NO.',
+    'pdf.header.issued': 'Issued {0}',
+    // Title and pills (DOC-01)
+    'pdf.pill.partnerRef': 'Partner ref. · {0}',
+    'pdf.pill.term': '{0} months',
+    // Client card (DOC-02)
+    'pdf.card.client.title': 'CLIENT COMPANY',
+    'pdf.card.client.siren': 'SIREN',
+    'pdf.card.client.siret': 'SIRET',
+    'pdf.card.client.recipient': 'Recipient',
+    'pdf.card.client.role': 'Role',
+    'pdf.card.client.phone': 'Phone',
+    'pdf.card.client.email': 'Email',
+    // Contact card (DOC-03, D-04 partner-first order — row LABELS keep the design's wording,
+    // only the block ORDER inverts; card title stays VOTRE CONTACT / YOUR CONTACT)
+    'pdf.card.contact.title': 'YOUR CONTACT',
+    'pdf.card.contact.salesRep': 'Sales rep',
+    'pdf.card.contact.partnerPhone': 'Phone',
+    // pdf.card.contact.advisorName has no design source: D-04 demotes the advisor's name from
+    // the design's 11pt headline to a key/value row, and a row needs a label. Wording matches
+    // the vocabulary Phase 42 shipped at admin.advisor.hero.title ('Leasetic advisor').
+    'pdf.card.contact.advisorName': 'Advisor',
+    'pdf.card.contact.advisorRole': 'Role',
+    'pdf.card.contact.advisorPhone': 'Phone',
+    'pdf.card.contact.advisorEmail': 'Email',
+    // Financial table (DOC-05) — the "Applied coefficient" row reuses the existing
+    // pdf.computed.coefficient.label above; not redeclared here.
+    'pdf.table.title': 'FINANCIAL TERMS',
+    'pdf.table.amount': 'Financed amount excl. VAT',
+    'pdf.table.term': 'Lease term',
+    'pdf.table.monthlyRent': 'Monthly rent excl. VAT',
+    'pdf.table.total': 'Total rents excl. VAT',
+    // Conditions (DOC-06) — the paragraph itself is the re-valued pdf.validity.caption above
+    'pdf.conditions.title': 'CONDITIONS',
+    // Acceptance block (DOC-07)
+    'pdf.acceptance.title': 'CLIENT ACCEPTANCE',
+    'pdf.acceptance.note': 'Agreed and accepted — company signature and stamp',
+    'pdf.acceptance.place': 'Place',
+    'pdf.acceptance.date': 'Date',
+    'pdf.acceptance.signatory': 'Name and role of signatory',
+    'pdf.acceptance.signature': 'Signature',
+    'pdf.acceptance.stamp': 'Company stamp',
+    // Legal footer (DOC-08) — the design renders the brand word in navy semibold and the rest
+    // in teal, so the first line is two nodes and therefore two keys.
+    'pdf.footer.legal.brand': 'Leasetic',
+    'pdf.footer.legal.rest':
+      ' — SAS, société par actions simplifiée · 63 chemin des Arnis, 31130 Balma, France',
+    'pdf.footer.legal.line2':
+      'SIREN 830 733 606 · SIRET (registered office) 830 733 606 00040 · VAT FR06830733606',
 
     // Phase 42 — partnerType FR/EN label pairs, PDF-only per D-16. The admin and /parametres
     // surfaces deliberately keep rendering the raw partnerType string (D-16 explicitly declines
