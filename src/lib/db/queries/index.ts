@@ -49,6 +49,10 @@ export type {
 export { listPartnersWithCounts } from './users';
 export type { PartnerWithCount } from './users';
 
+// Phase 42 Plan 06 — the single Leasetic advisor identity (PROF-03, D-07/D-08/D-09).
+export { getAdvisor, upsertAdvisor, ADVISOR_ROW_ID } from './advisor';
+export type { UpsertAdvisorArgs } from './advisor';
+
 export { writeAuditLog } from './audit-log';
 export type { AuditAction, AuditTargetType, WriteAuditLogArgs } from './audit-log';
 
