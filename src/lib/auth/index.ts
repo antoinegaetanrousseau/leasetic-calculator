@@ -170,6 +170,18 @@ function createAuth() {
         // mutate their own type via /api/auth/update-user (T-22-01-E privilege-escalation
         // mitigation). Type changes are admin-only server actions (Plan 22-03).
         partnerType: { type: 'string', required: false, defaultValue: 'Partenaire', input: false },
+        // FIELD-02 / D-13: the partner company's telephone. Admin-set only (on the
+        // admin partner form), never partner-editable. input: false is what makes
+        // D-13's "admin-set, not partner-editable" rule structural rather than a
+        // form-layer check someone can forget — Better Auth rejects this field at
+        // /api/auth/update-user at the framework level, the same mechanism that
+        // already protects partnerType and role from self-elevation (T-42-04-A).
+        // No defaultValue: the column is nullable.
+        companyTelephone: { type: 'string', required: false, input: false },
+        // PROF-01 / D-19: the partner's own telephone. Partner-writable — /parametres
+        // writes it via authClient.updateUser({ telephone }). No defaultValue: the
+        // column is nullable.
+        telephone: { type: 'string', required: false, input: true },
       },
     },
 
