@@ -15,10 +15,19 @@ proposal into it.
 
 ### Document — the redesigned PDF
 
+> **Scope reconciled 2026-09-08 (Phase 41 discussion — `41-CONTEXT.md` D-02 / D-04).** DOC-09 is
+> narrowed to a font-family swap: the design's ten-step type scale (6.8 … 21pt) moves to DOC-01 /
+> Phase 43, where the card geometry that gives a 6.8pt caption a reason to exist also lands.
+> Inter Tight is not committed in Phase 41 (D-04) — neither `Quote-FR-A.dc.html` nor
+> `Quote-EN-A.dc.html` references it. Authority: `.planning/phases/41-typography-migration/41-CONTEXT.md`.
+
 - [ ] **DOC-01**: A partner generating a proposal gets a single-page A4 PDF matching the design
   spec's header band — `leasetic-lockup-color` logo left, `PROPOSITION N°` eyebrow + reference +
   `Établie le {date}` right, a 2px `#112C3B` rule beneath — followed by the 21pt two-line title,
-  the project description, and the `Réf. partenaire` / term pills.
+  the project description, and the `Réf. partenaire` / term pills. Every text node uses the
+  design's ten-step type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt) — relocated
+  here from DOC-09 by the Phase 41 D-02 amendment, since the scale only has meaning alongside
+  this layout.
 - [ ] **DOC-02**: The PDF shows a `SOCIÉTÉ CLIENTE` card listing the client company name, SIREN,
   SIRET, destinataire, fonction, téléphone and email in the design's two-column key/value grid.
 - [ ] **DOC-03**: The PDF shows a `VOTRE CONTACT` card listing the advisor's name, fonction,
@@ -38,9 +47,10 @@ proposal into it.
 - [ ] **DOC-08**: The PDF shows a legal footer carrying the Leasetic company registration line
   (SAS, address, SIREN, SIRET, TVA) with the proposal reference, page number and the 14%-opacity
   icon mark on the right.
-- [ ] **DOC-09**: The PDF renders in Inter at the design's type scale (6.8 / 7.5 / 8 / 8.5 / 9 /
-  9.5 / 10 / 11 / 13 / 21pt), replacing Plus Jakarta Sans, with no missing-glyph or
-  font-registration failure in any rendered proposal.
+- [ ] **DOC-09**: The PDF renders in Inter, replacing Plus Jakarta Sans, with no missing-glyph or
+  font-registration failure in any rendered proposal. *(Narrowed 2026-09-08 by Phase 41 D-02: the
+  design's ten-step type scale moved to DOC-01 / Phase 43. Phase 41 keeps today's `pdfFontSizes`
+  — 8 / 9 / 10 / 22 / 32pt — untouched per D-01.)*
 - [ ] **DOC-10**: A proposal whose committed language is English renders the English variant —
   every label and the full legal conditions paragraph — per `Quote-EN-A.dc.html`.
 - [ ] **DOC-11**: A field with no captured value renders its label followed by an em dash, so card
@@ -99,6 +109,13 @@ proposal into it.
   this milestone changes presentation and captured metadata only.
 - **Removing the commission-invisibility rule** — non-negotiable, and DOC-12 pins it.
 - **Retiring `proposals.language`** — the PDF stays bilingual, so the column keeps driving rendering.
+- **The design's ten-step type scale inside Phase 41** — Phase 41 is a font-family swap only
+  (D-01 / D-02). Introducing the scale there would make the byte-determinism delta "font + scale",
+  so a regression could not be attributed to either. It ships with DOC-01 in Phase 43.
+- **Inter Tight anywhere in v1.9** — Phase 41 commits four static Inter TTFs only (D-04). Inter
+  Tight is the design system's display face for the web app, not the document's; if Phase 43's
+  header lockup proves it needs a display cut, Phase 43 commits it in the same phase that proves
+  it renders.
 
 ### Rule lifted by this milestone
 
