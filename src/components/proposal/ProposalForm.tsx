@@ -44,12 +44,27 @@ export function ProposalFormProvider({
     defaultValues: {
       partnerCo: prefill?.partnerCo ?? '',
       partnerName: prefill?.partnerName ?? '',
+      // Phase 42 Plan 09 (FIELD-02 / D-11): partnerTel is never rendered as
+      // an input (same hidden-field discipline as partnerCo/partnerName
+      // above), but it MUST still be part of RHF's tracked values — the
+      // wizard's save actions persist form.getValues() verbatim
+      // (WizardStep1Wiring.tsx), so a value missing from defaultValues here
+      // would be silently dropped on the very next save-as-draft or
+      // save-and-advance, discarding whatever the D-25/D-30 overlay wrote.
+      // Rule 2 auto-fix (see SUMMARY).
+      partnerTel: prefill?.partnerTel ?? '',
       clientCo: prefill?.clientCo ?? '',
       clientName: prefill?.clientName ?? '',
       clientRole: prefill?.clientRole ?? '',
       clientTel: prefill?.clientTel ?? '',
       clientEmail: prefill?.clientEmail ?? '',
       clientSiren: prefill?.clientSiren ?? '',
+      // Phase 42 Plan 09 (FIELD-01 / D-04): without this key, RHF's
+      // useForm defaultValues never sees clientSiret, so the Controller-bound
+      // SiretInput in ParametresFormCard falls back to field.value ?? ''
+      // regardless of what page.tsx's prefill carries — the resume path
+      // would silently lose a typed SIRET. Rule 2 auto-fix (see SUMMARY).
+      clientSiret: prefill?.clientSiret ?? '',
       slb: prefill?.slb ?? undefined,
       evalParc: prefill?.evalParc ?? undefined,
       amountHT: prefill?.amountHT ?? '',

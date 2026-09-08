@@ -101,10 +101,19 @@ export default async function ParametresStep1Page({
     displayName?: string | null;
     name?: string | null;
     companyName?: string | null;
+    companyTelephone?: string | null;
   };
   const nameFallback = u.displayName?.trim() || u.name?.trim() || u.email;
   const partnerName = nameFallback;
   const partnerCo = u.companyName?.trim() || nameFallback;
+  // Phase 42 Plan 09 (FIELD-02 / D-11): unlike companyName, companyTelephone
+  // WAS registered as a Better Auth additionalField in the same phase that
+  // added the column (Plan 42-04) — session.user.companyTelephone is
+  // authoritative and needs no displayName → name → email style fallback
+  // chain. An absent value is a real absence, not a read failure, and it
+  // resolves to '' — D-13 requires that an account with no company
+  // telephone never blocks anything.
+  const partnerTel = u.companyTelephone?.trim() || '';
 
   // D-08: validityDays resolved server-side; fallback 30 if the admin
   // hasn't seeded global_params yet or has set a value outside the whitelist.
@@ -252,9 +261,19 @@ export default async function ParametresStep1Page({
     projectDesc: (inputs.projectDesc as string | undefined) ?? '',
     slb: inputs.slb as boolean | undefined,
     evalParc: inputs.evalParc as boolean | undefined,
+    // Phase 42 Plan 09 (FIELD-01 / D-04): clientSiret is client data typed by
+    // the partner, so it round-trips from the stored draft on resume, same
+    // discipline as clientSiren beside it.
+    clientSiret: (inputs.clientSiret as string | undefined) ?? '',
     // Session-hydrated / server-resolved (NEVER user-editable)
+    // Phase 42 Plan 09 (FIELD-02 / D-11): partnerTel joins partnerName /
+    // partnerCo here, not the read-from-draft group above — it must be
+    // resolved from the session on every render so a stale stored value is
+    // overwritten by the current one, the same D-07 lock already applied to
+    // the two fields beside it.
     partnerName,
     partnerCo,
+    partnerTel,
     validityDays: defaultValidityDays,
   };
 

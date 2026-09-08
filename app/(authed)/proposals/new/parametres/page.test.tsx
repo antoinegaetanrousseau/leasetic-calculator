@@ -11,7 +11,7 @@
  * target via the thrown error message.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 
 vi.mock('server-only', () => ({}));
 
@@ -551,5 +551,178 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
     // The mock placeholder "1 200 €" used as an example commission value must
     // also be absent.
     expect(container.innerHTML).not.toMatch(/1\s*200\s*€/);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// Phase 42 Plan 09 (FIELD-02 / D-11 / D-13, FIELD-01 / D-04):
+// partnerTel session hydration + clientSiret resume prefill.
+// ──────────────────────────────────────────────────────────────────────────
+describe('Phase 42 — partnerTel hydration + clientSiret resume (D-11 / FIELD-01)', () => {
+  // partnerTel is deliberately never rendered as a visible input (D-11), so
+  // it cannot be asserted via a DOM query. It IS still tracked in RHF's form
+  // state (ProposalForm.tsx defaultValues), so it survives a save-as-draft
+  // round trip — verified here by clicking "Enregistrer comme brouillon".
+  // WizardStep1Wiring's onSaveDraft calls the real saveAsDraftAction (this
+  // suite's saveAsDraftMock is bound at a module id under src/ that the
+  // action's real app/ relative import never resolves to — a pre-existing,
+  // unrelated test-mock gap, not something this plan introduces or fixes),
+  // which in turn calls the correctly-mocked `updateDraft` with the RHF
+  // form's live values as `inputs` — the same signal this plan cares about.
+  async function clickSaveDraftAndGetInputs(
+    tree: Awaited<ReturnType<typeof ParametresStep1Page>>,
+  ) {
+    const { getByText } = render(tree);
+    fireEvent.click(getByText(/Enregistrer comme brouillon/));
+    await waitFor(() => expect(updateDraftMock).toHaveBeenCalled());
+    const lastCall = updateDraftMock.mock.calls[
+      updateDraftMock.mock.calls.length - 1
+    ] as [string, string, { inputs: Record<string, unknown> }];
+    return lastCall[2].inputs;
+  }
+
+  it('with session.user.companyTelephone set, saving as draft persists partnerTel from the session', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: USER_ID,
+          email: 'partner@example.com',
+          displayName: 'Alice Partner',
+          name: 'Alice',
+          companyName: 'Acme Leasing',
+          companyTelephone: '01 23 45 67 89',
+        },
+      },
+    });
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      inputs: { _completedSteps: [] },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const inputs = await clickSaveDraftAndGetInputs(tree);
+    expect(inputs.partnerTel).toBe('01 23 45 67 89');
+  });
+
+  it('with companyTelephone null, saving as draft persists partnerTel: "" and the page still renders', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: USER_ID,
+          email: 'partner@example.com',
+          displayName: 'Alice Partner',
+          name: 'Alice',
+          companyName: 'Acme Leasing',
+          companyTelephone: null,
+        },
+      },
+    });
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      inputs: { _completedSteps: [] },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const inputs = await clickSaveDraftAndGetInputs(tree);
+    expect(inputs.partnerTel).toBe('');
+  });
+
+  it('with companyTelephone whitespace-only "   ", saving as draft persists partnerTel: ""', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: USER_ID,
+          email: 'partner@example.com',
+          displayName: 'Alice Partner',
+          name: 'Alice',
+          companyName: 'Acme Leasing',
+          companyTelephone: '   ',
+        },
+      },
+    });
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      inputs: { _completedSteps: [] },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const inputs = await clickSaveDraftAndGetInputs(tree);
+    expect(inputs.partnerTel).toBe('');
+  });
+
+  it('a stored inputs.partnerTel differing from the session value does not survive into the prefill — session wins', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: USER_ID,
+          email: 'partner@example.com',
+          displayName: 'Alice Partner',
+          name: 'Alice',
+          companyName: 'Acme Leasing',
+          companyTelephone: '01 23 45 67 89',
+        },
+      },
+    });
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      inputs: { partnerTel: '09 99 99 99 99', _completedSteps: [] },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const inputs = await clickSaveDraftAndGetInputs(tree);
+    expect(inputs.partnerTel).toBe('01 23 45 67 89');
+    expect(inputs.partnerTel).not.toBe('09 99 99 99 99');
+  });
+
+  it('resuming a draft whose inputs.clientSiret is "12345678900012" produces a prefill containing that value', async () => {
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      inputs: { clientSiret: '12345678900012', _completedSteps: [] },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const { container } = render(tree);
+    const clientSiretInput = container.querySelector(
+      '#client-siret',
+    ) as HTMLInputElement | null;
+    expect(clientSiretInput?.value).toBe('12345678900012');
+  });
+
+  it('resuming a draft with no clientSiret key produces clientSiret: "" and does not throw', async () => {
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      inputs: { _completedSteps: [] },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const { container } = render(tree);
+    const clientSiretInput = container.querySelector(
+      '#client-siret',
+    ) as HTMLInputElement | null;
+    expect(clientSiretInput?.value ?? '').toBe('');
   });
 });
