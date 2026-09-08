@@ -769,10 +769,18 @@ Plans:
 **Requirements:** DOC-09
 **Success Criteria** (what must be TRUE):
 
-  1. Every text node in a generated proposal PDF (FR and EN, every partner type) renders in Inter at the design's type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), with Plus Jakarta Sans fully retired from the PDF font-registration path.
+  1. Every text node in a generated proposal PDF (FR and EN, every partner type) renders in Inter, with Plus Jakarta Sans fully retired from the PDF font-registration path and its nine committed binaries deleted from `public/fonts/`.
   2. No proposal PDF renders a missing-glyph/tofu character or throws a font-registration error.
-  3. The Inter and Inter Tight TTF files are committed into the repo as self-hosted assets (not remote-linked) — acquired from the design bundle's source handoff, since only the token CSS and SVGs were vendored into `.planning/assets/v1.9-quote-design/`.
-  4. The PDF's visual design, palette and content stay exactly as they are today — this phase touches font registration only — and the byte-determinism fixture is regenerated to reflect the font swap so CI stays green.**Plans:** 3 plans (2 waves)
+  3. The four static Inter TTF files (weights 400 / 500 / 600 / 700) are committed into the repo as self-hosted assets (not remote-linked), acquired from the upstream `rsms/inter` tagged release `v4.1` and pinned by SHA-256 — the design bundle vendored only token CSS and SVGs into `.planning/assets/v1.9-quote-design/`, so the binaries are acquired separately.
+  4. The PDF's visual design, palette and content stay exactly as they are today — this phase touches font registration only — and the byte-determinism fixture is regenerated to reflect the font swap so CI stays green.
+
+> **Criteria 1 and 3 reconciled 2026-09-08** (Phase 41 discussion — `41-CONTEXT.md` D-02 / D-04,
+> executed by Plan 41-01). Criterion 1 previously demanded the design's ten-step type scale while
+> criterion 4 forbade any visual change; the type-scale clause moved to REQUIREMENTS `DOC-01` and
+> Phase 43 criterion 6. Criterion 3 previously asked for a second, display-weight typeface
+> that neither design file references (D-04).
+
+**Plans:** 3 plans (2 waves)
 
 **Wave 1**
 
@@ -812,6 +820,7 @@ Plans:
   3. A proposal whose committed `language` is English renders every label and the full legal paragraph from `Quote-EN-A.dc.html`; a French proposal renders `Quote-FR-A.dc.html`'s text — both from the same document component.
   4. A field with no captured value — including SIRET/partner phone on proposals finalized before Phase 42, and advisor role/phone on any proposal — renders its label followed by an em dash rather than blank space or a thrown error, so every card keeps identical geometry regardless of which fields a given proposal carries.
   5. No commission figure, rate or derived value appears anywhere in the rendered PDF, in either language, for any partner type (the existing 20-gate `tests/admin-09-grep-contracts.test.ts` suite and `src/lib/pdf/no-commission.test.ts` stay green); and re-rendering the same proposal twice produces byte-identical PDFs, with the committed fixture at `__pdf-fixtures__/expected.sha256.txt` regenerated via `scripts/update-pdf-fixture.ts` to reflect the new design.
+  6. Every text node uses the design's ten-step type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), replacing the five-role scale Phase 41 deliberately froze (`pdfFontSizes` at 8 / 9 / 10 / 22 / 32pt) — relocated here from Phase 41 by the D-02 amendment.
 
 **Plans:** TBD
 **UI hint:** yes
@@ -893,4 +902,4 @@ Plans:
 
 *Updated 2026-09-07 — v1.8 (Deferred Items) SHIPPED: 5 phases (36-40), 26 plans, 62 tasks, 24/24 requirements. Audit `milestones/v1.8-MILESTONE-AUDIT.md` — status `tech_debt`, no blockers; one live defect (WR-07) and the OVH cutover (OPS-03) carry into v1.9 as tracked todos. Phase details archived to `milestones/v1.8-ROADMAP.md`. Next: `/gsd-new-milestone`.*
 
-*Updated 2026-09-08 — v1.9 (PDF Proposal Redesign) ROADMAP created: 4 phases (41-44), 24/24 requirements mapped, 100% coverage. Sequencing: Phase 41 (font, isolated) -> Phase 42 (new fields + advisor profile, independent of 41) -> Phase 43 (full layout, depends on 41+42, carries DOC-12/DOC-13 as finishing gates) -> Phase 44 (backfill, last, irreversible, depends on 43). Next: `/gsd-plan-phase 41`.*
+*Updated 2026-09-08 — v1.9 (PDF Proposal Redesign) ROADMAP created: 4 phases (41-44), 24/24 requirements mapped, 100% coverage. Sequencing: Phase 41 (font, isolated) -> Phase 42 (new fields + advisor profile, independent of 41) -> Phase 43 (full layout, depends on 41+42, carries DOC-12/DOC-13 as finishing gates) -> Phase 44 (backfill, last, irreversible, depends on 43). Next: `/gsd-plan-phase 41`. Amended 2026-09-08 by Plan 41-01: Phase 41 criteria 1 and 3 reconciled to a font-family-only swap (D-02 / D-04); the ten-step type scale relocated to Phase 43 criterion 6 and REQUIREMENTS DOC-01.*
