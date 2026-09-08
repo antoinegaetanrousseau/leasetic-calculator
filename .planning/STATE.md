@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T19:13:13.592Z"
+last_updated: "2026-09-08T19:31:06.297Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 2
   total_plans: 21
-  completed_plans: 14
+  completed_plans: 15
   percent: 8
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 43 (New PDF Layout) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-09-08
 
@@ -531,6 +531,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 42 P10 | ~35min | 3 tasks | 7 files |
 | Phase 42 P04 | ~8min | 2 tasks | 6 files |
 | Phase 43 P01 | ~5min | 2 tasks | 3 files |
+| Phase 43 P02 | 14min | 2 tasks | 3 files |
 
 ## Decisions
 
@@ -742,6 +743,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 42-04]: Migration gate covering only the production Neon branch is insufficient once additionalFields are involved — every branch in use (main, development, preview) needs the migration before code registering new columns is exercised against it; development was unmigrated and broke localhost login post-deploy, fixed via DB Migrate run 34250717059; preview remains unmigrated, flagged for Phases 43/44
 - [Phase 43]: D-03 retraction executed: DOC-03's fonction-translation clause removed as a category error (users.partnerType FR/EN pairs applied to unrelated free-text leasetic_advisor.fonction column); D-04 restructure note preserved
 - [Phase 43]: Orphaned pdf.partnerType.* keys kept and annotated (not deleted) per Deferred Ideas -- partnerType translation on web surfaces is a live later decision; disposition executed by plan 43-03
+- [Phase 43]: D-07 verdict: react-pdf 4.5.1 honours rotate(-90 cx cy); pre-applied rx/ry swap used anyway per plan framing (correct either way)
+- [Phase 43]: Rule 1 fix: style={{opacity}} on react-pdf Svg is a silent no-op (4.5.1); LeaseticIcon now passes opacity as a direct Svg attribute
 
 ### Blockers
 
