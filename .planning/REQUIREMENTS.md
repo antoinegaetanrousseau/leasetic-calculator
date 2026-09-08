@@ -70,7 +70,7 @@ proposal into it.
 
 - [ ] **FIELD-01**: A partner filling the proposal wizard must supply the client's SIRET, validated
   as 14 digits, before the proposal can be finalized.
-- [ ] **FIELD-02**: The partner company's telephone is held on the partner account (admin-set) and
+- [x] **FIELD-02**: The partner company's telephone is held on the partner account (admin-set) and
   carried onto every proposal's immutable `inputs` at draft creation. *(Restated 2026-09-08 by Phase 42 D-15 / D-11 / D-13:
   it is not a wizard field, and it never blocks finalization — the
   column ships nullable and an absent value renders as an em dash under DOC-11.)*
@@ -79,17 +79,17 @@ proposal into it.
 
 ### Profile — advisor identity
 
-- [ ] **PROF-01**: A partner can set their own telephone on their account and sees their fonction,
+- [x] **PROF-01**: A partner can set their own telephone on their account and sees their fonction,
   name and email on the settings page; fonction is read-only. *(Restated 2026-09-08 by Phase 42 D-20 / D-14:
   "can set their fonction" is dropped — fonction is `users.partnerType`, admin-assigned
   and client-immutable by `input: false`.)*
-- [ ] **PROF-02**: A partner whose account is missing a telephone is stopped at proposal
+- [x] **PROF-02**: A partner whose account is missing a telephone is stopped at proposal
   finalization with a message naming the telephone field and linking to `/parametres`. *(Restated 2026-09-08 by Phase 42 D-21 / D-14:
   narrowed from the prior wording pairing fonction with telephone — `partner_type`
   is NOT NULL so fonction can never be the missing thing. The "fixed once, never re-prompted per
   proposal" clause is dropped as a behaviour to build: it follows automatically from a check that
   reads the account.)*
-- [ ] **PROF-03**: A finalized proposal's **partner** block is sourced from the authenticated
+- [x] **PROF-03**: A finalized proposal's **partner** block is sourced from the authenticated
   creating user's account rather than retyped per proposal; its **advisor** block is sourced from
   a single admin-editable Leasetic advisor setting (name, fonction, telephone, email) read live at
   render time and never snapshotted into `inputs`. *(Restated 2026-09-08 by Phase 42 D-22 / D-06 /
@@ -161,11 +161,11 @@ proposal into it.
 | DOC-12 | Phase 43 — New PDF Layout | Pending |
 | DOC-13 | Phase 43 — New PDF Layout | Pending |
 | FIELD-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
-| FIELD-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| FIELD-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | FIELD-03 | Phase 43 — New PDF Layout | Pending |
-| PROF-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
-| PROF-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
-| PROF-03 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| PROF-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
+| PROF-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
+| PROF-03 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | MIG-01 | Phase 44 — Backfill Migration | Pending |
 | MIG-02 | Phase 44 — Backfill Migration | Pending |
 | MIG-03 | Phase 44 — Backfill Migration | Pending |

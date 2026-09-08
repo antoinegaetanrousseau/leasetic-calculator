@@ -815,11 +815,11 @@ Plans:
 > sources the partner block instead (D-22/D-06). Authority:
 > `.planning/phases/42-captured-data-fields-advisor-profile/42-CONTEXT.md`.
 
-**Plans:** 10 plans
+**Plans:** 1/10 plans executed
 
 **Wave 1**
 
-- [ ] 42-01-PLAN.md — Reconcile REQUIREMENTS/ROADMAP with D-15/D-20/D-21/D-22/D-23/D-24 and land the full FR/EN copy deck
+- [x] 42-01-PLAN.md — Reconcile REQUIREMENTS/ROADMAP with D-15/D-20/D-21/D-22/D-23/D-24 and land the full FR/EN copy deck
 - [ ] 42-02-PLAN.md — users.telephone + users.company_telephone + leasetic_advisor table, migration 0011, operator MIGRATE PROD checkpoint
 
 **Wave 2** *(blocked on Wave 1)*
@@ -931,7 +931,7 @@ D-16's PDF-only fonction translation, rendering the FR/EN label matching each pr
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
 | 41. Typography Migration | v1.9 | 3/3 | Complete    | 2026-09-08 |
-| 42. Captured Data — Fields & Advisor Profile | v1.9 | 0/TBD | Not started | - |
+| 42. Captured Data — Fields & Advisor Profile | v1.9 | 1/10 | In Progress|  |
 | 43. New PDF Layout | v1.9 | 0/TBD | Not started | - |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
 

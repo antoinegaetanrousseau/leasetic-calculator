@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T12:03:17.647Z"
-last_activity: 2026-09-08 -- Phase 42 planning complete
+last_updated: "2026-09-08T12:27:01.009Z"
+last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 1
   total_plans: 13
-  completed_plans: 3
+  completed_plans: 4
   percent: 4
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 42 — captured data — fields & advisor profile
+**Current focus:** Phase 42 — Captured Data — Fields & Advisor Profile
 
 ## Current Position
 
-Phase: 42
-Plan: Not started
+Phase: 42 (Captured Data — Fields & Advisor Profile) — EXECUTING
+Plan: 2 of 10
 Status: Ready to execute
-Last activity: 2026-09-08 -- Phase 42 planning complete
+Last activity: 2026-09-08
 
 ## Deferred Items
 
@@ -520,6 +520,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 41 P01 | 4min | 2 tasks | 2 files |
 | Phase 41 P02 | 10min | 2 tasks | 14 files |
 | Phase 41 P03 | 25min | 3 tasks | 1 files |
+| Phase 42 P01 | 9min | 4 tasks | 5 files |
 
 ## Decisions
 
@@ -711,6 +712,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: npm run build verified locally by temporarily moving the gitignored, prod-pointing .env.production.local aside (mirrors CI's zero-env-file SKIP condition); no DB command run, file restored immediately
 - [Phase 41]: Human approval for D-11 recorded verbatim from Antoine, not workflow.auto_advance -- typography-migration phase closes on 41-03
 - [Phase 41]: Brand wordmark spelling (the accented pre-rebrand form was rendered where LEASETIC was correct) deferred as out-of-scope for Phase 41 per D-01; tracked separately by Antoine as a repo-wide rebrand cleanup — RESOLVED 2026-09-08 in commit 976177c, which dropped the accent across the source tree and regenerated the PROP-17 PDF fixture
+- [Phase 42]: Verify-script stale-phrase checks are substring matches — rephrased amended REQUIREMENTS/ROADMAP annotation text to preserve D-NN meaning without literally reproducing the retracted phrase the plan's own verify one-liners flag
+- [Phase 42]: pdf.partnerType.* translation is scoped to the PDF only (D-16) — admin and /parametres surfaces deliberately keep rendering the raw partnerType string, documented inline as a recorded Deferred item
 
 ### Blockers
 
