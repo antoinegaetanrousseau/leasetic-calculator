@@ -854,15 +854,31 @@ Plans:
   6. Every text node uses the design's ten-step type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), replacing the five-role scale Phase 41 deliberately froze (`pdfFontSizes` at 8 / 9 / 10 / 22 / 32pt) — relocated here from Phase 41 by the D-02 amendment.
 
 **Plans:** 8 plans in 6 waves
-
 Plans:
+**Wave 1**
+
 - [ ] 43-01-PLAN.md — Reconcile DOC-03 upstream (D-03) and transcribe the design's ten-step scale, palette and mm page margins into `styles.ts`
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 43-02-PLAN.md — Port the lockup and icon marks to `<Svg>` primitives, evidence-first, with the rotate-transform pre-applied (D-07)
 - [ ] 43-03-PLAN.md — Add the design's full FR/EN `pdf.*` copy and ledger the keys the redesign orphans for deletion alongside their last consumer
 - [ ] 43-04-PLAN.md — Grow `ProposalDocumentProps` and thread the advisor + partner phone through BOTH render call sites; add the `emDash` formatter (D-12/D-13)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 43-05-PLAN.md — Rebuild the page frame, lockup header, 2px rule, 21pt title + pills and the two cards; delete the three keys it retires (DOC-01/02/03)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 43-06-PLAN.md — Rebuild the loyer hero, financial table, conditions, bottom-pinned acceptance block and legal footer; delete the interests block, the last two orphaned keys and the orphaned tokens (DOC-04..08)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 43-07-PLAN.md — Prove DOC-10/11/12/13 + FIELD-03 against rendered bytes, reconcile the Phase 41 four-faces proof, and regenerate the fixture baseline (D-16)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
 - [ ] 43-08-PLAN.md — `pdf:preview` renderer + Antoine's human visual pass against the reference PNGs (D-15)
 
 **UI hint:** yes
