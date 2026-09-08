@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T15:12:07.081Z"
+last_updated: "2026-09-08T15:42:55.514Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 1
   total_plans: 13
-  completed_plans: 10
+  completed_plans: 11
   percent: 4
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 42 (Captured Data — Fields & Advisor Profile) — EXECUTING
-Plan: 8 of 10
+Plan: 9 of 10
 Status: Ready to execute
 Last activity: 2026-09-08
 
@@ -527,6 +527,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 42 P07 | ~10min | 3 tasks | 6 files |
 | Phase 42 P08 | ~35min | 3 tasks | 7 files |
 | Phase 42 P02 | ~4min active / ~2h41m elapsed | 3 tasks | 5 files |
+| Phase 42 P09 | ~40min | 2 tasks | 3 files |
 
 ## Decisions
 
@@ -730,6 +731,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 42-07]: AdvisorForm calls adminUpdateAdvisor directly (no action prop) — this is a singleton settings screen, not a reusable create form.
 - [Phase 42-08]: WizardStep1Wiring.tsx's Suivant trigger array extended with clientSiret (Rule 2) so D-04's blocking requirement actually holds — Plan 42-08 files_modified omitted this file; saveAndAdvanceAction already re-validates server-side, but client-side inline blocking on Suivant needed the same fix
 - [Phase 42]: Phase 42 P02: Migration 0011 (users.telephone/company_telephone + leasetic_advisor) applied to production Neon main via MIGRATE PROD Actions run 34241648389 (both jobs green) — Structural checkpoint ordering avoids RESEARCH R2 Pitfall 1 outage; Plan 42-04 now unblocked to register Better Auth additionalFields
+- [Phase 42]: ProposalForm.tsx's RHF defaultValues never tracked clientSiret/partnerTel — added both (Rule 2 deviation, 42-09), otherwise page.tsx's session/resume prefill for either field had zero effect and partnerTel was silently dropped on the next save-as-draft
 
 ### Blockers
 
