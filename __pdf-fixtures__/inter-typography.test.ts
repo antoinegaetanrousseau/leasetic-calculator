@@ -56,13 +56,29 @@ const EXPECTED_POSTSCRIPT_NAMES: Record<(typeof INTER_WEIGHTS)[number], string> 
 // render-content) — so this is a fixture-content gap, not a font-coverage gap, and is
 // out of scope to fix here (fixture data is frozen per PROP-17; inventing new fixture
 // content is explicitly forbidden by this task).
+// Phase 43 / D-05 amendment (2026-09-08): U+202F NARROW NO-BREAK SPACE and U+00CA LATIN
+// CAPITAL LETTER E WITH CIRCUMFLEX are both retired from this required set. Their only
+// source anywhere in the FR/EN dictionaries was the SAME literal escape — the deleted
+// `pdf.section.interests` FR string, "POINTS D’INTÉRÊT IDENTIFIÉS :" — which
+// carries the U+202F before the colon AND the Ê inside "INTÉRÊT". Phase 43 D-05 deletes
+// this string wholesale (the interests block has no slot in the Claude Design layout and
+// stops printing); the two codepoints' shared origin, and the fact both went missing
+// together, is direct evidence for that root cause rather than two independent breaks.
+// No other `pdf.*`/`proposal.*` string or `document.tsx` literal consumed by the
+// happy-path fixtures contains either codepoint — confirmed empty via a direct grep of
+// both files, not assumed. `sanitizePdfNumber` (src/lib/pdf/sanitize-number.ts) separately
+// and intentionally strips U+202F from every formatted number before render. This is a
+// direct, correct consequence of D-05's content deletion, not a font-coverage regression,
+// so both entries are retired rather than left failing. See
+// `.planning/phases/43-new-pdf-layout/43-06-SUMMARY.md` for the observed evidence this
+// reconciliation is based on. (43-06 flagged only U+202F by name; U+00CA's identical fate
+// was masked by array short-circuiting — the loop below throws on the first failing
+// codepoint, so U+202F's failure hid U+00CA's until this task removed it.)
 const REQUIRED_CODEPOINTS: Array<{ cp: number; label: string }> = [
-  { cp: 0x202f, label: 'U+202F NARROW NO-BREAK SPACE' },
   { cp: 0x20ac, label: 'U+20AC EURO SIGN' },
   { cp: 0x2019, label: 'U+2019 RIGHT SINGLE QUOTATION MARK' },
   { cp: 0x00b0, label: 'U+00B0 DEGREE SIGN' },
   { cp: 0x00c9, label: 'U+00C9 LATIN CAPITAL LETTER E WITH ACUTE' },
-  { cp: 0x00ca, label: 'U+00CA LATIN CAPITAL LETTER E WITH CIRCUMFLEX' },
   { cp: 0x00e9, label: 'U+00E9 LATIN SMALL LETTER E WITH ACUTE' },
   { cp: 0x00e8, label: 'U+00E8 LATIN SMALL LETTER E WITH GRAVE' },
 ];
@@ -251,36 +267,78 @@ describe('Inter typography swap — glyph coverage (D-09) and distinct embedded 
     });
   });
 
-  describe('D-10: exactly four distinct embedded Inter faces (400 ≠ 500 ≠ 600 ≠ 700)', () => {
-    it('FR fixture embeds exactly 4 FontDescriptors with 4 distinct stream hashes', async () => {
+  /**
+   * Phase 43 / DOC-01 amendment (2026-09-08): the Claude Design layout
+   * (`document.tsx`, rebuilt across 43-05/43-06) uses only weights 400 (regular) and
+   * 600 (semibold) — `pdfFontWeights.medium` (500) and `.bold` (700) are never
+   * referenced anywhere in the rewritten render tree. The rewritten document therefore
+   * embeds 2 distinct font subsets, not the 4 a Phase-41-era document embedded. That
+   * drop is the correct consequence of the redesign, not a regression, and reintroducing
+   * an unused weight purely to keep the old count green would be design drift dressed as
+   * a passing test.
+   *
+   * The original Phase 41 D-10 proof asserted an exact count of 4 because that was the
+   * true weight count of the document that existed then. The property Phase 41 actually
+   * cared about — that all four Inter weights remain REGISTERED, so a future layout can
+   * use any of them without a font-registration change — is a different proof, and it
+   * still holds: see `tests/vendored-ui-integrity.test.ts` case 3 (asserts
+   * `document.tsx` still registers `Inter-{400,500,600,700}.ttf`), left untouched by this
+   * plan. This describe block is narrowed to what the current layout can actually prove:
+   * every embedded face is a member of the four registered faces (no
+   * substituted/unregistered face), no two differently-named faces share a subset stream
+   * (the weight-collapse failure mode Phase 41 D-03 rejected the variable font over), and
+   * the two weights this design actually uses — Regular and SemiBold — are both present.
+   * See `.planning/REQUIREMENTS.md` DOC-09 for the requirement-level record.
+   */
+  describe('D-10: every embedded Inter face is registered, no weight collapse, Regular+SemiBold present', () => {
+    const REGISTERED_FACE_NAMES = ['Inter-Regular', 'Inter-Medium', 'Inter-SemiBold', 'Inter-Bold'];
+
+    it('FR fixture: every embedded face is a registered Inter face, no two share a stream, Regular+SemiBold both present', async () => {
       const result = await renderProposalPdf({ data: FR_FIXTURE.data });
       const faces = extractEmbeddedFontFaces(result.buffer);
+      const names = faces.map((f) => f.fontName.split('+')[1]);
 
-      expect(faces).toHaveLength(4);
+      for (const name of names) {
+        expect(
+          REGISTERED_FACE_NAMES.includes(name),
+          `Embedded face '${name}' is not one of the four registered Inter faces ` +
+            `(${REGISTERED_FACE_NAMES.join(', ')}). A substituted or unregistered face is the ` +
+            'real regression this case exists to catch.',
+        ).toBe(true);
+      }
+
       expect(
         new Set(faces.map((f) => f.streamHash)).size,
-        'Fewer than 4 distinct embedded font-stream hashes. This is the exact failure a ' +
-          'collapsed variable-font registration (or a copy-paste error pointing several ' +
-          'FontSource entries at the same file) would produce: a valid, gate-green, subtly ' +
-          'flat document with no error and no tofu.',
-      ).toBe(4);
+        'Two differently-named embedded faces share a subset stream — the weight-collapse ' +
+          'failure mode Phase 41 D-03 rejected the variable font over.',
+      ).toBe(new Set(names).size);
 
-      // Never assert the random 6-character subset-tag prefix (e.g. "JRJJHY+") —
-      // PDFKit regenerates it on every render (41-RESEARCH.md Pitfall 2). Match
-      // only the stable PostScript-name suffix after "+".
-      const names = faces.map((f) => f.fontName.split('+')[1]).sort();
-      expect(names).toEqual(['Inter-Bold', 'Inter-Medium', 'Inter-Regular', 'Inter-SemiBold'].sort());
+      expect(names, 'Inter-Regular is missing from the embedded faces.').toContain('Inter-Regular');
+      expect(names, 'Inter-SemiBold is missing from the embedded faces.').toContain('Inter-SemiBold');
     });
 
-    it('EN fixture also embeds exactly 4 FontDescriptors with 4 distinct stream hashes', async () => {
+    it('EN fixture: every embedded face is a registered Inter face, no two share a stream, Regular+SemiBold both present', async () => {
       const result = await renderProposalPdf({ data: EN_FIXTURE.data });
       const faces = extractEmbeddedFontFaces(result.buffer);
+      const names = faces.map((f) => f.fontName.split('+')[1]);
 
-      expect(faces).toHaveLength(4);
-      expect(new Set(faces.map((f) => f.streamHash)).size).toBe(4);
+      for (const name of names) {
+        expect(
+          REGISTERED_FACE_NAMES.includes(name),
+          `Embedded face '${name}' is not one of the four registered Inter faces ` +
+            `(${REGISTERED_FACE_NAMES.join(', ')}). A substituted or unregistered face is the ` +
+            'real regression this case exists to catch.',
+        ).toBe(true);
+      }
 
-      const names = faces.map((f) => f.fontName.split('+')[1]).sort();
-      expect(names).toEqual(['Inter-Bold', 'Inter-Medium', 'Inter-Regular', 'Inter-SemiBold'].sort());
+      expect(
+        new Set(faces.map((f) => f.streamHash)).size,
+        'Two differently-named embedded faces share a subset stream — the weight-collapse ' +
+          'failure mode Phase 41 D-03 rejected the variable font over.',
+      ).toBe(new Set(names).size);
+
+      expect(names, 'Inter-Regular is missing from the embedded faces.').toContain('Inter-Regular');
+      expect(names, 'Inter-SemiBold is missing from the embedded faces.').toContain('Inter-SemiBold');
     });
 
     it('never asserts on PDFKit random subset-tag prefixes (self-check)', async () => {

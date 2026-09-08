@@ -59,7 +59,11 @@ proposal into it.
 - [x] **DOC-09**: The PDF renders in Inter, replacing Plus Jakarta Sans, with no missing-glyph or
   font-registration failure in any rendered proposal. *(Narrowed 2026-09-08 by Phase 41 D-02: the
   design's ten-step type scale moved to DOC-01 / Phase 43. Phase 41 keeps today's `pdfFontSizes`
-  — 8 / 9 / 10 / 22 / 32pt — untouched per D-01.)*
+  — 8 / 9 / 10 / 22 / 32pt — untouched per D-01. Further narrowed 2026-09-08 by Phase 43 / DOC-01:
+  the Phase 41 D-10 four-distinct-faces proof is narrowed to "every embedded face is a registered
+  Inter face, and Regular + SemiBold are both present", because the Claude Design layout specifies
+  only weights 400 and 600; registration of all four weights remains gated by
+  `tests/vendored-ui-integrity.test.ts`.)*
 - [ ] **DOC-10**: A proposal whose committed language is English renders the English variant —
   every label and the full legal conditions paragraph — per `Quote-EN-A.dc.html`.
 - [ ] **DOC-11**: A field with no captured value renders its label followed by an em dash, so card
