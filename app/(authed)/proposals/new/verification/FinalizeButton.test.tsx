@@ -299,3 +299,188 @@ describe('FinalizeButton (Plan 13-05 Task 1 — D-16 / D-24)', () => {
     await waitFor(() => expect(onSaveDraft).toHaveBeenCalledTimes(1));
   });
 });
+
+describe('FinalizeButton — Phase 42 bounded-code branches (D-05 / D-18)', () => {
+  it('1: a 200 response behaves exactly as today — success toast then router.push', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ id: 'p-99' }), { status: 200 }),
+    ) as unknown as typeof fetch;
+
+    render(<FinalizeButton draftId="d-1" onSaveDraft={noopSave} lang="fr" />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: /Confirmer & Générer le PDF/ }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(routerPushMock).toHaveBeenCalledWith('/proposals/p-99');
+    });
+    expect(toastSuccessMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('2: a MissingPartnerTelephone failure opens the dialog, resets isSubmitting, and shows NO toast', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ error: 'MissingPartnerTelephone' }), {
+        status: 500,
+      }),
+    ) as unknown as typeof fetch;
+
+    render(<FinalizeButton draftId="d-1" onSaveDraft={noopSave} lang="fr" />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: /Confirmer & Générer le PDF/ }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Coordonnées manquantes')).toBeTruthy();
+    });
+    expect(toastErrorMock).not.toHaveBeenCalled();
+    expect(toastSuccessMock).not.toHaveBeenCalled();
+    // The background CTA is now behind the open modal (aria-hidden/inert per
+    // Base UI's Dialog) — pass `hidden: true` to still locate it in the DOM.
+    const cta = screen.getByRole('button', {
+      name: /Confirmer & Générer le PDF/,
+      hidden: true,
+    });
+    expect((cta as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('3: the dialog title/body come from the dictionary and the primary action links to /parametres', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ error: 'MissingPartnerTelephone' }), {
+        status: 500,
+      }),
+    ) as unknown as typeof fetch;
+
+    render(<FinalizeButton draftId="d-1" onSaveDraft={noopSave} lang="fr" />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: /Confirmer & Générer le PDF/ }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Coordonnées manquantes')).toBeTruthy();
+    });
+    expect(
+      screen.getByText(
+        'Votre numéro de téléphone doit être renseigné avant de finaliser une proposition. Ajoutez-le dans vos paramètres.',
+      ),
+    ).toBeTruthy();
+    const cta = screen.getByRole('link', { name: 'Aller à Paramètres' });
+    expect(cta.getAttribute('href')).toBe('/parametres');
+  });
+
+  it('4: dismissing the dialog closes it and performs no navigation', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ error: 'MissingPartnerTelephone' }), {
+        status: 500,
+      }),
+    ) as unknown as typeof fetch;
+
+    render(<FinalizeButton draftId="d-1" onSaveDraft={noopSave} lang="fr" />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: /Confirmer & Générer le PDF/ }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Coordonnées manquantes')).toBeTruthy();
+    });
+
+    // Two "Fermer" buttons exist: the dialog's built-in icon-only close (X,
+    // accessible name from common.close.aria) plus our own footer dismiss
+    // button — the footer dismiss renders first (it's part of `children`;
+    // the icon close is appended after).
+    await act(async () => {
+      fireEvent.click(screen.getAllByRole('button', { name: 'Fermer' })[0]);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Coordonnées manquantes')).toBeNull();
+    });
+    expect(routerPushMock).not.toHaveBeenCalled();
+  });
+
+  it('5: a LegacyDraftIncomplete failure shows the legacy toast and redirects to step 1 (NOT the dialog)', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ error: 'LegacyDraftIncomplete' }), {
+        status: 500,
+      }),
+    ) as unknown as typeof fetch;
+
+    render(<FinalizeButton draftId="d-legacy" onSaveDraft={noopSave} lang="fr" />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: /Confirmer & Générer le PDF/ }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(routerPushMock).toHaveBeenCalledWith(
+        '/proposals/new/parametres?draft_id=d-legacy',
+      );
+    });
+    expect(toastErrorMock).toHaveBeenCalledTimes(1);
+    expect(toastErrorMock.mock.calls[0][0]).toBe(
+      "Ce brouillon a été créé avant l'ajout du SIRET. Complétez l'étape 1 pour finaliser.",
+    );
+    expect(screen.queryByText('Coordonnées manquantes')).toBeNull();
+  });
+
+  it('6: a non-JSON error body still produces the generic toast', async () => {
+    global.fetch = vi.fn(async () => {
+      const res = new Response('not json', { status: 500 });
+      return res;
+    }) as unknown as typeof fetch;
+
+    render(<FinalizeButton draftId="d-1" onSaveDraft={noopSave} lang="fr" />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: /Confirmer & Générer le PDF/ }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledTimes(1);
+    });
+    expect(toastErrorMock.mock.calls[0][0]).toBe(
+      'Erreur lors de la génération. Réessayez.',
+    );
+    expect(screen.queryByText('Coordonnées manquantes')).toBeNull();
+  });
+
+  it('7: an unrecognized bounded error code still produces the generic toast (no dialog, no legacy redirect)', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ error: 'FinalizeFailed' }), {
+        status: 500,
+      }),
+    ) as unknown as typeof fetch;
+
+    render(<FinalizeButton draftId="d-1" onSaveDraft={noopSave} lang="fr" />);
+
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: /Confirmer & Générer le PDF/ }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledTimes(1);
+    });
+    expect(toastErrorMock.mock.calls[0][0]).toBe(
+      'Erreur lors de la génération. Réessayez.',
+    );
+    expect(routerPushMock).not.toHaveBeenCalled();
+    expect(screen.queryByText('Coordonnées manquantes')).toBeNull();
+  });
+});

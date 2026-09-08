@@ -20,8 +20,10 @@
  *
  * ADMIN-09 D-12 boundary: this component NEVER reads, transforms, or echoes
  * the partner-only-visible parameter amount. The only payload it sends is
- * `{ draftId }`; the only payload it consumes is `{ id }` on success or
- * a bounded `safeCode` on error (which it converts to a generic toast). The
+ * `{ draftId }`; the only payload it consumes is `{ id }` on success, OR one
+ * of two bounded `safeCode`s that each drive their own dictionary-string
+ * branch (Phase 42 D-05 / D-18 — see below), OR any other non-OK response
+ * (still a bounded `safeCode`, but converted to the generic toast). The
  * commission visibility on step 3's `● CALCUL` recap card is owned by the
  * parent server component (page.tsx) — this client adapter is structurally
  * isolated from that surface.
@@ -31,14 +33,31 @@
  *     re-runs getDraftById under session.user.id; cross-user → DraftNotFound
  *     → 500 + safeCode. Tests 6/7 cover the client-side error handling.
  *   - T-13-05-I-FailureLeak: response body never echoed; client renders
- *     bounded `wizard.toast.finalize.error` string.
+ *     bounded `wizard.toast.finalize.error` string. Phase 42 EXTENDS this
+ *     boundary rather than regressing it: the component now calls
+ *     `res.json()` on the failure path and branches on `body?.error`, but it
+ *     only ever renders a dictionary string keyed by the bounded code — never
+ *     `body.error` itself, and never any other field from the response body.
+ *     The two new branches (`MissingPartnerTelephone` → dialog, D-18;
+ *     `LegacyDraftIncomplete` → toast + redirect to step 1, D-05) are each a
+ *     fixed, hardcoded copy lookup, not a template interpolating server data.
  */
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { t, type Lang } from '@/lib/i18n/dictionaries';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 import { WizardActionBar } from '../_components/WizardActionBar';
 
@@ -63,6 +82,7 @@ export function FinalizeButton({
 }: FinalizeButtonProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleFinalize = async () => {
     if (isSubmitting) return;
@@ -74,6 +94,27 @@ export function FinalizeButton({
         body: JSON.stringify({ draftId }),
       });
       if (!res.ok) {
+        // Phase 42 D-05 / D-18 — parse the body defensively first. The
+        // `.catch` matters: a non-JSON error response must not turn into an
+        // unhandled rejection and lose the generic path below.
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        if (body?.error === 'MissingPartnerTelephone') {
+          // D-18 chose a dialog precisely because the partner must act
+          // elsewhere — a 5-second toast is the wrong affordance for an
+          // instruction that requires leaving the page. No toast here.
+          setDialogOpen(true);
+          setIsSubmitting(false);
+          return;
+        }
+        if (body?.error === 'LegacyDraftIncomplete') {
+          // D-05 — a DIFFERENT failure from the one above: fixable inside
+          // this proposal by returning to step 1, not by visiting
+          // /parametres, so it deliberately does not reuse the dialog.
+          toast.error(t('wizard.finalize.toast.legacyMissingSiret', lang));
+          setIsSubmitting(false);
+          router.push(`/proposals/new/parametres?draft_id=${draftId}`);
+          return;
+        }
         // Bounded error code from the route — never echo body to the partner.
         throw new Error(`finalize_failed_${res.status}`);
       }
@@ -95,18 +136,41 @@ export function FinalizeButton({
   };
 
   return (
-    <WizardActionBar
-      currentStep={3}
-      draftId={draftId}
-      onSaveDraft={onSaveDraft}
-      lang={lang}
-      primary={{
-        kind: 'action',
-        onClick: handleFinalize,
-        label: t('wizard.action.step3.confirm', lang),
-        spinnerLabel: t('wizard.action.step3.confirm.spinner', lang),
-        isSubmitting,
-      }}
-    />
+    <>
+      <WizardActionBar
+        currentStep={3}
+        draftId={draftId}
+        onSaveDraft={onSaveDraft}
+        lang={lang}
+        primary={{
+          kind: 'action',
+          onClick: handleFinalize,
+          label: t('wizard.action.step3.confirm', lang),
+          spinnerLabel: t('wizard.action.step3.confirm.spinner', lang),
+          isSubmitting,
+        }}
+      />
+      {/* Phase 42 D-18 — the finalization profile-completeness dialog. Never
+          AlertDialog: this blocks progress but is not a destructive
+          confirmation (UIC-06). */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('wizard.finalize.dialog.missingPhone.title', lang)}</DialogTitle>
+            <DialogDescription>
+              {t('wizard.finalize.dialog.missingPhone.body', lang)}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              {t('wizard.finalize.dialog.missingPhone.dismiss', lang)}
+            </Button>
+            <Button render={<Link href="/parametres" />}>
+              {t('wizard.finalize.dialog.missingPhone.cta', lang)}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
