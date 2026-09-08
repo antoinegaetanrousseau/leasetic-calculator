@@ -766,9 +766,13 @@ incident in `schema.ts`'s comments) may lag it in field completeness (see Pitfal
 | A3 | `lookupCompanyBySiren`'s existing `RegistryIdentity`/`toRegistryIdentity` (CRM-tier) is the right function to extend for the wizard's SIRET prefill, rather than building a second, wizard-scoped mapper | Code Examples | Medium — if a future CRM-tier change to `RegistryIdentity` inadvertently changes shape in a way that affects the wizard's prefill (coupling two consumers to one type), that coupling could surprise a later phase. Alternative: a wizard-scoped thin wrapper that only extracts `siret` directly from the parsed `RegistryResult` (bypassing `toRegistryIdentity` entirely) would decouple the two call sites at the cost of a small amount of duplication. The planner should decide explicitly rather than default to reuse. |
 | A4 | Cross-field validation error path redirection (`path: ['clientSiret']` on `.refine()`) works identically whether chained after `.object()` directly or after the existing per-field schemas — no live code in this repo exercises `.refine()` with an explicit `path` option today (only field-level `.refine()` without `path`, e.g. `optionalPhoneSchema`) | Pattern 3 | Low — this is standard, long-stable Zod behavior (not a recent/breaking API), and the training-data-based claim is easily unit-tested in the first TDD task the plan writes: assert `parseResult.error.issues[0].path` equals `['clientSiret']` for a mismatched pair. Flagging as ASSUMED because it was not verified against zod@4.4.3's actual installed behavior in this session (no code was run) |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> All three were resolved by the plans written after this research pass. Resolutions recorded
+> inline below; the reasoning above is retained as the audit trail.
 
 1. **Should the SIRET prefill call be a Server Action or a Route Handler?**
+   - **RESOLVED (plan 42-08):** Server Action, mirroring the `saveAsDraft.action.ts` sibling pattern.
    - What we know: `lookupCompanyBySiren` has no `'server-only'` guard itself but is only ever
      called from `server-only`-guarded modules today (`registry-sync.ts`). The wizard's
      `ParametresFormCard.tsx` is a client component (`'use client'`), so the call must cross a
@@ -786,6 +790,7 @@ incident in `schema.ts`'s comments) may lag it in field completeness (see Pitfal
      precedent (not confirmed in this research pass).
 
 2. **Exact naming for the `leasetic_advisor` table's single-row identifier.**
+   - **RESOLVED (plan 42-02):** fixed UUID literal `00000000-0000-0000-0000-000000000001`, seeded by the migration; every read/write targets that id.
    - What we know: D-08 requires exactly one row, admin-editable, no per-partner or per-proposal
      variation.
    - What's unclear: whether to seed the row with a fixed UUID literal in the migration (simplest
@@ -798,6 +803,7 @@ incident in `schema.ts`'s comments) may lag it in field completeness (see Pitfal
      ever needing an "is there already a row" branch in application code.
 
 3. **Whether `getUserTelephone` (or equivalent) is a new query helper or an inline session read.**
+   - **RESOLVED (plan 42-10):** option (a) — `FinalizeWizardArgs` gains `telephone`, threaded from the route handler's session read, mirroring `partnerType`. No new DB read inside `finalizeWizard`.
    - What we know: `finalizeWizard` receives `args.userId` but not the full session object (the
      route handler already extracted `partnerType` from the session before calling it) — D-17's
      telephone gate could either (a) have the route handler pass `telephone` through as an

@@ -1,7 +1,7 @@
 ---
 phase: 42
 slug: captured-data-fields-advisor-profile
-status: draft
+status: approved
 shadcn_initialized: true
 preset: base-maia (neutral base color, hugeicons icon library) — pre-existing project state (components.json), not initialized by this session
 created: 2026-09-08
@@ -437,14 +437,21 @@ from primitives already in the tree) rather than pulling any new registry block.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending — revised 2026-09-08 to address BLOCK (relabel-only premise for D-13
-company phone; typography size-count overrun) and four non-blocking recommendations
-(advisor CTA copy, focal-point statements, Component Inventory phone-field disambiguation,
-generic-toast note). Awaiting re-verification.
+**Approval:** APPROVED 2026-09-08 by `gsd-ui-checker` re-verification (6/6 dimensions PASS,
+no BLOCK). The revision that earned it addressed the prior BLOCK — the relabel-only premise for
+D-13's company phone, and the typography size-count overrun — plus four non-blocking
+recommendations (advisor CTA copy, focal-point statements, Component Inventory phone-field
+disambiguation, generic-toast note).
+
+**One open provenance item, non-blocking:** `UIC-12` in `.planning/codebase/UI-CONVENTIONS.md`
+(which ratifies `PageHero`'s two font sizes) was written in the same revision round that needed
+the exception, without the named operator sign-off that closed `UIC-02`. The re-verification
+checked its substance against `PageHero.tsx` and found it legitimate rather than a rubber stamp,
+but the provenance gap is recorded here deliberately rather than left silent.
