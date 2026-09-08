@@ -31,6 +31,7 @@
     "db:reconcile": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/reconcile-proposals.ts",
     "grant:admin": "tsx scripts/grant-admin.ts",
     "pdf:update-fixture": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/update-pdf-fixture.ts",
+    "pdf:preview": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/render-pdf-preview.ts",
     "purge:soft-deleted": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/purge-soft-deleted.ts",
     "purge:soft-deleted:dry": "CONFIRM= tsx -r ./scripts/_preload-mock-server-only.cjs scripts/purge-soft-deleted.ts",
     "purge:test-data": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/purge-test-data.ts",
