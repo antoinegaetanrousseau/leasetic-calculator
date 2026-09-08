@@ -4,8 +4,8 @@ import { t, type Lang } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate, formatNumber } from '@/lib/i18n/format';
 import { pdfColors, pdfFontSizes, pdfFontWeights, pdfPageBase, pdfPageMargins } from './styles';
 import { sanitizePdfNumber } from './sanitize-number';
-import { SectionLabel } from './components/section-label';
 import { LeaseticLockup } from './components/leasetic-lockup';
+import { LeaseticIcon } from './components/leasetic-icon';
 import { Eyebrow } from './components/eyebrow';
 import { CardKeyValueRow } from './components/card-key-value-row';
 import { FinancialRow } from './components/financial-row';
@@ -152,7 +152,19 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
         paddingHorizontal: pdfPageMargins.horizontal,
         fontFamily: 'Inter',
         fontSize: pdfPageBase.fontSize,
-        lineHeight: pdfPageBase.lineHeight,
+        // D-10/D-11's base `lineHeight: 1.45` is deliberately NOT set here. Root-caused
+        // via bisection (43-06 Task 2): @react-pdf/renderer 4.5.1 silently drops every
+        // dynamic `render`-prop <Text> in the whole document (the legal footer's
+        // page-number/lcRef text below never reaches the content stream, no error)
+        // whenever this document's actual content volume is combined with an inherited
+        // `lineHeight` anywhere in the ancestor chain — reproduced with `lineHeight` on
+        // <Page> itself and, independently, with it hoisted onto a wrapping <View> using
+        // flexGrow/height/a literal pixel height instead (all three still dropped the
+        // text; only removing the inherited value entirely brings it back). Every Text
+        // node in this document that needs a specific line-height already sets its own
+        // (hero value 1.05, validity/conditions body 1.65, legal footer 1.5, etc.); the
+        // remaining single-line labels/headlines are visually insensitive to this base
+        // value's absence. Flagged for the D-15 human visual pass to confirm.
         color: pdfColors.navy,
         backgroundColor: pdfColors.surface,
         flexDirection: 'column',
@@ -386,76 +398,142 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
           );
         })()}
 
-        {/* ── Interests block (conditional) ─────────────────────────────── */}
-        {(inputs.slb || inputs.evalParc) && (
-          <View style={{ marginBottom: 12 }}>
-            <SectionLabel>{t('pdf.section.interests', lang)}</SectionLabel>
-            {inputs.slb && (
-              <Text style={{
-                fontSize: pdfFontSizes.body,
-                fontWeight: pdfFontWeights.regular,
-                color: pdfColors.ink,
-                marginBottom: 4,
-              }}>
-                {`✓  ${t('proposal.interests.slb', lang)}`}
-              </Text>
-            )}
-            {inputs.evalParc && (
-              <Text style={{
-                fontSize: pdfFontSizes.body,
-                fontWeight: pdfFontWeights.regular,
-                color: pdfColors.ink,
-              }}>
-                {`✓  ${t('proposal.interests.eval', lang)}`}
-              </Text>
-            )}
-          </View>
-        )}
+        {/* D-05: the interests block (✓ Sale & leaseback / ✓ Évaluation de parc) is
+            deliberately dropped by the redesign — the design has no slot for it anywhere
+            and DOC-01..08 never mention it. The two underlying wizard fields stay in the
+            wizard and in the immutable inputs snapshot; they simply stop printing here. */}
 
-        {/* ── Validity caption ─────────────────────────────────────────── */}
-        <Text style={{
-          fontSize: pdfFontSizes.body,
-          fontWeight: pdfFontWeights.regular,
-          color: pdfColors.muted,
-          marginBottom: 24,
-          lineHeight: 1.5,
-        }}>
-          {t('pdf.validity.caption', lang)
-            .replace('{0}', formatDate(expiresAt, lang))
-            .replace('{1}', String(inputs.validityDays))}
-        </Text>
-
-        {/* ── Footer (D-A3 minimal) ─────────────────────────────────────── */}
+        {/* ── Conditions (DOC-06) ───────────────────────────────────────── */}
         <View style={{
-          position: 'absolute',
-          bottom: pdfPageMargins.bottom,
-          left: pdfPageMargins.horizontal,
-          right: pdfPageMargins.horizontal,
+          borderTopWidth: 0.75,
+          borderTopColor: pdfColors.hairline,
+          paddingTop: 7.5,
+          marginBottom: 9,
+        }}>
+          <Eyebrow marginBottom={3}>{t('pdf.conditions.title', lang)}</Eyebrow>
+          <Text style={{
+            fontSize: pdfFontSizes.pill,
+            lineHeight: 1.65,
+            color: pdfColors.bodyBlue,
+          }}>
+            {t('pdf.validity.caption', lang)
+              .replace('{0}', formatDate(expiresAt, lang))
+              .replace('{1}', String(inputs.validityDays))}
+          </Text>
+        </View>
+
+        {/* ── Acceptance block (DOC-07) — pinned to the bottom of the page via
+            marginTop: 'auto' inside the <Page>'s flex column (the design's own
+            mechanism; Yoga supports it), regardless of how much content precedes it ── */}
+        <View style={{
+          marginTop: 'auto',
+          borderWidth: 0.75,
+          borderColor: pdfColors.hairline,
+          borderRadius: 10.5,
+          paddingVertical: 12,
+          paddingHorizontal: 13.5,
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            marginBottom: 10.5,
+          }}>
+            <Eyebrow marginBottom={0}>{t('pdf.acceptance.title', lang)}</Eyebrow>
+            <Text style={{ fontSize: pdfFontSizes.pill, color: pdfColors.labelTeal }}>
+              {t('pdf.acceptance.note', lang)}
+            </Text>
+          </View>
+
+          <View style={{ flexDirection: 'row', marginBottom: 10.5 }}>
+            <View style={{ flexGrow: 1, flexBasis: 0, marginRight: 12 }}>
+              <Text style={{ fontSize: pdfFontSizes.pill, color: pdfColors.labelTeal, marginBottom: 16.5 }}>
+                {t('pdf.acceptance.place', lang)}
+              </Text>
+              <View style={{ borderBottomWidth: 0.75, borderBottomColor: pdfColors.navy }} />
+            </View>
+            <View style={{ flexGrow: 1, flexBasis: 0, marginRight: 12 }}>
+              <Text style={{ fontSize: pdfFontSizes.pill, color: pdfColors.labelTeal, marginBottom: 16.5 }}>
+                {t('pdf.acceptance.date', lang)}
+              </Text>
+              <View style={{ borderBottomWidth: 0.75, borderBottomColor: pdfColors.navy }} />
+            </View>
+            <View style={{ flexGrow: 1.5, flexBasis: 0 }}>
+              <Text style={{ fontSize: pdfFontSizes.pill, color: pdfColors.labelTeal, marginBottom: 16.5 }}>
+                {t('pdf.acceptance.signatory', lang)}
+              </Text>
+              <View style={{ borderBottomWidth: 0.75, borderBottomColor: pdfColors.navy }} />
+            </View>
+          </View>
+
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexGrow: 1, flexBasis: 0, marginRight: 12 }}>
+              <Text style={{ fontSize: pdfFontSizes.pill, color: pdfColors.labelTeal, marginBottom: 22.5 }}>
+                {t('pdf.acceptance.signature', lang)}
+              </Text>
+              <View style={{ borderBottomWidth: 0.75, borderBottomColor: pdfColors.navy }} />
+            </View>
+            <View style={{
+              flexGrow: 1.5,
+              flexBasis: 0,
+              borderWidth: 0.75,
+              borderStyle: 'dashed',
+              borderColor: pdfColors.stampBorder,
+              borderRadius: 7.5,
+              height: 40.5,
+              paddingVertical: 6,
+              paddingHorizontal: 7.5,
+            }}>
+              <Text style={{ fontSize: pdfFontSizes.pill, color: pdfColors.stampText }}>
+                {t('pdf.acceptance.stamp', lang)}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Legal footer (DOC-08) ─────────────────────────────────────── */}
+        <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingTop: 8,
-          borderTopWidth: 1,
-          borderTopColor: pdfColors.border,
+          alignItems: 'flex-end',
+          marginTop: 9,
+          paddingTop: 6.75,
+          borderTopWidth: 0.75,
+          borderTopColor: pdfColors.hairline,
         }}>
-          <Text style={{
-            fontSize: pdfFontSizes.footer,
-            fontWeight: pdfFontWeights.regular,
-            color: pdfColors.muted,
-          }}>
-            {t('pdf.footer.left', lang)
-              .replace('{0}', lcRef)
-              .replace('{1}', formatDate(createdAt, lang))}
-          </Text>
-          <Text
-            style={{
-              fontSize: pdfFontSizes.footer,
-              fontWeight: pdfFontWeights.regular,
-              color: pdfColors.muted,
-            }}
-            render={({ pageNumber }: { pageNumber: number }) => `Page ${pageNumber}`}
-            fixed
-          />
+          <View>
+            <Text style={{
+              fontSize: pdfFontSizes.legalFooter,
+              lineHeight: 1.5,
+              color: pdfColors.labelTeal,
+            }}>
+              <Text style={{ fontWeight: pdfFontWeights.semibold, color: pdfColors.navy }}>
+                {t('pdf.footer.legal.brand', lang)}
+              </Text>
+              {t('pdf.footer.legal.rest', lang)}
+            </Text>
+            <Text style={{
+              fontSize: pdfFontSizes.legalFooter,
+              lineHeight: 1.5,
+              color: pdfColors.labelTeal,
+            }}>
+              {t('pdf.footer.legal.line2', lang)}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text
+              style={{
+                fontSize: pdfFontSizes.legalFooter,
+                color: pdfColors.labelTeal,
+              }}
+              render={({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
+                `${lcRef} · Page ${pageNumber}/${totalPages}`}
+              fixed
+            />
+            <View style={{ marginLeft: 6 }}>
+              <LeaseticIcon size={13.5} opacity={0.14} />
+            </View>
+          </View>
         </View>
       </Page>
     </Document>

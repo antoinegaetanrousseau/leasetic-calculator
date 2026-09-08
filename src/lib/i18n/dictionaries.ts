@@ -466,25 +466,22 @@ export const dictionaries = {
     'proposal.row.toast.archive.action.viewArchived': 'Voir les archivées',
     'proposal.toast.duplicate.prefilled': "Champs pré-remplis depuis la proposition d\u2019origine. Modifiez si nécessaire.",
 
-    // 7.8 PDF document copy (9 keys — used by @react-pdf/renderer only;
+    // 7.8 PDF document copy (used by @react-pdf/renderer only;
     //     5 v10 keys reused per §7.9 — pdf.computed.duration.* + pdf.interests.* + pdf.computed.amount.label
     //     are NOT redeclared; consumers reference proposal.duree.* / proposal.interests.* / proposal.montant.label.
     //     Phase 43 (plan 43-05) deleted the header tagline key, the bare reference-label key,
     //     the PROJET section-label key and pdf.project.ref.prefix alongside their last consumer
-    //     — see the header/title-row rewrite.)
+    //     — see the header/title-row rewrite. Plan 43-06 deleted the interests-block section-
+    //     label key (D-05 — the SLB / évaluation-de-parc block is dropped) and the old two-arg
+    //     footer-left key (the N° {0} · Créée le {1} line becomes the legal footer) alongside
+    //     their last consumers — ledger closed.)
     'pdf.title': 'Proposition de location financière',
-    // Phase 43 orphan — deleted in plan 43-06 with its last consumer (D-05 — the SLB /
-    // évaluation-de-parc block is dropped)
-    'pdf.section.interests': "POINTS D\u2019INTÉRÊT IDENTIFIÉS\u202f:",
     'pdf.project.placeholder': 'Projet non précisé',
     'pdf.computed.coefficient.label': 'Coefficient appliqué',
     'pdf.loyer.label': 'LOYER MENSUEL HT',
     'pdf.loyer.subtext': 'sur {0} mois, hors taxes',
     'pdf.loyer.on.demand': 'Sur demande',
     'pdf.validity.caption': "Proposition valable jusqu\u2019au {0} ({1} jours), sous réserve de l\u2019accord du comité des engagements de Leasetic. Document non contractuel. Les loyers sont exprimés hors taxes et hors prestations annexes. Le coefficient appliqué est susceptible d\u2019évoluer en cas de modification du montant financé, de la durée ou des conditions de marché à la date de mise en loyer.",
-    // Phase 43 orphan — deleted in plan 43-06 with its last consumer (the N° {0} · Créée le {1}
-    // line becomes the legal footer)
-    'pdf.footer.left': 'N° {0} · Créée le {1}',
 
     // Phase 43 — Claude Design layout copy (DOC-01, DOC-02, DOC-05, DOC-07, DOC-08), sourced
     // verbatim from Quote-FR-A.dc.html, grouped by section in the design's document order.
@@ -1842,24 +1839,21 @@ export const dictionaries = {
     'proposal.row.toast.archive.action.viewArchived': 'View archived',
     'proposal.toast.duplicate.prefilled': 'Fields pre-filled from source proposal. Edit if needed.',
 
-    // 7.8 PDF document copy (9 keys — used by @react-pdf/renderer only;
+    // 7.8 PDF document copy (used by @react-pdf/renderer only;
     //     5 v10 keys reused per §7.9.
     //     Phase 43 (plan 43-05) deleted the header tagline key, the bare reference-label key,
     //     the PROJET section-label key and pdf.project.ref.prefix alongside their last consumer
-    //     — see the header/title-row rewrite.)
+    //     — see the header/title-row rewrite. Plan 43-06 deleted the interests-block section-
+    //     label key (D-05 — the SLB / évaluation-de-parc block is dropped) and the old two-arg
+    //     footer-left key (the No. {0} · Created on {1} line becomes the legal footer)
+    //     alongside their last consumers — ledger closed.)
     'pdf.title': 'Equipment lease financing proposal',
-    // Phase 43 orphan — deleted in plan 43-06 with its last consumer (D-05 — the SLB /
-    // évaluation-de-parc block is dropped)
-    'pdf.section.interests': 'POINTS OF INTEREST IDENTIFIED:',
     'pdf.project.placeholder': 'Project not specified',
     'pdf.computed.coefficient.label': 'Applied coefficient',
     'pdf.loyer.label': 'MONTHLY RENT EXCL. VAT',
     'pdf.loyer.subtext': 'over {0} months, excl. taxes',
     'pdf.loyer.on.demand': 'On request',
     'pdf.validity.caption': "This proposal is valid until {0} ({1} days), subject to approval by Leasetic\u2019s credit committee. Non-contractual document. Rents are stated excluding taxes and excluding ancillary services. The applied coefficient may change if the financed amount, the term, or market conditions at the lease start date change.",
-    // Phase 43 orphan — deleted in plan 43-06 with its last consumer (the No. {0} · Created on
-    // {1} line becomes the legal footer)
-    'pdf.footer.left': 'No. {0} \u00b7 Created on {1}',
 
     // Phase 43 — Claude Design layout copy (DOC-01, DOC-02, DOC-05, DOC-07, DOC-08), sourced
     // verbatim from Quote-EN-A.dc.html, grouped by section in the design's document order.
