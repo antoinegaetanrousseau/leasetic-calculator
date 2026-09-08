@@ -804,7 +804,27 @@ Plans:
   3. A partner whose account is missing fonction or téléphone is stopped at proposal finalization with a message naming exactly what's missing and a link to `/parametres` — fixed once on the account, never re-prompted per proposal.
   4. A newly finalized proposal's advisor name and email are sourced from the authenticated creating user's account rather than a free-typed field.
 
-**Plans:** TBD
+**Plans:** 10 plans
+
+**Wave 1**
+
+- [ ] 42-01-PLAN.md — Reconcile REQUIREMENTS/ROADMAP with D-15/D-20/D-21/D-22/D-23/D-24 and land the full FR/EN copy deck
+- [ ] 42-02-PLAN.md — users.telephone + users.company_telephone + leasetic_advisor table, migration 0011, operator MIGRATE PROD checkpoint
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 42-03-PLAN.md — clientSiret with the SIREN-prefix refine, optional partnerTel, and siege.siret in the registry parser
+- [ ] 42-04-PLAN.md — Better Auth additionalFields registration + /parametres telephone and read-only fonction
+- [ ] 42-05-PLAN.md — Admin partner form: company telephone persistence and the new partner telephone field
+- [ ] 42-06-PLAN.md — Advisor singleton persistence: fixed-id query helpers, form schema, admin-gated action
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 42-07-PLAN.md — Admin advisor screen at /{adminSegment}/advisor plus its nav entry point
+- [ ] 42-08-PLAN.md — SiretInput, the registry-lookup action, and the wizard step-1 SIRET field
+- [ ] 42-09-PLAN.md — Session hydration of partnerTel into draft inputs and clientSiret resume prefill
+- [ ] 42-10-PLAN.md — Finalize telephone gate, legacy-draft pre-check, two bounded codes, and the FinalizeButton dialog
+
 **UI hint:** yes
 
 ### Phase 43: New PDF Layout

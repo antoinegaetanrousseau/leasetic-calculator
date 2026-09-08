@@ -2,8 +2,8 @@
 phase: 42
 slug: captured-data-fields-advisor-profile
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: false  # closed by Plans 42-02 (migration) and 42-06 (advisor helper)
 created: 2026-09-08
 ---
 
@@ -44,20 +44,20 @@ planner can attach each row to the task that closes it.
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| TBD | TBD | TBD | FIELD-01 | — | SIRET required at step 1; 14-digit shape | unit (Zod) | `npx vitest run src/lib/calc/schema.test.ts` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | FIELD-01 / D-01 | — | Registry prefill populates SIRET when SIREN resolves; field stays editable | component | `npx vitest run "app/(authed)/proposals/new/parametres/ParametresFormCard.test.tsx"` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | D-02 | — | SIRET/SIREN prefix mismatch blocks, error lands on the SIRET field | unit (Zod) | `npx vitest run src/lib/calc/schema.test.ts` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | D-03 | — | Registry failure leaves the field empty and editable, with NO notice rendered | component | `npx vitest run "app/(authed)/proposals/new/parametres/ParametresFormCard.test.tsx"` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | D-05 | T-42-LegacyDraft | Pre-Phase-42 draft at finalize returns a distinct bounded code, not `ValidationFailed` | unit + route | `npx vitest run src/lib/api/proposals/finalize-wizard.test.ts "app/api/proposals/finalize/route.test.ts"` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | PROF-01 | — | Partner sets/sees own téléphone; fonction rendered read-only from `partnerType`, never an input | component | `npx vitest run "app/(authed)/parametres/ParametresForm.test.tsx"` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | PROF-02 / D-17 | T-42-GateBypass | Missing téléphone blocks finalize with its own bounded code; gate is server-side, not client-only | unit + route | `npx vitest run src/lib/api/proposals/finalize-wizard.test.ts "app/api/proposals/finalize/route.test.ts"` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | PROF-02 / D-18 | T-42-PayloadEcho | `FinalizeButton` parses `body.error` (it does not today) and renders the dialog, not a toast; no payload echoed | component | `npx vitest run "app/(authed)/proposals/new/verification/FinalizeButton.test.tsx"` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | PROF-03 / D-07..D-09 | T-42-AdvisorAuthz | Advisor singleton is admin-writable only and readable back; never enters `params_snapshot` | unit (query helper) | `npx vitest run src/lib/db/queries/advisor.test.ts` | ❌ **Wave 0** | ⬜ pending |
-| TBD | TBD | TBD | D-13 | — | Company téléphone persists to a real `users` column and reads back — not only into `audit_log.payload.profile` | unit (admin action) | `npx vitest run src/lib/admin/actions.test.ts` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | D-13 | — | Company téléphone never blocks finalization | unit | `npx vitest run src/lib/api/proposals/finalize-wizard.test.ts` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | D-19 | — | Admin can set the partner's own téléphone at creation | unit + component | `npx vitest run src/lib/admin/actions.test.ts "app/(admin)/[adminSegment]/partners/new/CreatePartnerForm.test.tsx"` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | D-16 | — | An EN proposal renders the English fonction label; FR renders French | unit (i18n) | `npx vitest run src/lib/i18n/dictionaries.test.ts` | ✅ extend | ⬜ pending |
-| TBD | TBD | TBD | FIELD-02 / D-11 | — | Company téléphone is session-hydrated into the draft's `inputs`, never read back from the form | component/unit | `npx vitest run "app/(authed)/proposals/new/parametres/page.test.tsx"` | ✅ extend | ⬜ pending |
+| 42-03-T1 | 42-03 | 2 | FIELD-01 | — | SIRET required at step 1; 14-digit shape | unit (Zod) | `npx vitest run src/lib/calc/schema.test.ts` | ✅ extend | ⬜ pending |
+| 42-08-T3 | 42-08 | 3 | FIELD-01 / D-01 | — | Registry prefill populates SIRET when SIREN resolves; field stays editable | component | `npx vitest run "app/(authed)/proposals/new/parametres/ParametresFormCard.test.tsx"` | ✅ extend | ⬜ pending |
+| 42-03-T1 | 42-03 | 2 | D-02 | — | SIRET/SIREN prefix mismatch blocks, error lands on the SIRET field | unit (Zod) | `npx vitest run src/lib/calc/schema.test.ts` | ✅ extend | ⬜ pending |
+| 42-08-T3 | 42-08 | 3 | D-03 | — | Registry failure leaves the field empty and editable, with NO notice rendered | component | `npx vitest run "app/(authed)/proposals/new/parametres/ParametresFormCard.test.tsx"` | ✅ extend | ⬜ pending |
+| 42-10-T1 / 42-10-T2 | 42-10 | 3 | D-05 | T-42-LegacyDraft | Pre-Phase-42 draft at finalize returns a distinct bounded code, not `ValidationFailed` | unit + route | `npx vitest run src/lib/api/proposals/finalize-wizard.test.ts "app/api/proposals/finalize/route.test.ts"` | ✅ extend | ⬜ pending |
+| 42-04-T2 | 42-04 | 2 | PROF-01 | — | Partner sets/sees own téléphone; fonction rendered read-only from `partnerType`, never an input | component | `npx vitest run "app/(authed)/parametres/ParametresForm.test.tsx"` | ✅ extend | ⬜ pending |
+| 42-10-T1 / 42-10-T2 | 42-10 | 3 | PROF-02 / D-17 | T-42-GateBypass | Missing téléphone blocks finalize with its own bounded code; gate is server-side, not client-only | unit + route | `npx vitest run src/lib/api/proposals/finalize-wizard.test.ts "app/api/proposals/finalize/route.test.ts"` | ✅ extend | ⬜ pending |
+| 42-10-T3 | 42-10 | 3 | PROF-02 / D-18 | T-42-PayloadEcho | `FinalizeButton` parses `body.error` (it does not today) and renders the dialog, not a toast; no payload echoed | component | `npx vitest run "app/(authed)/proposals/new/verification/FinalizeButton.test.tsx"` | ✅ extend | ⬜ pending |
+| 42-06-T1 / 42-06-T2 | 42-06 | 2 | PROF-03 / D-07..D-09 | T-42-AdvisorAuthz | Advisor singleton is admin-writable only and readable back; never enters `params_snapshot` | unit (query helper) | `npx vitest run src/lib/db/queries/advisor.test.ts` | ❌ → created by 42-06-T1 | ⬜ pending |
+| 42-05-T2 | 42-05 | 2 | D-13 | — | Company téléphone persists to a real `users` column and reads back — not only into `audit_log.payload.profile` | unit (admin action) | `npx vitest run src/lib/admin/actions.test.ts` | ✅ extend | ⬜ pending |
+| 42-10-T1 | 42-10 | 3 | D-13 | — | Company téléphone never blocks finalization | unit | `npx vitest run src/lib/api/proposals/finalize-wizard.test.ts` | ✅ extend | ⬜ pending |
+| 42-05-T2 / 42-05-T3 | 42-05 | 2 | D-19 | — | Admin can set the partner's own téléphone at creation | unit + component | `npx vitest run src/lib/admin/actions.test.ts "app/(admin)/[adminSegment]/partners/new/CreatePartnerForm.test.tsx"` | ✅ extend | ⬜ pending |
+| 42-01-T3 | 42-01 | 1 | D-16 | — | The FR/EN `pdf.partnerType.*` label pairs exist in both dictionaries (Phase 43 renders them per D-24) | unit (i18n) | `npx vitest run src/lib/i18n/dictionaries.test.ts` | ✅ extend | ⬜ pending |
+| 42-09-T1 / 42-09-T2 | 42-09 | 3 | FIELD-02 / D-11 | — | Company téléphone is session-hydrated into the draft's `inputs`, never read back from the form | component/unit | `npx vitest run "app/(authed)/proposals/new/parametres/page.test.tsx"` | ✅ extend | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -73,8 +73,8 @@ during this planning run; they need new cases, not creation:
 
 Genuine Wave 0 work:
 
-- [ ] `src/lib/db/queries/advisor.ts` + `src/lib/db/queries/advisor.test.ts` — new singleton table for the Leasetic advisor identity (D-07/D-08); no existing file to extend.
-- [ ] `drizzle/0011_phase42_*.sql` — generated via `npm run db:generate` after `src/db/schema.ts` edits, **never hand-authored**, then renamed descriptively with `_journal.json` kept in sync (`scripts/check-migration-journal-sync.sh` enforces this). Ordinal `0011` confirmed against `drizzle/meta/_journal.json` (last entry is `idx: 10`, `0010_phase34_fiche_client`).
+- [ ] `src/lib/db/queries/advisor.ts` + `src/lib/db/queries/advisor.test.ts` — **owned by Plan 42-06 Task 1** — new singleton table for the Leasetic advisor identity (D-07/D-08); no existing file to extend.
+- [ ] `drizzle/0011_phase42_*.sql` — **owned by Plan 42-02 Task 2; applied by Plan 42-02 Task 3** — generated via `npm run db:generate` after `src/db/schema.ts` edits, **never hand-authored**, then renamed descriptively with `_journal.json` kept in sync (`scripts/check-migration-journal-sync.sh` enforces this). Ordinal `0011` confirmed against `drizzle/meta/_journal.json` (last entry is `idx: 10`, `0010_phase34_fiche_client`).
 
 *No test framework install needed — Vitest is configured and 2578 tests are green.*
 
@@ -100,4 +100,4 @@ Genuine Wave 0 work:
 - [ ] `npm run lint:check` and `npm run check:no-drizzle-push` green
 - [ ] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** task IDs attached by the planner 2026-09-08 (Plans 42-01..42-10); awaiting execution
