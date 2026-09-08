@@ -68,7 +68,7 @@ proposal into it.
 
 ### Fields — newly captured data
 
-- [ ] **FIELD-01**: A partner filling the proposal wizard must supply the client's SIRET, validated
+- [x] **FIELD-01**: A partner filling the proposal wizard must supply the client's SIRET, validated
   as 14 digits, before the proposal can be finalized.
 - [ ] **FIELD-02**: The partner company's telephone is held on the partner account (admin-set) and
   carried onto every proposal's immutable `inputs` at draft creation. *(Restated 2026-09-08 by Phase 42 D-15 / D-11 / D-13:
@@ -160,7 +160,7 @@ proposal into it.
 | DOC-11 | Phase 43 — New PDF Layout | Pending |
 | DOC-12 | Phase 43 — New PDF Layout | Pending |
 | DOC-13 | Phase 43 — New PDF Layout | Pending |
-| FIELD-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| FIELD-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | FIELD-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
 | FIELD-03 | Phase 43 — New PDF Layout | Pending |
 | PROF-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |

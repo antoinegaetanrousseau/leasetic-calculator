@@ -119,3 +119,7 @@ None — no external service configuration required. `lookupSiretAction` reuses 
 ---
 *Phase: 42-captured-data-fields-advisor-profile*
 *Completed: 2026-09-08*
+
+## Self-Check: PASSED
+
+All 8 claimed files found on disk; all 4 commit hashes (c724070, 6588b4f, 20433d0, cb47f9c) found in git history.

@@ -815,7 +815,7 @@ Plans:
 > sources the partner block instead (D-22/D-06). Authority:
 > `.planning/phases/42-captured-data-fields-advisor-profile/42-CONTEXT.md`.
 
-**Plans:** 5/10 plans executed
+**Plans:** 6/10 plans executed
 
 **Wave 1**
 
@@ -832,7 +832,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2)*
 
 - [x] 42-07-PLAN.md — Admin advisor screen at /{adminSegment}/advisor plus its nav entry point
-- [ ] 42-08-PLAN.md — SiretInput, the registry-lookup action, and the wizard step-1 SIRET field
+- [x] 42-08-PLAN.md — SiretInput, the registry-lookup action, and the wizard step-1 SIRET field
 - [ ] 42-09-PLAN.md — Session hydration of partnerTel into draft inputs and clientSiret resume prefill
 - [ ] 42-10-PLAN.md — Finalize telephone gate, legacy-draft pre-check, two bounded codes, and the FinalizeButton dialog
 
@@ -931,7 +931,7 @@ D-16's PDF-only fonction translation, rendering the FR/EN label matching each pr
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
 | 41. Typography Migration | v1.9 | 3/3 | Complete    | 2026-09-08 |
-| 42. Captured Data — Fields & Advisor Profile | v1.9 | 5/10 | In Progress|  |
+| 42. Captured Data — Fields & Advisor Profile | v1.9 | 6/10 | In Progress|  |
 | 43. New PDF Layout | v1.9 | 0/TBD | Not started | - |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
 
