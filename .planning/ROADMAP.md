@@ -780,12 +780,12 @@ Plans:
 > Phase 43 criterion 6. Criterion 3 previously asked for a second, display-weight typeface
 > that neither design file references (D-04).
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 **Wave 1**
 
 - [x] 41-01-PLAN.md — Reconcile ROADMAP criteria 1/3 and REQUIREMENTS DOC-09 with the family-only scope (D-02, D-04)
-- [ ] 41-02-PLAN.md — Acquire SHA-256-pinned Inter statics, register them, retire Plus Jakarta Sans, invert the guard, regenerate the fixture
+- [x] 41-02-PLAN.md — Acquire SHA-256-pinned Inter statics, register them, retire Plus Jakarta Sans, invert the guard, regenerate the fixture
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -891,7 +891,7 @@ Plans:
 | 38. Shell, Dialogs & Visual Conventions | v1.8 | 4/4 | Complete    | 2026-09-06 |
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
-| 41. Typography Migration | v1.9 | 1/3 | In Progress|  |
+| 41. Typography Migration | v1.9 | 2/3 | In Progress|  |
 | 42. Captured Data — Fields & Advisor Profile | v1.9 | 0/TBD | Not started | - |
 | 43. New PDF Layout | v1.9 | 0/TBD | Not started | - |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |

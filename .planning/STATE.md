@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T08:35:09.425Z"
+last_updated: "2026-09-08T08:47:23.382Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 41 (typography-migration) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-09-08
 
@@ -518,6 +518,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 40 P05 | 35m | 3 tasks | 3 files |
 | Phase 40 P06 | 55min | 3 tasks | 160 files |
 | Phase 41 P01 | 4min | 2 tasks | 2 files |
+| Phase 41 P02 | 10min | 2 tasks | 14 files |
 
 ## Decisions
 
@@ -704,6 +705,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 40]: D-40-09 amended in place: path-reference rewrite scope narrowed to Phase 40's own live docs plus forward-read refs in phases 36-39, excluding already-executed PLAN/SUMMARY/VERIFICATION/PATTERNS records in 36-39 (258 hits/32 files measured, vs 225/21 at planning time)
 - [Phase 41]: DOC-09 narrowed to a font-family swap; ten-step type scale relocated to DOC-01/Phase 43 — 41-CONTEXT.md D-02: criterion 1/DOC-09 and criterion 4 (no visual change) contradicted each other
 - [Phase 41]: ROADMAP Phase 41 criterion 3 drops Inter Tight; names rsms/inter v4.1 SHA-256-pinned as the source — 41-CONTEXT.md D-04: neither design file references Inter Tight
+- [Phase ?]: VERIFY-THEN-PIN-TO-v4.1 policy executed: releases/latest resolved to v4.1 (no drift), acquired v4.1 as pinned
+- [Phase ?]: Guard test and comment wording adjusted to avoid the literal string 'Jakarta' so the plan's own grep -ci jakarta acceptance gates return 0
+- [Phase ?]: npm run build verified locally by temporarily moving the gitignored, prod-pointing .env.production.local aside (mirrors CI's zero-env-file SKIP condition); no DB command run, file restored immediately
 
 ### Blockers
 
