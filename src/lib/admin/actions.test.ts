@@ -326,3 +326,91 @@ describe('Phase 30 Plan 03 (ROLE-01/02) — adminUpdatePartnerType moves role wi
     expect(payloadStr.toLowerCase()).not.toContain('commission');
   });
 });
+
+describe('Phase 42 — telephone persistence (D-13 / D-19)', () => {
+  it("phone (company telephone) writes companyTelephone into the users UPDATE's set object", async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-6', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'company-phone@example.com',
+      displayName: 'Company Phone User',
+      language: 'fr',
+      phone: '01 23 45 67 89',
+    });
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.companyTelephone).toBe('01 23 45 67 89');
+  });
+
+  it("telephone (partner's own) writes telephone into the users UPDATE's set object", async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-7', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'own-telephone@example.com',
+      displayName: 'Own Telephone User',
+      language: 'fr',
+      telephone: '06 12 34 56 78',
+    });
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.telephone).toBe('06 12 34 56 78');
+  });
+
+  it('omitting both telephones leaves neither key present in the set object', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-8', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'no-phones@example.com',
+      displayName: 'No Phones User',
+      language: 'fr',
+    });
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect('companyTelephone' in setCall).toBe(false);
+    expect('telephone' in setCall).toBe(false);
+  });
+
+  it("phone: '' also omits companyTelephone — an absent value must not overwrite an existing column", async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-9', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'empty-phone@example.com',
+      displayName: 'Empty Phone User',
+      language: 'fr',
+      phone: '',
+      telephone: '',
+    });
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect('companyTelephone' in setCall).toBe(false);
+    expect('telephone' in setCall).toBe(false);
+  });
+
+  it('existing language/partnerType/roleUpdate behaviour is unchanged and exactly ONE users UPDATE is issued', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-10', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'full@example.com',
+      displayName: 'Full User',
+      language: 'en',
+      partnerType: 'Agent',
+      phone: '01 23 45 67 89',
+      telephone: '06 12 34 56 78',
+    });
+    expect(dbSpies()._setMock).toHaveBeenCalledTimes(1);
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.language).toBe('en');
+    expect(setCall.partnerType).toBe('Agent');
+    expect(setCall.companyTelephone).toBe('01 23 45 67 89');
+    expect(setCall.telephone).toBe('06 12 34 56 78');
+  });
+
+  it('the audit_log profile payload still contains phone and telephone when supplied', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ id: 'user-11', role: 'partner' });
+    await adminCreateInvitation({
+      email: 'audited-phones@example.com',
+      displayName: 'Audited Phones User',
+      language: 'fr',
+      phone: '01 23 45 67 89',
+      telephone: '06 12 34 56 78',
+    });
+    const userCreateCall = writeAuditLogMock.mock.calls
+      .map((c) => c[0])
+      .find((c) => c.action === 'user.create');
+    const profile = (userCreateCall!.payload as { profile?: Record<string, unknown> }).profile;
+    expect(profile).toBeDefined();
+    expect(profile!.phone).toBe('01 23 45 67 89');
+    expect(profile!.telephone).toBe('06 12 34 56 78');
+  });
+});

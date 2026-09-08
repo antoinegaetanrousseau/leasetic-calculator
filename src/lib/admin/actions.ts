@@ -356,11 +356,26 @@ export async function adminCreateInvitation(
     // Set the partner's language preference and partner_type (createInvitation does not set them).
     // PTYPE-01: partnerType is persisted here exactly as language is — via UPDATE users SET.
     // ADMIN-09: partner_type is a business-classification field, NOT a commission/rate value.
+    //
+    // Phase 42 Plan 05 (D-13/D-19, RESEARCH Pitfall 4): the two telephone args
+    // now ALSO reach real, queryable users columns via this same UPDATE — not
+    // a second .update() call, which would turn one write into two and break
+    // the single-UPDATE assertion the tests make. Before this change, `phone`
+    // was captured by the form and written only into audit_log.payload.profile
+    // (buildProfilePayload below) — a write-only compliance trail that is
+    // never read back, so the field looked persisted while
+    // session.user.companyTelephone stayed null forever. Both spreads use the
+    // same conditional-spread idiom as `partnerType` above so an absent value
+    // never clobbers an existing column. `args.phone` (kept under its legacy
+    // arg name per the AdminCreateInvitationArgs comment) maps to
+    // companyTelephone; `args.telephone` maps to telephone.
     await db()
       .update(schema.users)
       .set({
         language: args.language,
         ...(args.partnerType ? { partnerType: args.partnerType } : {}),
+        ...(args.phone ? { companyTelephone: args.phone } : {}),
+        ...(args.telephone ? { telephone: args.telephone } : {}),
         ...roleUpdate,
       })
       .where(eq(schema.users.id, userRow.id));
@@ -615,6 +630,10 @@ export async function createPartnerInvitationAction(
       companyName: parsed.companyName,
       siret: parsed.siret,
       phone: parsed.phone,
+      // Phase 42 Plan 05 (D-19): the partner's own telephone, threaded
+      // through to adminCreateInvitation alongside the existing companyName
+      // telephone (`phone`) so both reach the single users UPDATE.
+      telephone: parsed.telephone,
       invitationMessage: parsed.invitationMessage,
       // PTYPE-01: thread partnerType through to adminCreateInvitation so it is
       // persisted via UPDATE users SET partner_type = ... at invitation time.
