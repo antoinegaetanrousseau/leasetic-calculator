@@ -86,7 +86,11 @@ vi.mock('@/(authed)/proposals/new/_actions/persistAccordionOpen.action', () => (
   persistAccordionOpenAction: (...args: unknown[]) =>
     persistAccordionOpenMock(...args),
 }));
-vi.mock('@/(authed)/proposals/new/_actions/saveAsDraft.action', () => ({
+// WizardStep1Wiring.tsx imports this action by an app/-relative specifier, so
+// the mock must use the SAME specifier: `@/` maps to src/, and a mock bound at
+// `@/(authed)/...` registers a module id nothing under app/ ever resolves to —
+// the mock never fires and every assertion through it passes vacuously.
+vi.mock('../_actions/saveAsDraft.action', () => ({
   saveAsDraftAction: (...args: unknown[]) => saveAsDraftMock(...args),
 }));
 vi.mock('@/(authed)/proposals/new/_actions/saveAndAdvance.action', () => ({
@@ -523,6 +527,50 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
     expect(container.innerHTML.toLowerCase()).not.toMatch(/commission/);
   });
 
+  it('Test 11a: clicking "Enregistrer comme brouillon" invokes saveAsDraftAction with the draft id and the RHF payload', async () => {
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      inputs: {
+        clientCo: 'Cliente SARL',
+        clientSiren: '123456789',
+        clientSiret: '12345678900012',
+        amountHT: '75000',
+        durationMonths: 48,
+        _completedSteps: [],
+      },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const { getByText } = render(tree);
+
+    fireEvent.click(getByText(/Enregistrer comme brouillon/));
+
+    // The action must actually fire — a dead mock would hang here rather than
+    // let the assertions below pass vacuously.
+    await waitFor(() => expect(saveAsDraftMock).toHaveBeenCalledTimes(1));
+    expect(saveAsDraftMock).toHaveBeenCalledWith(
+      'd-1',
+      expect.objectContaining({
+        // Client data round-trips out of the stored draft via the RHF prefill.
+        clientCo: 'Cliente SARL',
+        clientSiren: '123456789',
+        clientSiret: '12345678900012',
+        amountHT: '75000',
+        durationMonths: 48,
+        // D-07 / D-08: partner attribution + validity are session- and
+        // params-resolved, never read from the draft, but they still travel
+        // in the save-as-draft payload.
+        partnerName: 'Alice Partner',
+        partnerCo: 'Acme Leasing',
+        validityDays: 30,
+      }),
+    );
+  });
+
   // ──────────────────────────────────────────────────────────────────────────
   // ADMIN-09 step-1 invariant
   // ──────────────────────────────────────────────────────────────────────────
@@ -562,23 +610,19 @@ describe('Phase 42 — partnerTel hydration + clientSiret resume (D-11 / FIELD-0
   // partnerTel is deliberately never rendered as a visible input (D-11), so
   // it cannot be asserted via a DOM query. It IS still tracked in RHF's form
   // state (ProposalForm.tsx defaultValues), so it survives a save-as-draft
-  // round trip — verified here by clicking "Enregistrer comme brouillon".
-  // WizardStep1Wiring's onSaveDraft calls the real saveAsDraftAction (this
-  // suite's saveAsDraftMock is bound at a module id under src/ that the
-  // action's real app/ relative import never resolves to — a pre-existing,
-  // unrelated test-mock gap, not something this plan introduces or fixes),
-  // which in turn calls the correctly-mocked `updateDraft` with the RHF
-  // form's live values as `inputs` — the same signal this plan cares about.
+  // round trip — verified here by clicking "Enregistrer comme brouillon" and
+  // reading the payload WizardStep1Wiring hands to saveAsDraftAction directly
+  // (the mock is live now that it is bound at the action's real module id).
   async function clickSaveDraftAndGetInputs(
     tree: Awaited<ReturnType<typeof ParametresStep1Page>>,
   ) {
     const { getByText } = render(tree);
     fireEvent.click(getByText(/Enregistrer comme brouillon/));
-    await waitFor(() => expect(updateDraftMock).toHaveBeenCalled());
-    const lastCall = updateDraftMock.mock.calls[
-      updateDraftMock.mock.calls.length - 1
-    ] as [string, string, { inputs: Record<string, unknown> }];
-    return lastCall[2].inputs;
+    await waitFor(() => expect(saveAsDraftMock).toHaveBeenCalled());
+    const lastCall = saveAsDraftMock.mock.calls[
+      saveAsDraftMock.mock.calls.length - 1
+    ] as [string, Record<string, unknown>];
+    return lastCall[1];
   }
 
   it('with session.user.companyTelephone set, saving as draft persists partnerTel from the session', async () => {
