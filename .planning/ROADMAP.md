@@ -794,15 +794,26 @@ Plans:
 ### Phase 42: Captured Data — Fields & Advisor Profile
 
 **Milestone:** v1.9 — PDF Proposal Redesign
-**Goal:** Proposals and partner accounts carry the new data the redesigned PDF needs — client SIRET, partner phone, and an advisor identity (fonction, téléphone) sourced from the creating user's account — so Phase 43 can build the "Société cliente" and "Votre contact" cards against real data rather than only em-dash fallbacks.
+**Goal:** Proposals and partner accounts carry the new data the redesigned PDF needs — client SIRET, partner telephone, and an advisor identity (name, fonction, téléphone, email) sourced from a single admin-editable Leasetic advisor setting — so Phase 43 can build the "Société cliente" and "Votre contact" cards against real data rather than only em-dash fallbacks.
 **Depends on:** Nothing in-milestone (independent of Phase 41; both precede Phase 43)
 **Requirements:** FIELD-01, FIELD-02, PROF-01, PROF-02, PROF-03
 **Success Criteria** (what must be TRUE):
 
-  1. A partner filling the proposal wizard must supply the client's SIRET (validated as 14 digits) and the partner company's telephone before the proposal can be finalized; both persist in that proposal's immutable `inputs`.
-  2. A partner can view and set their own fonction and téléphone on `/parametres`, alongside the name and email already shown there.
-  3. A partner whose account is missing fonction or téléphone is stopped at proposal finalization with a message naming exactly what's missing and a link to `/parametres` — fixed once on the account, never re-prompted per proposal.
-  4. A newly finalized proposal's advisor name and email are sourced from the authenticated creating user's account rather than a free-typed field.
+  1. The partner must supply the client's SIRET — validated as 14 digits, and whose first 9 digits equal the proposal's SIREN — before the proposal can be finalized; it persists in that proposal's immutable `inputs`. The partner company's telephone is admin-set on the partner account and session-hydrated into the same `inputs`; it is not a wizard field and never blocks finalization.
+  2. A partner can set their own téléphone on `/parametres` and sees their fonction there as read-only text derived from the admin-assigned `partnerType`, alongside the name and email already shown.
+  3. A partner whose account is missing a téléphone is stopped at proposal finalization by a dialog naming the téléphone field and linking to `/parametres`.
+  4. A newly finalized proposal's partner block is sourced from the account of the authenticated user who created it; the advisor block is sourced from a single admin-editable Leasetic advisor setting, read live at render time and never snapshotted into `inputs`.
+
+> **Criteria 1-4 reconciled 2026-09-08** (Phase 42 discussion — `42-CONTEXT.md` D-23, executed by
+> Plan 42-01). Criterion 1 retracted the claim that the company telephone gates finalization at
+> all — it is admin-set and never blocks finalization (D-15/D-11/D-13). Criterion 2 retracted
+> partner-editability of fonction entirely — fonction is the admin-assigned `partnerType`, read-only
+> to the partner (D-20/D-14). Criterion 3 narrowed the pair of possible missing fields down to
+> téléphone alone, since `partner_type` is NOT NULL and can never be the missing one (D-21/D-14).
+> Criterion 4 retracted the pairing of the advisor's identity with the account that creates the
+> proposal — the advisor is a distinct Leasetic-side person, and that account's identity now
+> sources the partner block instead (D-22/D-06). Authority:
+> `.planning/phases/42-captured-data-fields-advisor-profile/42-CONTEXT.md`.
 
 **Plans:** 10 plans
 
@@ -846,6 +857,14 @@ Plans:
 **UI hint:** yes
 
 **Planning note:** `@react-pdf/renderer`'s SVG support is partial — the header lockup and footer icon mark may need a PNG or a hand-built vector rather than the source SVGs directly; confirm during planning rather than assuming direct `<Image>`/SVG support.
+
+**Planning note:** Phase 42 discussion (D-24) amends this phase's `DOC-03` to carry D-10's
+partner-first / advisor-second card restructure — the "Votre contact" card headlines the partner
+company, commercial and téléphone, with the Leasetic advisor's name, fonction, téléphone and email
+as the supporting contact beneath, deliberately deviating from `Quote-FR-A.dc.html:67-74` — and
+D-16's PDF-only fonction translation, rendering the FR/EN label matching each proposal's committed
+`language`. Phase 42 lands the `pdf.partnerType.*` FR/EN label pairs this phase renders; see
+`.planning/phases/42-captured-data-fields-advisor-profile/42-CONTEXT.md`.
 
 ### Phase 44: Backfill Migration
 
