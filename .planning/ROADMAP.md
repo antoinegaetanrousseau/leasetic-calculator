@@ -815,7 +815,7 @@ Plans:
 > sources the partner block instead (D-22/D-06). Authority:
 > `.planning/phases/42-captured-data-fields-advisor-profile/42-CONTEXT.md`.
 
-**Plans:** 3/10 plans executed
+**Plans:** 4/10 plans executed
 
 **Wave 1**
 
@@ -827,7 +827,7 @@ Plans:
 - [x] 42-03-PLAN.md — clientSiret with the SIREN-prefix refine, optional partnerTel, and siege.siret in the registry parser
 - [ ] 42-04-PLAN.md — Better Auth additionalFields registration + /parametres telephone and read-only fonction
 - [x] 42-05-PLAN.md — Admin partner form: company telephone persistence and the new partner telephone field
-- [ ] 42-06-PLAN.md — Advisor singleton persistence: fixed-id query helpers, form schema, admin-gated action
+- [x] 42-06-PLAN.md — Advisor singleton persistence: fixed-id query helpers, form schema, admin-gated action
 
 **Wave 3** *(blocked on Wave 2)*
 
@@ -931,7 +931,7 @@ D-16's PDF-only fonction translation, rendering the FR/EN label matching each pr
 | 39. Database Guard Correctness | v1.8 | 5/5 | Complete    | 2026-09-06 |
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
 | 41. Typography Migration | v1.9 | 3/3 | Complete    | 2026-09-08 |
-| 42. Captured Data — Fields & Advisor Profile | v1.9 | 3/10 | In Progress|  |
+| 42. Captured Data — Fields & Advisor Profile | v1.9 | 4/10 | In Progress|  |
 | 43. New PDF Layout | v1.9 | 0/TBD | Not started | - |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
 
