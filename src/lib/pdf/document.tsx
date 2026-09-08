@@ -5,10 +5,10 @@ import { formatCurrency, formatDate, formatNumber } from '@/lib/i18n/format';
 import { pdfColors, pdfFontSizes, pdfFontWeights, pdfPageBase, pdfPageMargins } from './styles';
 import { sanitizePdfNumber } from './sanitize-number';
 import { SectionLabel } from './components/section-label';
-import { KeyValueRow } from './components/key-value-row';
 import { LeaseticLockup } from './components/leasetic-lockup';
 import { Eyebrow } from './components/eyebrow';
 import { CardKeyValueRow } from './components/card-key-value-row';
+import { FinancialRow } from './components/financial-row';
 import { emDash } from './em-dash';
 
 // ── Font.register: once, at module load ──────────────────────────────────────
@@ -304,70 +304,87 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
           </View>
         </View>
 
-        {/* ── Computation breakdown ─────────────────────────────────────── */}
-        <View style={{
-          borderWidth: 1,
-          borderColor: pdfColors.border,
-          borderRadius: 8,
-          padding: 16,
-          marginBottom: 12,
-        }}>
-          <KeyValueRow
-            keyText={t('proposal.montant.label', lang)}
-            valueText={sanitizePdfNumber(formatCurrency(Number(inputs.amountHT), lang))}
-          />
-          <KeyValueRow
-            keyText={t('proposal.duree.label', lang)}
-            valueText={`${inputs.durationMonths} ${t('proposal.duree.months', lang)}`}
-          />
-          {computed.state === 'computed' && computed.coeff && (
-            <KeyValueRow
-              keyText={t('pdf.computed.coefficient.label', lang)}
-              valueText={`${sanitizePdfNumber(formatNumber(Number(computed.coeff), lang, { minimumFractionDigits: 4, maximumFractionDigits: 4 }))} %`}
-            />
-          )}
-        </View>
+        {/* ── Loyer hero + CONDITIONS FINANCIÈRES table (DOC-04, DOC-05, D-08, D-09) ──
+            The design's `1.05fr 1.15fr` grid with a 10px gap — react-pdf has no grid
+            primitive, so flexGrow + flexBasis: 0 is the port. */}
+        {(() => {
+          const isOnDemand = computed.state === 'on-demand' || !computed.loyerHT;
+          const loyerText = isOnDemand
+            ? t('pdf.loyer.on.demand', lang)
+            : sanitizePdfNumber(formatCurrency(Number(computed.loyerHT), lang));
+          const total = isOnDemand
+            ? null
+            : Math.round(Number(computed.loyerHT) * inputs.durationMonths * 100) / 100;
+          return (
+            <View style={{ flexDirection: 'row', alignItems: 'stretch', marginBottom: 10.5 }}>
+              {/* Hero (DOC-04) — no background fill, no green anywhere (D-08). */}
+              <View style={{
+                flexGrow: 1.05,
+                flexBasis: 0,
+                marginRight: 7.5,
+                borderWidth: 1.125,
+                borderColor: pdfColors.navy,
+                borderRadius: 10.5,
+                padding: 15,
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}>
+                <Eyebrow marginBottom={4.5}>{t('pdf.loyer.label', lang)}</Eyebrow>
+                <Text style={{
+                  fontSize: pdfFontSizes.h1,
+                  fontWeight: pdfFontWeights.semibold,
+                  color: pdfColors.navy,
+                  letterSpacing: -0.63,
+                  lineHeight: 1.05,
+                }}>{loyerText}</Text>
+                <Text style={{
+                  fontSize: pdfFontSizes.heroCaption,
+                  fontWeight: pdfFontWeights.regular,
+                  color: pdfColors.bodyBlue,
+                  marginTop: 4.5,
+                }}>
+                  {t('pdf.loyer.subtext', lang).replace('{0}', String(inputs.durationMonths))}
+                </Text>
+              </View>
 
-        {/* ── Loyer feature card (visual climax) ────────────────────────── */}
-        <View style={{
-          borderWidth: 1,
-          borderColor: pdfColors.green,
-          borderRadius: 8,
-          padding: 24,
-          marginBottom: 16,
-          backgroundColor: pdfColors.greenTint,
-        }}>
-          <Text style={{
-            fontSize: pdfFontSizes.caption,
-            fontWeight: pdfFontWeights.bold,
-            color: pdfColors.muted,
-            textTransform: 'uppercase',
-            letterSpacing: 0.06,
-            marginBottom: 6,
-          }}>{t('pdf.loyer.label', lang)}</Text>
-          {computed.state === 'on-demand' || !computed.loyerHT ? (
-            <Text style={{
-              fontSize: pdfFontSizes.title,
-              fontWeight: pdfFontWeights.bold,
-              color: pdfColors.navy,
-            }}>{t('pdf.loyer.on.demand', lang)}</Text>
-          ) : (
-            <Text style={{
-              fontSize: pdfFontSizes.loyer,
-              fontWeight: pdfFontWeights.bold,
-              color: pdfColors.navy,
-              letterSpacing: -0.5,
-            }}>{sanitizePdfNumber(formatCurrency(Number(computed.loyerHT), lang))}</Text>
-          )}
-          <Text style={{
-            fontSize: pdfFontSizes.body,
-            fontWeight: pdfFontWeights.regular,
-            color: pdfColors.muted,
-            marginTop: 4,
-          }}>
-            {t('pdf.loyer.subtext', lang).replace('{0}', String(inputs.durationMonths))}
-          </Text>
-        </View>
+              {/* Table card (DOC-05) */}
+              <View style={{
+                flexGrow: 1.15,
+                flexBasis: 0,
+                backgroundColor: pdfColors.cardFill,
+                borderRadius: 10.5,
+                paddingVertical: 9.75,
+                paddingHorizontal: 11.25,
+              }}>
+                <Eyebrow marginBottom={6.75}>{t('pdf.table.title', lang)}</Eyebrow>
+                <FinancialRow
+                  label={t('pdf.table.amount', lang)}
+                  value={sanitizePdfNumber(formatCurrency(Number(inputs.amountHT), lang))}
+                />
+                <FinancialRow
+                  label={t('pdf.table.term', lang)}
+                  value={t('pdf.pill.term', lang).replace('{0}', String(inputs.durationMonths))}
+                />
+                <FinancialRow
+                  label={t('pdf.computed.coefficient.label', lang)}
+                  value={isOnDemand
+                    ? emDash(null)
+                    : `${sanitizePdfNumber(formatNumber(Number(computed.coeff), lang, { minimumFractionDigits: 4, maximumFractionDigits: 4 }))} %`}
+                />
+                <FinancialRow
+                  label={t('pdf.table.monthlyRent', lang)}
+                  value={loyerText}
+                />
+                <FinancialRow
+                  label={t('pdf.table.total', lang)}
+                  value={total === null ? emDash(null) : sanitizePdfNumber(formatCurrency(total, lang))}
+                  emphasis
+                  last
+                />
+              </View>
+            </View>
+          );
+        })()}
 
         {/* ── Interests block (conditional) ─────────────────────────────── */}
         {(inputs.slb || inputs.evalParc) && (
