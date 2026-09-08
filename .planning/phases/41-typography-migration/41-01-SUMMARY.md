@@ -33,7 +33,9 @@ key-decisions:
 patterns-established:
   - "ID-preserving amendment: never delete a requirement bullet or renumber criteria when narrowing scope -- rewrite in place and add a dated blockquote citing the deciding CONTEXT.md"
 
-requirements-completed: [DOC-09]
+requirements-completed: []  # DOC-09 listed in this plan's frontmatter for relevance only; the
+  # actual Inter font-registration behavior it demands is implemented by 41-02 and verified by
+  # 41-03. This plan only rewrote the requirement's text (D-02 scope narrowing) — see note below.
 
 # Metrics
 duration: 4min
@@ -145,13 +147,21 @@ _No plan-metadata commit yet -- created below, after this SUMMARY and STATE.md u
 - **Verification:** `sed -n '/### Phase 41: Typography Migration/,/### Phase 42:/p' .planning/ROADMAP.md | grep -ci "Inter Tight"` returns 0; all other Task 2 acceptance criteria (rsms/inter citation, 41-CONTEXT.md citation, criterion 4 verbatim, no "6.8" in block, Phase 43 criterion 6 present, `**Requirements:** DOC-09` unchanged) verified passing.
 - **Committed in:** `82713dd` (Task 2 commit)
 
+**2. [Rule 1 - Bug] Reverted premature `requirements.mark-complete DOC-09` during state updates**
+- **Found during:** Post-execution state-update step (`requirements.mark-complete`)
+- **Issue:** Following the standard `state_updates` procedure ("extract requirement IDs from the plan's `requirements:` frontmatter, pass to `requirements mark-complete`") ticked DOC-09's checkbox and flipped its Traceability row to `Complete`. But this plan only rewrote DOC-09's *wording* (D-02 scope narrowing) — it did not register Inter, retire Plus Jakarta Sans, or verify glyph coverage. Those are Plan 41-02's and 41-03's jobs. The plan's `requirements:` frontmatter field records relevance (which requirement this plan touches), not ownership of the requirement's actual completion.
+- **Fix:** Manually reverted `- [x] **DOC-09**` back to `- [ ]` and the Traceability row back to `Pending` in `.planning/REQUIREMENTS.md`, and left `requirements-completed: []` in this SUMMARY's frontmatter.
+- **Files modified:** `.planning/REQUIREMENTS.md`
+- **Verification:** `git diff .planning/REQUIREMENTS.md` after the revert shows no residual change from the pre-existing committed state.
+- **Committed in:** part of the final metadata commit (this SUMMARY + STATE.md + ROADMAP.md), no separate task commit since it corrects a post-task automation step rather than task work.
+
 ---
 
-**Total deviations:** 1 auto-fixed (1 bug — plan self-contradiction)
-**Impact on plan:** No scope creep; the fix only changed four words of a blockquote's wording to satisfy the plan's own explicit acceptance gate. The amendment's substance (D-04: Inter Tight dropped) is unchanged and still documented.
+**Total deviations:** 2 auto-fixed (1 plan self-contradiction, 1 premature-completion automation correction)
+**Impact on plan:** No scope creep. Both fixes keep the milestone's traceability honest — a wording change and matching a plan's own acceptance gate, and not falsely marking a requirement done before its behavior exists.
 
 ## Issues Encountered
-None beyond the deviation above.
+None beyond the deviations above.
 
 ## User Setup Required
 None — no external service configuration required.
@@ -159,6 +169,7 @@ None — no external service configuration required.
 ## Next Phase Readiness
 - Plan 41-02 (font acquisition, registration, Plus Jakarta Sans retirement) and Plan 41-03 (glyph-coverage/distinct-faces proof, human visual pass) can now be judged against a self-consistent set of ROADMAP criteria and REQUIREMENTS.
 - Phase 43 planning has an explicit criterion 6 and a DOC-01 clause to plan the ten-step type scale against, once Phase 41 and 42 land.
+- **DOC-09 stays unchecked (`[ ]`) and `Pending` in the Traceability table.** This plan only narrowed the requirement's wording (D-02) — it did not register Inter or retire Plus Jakarta Sans. The `requirements.mark-complete` SDK verb was run and then deliberately reverted after review (see Deviations), since ticking it here would falsely claim the font swap already renders. Plan 41-02 (and its verification in 41-03) is what actually earns the checkbox.
 - No blockers.
 
 ---

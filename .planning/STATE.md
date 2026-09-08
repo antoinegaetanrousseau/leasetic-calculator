@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T08:21:33.560Z"
-last_activity: 2026-09-08 -- Phase 41 planning complete
+last_updated: "2026-09-08T08:35:09.425Z"
+last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** v1.9 — PDF Proposal Redesign; Phase 41 context captured, ready for `/gsd-plan-phase 41`.
+**Current focus:** Phase 41 — typography-migration
 
 ## Current Position
 
-Phase: 41 — Typography Migration (context gathered)
-Plan: —
+Phase: 41 (typography-migration) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-09-08 -- Phase 41 planning complete
+Last activity: 2026-09-08
 
 ## Deferred Items
 
@@ -517,6 +517,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 40-milestone-record-closure P03 | 25min | 3 tasks | 3 files |
 | Phase 40 P05 | 35m | 3 tasks | 3 files |
 | Phase 40 P06 | 55min | 3 tasks | 160 files |
+| Phase 41 P01 | 4min | 2 tasks | 2 files |
 
 ## Decisions
 
@@ -701,6 +702,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 40]: CLOSE-06 marked complete: this plan supplied its last two clauses (MILESTONES.md entry + v1.6-ROADMAP.md); the audit re-run (40-03) and ROADMAP.md shipped-status fix (40-01) were already satisfied
 - [Phase 40]: Archived phases 28-35 by hand git mv against a written-first phase->milestone map, not the GSD archiving CLI (D-40-08) — the CLI mis-attributed every phase on disk in v1.7's close
 - [Phase 40]: D-40-09 amended in place: path-reference rewrite scope narrowed to Phase 40's own live docs plus forward-read refs in phases 36-39, excluding already-executed PLAN/SUMMARY/VERIFICATION/PATTERNS records in 36-39 (258 hits/32 files measured, vs 225/21 at planning time)
+- [Phase 41]: DOC-09 narrowed to a font-family swap; ten-step type scale relocated to DOC-01/Phase 43 — 41-CONTEXT.md D-02: criterion 1/DOC-09 and criterion 4 (no visual change) contradicted each other
+- [Phase 41]: ROADMAP Phase 41 criterion 3 drops Inter Tight; names rsms/inter v4.1 SHA-256-pinned as the source — 41-CONTEXT.md D-04: neither design file references Inter Tight
 
 ### Blockers
 
