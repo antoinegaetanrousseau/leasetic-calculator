@@ -30,8 +30,13 @@ proposal into it.
   this layout.
 - [ ] **DOC-02**: The PDF shows a `SOCIÉTÉ CLIENTE` card listing the client company name, SIREN,
   SIRET, destinataire, fonction, téléphone and email in the design's two-column key/value grid.
-- [ ] **DOC-03**: The PDF shows a `VOTRE CONTACT` card listing the advisor's name, fonction,
-  téléphone and email, then the partner company, commercial and téléphone.
+- [ ] **DOC-03**: The PDF shows a `VOTRE CONTACT` card whose headline is the partner company,
+  commercial and téléphone, with the Leasetic advisor's name, fonction, téléphone and email as the
+  supporting contact beneath; the advisor's fonction renders from the FR/EN label pair matching the
+  proposal's committed `language`. *(Amended 2026-09-08 by Phase 42 D-10 / D-16 via D-24: this
+  deliberately deviates from `Quote-FR-A.dc.html:67-74`, which makes `advisorName` the 11pt/600
+  headline. The deviation is intended — Phase 43 must not treat it as a spec violation. The two
+  blocks are re-ordered, not relabelled.)*
 - [ ] **DOC-04**: The PDF shows the monthly rent in a navy-outlined hero card with its term caption,
   sized and spaced per the design spec.
 - [ ] **DOC-05**: The PDF shows a `CONDITIONS FINANCIÈRES` table listing financed amount, lease term,
@@ -65,20 +70,31 @@ proposal into it.
 
 - [ ] **FIELD-01**: A partner filling the proposal wizard must supply the client's SIRET, validated
   as 14 digits, before the proposal can be finalized.
-- [ ] **FIELD-02**: A partner filling the proposal wizard must supply the partner company's
-  telephone number before the proposal can be finalized.
+- [ ] **FIELD-02**: The partner company's telephone is held on the partner account (admin-set) and
+  carried onto every proposal's immutable `inputs` at draft creation. *(Restated 2026-09-08 by Phase 42 D-15 / D-11 / D-13:
+  it is not a wizard field, and it never blocks finalization — the
+  column ships nullable and an absent value renders as an em dash under DOC-11.)*
 - [ ] **FIELD-03**: A proposal finalized before these fields existed still renders — the PDF reads
   the absent keys without throwing, and DOC-11's em-dash treatment covers them.
 
 ### Profile — advisor identity
 
-- [ ] **PROF-01**: A partner can set their fonction and telephone on their own account, and see
-  them on the settings page alongside the name and email already held there.
-- [ ] **PROF-02**: A partner whose profile is missing fonction or telephone is stopped at proposal
-  finalization with a message naming exactly what is missing and linking to where to set it —
-  once, not on every proposal.
-- [ ] **PROF-03**: The PDF's advisor name and email come from the authenticated creating user's
-  account rather than being retyped per proposal.
+- [ ] **PROF-01**: A partner can set their own telephone on their account and sees their fonction,
+  name and email on the settings page; fonction is read-only. *(Restated 2026-09-08 by Phase 42 D-20 / D-14:
+  "can set their fonction" is dropped — fonction is `users.partnerType`, admin-assigned
+  and client-immutable by `input: false`.)*
+- [ ] **PROF-02**: A partner whose account is missing a telephone is stopped at proposal
+  finalization with a message naming the telephone field and linking to `/parametres`. *(Restated 2026-09-08 by Phase 42 D-21 / D-14:
+  narrowed from the prior wording pairing fonction with telephone — `partner_type`
+  is NOT NULL so fonction can never be the missing thing. The "fixed once, never re-prompted per
+  proposal" clause is dropped as a behaviour to build: it follows automatically from a check that
+  reads the account.)*
+- [ ] **PROF-03**: A finalized proposal's **partner** block is sourced from the authenticated
+  creating user's account rather than retyped per proposal; its **advisor** block is sourced from
+  a single admin-editable Leasetic advisor setting (name, fonction, telephone, email) read live at
+  render time and never snapshotted into `inputs`. *(Restated 2026-09-08 by Phase 42 D-22 / D-06 /
+  D-07 / D-08 / D-09: the advisor is a Leasetic-side person who supports the partner's relationship
+  with the end client, not the creating user.)*
 
 ### Migration — the backfill
 
