@@ -719,6 +719,7 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
       '0008_phase31_reconciliation.sql',  // Phase 31 — companies/client_relationships/contacts.source provenance column + company_pair_decisions table (D-08/D-09/D-10); no commission-related column added
       '0009_phase33_pipeline.sql',        // Phase 33 — client_relationships.stage + proposals.outcome/outcome_date/outcome_reason + the D-07 SIREN-gate triggers; no commission-related column added
       '0010_phase34_fiche_client.sql',    // Phase 34 — companies registry-identity + website/phone/registry_status columns, client_relationships lead_source/description/next_action_at/next_action_note, and the relationship_events timeline table; no commission-related column added
+      '0011_phase42_captured_data.sql',   // Phase 42 — users.telephone/company_telephone + leasetic_advisor singleton table (name/fonction/telephone/email); no commission-related column added
     ]);
     const sqlFiles = files.filter((f) => f.endsWith('.sql'));
     const unexpected = sqlFiles.filter((f) => !KNOWN_MIGRATIONS.has(f));
