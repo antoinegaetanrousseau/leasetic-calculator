@@ -748,8 +748,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 43]: D-07 verdict: react-pdf 4.5.1 honours rotate(-90 cx cy); pre-applied rx/ry swap used anyway per plan framing (correct either way)
 - [Phase 43]: Rule 1 fix: style={{opacity}} on react-pdf Svg is a silent no-op (4.5.1); LeaseticIcon now passes opacity as a direct Svg attribute
 - [Phase 43]: Plan 43-04: emDash written as the — escape (not a pasted character); advisor row mapped as an explicit four-key literal, never spread; companyTelephone threaded opaquely from the session mirroring telephone; submit.ts's pre-existing commissionPct naming is a known, out-of-scope asymmetry with finalize-wizard.ts's ADMIN-09 grep isolation.
-- [Phase ?]: pdf.project.ref.prefix deleted in 43-05 alongside pdf.tagline/pdf.ref.label/pdf.section.project — the plan's grep-then-delete instruction found no surviving consumer
-- [Phase ?]: Ledger comments naming deleted dictionary keys literally must avoid the literal dotted key string — the plan's repo-wide grep gate checks comments too, not just consumers
+- [Phase 43]: pdf.project.ref.prefix deleted in 43-05 alongside pdf.tagline/pdf.ref.label/pdf.section.project — the plan's grep-then-delete instruction found no surviving consumer
+- [Phase 43]: Ledger comments naming deleted dictionary keys literally must avoid the literal dotted key string — the plan's repo-wide grep gate checks comments too, not just consumers
 
 ### Blockers
 
