@@ -137,6 +137,7 @@ continues from Phase 28 (retro-documented ReUI/base-maia migration). Depends on 
 Replaces the proposal PDF with the new Claude Design layout — branded lockup header, two-column
 card grid, financial-conditions table, legal conditions and a client signature block — and brings
 every existing proposal into it. Design spec: `.planning/assets/v1.9-quote-design/` (`Quote-FR-A.dc.html`
+
 + `Quote-EN-A.dc.html`, both authoritative pixel specs). Phase numbering continues from Phase 40.
 
 - [ ] **Phase 41: Typography Migration** — Inter replaces Plus Jakarta Sans in the PDF font-registration path, isolated from any layout or palette change
@@ -767,13 +768,19 @@ Plans:
 **Depends on:** Phase 40 (v1.8 close) — first phase of v1.9, no in-milestone dependency
 **Requirements:** DOC-09
 **Success Criteria** (what must be TRUE):
+
   1. Every text node in a generated proposal PDF (FR and EN, every partner type) renders in Inter at the design's type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), with Plus Jakarta Sans fully retired from the PDF font-registration path.
   2. No proposal PDF renders a missing-glyph/tofu character or throws a font-registration error.
   3. The Inter and Inter Tight TTF files are committed into the repo as self-hosted assets (not remote-linked) — acquired from the design bundle's source handoff, since only the token CSS and SVGs were vendored into `.planning/assets/v1.9-quote-design/`.
-  4. The PDF's visual design, palette and content stay exactly as they are today — this phase touches font registration only — and the byte-determinism fixture is regenerated to reflect the font swap so CI stays green.
-**Plans:** 3 plans (2 waves)
+  4. The PDF's visual design, palette and content stay exactly as they are today — this phase touches font registration only — and the byte-determinism fixture is regenerated to reflect the font swap so CI stays green.**Plans:** 3 plans (2 waves)
+
+**Wave 1**
+
 - [ ] 41-01-PLAN.md — Reconcile ROADMAP criteria 1/3 and REQUIREMENTS DOC-09 with the family-only scope (D-02, D-04)
 - [ ] 41-02-PLAN.md — Acquire SHA-256-pinned Inter statics, register them, retire Plus Jakarta Sans, invert the guard, regenerate the fixture
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 41-03-PLAN.md — Glyph-coverage + distinct-embedded-faces proof, full gate, human visual pass (D-09, D-10, D-11)
 
 ### Phase 42: Captured Data — Fields & Advisor Profile
@@ -783,10 +790,12 @@ Plans:
 **Depends on:** Nothing in-milestone (independent of Phase 41; both precede Phase 43)
 **Requirements:** FIELD-01, FIELD-02, PROF-01, PROF-02, PROF-03
 **Success Criteria** (what must be TRUE):
+
   1. A partner filling the proposal wizard must supply the client's SIRET (validated as 14 digits) and the partner company's telephone before the proposal can be finalized; both persist in that proposal's immutable `inputs`.
   2. A partner can view and set their own fonction and téléphone on `/parametres`, alongside the name and email already shown there.
   3. A partner whose account is missing fonction or téléphone is stopped at proposal finalization with a message naming exactly what's missing and a link to `/parametres` — fixed once on the account, never re-prompted per proposal.
   4. A newly finalized proposal's advisor name and email are sourced from the authenticated creating user's account rather than a free-typed field.
+
 **Plans:** TBD
 **UI hint:** yes
 
@@ -797,11 +806,13 @@ Plans:
 **Depends on:** Phase 41 (Inter must already be registered), Phase 42 (real SIRET / partner-phone / advisor data available — though the layout itself tolerates absence via em dashes, so it is not blocked on Phase 42 finishing first)
 **Requirements:** DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, DOC-06, DOC-07, DOC-08, DOC-10, DOC-11, DOC-12, DOC-13, FIELD-03
 **Success Criteria** (what must be TRUE):
+
   1. A generated proposal PDF matches the design spec end to end: lockup header + proposition-number block over a 2px navy rule; 21pt two-line title with `Réf. partenaire` / term pills; a `SOCIÉTÉ CLIENTE` card and a `VOTRE CONTACT` card in the two-column key/value grid; a navy-outlined loyer hero beside the `CONDITIONS FINANCIÈRES` table ending in a bold **Total des loyers HT** (`monthlyRent × termMonths`); the conditions paragraph; a bottom-pinned acceptance/signature/company-stamp block; and a legal footer carrying the company registration line, proposal reference, page number and the 14%-opacity icon mark.
   2. The conditions paragraph always states the proposal's actual `validityDays` (15 / 30 / 60) — never the design files' hardcoded "30 jours" / "30 days", which would contradict a 15-day proposal's own `validUntil` date.
   3. A proposal whose committed `language` is English renders every label and the full legal paragraph from `Quote-EN-A.dc.html`; a French proposal renders `Quote-FR-A.dc.html`'s text — both from the same document component.
   4. A field with no captured value — including SIRET/partner phone on proposals finalized before Phase 42, and advisor role/phone on any proposal — renders its label followed by an em dash rather than blank space or a thrown error, so every card keeps identical geometry regardless of which fields a given proposal carries.
   5. No commission figure, rate or derived value appears anywhere in the rendered PDF, in either language, for any partner type (the existing 20-gate `tests/admin-09-grep-contracts.test.ts` suite and `src/lib/pdf/no-commission.test.ts` stay green); and re-rendering the same proposal twice produces byte-identical PDFs, with the committed fixture at `__pdf-fixtures__/expected.sha256.txt` regenerated via `scripts/update-pdf-fixture.ts` to reflect the new design.
+
 **Plans:** TBD
 **UI hint:** yes
 
@@ -814,10 +825,12 @@ Plans:
 **Depends on:** Phase 43 (the new document must already render correctly before anything is bulk re-rendered into it)
 **Requirements:** MIG-01, MIG-02, MIG-03, MIG-04, MIG-05
 **Success Criteria** (what must be TRUE):
+
   1. An operator can dry-run the backfill and see a count of proposals that would be re-rendered plus a list of any that would fail to render, without a single blob being written.
   2. An operator can execute the backfill only behind the local-database guard and an explicit typed confirmation, and every stored proposal's PDF is re-rendered in the new design.
   3. Every re-rendered PDF keeps its own committed `language` (no delivered document changes language at its existing reference) and reproduces the same financial figures as before, computed from that proposal's `params_snapshot` rather than current coefficients.
   4. Interrupting the backfill mid-run and re-running it does not duplicate work or corrupt any proposal — already-migrated proposals are safely skipped or re-written to the identical result.
+
 **Plans:** TBD
 
 **Planning note:** this is the milestone's one irreversible step and the standing constraint it lifts — "Mutating already-saved PDFs" (see `.planning/REQUIREMENTS.md` § Rule lifted by this milestone). It must run last, behind Phase 39's DB guard, following the same gated `tsx` + `_load-env` entry-point pattern as every other write-capable script.

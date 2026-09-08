@@ -531,15 +531,19 @@ Both `render-fixtures.test.ts` (3 fixtures: happy-path-fr, happy-path-en, agent-
 | A1 | `rsms/inter` v4.1 (tag `v4.1`, released 2024-11-16) is the correct/current tagged release to pin, based on GitHub release-history search rather than an official "latest stable" API confirmation with a publish-date cross-check beyond the search snippet | Standard Stack / D-05 Pin | Low — the release asset was downloaded directly from the tag URL and its bytes hashed in this session; even if a newer tag exists, `v4.1` is a real, addressable, immutable release asset and remains reproducible. Executor should re-check `https://github.com/rsms/inter/releases` for a newer tag before acquiring, and update the pin if one exists, but the mechanism/rationale (plain `Inter-*.ttf`, no opsz prefix) holds for any rsms/inter release. |
 | A2 | The full glyph inventory used to probe fontkit coverage (68 codepoints) was derived by static regex extraction of `dictionaries.ts` string literals plus manually-added document literals (`'LEASÉTIC'`, `'✓'`, digits, `€`, `%`), not by actually rendering the FR/EN PDF and reconstructing visible text via the ToUnicode CMap (the technique `commission-free-fixture.test.ts` uses) | Priority 3 / D-09 | Low-Medium — the static extraction covers every dictionary key document.tsx actually consumes (verified by reading document.tsx's full source), so it should be a superset-equivalent of what CMap reconstruction would find. The planner's actual D-09 test implementation MUST use the render+reconstruct technique (Pattern 3 code example), not hand-curation, to satisfy CONTEXT.md's "derived from real rendered output" requirement — this research's static approach was a proxy for hash-checking font coverage ahead of time, not a substitute for the real test. |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> Both questions were resolved during planning (2026-09-08). Resolutions are recorded inline below.
 
 1. **Should `app/layout.tsx:16`'s now-inaccurate "still uses Plus Jakarta Sans" comment be fixed in this phase?**
    - What we know: it's a one-line comment, zero functional impact either way, and becomes factually wrong the moment this phase ships.
    - What's unclear: whether touching a file outside D-01's explicit file list ("`document.tsx`, `public/fonts/`, guard test, fixture") is acceptable drive-by scope.
    - Recommendation: low-risk one-line fix, bundle it into the same commit as the guard-test inversion (D-08) since both are "make the comments/assertions match new reality" work. Not blocking either way.
+   - **RESOLVED — implemented by `41-02` Task 2, step 8.** `app/layout.tsx:16` and `proxy.ts:72` are IN scope (both describe the *current* PDF font path and become factually wrong). `sanitize-number.ts` + its test are OUT of scope and recorded as accepted drift (touching them would change rendered output, which D-01 forbids); `tests/reui-blocks-deletion.test.ts:7` is OUT of scope because it is accurate as history.
 
 2. **Exact D-05 zip URL stability** — GitHub release asset URLs for tagged releases are permanent by GitHub's own guarantee, but the executor should re-verify the `v4.1` tag is still the latest before acquiring, in case a newer Inter release has shipped between this research and execution.
    - Recommendation: re-run `curl -sI https://github.com/rsms/inter/releases/latest` (or check the releases page) at execution time; if a newer tag exists, re-derive the SHA-256 pins using the same `extras/ttf/Inter-{Regular,Medium,SemiBold,Bold}.ttf` paths (this directory structure has been stable across recent rsms/inter releases).
+   - **RESOLVED — implemented by `41-02` Task 1 as a VERIFY-THEN-PIN-TO-v4.1 policy.** The executor records what `releases/latest` reports but acquires `v4.1` regardless: the four SHA-256 pins and the fontkit glyph-coverage probe in this document are valid only for that tag, and reproducibility of the PROP-17 byte-determinism baseline outranks currency. A newer tag becomes a Phase 43 note rather than an in-flight substitution.
 
 ## Validation Architecture
 
