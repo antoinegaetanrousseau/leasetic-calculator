@@ -437,7 +437,7 @@ export in lines 84-108 is consumed before deleting that span).
 `DURATION_OPTIONS` at lines 88-92 appears to be used only inside the now-deleted `ProposalForm`
 body; verify with a grep before deciding whether it goes too.
 
-**Analog for "how a Leasétic component gets deleted cleanly":** none needed — this is a subtractive
+**Analog for "how a Leasetic component gets deleted cleanly":** none needed — this is a subtractive
 edit with no pattern to copy; the risk is entirely in the stale-citation repair (Pattern 9 below),
 not in the deletion mechanics itself.
 

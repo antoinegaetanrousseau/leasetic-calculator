@@ -25,7 +25,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Email to Thomas's Leasétic address | Standard email + record `**Sent:**` line in doc | |
+| Email to Thomas's Leasetic address | Standard email + record `**Sent:**` line in doc | |
 | Email + Slack/WhatsApp nudge | Formal email + informal ping to reduce latency | |
 | Quick call → written follow-up | 15-min call + Antoine writes up reply + Thomas counter-signs | |
 
@@ -37,7 +37,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Email to Thomas's Leasétic address | Same as before | |
+| Email to Thomas's Leasetic address | Same as before | |
 | Email + Slack/WhatsApp nudge | Same as before | |
 | Quick call → written follow-up | Same as before | |
 
@@ -55,26 +55,26 @@
 
 **User's response:** Free-text — "I handle our website for Leasetic, I can edit the data policy page. Create a prompt I can put into a new chat session to edit the current one to add the necessary new details."
 
-**Notes:** **Major reframing.** Antoine owns the leasetic.fr website directly. The original "ask Thomas for confirmation" framing was based on the architect's (Claude's, in Phase 10) incorrect assumption that the privacy notice was managed by Leasétic / Thomas. The actual primitive is "publish the policy update" — a single-operator self-edit. The "ask Thomas" loop is unnecessary friction.
+**Notes:** **Major reframing.** Antoine owns the leasetic.fr website directly. The original "ask Thomas for confirmation" framing was based on the architect's (Claude's, in Phase 10) incorrect assumption that the privacy notice was managed by Leasetic / Thomas. The actual primitive is "publish the policy update" — a single-operator self-edit. The "ask Thomas" loop is unnecessary friction.
 
 **Captured as decision D-01 in CONTEXT.md.**
 
 ### Prompt drafted for the leasetic.fr edit session (verbatim, for record)
 
 The following prompt was generated during this discussion for Antoine to paste
-into a fresh chat session on the Leasétic website project. It is reproduced
+into a fresh chat session on the Leasetic website project. It is reproduced
 here verbatim so future audits can reconstruct exactly what was instructed.
 
 ```
 Je dois mettre à jour la page "Politique de confidentialité" (ou
 "Mentions légales / Données personnelles" selon la structure du site)
 de leasetic.fr pour couvrir deux nouvelles activités de traitement
-introduites par l'application Leasétic Matrice (l'outil de devis
+introduites par l'application Leasetic Matrice (l'outil de devis
 commercial distribué aux partenaires intégrateurs).
 
 ## Contexte
 
-L'application Leasétic Matrice est hébergée sur Vercel + Neon Postgres
+L'application Leasetic Matrice est hébergée sur Vercel + Neon Postgres
 (régions EU) et conserve les propositions PDF générées par les
 partenaires pendant 10 ans. La politique de confidentialité actuelle du
 site a été rédigée avant la mise en ligne de cette app et doit être
@@ -101,11 +101,11 @@ site a été rédigée avant la mise en ligne de cette app et doit être
    Ajouter dans la liste des sous-traitants / destinataires :
 
    - **Vercel Inc.** — hébergement de l'interface applicative
-     (Leasétic Matrice). Données traitées dans l'Union européenne
+     (Leasetic Matrice). Données traitées dans l'Union européenne
      (région Frankfurt / Paris selon configuration). DPA signé
      conformément à l'article 28 RGPD. Site : vercel.com.
    - **Neon Inc.** — hébergement de la base de données Postgres de
-     l'application Leasétic Matrice. Données stockées dans l'Union
+     l'application Leasetic Matrice. Données stockées dans l'Union
      européenne (région EU Central / EU West). DPA signé. Site :
      neon.tech.
 
@@ -116,7 +116,7 @@ site a été rédigée avant la mise en ligne de cette app et doit être
    ### Ajout #2 — Conservation 10 ans des propositions PDF
 
    Ajouter dans la section "Durée de conservation" une ligne pour la
-   catégorie "Propositions commerciales (PDF générés via Leasétic
+   catégorie "Propositions commerciales (PDF générés via Leasetic
    Matrice)" :
 
    - **Durée** : 10 ans à compter de la date de génération du
@@ -261,5 +261,5 @@ gate, single operator, small blast radius. Consistent with Phase 10
   needed (different shape than the temporary gate).
 - **Thomas's verbatim privacy-coverage confirmation** — original
   D-10-18 framing, superseded by D-01 (Antoine self-edits public
-  policy). If Leasétic legal posture changes later, capture in a
+  policy). If Leasetic legal posture changes later, capture in a
   future phase.

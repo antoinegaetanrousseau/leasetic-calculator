@@ -7,7 +7,7 @@
 ## Phase Boundary
 
 Close the two Tier-1 partner-onboarding blockers that must complete before any
-real partner account is created on Leasétic Matrice:
+real partner account is created on Leasetic Matrice:
 
 1. **GATE-01** — Rotate both admin accounts (`antoine.rousseau@leasetic.com`
    + `emmanuel.rousseau@leasetic.com`) from the shared launch-day password
@@ -19,14 +19,14 @@ real partner account is created on Leasétic Matrice:
    path). Resolves Phase 6 follow-up #1 + permanently closes the
    no-self-service-password-change gap.
 
-2. **GATE-02** — Update Leasétic's public privacy notice on `leasetic.fr` to
+2. **GATE-02** — Update Leasetic's public privacy notice on `leasetic.fr` to
    cover (a) Vercel/Neon EU hosting as data processors and (b) 10-year PDF
    retention as a new processing activity under French Commercial Code
    L123-22 / L110-4. **Scope reframed during discussion:** Antoine owns
    the leasetic.fr website directly — GATE-02 no longer depends on a written
    confirmation from Thomas Heufke. The original "ask Thomas" framing (D-10-18)
    is superseded; Antoine self-edits the privacy notice via a separate fresh
-   session on the Leasétic website project (prompt drafted during discussion —
+   session on the Leasetic website project (prompt drafted during discussion —
    see Discussion Log). `docs/legal/privacy-coverage-confirmation.md` is
    updated post-publication with the public URL + publication date as evidence,
    replacing the stub's pending-reply text.
@@ -72,11 +72,11 @@ Enforcement is **process-only** (no code-level guard) — see D-04.
 
 - **D-01 (Privacy-notice channel):** Antoine owns the `leasetic.fr` website
   directly. GATE-02 closes by Antoine self-editing the public privacy notice
-  via a separate fresh session on the Leasétic website project, **not** by
+  via a separate fresh session on the Leasetic website project, **not** by
   obtaining a written confirmation from Thomas Heufke. The two additions
   required: (a) Vercel + Neon listed as EU-hosted data processors in the
   "Sous-traitants / Destinataires" section with DPA attestation, (b)
-  "Propositions commerciales (PDF générés via Leasétic Matrice) — 10 ans"
+  "Propositions commerciales (PDF générés via Leasetic Matrice) — 10 ans"
   added to the "Durée de conservation" section, citing French Commercial Code
   L123-22 / L110-4 as the legal basis. The full prompt to drop into the
   fresh website session is captured verbatim in
@@ -145,7 +145,7 @@ Enforcement is **process-only** (no code-level guard) — see D-04.
   after password change), planner picks the secure default (revoke
   other sessions, keep current session active).
 - **Privacy-notice editing session is OUT-OF-BAND.** Antoine runs that
-  session separately on the Leasétic website project using the
+  session separately on the Leasetic website project using the
   prompt in DISCUSSION-LOG; Phase 21 plans only verify the result + log
   the URL.
 
@@ -270,7 +270,7 @@ Enforcement is **process-only** (no code-level guard) — see D-04.
 ## Specific Ideas
 
 - **Privacy-notice edit is OUT-OF-BAND.** Antoine runs the privacy-notice
-  edit in a separate fresh session on the Leasétic website project. The
+  edit in a separate fresh session on the Leasetic website project. The
   exact prompt is captured verbatim in `21-DISCUSSION-LOG.md` under
   "Decision D-01 — privacy-notice edit prompt." Phase 21 plans assume
   the edit was performed and verify the public URL post-hoc; the
@@ -285,7 +285,7 @@ Enforcement is **process-only** (no code-level guard) — see D-04.
 - **Admin email domain pinned:** `antoine.rousseau@leasetic.com` and
   `emmanuel.rousseau@leasetic.com` are the rotation targets. CLAUDE.md
   references `@memento.eco` for unrelated Memento Hub context — DO NOT
-  use those for the Leasétic Matrice admins (Decisions Log 2026-05-08
+  use those for the Leasetic Matrice admins (Decisions Log 2026-05-08
   `06-launch` row).
 
 - **The shared password `leasetic2026` is not in source / git.** It
@@ -319,7 +319,7 @@ Enforcement is **process-only** (no code-level guard) — see D-04.
   capability (operational freeze), not the temporary gate of Phase 21.
 - **Thomas's verbatim confirmation of privacy coverage** — the
   original D-10-18 paper-trail framing. Superseded by D-01 (Antoine
-  self-edits the public policy). If Leasétic legal posture changes
+  self-edits the public policy). If Leasetic legal posture changes
   later and Thomas needs to formally sign off on the published policy,
   capture that in a future phase with an updated process.
 

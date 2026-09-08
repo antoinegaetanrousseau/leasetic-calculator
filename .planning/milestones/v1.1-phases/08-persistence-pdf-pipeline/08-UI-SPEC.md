@@ -144,7 +144,7 @@ Phase 7 left this page as: greeting + CTA + empty-state card. Phase 8 keeps the 
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│ [sidebar Leasétic]                                               │
+│ [sidebar Leasetic]                                               │
 ├──────┬───────────────────────────────────────────────────────────┤
 │      │ [Page title: Accueil/Home]   [LT][TT][UserMenu ▾]         │  ← Topbar (Phase 6)
 │      ├───────────────────────────────────────────────────────────┤
@@ -171,7 +171,7 @@ Phase 7 left this page as: greeting + CTA + empty-state card. Phase 8 keeps the 
 │      │  └──────────────────────────────────────────────────────┘   │
 │      │                                                           │
 │      ├───────────────────────────────────────────────────────────┤
-│      │           © 2026 Leasétic — Application interne           │  ← Footer (Phase 6)
+│      │           © 2026 Leasetic — Application interne           │  ← Footer (Phase 6)
 └──────┴───────────────────────────────────────────────────────────┘
 ```
 
@@ -620,7 +620,7 @@ PROP-19: `document.fonts.ready` is the BROWSER's font-load gate; for `@react-pdf
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
-║   LEASÉTIC                                  N° LC-12345      ║  ← Header band
+║   LEASETIC                                  N° LC-12345      ║  ← Header band
 ║   IT financial leasing                       09/05/2026      ║
 ║                                                              ║
 ║   ──────────────────────────────────────────────────────     ║
@@ -661,7 +661,7 @@ PROP-19: `document.fonts.ready` is the BROWSER's font-load gate; for `@react-pdf
 ║                                                              ║
 ║                                                              ║
 ║   Proposition valable jusqu'au 08/06/2026, sous réserve      ║  ← Validity caption
-║   de l'accord du comité des engagements de Leasétic.         ║     (10pt italic --muted)
+║   de l'accord du comité des engagements de Leasetic.         ║     (10pt italic --muted)
 ║   Document non contractuel.                                  ║
 ║                                                              ║
 ║                                                              ║
@@ -678,7 +678,7 @@ PROP-19: `document.fonts.ready` is the BROWSER's font-load gate; for `@react-pdf
 ```tsx
 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
   <View>
-    <Text style={{ fontSize: 22, fontWeight: 700, color: '#112c3b' }}>LEASÉTIC</Text>
+    <Text style={{ fontSize: 22, fontWeight: 700, color: '#112c3b' }}>LEASETIC</Text>
     <Text style={{ fontSize: 9, fontWeight: 400, color: '#6e7191', marginTop: 2 }}>
       {t('pdf.tagline', lang)}
     </Text>
@@ -696,11 +696,11 @@ PROP-19: `document.fonts.ready` is the BROWSER's font-load gate; for `@react-pdf
 ```
 
 **Header content:**
-- Left: "LEASÉTIC" wordmark, 22pt weight 700 navy, with tagline below ("IT financial leasing" en / "Location financière IT" fr) at 9pt weight 400 muted
+- Left: "LEASETIC" wordmark, 22pt weight 700 navy, with tagline below ("IT financial leasing" en / "Location financière IT" fr) at 9pt weight 400 muted
 - Right: "N° LC-12345" at 10pt weight 600 navy, with creation date below at 9pt weight 400 muted
 - Below: 1pt horizontal rule in `--border` (`#d9dbe9`), margin 16pt above and below
 
-**Decision (D-8-12): NO logo image in the header for v1.1.** v10 has no actual brand image asset; the wordmark is text-rendered. Phase 8 keeps text-rendered "LEASÉTIC" — guarantees byte-determinism (no image embedding variability), avoids asset-pipeline coupling. v1.2 candidate to add an SVG/PNG logo if Leasétic's brand team supplies one.
+**Decision (D-8-12): NO logo image in the header for v1.1.** v10 has no actual brand image asset; the wordmark is text-rendered. Phase 8 keeps text-rendered "LEASETIC" — guarantees byte-determinism (no image embedding variability), avoids asset-pipeline coupling. v1.2 candidate to add an SVG/PNG logo if Leasetic's brand team supplies one.
 
 #### 3.3.5 Title row
 
@@ -851,8 +851,8 @@ The `✓` is a literal U+2713 character (works in Plus Jakarta Sans, byte-determ
 ```
 
 Copy `pdf.validity.caption`:
-- FR: "Proposition valable jusqu'au {0} ({1} jours), sous réserve de l'accord du comité des engagements de Leasétic. Document non contractuel."
-- EN: "Proposal valid until {0} ({1} days), subject to approval by Leasétic's credit committee. Non-contractual document."
+- FR: "Proposition valable jusqu'au {0} ({1} jours), sous réserve de l'accord du comité des engagements de Leasetic. Document non contractuel."
+- EN: "Proposal valid until {0} ({1} days), subject to approval by Leasetic's credit committee. Non-contractual document."
 
 This single sentence subsumes v10's longer disclaimer; the legal copy is intentionally light per D-A3 (no full Mentions Légales — IT/Legal supplies via email if needed).
 
@@ -888,7 +888,7 @@ Anchored at bottom of page via `position: 'absolute', bottom: 32, left: 56, righ
 Horizontal rule above footer: 1pt `#d9dbe9` (matches header rule).
 
 **Explicitly absent (per D-A3):**
-- ❌ No mentions légales / legal disclaimer (Leasétic IT/Legal supplies via email if needed)
+- ❌ No mentions légales / legal disclaimer (Leasetic IT/Legal supplies via email if needed)
 - ❌ No signature line / "à retourner signé" (signature workflow not in v1.1 scope)
 - ❌ No partner name embedded in footer (PROP-21 lite — partner identity is captured in the Destinataire section already; duplicating in footer was v10 noise)
 - ❌ No "www.leasetic.fr" URL (kept clean)
@@ -1213,7 +1213,7 @@ Phase 8 adds **~36 new keys × 2 langs = 72 entries.** All dot-notation matching
 | `pdf.loyer.on.demand` | Sur demande | On request |
 | `pdf.interests.slb` | Sale & lease-back du parc | Sale & lease-back of the fleet |
 | `pdf.interests.eval` | Évaluation du parc sortant | Valuation of the outgoing fleet |
-| `pdf.validity.caption` | Proposition valable jusqu'au {0} ({1} jours), sous réserve de l'accord du comité des engagements de Leasétic. Document non contractuel. | Proposal valid until {0} ({1} days), subject to approval by Leasétic's credit committee. Non-contractual document. |
+| `pdf.validity.caption` | Proposition valable jusqu'au {0} ({1} jours), sous réserve de l'accord du comité des engagements de Leasetic. Document non contractuel. | Proposal valid until {0} ({1} days), subject to approval by Leasetic's credit committee. Non-contractual document. |
 | `pdf.footer.left` | N° {0} · Créée le {1} | No. {0} · Created on {1} |
 
 (19 keys.)
@@ -1261,7 +1261,7 @@ Per `<interaction_rules>` ("prefer deciding"), the following defaults were commi
 | **D-8-09** | **Post-delete redirect goes to `/` (default Active list) with `?deleted_just=1` URL flag for Sonner toast triggering on home mount; toast includes a "Voir" action button → `/?deleted=1`** | Discoverability of Recently Deleted is a key UX touch (D-C3); the action button teaches the partner where to find their deleted proposal | User can simplify to no action button if testing shows clutter |
 | **D-8-10** | **PDF preview uses `<embed src=".../pdf" type="application/pdf">` with text-link fallback child; NOT iframe, NOT PDF.js** | Smallest API for inline PDF in Chrome+Edge (project's required browsers per CLAUDE.md); no JS bundle weight; fallback link covers Firefox/Safari edge cases | Phase 9/10 can swap to PDF.js if browser-compat issues surface |
 | **D-8-11** | **PDF render is a single `<Page>` Document; absolute-positioned footer at `bottom: 32`** | A single page is the requirement (PROP-15); absolute footer is the canonical pattern in `@react-pdf/renderer` for page-anchored content | N/A — this is locked by PROP-15 |
-| **D-8-12** | **PDF header uses text-rendered "LEASÉTIC" wordmark, NOT an embedded image/SVG** | Guarantees byte-determinism (PROP-17); no asset pipeline coupling; v10 had no actual brand image asset | v1.2 candidate to add an SVG/PNG logo if Leasétic brand team supplies one |
+| **D-8-12** | **PDF header uses text-rendered "LEASETIC" wordmark, NOT an embedded image/SVG** | Guarantees byte-determinism (PROP-17); no asset pipeline coupling; v10 had no actual brand image asset | v1.2 candidate to add an SVG/PNG logo if Leasetic brand team supplies one |
 | **D-8-13** | **Loyer card on PDF uses `--gd` border + 5%-tint background (`#f0f9f4`) for visual climax** | Makes the loyer the visual focal point of the document, matching its semantic primacy in the offer | User can request plain border without tint |
 | **D-8-14** | **PDF body font 10pt; loyer big-number 32pt; section labels 9pt; footer 8pt; tagline 9pt** | Common B2B PDF typography scale (10pt body is print-comfortable); loyer big-number per §3.3.9; small footer per D-A3 minimal scope | User can adjust ±1pt across the board |
 | **D-8-15** | **`<embed>` PDF preview height: 480px fixed** | Fits ~1 full A4 page at the right column's 360px width × proportional aspect; users scroll inside the embed for details; full-page download is one click away | User can request a taller (e.g. 720px) embed; sticky behavior is preserved |

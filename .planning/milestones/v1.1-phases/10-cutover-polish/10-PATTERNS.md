@@ -42,7 +42,7 @@
 ```markdown
 # Database Migrations — Operator Runbook
 
-Leasétic Matrice v1.1 uses Drizzle ORM...
+Leasetic Matrice v1.1 uses Drizzle ORM...
 
 ## Locked rules
 
@@ -543,12 +543,12 @@ Per D-10-05/06: cron schedule `"0 3 1,15 * *"` = 1st and 15th of each month at 0
 # Phase 10 — Cutover & Polish
 # ─────────────────────────────────────────────────────────────────────────
 
-# NEXT_PUBLIC_PRIVACY_URL_FR: URL to Leasétic's French privacy policy.
+# NEXT_PUBLIC_PRIVACY_URL_FR: URL to Leasetic's French privacy policy.
 # Supplied by Thomas. Appears as a link on the /login page footer.
 # Update without code change — just change this env var and redeploy.
 NEXT_PUBLIC_PRIVACY_URL_FR=https://leasetic.fr/mentions-legales
 
-# NEXT_PUBLIC_PRIVACY_URL_EN: URL to Leasétic's English privacy policy.
+# NEXT_PUBLIC_PRIVACY_URL_EN: URL to Leasetic's English privacy policy.
 NEXT_PUBLIC_PRIVACY_URL_EN=https://leasetic.fr/privacy-policy
 
 # PURGE_CRON_SECRET: shared secret for the unattended /api/internal/purge-soft-deleted route.

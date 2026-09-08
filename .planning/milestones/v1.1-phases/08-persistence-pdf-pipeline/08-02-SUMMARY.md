@@ -38,7 +38,7 @@ key-decisions:
   - "5 v10 keys NOT redeclared (proposal.duree.label, proposal.duree.months, proposal.interests.slb, proposal.interests.eval, proposal.montant.label) — consumers reference them directly per UI-SPEC §7.9 reuse table"
   - "FR typography: U+2019 curly apostrophe in jusqu'au / d'origine / l'accord / D'INTÉRÊT; U+202F narrow-no-break-space before colon in pdf.section.interests + pdf.project.ref.prefix"
   - "EN proposal.confirm.delete uses straight single quotes (plan spec); FR uses guillemets « ... » with U+202F per French typography"
-  - "EN pdf.validity.caption uses straight apostrophe in 'Leasétic's' (English typography convention)"
+  - "EN pdf.validity.caption uses straight apostrophe in 'Leasetic's' (English typography convention)"
 
 requirements-completed:
   - PROP-02
@@ -118,7 +118,7 @@ These 5 keys already existed in the v10 dictionary with identical FR + EN values
 - U+202F narrow-no-break space before `:` in `pdf.section.interests` ("IDENTIFIÉS :") and `pdf.project.ref.prefix` ("partenaire :") — French typography convention
 - U+00A0 non-breaking space before `?` in FR `proposal.confirm.delete` — French typography
 - EN `proposal.confirm.delete` uses straight `'Show deleted'` (per plan spec; no typographic quotes in EN)
-- EN `pdf.validity.caption` uses straight `'` in "Leasétic's" (English typography)
+- EN `pdf.validity.caption` uses straight `'` in "Leasetic's" (English typography)
 
 ## Deviations from Plan
 

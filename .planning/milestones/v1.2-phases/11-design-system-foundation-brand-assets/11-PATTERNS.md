@@ -798,7 +798,7 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
 **Pattern** (insert into the existing sidebar/topbar/footer comment block at FR line 40 + EN line 544):
 ```typescript
 // In dictionaries.fr (around line 41):
-'sidebar.brand': 'Leasétic',
+'sidebar.brand': 'Leasetic',
 'sidebar.collapse': 'Réduire le menu',                  // NEW per UI-SPEC §7
 'sidebar.expand': 'Déployer le menu',                   // NEW
 'sidebar.lang.cycle': 'Changer de langue',              // NEW
@@ -816,7 +816,7 @@ html[data-theme="dark"]  .brand-logo-light { display: none; }
 
 EN mirror at line 545 area:
 ```typescript
-'sidebar.brand': 'Leasétic',
+'sidebar.brand': 'Leasetic',
 'sidebar.collapse': 'Collapse menu',
 'sidebar.expand': 'Expand menu',
 'sidebar.lang.cycle': 'Change language',

@@ -212,7 +212,7 @@ Each card contains:
 ### 3.0.3 Page heading copy
 
 - `h1`: i18n `admin.home.title` = "Administration" / "Administration"
-- Subtitle `<p>`: i18n `admin.home.subtitle` = "Tableau de bord d'administration Leasétic." / "Leasétic administration dashboard."
+- Subtitle `<p>`: i18n `admin.home.subtitle` = "Tableau de bord d'administration Leasetic." / "Leasetic administration dashboard."
 
 ---
 
@@ -956,7 +956,7 @@ All new keys follow the dot-notation convention (`admin.coefficients.*`, `admin.
 | Key | FR | EN |
 |-----|----|----|
 | `admin.home.title` | "Administration" | "Administration" |
-| `admin.home.subtitle` | "Tableau de bord d'administration Leasétic." | "Leasétic administration dashboard." |
+| `admin.home.subtitle` | "Tableau de bord d'administration Leasetic." | "Leasetic administration dashboard." |
 | `admin.home.coefficients.title` | "Coefficients & commission" | "Coefficients & commission" |
 | `admin.home.coefficients.sub` | "Éditez les paramètres globaux" | "Edit global parameters" |
 

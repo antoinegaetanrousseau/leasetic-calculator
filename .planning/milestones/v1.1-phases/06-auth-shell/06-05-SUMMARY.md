@@ -49,7 +49,7 @@ decisions:
   - "useWatch over watch() for strength meter: React Compiler lint rule flags watch() as incompatible-library warning; useWatch is the recommended alternative."
   - "Direct @node-rs/argon2 call in redeem.ts: better-auth's configured hasher is not exposed via a public API; calling argon2 directly with identical parameters produces interchangeable hashes."
   - "auth() not auth: auth() is the lazy singleton factory (from Plan 06-03); all server code must call auth() not auth."
-  - "sidebar.brand dictionary key for logo text: the ESLint no-hardcoded-jsx rule fires on 'Leasétic' in JSXText; using t('sidebar.brand', lang) satisfies the rule."
+  - "sidebar.brand dictionary key for logo text: the ESLint no-hardcoded-jsx rule fires on 'Leasetic' in JSXText; using t('sidebar.brand', lang) satisfies the rule."
 metrics:
   duration: "~8 minutes"
   completed: "2026-05-08T17:06:40Z"
@@ -79,7 +79,7 @@ metrics:
 - `redeem.ts`: `redeemToken(plaintext, kind, password, confirmPassword)` atomic server action; Zod validation before DB; 4-condition token lookup; argon2id hash via `@node-rs/argon2`; accounts row upsert; usedAt mark; sessionVersion bump + revokeUserSessions for kind='reset'; all 7 tests passing
 - `LoginForm.tsx`: `'use client'`, react-hook-form + zodResolver(loginSchema), `authClient.signIn.email` (AUTH-18), always-generic error (AUTH-04/D-22), `?next=` open-redirect protection (T-06-05-08), mount-time toasts for `?invited=1`/`?reset=1`/`?logged_out=1`
 - `SetPasswordForm.tsx`: `'use client'`, zodResolver(setPasswordSchema), `useWatch` (React Compiler compatible), 4-segment strength meter, eye-toggle (Lucide Eye/EyeOff), calls `redeemToken` server action
-- `app/(public)/layout.tsx`: minimal layout (SHELL-03), top-right LocaleToggle + ThemeToggle, Leasétic logo, footer with privacy link, `force-dynamic`
+- `app/(public)/layout.tsx`: minimal layout (SHELL-03), top-right LocaleToggle + ThemeToggle, Leasetic logo, footer with privacy link, `force-dynamic`
 - `app/(public)/login/page.tsx`: server-side `auth().api.getSession` → `redirect('/')` for authenticated users (D-21), passes lang to LoginForm
 - `app/(public)/invite/[token]/page.tsx` and `app/(public)/reset/[token]/page.tsx`: 4-condition token lookup per kind; expired-token card or SetPasswordForm
 
@@ -108,10 +108,10 @@ metrics:
 - **Files modified:** `src/components/SetPasswordForm.tsx`
 - **Commit:** `08fe0e4`
 
-**3. [Rule 1 - Bug] ESLint no-hardcoded-jsx fires on 'Leasétic' in layout JSXText**
+**3. [Rule 1 - Bug] ESLint no-hardcoded-jsx fires on 'Leasetic' in layout JSXText**
 - **Found during:** Task 3 lint:check
-- **Issue:** `JSXText[value=/[a-zA-ZÀ-ÿ]{2,}/]` selector in `no-restricted-syntax` fires on the Leasétic brand name rendered as JSXText in the public layout.
-- **Fix:** Used `{t('sidebar.brand', lang)}` — `sidebar.brand` = `'Leasétic'` in both FR and EN (identical translation; correct behavior since it is a brand name).
+- **Issue:** `JSXText[value=/[a-zA-ZÀ-ÿ]{2,}/]` selector in `no-restricted-syntax` fires on the Leasetic brand name rendered as JSXText in the public layout.
+- **Fix:** Used `{t('sidebar.brand', lang)}` — `sidebar.brand` = `'Leasetic'` in both FR and EN (identical translation; correct behavior since it is a brand name).
 - **Files modified:** `app/(public)/layout.tsx`
 - **Commit:** `8d2268a`
 

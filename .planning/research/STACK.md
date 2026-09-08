@@ -1,4 +1,4 @@
-# STACK Research — Leasétic Matrice v1.1 Hosted Web App
+# STACK Research — Leasetic Matrice v1.1 Hosted Web App
 
 **Researched:** 2026-05-05
 **Mode:** Project Research (Stack)
@@ -232,7 +232,7 @@ This is the OVH portability lever. Spend ~half a day on it in v1.1, save days on
 
 **Math:** 138 keys × 2 languages = 276 string entries total. The Next.js docs example handles this in ~20 lines of code with zero runtime dependencies.
 
-**For Leasétic specifically:**
+**For Leasetic specifically:**
 - FR + EN, both with same plural rules, no RTL.
 - Number formatting: `Intl.NumberFormat` is a **browser/Node native API**. No library needed.
 - Date formatting: same — `Intl.DateTimeFormat` built in.

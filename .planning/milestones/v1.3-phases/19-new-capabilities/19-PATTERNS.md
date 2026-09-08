@@ -273,7 +273,7 @@ import { listLcReferences } from '@/lib/db/queries/lc-references';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Références LC — Leasétic Matrice',
+  title: 'Références LC — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

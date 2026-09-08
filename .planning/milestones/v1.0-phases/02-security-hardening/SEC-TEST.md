@@ -94,12 +94,12 @@ Start each scenario from a known good login (`leasetic2025` accepted, panel open
 
 - [ ] Paste `<img src=x onerror="alert(1)">` into `partner-co`
 - [ ] `#hdr-title` shows the literal text (as a rendered string); no `<img>` child node; no alert fires on input
-- [ ] Paste `Acme & Sons <Group>` into `partner-co` → header reads `Proposition de location — Acme & Sons <Group> — by Leasétic` with the ampersand and angle-bracket token visible as literal characters
+- [ ] Paste `Acme & Sons <Group>` into `partner-co` → header reads `Proposition de location — Acme & Sons <Group> — by Leasetic` with the ampersand and angle-bracket token visible as literal characters
 
 ### C7 — Regression guard (clean proposal still renders)
 
 - [ ] Reset form, fill with legitimate values: partner-co=`Acme SA`, partner-name=`Jane Doe`, client-co=`TestCorp`, client-name=`John Smith`, amount=`75000`, durée=`48`, project-desc=`IT modernization`
-- [ ] Generate → Proposition tab still shows: logo, header strip, info-grid (destinataire/société/projet), ref+date row, montant/loyer/durée tiles, "Pourquoi choisir Leasétic?" tiles, OPEX/Cycles tiles, conditions line, footer
+- [ ] Generate → Proposition tab still shows: logo, header strip, info-grid (destinataire/société/projet), ref+date row, montant/loyer/durée tiles, "Pourquoi choisir Leasetic?" tiles, OPEX/Cycles tiles, conditions line, footer
 - [ ] Cmd+P → exactly 2 A4 pages, commission invisible (find-in-page for `commission`/`5%` → zero hits)
 - [ ] RSE slide renders on page 2
 
@@ -138,7 +138,7 @@ Every HTML-writing assignment site in the v10 `<script>` block, pre-edit line nu
 | 11 | 816 | 838 | `renderProposal()` delegates to `p1p2() + p3()` | USER | (escape happens inside callees) | Sites 12–15 cover the escape sweep. |
 | 12 | 821 | 843 | `p1p2()` `siren` local var | USER | ESCAPE | `escapeHtml(d.csiren)`. |
 | 13 | 824 | 846 | `p1p2()` `contact` local var | USER | ESCAPE | `escapeHtml(d.ctel \|\| '')` and `escapeHtml(d.cemail \|\| '')`. |
-| 14 | 832–896 | 854–918 | `p1p2()` main return block | USER | ESCAPE | Wraps `d.pco` (×4: prop-offer-partner, prop-partner, conds line, prop-foot), `d.pnm` (×2: prop-partner, prop-foot), `d.cnm`, `d.crole`, `d.ctel`, `d.cemail`, `d.cco`, `d.csiren` (inline SIREN), `d.projdesc`, `d.partnerref`. Partnerref uses `escapeHtml(d.partnerref) \|\| 'NC'` so the `'NC'` fallback stays literal. Leaves untouched: `${LOGO_SRC}`, `${fmt(d.a)}`, `${fmt(d.monthly)}`, `${d.dur}`, `${d.ref}`, `${d.ds}`, `${expiryDate(d.ds)}`, `${intro}` (local const), `ynDisplay(...)` calls, all static "Pourquoi Leasétic" tiles and conditions prose. |
+| 14 | 832–896 | 854–918 | `p1p2()` main return block | USER | ESCAPE | Wraps `d.pco` (×4: prop-offer-partner, prop-partner, conds line, prop-foot), `d.pnm` (×2: prop-partner, prop-foot), `d.cnm`, `d.crole`, `d.ctel`, `d.cemail`, `d.cco`, `d.csiren` (inline SIREN), `d.projdesc`, `d.partnerref`. Partnerref uses `escapeHtml(d.partnerref) \|\| 'NC'` so the `'NC'` fallback stays literal. Leaves untouched: `${LOGO_SRC}`, `${fmt(d.a)}`, `${fmt(d.monthly)}`, `${d.dur}`, `${d.ref}`, `${d.ds}`, `${expiryDate(d.ds)}`, `${intro}` (local const), `ynDisplay(...)` calls, all static "Pourquoi Leasetic" tiles and conditions prose. |
 | 15 | 899–906 | 921–928 | `p3()` page 2/2 footer | USER | ESCAPE | Wraps `d.pco` and `d.pnm`. Leaves `${DECK3_SRC}` untouched (internal base64 src). |
 | 16 | 1046 | 1100 | `btn-dl` handler reads `styleTags[i].innerHTML` | READ | NONE | Read-only: iterates `<style>` tags to inline CSS into downloadable blob. No DOM write. |
 | 17 | 1055 | 1109 | `btn-dl` handler reads `$('printable').innerHTML` | READ | NONE | Read-only: serializes the already-rendered proposal into the blob. No DOM write. Upstream `#prop-content` is already escaped via site 11→14→15. |

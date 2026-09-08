@@ -1,4 +1,4 @@
-# Architecture: Leasétic Matrice v1.1 — Hosted Web App Foundation
+# Architecture: Leasetic Matrice v1.1 — Hosted Web App Foundation
 
 **Researched:** 2026-05-05
 **Mode:** Project Research (Architecture)

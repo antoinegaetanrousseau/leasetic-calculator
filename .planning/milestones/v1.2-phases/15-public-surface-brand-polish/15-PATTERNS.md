@@ -33,7 +33,7 @@ The existing imports use the `@/components/...` alias for `src/components/...`. 
 
 **Block being removed** (`app/(public)/layout.tsx` lines 56-68 — VERBATIM):
 ```tsx
-{/* Leasétic logo — displayed above the card, weight 700, 22px, color --navy */}
+{/* Leasetic logo — displayed above the card, weight 700, 22px, color --navy */}
 <div
   style={{
     fontWeight: 700,
@@ -43,7 +43,7 @@ The existing imports use the `@/components/...` alias for `src/components/...`. 
     userSelect: 'none',
   }}
 >
-  {/* Brand name — from dictionary (sidebar.brand = 'Leasétic', same in FR + EN) */}
+  {/* Brand name — from dictionary (sidebar.brand = 'Leasetic', same in FR + EN) */}
   {t('sidebar.brand', lang)}
 </div>
 ```
@@ -147,11 +147,11 @@ it('renders <span class="brand-logo public-page-logo"> in the public layout', as
 
 **Negative assertion pattern** (per UI-SPEC §9.1 assertion #4 — assert plain-text header is gone):
 ```typescript
-it('does NOT render the v1.1 plain-text Leasétic header', async () => {
+it('does NOT render the v1.1 plain-text Leasetic header', async () => {
   const ui = await PublicLayout({ children: null });
   const { container } = render(ui);
 
-  // The old block had inline style fontSize: 22 + fontWeight: 700 on a <div> containing 'Leasétic'
+  // The old block had inline style fontSize: 22 + fontWeight: 700 on a <div> containing 'Leasetic'
   const oldHeader = Array.from(container.querySelectorAll('div')).find(
     (d) => d.style.fontSize === '22px' && d.style.fontWeight === '700'
   );
@@ -177,10 +177,10 @@ import { BrandLogo } from '@/components/ui/BrandLogo';
 Phase 11's component prepends `brand-logo` to any `className` you pass, so the rendered wrapper class is `"brand-logo public-page-logo"` — exactly what the new CSS targets.
 
 ### i18n key reuse convention
-**Source:** `src/lib/i18n/dictionaries.ts` line 41 (FR) + line 707 (EN) — both return `'Leasétic'`
+**Source:** `src/lib/i18n/dictionaries.ts` line 41 (FR) + line 707 (EN) — both return `'Leasetic'`
 **Apply to:** the BrandLogo `alt` prop in `app/(public)/layout.tsx`
 ```typescript
-alt={t('sidebar.brand', lang)}  // returns 'Leasétic' in both languages
+alt={t('sidebar.brand', lang)}  // returns 'Leasetic' in both languages
 ```
 No new dictionary keys are added by Phase 15 (per UI-SPEC §7 + CONTEXT decisions row).
 

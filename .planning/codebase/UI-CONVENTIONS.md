@@ -222,7 +222,7 @@ expanded / **68px** collapsed; header height (`--topbar-h`) is **52px**; the bra
 four values must stay set in `SidebarProvider`'s inline `style` (`Shell.tsx`), not a `className`:
 `SidebarProvider` spreads its own inline style, which outranks an arbitrary-property `className`
 targeting the same custom property — the vendored `app-shell-1` block has this latent bug;
-Leasétic's `Shell.tsx` documents it and avoids it.
+Leasetic's `Shell.tsx` documents it and avoids it.
 
 ---
 
@@ -253,7 +253,7 @@ inflate any control corner, because no control corner reads it.
 ReUI `Badge`/`Cascader` all reach `--radius-4xl` (= **26px**) through the `rounded-4xl` utility;
 `calendar.tsx` reads `var(--radius-4xl)` as its `--cell-radius`. `--radius-3xl` (22px) is the
 other load-bearing step (`toggle-group.tsx`'s four directional corners). ROADMAP criterion 4's
-"8px" describes **Colibris's** controls, not Leasétic's — the binding requirement for Phase 31.1
+"8px" describes **Colibris's** controls, not Leasetic's — the binding requirement for Phase 31.1
 was "keeps its current corner," which is what shipped (zero visual change to any control). A
 future phase reading "controls are 8px" here would make a wrong edit; the real number is 26px.
 
@@ -536,7 +536,7 @@ block wholesale:
   documents this and keeps the widths in `SidebarProvider`'s own inline `style` instead (252px /
   68px, Plan 31.1-06 D-11).
 - **`SidebarRailToggle`.** The vendored block's rail toggle carries `tabIndex={-1}` and a
-  hardcoded English label ("Toggle Sidebar") with no i18n. Leasétic's `SidebarRail` keeps the same
+  hardcoded English label ("Toggle Sidebar") with no i18n. Leasetic's `SidebarRail` keeps the same
   `tabIndex={-1}`/`aria-hidden` posture (excluding it from the accessibility tree by design) but
   the shell's one real collapse control is the header `SidebarTrigger`, which is properly
   FR/EN-labelled — the vendored toggle's English-only label was never adopted anywhere reachable.

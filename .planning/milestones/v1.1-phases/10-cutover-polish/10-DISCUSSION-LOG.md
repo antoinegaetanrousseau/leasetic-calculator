@@ -15,7 +15,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| OVH Managed PG + Object Storage (Recommended) | Matches eventual prod target. Closes Open Q5 by *doing* it. Requires Leasétic IT involvement. | |
+| OVH Managed PG + Object Storage (Recommended) | Matches eventual prod target. Closes Open Q5 by *doing* it. Requires Leasetic IT involvement. | |
 | Local docker-compose (PG + MinIO) | Cheapest proof; doesn't catch OVH-specific quirks. | |
 | Scaleway PG + Object Storage | Different vendor, same EU footprint. Faster provisioning than OVH. | |
 | Two-stage: docker first then OVH-confirm | Build smoke against docker first, then run same stack against OVH. Best of both. | |
@@ -49,7 +49,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Now — fire ask alongside planning (Recommended) | Email Leasétic IT today. Phase 10 planner waits for answer. | |
+| Now — fire ask alongside planning (Recommended) | Email Leasetic IT today. Phase 10 planner waits for answer. | |
 | Defer — use docker-compose proof, document v1.2 follow-up | Phase 10 ships docker proof; OVH retest in v1.2. | ✓ |
 | Block Phase 10 until Open Q5 resolved | Stalls progress on CUT-01..08 which don't depend on Open Q5. | |
 
@@ -160,7 +160,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Thomas (Leasétic) (Recommended) | Owns partner relationship today. Cleanest separation: tech vs human. | |
+| Thomas (Leasetic) (Recommended) | Owns partner relationship today. Cleanest separation: tech vs human. | |
 | Antoine (you) | Direct involvement. Faster (no coordination). New sender to partners. | ✓ |
 | Joint — Thomas signs, Antoine drafts | Combines technical accuracy + relationship continuity. | |
 
@@ -192,7 +192,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Use existing Leasétic privacy policy + ask Thomas (Recommended) | Login page links existing policy. Antoine asks Thomas this week. Confirmation → docs/legal/privacy-coverage-confirmation.md. | ✓ |
+| Use existing Leasetic privacy policy + ask Thomas (Recommended) | Login page links existing policy. Antoine asks Thomas this week. Confirmation → docs/legal/privacy-coverage-confirmation.md. | ✓ |
 | Draft a v1.1-specific addendum | More work; paper trail. Thomas may still need legal counsel review. | |
 | Defer legal review to v1.2 (launch with main policy link) | No formal sign-off in v1.1. Acceptable for closed-network admin-invited partners. | |
 

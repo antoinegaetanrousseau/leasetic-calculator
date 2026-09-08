@@ -223,7 +223,7 @@ v1.1 ████████████████████ 6/6 phases com
 2. **Existing v10 form schema** — does it capture a structured "client name" field? Verify by reading v10 HTML at start of Phase 7.
 3. **Legal counsel sign-off** on 10-year retention (DATA-11). Resolve before Phase 10.
 4. ~~**Auth library version pinning matrix** — exact Better Auth + Drizzle adapter + Next.js + React versions. Pin no-carets at Phase 5 bootstrap.~~ ✓ Resolved 2026-05-08 (Phase 6 plan 06-01): `better-auth@1.6.9`, `@node-rs/argon2@2.0.2`, `react-hook-form@7.75.0`, `zod@4.4.3`, `@hookform/resolvers@5.2.2`, `drizzle-kit@0.31.10`, `drizzle-orm@0.45.2`, `next@16.2.4`, `react@19.0.0`. All exact pins, no carets. Drizzle adapter is bundled inside `better-auth/adapters/drizzle` — no separate package.
-5. **OVH side stack** — managed Postgres provider, S3-compatible blob endpoint. Confirm with Leasétic IT before Phase 10 smoke deploy.
+5. **OVH side stack** — managed Postgres provider, S3-compatible blob endpoint. Confirm with Leasetic IT before Phase 10 smoke deploy.
 6. ~~**Admin role provisioning** — Antoine + Thomas at launch, or Antoine first? Affects AUTH-12 CLI script payload.~~ ✓ Resolved 2026-05-07: **Antoine + Emmanuel** at launch (see Decisions Log).
 
 ## Carry-Forward Notes (from v1.0)
@@ -272,13 +272,13 @@ v1.1 ████████████████████ 6/6 phases com
 | Vitest mocks server-only as no-op: vi.mock('server-only', () => ({})) in test files — standard pattern for server-only modules outside Next.js bundler | 06-04 execution | 06-04 |
 | t() moved from i18n/index.ts to i18n/dictionaries.ts: client components cannot import next/headers — index.ts was bundled into LoginForm/SetPasswordForm causing build failure (Rule 3 auto-fix) | 06-05 execution | 06-05 |
 | useWatch over watch() for strength meter: React Compiler lint rule flags watch() as incompatible-library; useWatch is the recommended alternative (Rule 1 auto-fix) | 06-05 execution | 06-05 |
-| sidebar.brand dictionary key for logo in public layout: ESLint no-hardcoded-jsx fires on 'Leasétic' in JSXText; t('sidebar.brand') resolves same in FR+EN (Rule 1 auto-fix) | 06-05 execution | 06-05 |
+| sidebar.brand dictionary key for logo in public layout: ESLint no-hardcoded-jsx fires on 'Leasetic' in JSXText; t('sidebar.brand') resolves same in FR+EN (Rule 1 auto-fix) | 06-05 execution | 06-05 |
 | auth() is a lazy singleton function (not a named object); all callers use auth().api.getSession() — matched require.ts pattern; plan snippets used auth.api.getSession() as shorthand | 06-06 execution | 06-06 |
 | displayName fallback chain: session.user.displayName ?? session.user.name ?? session.user.email — covers all user states (displayName is optional additionalField) | 06-06 execution | 06-06 |
 | Layer order in AdminLayout: segment check (notFound) first, requireAdmin() second — URL obscurity fires before any role reveal per D-18 | 06-07 execution | 06-07 |
 | ADMIN_URL_SEGMENT unset → notFound() (fail-closed) — safe operational failure, no admin reach possible (T-06-07-04 accepted) | 06-07 execution | 06-07 |
 | InviteUrlModal uses inline backdrop + panel siblings at z-index 200/201 (no ReactDOM.createPortal) — adequate for Phase 6; no stacking-context-creating ancestors exist | 06-07 execution | 06-07 |
-| Admin email domain: `@leasetic.com` (NOT `@memento.eco` as CLAUDE.md notes) — antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com seeded as admins. CLAUDE.md still references @memento.eco for unrelated-project context (Memento Hub); for THIS project (Leasétic Matrice) use @leasetic.com. | user 2026-05-08 launch | 06-launch |
+| Admin email domain: `@leasetic.com` (NOT `@memento.eco` as CLAUDE.md notes) — antoine.rousseau@leasetic.com + emmanuel.rousseau@leasetic.com seeded as admins. CLAUDE.md still references @memento.eco for unrelated-project context (Memento Hub); for THIS project (Leasetic Matrice) use @leasetic.com. | user 2026-05-08 launch | 06-launch |
 | Launch-day admin seeding via `scripts/seed-admins-launch.ts` (direct-DB INSERT into users + accounts) — bypasses Better Auth `signUpEmail` (architecturally disabled) AND admin plugin `createUser` (chicken-and-egg at bootstrap, no admin yet). One-off script with typed-confirmation gate + INITIAL_PASSWORD env var (literal not in source). For ongoing grants: use `grant-admin` (invitation flow). | 2026-05-08 launch decision | 06-launch |
 | Both admins seeded with shared "for now" password `leasetic2026` (not in source/git; in chat transcript only). Architecturally diverges from AUTH-08/09 invitation-flow lock; documented as launch-day exception. Rotation to individual strong passwords pending — see Phase 6 follow-ups. | user 2026-05-08 launch | 06-launch |
 | `APP_URL` + `NEXT_PUBLIC_APP_URL` env vars BOTH required for Better Auth to work end-to-end on Vercel — server uses APP_URL for resolveBaseUrl()/trustedOrigins; client uses NEXT_PUBLIC_APP_URL for authClient baseURL. Default fallbacks (VERCEL_URL deployment-specific hash, empty string) cause silent login failures with the same INVALID_EMAIL_OR_PASSWORD message browsers see for actual bad creds (anti-enumeration discipline collapses all failures). Set both to canonical alias in production+preview Vercel scopes; localhost:3000 in development. | 2026-05-08 launch debug | 06-launch |
@@ -711,7 +711,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase ?]: Guard test and comment wording adjusted to avoid the literal string 'Jakarta' so the plan's own grep -ci jakarta acceptance gates return 0
 - [Phase ?]: npm run build verified locally by temporarily moving the gitignored, prod-pointing .env.production.local aside (mirrors CI's zero-env-file SKIP condition); no DB command run, file restored immediately
 - [Phase 41]: Human approval for D-11 recorded verbatim from Antoine, not workflow.auto_advance -- typography-migration phase closes on 41-03
-- [Phase 41]: Brand wordmark spelling (rendered LEASÉTIC, correct post-rebrand spelling is LEASETIC without the accent) deferred as out-of-scope for Phase 41 per D-01; tracked separately by Antoine as a repo-wide rebrand cleanup
+- [Phase 41]: Brand wordmark spelling (the accented pre-rebrand form was rendered where LEASETIC was correct) deferred as out-of-scope for Phase 41 per D-01; tracked separately by Antoine as a repo-wide rebrand cleanup — RESOLVED 2026-09-08 in commit 976177c, which dropped the accent across the source tree and regenerated the PROP-17 PDF fixture
 
 ### Blockers
 

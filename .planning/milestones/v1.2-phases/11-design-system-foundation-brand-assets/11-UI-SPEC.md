@@ -99,7 +99,7 @@ The Figma "13 semantic text styles" inventory is the authoritative table. Phase 
 | `toggle-pill` | 12.5 | 500 (Medium) | 1.40 | normal | none | `--muted` (off) / `--ink` (on) | **Sidebar lang/theme toggle segments** (matches existing `.toggle-pill`) |
 
 **Special chrome typography (not in the 13 styles):**
-- **Wordmark "Leasétic"** in Sidebar brand row (expanded only): 22px / 700 / `--navy`, family `var(--font-sans)`. This is decorative chrome; do NOT consume a semantic style.
+- **Wordmark "Leasetic"** in Sidebar brand row (expanded only): 22px / 700 / `--navy`, family `var(--font-sans)`. This is decorative chrome; do NOT consume a semantic style.
 - **Stepper step-number / step-label** — uses `body/default-medium` for active+done labels, `body/default` for pending labels. Numbers inside circles: 14px / 600 / `#ffffff` (active+done) or 14px / 500 / `--muted` (pending).
 
 ---
@@ -352,7 +352,7 @@ export interface RetractableSidebarProps {
 
 ```
 ┌────────────────────────────────────────────┐  ← outer <aside>
-│  ┌──┐ Leasétic         ┌─┐                 │  ← brand row (36×36 logo + wordmark + 16×16 chevron)
+│  ┌──┐ Leasetic         ┌─┐                 │  ← brand row (36×36 logo + wordmark + 16×16 chevron)
 │  └──┘                  └─┘                 │
 │                                            │
 │  NAVIGATION                                │  ← eyebrow (label/section-title, paddingTop 24px)
@@ -390,8 +390,8 @@ export interface RetractableSidebarProps {
 
 **Brand row (top, expanded):**
 - Container: `display: flex; align-items: center; gap: 8px;`
-- Logo: `<BrandLogo width={36} height={36} alt="" />` — **wait: BrandLogo renders the full lockup (mark + wordmark) at viewBox 1192×200; in the sidebar brand row the design uses ONLY the mark glyph at 36×36 + a separate text "Leasétic" wordmark in HTML.** See §6.3.1 below for resolution.
-- Wordmark: `<span>Leasétic</span>` — font-family `var(--font-sans)`, size 22px, weight 700, color `var(--navy)`.
+- Logo: `<BrandLogo width={36} height={36} alt="" />` — **wait: BrandLogo renders the full lockup (mark + wordmark) at viewBox 1192×200; in the sidebar brand row the design uses ONLY the mark glyph at 36×36 + a separate text "Leasetic" wordmark in HTML.** See §6.3.1 below for resolution.
+- Wordmark: `<span>Leasetic</span>` — font-family `var(--font-sans)`, size 22px, weight 700, color `var(--navy)`.
 - Spacer: `flex: 1`.
 - Chevron toggle: `<button>` with lucide `ChevronLeft` (size 16, stroke 1.6, color `var(--muted)`). Background transparent. Border none. `aria-label={t('sidebar.collapse', lang)}` ("Réduire" / "Collapse"). `aria-expanded="true"` (since sidebar is currently expanded).
 
@@ -496,7 +496,7 @@ export interface RetractableSidebarProps {
 - `aria-label={t('sidebar.theme.cycle', lang)}` ("Changer de thème" / "Change theme").
 
 #### 6.3.1 BrandLogo dimensions inside sidebar
-The full BrandLogo (mark + wordmark lockup) at width 190 / height 32 is used in the EXPANDED brand row (rendered as a `<BrandLogo width={190} height={32} alt={t('sidebar.brand', lang)} />`). The wordmark inside this SVG matches the "Leasétic" text in the design — so the separate `<span>Leasétic</span>` mentioned in the layout above is REMOVED (the SVG carries both glyphs).
+The full BrandLogo (mark + wordmark lockup) at width 190 / height 32 is used in the EXPANDED brand row (rendered as a `<BrandLogo width={190} height={32} alt={t('sidebar.brand', lang)} />`). The wordmark inside this SVG matches the "Leasetic" text in the design — so the separate `<span>Leasetic</span>` mentioned in the layout above is REMOVED (the SVG carries both glyphs).
 
 For the COLLAPSED state, the SVG cannot be cropped to "mark only" via the `<img>` element. Resolution: ship a third asset `public/logo-mark.svg` (just the clover mark, viewBox 0 0 200 200, mark fill `#6DC388`). The collapsed sidebar uses `<img src="/logo-mark.svg" width={36} height={36} alt="" />` directly (NOT via BrandLogo helper). BrandLogo helper is only for the full lockup with theme-switching wordmark.
 
@@ -750,7 +750,7 @@ export interface ShellProps {
 
 #### Layout contract
 
-The existing 2-col / 3-row CSS grid in `app/(authed)/layout.tsx` is preserved. The only structural change: the sidebar slot is now `<RetractableSidebar>` (not the inline `<aside>` with hardcoded `Leasétic` text) and the topbar slot's `<Topbar>` no longer renders LocaleToggle + ThemeToggle internally.
+The existing 2-col / 3-row CSS grid in `app/(authed)/layout.tsx` is preserved. The only structural change: the sidebar slot is now `<RetractableSidebar>` (not the inline `<aside>` with hardcoded `Leasetic` text) and the topbar slot's `<Topbar>` no longer renders LocaleToggle + ThemeToggle internally.
 
 ```html
 <div style="display: grid;
@@ -814,7 +814,7 @@ Phase 11 ships components, not surfaces. Most user-facing strings are PASSED IN 
 
 | Element | Owner | Default FR | Default EN | i18n key |
 |---|---|---|---|---|
-| Sidebar brand wordmark (rendered inside `logo-light.svg` / `logo-dark.svg`) | SVG file | Leasétic | Leasétic | n/a (baked into SVG) |
+| Sidebar brand wordmark (rendered inside `logo-light.svg` / `logo-dark.svg`) | SVG file | Leasetic | Leasetic | n/a (baked into SVG) |
 | Sidebar collapse-toggle aria-label | RetractableSidebar | Réduire le menu | Collapse menu | `sidebar.collapse` |
 | Sidebar expand-toggle aria-label | RetractableSidebar | Déployer le menu | Expand menu | `sidebar.expand` |
 | Sidebar lang toggle aria-label (collapsed) | RetractableSidebar | Changer de langue | Change language | `sidebar.lang.cycle` |
@@ -828,7 +828,7 @@ Phase 11 ships components, not surfaces. Most user-facing strings are PASSED IN 
 | Sidebar nav.adminCoefficients | RetractableSidebar | Coefficients | Coefficients | `sidebar.nav.adminCoefficients` |
 | Sidebar nav.adminPartners | RetractableSidebar | Partenaires | Partners | `sidebar.nav.adminPartners` |
 | Sidebar nav.adminHistory | RetractableSidebar | Historique | History | `sidebar.nav.adminHistory` |
-| BrandLogo alt-text (default usage in sidebar brand row) | RetractableSidebar consumer | Leasétic | Leasétic | reuse `sidebar.brand` (already exists in v1.1 dict) |
+| BrandLogo alt-text (default usage in sidebar brand row) | RetractableSidebar consumer | Leasetic | Leasetic | reuse `sidebar.brand` (already exists in v1.1 dict) |
 
 **No copywriting owned for:** Stepper labels (passed in by Phase 13 consumer), MetricTile label/value/sublabel (passed by Phase 14 consumer), AdminNavCard title/description/openLabel (passed by Phase 14 consumer), StatusChip label (passed by every consumer).
 

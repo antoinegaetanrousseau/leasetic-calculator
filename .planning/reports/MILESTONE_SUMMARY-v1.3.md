@@ -8,7 +8,7 @@
 
 ## 1. Project Overview
 
-**Leasétic Matrice** is the internal sales-quote tool for Leasétic, distributed to channel
+**Leasetic Matrice** is the internal sales-quote tool for Leasetic, distributed to channel
 partners (IT integrators, resellers). Partners fill in client info + project amount +
 duration and generate a 2-page PDF proposal (financial offer + RSE page) for their client.
 

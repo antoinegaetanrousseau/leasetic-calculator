@@ -1,4 +1,4 @@
-# Domain Pitfalls — Leasétic Matrice v1.1 Foundation Migration
+# Domain Pitfalls — Leasetic Matrice v1.1 Foundation Migration
 
 **Domain:** Single-file vanilla HTML calculator → Next.js multi-page authed B2B internal tool with persistent immutable PDF artifacts and dual-host (Vercel/OVH) portability
 **Researched:** 2026-05-05
@@ -302,13 +302,13 @@ Severity legend: **BLOCKING** = sinks the milestone if missed · **HIGH** = hour
 
 ---
 
-## 9. Domain-specific (Leasétic / IT-leasing)
+## 9. Domain-specific (Leasetic / IT-leasing)
 
 ### 9.1 GDPR / CNIL applicability to a B2B internal tool (HIGH)
 **What goes wrong:** "It's B2B, GDPR doesn't fully apply" — wrong. GDPR applies to *personal* data, and partner contact info (name, email, phone) is personal data even in a B2B context. End-client data inside proposals is also personal data.
 **Prevention:** (a) Data inventory document: what personal data is stored, where, retention period, lawful basis. (b) Partner-facing privacy notice (FR + EN) accessible from app footer. (c) Right-to-erasure flow: an admin action to delete a partner's account *but* PDFs are retained as legal artifacts (legitimate interest / legal obligation). (d) Server hosted in EU only (Vercel EU regions; OVH is FR — both compliant). (e) CNIL Art. 30 register is required.
 **Phase:** Phase 2 / pre-launch
-**Confidence:** MEDIUM (consult Leasétic's existing GDPR posture)
+**Confidence:** MEDIUM (consult Leasetic's existing GDPR posture)
 
 ### 9.2 PDF as legal document: archival period (HIGH)
 **What goes wrong:** PDFs deleted after a partner is deactivated. But IT-leasing contracts have French commercial-law retention obligations — typically 10 years for commercial documents (Code de commerce art. L. 123-22).
@@ -318,7 +318,7 @@ Severity legend: **BLOCKING** = sinks the milestone if missed · **HIGH** = hour
 
 ### 9.3 PDF integrity guarantees expected in IT-leasing (MEDIUM-HIGH)
 **What goes wrong:** A contested proposal six months later: client claims "the version I received showed 4.2%, your dashboard shows 4.5%." Without integrity proof, dispute resolution is "your word vs theirs."
-**Prevention:** (a) SHA256 of PDF stored in DB at generation time, never recomputed. (b) PDF metadata includes proposal ID + generation timestamp (visibly in the footer). (c) Optional: digital signature with a Leasétic certificate (PAdES) — defer to v1.2. (d) Audit log: who downloaded which PDF when (IP, user, partner) — minimum 10 years.
+**Prevention:** (a) SHA256 of PDF stored in DB at generation time, never recomputed. (b) PDF metadata includes proposal ID + generation timestamp (visibly in the footer). (c) Optional: digital signature with a Leasetic certificate (PAdES) — defer to v1.2. (d) Audit log: who downloaded which PDF when (IP, user, partner) — minimum 10 years.
 **Phase:** Phase 4/5
 **Confidence:** MEDIUM
 

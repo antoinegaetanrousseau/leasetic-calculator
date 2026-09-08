@@ -19,7 +19,7 @@
 
 **User's choice:** Extract `<PageHero>` primitive (Recommended)
 
-**Notes:** Final shape includes a `children` slot reserved for future composition (e.g. inline stats), but not used in Phase 16. Eyebrow color = `--gd` (Leasétic brand green) matching the `●` section-bullet convention from Phase 13. Hero typography pinned: title 32px / weight 700, subtitle 14.5px / weight 400 / `--muted`, eyebrow 11.8px / weight 700 / uppercase / 0.06em letter-spacing. Spacing: `margin-bottom: 32px` between hero and first content card (matches Phase 13/14 4-multiple scale precedent).
+**Notes:** Final shape includes a `children` slot reserved for future composition (e.g. inline stats), but not used in Phase 16. Eyebrow color = `--gd` (Leasetic brand green) matching the `●` section-bullet convention from Phase 13. Hero typography pinned: title 32px / weight 700, subtitle 14.5px / weight 400 / `--muted`, eyebrow 11.8px / weight 700 / uppercase / 0.06em letter-spacing. Spacing: `margin-bottom: 32px` between hero and first content card (matches Phase 13/14 4-multiple scale precedent).
 
 ---
 

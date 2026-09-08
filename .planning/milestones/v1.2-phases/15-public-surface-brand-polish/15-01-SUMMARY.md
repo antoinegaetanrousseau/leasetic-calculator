@@ -48,7 +48,7 @@ metrics:
 
 # Phase 15 Plan 01: Public Surface Brand Polish — Summary
 
-Replaced the v1.1 plain-text `Leasétic` header in the shared `app/(public)/layout.tsx` with the Phase 11 `<BrandLogo>` SVG component using a new `.public-page-logo` CSS class (clamp 140px/50vw/200px); change propagates automatically to `/login`, `/invite/[token]`, and `/reset/[token]` via the single shared server layout (PUB-01 + PUB-02 closed).
+Replaced the v1.1 plain-text `Leasetic` header in the shared `app/(public)/layout.tsx` with the Phase 11 `<BrandLogo>` SVG component using a new `.public-page-logo` CSS class (clamp 140px/50vw/200px); change propagates automatically to `/login`, `/invite/[token]`, and `/reset/[token]` via the single shared server layout (PUB-01 + PUB-02 closed).
 
 ## Atomic Commits
 
@@ -91,7 +91,7 @@ The existing Phase 11 brand-logo CSS picker at lines 543-545 (`html[data-theme="
 
 Four Vitest assertions:
 
-- **AC-15-BL-01** — `<BrandLogo>` with `.public-page-logo` className renders: outer `span.brand-logo.public-page-logo` contains two `<img>` tags (one `.brand-logo-light` → `/logo-light.svg`, one `.brand-logo-dark` → `/logo-dark.svg`), both with `alt="Leasétic"`.
+- **AC-15-BL-01** — `<BrandLogo>` with `.public-page-logo` className renders: outer `span.brand-logo.public-page-logo` contains two `<img>` tags (one `.brand-logo-light` → `/logo-light.svg`, one `.brand-logo-dark` → `/logo-dark.svg`), both with `alt="Leasetic"`.
 - **AC-15-BL-02** — v1.1 plain-text header is gone: no `<div>` with inline style `font-size: 22; font-weight: 700` exists in rendered output.
 - **AC-15-BL-03** — Top-right LocaleToggle + ThemeToggle cluster preserved: the absolute-positioned wrapper (`position: absolute; top: 24; right: 24`) exists and contains both toggles.
 - **T-15-01** — Information-disclosure gate: rendered DOM contains no `commission`, `admin`, or `[adminSegment]` substrings.
@@ -139,7 +139,7 @@ The test file documents the first-of-kind async-server-component pattern (`await
 
 | # | Criterion | Status | Verification |
 |---|-----------|:------:|--------------|
-| 1 | `/login` swaps plain-text "Leasétic" → SVG logo lockup centered above form card; form unchanged | ✅ | Vitest AC-15-BL-01 + grep `fontSize: 22` = 0 in non-test files |
+| 1 | `/login` swaps plain-text "Leasetic" → SVG logo lockup centered above form card; form unchanged | ✅ | Vitest AC-15-BL-01 + grep `fontSize: 22` = 0 in non-test files |
 | 2 | Body background on `/login`, `/invite/[token]`, `/reset/[token]` = `--paper`; form card stays `--surface` | ⏳ (automated) | `background: 'var(--paper)'` on layout line 35 preserved (no edit to lines 27-40); form cards owned by Phase 6 form primitives, also unmodified. Manual smoke below outstanding for Chrome + Edge. |
 | 3 | LocaleToggle + ThemeToggle stay top-right on all 3 public routes | ✅ | Vitest AC-15-BL-03 |
 | 4 | All 3 routes share one reusable `(public)` layout — no per-route duplication | ✅ | Grep contract: `BrandLogo` appears in exactly 1 non-test file in `app/(public)/` (the shared layout) |
@@ -174,7 +174,7 @@ Bonus check: resize browser to 320px width on `/login` — confirm logo scales s
 - **Footer** in `app/(public)/layout.tsx` — `marginTop: 32`, `fontSize: 10.5px`, `color: var(--muted)`, Mentions légales link preserved verbatim.
 - **Top-right toggle cluster** — same `position: absolute; top: 24; right: 24; gap: 12; zIndex: 10` styling; both `<LocaleToggle current={lang} />` and `<ThemeToggle current={theme} />` invocations identical.
 - **Color tokens & CSS variables** — no new `--variables`, no edits to existing tokens; v1.3 color refresh remains the appropriate vehicle per PROJECT.md.
-- **i18n keys** — no new keys; the `sidebar.brand` key (returns `'Leasétic'` in FR + EN per `dictionaries.ts` lines 41 + 707) is reused for the BrandLogo `alt` prop.
+- **i18n keys** — no new keys; the `sidebar.brand` key (returns `'Leasetic'` in FR + EN per `dictionaries.ts` lines 41 + 707) is reused for the BrandLogo `alt` prop.
 - **Other layouts** — `app/(authed)/`, `app/(admin)/`, `app/layout.tsx` (root) — all untouched.
 
 ## Deviations from Plan
@@ -201,7 +201,7 @@ No other deviations. Phase 15 is a tightly-scoped shell-only swap and executed e
 
 Both PUB-01 and PUB-02 are closed by this plan:
 
-- **PUB-01** — "Public routes adopt centered Leasétic SVG logo above form card" → ✅ implemented via the BrandLogo swap in the shared `(public)` layout.
+- **PUB-01** — "Public routes adopt centered Leasetic SVG logo above form card" → ✅ implemented via the BrandLogo swap in the shared `(public)` layout.
 - **PUB-02** — "Logo sizing responsive via `clamp(140px, 50vw, 200px)`" → ✅ implemented via the `.public-page-logo` CSS class with the exact clamp formula from UI-SPEC §6.3.
 
 User to update REQUIREMENTS.md Traceability table to mark both rows as ✅ (executor leaves the markdown edit to the user pending final visual smoke).

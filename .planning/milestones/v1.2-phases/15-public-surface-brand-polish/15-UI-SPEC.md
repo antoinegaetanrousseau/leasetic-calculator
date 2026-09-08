@@ -187,15 +187,15 @@ With:
 
 **Why this exact invocation (D-01, D-02, D-Claude-discretion):**
 - `className="public-page-logo"` — adds the Phase 15 sizing class (declared in §6.3 below) which overrides the Phase 11 defaults via CSS specificity.
-- `alt={t('sidebar.brand', lang)}` — reuses the existing `sidebar.brand` i18n key (returns `'Leasétic'` in both FR + EN per `src/lib/i18n/dictionaries.ts` line 41 + line 707). No new i18n keys introduced.
+- `alt={t('sidebar.brand', lang)}` — reuses the existing `sidebar.brand` i18n key (returns `'Leasetic'` in both FR + EN per `src/lib/i18n/dictionaries.ts` line 41 + line 707). No new i18n keys introduced.
 - `width` and `height` props are **omitted intentionally** — the CSS `width: clamp(...)` rule on `.public-page-logo` is the authoritative sizing source; the underlying `<img>` `width`/`height` attributes default to 190×32 from Phase 11 (these become layout fallbacks under `width: auto; height: auto;` should the CSS fail to load, but the `.public-page-logo` CSS overrides them).
 
 #### DOM contract after the swap (rendered output in `(public)` routes)
 
 ```html
 <span class="brand-logo public-page-logo" style="display:inline-block; line-height:0;">
-  <img class="brand-logo-light" src="/logo-light.svg" alt="Leasétic" width="190" height="32" />
-  <img class="brand-logo-dark"  src="/logo-dark.svg"  alt="Leasétic" width="190" height="32" />
+  <img class="brand-logo-light" src="/logo-light.svg" alt="Leasetic" width="190" height="32" />
+  <img class="brand-logo-dark"  src="/logo-dark.svg"  alt="Leasetic" width="190" height="32" />
 </span>
 ```
 
@@ -204,7 +204,7 @@ The Phase 11 CSS picker (already in `app/globals.css` lines 544-545) hides one i
 #### Acceptance criteria (Phase 15 BrandLogo consumption)
 
 - **AC-15-BL-01:** All 3 public routes (`/login`, `/invite/[token]`, `/reset/[token]`) render exactly one `<span class="brand-logo public-page-logo">` element. Verified by Vitest test (D-12).
-- **AC-15-BL-02:** The plain-text `{t('sidebar.brand', lang)}` block (the v1.1 plain-text "Leasétic" header) is no longer present in the rendered DOM of `(public)` routes. Verified by Vitest test (D-11): grep the rendered HTML for `fontSize: 22` inline style — must return 0 matches in `app/(public)/layout.tsx` output.
+- **AC-15-BL-02:** The plain-text `{t('sidebar.brand', lang)}` block (the v1.1 plain-text "Leasetic" header) is no longer present in the rendered DOM of `(public)` routes. Verified by Vitest test (D-11): grep the rendered HTML for `fontSize: 22` inline style — must return 0 matches in `app/(public)/layout.tsx` output.
 - **AC-15-BL-03:** With `<html data-theme="light">`, `.brand-logo-light` `<img>` has computed `display !== 'none'`; `.brand-logo-dark` `<img>` has computed `display: none`. Inherited from Phase 11 AC-BL-01; verified in manual smoke (ROADMAP §Phase 15 success criterion #5).
 - **AC-15-BL-04:** With `<html data-theme="dark">`, the reverse. Inherited from Phase 11 AC-BL-02.
 - **AC-15-BL-05:** No flash of unstyled content on reload — the Phase 6 no-flash inline `<script>` sets `data-theme` before first paint, and the CSS picker is in `app/globals.css` (synchronously linked). Verified in manual smoke per ROADMAP §Phase 15 success criterion #5.
@@ -311,7 +311,7 @@ Phase 15 introduces **zero** new user-facing copy. All visible text on public ro
 
 | Element | Copy (FR / EN) | Source key | New in Phase 15? |
 |---------|----------------|------------|------------------|
-| BrandLogo `alt` text | `"Leasétic"` / `"Leasétic"` | `sidebar.brand` (existing) | No — reuses Phase 11 / Phase 6 key |
+| BrandLogo `alt` text | `"Leasetic"` / `"Leasetic"` | `sidebar.brand` (existing) | No — reuses Phase 11 / Phase 6 key |
 | Footer copyright | (existing FR / EN values) | `shell.footer.copyright` | No |
 | Footer privacy link | `"Mentions légales"` / `"Privacy notice"` (existing) | `shell.footer.privacy` | No |
 | Form field labels (login / invite / reset) | (existing) | Phase 6 / Phase 7 keys | No |
@@ -328,7 +328,7 @@ Phase 15 introduces **zero** new user-facing copy. All visible text on public ro
 
 | Concern | Phase 15 behavior |
 |---------|-------------------|
-| BrandLogo alt text | `alt={t('sidebar.brand', lang)}` → `"Leasétic"` in both languages. Phase 11's BrandLogo renders both `<img>` tags with this alt; one is hidden via CSS, but screen readers may still announce both — acceptable because the alt text is identical, so it reads as one logical brand name. |
+| BrandLogo alt text | `alt={t('sidebar.brand', lang)}` → `"Leasetic"` in both languages. Phase 11's BrandLogo renders both `<img>` tags with this alt; one is hidden via CSS, but screen readers may still announce both — acceptable because the alt text is identical, so it reads as one logical brand name. |
 | Tab order | LocaleToggle → ThemeToggle → form fields → submit button → footer link. BrandLogo is **non-tabbable** (no `tabindex`, no `<Link>` wrapper, no native interactive element). Preserved from Phase 6. |
 | Focus ring | BrandLogo wrapper has no `:focus-visible` rule (it is non-focusable). Toggles and form fields retain their existing `:focus-visible` rings (teal-18%, 3px spread). |
 | Color contrast | Inherited from Phase 11 logo design — `#6DC388` mark + `--navy` (light) / `#e6e9ef` (dark) wordmark on `--paper` background was validated at Phase 11 logo design. Phase 15 introduces no new composite. **Re-verification deferred to v1.3 color refresh per §4.5.** |
@@ -339,7 +339,7 @@ Phase 15 introduces **zero** new user-facing copy. All visible text on public ro
 
 ## 9. Tests
 
-Per D-11 + D-12, Phase 15 adds **exactly 1 new Vitest test** and **updates any existing test** that asserted the plain-text "Leasétic" header.
+Per D-11 + D-12, Phase 15 adds **exactly 1 new Vitest test** and **updates any existing test** that asserted the plain-text "Leasetic" header.
 
 ### 9.1 New test (D-12)
 
@@ -349,17 +349,17 @@ Per D-11 + D-12, Phase 15 adds **exactly 1 new Vitest test** and **updates any e
 1. Rendering `<PublicLayout>{children}</PublicLayout>` produces a DOM that contains exactly one element matching `span.brand-logo.public-page-logo`.
 2. The same DOM contains two `<img>` tags with classes `brand-logo-light` and `brand-logo-dark` respectively.
 3. The same DOM contains the top-right absolute-positioned toggle cluster: a `<div>` with `position: absolute; top: 24; right: 24` containing both `<LocaleToggle>` and `<ThemeToggle>` (rendered by class names or test-ids per Phase 6 convention).
-4. The same DOM **does NOT contain** the plain-text "Leasétic" header pattern (inline `fontSize: 22` style + `fontWeight: 700` on a `<div>` containing `'Leasétic'`).
+4. The same DOM **does NOT contain** the plain-text "Leasetic" header pattern (inline `fontSize: 22` style + `fontWeight: 700` on a `<div>` containing `'Leasetic'`).
 
 **Coverage of the 3 routes:** since all 3 public routes (`/login`, `/invite/[token]`, `/reset/[token]`) share the same `app/(public)/layout.tsx`, asserting the layout's output once covers all 3 by the layout's shared-shell guarantee. ROADMAP §Phase 15 success criterion #4 ("All 3 public routes share a single reusable `(public)` layout component — verified by grep: the logo + paper-bg pattern is not duplicated across 3 files") is verified by an additional grep test step.
 
 ### 9.2 Updated tests (D-11)
 
-If any existing test under `app/` or `src/` asserts the plain-text "Leasétic" header on `(public)` routes, update its expectation to assert the BrandLogo span instead. Probable candidates (developer audit):
+If any existing test under `app/` or `src/` asserts the plain-text "Leasetic" header on `(public)` routes, update its expectation to assert the BrandLogo span instead. Probable candidates (developer audit):
 - `app/(public)/login/page.test.tsx` (if exists)
 - Any e2e or integration test that scrapes the login page DOM
 
-**Verification:** after Phase 15 ships, no test in the codebase asserts the presence of the inline-styled plain-text "Leasétic" `<div>`. Grep: `grep -rn "fontSize: 22\|fontSize: '22'" {src,app}/**/*.test.{ts,tsx}` returns 0 matches related to the public layout.
+**Verification:** after Phase 15 ships, no test in the codebase asserts the presence of the inline-styled plain-text "Leasetic" `<div>`. Grep: `grep -rn "fontSize: 22\|fontSize: '22'" {src,app}/**/*.test.{ts,tsx}` returns 0 matches related to the public layout.
 
 ### 9.3 Grep contract (ROADMAP §Phase 15 success criterion #4)
 

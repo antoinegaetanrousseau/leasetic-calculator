@@ -68,7 +68,7 @@ Replace the v1.1 single-page `/proposals/new` form with a three-route wizard —
 - **D-14:** Step 3 is a 2-column read-only review:
   - **Left column (~640px):** three sections separated by horizontal rules, each with a `●` bullet header and a `← Modifier` link (top-right, accent-colored): `● CLIENT` (Nom, Personne de contact, Email, Téléphone) → links to step 1. `● PROJET` (Référence, Montant HT, Durée) → links to step 1. `● CALCUL` (Coefficient appliqué, Tranche, Commission apporteur amount) → links to step 2 (which itself can `← Modifier` back to step 1).
   - **Right column (~360px):** the **PDF preview** card.
-- **D-15:** The PDF preview on step 3 is a **CSS mock**, not a real `@react-pdf/renderer` artifact. The card renders the Leasétic light-mode logo (PUB-01 / ASSET-01) + title `Proposition de financement` + a placeholder reference line `Réf. LC-2026-XXX · {validityDays} jours de validité` (literal `XXX` — the real `lc_ref` is generated only at finalize time) + a few mock body lines (gray placeholder bars) + a `LOYER MENSUEL` block with the computed value. No `lc_ref` is reserved during draft, no PDF blob is uploaded, no `audit_log` entry is written pre-finalize.
+- **D-15:** The PDF preview on step 3 is a **CSS mock**, not a real `@react-pdf/renderer` artifact. The card renders the Leasetic light-mode logo (PUB-01 / ASSET-01) + title `Proposition de financement` + a placeholder reference line `Réf. LC-2026-XXX · {validityDays} jours de validité` (literal `XXX` — the real `lc_ref` is generated only at finalize time) + a few mock body lines (gray placeholder bars) + a `LOYER MENSUEL` block with the computed value. No `lc_ref` is reserved during draft, no PDF blob is uploaded, no `audit_log` entry is written pre-finalize.
 - **D-16:** Step 3's action bar carries `← Précédent` ghost link + `Enregistrer comme brouillon` ghost button + `Confirmer & Générer le PDF` primary CTA. Clicking the CTA invokes a server action that:
   1. Re-validates the full `proposalInputSchema` (server-side gate).
   2. Re-reads the latest `global_params` (Phase 8 `getLatestGlobalParams()` pattern — current params snapshot).
@@ -225,7 +225,7 @@ Replace the v1.1 single-page `/proposals/new` form with a three-route wizard —
 ## Specific Ideas
 
 - **`<WizardActionBar>` composition:** rounded white `.card` at the bottom of each step's main content. Inner layout: `← Précédent` (steps 2/3) ghost-text link on the far left → `Enregistrer comme brouillon` `.btn-out` (ghost) → spacer → primary `.btn-green` CTA on the far right.
-- **PDF preview mock content:** Leasétic logo (light, ASSET-01 SVG) + `Proposition de financement` title + `Réf. LC-2026-XXX · {validityDays} jours de validité` (literal `XXX`) + 3-4 gray placeholder bars representing body content + `LOYER MENSUEL` label + computed value `2 770 € / mois` + 2 more gray bars. Background: white surface inside a rounded card. Total height ~340–400px to fit alongside the recap column on a 982px viewport.
+- **PDF preview mock content:** Leasetic logo (light, ASSET-01 SVG) + `Proposition de financement` title + `Réf. LC-2026-XXX · {validityDays} jours de validité` (literal `XXX`) + 3-4 gray placeholder bars representing body content + `LOYER MENSUEL` label + computed value `2 770 € / mois` + 2 more gray bars. Background: white surface inside a rounded card. Total height ~340–400px to fit alongside the recap column on a 982px viewport.
 - **`← Modifier` link styling:** small `--gd` accent-colored text link (12–13px) in the top-right corner of each recap-section header, prefixed with a back-arrow Unicode glyph (`←` U+2190). Hover: underline.
 - **Toast strings:**
   - Brouillon save (success): FR `Brouillon enregistré ✓`, EN `Draft saved ✓`
@@ -234,7 +234,7 @@ Replace the v1.1 single-page `/proposals/new` form with a three-route wizard —
   - Duplicate prefill (existing `<DuplicatePrefillToast>` keeps its v1.1 copy)
 - **Spinner label during finalize:** `Génération en cours…` (FR) / `Generating…` (EN). The primary CTA both disables and morphs its label.
 - **Step labels for `<Stepper>`:** use the Phase 11 in-component defaults `['Paramètres', 'Calcul', 'Vérification']` (FR) / `['Parameters', 'Calculation', 'Verification']` (EN). No `stepLabels` override needed.
-- **Section bullet color in step content:** the `●` glyph in each section header (`● INFORMATIONS CLIENT`, `● DÉTAILS DU PROJET`, `● CLIENT`, `● PROJET`, `● CALCUL`, `● PARAMÈTRES SAISIS`, `● DÉTAIL DU CALCUL`) uses `--gd` (Leasétic brand green). All caps + tracking for the label per Figma `label/section-title` text style.
+- **Section bullet color in step content:** the `●` glyph in each section header (`● INFORMATIONS CLIENT`, `● DÉTAILS DU PROJET`, `● CLIENT`, `● PROJET`, `● CALCUL`, `● PARAMÈTRES SAISIS`, `● DÉTAIL DU CALCUL`) uses `--gd` (Leasetic brand green). All caps + tracking for the label per Figma `label/section-title` text style.
 - **Accordion trigger copy:** FR `+ Plus de détails (facultatif)` / EN `+ More details (optional)`. Caret icon rotates 90° on expand. Animation: 200ms ease-out height transition.
 - **"Plus de détails" accordion content order:** clientRole → clientSiren → projectDesc → slb toggle → evalParc toggle (mirrors v1.1's visual grouping: optional client identity fields first, then project narrative, then interest booleans).
 - **Step-1 segmented control values:** literal `36 mois / 48 mois / 60 mois` (NOT `24 mois / 36 mois / 48 mois` as the Figma sketches — Figma is wrong here per D-13).
@@ -250,7 +250,7 @@ Replace the v1.1 single-page `/proposals/new` form with a three-route wizard —
 - **Sticky-footer treatment of `<WizardActionBar>`** when step 1's accordion expansion pushes content beyond the 982px viewport — planner's call within Phase 13 or defer to v1.3.
 - **`beforeunload` warning for unsaved edits** on step 1 (when `dirtyFields.size > 0`) — possible Phase 13 polish; otherwise v1.3.
 - **Animation / transitions between routes** (slide-in, fade) — keep instant route changes for v1.2 polish, revisit in v1.3+.
-- **Per-step browser tab titles** vs. single `Nouvelle proposition — Leasétic Matrice` for all 3 — planner's call.
+- **Per-step browser tab titles** vs. single `Nouvelle proposition — Leasetic Matrice` for all 3 — planner's call.
 - **Cron purge of stale empty drafts** (drafts with `inputs = {}` and `created_at` older than N days) — Phase 12 D-02 explicitly rejected TTLs; revisit only if observation shows draft accumulation hurts ops or admin views.
 - **Figma label fixes** for the wizard frames (durations 24/36/48 → 36/48/60; partner-card hidden auto-fill notes; "Plus de détails" accordion sketch) — to do post-phase, not blocking.
 - **Admin coefficient history viewer, AdminNavCards, partner home MetricTiles, partner home `Nouvelle proposition` CTA wiring** — all Phase 14.

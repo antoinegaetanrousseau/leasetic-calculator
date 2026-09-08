@@ -42,7 +42,7 @@ metrics:
 
 One-liner: Closes both v1.3 partner-onboarding gates — GATE-01 (admin password rotation
 from the shared `leasetic2026` to individual strong passwords via the new `/parametres`
-self-service flow shipped by Plan 21-01) and GATE-02 (Leasétic public privacy notice
+self-service flow shipped by Plan 21-01) and GATE-02 (Leasetic public privacy notice
 updated to cover Vercel/Neon EU hosting + 10-year PDF retention per French Commercial
 Code L123-22 / L110-4) — and records the auditable closure artifact that future GDPR
 or partner audits will reference.

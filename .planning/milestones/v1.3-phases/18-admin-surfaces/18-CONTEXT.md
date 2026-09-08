@@ -100,8 +100,8 @@ Apply the Figma `9:46` design contract to all admin surfaces (Admin Home `41:46`
 - Frame `42:46` — Liste partenaires v1.3 sketch (light only)
 - Frame `43:46` — Créer partenaire v1.3 sketch (light only)
 - Frame `45:46` — Coefficients v1.3 sketch (light only)
-- Frame `93:177` — Aide / Centre d'Aide landing (partner sidebar shown; generic template — Leasétic content TBD)
-- Frame `93:2773` — Aide article template "Getting started" (lorem ipsum + Dashly X placeholder — Leasétic content TBD)
+- Frame `93:177` — Aide / Centre d'Aide landing (partner sidebar shown; generic template — Leasetic content TBD)
+- Frame `93:2773` — Aide article template "Getting started" (lorem ipsum + Dashly X placeholder — Leasetic content TBD)
 
 Screenshots downloaded during discussion: `/tmp/figma-phase18/{admin-home,partners-list,creer-partenaire,coefficients,aide,aide-subpage}.png` (ephemeral; re-fetch via `mcp__0c362372-5270-457f-b11b-4797e40bf045__get_screenshot` if needed during planning).
 
@@ -167,7 +167,7 @@ Screenshots downloaded during discussion: `/tmp/figma-phase18/{admin-home,partne
 
 - **Sidebar deviation from Figma "3 filter tabs"**: D-09 adds a 4th `Invités` tab. User-confirmed deviation. Planner: bake this into the FilterPillRow extension explicitly.
 - **Stat tile color always-teal**: D-04 deviates from Figma's gold for `Dernière modif. coeffs`. User-confirmed. Planner: document in the plan's deviations section.
-- **Figma placeholder content in Aide frames** (`93:177` + `93:2773`): both frames use generic template content (Dashly X, John Carter, lorem ipsum, generic categories like "Applications de bureau et mobiles"). User-confirmed that real Leasétic content is needed; planner drafts FR + EN for the `Commencer ici` starter article.
+- **Figma placeholder content in Aide frames** (`93:177` + `93:2773`): both frames use generic template content (Dashly X, John Carter, lorem ipsum, generic categories like "Applications de bureau et mobiles"). User-confirmed that real Leasetic content is needed; planner drafts FR + EN for the `Commencer ici` starter article.
 - **Figma typos in admin frames**: `Acceuil` (should be `Accueil`) in the Admin Home topbar (`41:46`); `Coéfficients` with acute accent (should be `Coefficients` per standard French + the route /coefficients) in the Coefficients topbar (`45:46`). Treat as Figma typos; ship with the correct spelling.
 - **Recent activity sidebar mismatch**: D-06 acknowledges that `Voir tout → /history` lands on a coefficient-only feed. Accepted as a known partial. Defer the unified /history feed to a later phase.
 

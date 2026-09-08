@@ -98,7 +98,7 @@ From REQUIREMENTS.md → Future Requirements:
 - SMTP-driven self-service password reset; MFA on admin accounts.
 - Centralized forms-i18n / Zod error-localization helper (remove EN-leak duplication).
 - OVH production deployment + smoke-deploy execution (September 2026 target).
-- Webhook notifications to Leasétic on proposal generation; generic audit-log viewer.
+- Webhook notifications to Leasetic on proposal generation; generic audit-log viewer.
 - Mobile-optimized layout; automated browser tests (Playwright); Sentry/APM observability.
 - `/accounts` 308 redirect sunset.
 

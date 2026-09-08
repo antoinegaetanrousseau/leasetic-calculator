@@ -39,7 +39,7 @@ tech-stack:
     - "Inline 'use server' arrow as a server-action prop into a 'use client' WizardActionBar. The arrow captures draft.id + inputs from the server-component scope and forwards to the shared saveAsDraftAction. Eliminates the need for a step-2 client wiring component (step 2 has no form to read getValues from)."
     - "trancheKey 't1'..'t4' → integer (1..4) + upper-bound K€ mapping tables at module scope. The calc engine ships trancheKey as a string discriminator; the UI binds it to chip labels and (tranche {N}K€) row suffixes."
     - "D-12 ADMIN-09 partial-relaxation enforcement by structural isolation — the partner-only-visible parameter is computed at a single named binding (commissionDisplay) that flows into exactly one JSX site (detailRows[1].value). The Paramètres saisis recap and the action bar never reference it. Test 15 asserts the value string appears EXACTLY ONCE in the rendered output."
-    - "Soft-error variant ladder: inputsIncomplete → 'Données du projet incomplètes' at body/danger; on-demand → 'Sur demande' at hero scale + 'Contactez Leasétic' subtitle; missing → 'Coefficients manquants pour cette tranche' at heading scale (24px/600/--gd) per UI-SPEC §5.6 non-blocking recommendation. Each variant pairs with a primary-CTA replacement when forward-nav must be blocked."
+    - "Soft-error variant ladder: inputsIncomplete → 'Données du projet incomplètes' at body/danger; on-demand → 'Sur demande' at hero scale + 'Contactez Leasetic' subtitle; missing → 'Coefficients manquants pour cette tranche' at heading scale (24px/600/--gd) per UI-SPEC §5.6 non-blocking recommendation. Each variant pairs with a primary-CTA replacement when forward-nav must be blocked."
 
 key-files:
   created:
@@ -161,7 +161,7 @@ All 10 contracts pass.
 | State | Hero card content | Détail du calcul card | Paramètres saisis recap | Primary CTA |
 |---|---|---|---|---|
 | `result.computed.state === 'computed'` (happy path) | 40px/700/--gd loyer + sublabel + tranche chip | Rendered with all 5 rows showing real values | Rendered with 7 rows + ← Modifier link | `Continuer vers la vérification →` /verification |
-| `result.computed.state === 'on-demand'` | 40px/700/--gd "Sur demande" + "Contactez Leasétic" sublabel; tranche chip HIDDEN | Rendered with `—` placeholders for coefficient + loyer | Rendered (recap still meaningful) | `Continuer vers la vérification →` (partner can still proceed; the PDF will surface "Sur demande" per UI-SPEC §10.2) |
+| `result.computed.state === 'on-demand'` | 40px/700/--gd "Sur demande" + "Contactez Leasetic" sublabel; tranche chip HIDDEN | Rendered with `—` placeholders for coefficient + loyer | Rendered (recap still meaningful) | `Continuer vers la vérification →` (partner can still proceed; the PDF will surface "Sur demande" per UI-SPEC §10.2) |
 | `result.computed.state === 'missing'` | 24px/600/--gd "Coefficients manquants pour cette tranche" | Rendered with `—` placeholders | Rendered | REPLACED → `← Retour à l'étape 1` |
 | `result.computed.state === 'idle'` (defensive — unreachable in practice) | error.incomplete fallback | NOT rendered | NOT rendered | REPLACED → `← Retour à l'étape 1` |
 | `inputsIncomplete` (proposalInputSchema.safeParse fail) | error.incomplete inline | NOT rendered | NOT rendered | REPLACED → `← Retour à l'étape 1` |

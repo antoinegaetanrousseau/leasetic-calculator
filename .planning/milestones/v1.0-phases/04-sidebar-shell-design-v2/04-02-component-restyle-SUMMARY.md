@@ -17,7 +17,7 @@ requirements_shipped:
 
 ## What shipped
 
-Every interactive surface of v10 restyled to match the Leasétic/Dashly design language established in 04-CONTEXT.md: pill buttons, shadowless-elevation cards, rounded inputs with teal focus ring, floating banners, and the sidebar ● dot completion marker.
+Every interactive surface of v10 restyled to match the Leasetic/Dashly design language established in 04-CONTEXT.md: pill buttons, shadowless-elevation cards, rounded inputs with teal focus ring, floating banners, and the sidebar ● dot completion marker.
 
 ## Changes
 

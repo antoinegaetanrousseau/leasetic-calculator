@@ -21,7 +21,7 @@ created: 2026-05-06
 Phase 5 produces:
 
 1. `app/layout.tsx` — root layout with font bootstrap, dark-mode class, locale cookie, Tailwind tokens
-2. `app/page.tsx` — minimal placeholder: Leasétic logo + brand color + Plus Jakarta Sans + theme toggle + locale toggle (FR/EN)
+2. `app/page.tsx` — minimal placeholder: Leasetic logo + brand color + Plus Jakarta Sans + theme toggle + locale toggle (FR/EN)
 3. `/healthz` route — JSON-only health probe, no UI
 
 Actual feature screens (login, proposal form, proposals list, admin) are out of scope. This UI-SPEC defines the CSS custom property layer, typography scale, color palette, spacing scale, and theme contract that every subsequent phase will consume — extracted from v10 as the source of truth.
@@ -198,7 +198,7 @@ Typography constraints:
 
 ## Color Contract
 
-60/30/10 split applied to the Leasétic palette:
+60/30/10 split applied to the Leasetic palette:
 
 | Role | Light mode | Dark mode | Usage |
 |------|-----------|-----------|-------|
@@ -243,7 +243,7 @@ Extracted from v10 — three distinct values in use:
 
 | Value | Token name | Applied to |
 |-------|-----------|------------|
-| 6px | `rounded-md` (Tailwind default) | Proposal print tiles (`.oi`), condition bars, "why Leasétic" tiles |
+| 6px | `rounded-md` (Tailwind default) | Proposal print tiles (`.oi`), condition bars, "why Leasetic" tiles |
 | 8px | `rounded-lg` | Sidebar nav items, tooltips, toggle icon buttons |
 | 12px | `rounded-xl` | Cards (small variant: `.cc`), inputs, alerts, toasts, banners |
 | 16px | `rounded-2xl` | Main cards (`.card`) |
@@ -272,7 +272,7 @@ body: display: grid
       min-height: 100vh
 ```
 
-**Phase 5 placeholder is permitted to show an empty/minimal shell.** The sidebar may contain only the Leasétic logo. The topbar contains the theme toggle and locale toggle. The main content area shows a "Phase 5: Bootstrap OK" or equivalent marker. No real navigation items yet.
+**Phase 5 placeholder is permitted to show an empty/minimal shell.** The sidebar may contain only the Leasetic logo. The topbar contains the theme toggle and locale toggle. The main content area shows a "Phase 5: Bootstrap OK" or equivalent marker. No real navigation items yet.
 
 ---
 
@@ -319,7 +319,7 @@ Phase 5 delivers a placeholder page only. Bilingual strings are required for the
 
 | Element | FR copy | EN copy |
 |---------|---------|---------|
-| Placeholder page heading | "Bienvenue sur Leasétic Matrice" | "Welcome to Leasétic Matrice" |
+| Placeholder page heading | "Bienvenue sur Leasetic Matrice" | "Welcome to Leasetic Matrice" |
 | Placeholder page subtext | "Application en cours de déploiement." | "Application deployment in progress." |
 | Theme toggle: light | "Clair" (icon only on mobile) | "Light" (icon only on mobile) |
 | Theme toggle: dark | "Sombre" (icon only) | "Dark" (icon only) |

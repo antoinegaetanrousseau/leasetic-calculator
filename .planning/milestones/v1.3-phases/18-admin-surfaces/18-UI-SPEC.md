@@ -53,8 +53,8 @@ These deviations are LOCKED from CONTEXT.md D-01..D-30 (user confirmed during `/
 | 4 | Coefficients topbar | Spelled `Coéfficients` (acute accent) | Correct `Coefficients` (matches `/coefficients` route + standard French) | Figma typo |
 | 5 | Coefficients warning banner | Always visible | Dismissable per-session (×) — dismissal persists in `sessionStorage` key `gsd.coefficients.warning.dismissed` | D-20 |
 | 6 | CoefficientHistorySidebar | Click-to-diff handler | Read-only rows (diff modal stays on `/history` full page only) | D-21, D-22 |
-| 7 | Aide landing content | Generic placeholder (Dashly X, lorem ipsum, generic categories) | Leasétic 3-card grid: `Commencer ici` (link) / `Créer une proposition` (`Bientôt disponible` muted card) / `Contact` (mailto) | D-25 |
-| 8 | Aide article content | Lorem ipsum + Dashly X placeholder visuals | Real Leasétic wizard quick-start (~500-1000 words FR + EN, Phase 17 wizard screenshots) | D-26 |
+| 7 | Aide landing content | Generic placeholder (Dashly X, lorem ipsum, generic categories) | Leasetic 3-card grid: `Commencer ici` (link) / `Créer une proposition` (`Bientôt disponible` muted card) / `Contact` (mailto) | D-25 |
+| 8 | Aide article content | Lorem ipsum + Dashly X placeholder visuals | Real Leasetic wizard quick-start (~500-1000 words FR + EN, Phase 17 wizard screenshots) | D-26 |
 | 9 | Admin sidebar nav | Current: `Accueil / Partenaires / Coefficients / Historique` | New: `Accueil / Nouvelle proposition / Propositions / Partenaires / Coefficients / Aide` (Historique removed → moved to Admin Home AdminNavCard + Recent activity `Voir tout` link) | D-27 |
 | 10 | Admin surfaces dark mode | No painted Figma dark frames exist | Derived via Phase 16 `html[data-theme="dark"]` token cascade — closing-out plan must include 12 visual checkpoints (6 surfaces × 2 modes) | D-29 |
 
@@ -532,7 +532,7 @@ NO `onClick` handler on the row. The `+ {0} autres` link / pagination control st
 **Directive:** server component (or static — no auth-derived data on this page). `requireUser()` — both partner and admin can read. `/aide` lives under `(authed)` route group so partner + admin auth both apply (D-28).
 
 **Layout (top → bottom):**
-1. `<PageHero>` — title `Centre d'aide` + subtitle `Tout pour démarrer et bien utiliser Leasétic`
+1. `<PageHero>` — title `Centre d'aide` + subtitle `Tout pour démarrer et bien utiliser Leasetic`
 2. 3-card grid — `display:grid; grid-template-columns:repeat(3,1fr); gap:24px; maxWidth:1040px; marginTop:32px`
 
 **`<PageHero>` call:**
@@ -712,7 +712,7 @@ Following Phase 17 D-21 verify-and-reuse discipline. **Existing keys** = already
 | 69 | History sidebar `/history` link | Voir tout l'historique → | View full history → | `admin.coefficients.history.viewAll` | **NEW** | similar to existing `admin.coefficients.history.load_more` (`Charger plus`) — different semantic |
 | **Aide landing** | | | | | | |
 | 70 | PageHero title | Centre d'aide | Help Center | `aide.landing.title` | **NEW** | — |
-| 71 | PageHero subtitle | Tout pour démarrer et bien utiliser Leasétic | Everything you need to get started with Leasétic | `aide.landing.subtitle` | **NEW** | — |
+| 71 | PageHero subtitle | Tout pour démarrer et bien utiliser Leasetic | Everything you need to get started with Leasetic | `aide.landing.subtitle` | **NEW** | — |
 | 72 | Card 1 title | Commencer ici | Start here | `aide.landing.card.commencerIci.title` | **NEW** | — |
 | 73 | Card 1 body | Premier guide pour créer une proposition en 3 étapes. | First guide to create a proposal in 3 steps. | `aide.landing.card.commencerIci.body` | **NEW** | — |
 | 74 | Card 1 CTA | Lire le guide → | Read the guide → | `aide.landing.card.commencerIci.cta` | **NEW** | — |

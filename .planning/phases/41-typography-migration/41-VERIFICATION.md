@@ -81,7 +81,7 @@ No orphaned requirements: Phase 41's ROADMAP block declares only `DOC-09`, match
 
 No BLOCKER-level anti-patterns found. No TBD/FIXME/XXX debt markers in any phase-touched file.
 
-**Known deferred item (not a gap, per task brief):** `src/lib/pdf/document.tsx` lines 103 and 132 render `Leasétic`/`LEASÉTIC` (pre-rebrand spelling); correct spelling is `LEASETIC`. Pre-existing, repo-wide (145 occurrences / 53 files), predates Phase 41, explicitly frozen by D-01 (content freeze), and recorded as deferred in `41-03-SUMMARY.md`. Not counted as a phase gap.
+**Known deferred item (not a gap, per task brief):** `src/lib/pdf/document.tsx` lines 103 and 132 rendered the accented pre-rebrand spelling; the correct spelling is `LEASETIC`. Pre-existing, repo-wide (145 occurrences / 53 files), predated Phase 41, explicitly frozen by D-01 (content freeze), and recorded as deferred in `41-03-SUMMARY.md`. Not counted as a phase gap. Resolved 2026-09-08 in commit `976177c`.
 
 ### Human Verification Required
 

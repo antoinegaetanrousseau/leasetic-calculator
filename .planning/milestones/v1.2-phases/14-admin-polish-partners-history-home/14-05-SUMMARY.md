@@ -89,7 +89,7 @@ i18n_keys_added: 8 × 2 langs = 16 entries
 
 - `requireAdmin()` defence-in-depth (AUTH-15) — runs FIRST per PITFALLS §7.3, before any data access. Throws notFound() for non-admins (URL secrecy per D-18).
 - `export const dynamic = 'force-dynamic'` — PITFALLS §1.6 cookie/session opt-out.
-- `export const metadata: Metadata = { title: 'Historique des coefficients — Leasétic Matrice', robots: { index: false, follow: false } }` — admin URL secrecy + standard admin chrome.
+- `export const metadata: Metadata = { title: 'Historique des coefficients — Leasetic Matrice', robots: { index: false, follow: false } }` — admin URL secrecy + standard admin chrome.
 - Page props: `{ params: Promise<{ adminSegment: string }>; searchParams: Promise<{ cursor?: string }> }` (Next.js 16 async-params signature).
 - Body flow: `await params` → `await requireAdmin()` → `await getCurrentLang()` → `await searchParams` → decode cursor if present → `listCoefficientHistory({ ...(decoded ? { cursor } : {}), limit: 20 })` → encode next cursor if present → render shell.
 - Render shell: `<div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 0' }}>` containing the h1 (32px/700/--ink, `t('history.title', lang)` = "Historique des coefficients"), subtitle `<p>` (16px/400/--muted, 8px below h1, 32px bottom margin, `t('history.subtitle', lang)` = "Tous les changements de coefficients et commission"), then `<CoefficientHistoryList>` with the full 6-prop bundle.

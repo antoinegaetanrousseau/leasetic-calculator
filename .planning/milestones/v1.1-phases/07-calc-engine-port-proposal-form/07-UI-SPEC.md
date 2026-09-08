@@ -137,7 +137,7 @@ Phase 6 left this page intentionally minimal with `welcomeHeading` + `welcomeSub
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ [sidebar Leasétic]                                          │
+│ [sidebar Leasetic]                                          │
 ├──────┬──────────────────────────────────────────────────────┤
 │      │ [Page title: Accueil/Home]   [LT][TT][UserMenu ▾]    │  ← Topbar (Phase 6, unchanged)
 │      ├──────────────────────────────────────────────────────┤
@@ -159,7 +159,7 @@ Phase 6 left this page intentionally minimal with `welcomeHeading` + `welcomeSub
 │      │   └────────────────────────────────────────────┘     │
 │      │                                                      │
 │      ├──────────────────────────────────────────────────────┤
-│      │           © 2026 Leasétic — Application interne      │  ← Footer (Phase 6, unchanged)
+│      │           © 2026 Leasetic — Application interne      │  ← Footer (Phase 6, unchanged)
 └──────┴──────────────────────────────────────────────────────┘
 ```
 

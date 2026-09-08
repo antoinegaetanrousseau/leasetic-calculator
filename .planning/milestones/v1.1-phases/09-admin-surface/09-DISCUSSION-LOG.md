@@ -109,7 +109,7 @@
 | Option | Description | Selected |
 |--------|-------------|----------|
 | Single default integer (Recommended) | Schema stays as-is (validity_days int NOT NULL). Admin edits ONE default value (e.g., 30). Partner UI keeps the fixed 15/30/60 segmented selector from Phase 7's <ValiditySegmented>; the admin's default just controls which one is initially highlighted on the form. Minimal scope; no schema bump; matches PROP-25's "configurable validity (15/30/60) preserved from v10" — v10 had fixed options too. Phase 7's swap-in seam already expects an integer. | ✓ |
-| Editable list of allowed options | Schema bump: replace validity_days int with validity_options jsonb (e.g., [15, 30, 60]) plus validity_default int. Admin edits both the list and the default. <ValiditySegmented> reads the list from props. More flexible (Leasétic could add 90 or remove 15 someday) but adds: schema migration, list-editing UI, validation that default ∈ options. Probably premature for v1.1. | |
+| Editable list of allowed options | Schema bump: replace validity_days int with validity_options jsonb (e.g., [15, 30, 60]) plus validity_default int. Admin edits both the list and the default. <ValiditySegmented> reads the list from props. More flexible (Leasetic could add 90 or remove 15 someday) but adds: schema migration, list-editing UI, validation that default ∈ options. Probably premature for v1.1. | |
 
 **User's choice:** Single default integer
 **Notes:** Locked as D-09-13. Schema unchanged.
@@ -118,7 +118,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Whitelist {15,30,60} hardcoded (Recommended) | Server validates the partner's submitted validityDays is in {15,30,60} via Zod enum (already in src/lib/calc/index.ts: validityDaysSchema = z.enum/literal-union). The single admin-edited default is just a UI affordance; the allowed *values* stay locked at the calc-engine layer. Matches v10 invariant; if Leasétic ever wants to expand, that's a calc-engine change (real code review, not a runtime config). | ✓ |
+| Whitelist {15,30,60} hardcoded (Recommended) | Server validates the partner's submitted validityDays is in {15,30,60} via Zod enum (already in src/lib/calc/index.ts: validityDaysSchema = z.enum/literal-union). The single admin-edited default is just a UI affordance; the allowed *values* stay locked at the calc-engine layer. Matches v10 invariant; if Leasetic ever wants to expand, that's a calc-engine change (real code review, not a runtime config). | ✓ |
 | Whitelist driven by global_params row | Server validates against the global_params row's allowed list. Pairs with "editable list" option above. Lets admin add/remove options without code changes. | |
 
 **User's choice:** Whitelist {15,30,60} hardcoded

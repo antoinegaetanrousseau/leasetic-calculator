@@ -15,9 +15,9 @@
 - **Impact:** Two-person shared secret over the only admin role on production. Any leak compromises full coefficient + audit-log control.
 - **Fix approach:** Use the admin↔admin password reset flow at `/[adminSegment]/partners/page.tsx` to rotate each admin to a distinct strong password. Then delete or gate `scripts/seed-admins-launch.ts` behind a `--allow-shared-password` flag so the pattern can't be reused.
 
-### [HIGH · security] Privacy policy not yet confirmed with Leasétic counsel
+### [HIGH · security] Privacy policy not yet confirmed with Leasetic counsel
 
-- **Issue:** Vercel/Neon EU hosting + 10-year PDF retention has not been confirmed against Leasétic's published privacy policy (per `.planning/v1.3-CARRYFORWARD.md:12`, Phase 10 cutover follow-up).
+- **Issue:** Vercel/Neon EU hosting + 10-year PDF retention has not been confirmed against Leasetic's published privacy policy (per `.planning/v1.3-CARRYFORWARD.md:12`, Phase 10 cutover follow-up).
 - **Files:** `.planning/v1.3-CARRYFORWARD.md:12`, fallback URL hardcoded in `src/components/LoginForm.tsx:238-239`
 - **Impact:** GDPR exposure. Real partner data cannot be collected until confirmed by Thomas Heufke.
 - **Fix approach:** Out-of-band review with Thomas; once confirmed, set `NEXT_PUBLIC_PRIVACY_URL_FR` / `_EN` in Vercel prod env (current fallback `https://leasetic.fr/mentions-legales` is hardcoded).

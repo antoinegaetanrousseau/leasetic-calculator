@@ -310,7 +310,7 @@ both light and dark modes.
 | `<PageHero>` title on admin home | `Administration` | `Administration` | `admin.home.title` | Existing |
 | `<PageHero>` subtitle on admin home | `Gérez les paramètres globaux et les comptes` | `Manage global parameters and accounts` | `admin.home.subtitle` | Existing |
 | Footer Mentions légales link text | `Mentions légales` | `Privacy notice` | `shell.footer.privacy` | Existing (reuse) |
-| Footer copyright | `© 2026 Leasétic — Application interne` | `© 2026 Leasétic — Internal application` | `shell.footer.copyright` | Existing |
+| Footer copyright | `© 2026 Leasetic — Application interne` | `© 2026 Leasetic — Internal application` | `shell.footer.copyright` | Existing |
 | Sidebar collapse toggle aria-label | `Réduire la barre latérale` | `Collapse sidebar` | `sidebar.collapse` | Existing |
 | Sidebar expand toggle aria-label | `Développer la barre latérale` | `Expand sidebar` | `sidebar.expand` | Existing |
 | Theme cycle button aria-label (collapsed) | `Changer le thème` | `Change theme` | `sidebar.theme.cycle` | Existing |

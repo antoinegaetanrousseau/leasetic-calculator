@@ -103,14 +103,14 @@ DB/API + i18n + sidebar foundation that unblocks every Wave-2 surface plan in Ph
 
 **1. [Rule 2 - Missing critical functionality] users.status column does not exist in schema**
 - **Found during:** Task 1 reading `src/db/schema.ts`.
-- **Issue:** Plan said `getActivePartnerCount` filters `users.status='active'` and `getTotalPartnerAccountCount` excludes by status. The Leasétic schema has NO `users.status` column — invited/active/inactive are DERIVED from existing columns per Phase 12 DB-02 D-10 (see `src/lib/db/queries/users.ts:listInvitedPartners`).
+- **Issue:** Plan said `getActivePartnerCount` filters `users.status='active'` and `getTotalPartnerAccountCount` excludes by status. The Leasetic schema has NO `users.status` column — invited/active/inactive are DERIVED from existing columns per Phase 12 DB-02 D-10 (see `src/lib/db/queries/users.ts:listInvitedPartners`).
 - **Fix:** Implemented `active` as `role='partner' AND deletedAt IS NULL AND lastLoginAt IS NOT NULL` (logged in at least once AND not soft-deleted). Total = same minus the `lastLoginAt` clause. Mirrors the established Phase 12 pattern.
 - **Files modified:** `src/lib/db/queries/partner-aggregates.ts` JSDoc explicitly cites Phase 12 D-10 as the derivation source.
 - **Commit:** 989d8ce.
 
 **2. [Rule 2 - Documented partial] Invitations source (c) DEFERRED in admin-activity**
 - **Found during:** Task 2 reading `src/db/schema.ts` for invitations table.
-- **Issue:** Plan said source (c) reads from `invitations` table JOIN `users` ON `createdBy`. The Leasétic schema has NO `invitations` table — partner invites live in `password_resets` (kind='invite') and that table has NO `createdBy` actor reference (only `userId`, the target). Implementing the invitation source requires schema work (out of Phase 18 scope).
+- **Issue:** Plan said source (c) reads from `invitations` table JOIN `users` ON `createdBy`. The Leasetic schema has NO `invitations` table — partner invites live in `password_resets` (kind='invite') and that table has NO `createdBy` actor reference (only `userId`, the target). Implementing the invitation source requires schema work (out of Phase 18 scope).
 - **Fix:** Documented as D-05 partial in JSDoc of `admin-activity.ts`. Recent activity ships as a 2-source union (coefficient_history + partner status). Logged in deferred-items.md.
 - **Files modified:** `src/lib/db/queries/admin-activity.ts` JSDoc + Known Stubs section of this SUMMARY.
 - **Commit:** 7dbd3c9.

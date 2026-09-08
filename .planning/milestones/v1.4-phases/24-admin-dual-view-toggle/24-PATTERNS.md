@@ -404,7 +404,7 @@ return (
 
 **Existing sidebar.* keys as positional anchor** (FR, lines 41–54):
 ```typescript
-'sidebar.brand': 'Leasétic',
+'sidebar.brand': 'Leasetic',
 'sidebar.collapse': 'Réduire le menu',
 'sidebar.expand': 'Déployer le menu',
 'sidebar.lang.cycle': 'Changer de langue',

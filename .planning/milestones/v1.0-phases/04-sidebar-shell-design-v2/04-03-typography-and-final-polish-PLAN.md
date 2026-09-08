@@ -265,9 +265,9 @@ Both attach to the same event-delegated `.btn-copy-ref` click handler. Both read
        ## Section D. DESIGN-01..12 visual verification (Phase 4)
        | REQ | Test | Expected | Result |
        |-----|------|----------|--------|
-       | DESIGN-01 | Sidebar structure | 260px light, Leasétic brand top, 3 main nav + Admin below divider, FR/EN segmented + quarter badge bottom | ☐ |
+       | DESIGN-01 | Sidebar structure | 260px light, Leasetic brand top, 3 main nav + Admin below divider, FR/EN segmented + quarter badge bottom | ☐ |
        | DESIGN-02 | Topbar contextual actions | Saisie: Réinit + Générer; Résultat: Modifier + Voir; Proposition: Modifier + Copier + Imprimer + Télécharger; Admin: Verrouiller + Enregistrer | ☐ |
-       | DESIGN-03 | Footer | Single 48px row "© 2026 Leasétic · thomas.heufke@leasetic.com · Matrice v10" | ☐ |
+       | DESIGN-03 | Footer | Single 48px row "© 2026 Leasetic · thomas.heufke@leasetic.com · Matrice v10" | ☐ |
        | DESIGN-04 | Pill buttons | Every .btn has 9999px radius; .btn-green has shadow + translateY hover lift | ☐ |
        | DESIGN-05 | Shadow cards | 16px radius, zero border, dual-layer navy-tinted shadow, 2rem padding | ☐ |
        | DESIGN-06 | Rounded inputs | 12px radius, 0.7rem/1rem padding, teal focus ring, red invalid ring | ☐ |
@@ -284,7 +284,7 @@ Both attach to the same event-delegated `.btn-copy-ref` click handler. Both read
        2. [ ] Fill partner-co "Partner SA", partner-name "J. Dupont", client-co "Acme", client-name "M. Durand", amount 75000 (thin-space formatting), SIREN 123 456 789, phone 01 23 45 67 89
        3. [ ] Click 60 mois duration → .db active state pill-shaped
        4. [ ] Click Générer from topbar → navigate to Proposition tab → ● dots appear on Résultat + Proposition sidebar items
-       5. [ ] Proposition page renders in French with all 5 "Pourquoi choisir Leasétic?" tiles, conditions block, RSE caption "Notre engagement RSE"
+       5. [ ] Proposition page renders in French with all 5 "Pourquoi choisir Leasetic?" tiles, conditions block, RSE caption "Notre engagement RSE"
        6. [ ] Click Copier la référence in topbar → toast "Référence copiée." fires → paste in DevTools → LC-XXXXX matches
        7. [ ] Click ← Modifier in topbar → back to Saisie with all fields intact
        8. [ ] Click Imprimer / PDF → print preview shows 2-page A4 identical to Phase 1, no sidebar/topbar/footer visible
@@ -297,7 +297,7 @@ Both attach to the same event-delegated `.btn-copy-ref` click handler. Both read
        ## Section F. EN-only smoke (same flow in English)
        Toggle to EN via sidebar bottom → repeat 13 steps above in English:
        - Footer text also translates to the EN `footer.text` key
-       - Proposition "Why choose Leasétic?" / "CSR commitment" visible
+       - Proposition "Why choose Leasetic?" / "CSR commitment" visible
        - Toasts in English ("Reference copied." / "Coefficients saved.")
        - Reload → UI persists in English
        - Toggle back → FR

@@ -51,7 +51,7 @@ import { getDefaultValidityDays, type ProposalInput } from '@/lib/calc';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Nouvelle proposition — Leasétic Matrice',
+  title: 'Nouvelle proposition — Leasetic Matrice',
 };
 ```
 Phase 13 adds `createDraft, updateDraft, getDraftById` from `@/lib/db/queries` and `redirect` from `next/navigation`.
@@ -149,7 +149,7 @@ import { getDraftById, getLatestGlobalParams } from '@/lib/db/queries';
 import { computeLoyer } from '@/lib/calc';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Résultat du calcul — Leasétic' };
+export const metadata: Metadata = { title: 'Résultat du calcul — Leasetic' };
 
 export default async function CalculPage({ searchParams }: { searchParams: Promise<{ draft_id?: string }> }) {
   const { session } = await requireUser();

@@ -195,7 +195,7 @@ during discussion and is deferred in full — see `<deferred>`.
 
 ### AMENDMENT — 2026-09-06, after design-system review (during `/gsd-ui-phase 38`)
 
-Reviewing the Leasétic design-system handoff
+Reviewing the Leasetic design-system handoff
 (`~/Downloads/Quote/_ds/leasetic-design-system-4b3fa15d-.../tokens/`) at the operator's request
 produced findings that **supersede D-38-14 and D-38-15**, and corrected two factual errors in
 D-38-13. Recorded here so downstream agents act on the corrected facts.

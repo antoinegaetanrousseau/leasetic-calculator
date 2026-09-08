@@ -63,7 +63,7 @@ import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
 ```tsx
 // PITFALLS §1.6: cookie-reading layout opts out of static rendering.
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Accueil — Leasétic Matrice' };
+export const metadata: Metadata = { title: 'Accueil — Leasetic Matrice' };
 ```
 
 #### Auth + displayName pattern (carry-forward from current page, lines 38–48)
@@ -154,7 +154,7 @@ import { FilterPillRow } from './_components/FilterPillRow';
 import { DeleteJustToast } from '@/components/proposals/DeleteJustToast';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Mes propositions — Leasétic Matrice' };
+export const metadata: Metadata = { title: 'Mes propositions — Leasetic Matrice' };
 
 async function getNowMs(): Promise<number> { return Date.now(); }   // current page line 21
 
@@ -795,7 +795,7 @@ import { getCurrentLang, t } from '@/lib/i18n';
 
 // PITFALLS §1.6: cookie-reading route opts out of static rendering.
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Page Name — Leasétic Matrice' };
+export const metadata: Metadata = { title: 'Page Name — Leasetic Matrice' };
 
 export default async function MyPage(props: PageProps) {
   const { session } = await requireUser();   // defense-in-depth even though (authed)/layout.tsx also calls it
@@ -929,4 +929,4 @@ Both are inside files Phase 17 already plans to modify, so no new analog file is
 
 **Project skills loaded:** none (no `.claude/skills/` or `.agents/skills/` present in repo)
 
-**Project instructions:** Top-level `CLAUDE.md` in `/Users/antoinerousseau/Developer/leasetic-calculator/` is NOT present (the working-directory `CLAUDE.md` at `/Users/antoinerousseau/Documents/Claude Code/CLAUDE.md` describes a different project — Memento Hub — and was NOT applied to Leasétic patterns). Phase 17 conventions came from `17-CONTEXT.md` + `17-UI-SPEC.md` + the explored repo, which encode all relevant Leasétic project rules (PITFALLS, ADMIN-09, i18n parity proof, Vitest colocation, `requireUser` defense-in-depth).
+**Project instructions:** Top-level `CLAUDE.md` in `/Users/antoinerousseau/Developer/leasetic-calculator/` is NOT present (the working-directory `CLAUDE.md` at `/Users/antoinerousseau/Documents/Claude Code/CLAUDE.md` describes a different project — Memento Hub — and was NOT applied to Leasetic patterns). Phase 17 conventions came from `17-CONTEXT.md` + `17-UI-SPEC.md` + the explored repo, which encode all relevant Leasetic project rules (PITFALLS, ADMIN-09, i18n parity proof, Vitest colocation, `requireUser` defense-in-depth).

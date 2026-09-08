@@ -64,7 +64,7 @@ export const dynamic = 'force-dynamic';
 **Admin route pattern** (from `accounts/page.tsx` lines 19-36 — copy verbatim, swap component import + remove the `listPartnersWithCounts` call):
 ```tsx
 export const metadata: Metadata = {
-  title: 'Créer un partenaire — Leasétic Matrice',
+  title: 'Créer un partenaire — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 
@@ -694,7 +694,7 @@ export default async function Page({ params }: PageProps) {
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '… — Leasétic Matrice',
+  title: '… — Leasetic Matrice',
   robots: { index: false, follow: false }, // admin URL is hidden — defense in depth
 };
 ```

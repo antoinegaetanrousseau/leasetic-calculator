@@ -16,9 +16,9 @@ requirements:
   - DESIGN-12
 must_haves:
   truths:
-    - "Opening v10 shows a 260px light sidebar on the left with Leasétic logo top, Saisie/Résultat/Proposition nav items, an Admin item below a divider, and a FR/EN segmented toggle + quarter status badge at the bottom"
+    - "Opening v10 shows a 260px light sidebar on the left with Leasetic logo top, Saisie/Résultat/Proposition nav items, an Admin item below a divider, and a FR/EN segmented toggle + quarter status badge at the bottom"
     - "A sticky 64px topbar displays the current page title on the left and contextual action buttons on the right (Saisie shows Réinitialiser + Générer, Résultat shows Modifier + Voir la proposition, Proposition shows Modifier + Copier + Imprimer + Télécharger, Admin shows Verrouiller + Enregistrer)"
-    - "A single-line 48px footer displays '© 2026 Leasétic · thomas.heufke@leasetic.com · Matrice v10' below the content"
+    - "A single-line 48px footer displays '© 2026 Leasetic · thomas.heufke@leasetic.com · Matrice v10' below the content"
     - "Clicking a sidebar nav item switches the active page via showTab(); the topbar action buttons swap accordingly and fire the exact same handlers they did in Phase 3 (generate, showTab('saisie'), window.print(), blob download, saveCoeffs, lock)"
     - "Clicking the FR or EN segment in the sidebar bottom toggle fires setLang() and persists the choice to lt_lang — the whole UI including the new sidebar labels, topbar title, and footer translates"
     - "window.print() renders a 2-page A4 PDF IDENTICAL to Phase 1's audited output — sidebar, topbar, and footer vanish; #page-proposition prints byte-identical to Phase 1"
@@ -76,7 +76,7 @@ Current DOM blocks to DELETE (v10 lines 330-355):
 ```html
 <!-- DELETE: .hdr block lines 330-337 -->
 <div class="hdr">
-  <div id="hdr-title" ...>Proposition de location — Leasétic</div>
+  <div id="hdr-title" ...>Proposition de location — Leasetic</div>
   <div class="hdr-r">
     <button class="btn btn-ghost" id="btn-lang" ...>EN</button>
     <button class="btn btn-ghost" id="btn-admin" ...>Admin</button>
@@ -179,7 +179,7 @@ i18n keys ALREADY in dictionary (reuse — do NOT rename):
 - admin.sbar.save → (check dict) or add "admin.topbar.save" / admin.sbar.lock
 
 i18n keys that MAY need adding (add to BOTH fr+en in same edit):
-- sidebar.brand → "Leasétic"
+- sidebar.brand → "Leasetic"
 - sidebar.nav.saisie → "Saisie" / "Saisie" (reuse tab.saisie value)
 - sidebar.nav.resultat → reuse tab.resultat
 - sidebar.nav.proposition → reuse tab.proposition
@@ -187,7 +187,7 @@ i18n keys that MAY need adding (add to BOTH fr+en in same edit):
 - sidebar.admin.locked → small "🔒" icon suffix (static or via aria-label)
 - topbar.title.saisie|resultat|proposition|admin → page titles (may reuse tab.* values)
 - topbar.action.voir_proposition → "Voir la proposition →" / "View proposal →"  (NEW)
-- footer.text → "© 2026 Leasétic · thomas.heufke@leasetic.com · Matrice v10" (NEW — single key; email part can stay literal)
+- footer.text → "© 2026 Leasetic · thomas.heufke@leasetic.com · Matrice v10" (NEW — single key; email part can stay literal)
 
 PREFER reusing existing tab.* keys for sidebar nav labels and topbar title to minimize dict churn. Any NEW key MUST be added to both fr and en branches in one edit.
 </interfaces>
@@ -201,9 +201,9 @@ PREFER reusing existing tab.* keys for sidebar nav labels and topbar title to mi
   <behavior>
     After this task:
     - Opening v10 in Chrome shows a 260px light sidebar, a 64px sticky topbar, a scrollable content column, and a 48px footer
-    - The sidebar contains: brand header row ("Leasétic"), 3 main nav items (Saisie/Résultat/Proposition) with a placeholder active-state green pill, a divider, an Admin nav item with a 🔒 affix when not authenticated, a flex-grow spacer, a FR/EN segmented toggle, and a ✓ Q2 2026 quarter badge
+    - The sidebar contains: brand header row ("Leasetic"), 3 main nav items (Saisie/Résultat/Proposition) with a placeholder active-state green pill, a divider, an Admin nav item with a 🔒 affix when not authenticated, a flex-grow spacer, a FR/EN segmented toggle, and a ✓ Q2 2026 quarter badge
     - The topbar shows a left-aligned page title (Plus Jakarta Sans 1.15rem/600) and a right-aligned action group that changes per page via a `data-topbar-actions="saisie|resultat|proposition|admin"` CSS switch (only one group visible at a time; the others are `display:none`)
-    - The footer contains a single centered paragraph "© 2026 Leasétic · thomas.heufke@leasetic.com · Matrice v10"
+    - The footer contains a single centered paragraph "© 2026 Leasetic · thomas.heufke@leasetic.com · Matrice v10"
     - `window.print()` hides the sidebar, topbar, and footer completely and #page-proposition prints full-width in the same 2-page A4 format as Phase 1
     - The old `.hdr`, `#exp-banner` (temporarily), `.tabs`, and `#breadcrumb` DOM blocks are GONE from the document source
     - The self-checks still log 6/6, 8/8, 6/6 green on load (no JS errors)
@@ -262,7 +262,7 @@ PREFER reusing existing tab.* keys for sidebar nav labels and topbar title to mi
        ```html
        <!-- SIDEBAR -->
        <aside id="sidebar">
-         <div class="sidebar-brand" data-i18n="sidebar.brand">Leasétic</div>
+         <div class="sidebar-brand" data-i18n="sidebar.brand">Leasetic</div>
          <nav class="sidebar-nav">
            <button type="button" class="nav-item active" id="nav-saisie" data-tab="saisie" data-i18n="tab.saisie">📋 Saisie</button>
            <button type="button" class="nav-item" id="nav-resultat" data-tab="resultat" data-i18n="tab.resultat">📊 Résultat</button>
@@ -313,7 +313,7 @@ PREFER reusing existing tab.* keys for sidebar nav labels and topbar title to mi
 
        <!-- FOOTER -->
        <footer id="footer">
-         <span data-i18n="footer.text">© 2026 Leasétic · thomas.heufke@leasetic.com · Matrice v10</span>
+         <span data-i18n="footer.text">© 2026 Leasetic · thomas.heufke@leasetic.com · Matrice v10</span>
        </footer>
        ```
        Wrap all four `#page-*` divs that previously followed the breadcrumb in the new `<main class="main-content">` container. The `<main>` opens BEFORE `#page-saisie` and closes AFTER `#page-admin`.
@@ -326,9 +326,9 @@ PREFER reusing existing tab.* keys for sidebar nav labels and topbar title to mi
        Leave `.exp` CSS alone for now (plan 04-02 restyles it). Leave `.btn`, `.btn-green`, `.btn-navy`, `.btn-out` alone.
 
     6. **Add new i18n keys** to the I18N dictionary (inside both `fr:` and `en:` blocks, same edit):
-       - `'sidebar.brand': 'Leasétic'` (both langs — brand name)
+       - `'sidebar.brand': 'Leasetic'` (both langs — brand name)
        - `'topbar.action.voir_proposition': 'Voir la proposition →'` / `'View proposal →'`
-       - `'footer.text': '© 2026 Leasétic · thomas.heufke@leasetic.com · Matrice v10'` (both langs — email stays literal, "Matrice" is a product name)
+       - `'footer.text': '© 2026 Leasetic · thomas.heufke@leasetic.com · Matrice v10'` (both langs — email stays literal, "Matrice" is a product name)
        - If `admin.sbar.save` / `admin.sbar.lock` do NOT already exist, add them: FR `'💾 Enregistrer'` / `'🔒 Verrouiller'`, EN `'💾 Save'` / `'🔒 Lock'`. Grep the dict first before adding to avoid duplicates.
 
     7. **Smoke-verify** after the DOM + CSS edits but BEFORE proceeding to Task 2:
@@ -518,7 +518,7 @@ Zero-regression gates (MUST all pass before declaring this plan complete):
 - [ ] Topbar title updates on every page change and on every lang toggle
 - [ ] FR/EN segmented toggle in sidebar wires to setLang('fr'|'en') with .active reflecting currentLang
 - [ ] #exp-banner relocated to top of main-content; still shows quarterly state
-- [ ] Footer renders "© 2026 Leasétic · thomas.heufke@leasetic.com · Matrice v10"
+- [ ] Footer renders "© 2026 Leasetic · thomas.heufke@leasetic.com · Matrice v10"
 - [ ] .hdr, .tabs, #breadcrumb DOM all deleted (not just hidden)
 - [ ] updateBreadcrumb not called from showTab or DOMContentLoaded
 - [ ] @media print hides sidebar + topbar + footer; #page-proposition prints identical to Phase 1

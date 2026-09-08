@@ -86,7 +86,7 @@ completed: 2026-05-24
 - **Task 2 — /proposals server route (TDD RED → GREEN):**
   - RED: 9 behavior tests fail (route file doesn't exist).
   - GREEN: `app/(authed)/proposals/page.tsx` ships with:
-    - `export const dynamic = 'force-dynamic'` + `metadata.title = 'Mes propositions — Leasétic Matrice'`
+    - `export const dynamic = 'force-dynamic'` + `metadata.title = 'Mes propositions — Leasetic Matrice'`
     - `requireUser()` defense-in-depth + `getCurrentLang()` + `searchParams` Promise unwrap (Next.js 16 shape)
     - Single SSR `buildListResponse({ userId: session.user.id, q, cursorEncoded: cursor, archived, limit: 20 })` call — IDOR-safe userId scope
     - Layout: `<DeleteJustToast/>` + `<PageHero/>` (title + subtitle + Nouvelle proposition CTA) + filter+search flex row + `<ProposalsList/>` (with re-mount key) OR empty-state `.card`

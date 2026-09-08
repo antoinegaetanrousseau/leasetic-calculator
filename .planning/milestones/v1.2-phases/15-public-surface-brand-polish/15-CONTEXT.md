@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Apply the Leasétic brand logo to all 3 `(public)` routes (`/login`, `/invite/[token]`, `/reset/[token]`) by replacing the plain-text "Leasétic" header in the shared `app/(public)/layout.tsx` with the Phase 11 `<BrandLogo />` SVG component.
+Apply the Leasetic brand logo to all 3 `(public)` routes (`/login`, `/invite/[token]`, `/reset/[token]`) by replacing the plain-text "Leasetic" header in the shared `app/(public)/layout.tsx` with the Phase 11 `<BrandLogo />` SVG component.
 
 **In scope:**
 - Modify `app/(public)/layout.tsx`: swap the `<div>` containing `{t('sidebar.brand', lang)}` (lines 65-74) for `<BrandLogo className="public-page-logo" />`
@@ -33,7 +33,7 @@ Apply the Leasétic brand logo to all 3 `(public)` routes (`/login`, `/invite/[t
 ### Logo placement
 
 - **D-01:** Replace the plain-text logo block in `app/(public)/layout.tsx` (currently lines 65-74) with `<BrandLogo className="public-page-logo" />`. The Phase 11 `<BrandLogo>` component auto-picks light vs dark SVG via the existing `data-theme` CSS picker — zero JS, zero FOUC.
-- **D-02:** Logo width on desktop: **200px**. Matches the visual weight of the v1.1 plain-text "Leasétic" (22px / weight 700 / `--navy`) while introducing the real SVG lockup with mark + wordmark.
+- **D-02:** Logo width on desktop: **200px**. Matches the visual weight of the v1.1 plain-text "Leasetic" (22px / weight 700 / `--navy`) while introducing the real SVG lockup with mark + wordmark.
 - **D-03:** Vertical padding above the form card: **32px** (Phase 11 4-multiple scale; replaces v1.1's 16px since the SVG logo has more presence than the text it replaces).
 - **D-04:** Vertical padding below the BrandLogo (between logo and the card below it): already 16px in the existing layout; preserved.
 
@@ -54,14 +54,14 @@ Apply the Leasétic brand logo to all 3 `(public)` routes (`/login`, `/invite/[t
 
 ### Tests
 
-- **D-11:** Update any existing test that asserts the plain-text "Leasétic" header is in the rendered DOM (e.g. `app/(public)/layout.test.tsx` if it exists, or login.test.tsx) — replace the assertion with one that asserts `<BrandLogo>` (or its rendered `<span className="brand-logo">` shell) is present in the layout's output.
+- **D-11:** Update any existing test that asserts the plain-text "Leasetic" header is in the rendered DOM (e.g. `app/(public)/layout.test.tsx` if it exists, or login.test.tsx) — replace the assertion with one that asserts `<BrandLogo>` (or its rendered `<span className="brand-logo">` shell) is present in the layout's output.
 - **D-12:** Add ONE new Vitest test asserting: (a) all 3 public routes (/login, /invite/[token], /reset/[token]) render the BrandLogo, (b) the `.public-page-logo` className is applied, (c) the layout still renders the LocaleToggle + ThemeToggle in the top-right absolute-positioned cluster. Mockable via React Testing Library's `render` on the layout component.
 
 ### Claude's Discretion
 
 - Whether to put the `.public-page-logo` CSS in `app/globals.css` (Phase 11 convention) or as inline CSS-in-JS on the BrandLogo wrapper div (zero-impact alternative). Recommendation: globals.css for consistency.
 - Whether to set the logo via `width` attribute vs CSS class. Recommendation: CSS class (matches Phase 11's `.brand-logo` base pattern).
-- The exact `aria-label` text on the BrandLogo for the public pages — recommendation: reuse Phase 11's existing key (e.g. `brand.logo.alt`) which says "Leasétic — retour à l'accueil" or similar. Verify the existing key matches the public-page context.
+- The exact `aria-label` text on the BrandLogo for the public pages — recommendation: reuse Phase 11's existing key (e.g. `brand.logo.alt`) which says "Leasetic — retour à l'accueil" or similar. Verify the existing key matches the public-page context.
 - Whether to wrap the BrandLogo in a `<Link href="/login">` (clickable logo). Recommendation: NO — `/login` IS the public landing route; making the logo clickable would just refresh the same page or create a circular nav.
 
 </decisions>
@@ -124,7 +124,7 @@ Apply the Leasétic brand logo to all 3 `(public)` routes (`/login`, `/invite/[t
 
 - **CSS class:** `.public-page-logo { width: clamp(140px, 50vw, 200px); height: auto; display: inline-block; margin-bottom: 16px; }`
 - **Vertical padding above logo** (between top of card-area + logo): 32px on desktop (per existing centered-flex layout, this happens naturally; no change needed unless the logo's own intrinsic height changes the vertical centering).
-- **Alt text** — the BrandLogo `<img>` tags already have `alt="Leasétic"` baked in per Phase 11 default. No new aria-label needed.
+- **Alt text** — the BrandLogo `<img>` tags already have `alt="Leasetic"` baked in per Phase 11 default. No new aria-label needed.
 - **No link wrapper on the logo** — keeping it as a non-interactive SVG matches the "logo IS the visual brand anchor, not a nav element" intent of the public page layout.
 - **No animation** — the logo appears statically on page load. No fade-in, no scale, no shimmer.
 - **Footer remains unchanged** — the existing copyright + Mentions légales link footer stays at the bottom of all 3 public routes.
@@ -139,7 +139,7 @@ Apply the Leasétic brand logo to all 3 `(public)` routes (`/login`, `/invite/[t
 - **Animated logo entrance** — if v1.3+ wants a brand-flourish on first paint (fade-in, mark-then-wordmark sequence), that's a separate polish task.
 - **Mobile-specific layout** — Phase 15's clamp() scaling is sufficient for the desktop-primary constraint; a real mobile-first redesign (vertical stack, larger touch targets, larger forms) belongs in the mobile-optimized layout work item already deferred to v1.3+ per PROJECT.md.
 - **Logo as nav element** — wrapping in `<Link href="/login">` if a future flow needs "click logo to go to login from invite/reset". Currently no such flow.
-- **Public-page hero copy** — adding a tagline or subtitle above/below the logo ("Outil interne — Leasétic" or similar). Currently none; the logo speaks for itself. Reconsider with the v1.3 brand polish.
+- **Public-page hero copy** — adding a tagline or subtitle above/below the logo ("Outil interne — Leasetic" or similar). Currently none; the logo speaks for itself. Reconsider with the v1.3 brand polish.
 
 </deferred>
 

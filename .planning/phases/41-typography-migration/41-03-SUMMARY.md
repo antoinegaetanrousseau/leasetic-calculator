@@ -31,7 +31,7 @@ key-decisions:
   - "Deviation from the plan's literal REQUIRED_CODEPOINTS list (Rule 1): dropped U+00E0 (à) from the required set — it never appears in the happy-path-fr/happy-path-en fixture content (verified against src/lib/i18n/dictionaries.ts), so asserting it would be a fixture-content gap, not a font-coverage gap. Inter's coverage of à was already proven separately in 41-RESEARCH.md."
   - "Deviation from the plan's literal instruction to reuse commission-free-fixture.test.ts's shared glyph-ID lookup approach (Rule 1 — bug found empirically): that approach is non-deterministic for this 4-subset document because @react-pdf/renderer's Fiber write order can let one font's CMap silently overwrite a colliding glyph ID from another font's CMap between runs. Fixed by unioning CMap bfchar TARGET values directly instead of building one merged glyph-ID table — verified stable across 3 consecutive runs (77 codepoints, identical set)."
   - "Human approval for D-11 is Antoine's own verbatim response, not workflow.auto_advance — recorded below, not self-granted."
-  - "Brand wordmark spelling (LEASÉTIC vs. correct post-rebrand LEASETIC) explicitly deferred — out of Phase 41 scope per D-01, which freezes rendered content/bytes for this phase. See Deferred Items below."
+  - "Brand wordmark spelling (the accented pre-rebrand form vs. the correct post-rebrand LEASETIC) explicitly deferred — out of Phase 41 scope per D-01, which freezes rendered content/bytes for this phase. See Deferred Items below."
 
 requirements-completed: [DOC-09]
 
@@ -121,11 +121,11 @@ None beyond the deviations above. Both mutation checks specified in Task 1's acc
 
 ## Deferred Items
 
-**Brand wordmark spelling — out of Phase 41 scope.** The PDF's wordmark renders `LEASÉTIC` (`src/lib/pdf/document.tsx:132`, the visible header text) and the document metadata `author` field is set to `"Leasétic"` (`src/lib/pdf/document.tsx:103`). Antoine confirmed the correct post-rebrand spelling (rebranding took place summer 2026) is `LEASETIC` / `Leasetic`, without the accent. This is a **pre-existing, repo-wide content issue** — 145 occurrences across 53 source files, plus 496 occurrences across planning docs — that predates Phase 41 and is being tracked as its own separate piece of work.
+**Brand wordmark spelling — out of Phase 41 scope.** At the time of this phase the PDF wordmark (`src/lib/pdf/document.tsx:132`, the visible header text) and the document metadata `author` field (`src/lib/pdf/document.tsx:103`) both still carried the accented pre-rebrand spelling. Antoine confirmed the correct post-rebrand spelling (rebranding took place summer 2026) is `LEASETIC` / `Leasetic`, without the accent. This was a **pre-existing, repo-wide content issue** — 145 occurrences across 53 source files, plus 496 occurrences across planning docs — that predated Phase 41 and was tracked as its own separate piece of work. **Resolved 2026-09-08 in commit `976177c`** (source tree + PROP-17 fixture regenerated) and the planning archive normalized in the follow-up commit.
 
 **Explicitly not fixed in this plan or this phase.** Decision D-01 freezes the PDF's rendered content and output bytes for Phase 41 (typeface swap only). Editing `document.tsx`'s wordmark would:
 1. Change the PDF's rendered bytes, invalidating `__pdf-fixtures__/expected.sha256.txt` (just regenerated in 41-02) and requiring another fixture regeneration in the same change.
-2. Break test assertions in at least 8 test files that currently assert on the `LEASÉTIC` string or its derived hashes.
+2. Break test assertions in at least 8 test files that currently assert on the `LEASETIC` string or its derived hashes.
 3. Constitute a content change, not a font-family change — outside this plan's `files_modified` scope (`__pdf-fixtures__/inter-typography.test.ts` only).
 
 No repo file was touched to address this finding. It is recorded here for a future plan (repo-wide rebrand cleanup, tracked separately by Antoine) to pick up.

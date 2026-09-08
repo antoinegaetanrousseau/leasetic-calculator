@@ -446,7 +446,7 @@ The only real `<open_questions>` XML block in the four:
 
 - **Open Q1 (Cutover ownership)** — Antoine vs Thomas for partner comms (Phase 10 — fire request now).
 - **Open Q3 (Legal counsel sign-off on 10-year retention — DATA-11)** — gates Phase 10 CUT-09. Recommend Antoine fires the legal-counsel ask alongside Phase 8 planning so the answer is in hand by Phase 10. Phase 8 itself is unblocked because soft-delete hard-purge handles the 30-day window without needing legal yet.
-- **Open Q5 (OVH side stack — managed Postgres + S3-compatible)** — gates Phase 10 CUT-04. Recommend Antoine fires the Leasétic IT ask alongside Phase 8 planning.
+- **Open Q5 (OVH side stack — managed Postgres + S3-compatible)** — gates Phase 10 CUT-04. Recommend Antoine fires the Leasetic IT ask alongside Phase 8 planning.
 - **Phase 7 carry-over: Antoine's canonical coefficients** — Phase 8 is unblocked (D-D1 ships placeholders; Phase 9 admin-edits before partner onboarding). Antoine's extraction work can happen any time before first partner onboard date. NOT a Phase 8 blocker.
 
 </open_questions>

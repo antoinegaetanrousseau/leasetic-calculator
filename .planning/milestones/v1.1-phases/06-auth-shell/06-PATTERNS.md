@@ -708,7 +708,7 @@ return (
     <aside style={{ gridRow: '1 / 4', gridColumn: '1',
                     background: 'var(--surface)', borderRight: '1px solid var(--border)',
                     padding: '1.5rem 1rem', position: 'sticky', top: 0, height: '100vh' }}>
-      <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '16.5px' }}>Leasétic</div>
+      <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '16.5px' }}>Leasetic</div>
     </aside>
     <header style={{ gridRow: '1', gridColumn: '2', background: 'var(--surface)',
                      borderBottom: '1px solid var(--border)', height: 'var(--topbar-h)',
@@ -746,7 +746,7 @@ export default async function AuthedLayout({ children }: { children: React.React
       minHeight: '100vh',
     }}>
       <aside style={{ gridRow: '1 / 4', gridColumn: '1', ... }}>
-        <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '22px' }}>Leasétic</div>
+        <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: '22px' }}>Leasetic</div>
       </aside>
       <Topbar displayName={session.user.displayName ?? session.user.email}
               lang={lang} theme={theme} isAdmin={false} />
@@ -1100,14 +1100,14 @@ export function InviteUrlModal({ url, kind, lang, onClose, triggerRef }: InviteU
 ```typescript
 export const dictionaries = {
   fr: {
-    welcomeHeading: 'Bienvenue sur Leasétic Matrice',
+    welcomeHeading: 'Bienvenue sur Leasetic Matrice',
     welcomeSubtext: 'Application en cours de déploiement.',
     themeLight: 'Clair',
     themeDark: 'Sombre',
     themeSystem: 'Système',
   },
   en: {
-    welcomeHeading: 'Welcome to Leasétic Matrice',
+    welcomeHeading: 'Welcome to Leasetic Matrice',
     welcomeSubtext: 'Application deployment in progress.',
     themeLight: 'Light',
     themeDark: 'Dark',

@@ -48,7 +48,7 @@ Full archive: `milestones/v1.0-ROADMAP.md` · `milestones/v1.0-REQUIREMENTS.md`
 <details>
 <summary>✅ v1.2 — UX Polish + Proposal Wizard (Phases 11-15) — SHIPPED 2026-05-21</summary>
 
-- [x] **Phase 11: Design System Foundation + Brand Assets** (5/5 plans) — Stepper, RetractableSidebar, MetricTile, AdminNavCard, StatusChip + light/dark Leasétic logo SVGs
+- [x] **Phase 11: Design System Foundation + Brand Assets** (5/5 plans) — Stepper, RetractableSidebar, MetricTile, AdminNavCard, StatusChip + light/dark Leasetic logo SVGs
 - [x] **Phase 12: Schema Extensions for Drafts + History** (7/7 plans) — `draft` proposal status, `invited` partner status, `coefficient_history` append-only table (with TRIGGER-enforced no-UPDATE/DELETE)
 - [x] **Phase 13: 3-Step Proposal Wizard** (6/6 plans) — `/proposals/new/{parametres,calcul,verification}` with server-side draft persistence + Stepper-gated forward nav + ADMIN-09 D-12 partner-facing commission relaxation (signed-off STRIDE addendum)
 - [x] **Phase 14: Admin Polish — Partners + History + Home** (6/6 plans) — Dedicated `/partners/new` route, StatusChip rollout, `/coefficients` history sidebar + standalone `/history` route, 3 AdminNavCards on admin home, ADMIN-09 D-29 grep-contract suite (9 gates)
@@ -549,7 +549,7 @@ Plans:
   2. The collapse/expand control remains focusable and FR/EN-labelled — keyboard users can still collapse the sidebar, and no two controls announce the same accessible name to a screen reader.
   3. Every authenticated page renders a breadcrumb trail in the shell header, derived from `getRouteMeta`, in the viewer's language, with the current page as non-link text.
   4. Container surfaces (cards, panels, sheets, dialogs) render at a **named token**, never a per-file literal, and every Input, Button and Select keeps its current 8px corner — the radius scale is declared as explicit per-step values rather than multiples of a single token, so the top of the scale cannot inflate the bottom.
-     *(Planning correction, 2026-09-02, grep-verified: Leasétic's controls do not read `--radius` and are not 8px today — `Button`/`Input`/`Select`/`Badge` reach `--radius-4xl` via the `rounded-4xl` utility. "8px" describes Colibris. The binding half of this criterion is **keeps its current corner**, and Plan 31.1-01 pins that value explicitly.)*
+     *(Planning correction, 2026-09-02, grep-verified: Leasetic's controls do not read `--radius` and are not 8px today — `Button`/`Input`/`Select`/`Badge` reach `--radius-4xl` via the `rounded-4xl` utility. "8px" describes Colibris. The binding half of this criterion is **keeps its current corner**, and Plan 31.1-01 pins that value explicitly.)*
 
   5. Phase 30's `.card` and Phase 31's review-queue cards render at the same radius; no surface is left on a hardcoded `rounded-[24px]`.
   6. The sidebar brand lockup occupies roughly the same share of sidebar width as Colibris's (~47%, i.e. ~120px in a 252px sidebar), and the sidebar width variables are still set where `SidebarProvider`'s inline style cannot outrank them.

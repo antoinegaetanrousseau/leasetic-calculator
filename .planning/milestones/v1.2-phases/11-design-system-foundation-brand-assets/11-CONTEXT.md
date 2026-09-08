@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Build the v1.2 reusable component library and ship the Leasétic brand-logo assets that every downstream UI phase (13 wizard, 14 admin polish, 15 public surfaces) will consume. Five new components — `Stepper`, `RetractableSidebar`, `MetricTile`, `AdminNavCard`, `StatusChip` — plus two SVG logo assets (`logo-light.svg`, `logo-dark.svg`) and a new shell wrapper that composes the sidebar with the existing Topbar.
+Build the v1.2 reusable component library and ship the Leasetic brand-logo assets that every downstream UI phase (13 wizard, 14 admin polish, 15 public surfaces) will consume. Five new components — `Stepper`, `RetractableSidebar`, `MetricTile`, `AdminNavCard`, `StatusChip` — plus two SVG logo assets (`logo-light.svg`, `logo-dark.svg`) and a new shell wrapper that composes the sidebar with the existing Topbar.
 
 **In scope:** the 5 components, the 2 SVG assets, the new `<Shell>` wrapper, dev-only smoke route, refactor of `src/components/Topbar.tsx` to drop LocaleToggle/ThemeToggle (moved into RetractableSidebar).
 

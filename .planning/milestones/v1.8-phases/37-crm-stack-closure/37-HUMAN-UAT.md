@@ -60,7 +60,7 @@ verified: |
   Signed in as antoine.rousseau@leasetic.com (ADMIN). Opened
   /proposals/f54f6b24-509b-4222-8a67-8053112221ae — LC-2026-002, owned by
   delphine.specht@leasetic.com, NOT the admin. The APERÇU PDF panel rendered the ACTUAL PDF
-  ("LEASÉTIC — Proposition de location financière", montant 123 000,00 €, loyer 3 068,48 €)
+  ("LEASETIC — Proposition de location financière", montant 123 000,00 €, loyer 3 068,48 €)
   with the PDF viewer's download and print controls. No `{"error":"not_found"}`.
 
   CORRECTION captured while closing this item: the original walk attributed the not_found on

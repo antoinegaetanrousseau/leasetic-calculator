@@ -97,6 +97,6 @@ aa05012 fix: escape </script> in assertEscape fixture
 
 ## Next action
 
-**Antoine runs `FINAL-TEST-v11.md` sections A–J in Chrome + Edge** (~75–105 min total) before distributing v10 to Leasétic partners.
+**Antoine runs `FINAL-TEST-v11.md` sections A–J in Chrome + Edge** (~75–105 min total) before distributing v10 to Leasetic partners.
 
 If any section fails: report the section letter + REQ-ID and I'll run a gap-closure plan (`/gsd:plan-phase 4 --gaps`).

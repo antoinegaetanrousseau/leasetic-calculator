@@ -80,7 +80,7 @@ One-liner: Ship the /parametres self-service settings page (Figma 132:867 rev 2)
 ### Task 3 — `/parametres` route + ParametresForm client island
 
 - **`app/(authed)/parametres/page.tsx`** (50 LOC server component):
-  - `dynamic = 'force-dynamic'`, `metadata = { title: 'Paramètres — Leasétic Matrice' }`.
+  - `dynamic = 'force-dynamic'`, `metadata = { title: 'Paramètres — Leasetic Matrice' }`.
   - Reads `session` from `requireUser()` (no second auth gate needed — the `(authed)` layout already enforced the cookie check).
   - Splits `session.user.name` ("Antoine Rousseau") into `firstName` / `lastName` via a local `splitName()` helper (first token + rest) per RESEARCH §1e.
   - Renders `<main maxWidth=1040>` → `<PageHero title={hero.title} subtitle={hero.subtitle} />` → `<ParametresForm lang initialFirstName initialLastName initialEmail emailEditable={false} />`.

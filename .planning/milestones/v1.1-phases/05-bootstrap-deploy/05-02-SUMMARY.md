@@ -119,8 +119,8 @@ Build output:
 - `npm run typecheck` exits 0
 
 Smoke test curl results:
-- `curl -H "Cookie: lt_lang=fr" http://localhost:3000/` returns "Bienvenue sur Leasétic Matrice" (FR heading confirmed in SSR HTML)
-- `curl -H "Cookie: lt_lang=en" http://localhost:3000/` returns "Welcome to Leasétic Matrice" (EN heading confirmed in SSR HTML)
+- `curl -H "Cookie: lt_lang=fr" http://localhost:3000/` returns "Bienvenue sur Leasetic Matrice" (FR heading confirmed in SSR HTML)
+- `curl -H "Cookie: lt_lang=en" http://localhost:3000/` returns "Welcome to Leasetic Matrice" (EN heading confirmed in SSR HTML)
 - `curl -H "Cookie: lt_theme=dark" http://localhost:3000/` returns `data-theme="dark"` on `<html>` element (SSR cookie read confirmed)
 
 Server action security gates confirmed:

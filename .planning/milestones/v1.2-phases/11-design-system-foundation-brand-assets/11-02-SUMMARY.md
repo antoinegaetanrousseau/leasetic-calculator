@@ -7,7 +7,7 @@
 
 ## What shipped
 
-- **`public/logo-light.svg`** — official Leasétic lockup (mark `#6DC388`, wordmark `#112C3B`). Source: user-exported Figma SVG saved to `~/Downloads/light mode logo.svg`.
+- **`public/logo-light.svg`** — official Leasetic lockup (mark `#6DC388`, wordmark `#112C3B`). Source: user-exported Figma SVG saved to `~/Downloads/light mode logo.svg`.
 - **`public/logo-dark.svg`** — dark-mode lockup (mark `#6DC388`, wordmark `#FFFFFF`). User exported as PNG from Figma; SVG variant constructed from the light template with wordmark fill switched to white (matches what the Figma node renders under dark theme).
 - **`public/logo-mark.svg`** — mark-only derivative for collapsed sidebar (4 ellipses only, no wordmark, viewBox cropped). Used by Plan 11-04's RetractableSidebar collapsed state.
 - **`src/components/ui/BrandLogo.tsx`** — server component with `width` / `height` / `alt` / `className` props. Renders both `<img>` tags side-by-side with `.brand-logo-light` and `.brand-logo-dark` classes. The CSS picker rules from Plan 11-01 (`html[data-theme="light"] .brand-logo-dark { display: none; }` and inverse) hide the wrong variant. Zero JavaScript — rides the no-flash inline `<head>` script that sets `data-theme` before first paint.
@@ -17,7 +17,7 @@
 
 | Hash | Message |
 |---|---|
-| `e9767dc` | feat(11-02): add Leasétic brand logo SVG assets (ASSET-01, ASSET-02) |
+| `e9767dc` | feat(11-02): add Leasetic brand logo SVG assets (ASSET-01, ASSET-02) |
 | `7b23a95` | test(11-02): add failing BrandLogo tests (RED) — 6 DOM assertions per UI-SPEC §6.1 |
 | `70cb81f` | feat(11-02): implement BrandLogo (GREEN) — zero-JS CSS-picker theme switch |
 

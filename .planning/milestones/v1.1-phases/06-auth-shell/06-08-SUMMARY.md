@@ -27,7 +27,7 @@ key_files:
 decisions:
   - "useState lazy initialisers instead of useEffect setState: readLangCookie and readThemeCookie passed as initialiser functions to avoid react-hooks/set-state-in-effect lint error"
   - "console.error(error) without eslint-disable: project has no active no-console rule; comment added for v1.2 when the rule ships"
-  - "Leasétic wordmark in error.tsx uses JSX string literal in braces ({'Leasétic'}) rather than t() — ESLint exemption covers the file; this is the bilingual fallback by design (D-30)"
+  - "Leasetic wordmark in error.tsx uses JSX string literal in braces ({'Leasetic'}) rather than t() — ESLint exemption covers the file; this is the bilingual fallback by design (D-30)"
 metrics:
   duration_minutes: 15
   tasks_completed: 2
@@ -58,7 +58,7 @@ Generic error boundary for the entire app. Key design decisions:
 - **Cookie reads via lazy useState initialisers:** `useState(readLangCookie)` and `useState(readThemeCookie)` pass the reader functions as lazy initialisers — they run once on first render client-side. This avoids calling `setState` synchronously inside a `useEffect` body, which the `react-hooks/set-state-in-effect` ESLint rule correctly flags.
 - **D-30 enforcement:** `error.message`, `error.digest`, and the full stack are never rendered to the DOM. Only the generic bilingual `STR[lang].title` + `STR[lang].body` copy is shown.
 - **Operator forensics:** `console.error('[error.tsx]', error)` inside a `useEffect` captures the full error in the Vercel runtime log without exposing it to the user.
-- **UI-SPEC compliance:** Centered card on `--paper`, top-right LocaleToggle + ThemeToggle (absolute position: top 24px right 24px), Leasétic wordmark (22px weight 700 `--navy`), AlertTriangle (size 38 strokeWidth 1.3 `--gold` opacity 0.6), `.btn-green` retry button calling `reset()`.
+- **UI-SPEC compliance:** Centered card on `--paper`, top-right LocaleToggle + ThemeToggle (absolute position: top 24px right 24px), Leasetic wordmark (22px weight 700 `--navy`), AlertTriangle (size 38 strokeWidth 1.3 `--gold` opacity 0.6), `.btn-green` retry button calling `reset()`.
 
 ### app/not-found.tsx (SHELL-13)
 

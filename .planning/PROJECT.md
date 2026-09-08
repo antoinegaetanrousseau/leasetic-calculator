@@ -1,8 +1,8 @@
-# Leasétic — Matrice Commerciale
+# Leasetic — Matrice Commerciale
 
 ## What this is
 
-The internal sales-quote tool for **Leasétic**, distributed as a self-contained HTML file to channel partners (IT integrators, resellers). Partners open it in a browser, fill in client information + project amount + duration, and generate a 2-page PDF proposal (financial offer + RSE page) for their client.
+The internal sales-quote tool for **Leasetic**, distributed as a self-contained HTML file to channel partners (IT integrators, resellers). Partners open it in a browser, fill in client information + project amount + duration, and generate a 2-page PDF proposal (financial offer + RSE page) for their client.
 
 Live deliverable: `Matrice_2026_THE_Leasetic-v10.html` (~2,300 lines, single-file standalone, no build chain).
 
@@ -329,7 +329,7 @@ Two things the phase surfaced are worth carrying as milestone-level knowledge:
 - **Database:** add `draft` proposal status (enum: `draft | active | expired | deleted`), `invited` partner account status, coefficient change history table powering a new History sidebar
 - **Routing:** split `/proposals/new` into 3 wizard steps with server-side draft persistence between steps; dedicated `/[adminSegment]/partners/new` route replacing v1.1's modal-based partner creation
 - **Components:** new reusable Stepper (3 states per step: active/pending/done), Retractable sidebar (260px ↔ 72px with localStorage preference), Home metric tile (3 variants), Admin nav cards, Status chip variants (active/draft/expired/disabled)
-- **Brand assets:** add Leasétic logo files (`#6DC388` mark, `#112C3B` wordmark) with light/dark mode SVG variants
+- **Brand assets:** add Leasetic logo files (`#6DC388` mark, `#112C3B` wordmark) with light/dark mode SVG variants
 - **Public surfaces:** apply brand logo + paper background to login, invite/[token], reset/[token]
 
 **Carried-over follow-ups from v1.1 (close before partner onboarding):**
@@ -403,7 +403,7 @@ Full requirements archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; desig
 - ✓ **3-step proposal wizard:** `/proposals/new/{parametres,calcul,verification}` with server-side draft persistence + Stepper-gated forward nav + ADMIN-09 D-12 partner-facing commission relaxation (signed-off STRIDE addendum) — v1.2 (Phase 13, ROUTE-01)
 - ✓ **Dedicated `/[adminSegment]/partners/new` route** replacing v1.1's modal-based partner creation (modal stays as shelf code; CTA → Link) — v1.2 (Phase 14, ROUTE-02)
 - ✓ **Reusable components:** Stepper, RetractableSidebar, MetricTile, AdminNavCard, StatusChip (5 variants incl. `invited` gold added in Phase 14) — v1.2 (Phase 11 + Phase 14 extension, COMP-01..05)
-- ✓ **Brand assets:** Leasétic logo SVGs (mark `#6DC388`, wordmark `#112C3B`/light-ink) shipped to `public/logo-light.svg` + `public/logo-dark.svg` — v1.2 (Phase 11, ASSET-01/02)
+- ✓ **Brand assets:** Leasetic logo SVGs (mark `#6DC388`, wordmark `#112C3B`/light-ink) shipped to `public/logo-light.svg` + `public/logo-dark.svg` — v1.2 (Phase 11, ASSET-01/02)
 - ✓ **Admin home redesign:** 3 AdminNavCards (Coefficients / Partenaires / Historique) replacing Phase 9's 2-link layout — v1.2 (Phase 14)
 - ✓ **Coefficient history sidebar + standalone /history route** with cursor pagination + shared `<CoefficientDiffPanel>` (condensed + full modes) + side-by-side Avant/Après diff with `--gold` tint highlight — v1.2 (Phase 14, scope-inflated per D-21..D-25)
 - ✓ **ADMIN-09 D-29 9-gate grep-contract suite** in CI verifying zero commission leakage across all Phase 14 non-exempt admin surfaces — v1.2 (Phase 14)
@@ -465,7 +465,7 @@ a shipped milestone (v1.0-v1.7). Full text archived in `milestones/v1.8-REQUIREM
 
 - [ ] Teal accent rebrand (`#2D7A8C`) — descoped from v1.4 Phase 25; needs splitting the overloaded `--gd` token into distinct accent (→ teal) vs. success (→ `#129657`) tokens, recoloring ~63 sites + hardcoded `rgba(18,150,87,…)` tints, then a fresh light+dark WCAG AA audit
 - [ ] OVH production deployment + smoke-deploy execution — **re-dated to December 2026** by v1.8 (OPS-03); the blocker is the environment, not the command. Antoine owns provisioning a Node + Postgres + S3-compatible target. Tracked: `.planning/todos/pending/ops-03-ovh-cutover-december-2026.md`
-- [ ] Webhook notifications to Leasétic on each proposal generation
+- [ ] Webhook notifications to Leasetic on each proposal generation
 - [ ] Mobile-optimized layout
 - [ ] Multi-language beyond FR + EN
 - [ ] Automated browser tests (Playwright or similar) — v1.8 made the case concrete: three of its verification gaps were structurally blocked on not having a scriptable relationship-holder session and a disposable dataset
@@ -540,7 +540,7 @@ a shipped milestone (v1.0-v1.7). Full text archived in `milestones/v1.8-REQUIREM
 | **v1.1** — Twice-monthly purge cron (1st + 15th) over daily | Less ops noise; DATA-10 "after 30 days" reads as minimum threshold; worst-case persistence ~46 days | ✓ Held v1.1 (Phase 10) |
 | **v1.1** — Email-pattern test-data discriminator (`@test.leasetic.com`) over `is_test` schema column | No schema artifact post-launch; cleaner production schema | ✓ Held v1.1 (Phase 10) |
 | **v1.1** — Antoine owns partner cutover comms directly (not Thomas) | Technical voice during the change; runbook written assuming Antoine-context | ✓ Held v1.1 (Phase 10) |
-| **v1.1** — OVH execution deferred to September 2026 | Ship runbook + script now (capability); execute when Leasétic IT engagement is ready | ✓ Held v1.1 (Phase 10) |
+| **v1.1** — OVH execution deferred to September 2026 | Ship runbook + script now (capability); execute when Leasetic IT engagement is ready | ✓ Held v1.1 (Phase 10) |
 | **v1.1** — `verifier_enabled: false` project policy | Per-phase VERIFICATION.md not needed when SUMMARY + REVIEW + SECURITY + milestone audit cover the same ground | ✓ Held v1.1 (validated by milestone audit) |
 | **v1.1** — Code review caught Drizzle correlated-subquery SQL bug post-deploy | Generator self-evaluation blind spot: unit tests passed (fixtures), build passed (types), only real Postgres exposed it. Found via Vercel runtime logs. | ⚠ Revisit — add a post-deploy DB-smoke step to CI in v1.2 or v1.3 |
 | **v1.1** — Vercel Cron uses reserved env-var name `CRON_SECRET` | Phase 10 originally named it `PURGE_CRON_SECRET`; CR-01 review fix renamed to match Vercel's auto-injection contract | ✓ Caught by code review |
@@ -556,7 +556,7 @@ a shipped milestone (v1.0-v1.7). Full text archived in `milestones/v1.8-REQUIREM
 ## Team
 
 - **Antoine Rousseau** — product owner, ship decision, sole reviewer
-- **Thomas Heufke** (Leasétic) — business stakeholder; distributes to channel partners
+- **Thomas Heufke** (Leasetic) — business stakeholder; distributes to channel partners
 - **Claude Code** — implementation pair-programming partner
 
 ## How we work

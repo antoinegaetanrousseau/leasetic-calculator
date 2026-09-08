@@ -175,7 +175,7 @@ The login page uses a **minimal layout** (no sidebar, no app-shell topbar). It d
 │                                                     │
 │                                                     │
 │              ┌─────────────────────┐                │
-│              │     Leasétic        │                │  ← logo, --navy, weight 700, 22px
+│              │     Leasetic        │                │  ← logo, --navy, weight 700, 22px
 │              │                     │                │
 │              │   Sign in           │  ← .ctitle      │
 │              │                     │                │
@@ -193,21 +193,21 @@ The login page uses a **minimal layout** (no sidebar, no app-shell topbar). It d
 │              │ Contact your admin  │                │
 │              └─────────────────────┘                │
 │                                                     │
-│                © 2026 Leasétic   Privacy notice     │  ← footer, 10.5px, --muted; "Privacy notice" links to existing leasetic.fr legal page (CUT-05)
+│                © 2026 Leasetic   Privacy notice     │  ← footer, 10.5px, --muted; "Privacy notice" links to existing leasetic.fr legal page (CUT-05)
 └─────────────────────────────────────────────────────┘
 ```
 
 Layout specifics:
 - **Page background:** `var(--paper)`; full viewport `min-height: 100vh`, `display: flex; flex-direction: column; justify-content: center; align-items: center`
 - **Card:** `var(--surface)`, `border-radius: 16px` (matches `.card`), `padding: 1.75rem` (28px = xl), `box-shadow: var(--shadow-card)`, `width: 100%`, `max-width: 420px`
-- **Logo above card:** Leasétic wordmark, color `var(--navy)`, weight 700, font-size 22px, margin-bottom 16px
+- **Logo above card:** Leasetic wordmark, color `var(--navy)`, weight 700, font-size 22px, margin-bottom 16px
 - **Card title:** "Connexion" / "Sign in" — uses `.ctitle` style (uppercase, 11.8px, weight 700, letter-spacing 0.06em, color `--muted`)
 - **Form field gap:** 16px between label-input groups; 8px between label and its input
 - **Error banner (when inline error present):** background `rgba(220,38,38,0.06)`, 1px left border `--danger`, padding 12px 16px, border-radius 12px, text color `--danger`, weight 500, margin-bottom 16px
 - **Submit button:** `.btn-green`, full-width, `padding: 0.6rem 1.5rem`, font-weight 600, font-size 14px, border-radius 9999px (pill), with loading spinner state (white, 14px, replaces label text during pending)
 - **Forgot-password hint:** small text below the button, `color: --muted`, font-size 10.5px, line-height 1.5, two lines (label + email-equivalent contact hint)
 - **Topbar widget cluster (top-right):** absolutely positioned at top: 24px, right: 24px, flex gap 12px — contains LocaleToggle + ThemeToggle reused from Phase 5. Both must work pre-auth (cookie-driven, no DB write needed when unauthenticated).
-- **Footer (bottom):** absolute or flex-anchored at bottom of viewport; centered text; "© 2026 Leasétic" + bullet separator + "Mentions légales" / "Privacy notice" link (opens leasetic.fr's existing legal page in new tab, `rel="noopener noreferrer"`).
+- **Footer (bottom):** absolute or flex-anchored at bottom of viewport; centered text; "© 2026 Leasetic" + bullet separator + "Mentions légales" / "Privacy notice" link (opens leasetic.fr's existing legal page in new tab, `rel="noopener noreferrer"`).
 
 ### Invite / Reset Page Layout (`app/(public)/invite/[token]/page.tsx`, `app/(public)/reset/[token]/page.tsx`)
 
@@ -237,10 +237,10 @@ grid-template-rows: var(--topbar-h) 1fr var(--footer-h)
 ```
 
 Phase 6 fills the topbar and the user-menu region. The sidebar STAYS minimal:
-- **Sidebar content (Phase 6):** Leasétic wordmark only, 22px weight 700, color `--navy`, padding 24px 16px, anchored top.
+- **Sidebar content (Phase 6):** Leasetic wordmark only, 22px weight 700, color `--navy`, padding 24px 16px, anchored top.
 - **Sidebar nav items:** **none in Phase 6.** Feature nav (proposals, partners, admin) lands in Phase 7+ as those features ship. Defer entirely.
-- **Topbar content (Phase 6):** Leasétic icon at left (smaller — 16px square — only shown when sidebar is collapsed; defer collapsed-state work to a later phase), page-title slot in middle (server-rendered from layout, e.g. "Accueil" / "Home"), spacer (`flex: 1`), `<LocaleToggle>`, `<ThemeToggle>`, `<UserMenu>`.
-- **Footer content:** "© 2026 Leasétic — Application interne" / "© 2026 Leasétic — Internal application" centered, 10.5px, `--muted`. Same height (`--footer-h: 48px`).
+- **Topbar content (Phase 6):** Leasetic icon at left (smaller — 16px square — only shown when sidebar is collapsed; defer collapsed-state work to a later phase), page-title slot in middle (server-rendered from layout, e.g. "Accueil" / "Home"), spacer (`flex: 1`), `<LocaleToggle>`, `<ThemeToggle>`, `<UserMenu>`.
+- **Footer content:** "© 2026 Leasetic — Application interne" / "© 2026 Leasetic — Internal application" centered, 10.5px, `--muted`. Same height (`--footer-h: 48px`).
 
 The admin shell `(admin)/[adminSegment]/layout.tsx` reuses the SAME `<Topbar>` component plus a small "ADMIN" pill badge (uppercase 9px label, padding 2px 8px, background `var(--navy)`, color `#fff`, border-radius 9999px) appended next to the page title. This visually distinguishes admin pages without leaking the URL segment.
 
@@ -317,7 +317,7 @@ Shown after `scripts/grant-admin.ts` (CLI prints to stdout, NOT a modal) and aft
 │            [LocaleToggle][ThemeToggle]       │
 │                                              │
 │                                              │
-│                  Leasétic                    │  ← logo
+│                  Leasetic                    │  ← logo
 │                                              │
 │              ┌─────────────────┐             │
 │              │       ⚠         │             │  ← Lucide AlertTriangle, 38px, --gold, opacity 0.6
@@ -327,7 +327,7 @@ Shown after `scripts/grant-admin.ts` (CLI prints to stdout, NOT a modal) and aft
 │              │                 │             │
 │              │ Si le problème  │             │  ← body 14.5px --muted
 │              │ persiste,       │             │
-│              │ contactez Leasétic│           │
+│              │ contactez Leasetic│           │
 │              │                 │             │
 │              │  [ Réessayer  ] │             │  ← .btn-green, calls reset()
 │              └─────────────────┘             │
@@ -341,7 +341,7 @@ Specifics:
 - Card max-width 420px
 - Icon: Lucide `AlertTriangle`, size 38, strokeWidth 1.3, color `--gold`, opacity 0.6 (matches Phase 5 "Large decorative/empty-state icons" rule)
 - Heading: "Une erreur s'est produite." / "Something went wrong."
-- Body: "Si le problème persiste, contactez Leasétic." / "If the problem persists, contact Leasétic."
+- Body: "Si le problème persiste, contactez Leasetic." / "If the problem persists, contact Leasetic."
 - Button: `.btn-green` "Réessayer" / "Try again" — calls Next.js `error.tsx` reset prop
 - NO stack trace, NO error message text from the runtime, NO digest displayed (per D-30)
 - Server logs the actual error via `console.error(error)` for forensics; the user sees only the generic copy
@@ -353,7 +353,7 @@ Specifics:
 │            [LocaleToggle][ThemeToggle]       │
 │                                              │
 │                                              │
-│                  Leasétic                    │  ← logo
+│                  Leasetic                    │  ← logo
 │                                              │
 │                    404                       │  ← display, 48px, weight 700, --navy
 │                                              │
@@ -482,7 +482,7 @@ These NEW keys must be added to `dictionaries.ts` in addition to the v10 port. U
 | `auth.error.generic` | Une erreur est survenue. Réessayez. | An error occurred. Please try again. |
 | `auth.hint.forgot.password` | Mot de passe oublié ? Contactez votre administrateur. | Forgot your password? Contact your admin. |
 | `auth.invite.title` | Définir votre mot de passe | Set your password |
-| `auth.invite.subtitle` | Bienvenue sur Leasétic. Définissez votre mot de passe pour activer votre compte. | Welcome to Leasétic. Set your password to activate your account. |
+| `auth.invite.subtitle` | Bienvenue sur Leasetic. Définissez votre mot de passe pour activer votre compte. | Welcome to Leasetic. Set your password to activate your account. |
 | `auth.reset.title` | Réinitialiser le mot de passe | Reset your password |
 | `auth.reset.subtitle` | Choisissez un nouveau mot de passe pour votre compte. | Choose a new password for your account. |
 | `auth.token.invalid.title` | Lien invalide ou expiré | Invalid or expired link |
@@ -509,10 +509,10 @@ These NEW keys must be added to `dictionaries.ts` in addition to the v10 port. U
 | `shell.topbar.admin.badge` | ADMIN | ADMIN |
 | `shell.locale.toggle.aria` | Changer la langue | Change language |
 | `shell.theme.toggle.aria` | Changer le thème | Change theme |
-| `shell.footer.copyright` | © 2026 Leasétic — Application interne | © 2026 Leasétic — Internal application |
+| `shell.footer.copyright` | © 2026 Leasetic — Application interne | © 2026 Leasetic — Internal application |
 | `shell.footer.privacy` | Mentions légales | Privacy notice |
 | `error.boundary.title` | Une erreur s'est produite. | Something went wrong. |
-| `error.boundary.body` | Si le problème persiste, contactez Leasétic. | If the problem persists, contact Leasétic. |
+| `error.boundary.body` | Si le problème persiste, contactez Leasetic. | If the problem persists, contact Leasetic. |
 | `error.boundary.retry` | Réessayer | Try again |
 | `error.404.display` | 404 | 404 |
 | `error.404.title` | Page introuvable | Page not found |
@@ -531,7 +531,7 @@ The ESLint rule per D-26 (`no-restricted-syntax` flagging hardcoded JSX strings 
 | Element | FR copy | EN copy |
 |---------|---------|---------|
 | **Login page** | | |
-| Page heading (logo above card) | Leasétic | Leasétic |
+| Page heading (logo above card) | Leasetic | Leasetic |
 | Card title | Connexion | Sign in |
 | Email field label | Email | Email |
 | Email field placeholder | vous@exemple.com | you@example.com |
@@ -541,11 +541,11 @@ The ESLint rule per D-26 (`no-restricted-syntax` flagging hardcoded JSX strings 
 | Submit button (pending) | Connexion... | Signing in... |
 | Inline error (any auth failure) | Email ou mot de passe incorrect. | Incorrect email or password. |
 | Forgot-password hint | Mot de passe oublié ? Contactez votre administrateur. | Forgot your password? Contact your admin. |
-| Footer copyright | © 2026 Leasétic | © 2026 Leasétic |
+| Footer copyright | © 2026 Leasetic | © 2026 Leasetic |
 | Footer privacy link | Mentions légales | Privacy notice |
 | **Invite page (`/invite/{token}`)** | | |
 | Card title | Définir votre mot de passe | Set your password |
-| Card subtitle | Bienvenue sur Leasétic. Définissez votre mot de passe pour activer votre compte. | Welcome to Leasétic. Set your password to activate your account. |
+| Card subtitle | Bienvenue sur Leasetic. Définissez votre mot de passe pour activer votre compte. | Welcome to Leasetic. Set your password to activate your account. |
 | New password label | Nouveau mot de passe | New password |
 | Confirm password label | Confirmer le mot de passe | Confirm password |
 | Strength: weak | Faible | Weak |
@@ -567,10 +567,10 @@ The ESLint rule per D-26 (`no-restricted-syntax` flagging hardcoded JSX strings 
 | **App shell** | | |
 | Topbar default title | Accueil | Home |
 | Admin badge | ADMIN | ADMIN |
-| Sidebar brand | Leasétic | Leasétic |
+| Sidebar brand | Leasetic | Leasetic |
 | User menu logout | Se déconnecter | Log out |
 | User menu aria-label | Menu utilisateur | User menu |
-| Footer copyright | © 2026 Leasétic — Application interne | © 2026 Leasétic — Internal application |
+| Footer copyright | © 2026 Leasetic — Application interne | © 2026 Leasetic — Internal application |
 | **Admin URL modal** | | |
 | Title (invitation) | Lien d'invitation | Invitation link |
 | Title (reset) | Lien de réinitialisation | Reset link |
@@ -588,7 +588,7 @@ The ESLint rule per D-26 (`no-restricted-syntax` flagging hardcoded JSX strings 
 | Copy success | Lien copié. | Link copied. |
 | **Error boundary** | | |
 | Title | Une erreur s'est produite. | Something went wrong. |
-| Body | Si le problème persiste, contactez Leasétic. | If the problem persists, contact Leasétic. |
+| Body | Si le problème persiste, contactez Leasetic. | If the problem persists, contact Leasetic. |
 | Retry button | Réessayer | Try again |
 | **404 page** | | |
 | Display | 404 | 404 |

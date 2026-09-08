@@ -56,7 +56,7 @@ Refresh the v1.2 app shell visually to match the v1.3 Figma `9:46` design contra
 - **D-02:** Typography (matches Figma `heading/hero` and `body/default`):
   - **Title:** `font-size: 32px`, `font-weight: 700`, `line-height: 1.2`, `color: var(--ink)`, `margin: 0`.
   - **Subtitle:** `font-size: 14.5px`, `font-weight: 400`, `line-height: 1.55`, `color: var(--muted)`, `margin-top: 8px`.
-  - **Eyebrow:** `font-size: 11.8px`, `font-weight: 700`, `letter-spacing: 0.06em`, `text-transform: uppercase`, `color: var(--gd)` (Leasétic brand green, matches the `●` section-bullet color from Phase 13), `margin-bottom: 8px`.
+  - **Eyebrow:** `font-size: 11.8px`, `font-weight: 700`, `letter-spacing: 0.06em`, `text-transform: uppercase`, `color: var(--gd)` (Leasetic brand green, matches the `●` section-bullet color from Phase 13), `margin-bottom: 8px`.
 - **D-03:** Layout — two-row flex container:
   - Row 1 (`actions` row): `display: flex`, `justify-content: space-between`, `align-items: flex-start`. Left: stacked eyebrow + title + subtitle column. Right: `actions` slot (right-aligned, top-aligned).
   - When `actions` is undefined or empty, the title block expands full-width naturally.

@@ -81,7 +81,7 @@ Both `setTheme` and `setLang` server actions extended:
 - Reads `lang` + `theme` from cookies
 - `displayName` fallback chain: `session.user.displayName ?? session.user.name ?? session.user.email`
 - Grid: 2-col × 3-row (sidebar / topbar / main / footer) using Phase 5 CSS variable tokens
-- Sidebar: Leasétic wordmark 22px/700/`--navy`, no nav items (Phase 7+ adds them)
+- Sidebar: Leasetic wordmark 22px/700/`--navy`, no nav items (Phase 7+ adds them)
 - Topbar receives `isAdmin={role === 'admin'}` — evaluated per-request from DB via `requireUser()`
 - Footer: `t('shell.footer.copyright', lang)`, centered, 10.5px, `--muted`
 - `export const dynamic = 'force-dynamic'` (PITFALLS §1.6)

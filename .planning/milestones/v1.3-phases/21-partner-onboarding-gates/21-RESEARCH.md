@@ -579,7 +579,7 @@ Always wrap user-facing strings through `t(key, lang)` — never inline.
 
 - `scripts/grant-admin.ts` line 62: comment example uses
   `antoine.rousseau@memento.eco` (Memento Hub context — NOT the live
-  Leasétic admin email). Stale comment; not binding on Phase 21.
+  Leasetic admin email). Stale comment; not binding on Phase 21.
 - `ROADMAP.md` Phase 21 success criterion #1: still says
   `antoine.rousseau@memento.eco`. Stale; CONTEXT.md D-06 corrects to
   `@leasetic.com`. **Planner does NOT update ROADMAP.md inline** — that's
@@ -743,7 +743,7 @@ publication record per D-01).
 **Status:** _pending — closed once leasetic.fr update is published._
 
 This document is the legal-side paper trail for the v1.3 partner-
-onboarding gates. It confirms that Leasétic's public privacy notice
+onboarding gates. It confirms that Leasetic's public privacy notice
 on `leasetic.fr` was updated to cover (a) Vercel + Neon EU hosting
 and (b) 10-year PDF retention as a new processing activity tied to
 French Commercial Code L123-22 / L110-4.
@@ -797,7 +797,7 @@ D-01 (this phase's reframe of D-10-18).*
 
 The prompt below was generated during the discuss-phase (DISCUSSION-LOG
 lines 68–161) for Antoine to paste into a fresh chat session on the
-Leasétic website project. **It is reproduced here verbatim so the
+Leasetic website project. **It is reproduced here verbatim so the
 planner can drop it into the GATE-02 task description as the operator's
 exact instruction.**
 
@@ -805,12 +805,12 @@ exact instruction.**
 Je dois mettre à jour la page "Politique de confidentialité" (ou
 "Mentions légales / Données personnelles" selon la structure du site)
 de leasetic.fr pour couvrir deux nouvelles activités de traitement
-introduites par l'application Leasétic Matrice (l'outil de devis
+introduites par l'application Leasetic Matrice (l'outil de devis
 commercial distribué aux partenaires intégrateurs).
 
 ## Contexte
 
-L'application Leasétic Matrice est hébergée sur Vercel + Neon Postgres
+L'application Leasetic Matrice est hébergée sur Vercel + Neon Postgres
 (régions EU) et conserve les propositions PDF générées par les
 partenaires pendant 10 ans. La politique de confidentialité actuelle du
 site a été rédigée avant la mise en ligne de cette app et doit être
@@ -837,11 +837,11 @@ site a été rédigée avant la mise en ligne de cette app et doit être
    Ajouter dans la liste des sous-traitants / destinataires :
 
    - **Vercel Inc.** — hébergement de l'interface applicative
-     (Leasétic Matrice). Données traitées dans l'Union européenne
+     (Leasetic Matrice). Données traitées dans l'Union européenne
      (région Frankfurt / Paris selon configuration). DPA signé
      conformément à l'article 28 RGPD. Site : vercel.com.
    - **Neon Inc.** — hébergement de la base de données Postgres de
-     l'application Leasétic Matrice. Données stockées dans l'Union
+     l'application Leasetic Matrice. Données stockées dans l'Union
      européenne (région EU Central / EU West). DPA signé. Site :
      neon.tech.
 
@@ -852,7 +852,7 @@ site a été rédigée avant la mise en ligne de cette app et doit être
    ### Ajout #2 — Conservation 10 ans des propositions PDF
 
    Ajouter dans la section "Durée de conservation" une ligne pour la
-   catégorie "Propositions commerciales (PDF générés via Leasétic
+   catégorie "Propositions commerciales (PDF générés via Leasetic
    Matrice)" :
 
    - **Durée** : 10 ans à compter de la date de génération du

@@ -73,8 +73,8 @@
 - **Toggle button:** header right, text shows the OTHER language (e.g. button says "EN" when currently fr). Click switches, persists, and re-renders everything.
 - **Re-render:** a `applyI18n()` function scans all elements with `data-i18n="key"` attribute and updates `textContent` (or `innerHTML` for trusted keys that include markup, but prefer textContent). Also re-renders the current proposal if `page-proposition` is active.
 - **Keys must be hierarchical-ish** for sanity: `form.partner.co`, `form.client.name`, `proposal.tiles.solution.title`, `admin.save.success`, `toast.copied`, `error.password.wrong`, etc.
-- **Proposal static labels translated:** "Offre de location financière", "Points d'intérêt identifiés", "Pourquoi choisir Leasétic?", all 5 tile titles + texts, conditions block, footers.
-- **Keep untranslated:** numeric formatting (use locale-aware `toLocaleString('fr-FR')` in FR, `'en-US'` in EN for numbers if desired — but currency symbol stays €), partner/client entered names, company name "Leasétic".
+- **Proposal static labels translated:** "Offre de location financière", "Points d'intérêt identifiés", "Pourquoi choisir Leasetic?", all 5 tile titles + texts, conditions block, footers.
+- **Keep untranslated:** numeric formatting (use locale-aware `toLocaleString('fr-FR')` in FR, `'en-US'` in EN for numbers if desired — but currency symbol stays €), partner/client entered names, company name "Leasetic".
 - **RSE page** is a base64 image → cannot translate the image content. Add a small bilingual caption below the image if FEAT-03 strictly requires it. Otherwise note in PLAN that the RSE slide stays French.
 
 ### Coefficient display (UX-09)
@@ -156,7 +156,7 @@
 - `form.project.*` — amount, duration, desc, ref
 - `form.duration.*` — 36/48/60 mois
 - `result.*` — inline preview, final result, coefficient label
-- `proposal.*` — all proposal static labels including "Pourquoi Leasétic?" tile titles + texts
+- `proposal.*` — all proposal static labels including "Pourquoi Leasetic?" tile titles + texts
 - `admin.*` — admin panel labels including new validity dropdown
 - `step.*` — progress indicator labels
 - `toast.*` — success/info toast messages

@@ -74,7 +74,7 @@ Build the admin operating surface on top of Phase 6's hidden `/[adminSegment]` g
 ### Validity options scope (gathered 2026-05-09)
 
 - **D-09-13 (Validity scope — schema unchanged):** `global_params.validity_days` stays a single `int NOT NULL` column. Admin edits the default value (e.g., 30). Partner UI keeps Phase 7's `<ValiditySegmented>` segmented selector with `{15,30,60}` fixed; the admin's default just controls which value is initially highlighted. The Phase 7 swap-in seam (`getMaxAmount()`-style) becomes `getDefaultValidityDays()` in Phase 9, reading from `global_params`.
-- **D-09-14 (Validity bounds):** Server-side `validityDaysSchema` (in `src/lib/calc/index.ts` or wherever Phase 7 placed it) keeps `{15,30,60}` whitelisted via Zod enum/literal-union. The single admin-edited default is a UI affordance; the allowed *values* stay locked at the calc-engine layer. If Leasétic ever wants 90-day validity, that's a calc-engine code change (real PR review, not a runtime config edit). Matches v10 invariant.
+- **D-09-14 (Validity bounds):** Server-side `validityDaysSchema` (in `src/lib/calc/index.ts` or wherever Phase 7 placed it) keeps `{15,30,60}` whitelisted via Zod enum/literal-union. The single admin-edited default is a UI affordance; the allowed *values* stay locked at the calc-engine layer. If Leasetic ever wants 90-day validity, that's a calc-engine code change (real PR review, not a runtime config edit). Matches v10 invariant.
 
 ### Audit log retrofit + partners list (gathered 2026-05-09)
 
@@ -211,7 +211,7 @@ Build the admin operating surface on top of Phase 6's hidden `/[adminSegment]` g
 ## Deferred Ideas
 
 - **Generic audit-log VIEWER** (filter by actor / action / date range across all admin and partner mutations) — v1.2+ per PROJECT.md "Future Requirements" (Audit log UI). Phase 9 only writes (extends the action union) and reads for the coefficient-history table.
-- **Editable validity options list** (`validity_options jsonb` schema bump + list-editing UI + default-must-be-in-list validation) — D-09-13 keeps schema as single int. v1.2+ schema bump if Leasétic ever needs more flexibility than the v10-locked `{15, 30, 60}`.
+- **Editable validity options list** (`validity_options jsonb` schema bump + list-editing UI + default-must-be-in-list validation) — D-09-13 keeps schema as single int. v1.2+ schema bump if Leasetic ever needs more flexibility than the v10-locked `{15, 30, 60}`.
 - **Admin sidebar with nav items** for `/coefficients`, `/accounts`, future admin pages — Phase 9 uses card-style links on the admin home page; planner can opt-in if trivially cheap. Full sidebar nav is deferred unless ADMIN routes grow beyond ~3-4 pages.
 - **Admin self-service password change UI** — out of scope. Admin password rotation handled out-of-band (Phase 6 follow-up #1) via the admin↔admin reset flow already wired.
 - **Better Auth `trustedOrigins` hardening / explicit Origin gate middleware** — Phase 6 follow-up #2; Phase 9 hardening candidate but explicitly not in this phase's scope (would expand Phase 9 beyond its requirement set).

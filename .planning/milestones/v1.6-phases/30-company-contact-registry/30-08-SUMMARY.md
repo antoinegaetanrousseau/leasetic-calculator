@@ -62,7 +62,7 @@ completed: 2026-09-01
 
 # Phase 30 Plan 08: Admin Company & Relationship Registry (CRM-03) Summary
 
-**Three requireAdmin()-gated admin surfaces — company list with a RELATIONS count column, per-company Relations table with holder identity and owner-type badges, and an admin-only relationship detail — giving Leasétic the duplicate-deal oversight (CRM-03) that makes the partner-side CRM-02 isolation safe to ship.**
+**Three requireAdmin()-gated admin surfaces — company list with a RELATIONS count column, per-company Relations table with holder identity and owner-type badges, and an admin-only relationship detail — giving Leasetic the duplicate-deal oversight (CRM-03) that makes the partner-side CRM-02 isolation safe to ship.**
 
 ## Performance
 

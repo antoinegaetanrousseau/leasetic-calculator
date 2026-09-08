@@ -57,7 +57,7 @@ The v10 file is now organized into clearly labeled sections that make phase 2 (s
 
 - **TOKENS**: Google Fonts import, `:root` CSS variables (`--navy`, `--green`, `--teal`, etc.), box-sizing reset, body base.
 - **LAYOUT**: Header, tabs, pages, `.two` grid, proposition page layout (`.prop-page`, `.prop-inner`, `.prop-content`, `.pg-brk`).
-- **COMPONENTS**: Buttons, banner, cards, forms, duration buttons, yes/no toggles, tranche badge, inline result, alerts, admin grid, proposition header/footer, info-grid3, offer tiles, options bar, "Pourquoi Leasétic" tiles, conditions, RSE slide image, and the two responsive breakpoints (768px tablet, 480px mobile).
+- **COMPONENTS**: Buttons, banner, cards, forms, duration buttons, yes/no toggles, tranche badge, inline result, alerts, admin grid, proposition header/footer, info-grid3, offer tiles, options bar, "Pourquoi Leasetic" tiles, conditions, RSE slide image, and the two responsive breakpoints (768px tablet, 480px mobile).
 - **PRINT**: Merged the two v9 `@media print` blocks (one substantive at line 235, one empty at line 312) into a single block. All rules preserved verbatim.
 
 ### `<script>` — 7 labeled sections

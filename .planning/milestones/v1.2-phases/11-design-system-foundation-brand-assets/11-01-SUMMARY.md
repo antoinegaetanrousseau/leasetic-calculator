@@ -93,7 +93,7 @@ Final file size: 540 lines (was 528; +12 per plan budget). All 8 grep gates pass
 
 ### Task 2: Add 13 new sidebar.* i18n keys (commit `e608b95`)
 
-- FR keys inserted at lines 42–54 (immediately after `'sidebar.brand': 'Leasétic'` at line 41)
+- FR keys inserted at lines 42–54 (immediately after `'sidebar.brand': 'Leasetic'` at line 41)
 - EN keys inserted at lines 559–571 (after the corresponding EN `sidebar.brand` declaration)
 - Total file diff: +26 lines (13 keys × 2 namespaces)
 - Total `'sidebar.` matches in file: 28 (= 14 keys × 2 langs)

@@ -379,7 +379,7 @@ import { PageHero } from '@/components/ui/PageHero';
 export const dynamic = 'force-dynamic'; // PITFALLS §1.6 — cookie/session-reading route
 
 export const metadata: Metadata = {
-  title: 'Réconciliation — Leasétic Matrice',
+  title: 'Réconciliation — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

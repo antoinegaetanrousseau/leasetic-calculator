@@ -136,7 +136,7 @@ Storage behind a `StorageAdapter` interface (5 methods). `STORAGE_DRIVER=vercel|
 - **Data retention conflict:** GDPR right-to-erasure vs French commercial-law 10-year retention (Code de commerce L.123-22). Reconciliation: PDFs are *append-only* and retained for 10 years (legitimate interest / legal obligation); partner deactivation never deletes PDFs; admin-mediated personal-data anonymization for explicit GDPR Art. 17 requests.
 - **No analytics in v1.1** = no cookie consent banner needed. Easier path.
 - **EU hosting only:** Vercel EU regions; OVH is FR. Both compliant.
-- **Confirm exact retention period with Leasétic legal counsel before writing into privacy notice.**
+- **Confirm exact retention period with Leasetic legal counsel before writing into privacy notice.**
 
 ---
 
@@ -146,7 +146,7 @@ Storage behind a `StorageAdapter` interface (5 methods). `STORAGE_DRIVER=vercel|
 2. **Auth library choice** (Better Auth vs NextAuth v5) — affects Phase 2 patterns slightly.
 3. **Email transport** for password resets / first-login — recommended deferred (admin-mediated only in v1.1), but if user wants email immediately, Resend or OVH SMTP are the candidates.
 4. **Existing v10 form schema** — does it already capture a structured "client name" field, or only LC reference? Affects "save proposal" requirement.
-5. **Leasétic legal counsel** must confirm 10-year retention period for IT-leasing pre-contractual documents before privacy notice is written.
+5. **Leasetic legal counsel** must confirm 10-year retention period for IT-leasing pre-contractual documents before privacy notice is written.
 
 ---
 

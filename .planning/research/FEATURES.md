@@ -1,4 +1,4 @@
-# Features Research — Leasétic Matrice v1.1
+# Features Research — Leasetic Matrice v1.1
 
 > **Quality note (orchestrator-added):** This research was produced under degraded tool access — the agent could not read project files or run web searches. Specific implementation API names (Firebase / Firestore) were assumed by the agent and are **wrong for our chosen stack** (Next.js + Postgres + NextAuth + Vercel Blob). Treat all framework-specific references as **conceptually correct, technically wrong** — the synthesizer must translate them. Feature scoping (table-stakes / differentiators / anti-features) is stack-agnostic and remains valid.
 
@@ -31,7 +31,7 @@ Complexity: **S** = <1 day, **M** = 1–3 days, **L** = >3 days (rough, single-d
 |---|---|---|---|
 | Email + password login | S | NextAuth Credentials provider | Required by the brief. |
 | Logout | S | session | Visible from topbar/sidebar. Clears session + any client cache. |
-| Password reset (self-serve, email-based) | S | Auth + transactional email | Customize the email template in FR + EN, with Leasétic branding. Reduces support load — without this, every forgotten password is an admin ticket. |
+| Password reset (self-serve, email-based) | S | Auth + transactional email | Customize the email template in FR + EN, with Leasetic branding. Reduces support load — without this, every forgotten password is an admin ticket. |
 | Session persistence across reloads | S | Auth | Default: persistent until logout or token expiry. No "remember me" checkbox. |
 | Session timeout / token refresh | S | Auth | Sensible default (e.g., 24h+refresh). Acceptable for this tool. |
 | Login error states (wrong password, unknown user, network) | S | i18n | Generic "incorrect email or password" message — do not leak whether the email exists (anti-enumeration). Localized FR/EN. |
@@ -72,7 +72,7 @@ Three real-world patterns for "admin creates account, partner gets credentials":
 
 - Admin creates the user via server action with a randomly generated password they never see/share.
 - Server triggers a one-time set-password email (using NextAuth's verification-token primitive or a custom signed-token route).
-- Send a customized "Welcome to Leasétic Matrice — set your password" email to the partner with that link.
+- Send a customized "Welcome to Leasetic Matrice — set your password" email to the partner with that link.
 - Partner clicks → sets password → lands on home page logged in.
 
 This:
@@ -121,7 +121,7 @@ This:
 | Comments / threads on proposals | The proposal is a static financial document. |
 | "Share with another partner" / "Forward proposal" | Partners are siloed by design. |
 | Notifications / activity feed | No multi-user workspace inside a partner account. |
-| In-app messaging / chat with Leasétic admin | Email exists. |
+| In-app messaging / chat with Leasetic admin | Email exists. |
 | Favorites / pinned proposals | Use search instead. |
 
 ---
@@ -184,7 +184,7 @@ This:
 
 ---
 
-## 4. Admin Surface (Leasétic admin only)
+## 4. Admin Surface (Leasetic admin only)
 
 ### Table-stakes
 
@@ -234,7 +234,7 @@ This:
 | Closed beta with 1–2 friendly partners | T-1 to T-2 weeks | Thomas | Real-world test on real client data. |
 | Cutover communication email to all partners | T-7 days | Thomas | Announces (a) the new URL, (b) that v10 will be retired on date X, (c) credentials will arrive separately, (d) past v10 proposals are NOT migrated. |
 | Send invite emails (set-your-password) | T-2 days | Antoine via admin UI | Each partner gets a personalized "set your password" link. |
-| v10 access revoked / page replaced with redirect notice | T-day | Antoine | Replace v10 HTML with a single-page "Leasétic Matrice has moved → [new URL]." |
+| v10 access revoked / page replaced with redirect notice | T-day | Antoine | Replace v10 HTML with a single-page "Leasetic Matrice has moved → [new URL]." |
 | Day-of support window | T-day to T+3 days | Thomas + Antoine | Pre-write FAQ. |
 
 ### Table-stakes for cutover

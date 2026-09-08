@@ -20,7 +20,7 @@
 | `a23c17a` | Retired `.ctitle` `.dot` `.ieu` `.suffix` `.tbadge` `.dg` `.db` |
 | `7d5b2e2` | `globals.css` widget rules into `@layer components` (600 → 494 lines) |
 | `f904e00` | One radius scale, not two |
-| `b24eebb` `d13aa9f` | Official Leasétic lockups + propeller mark; height derived from asset aspect |
+| `b24eebb` `d13aa9f` | Official Leasetic lockups + propeller mark; height derived from asset aspect |
 | `cbefb91` `8831967` | Icon library unified: lucide → Hugeicons → Iconly, behind one central map |
 | `e589d4a` | ReUI Pro blocks audit documented |
 | `cb0647a` `21b96c4` | `auth-1` adopted on public pages, then reverted at Antoine's call |

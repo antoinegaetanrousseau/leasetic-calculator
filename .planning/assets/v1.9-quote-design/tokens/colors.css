@@ -1,5 +1,5 @@
-/* Leasétic Design System — color tokens (v7, brand-ready rename)
-   Core: Leasétic Green #01CC72. Neutrals are a blue-gray ramp anchored on
+/* Leasetic Design System — color tokens (v7, brand-ready rename)
+   Core: Leasetic Green #01CC72. Neutrals are a blue-gray ramp anchored on
    ink #112C3B. Secondary family is the teal→navy "pine" ramp. Warm palette
    tints (skin/orange/amber/sand/sage/emerald) serve illustration.
 
@@ -44,7 +44,7 @@
      --text-action-secondary        8.73   --text-on-lime         9.51
 */
 :root {
-  /* ---- Brand primary — Leasétic Green, OKLCH ramp 145°→162° ---- */
+  /* ---- Brand primary — Leasetic Green, OKLCH ramp 145°→162° ---- */
   --color-brand-primary-50:  #f0fbf0;
   --color-brand-primary-100: #def6e0;
   --color-brand-primary-200: #baecc3;
