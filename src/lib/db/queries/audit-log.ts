@@ -26,6 +26,11 @@ export type AuditAction =
   // before/after record the SPECIFIC type string, never a boolean (D-02).
   // ADMIN-09: partner_type is a business-classification field, NOT a commission/rate value.
   | 'user.partner_type_change'
+  // ── Phase 42 follow-up — admin edit of company_telephone (FIELD-02) ────────
+  // before/after carry the specific telephone values (or null for a clear),
+  // exactly as the partner_type_change entry above records type strings.
+  // ADMIN-09: a telephone is contact data, NOT a commission/rate value.
+  | 'user.company_telephone_change'
   // ── Phase 30 — Company & Contact Registry write layer (CRM-01/02/04) ───────
   // Payloads carry only ids and caller-submitted values — never commission
   // data, never the pre-existing/new-company distinction (T-30-05-02/07).

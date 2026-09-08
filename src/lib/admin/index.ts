@@ -13,6 +13,8 @@ export {
   createPartnerInvitationAction,
   // Phase 22 Plan 03 — PTYPE-03: admin-only partner type change (audited).
   adminUpdatePartnerType,
+  // Phase 42 follow-up — FIELD-02: admin edit of company_telephone (audited).
+  adminUpdatePartnerCompanyTelephone,
 } from './actions';
 export type {
   AdminUpdateGlobalParamsArgs,
