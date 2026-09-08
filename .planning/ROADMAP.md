@@ -888,10 +888,18 @@ Plans:
 **Planning note:** Phase 42 discussion (D-24) amends this phase's `DOC-03` to carry D-10's
 partner-first / advisor-second card restructure — the "Votre contact" card headlines the partner
 company, commercial and téléphone, with the Leasetic advisor's name, fonction, téléphone and email
-as the supporting contact beneath, deliberately deviating from `Quote-FR-A.dc.html:67-74` — and
-D-16's PDF-only fonction translation, rendering the FR/EN label matching each proposal's committed
-`language`. Phase 42 lands the `pdf.partnerType.*` FR/EN label pairs this phase renders; see
+as the supporting contact beneath, deliberately deviating from `Quote-FR-A.dc.html:67-74`. See
 `.planning/phases/42-captured-data-fields-advisor-profile/42-CONTEXT.md`.
+
+[Retracted 2026-09-08 by Phase 43 D-03, see `43-CONTEXT.md`: the clause carrying D-16's PDF-only
+fonction translation — rendering the FR/EN label pair matching each proposal's committed
+`language` — is dropped; it applied `users.partnerType`'s translation to the unrelated, free-text,
+required `leasetic_advisor.fonction` column. The advisor's fonction now renders as typed. The
+orphaned-key disposition this retraction leaves is locked here and executed by plan 43-03: the
+five layout-orphaned `pdf.*` keys (tagline, project section label, and the interests-block keys)
+are deleted; the three `pdf.partnerType.*` FR/EN pairs and their pinning test are kept and
+annotated as unused under D-02, because `43-CONTEXT.md`'s Deferred Ideas lists translating
+`partnerType` on the web surfaces as a live later decision.]
 
 ### Phase 44: Backfill Migration
 

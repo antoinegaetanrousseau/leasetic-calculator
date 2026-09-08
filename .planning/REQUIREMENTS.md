@@ -32,11 +32,15 @@ proposal into it.
   SIRET, destinataire, fonction, téléphone and email in the design's two-column key/value grid.
 - [ ] **DOC-03**: The PDF shows a `VOTRE CONTACT` card whose headline is the partner company,
   commercial and téléphone, with the Leasetic advisor's name, fonction, téléphone and email as the
-  supporting contact beneath; the advisor's fonction renders from the FR/EN label pair matching the
-  proposal's committed `language`. *(Amended 2026-09-08 by Phase 42 D-10 / D-16 via D-24: this
+  supporting contact beneath. *(Amended 2026-09-08 by Phase 42 D-10 / D-16 via D-24: this
   deliberately deviates from `Quote-FR-A.dc.html:67-74`, which makes `advisorName` the 11pt/600
   headline. The deviation is intended — Phase 43 must not treat it as a spec violation. The two
-  blocks are re-ordered, not relabelled.)*
+  blocks are re-ordered, not relabelled. Retracted 2026-09-08 by Phase 43 D-03: the clause applying
+  `users.partnerType`'s PDF-only FR/EN label pairs to `leasetic_advisor.fonction` is dropped — it
+  was a category error, applying a translation scoped to a different column on a different table,
+  free text and required (`src/lib/admin/advisor-schemas.ts`). Honouring it literally would have
+  meant converting the advisor's fonction to an enum and contradicting the admin form Phase 42
+  shipped. The advisor's fonction renders as typed. See `43-CONTEXT.md` D-03.)*
 - [ ] **DOC-04**: The PDF shows the monthly rent in a navy-outlined hero card with its term caption,
   sized and spaced per the design spec.
 - [ ] **DOC-05**: The PDF shows a `CONDITIONS FINANCIÈRES` table listing financed amount, lease term,
