@@ -36,6 +36,14 @@ const FIXTURE = {
     coeff: '2.2500',
     isOnDemand: false,
   },
+  // Phase 43 D-12 — frozen literals, chosen to be visibly synthetic.
+  partner: { companyTelephone: '05 61 00 00 00' },
+  advisor: {
+    name: 'Camille Martin',
+    fonction: 'Responsable financement',
+    telephone: '05 61 11 22 33',
+    email: 'camille.martin@leasetic.example',
+  },
 };
 
 describe('renderProposalPdf', () => {
@@ -76,6 +84,22 @@ describe('renderProposalPdf', () => {
   it('renders English language', async () => {
     const enFixture = { ...FIXTURE, language: 'en' as const };
     const result = await renderProposalPdf({ data: enFixture });
+    expect(result.sizeBytes).toBeGreaterThan(4_000);
+  });
+
+  it('D-13: renders without throwing when advisor is null', async () => {
+    const nullAdvisorFixture = { ...FIXTURE, advisor: null };
+    const result = await renderProposalPdf({ data: nullAdvisorFixture });
+    expect(result.sizeBytes).toBeGreaterThan(4_000);
+  });
+
+  it('FIELD-03: renders without throwing on a pre-Phase-42 proposal (no clientSiret/partnerTel, no companyTelephone)', async () => {
+    const legacyProposalFixture = {
+      ...FIXTURE,
+      inputs: { ...FIXTURE.inputs, clientSiret: undefined, partnerTel: undefined },
+      partner: { companyTelephone: null },
+    };
+    const result = await renderProposalPdf({ data: legacyProposalFixture });
     expect(result.sizeBytes).toBeGreaterThan(4_000);
   });
 });

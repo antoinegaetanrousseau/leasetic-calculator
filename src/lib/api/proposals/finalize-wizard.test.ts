@@ -23,6 +23,7 @@ const {
   renderProposalPdfMock,
   storagePutMock,
   storageMock,
+  getAdvisorMock,
 } = vi.hoisted(() => {
   const storagePut = vi.fn();
   return {
@@ -32,6 +33,7 @@ const {
     renderProposalPdfMock: vi.fn(),
     storagePutMock: storagePut,
     storageMock: vi.fn(() => ({ put: storagePut })),
+    getAdvisorMock: vi.fn(),
   };
 });
 
@@ -41,6 +43,9 @@ vi.mock('@/lib/db/queries/proposals', () => ({
 }));
 vi.mock('@/lib/db/queries/global-params', () => ({
   getLatestGlobalParams: (...args: unknown[]) => getLatestGlobalParamsMock(...args),
+}));
+vi.mock('@/lib/db/queries/advisor', () => ({
+  getAdvisor: (...args: unknown[]) => getAdvisorMock(...args),
 }));
 vi.mock('@/lib/pdf', () => ({
   renderProposalPdf: (...args: unknown[]) => renderProposalPdfMock(...args),
@@ -82,6 +87,16 @@ const PDF_RENDER_RESULT = {
   sizeBytes: 1020,
 };
 
+const FIXTURE_ADVISOR = {
+  id: '00000000-0000-0000-0000-000000000001',
+  name: 'Camille Martin',
+  fonction: 'Responsable financement',
+  telephone: '05 61 11 22 33',
+  email: 'camille.martin@leasetic.example',
+  updatedAt: new Date('2026-01-01'),
+  updatedBy: null,
+};
+
 beforeEach(() => {
   getDraftByIdMock.mockReset();
   getLatestGlobalParamsMock.mockReset();
@@ -89,6 +104,7 @@ beforeEach(() => {
   renderProposalPdfMock.mockReset();
   storagePutMock.mockReset();
   storageMock.mockClear();
+  getAdvisorMock.mockReset();
 
   // Happy-path defaults — Phase 17 D-03: draft row carries pre-allocated lcRef.
   getDraftByIdMock.mockResolvedValue({
@@ -99,6 +115,7 @@ beforeEach(() => {
   });
   getLatestGlobalParamsMock.mockResolvedValue(PARAMS);
   renderProposalPdfMock.mockResolvedValue(PDF_RENDER_RESULT);
+  getAdvisorMock.mockResolvedValue(FIXTURE_ADVISOR);
   storagePutMock.mockResolvedValue({
     key: 'proposals/u-1/d-1.pdf',
     size: PDF_RENDER_RESULT.sizeBytes,
@@ -120,7 +137,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
       createdAt: new Date(),
     });
     await expect(
-      finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' }),
+      finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' }),
     ).rejects.toThrow();
     expect(renderProposalPdfMock).not.toHaveBeenCalled();
     expect(finalizeDraftMock).not.toHaveBeenCalled();
@@ -129,23 +146,23 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   it('Test 1b: throws DraftNotFound when getDraftById returns null', async () => {
     getDraftByIdMock.mockResolvedValue(null);
     await expect(
-      finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' }),
+      finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' }),
     ).rejects.toThrow(/DraftNotFound/);
   });
 
   it('Test 2: calls getLatestGlobalParams (D-16 step 2); throws NoGlobalParams if null', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     expect(getLatestGlobalParamsMock).toHaveBeenCalledTimes(1);
 
     // Now exercise the null branch.
     getLatestGlobalParamsMock.mockResolvedValueOnce(null);
     await expect(
-      finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' }),
+      finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' }),
     ).rejects.toThrow(/NoGlobalParams/);
   });
 
   it('Test 3: passes validated inputs + global params to PDF render (computeLoyer invoked inline)', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     expect(renderProposalPdfMock).toHaveBeenCalledTimes(1);
     const callArg = renderProposalPdfMock.mock.calls[0][0] as {
       data: { inputs: Record<string, unknown>; computed: Record<string, unknown> };
@@ -157,7 +174,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   });
 
   it('Test 4: invokes @react-pdf/renderer with our ProposalDocument data (assert call shape)', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     expect(renderProposalPdfMock).toHaveBeenCalledOnce();
     const arg = renderProposalPdfMock.mock.calls[0][0] as { data: { lcRef: string; language: string } };
     expect(typeof arg.data.lcRef).toBe('string');
@@ -165,7 +182,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   });
 
   it('Test 5: uploads the rendered buffer via storage().put and obtains a pdfBlobKey (D-16 step 5)', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     expect(storagePutMock).toHaveBeenCalledTimes(1);
     const [keyArg, bodyArg, optsArg] = storagePutMock.mock.calls[0];
     expect(typeof keyArg).toBe('string');
@@ -175,7 +192,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   });
 
   it('Test 6: allocates idempotency_key (D-16 step 6); lc_ref sourced from the pre-allocated draft row (Phase 17 D-03)', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     expect(finalizeDraftMock).toHaveBeenCalledTimes(1);
     const [, , payload] = finalizeDraftMock.mock.calls[0];
     const p = payload as { idempotencyKey: string };
@@ -190,7 +207,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   });
 
   it('Test 7: calls finalizeDraft(draftId, userId, { ...7 fields }) — single-shot atomic UPDATE (D-16 step 7-8); lc_ref removed from args per Phase 17 D-03', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     expect(finalizeDraftMock).toHaveBeenCalledTimes(1);
     const [draftIdArg, userIdArg, payload] = finalizeDraftMock.mock.calls[0];
     expect(draftIdArg).toBe('d-1');
@@ -210,7 +227,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   it('Test 8: finalize-wizard does NOT write a second audit_log entry — finalizeDraft owns it (Phase 12 D-discretion)', async () => {
     // We assert this both behaviorally (mocks reveal no extra invocation) AND
     // structurally via the verification grep contract (audit_log substring count).
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     // No direct writeAuditLog mock — but we can verify by ensuring finalizeDraft
     // is called exactly once (it owns the audit_log entry internally).
     expect(finalizeDraftMock).toHaveBeenCalledTimes(1);
@@ -218,19 +235,19 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
 
   it('Test 9: returns { id: newProposalId } on success', async () => {
     finalizeDraftMock.mockResolvedValue({ id: 'd-1-finalized' });
-    const result = await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    const result = await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     expect(result).toEqual({ id: 'd-1-finalized' });
   });
 
   it('Test 9b: throws FinalizeFailed when finalizeDraft returns null (cross-user / already-finalized)', async () => {
     finalizeDraftMock.mockResolvedValue(null);
     await expect(
-      finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' }),
+      finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' }),
     ).rejects.toThrow(/FinalizeFailed/);
   });
 
   it('Test 10: ADMIN-09 — PDF render data props contain NO commission field', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     const renderArg = renderProposalPdfMock.mock.calls[0][0] as {
       data: {
         inputs: Record<string, unknown>;
@@ -243,7 +260,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   });
 
   it('Test 10b: ADMIN-09 — persisted `computed` jsonb (passed to finalizeDraft) contains NO commission field', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     const [, , payload] = finalizeDraftMock.mock.calls[0];
     const computed = (payload as { computed: Record<string, unknown> }).computed;
     expect('commission' in computed).toBe(false);
@@ -282,7 +299,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
   });
 
   it('Test 11: paramsSnapshot is captured from getLatestGlobalParams verbatim (Stripe Option A immutability)', async () => {
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
     const [, , payload] = finalizeDraftMock.mock.calls[0];
     const snapshot = (payload as { paramsSnapshot: Record<string, unknown> }).paramsSnapshot;
     // Must include the 4 v1.1 fields that submit.ts captures.
@@ -302,7 +319,7 @@ describe('finalizeWizard (D-16 8-step pipeline)', () => {
       lcRef: 'LC-2026-001',
       clientRelationshipId: 'rel-1',
     });
-    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+    await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
 
     // The PDF-rendered inputs are exactly the pre-finalize draft.inputs,
     // re-parsed through proposalInputSchema — never touched by the presence
@@ -343,6 +360,7 @@ describe('Phase 42 — finalize gates (D-05 / D-17 / D-13)', () => {
         language: 'fr',
         partnerType: 'Partenaire' as const,
         telephone: '06 12 34 56 78',
+        companyTelephone: '05 61 00 00 00',
       }),
     ).rejects.toThrow(/LegacyDraftIncomplete/);
     // The ordering assertion: the legacy pre-check must short-circuit before
@@ -366,6 +384,7 @@ describe('Phase 42 — finalize gates (D-05 / D-17 / D-13)', () => {
         language: 'fr',
         partnerType: 'Partenaire' as const,
         telephone: '06 12 34 56 78',
+        companyTelephone: '05 61 00 00 00',
       }),
     ).rejects.toThrow(/ValidationFailed/);
   });
@@ -378,6 +397,7 @@ describe('Phase 42 — finalize gates (D-05 / D-17 / D-13)', () => {
         language: 'fr',
         partnerType: 'Partenaire' as const,
         telephone: null,
+        companyTelephone: '05 61 00 00 00',
       }),
     ).rejects.toThrow(/MissingPartnerTelephone/);
     expect(renderProposalPdfMock).not.toHaveBeenCalled();
@@ -392,6 +412,7 @@ describe('Phase 42 — finalize gates (D-05 / D-17 / D-13)', () => {
         language: 'fr',
         partnerType: 'Partenaire' as const,
         telephone: '',
+        companyTelephone: '05 61 00 00 00',
       }),
     ).rejects.toThrow(/MissingPartnerTelephone/);
     expect(renderProposalPdfMock).not.toHaveBeenCalled();
@@ -404,6 +425,7 @@ describe('Phase 42 — finalize gates (D-05 / D-17 / D-13)', () => {
       language: 'fr',
       partnerType: 'Partenaire' as const,
       telephone: '06 12 34 56 78',
+      companyTelephone: '05 61 00 00 00',
     });
     expect(result).toEqual({ id: 'd-1' });
     expect(renderProposalPdfMock).toHaveBeenCalledTimes(1);
@@ -418,6 +440,7 @@ describe('Phase 42 — finalize gates (D-05 / D-17 / D-13)', () => {
       language: 'fr',
       partnerType: 'Partenaire' as const,
       telephone: '06 12 34 56 78',
+      companyTelephone: '05 61 00 00 00',
     });
     expect(result).toEqual({ id: 'd-1' });
   });
@@ -435,7 +458,25 @@ describe('Phase 42 — finalize gates (D-05 / D-17 / D-13)', () => {
       language: 'fr',
       partnerType: 'Partenaire' as const,
       telephone: '06 12 34 56 78',
+      companyTelephone: '05 61 00 00 00',
     });
     expect(result).toEqual({ id: 'd-1' });
+  });
+
+  it('D-13: a null advisor still finalizes — no bounded-error guard, renderProposalPdf/finalizeDraft still called', async () => {
+    getAdvisorMock.mockResolvedValue(null);
+    const result = await finalizeWizard({
+      userId: 'u-1',
+      draftId: 'd-1',
+      language: 'fr',
+      partnerType: 'Partenaire' as const,
+      telephone: '06 12 34 56 78',
+      companyTelephone: '05 61 00 00 00',
+    });
+    expect(result).toEqual({ id: 'd-1' });
+    expect(renderProposalPdfMock).toHaveBeenCalledTimes(1);
+    expect(finalizeDraftMock).toHaveBeenCalledTimes(1);
+    const renderArg = renderProposalPdfMock.mock.calls[0][0] as { data: { advisor: unknown } };
+    expect(renderArg.data.advisor).toBeNull();
   });
 });

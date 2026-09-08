@@ -16,9 +16,21 @@ export async function POST(req: NextRequest) {
   // requireUser uses `redirect()` from next/navigation, which throws a
   // NEXT_REDIRECT error inside route handlers. We catch and translate.
   let userId: string;
+  let companyTelephone: string | null;
   try {
     const { session } = await requireUser();
     userId = session.user.id;
+    // Phase 43 D-12 — the partner COMPANY's telephone line, read off the
+    // session (a registered Better Auth additionalField), mirroring the
+    // normalisation app/api/proposals/finalize/route.ts applies to
+    // `telephone`. Never blocks submission (D-13) — a missing value renders
+    // as an em dash in the PDF.
+    const rawCompanyTelephone = (session.user as { companyTelephone?: unknown })
+      .companyTelephone;
+    companyTelephone =
+      typeof rawCompanyTelephone === 'string' && rawCompanyTelephone.trim().length > 0
+        ? rawCompanyTelephone
+        : null;
   } catch {
     // session missing → redirect threw. Translate to JSON 401.
     return jsonError('unauthorized');
@@ -44,6 +56,7 @@ export async function POST(req: NextRequest) {
       language: lang,
       idempotencyKey,
       body,
+      companyTelephone,
     });
     return NextResponse.json(result, { status: 200 });
   } catch (err) {

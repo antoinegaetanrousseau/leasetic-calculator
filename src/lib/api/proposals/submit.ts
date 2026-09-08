@@ -10,6 +10,7 @@ import {
   createProposal,
   finalizePdfBlobOnProposal,
   findByIdempotencyKey,
+  getAdvisor,
   getLatestGlobalParams,
   softDeleteProposal,
   writeAuditLog,
@@ -31,6 +32,11 @@ export interface SubmitProposalArgs {
   idempotencyKey: string;
   /** Raw JSON body from the request. submitProposal Zod-parses. */
   body: unknown;
+  /** Phase 43 D-12: the partner COMPANY's telephone line (read from the
+   *  session by the route handler, mirroring `finalize-wizard.ts`'s
+   *  `telephone`/`companyTelephone` threading). A null value never blocks
+   *  submission (D-13) — it renders an em dash in the PDF. */
+  companyTelephone: string | null;
 }
 
 export interface SubmitProposalResult {
@@ -143,6 +149,11 @@ export async function submitProposal(args: SubmitProposalArgs): Promise<SubmitPr
     // Build the PDF data — use the snapshot state (computed from above).
     const pdfComputed = buildPdfComputed(computeResult.computed);
 
+    // Phase 43 D-12/D-13 — read the single Leasetic advisor identity live,
+    // immediately before the render call. D-13: a null advisor is valid —
+    // do NOT add a bounded-error guard here.
+    const advisor = await getAdvisor();
+
     const { buffer, sha256, sizeBytes } = await renderProposalPdf({
       data: {
         lcRef: row.lcRef!,
@@ -150,6 +161,15 @@ export async function submitProposal(args: SubmitProposalArgs): Promise<SubmitPr
         createdAt: row.createdAt,
         inputs: input,
         computed: pdfComputed,
+        partner: { companyTelephone: args.companyTelephone },
+        advisor: advisor
+          ? {
+              name: advisor.name,
+              fonction: advisor.fonction,
+              telephone: advisor.telephone,
+              email: advisor.email,
+            }
+          : null,
       },
     });
 

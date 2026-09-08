@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
   let userId: string;
   let partnerType: 'Agent' | 'Commercial' | 'Partenaire';
   let telephone: string | null;
+  let companyTelephone: string | null;
   try {
     const { session } = await requireUser();
     userId = session.user.id;
@@ -93,6 +94,16 @@ export async function POST(req: NextRequest) {
       typeof rawTelephone === 'string' && rawTelephone.trim().length > 0
         ? rawTelephone
         : null;
+    // Phase 43 D-12 — the partner COMPANY's telephone line, read off the
+    // session (a registered Better Auth additionalField, mirroring
+    // `telephone` above). Unlike `telephone`, this never blocks finalization
+    // (D-13) — a missing value renders as an em dash in the PDF.
+    const rawCompanyTelephone = (session.user as { companyTelephone?: unknown })
+      .companyTelephone;
+    companyTelephone =
+      typeof rawCompanyTelephone === 'string' && rawCompanyTelephone.trim().length > 0
+        ? rawCompanyTelephone
+        : null;
   } catch {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
@@ -113,7 +124,14 @@ export async function POST(req: NextRequest) {
   const language = await getCurrentLang();
 
   try {
-    const result = await finalizeWizard({ userId, draftId, language, partnerType, telephone });
+    const result = await finalizeWizard({
+      userId,
+      draftId,
+      language,
+      partnerType,
+      telephone,
+      companyTelephone,
+    });
 
     // ACTV-02 (D-15) — narrate the finalize onto the owner's timeline. Its OWN
     // try/catch, deliberately: by this point the PDF is rendered, uploaded and

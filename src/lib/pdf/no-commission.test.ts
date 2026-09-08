@@ -62,6 +62,7 @@ const {
   renderProposalPdfMock,
   storagePutMock,
   storageMock,
+  getAdvisorMock,
 } = vi.hoisted(() => {
   const storagePut = vi.fn();
   return {
@@ -71,6 +72,7 @@ const {
     renderProposalPdfMock: vi.fn(),
     storagePutMock: storagePut,
     storageMock: vi.fn(() => ({ put: storagePut })),
+    getAdvisorMock: vi.fn(),
   };
 });
 
@@ -80,6 +82,9 @@ vi.mock('@/lib/db/queries/proposals', () => ({
 }));
 vi.mock('@/lib/db/queries/global-params', () => ({
   getLatestGlobalParams: (...args: unknown[]) => getLatestGlobalParamsMock(...args),
+}));
+vi.mock('@/lib/db/queries/advisor', () => ({
+  getAdvisor: (...args: unknown[]) => getAdvisorMock(...args),
 }));
 vi.mock('@/lib/pdf', () => ({
   renderProposalPdf: (...args: unknown[]) => renderProposalPdfMock(...args),
@@ -219,6 +224,16 @@ const PDF_RENDER_RESULT_STUB = {
   sizeBytes: 1020,
 };
 
+const FIXTURE_ADVISOR = {
+  id: '00000000-0000-0000-0000-000000000001',
+  name: 'Camille Martin',
+  fonction: 'Responsable financement',
+  telephone: '05 61 11 22 33',
+  email: 'camille.martin@leasetic.example',
+  updatedAt: new Date('2026-01-01'),
+  updatedBy: null,
+};
+
 beforeEach(() => {
   getDraftByIdMock.mockReset();
   getLatestGlobalParamsMock.mockReset();
@@ -226,9 +241,11 @@ beforeEach(() => {
   renderProposalPdfMock.mockReset();
   storagePutMock.mockReset();
   storageMock.mockClear();
+  getAdvisorMock.mockReset();
 
   getLatestGlobalParamsMock.mockResolvedValue(FIXTURE_PARAMS);
   renderProposalPdfMock.mockResolvedValue(PDF_RENDER_RESULT_STUB);
+  getAdvisorMock.mockResolvedValue(FIXTURE_ADVISOR);
   storagePutMock.mockResolvedValue({
     key: 'proposals/u-1/d-1.pdf',
     size: 1020,
@@ -258,7 +275,7 @@ describe('ADMIN-09 no-commission-in-PDF — golden corpus (D-12 + D-28)', () => 
         lcRef: 'LC-2026-001',
       });
 
-      await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+      await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
 
       // ── Layer 1: PDF render data has no commission ─────────────────────
       expect(renderProposalPdfMock).toHaveBeenCalledTimes(1);
@@ -325,7 +342,7 @@ describe('ADMIN-09 no-commission-in-PDF — golden corpus (D-12 + D-28)', () => 
         // Phase 17 D-03: draft row carries pre-allocated lcRef.
         lcRef: 'LC-2026-001',
       });
-      await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78' });
+      await finalizeWizard({ userId: 'u-1', draftId: 'd-1', language: 'fr', partnerType: 'Partenaire' as const, telephone: '06 12 34 56 78', companyTelephone: '05 61 00 00 00' });
       totalCalls += finalizeDraftMock.mock.calls.length;
     }
     expect(totalCalls).toBe(GOLDEN_FIXTURES.length);
@@ -461,6 +478,14 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
           createdAt: new Date('2026-05-09T10:00:00.000Z'),
           inputs,
           computed: pdfComputed,
+          // Phase 43 D-12 — required on ProposalDocumentProps['data'].
+          partner: { companyTelephone: '05 61 00 00 00' },
+          advisor: {
+            name: 'Camille Martin',
+            fonction: 'Responsable financement',
+            telephone: '05 61 11 22 33',
+            email: 'camille.martin@leasetic.example',
+          },
         };
 
         const result = await renderProposalPdfReal({ data: pdfData });
@@ -601,6 +626,7 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
             language: 'fr',
             partnerType,
             telephone: '06 12 34 56 78',
+            companyTelephone: '05 61 00 00 00',
           });
 
           // ── Layer 1: PDF render data has no commission ──────────────
@@ -672,6 +698,7 @@ describe('ADMIN-09 no-commission-in-PDF — binary inspection (D-28 load-bearing
           language: 'fr',
           partnerType,
           telephone: '06 12 34 56 78',
+          companyTelephone: '05 61 00 00 00',
         });
 
         // Commission-free loyer: commissionPct forced to 0.

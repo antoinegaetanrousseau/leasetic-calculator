@@ -10,6 +10,7 @@ const mocks = {
   softDeleteProposal: vi.fn(),
   writeAuditLog: vi.fn(),
   getLatestGlobalParams: vi.fn(),
+  getAdvisor: vi.fn(),
   renderProposalPdf: vi.fn(),
   storagePut: vi.fn(),
 };
@@ -21,6 +22,7 @@ vi.mock('@/lib/db/queries', () => ({
   softDeleteProposal: (...args: unknown[]) => mocks.softDeleteProposal(...args),
   writeAuditLog: (...args: unknown[]) => mocks.writeAuditLog(...args),
   getLatestGlobalParams: (...args: unknown[]) => mocks.getLatestGlobalParams(...args),
+  getAdvisor: (...args: unknown[]) => mocks.getAdvisor(...args),
 }));
 
 vi.mock('@/lib/pdf', () => ({
@@ -80,33 +82,33 @@ beforeEach(() => {
 describe('submitProposal', () => {
   it('rejects an invalid idempotency key', async () => {
     await expect(submitProposal({
-      userId: 'u-1', language: 'fr', idempotencyKey: 'not-a-uuid', body: VALID_BODY,
+      userId: 'u-1', language: 'fr', idempotencyKey: 'not-a-uuid', body: VALID_BODY, companyTelephone: null,
     })).rejects.toThrow(SubmitError);
   });
 
   it('rejects a missing idempotency key (empty string)', async () => {
     await expect(submitProposal({
-      userId: 'u-1', language: 'fr', idempotencyKey: '', body: VALID_BODY,
+      userId: 'u-1', language: 'fr', idempotencyKey: '', body: VALID_BODY, companyTelephone: null,
     })).rejects.toMatchObject({ code: 'invalid_idempotency_key', httpStatus: 400 });
   });
 
   it('rejects an invalid body via Zod', async () => {
     await expect(submitProposal({
-      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: { foo: 'bar' },
+      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: { foo: 'bar' }, companyTelephone: null,
     })).rejects.toThrow(SubmitError);
   });
 
   it('rejects body with missing required clientCo', async () => {
     await expect(submitProposal({
       userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY,
-      body: { ...VALID_BODY, clientCo: '' },
+      body: { ...VALID_BODY, clientCo: '' }, companyTelephone: null,
     })).rejects.toMatchObject({ code: 'invalid_body', httpStatus: 400 });
   });
 
   it('returns existing row on idempotency hit', async () => {
     mocks.findByIdempotencyKey.mockResolvedValueOnce({ ...PROPOSAL_ROW, pdfBlobKey: 'proposals/u-1/p-1.pdf' });
     const result = await submitProposal({
-      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY,
+      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY, companyTelephone: null,
     });
     expect(result.id).toBe('p-1');
     expect(result.pdfUrl).toBe('/api/proposals/p-1/pdf');
@@ -119,7 +121,7 @@ describe('submitProposal', () => {
     mocks.findByIdempotencyKey.mockResolvedValueOnce(null);
     mocks.getLatestGlobalParams.mockResolvedValueOnce(null);
     await expect(submitProposal({
-      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY,
+      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY, companyTelephone: null,
     })).rejects.toMatchObject({ code: 'seed_not_applied', httpStatus: 503 });
   });
 
@@ -138,7 +140,7 @@ describe('submitProposal', () => {
     mocks.writeAuditLog.mockResolvedValue({} as never);
 
     const result = await submitProposal({
-      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY,
+      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY, companyTelephone: null,
     });
 
     expect(result).toEqual({ id: 'p-1', pdfUrl: '/api/proposals/p-1/pdf', idempotent: false });
@@ -165,7 +167,7 @@ describe('submitProposal', () => {
     mocks.writeAuditLog.mockResolvedValue({} as never);
 
     await expect(submitProposal({
-      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY,
+      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY, companyTelephone: null,
     })).rejects.toMatchObject({ code: 'pdf_render_failed', httpStatus: 500 });
 
     // D-B1: tombstone must have been called with the row id + userId
@@ -188,7 +190,7 @@ describe('submitProposal', () => {
     mocks.writeAuditLog.mockResolvedValue({} as never);
 
     await expect(submitProposal({
-      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY,
+      userId: 'u-1', language: 'fr', idempotencyKey: VALID_KEY, body: VALID_BODY, companyTelephone: null,
     })).rejects.toMatchObject({ code: 'pdf_upload_failed', httpStatus: 500 });
 
     expect(mocks.softDeleteProposal).toHaveBeenCalledWith('p-1', 'u-1');

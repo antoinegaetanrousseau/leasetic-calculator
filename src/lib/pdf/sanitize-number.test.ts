@@ -216,6 +216,15 @@ describe('PDF binary repro -- no U+202F or U+00A0 in rendered visible text', () 
       coeff: '2.2500',
       isOnDemand: false,
     },
+    // Phase 43 D-12 — required on ProposalDocumentProps['data']; frozen
+    // literals, not exercised by this file's own U+202F/U+00A0 assertions.
+    partner: { companyTelephone: '05 61 00 00 00' },
+    advisor: {
+      name: 'Camille Martin',
+      fonction: 'Responsable financement',
+      telephone: '05 61 11 22 33',
+      email: 'camille.martin@leasetic.example',
+    },
   };
 
   it('fr fixture: reconstructed PDF visible text contains no U+202F (\\u202F) and no U+00A0 (\\u00A0)', async () => {

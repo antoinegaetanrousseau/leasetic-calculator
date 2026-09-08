@@ -42,6 +42,7 @@ import {
   proposalInputSchema,
   type ProposalInput,
 } from '@/lib/calc';
+import { getAdvisor } from '@/lib/db/queries/advisor';
 import { getLatestGlobalParams } from '@/lib/db/queries/global-params';
 import { finalizeDraft, getDraftById } from '@/lib/db/queries/proposals';
 import { renderProposalPdf } from '@/lib/pdf';
@@ -68,6 +69,13 @@ export interface FinalizeWizardArgs {
    *  read here) is this file's established precedent. `null` means the
    *  account has no telephone on file. */
   telephone: string | null;
+  /** Phase 43 D-12: the partner COMPANY's telephone line (read from the
+   *  session by the route handler, mirroring `telephone` above), threaded
+   *  opaquely. Distinct from `telephone` above (the individual's line,
+   *  PROF-02's finalization gate): unlike `telephone`, a null
+   *  `companyTelephone` never blocks finalization (D-13) — it renders an
+   *  em dash. */
+  companyTelephone: string | null;
 }
 
 export interface FinalizeWizardResult {
@@ -212,6 +220,11 @@ export async function finalizeWizard(
   // branch that names the commission parameter (grep-isolation barrier).
   const compute = computeLoyer(buildComputeArgs(parsed, params, args.partnerType));
 
+  // D-16 step 3.5 (Phase 43 D-12/D-13) — read the single Leasetic advisor
+  // identity live, immediately before the render step.
+  // D-13: a null advisor is valid — do NOT add a bounded-error guard here.
+  const advisor = await getAdvisor();
+
   // D-16 step 6 — idempotencyKey allocated here; lcRef was set at draft
   // creation (Phase 17 D-03).
   const idempotencyKey = randomUUID();
@@ -223,6 +236,15 @@ export async function finalizeWizard(
     createdAt: draft.createdAt,
     inputs: parsed,
     computed: buildPdfComputed(compute.computed),
+    partner: { companyTelephone: args.companyTelephone },
+    advisor: advisor
+      ? {
+          name: advisor.name,
+          fonction: advisor.fonction,
+          telephone: advisor.telephone,
+          email: advisor.email,
+        }
+      : null,
   };
   const { buffer, sha256, sizeBytes } = await renderProposalPdf({ data: pdfData });
 

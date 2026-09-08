@@ -40,6 +40,14 @@ const SHARED_BASE: Omit<ProposalDocumentProps['data'], 'language'> = {
     coeff: '2.2500',
     isOnDemand: false,
   },
+  // Phase 43 D-12 — frozen literals, chosen to be visibly synthetic.
+  partner: { companyTelephone: '05 61 00 00 00' },
+  advisor: {
+    name: 'Camille Martin',
+    fonction: 'Responsable financement',
+    telephone: '05 61 11 22 33',
+    email: 'camille.martin@leasetic.example',
+  },
 };
 
 export interface PdfFixture {
