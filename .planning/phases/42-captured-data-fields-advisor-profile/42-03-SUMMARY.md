@@ -134,3 +134,7 @@ None — no external service configuration required. This plan touches Zod schem
 ---
 *Phase: 42-captured-data-fields-advisor-profile*
 *Completed: 2026-09-08*
+
+## Self-Check: PASSED
+
+All 6 claimed source files found on disk; all 3 task/plan commit hashes (e573fb0, 6b9428f, 775b91d) found in git history.
