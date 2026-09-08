@@ -107,3 +107,8 @@ None — no external service configuration required. This plan writes to `users.
 ---
 *Phase: 42-captured-data-fields-advisor-profile*
 *Completed: 2026-09-08*
+
+## Self-Check: PASSED
+
+All 6 claimed source files + this Summary found on disk; all 4 commit hashes
+(f8110f7, 16dbd6e, a8a5395, 4e1230b) found in git history.
