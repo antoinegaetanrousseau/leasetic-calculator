@@ -726,3 +726,144 @@ describe('Phase 42 — partnerTel hydration + clientSiret resume (D-11 / FIELD-0
     expect(clientSiretInput?.value ?? '').toBe('');
   });
 });
+
+// ──────────────────────────────────────────────────────────────────────────
+// Phase 42 Plan 09 (FIELD-02 / D-11 / D-25 / D-30):
+// overlay writes re-assert partnerTel; clientSiret survives the duplicate
+// ...sourceInputs spread untouched.
+// ──────────────────────────────────────────────────────────────────────────
+describe('Phase 42 — overlay writes re-assert partnerTel (D-11 / D-25 / D-30)', () => {
+  it('minting a draft from a client relationship writes partnerTel into the overlay inputs alongside partnerName and partnerCo', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: USER_ID,
+          email: 'partner@example.com',
+          displayName: 'Alice Partner',
+          name: 'Alice',
+          companyName: 'Acme Leasing',
+          companyTelephone: '01 23 45 67 89',
+        },
+      },
+    });
+    getClientRelationshipForOwnerMock.mockResolvedValue({
+      relationshipId: 'rel-1',
+      companyId: 'co-1',
+      companyName: 'Acme Corp',
+      siren: '123456789',
+      createdAt: new Date(),
+    });
+    listContactsForRelationshipMock.mockResolvedValue([]);
+    await expect(
+      ParametresStep1Page({
+        searchParams: Promise.resolve({ clientRelationshipId: 'rel-1' }),
+      }),
+    ).rejects.toThrow(/NEXT_REDIRECT/);
+    expect(updateDraftMock).toHaveBeenCalledTimes(1);
+    const [, , payload] = updateDraftMock.mock.calls[0] as [
+      string,
+      string,
+      { inputs: Record<string, unknown> },
+    ];
+    expect(payload.inputs.partnerTel).toBe('01 23 45 67 89');
+    expect(payload.inputs.partnerName).toBe('Alice Partner');
+    expect(payload.inputs.partnerCo).toBe('Acme Leasing');
+  });
+
+  it('duplicating a proposal writes the current session partnerTel into the overlay, discarding the source proposal stored partnerTel', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: USER_ID,
+          email: 'partner@example.com',
+          displayName: 'Alice Partner',
+          name: 'Alice',
+          companyName: 'Acme Leasing',
+          companyTelephone: '01 23 45 67 89',
+        },
+      },
+    });
+    getProposalByIdMock.mockResolvedValue({
+      id: 'source-1',
+      userId: USER_ID,
+      deletedAt: null,
+      inputs: {
+        clientCo: 'PrefilledCorp',
+        clientSiret: '12345678900012',
+        partnerTel: '09 99 99 99 99',
+      },
+    });
+    await expect(
+      ParametresStep1Page({ searchParams: Promise.resolve({ duplicate: 'source-1' }) }),
+    ).rejects.toThrow(/NEXT_REDIRECT/);
+    expect(updateDraftMock).toHaveBeenCalledTimes(1);
+    const [, , payload] = updateDraftMock.mock.calls[0] as [
+      string,
+      string,
+      { inputs: Record<string, unknown> },
+    ];
+    expect(payload.inputs.partnerTel).toBe('01 23 45 67 89');
+    expect(payload.inputs.partnerTel).not.toBe('09 99 99 99 99');
+    // clientSiret is client data, not partner attribution — still carried
+    // through the ...sourceInputs spread, untouched by the overlay.
+    expect(payload.inputs.clientSiret).toBe('12345678900012');
+  });
+
+  it('when companyTelephone is absent, the overlays write partnerTel: "" rather than omitting the key or writing undefined', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: USER_ID,
+          email: 'partner@example.com',
+          displayName: 'Alice Partner',
+          name: 'Alice',
+          companyName: 'Acme Leasing',
+          companyTelephone: null,
+        },
+      },
+    });
+    getProposalByIdMock.mockResolvedValue({
+      id: 'source-1',
+      userId: USER_ID,
+      deletedAt: null,
+      inputs: { clientCo: 'PrefilledCorp' },
+    });
+    await expect(
+      ParametresStep1Page({ searchParams: Promise.resolve({ duplicate: 'source-1' }) }),
+    ).rejects.toThrow(/NEXT_REDIRECT/);
+    const [, , payload] = updateDraftMock.mock.calls[0] as [
+      string,
+      string,
+      { inputs: Record<string, unknown> },
+    ];
+    expect('partnerTel' in payload.inputs).toBe(true);
+    expect(payload.inputs.partnerTel).toBe('');
+  });
+
+  it('existing partnerName / partnerCo / validityDays overlay behaviour is unchanged and no additional updateDraft call is introduced', async () => {
+    getClientRelationshipForOwnerMock.mockResolvedValue({
+      relationshipId: 'rel-1',
+      companyId: 'co-1',
+      companyName: 'Acme Corp',
+      siren: '123456789',
+      createdAt: new Date(),
+    });
+    listContactsForRelationshipMock.mockResolvedValue([]);
+    await expect(
+      ParametresStep1Page({
+        searchParams: Promise.resolve({ clientRelationshipId: 'rel-1' }),
+      }),
+    ).rejects.toThrow(/NEXT_REDIRECT/);
+    // Exactly one updateDraft call for the relationship-prefill path — no
+    // new DB round-trip was introduced by this plan.
+    expect(updateDraftMock).toHaveBeenCalledTimes(1);
+    const [, , payload] = updateDraftMock.mock.calls[0] as [
+      string,
+      string,
+      { inputs: Record<string, unknown> },
+    ];
+    expect(payload.inputs.partnerName).toBe('Alice Partner');
+    expect(payload.inputs.partnerCo).toBe('Acme Leasing');
+    expect(payload.inputs.validityDays).toBe(30);
+  });
+});

@@ -191,9 +191,12 @@ export default async function ParametresStep1Page({
         inputs: {
           ...relationshipPrefill,
           // Session-derived attribution always wins — never trust a stored
-          // or prefilled value for these two fields (D-07 discipline).
+          // or prefilled value for these fields (D-07 discipline). Phase 42
+          // Plan 09 (FIELD-02 / D-11): partnerTel joins partnerName /
+          // partnerCo here — a relationship prefill must not supply one.
           partnerName,
           partnerCo,
+          partnerTel,
           validityDays: defaultValidityDays,
         },
       });
@@ -208,9 +211,15 @@ export default async function ParametresStep1Page({
           inputs: {
             ...sourceInputs,
             // D-25 overlay — never carry the source row's cached partner
-            // attribution. Session is authoritative.
+            // attribution. Session is authoritative. Phase 42 Plan 09
+            // (FIELD-02 / D-11): partnerTel joins partnerName / partnerCo
+            // here — a duplicated proposal must not carry the source row's
+            // cached telephone. clientSiret is client data, not partner
+            // attribution, so it is deliberately left to the ...sourceInputs
+            // spread above and NOT added to this overlay.
             partnerName,
             partnerCo,
+            partnerTel,
             validityDays: defaultValidityDays,
           },
         });
