@@ -64,14 +64,14 @@ proposal into it.
   Inter face, and Regular + SemiBold are both present", because the Claude Design layout specifies
   only weights 400 and 600; registration of all four weights remains gated by
   `tests/vendored-ui-integrity.test.ts`.)*
-- [ ] **DOC-10**: A proposal whose committed language is English renders the English variant —
+- [x] **DOC-10**: A proposal whose committed language is English renders the English variant —
   every label and the full legal conditions paragraph — per `Quote-EN-A.dc.html`.
-- [ ] **DOC-11**: A field with no captured value renders its label followed by an em dash, so card
+- [x] **DOC-11**: A field with no captured value renders its label followed by an em dash, so card
   geometry is identical across proposals regardless of which fields a record carries.
-- [ ] **DOC-12**: No commission figure, rate or derived commission value appears anywhere in the
+- [x] **DOC-12**: No commission figure, rate or derived commission value appears anywhere in the
   PDF, in either language, for any partner type. *(ADMIN-09 envelope — the existing 20 grep gates
   and `no-commission.test.ts` stay green.)*
-- [ ] **DOC-13**: Re-rendering the same proposal twice produces byte-identical PDFs, and the
+- [x] **DOC-13**: Re-rendering the same proposal twice produces byte-identical PDFs, and the
   committed fixture hash reflects the new design.
 
 ### Fields — newly captured data
@@ -82,7 +82,7 @@ proposal into it.
   carried onto every proposal's immutable `inputs` at draft creation. *(Restated 2026-09-08 by Phase 42 D-15 / D-11 / D-13:
   it is not a wizard field, and it never blocks finalization — the
   column ships nullable and an absent value renders as an em dash under DOC-11.)*
-- [ ] **FIELD-03**: A proposal finalized before these fields existed still renders — the PDF reads
+- [x] **FIELD-03**: A proposal finalized before these fields existed still renders — the PDF reads
   the absent keys without throwing, and DOC-11's em-dash treatment covers them.
 
 ### Profile — advisor identity
@@ -164,13 +164,13 @@ proposal into it.
 | DOC-07 | Phase 43 — New PDF Layout | Complete |
 | DOC-08 | Phase 43 — New PDF Layout | Complete |
 | DOC-09 | Phase 41 — Typography Migration | Complete |
-| DOC-10 | Phase 43 — New PDF Layout | Pending |
-| DOC-11 | Phase 43 — New PDF Layout | Pending |
-| DOC-12 | Phase 43 — New PDF Layout | Pending |
-| DOC-13 | Phase 43 — New PDF Layout | Pending |
+| DOC-10 | Phase 43 — New PDF Layout | Complete |
+| DOC-11 | Phase 43 — New PDF Layout | Complete |
+| DOC-12 | Phase 43 — New PDF Layout | Complete |
+| DOC-13 | Phase 43 — New PDF Layout | Complete |
 | FIELD-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | FIELD-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
-| FIELD-03 | Phase 43 — New PDF Layout | Pending |
+| FIELD-03 | Phase 43 — New PDF Layout | Complete |
 | PROF-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | PROF-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | PROF-03 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |

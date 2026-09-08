@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T22:01:40.386Z"
+last_updated: "2026-09-08T22:43:35.806Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 2
   total_plans: 21
-  completed_plans: 19
+  completed_plans: 20
   percent: 8
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 43 (new-pdf-layout) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-09-08
 
@@ -535,6 +535,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 43 P04 | 20min | 3 tasks | 14 files |
 | Phase 43 P05 | ~25min | 3 tasks | 5 files |
 | Phase 43 P06 | ~65min | 3 tasks | 8 files |
+| Phase 43 P07 | ~22min | 3 tasks | 4 files |
 
 ## Decisions
 
@@ -753,6 +754,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 43]: Ledger comments naming deleted dictionary keys literally must avoid the literal dotted key string — the plan's repo-wide grep gate checks comments too, not just consumers
 - [Phase 43]: 43-06: removed the Page-level lineHeight in the PDF document to work around a reproduced @react-pdf/renderer 4.5.1 defect that silently drops every dynamic render-prop <Text> (the legal footer's page-number callback) when a lineHeight is inherited anywhere in the ancestor chain — every wrapping-View alternative (flexGrow/height/literal px) either kept the bug or overflowed the document to two pages; removal was the only fix satisfying both constraints
 - [Phase 43]: 43-06: financial table row 4 (Loyer mensuel HT) renders the same on-demand branch as the hero rather than D-09's literal em-dash enumeration, since it restates the hero's own real value — flagged for the D-15 visual pass to confirm or overrule, per the plan's own instruction
+- [Phase 43]: D-10 four-faces proof reconciled to face-membership + no-collapse + Regular/SemiBold presence, not an exact count of 4 — Claude Design layout uses only Inter weights 400/600; the four-weight REGISTRATION guard in tests/vendored-ui-integrity.test.ts stays the separate, untouched proof (43-07 Task 1)
+- [Phase 43]: layout.test.ts uses a font-aware PDF decoder and a q/Q/cm matrix tracker instead of no-commission.test.ts's single-merged-glyph-map reconstruction and a literal min-Tm-y check — Both literal approaches were empirically shown to produce a false negative (em-dash count of 0) or a vacuously-always-passing check (Tm is a page-height constant in every BT block); the extraction must be correct before its assertion means anything (43-07 Task 2)
 
 ### Blockers
 
