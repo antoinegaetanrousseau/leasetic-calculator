@@ -14,7 +14,15 @@
  * on purpose.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 
 const { updateUserMock, changePasswordMock, refreshMock, toastMock } = vi.hoisted(() => ({
   updateUserMock: vi.fn(),
@@ -42,6 +50,8 @@ const PROPS = {
   initialLastName: 'Rousseau',
   initialEmail: 'antoine@leasetic.com',
   emailEditable: false,
+  initialTelephone: '',
+  fonction: 'Partenaire',
 };
 
 const renderForm = (overrides: Partial<typeof PROPS> = {}) =>
@@ -183,7 +193,12 @@ describe('ParametresForm', () => {
     });
 
     await waitFor(() => expect(updateUserMock).toHaveBeenCalledTimes(1));
-    expect(updateUserMock).toHaveBeenCalledWith({ name: 'Marie Rousseau' });
+    // Phase 42 Plan 04: telephone rides on the same identity write as name
+    // (empty string here since PROPS.initialTelephone defaults to '').
+    expect(updateUserMock).toHaveBeenCalledWith({
+      name: 'Marie Rousseau',
+      telephone: '',
+    });
     expect(changePasswordMock).not.toHaveBeenCalled();
     expect(toastMock.success).toHaveBeenCalled();
     expect(refreshMock).toHaveBeenCalled();
@@ -281,6 +296,92 @@ describe('ParametresForm', () => {
     await type(newPwInput(), 'Str0ng!Passw0rd#2026');
     await waitFor(() => {
       expect(container.textContent).not.toBe(before);
+    });
+  });
+});
+
+describe('Phase 42 — telephone + fonction (PROF-01 / D-14)', () => {
+  const telephoneInput = () => screen.getByLabelText('Téléphone');
+
+  it('Test 15: the telephone input is seeded from initialTelephone', () => {
+    renderForm({ initialTelephone: '06 12 34 56 78' });
+    expect((telephoneInput() as HTMLInputElement).value).toBe('06 12 34 56 78');
+  });
+
+  it('Test 16 (D-14): fonction renders as raw static text, never an editable control', () => {
+    const { container } = renderForm({ fonction: 'Commercial' });
+    expect(container.textContent).toContain('Commercial');
+
+    const fonctionValue = container.querySelector('#pf-fonction');
+    expect(fonctionValue).not.toBeNull();
+    expect(fonctionValue!.tagName).toBe('P');
+    expect(fonctionValue!.textContent).toBe('Commercial');
+
+    // No textbox/combobox role anywhere inside the fonction row.
+    expect(
+      within(fonctionValue!.parentElement as HTMLElement).queryByRole('textbox'),
+    ).toBeNull();
+    expect(
+      within(fonctionValue!.parentElement as HTMLElement).queryByRole('combobox'),
+    ).toBeNull();
+  });
+
+  it('Test 17: the fonction row renders the readonly notice helper text', () => {
+    const { container } = renderForm({ fonction: 'Agent' });
+    expect(container.textContent).toMatch(/Défini par votre administrateur\./);
+  });
+
+  it('Test 18: an invalid phone surfaces error.field.phone.invalid on blur', async () => {
+    renderForm();
+    const tel = telephoneInput();
+    await type(tel, '0612');
+    await blur(tel);
+
+    await waitFor(() => {
+      expect(tel.getAttribute('aria-invalid')).toBe('true');
+    });
+    const alerts = Array.from(document.querySelectorAll('[role="alert"]'));
+    expect(
+      alerts.some((a) =>
+        /Numéro de téléphone invalide\./.test(a.textContent ?? ''),
+      ),
+    ).toBe(true);
+  });
+
+  it('Test 19: changing only the telephone marks identity dirty and saves name + telephone together', async () => {
+    renderForm();
+    expect(saveButton()).toBeDisabled();
+
+    await type(telephoneInput(), '0612345678');
+    await waitFor(() => expect(saveButton()).not.toBeDisabled());
+
+    await act(async () => {
+      fireEvent.click(saveButton());
+    });
+
+    await waitFor(() => expect(updateUserMock).toHaveBeenCalledTimes(1));
+    expect(updateUserMock).toHaveBeenCalledWith({
+      name: 'Antoine Rousseau',
+      telephone: '06 12 34 56 78',
+    });
+  });
+
+  it('Test 20: the telephone field has no required asterisk and an empty value still saves', async () => {
+    const { container } = renderForm();
+    const label = screen.getByText('Téléphone');
+    expect(label.textContent).toBe('Téléphone');
+    expect(container.querySelector('label[for="pf-telephone"] .text-destructive')).toBeNull();
+
+    // Dirty the identity section via firstName only, leaving telephone empty.
+    await type(firstNameInput(), 'Marie');
+    await act(async () => {
+      fireEvent.click(saveButton());
+    });
+
+    await waitFor(() => expect(updateUserMock).toHaveBeenCalledTimes(1));
+    expect(updateUserMock).toHaveBeenCalledWith({
+      name: 'Marie Rousseau',
+      telephone: '',
     });
   });
 });

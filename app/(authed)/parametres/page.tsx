@@ -55,6 +55,12 @@ export default async function ParametresPage() {
     email: string;
     name?: string | null;
     displayName?: string | null;
+    // Phase 42 Plan 04 (PROF-01/D-14): both additionalFields registered in
+    // src/lib/auth/index.ts. telephone may be legitimately absent (nullable
+    // column); partnerType falls back to 'Partenaire' below for legacy rows,
+    // mirroring the finalize route's existing belt-and-suspenders cast.
+    telephone?: string | null;
+    partnerType?: string | null;
   };
   const fullName = (user.name ?? user.displayName ?? '').toString();
   const { firstName, lastName } = splitName(fullName);
@@ -71,6 +77,8 @@ export default async function ParametresPage() {
         initialLastName={lastName}
         initialEmail={user.email}
         emailEditable={false /* D-06d → READ-ONLY (live DB probe 2026-05-29) */}
+        initialTelephone={user.telephone ?? ''}
+        fonction={user.partnerType ?? 'Partenaire'}
       />
     </main>
   );

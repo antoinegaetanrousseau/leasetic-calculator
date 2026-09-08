@@ -37,7 +37,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EyeIcon, EyeOffIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
@@ -55,6 +55,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group';
+import { PhoneInput } from '@/components/proposal/PhoneInput';
 import { authClient } from '@/lib/auth/client';
 import {
   changePasswordSchema,
@@ -82,6 +83,18 @@ export interface ParametresFormProps {
    * helper; when `true`, an editable input bound to `authClient.changeEmail`.
    */
   emailEditable: boolean;
+  /**
+   * PROF-01 / D-19 (Phase 42 Plan 04). The partner's own téléphone, seeded
+   * from `session.user.telephone` (nullable — empty string when unset).
+   * Editable on this form; saved together with name in one identity write.
+   */
+  initialTelephone: string;
+  /**
+   * D-14 (Phase 42 Plan 04). The partner's admin-assigned fonction, derived
+   * from `session.user.partnerType`. Rendered read-only — never an input,
+   * never writable from this surface.
+   */
+  fonction: string;
 }
 
 const FORM_ID = 'parametres-form';
@@ -92,6 +105,8 @@ export function ParametresForm({
   initialLastName,
   initialEmail,
   emailEditable,
+  initialTelephone,
+  fonction,
 }: ParametresFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -107,6 +122,7 @@ export function ParametresForm({
     defaultValues: {
       firstName: initialFirstName,
       lastName: initialLastName,
+      telephone: initialTelephone,
     },
   });
 
@@ -189,7 +205,13 @@ export function ParametresForm({
         const fullName =
           `${identityValues.firstName} ${identityValues.lastName}`.trim();
         try {
-          const { error } = await authClient.updateUser({ name: fullName });
+          // PROF-01 / D-19: telephone rides on the same identity write as
+          // name — one transaction, no second call. companyTelephone is
+          // never sent from here (input: false, D-13's structural block).
+          const { error } = await authClient.updateUser({
+            name: fullName,
+            telephone: identityValues.telephone ?? '',
+          });
           if (error) {
             identityOk = false;
           } else {
@@ -415,6 +437,37 @@ export function ParametresForm({
           </Field>
         </FieldGroup>
 
+        {/* Téléphone (full-width, editable) — PROF-01 / D-19. No required
+            asterisk: PROF-02's enforcement lives exclusively at finalize
+            (D-17), not here. */}
+        <Field className="mb-4">
+          <FieldLabel htmlFor="pf-telephone">
+            {t('parametres.identity.telephone.label', lang)}
+          </FieldLabel>
+          <Controller
+            control={identityForm.control}
+            name="telephone"
+            render={({ field }) => (
+              <PhoneInput
+                inputId="pf-telephone"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ariaInvalid={!!identityErrors.telephone}
+                placeholder={t(
+                  'parametres.identity.telephone.placeholder',
+                  lang,
+                )}
+              />
+            )}
+          />
+          {identityErrors.telephone && (
+            <FieldError role="alert">
+              {t('error.field.phone.invalid', lang)}
+            </FieldError>
+          )}
+        </Field>
+
         {/* Identity row 2 — Email (full-width). READ-ONLY per D-06d. */}
         <Field className="mb-4">
           <FieldLabel htmlFor="pf-email">
@@ -450,6 +503,25 @@ export function ParametresForm({
               </p>
             </>
           )}
+        </Field>
+
+        {/* Fonction (full-width, read-only) — D-14. Derived from
+            session.user.partnerType, never a new column, never an input.
+            Reuses the email row's box treatment, sized at text-sm (14px) per
+            42-UI-SPEC.md — NOT the email row's own bespoke text-[14.5px]. */}
+        <Field className="mb-4">
+          <FieldLabel htmlFor="pf-fonction">
+            {t('parametres.identity.fonction.label', lang)}
+          </FieldLabel>
+          <p
+            id="pf-fonction"
+            className="m-0 rounded-xl border border-border bg-[var(--hover-overlay)] px-3 py-2.5 text-ink text-sm"
+          >
+            {fonction}
+          </p>
+          <p className="mt-1.5 mb-0 text-[12px] text-muted-foreground">
+            {t('parametres.identity.fonction.readonly.notice', lang)}
+          </p>
         </Field>
 
         {/* Horizontal divider (no section header after — rev 2). */}

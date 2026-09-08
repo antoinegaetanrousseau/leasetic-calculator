@@ -6,6 +6,7 @@
  * framework imports, no I/O, no 'use server' / 'use client' directives.
  */
 import { z } from 'zod';
+import { optionalPhoneSchema } from '@/lib/calc/schema';
 
 /** Login form / signIn.email input. */
 export const loginSchema = z.object({
@@ -64,19 +65,25 @@ export const changePasswordSchema = z.object({
 });
 
 /**
- * Identity update (Phase 21 — D-06).
+ * Identity update (Phase 21 — D-06; extended Phase 42 Plan 04 — PROF-01/D-19).
  *
  * Splits a Better Auth `user.name` into Prénom / Nom for the form, recombines
- * client-side before calling `authClient.updateUser({ name })`.
+ * client-side before calling `authClient.updateUser({ name, telephone })`.
  *
  * Email is OMITTED — D-06d resolved to "email READ-ONLY" (see top-of-section
  * comment above). If the resolution flips to "editable" in the future, add
  * `email: z.string().email()` here AND enable `user.changeEmail` in
  * src/lib/auth/index.ts.
+ *
+ * `telephone` reuses `optionalPhoneSchema` (src/lib/calc/schema.ts) verbatim
+ * rather than a third phone regex (42-CONTEXT.md Claude's Discretion). It is
+ * optional/no-asterisk on this form — PROF-02's finalize-time enforcement
+ * (D-17) lives elsewhere, not here.
  */
 export const identitySchema = z.object({
   firstName: z.string().min(1, 'Prénom requis').max(60),
   lastName: z.string().min(1, 'Nom requis').max(60),
+  telephone: optionalPhoneSchema,
 });
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
