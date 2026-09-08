@@ -41,19 +41,19 @@ proposal into it.
   free text and required (`src/lib/admin/advisor-schemas.ts`). Honouring it literally would have
   meant converting the advisor's fonction to an enum and contradicting the admin form Phase 42
   shipped. The advisor's fonction renders as typed. See `43-CONTEXT.md` D-03.)*
-- [ ] **DOC-04**: The PDF shows the monthly rent in a navy-outlined hero card with its term caption,
+- [x] **DOC-04**: The PDF shows the monthly rent in a navy-outlined hero card with its term caption,
   sized and spaced per the design spec.
-- [ ] **DOC-05**: The PDF shows a `CONDITIONS FINANCIÈRES` table listing financed amount, lease term,
+- [x] **DOC-05**: The PDF shows a `CONDITIONS FINANCIÈRES` table listing financed amount, lease term,
   applied coefficient, monthly rent, and a bold **Total des loyers HT** derived as
   `monthlyRent × termMonths`.
-- [ ] **DOC-06**: The conditions paragraph states the proposal's **actual** validity period, not a
+- [x] **DOC-06**: The conditions paragraph states the proposal's **actual** validity period, not a
   hardcoded 30 days. *(Both design files hardcode "(30 jours)" / "(30 days)" while `validityDays`
   is operator-selectable at 15 / 30 / 60 — a 15-day proposal would otherwise contradict its own
   `validUntil` date. The design is wrong here and the implementation must not copy it.)*
-- [ ] **DOC-07**: The PDF shows a client acceptance block — `Fait à`, `Le`, `Nom et qualité du
+- [x] **DOC-07**: The PDF shows a client acceptance block — `Fait à`, `Le`, `Nom et qualité du
   signataire`, `Signature`, and a dashed company-stamp box — pinned to the bottom of the page
   regardless of how much content precedes it.
-- [ ] **DOC-08**: The PDF shows a legal footer carrying the Leasetic company registration line
+- [x] **DOC-08**: The PDF shows a legal footer carrying the Leasetic company registration line
   (SAS, address, SIREN, SIRET, TVA) with the proposal reference, page number and the 14%-opacity
   icon mark on the right.
 - [x] **DOC-09**: The PDF renders in Inter, replacing Plus Jakarta Sans, with no missing-glyph or
@@ -154,11 +154,11 @@ proposal into it.
 | DOC-01 | Phase 43 — New PDF Layout | Pending |
 | DOC-02 | Phase 43 — New PDF Layout | Pending |
 | DOC-03 | Phase 43 — New PDF Layout | Pending |
-| DOC-04 | Phase 43 — New PDF Layout | Pending |
-| DOC-05 | Phase 43 — New PDF Layout | Pending |
-| DOC-06 | Phase 43 — New PDF Layout | Pending |
-| DOC-07 | Phase 43 — New PDF Layout | Pending |
-| DOC-08 | Phase 43 — New PDF Layout | Pending |
+| DOC-04 | Phase 43 — New PDF Layout | Complete |
+| DOC-05 | Phase 43 — New PDF Layout | Complete |
+| DOC-06 | Phase 43 — New PDF Layout | Complete |
+| DOC-07 | Phase 43 — New PDF Layout | Complete |
+| DOC-08 | Phase 43 — New PDF Layout | Complete |
 | DOC-09 | Phase 41 — Typography Migration | Complete |
 | DOC-10 | Phase 43 — New PDF Layout | Pending |
 | DOC-11 | Phase 43 — New PDF Layout | Pending |
