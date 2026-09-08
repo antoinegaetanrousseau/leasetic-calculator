@@ -284,7 +284,9 @@ deliberately not vendored (see the reference README).
   two planning notes (partial SVG support; the D-24 amendment). Criterion 5's
   "byte-identical" wording is qualified by D-16 above.
 
-### The code this phase rewrites
+### The code this phase touches
+
+**Written by this phase.**
 - `src/lib/pdf/document.tsx` — the whole render tree. §10-49 font registration (untouched),
   §57-90 the props interface D-12 grows, §112 the single `fontFamily`, §132 the `LEASETIC`
   text node D-07 replaces and §138 the tagline D-06 deletes, §255-277 the interests block
@@ -293,18 +295,26 @@ deliberately not vendored (see the reference README).
   `pdfPageMargins` (the design's 14/15/10mm).
 - `src/lib/pdf/components/section-label.tsx`, `components/key-value-row.tsx` — today's two
   primitives; may not survive the new geometry.
+- `src/lib/api/proposals/finalize-wizard.ts` §220-227 — the first `pdfData` construction;
+  gains the advisor read and the new fields (D-12).
+- `src/lib/api/proposals/submit.ts` §146 — the second construction. Same change. Missing it
+  is the likeliest silent gap in this phase.
+- `src/lib/i18n/dictionaries.ts` — a large batch of new `pdf.*` FR/EN pairs; also the
+  disposition of the keys D-02 and D-06 orphan (§489-491 and §1804 are the
+  `pdf.partnerType.*` pairs).
+- `.planning/ROADMAP.md` and `.planning/REQUIREMENTS.md` — reconciled in place by D-03.
+
+**Read-only — reference only. This phase adds no migration and modifies no schema;**
+`src/db/schema.ts` is listed so the planner can see the column shapes Phase 42 already
+landed and applied via `0011_phase42_captured_data`.
 - `src/lib/pdf/render.ts` §16-34, §50-104 — the determinism contract and `computeContentHash`.
   Read before writing any determinism assertion (D-16).
-- `src/lib/api/proposals/finalize-wizard.ts` §220-227 — the first `pdfData` construction.
-- `src/lib/api/proposals/submit.ts` §146 — the second. Both need D-12's new fields.
-- `src/lib/db/queries/advisor.ts` — `getAdvisor()`, `ADVISOR_ROW_ID`, and the header
-  comment explaining why the row is read live and never snapshotted (D-13).
+- `src/lib/db/queries/advisor.ts` — `getAdvisor()`, `ADVISOR_ROW_ID`, and the header comment
+  explaining why the row is read live and never snapshotted (D-13). Called, not changed.
 - `src/db/schema.ts` §189-228 — `leaseticAdvisor` and its four nullable columns;
   §71-81 — `companyTelephone` and `telephone`.
 - `src/lib/calc/schema.ts` §184, §195, §224-227 — `partnerTel`, `clientSiret`, and the
   SIRET/SIREN prefix refine.
-- `src/lib/i18n/dictionaries.ts` §489-491 and §1804 — the `pdf.partnerType.*` pairs D-02
-  orphans; the `pdf.*` namespace this phase extends heavily.
 
 ### The gates that must stay green
 - `tests/admin-09-grep-contracts.test.ts` — the 20 commission-invisibility gates.
