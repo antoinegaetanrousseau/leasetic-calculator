@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: true
 preset: base-maia (neutral base color, hugeicons icon library) — pre-existing project state (components.json), not initialized by this session
 created: 2026-09-08
+revised: 2026-09-08 — addressed gsd-ui-checker BLOCK (relabel-only premise for company phone, typography size-count overrun) plus four non-blocking recommendations
 ---
 
 # Phase 42 — UI Design Contract
@@ -38,7 +39,8 @@ open (copy, layout placement, component choice, states).**
 
 This phase installs **no new shadcn/ReUI components**. Every primitive it needs
 (`Field`/`FieldGroup`/`FieldLabel`/`FieldError`/`FieldSeparator`, `Input`, `InputGroup*`,
-`Dialog*`, `Button`, `SectionTitle`) already exists in the tree and is reused verbatim.
+`Dialog*`, `Button`, `SectionTitle`, `PageHero`) already exists in the tree and is reused
+verbatim.
 
 ---
 
@@ -64,20 +66,51 @@ Exceptions: none. This phase introduces no sub-4px or non-multiple-of-4 literal.
 ## Typography
 
 Per **UIC-02** (project-wide ratified exception: four weights — 400/500/600/700, not the
-generic two-weight default). Measured from the exact primitives this phase's surfaces reuse:
+generic two-weight default). A phase surface's **working-content** type scale (body copy,
+labels, controls, dialog copy, inline errors, helper/notice text) stays capped at **4** distinct
+font sizes — this file has never ratified a size-*count* exception the way UIC-02 ratifies a
+weight-count exception, so this table does not assert one unilaterally. `PageHero`'s two sizes
+are cited separately below via **UIC-12**, not folded into this cap.
 
 | Role | Size | Weight | Line Height | Source |
 |------|------|--------|-------------|--------|
-| Body / input value | 14px (`md:text-sm`) | 400 | ~1.5 (browser default) | `input.tsx` |
-| Field label | 14px (`text-sm`) | 500 (`font-medium`) | `leading-none` (1.0, single-line label) | `label.tsx` / `FieldLabel` |
-| Section eyebrow | 11.8px | 700 (`font-bold`) | 1.2, `tracking-[0.06em]` uppercase | `SectionTitle.tsx` |
-| Read-only static value (fonction, email) | 14.5px | 400 | 1.4 | `ParametresForm.tsx`'s existing email `<p>` treatment — the fonction display reuses this exact class string |
-| Dialog title | 16px (`text-base`) | 500 (`font-medium`) | `leading-none` | `dialog.tsx` `DialogTitle` |
+| Body / input value / read-only value | 14px (`text-sm`) | 400 | ~1.5 | `input.tsx`; also the fonction read-only `<p>` (D-14) — see note below, this is `text-sm`, **not** the email row's bespoke 14.5px class |
+| Field label | 14px (`text-sm`) | 500 (`font-medium`) | `leading-none` (single-line label) | `label.tsx` / `FieldLabel` |
+| Section eyebrow | 11.8px | 700 (`font-bold`) | 1.2, `tracking-[0.06em]` uppercase | `SectionTitle.tsx` — identical value to `PageHero`'s own eyebrow (`text-[11.8px] font-bold`), so the two fold into one bucket rather than adding a fifth |
+| Dialog title | 16px (`text-base`) | 500 (`font-medium`) | `leading-none` | `dialog.tsx` `DialogTitle` — D-18's finalize dialog |
 | Dialog body | 14px (`text-sm`) | 400 | 1.5 | `dialog.tsx` `DialogDescription` |
-| Helper / notice text | 12–13px | 400 | 1.4 | `ParametresForm.tsx`'s existing readonly-notice and session-notice paragraphs |
+| Helper / notice text | 12px (`text-[12px]`) | 400 | 1.4 | `ParametresForm.tsx`'s existing email readonly-notice class — the new fonction `readonly.notice` paragraph mirrors this exact literal. (The page also has a pre-existing, unrelated 13px session-notice paragraph elsewhere; this phase does not touch it and it is not part of this table.) |
 | Inline field error | 14px (`text-sm`) | 400 | 1.4 | `FieldError` |
 
-No new font size or weight is introduced. Every value above already ships on the surfaces this
+**Working-content size count: 4** — 14px, 11.8px, 16px, 12px. Cap satisfied.
+
+**Correction from the previous draft — the fonction field does not reuse the email row's
+`text-[14.5px]`.** An earlier version of this contract had the new fonction `<p>` copy the
+email row's exact class string verbatim, including its bespoke 14.5px size — that pushed this
+table to 5 working-content sizes with no ratified exception covering a fifth. Fixed: the
+fonction `<p>` reuses the email row's **box** treatment only
+(`rounded-xl border border-border bg-[var(--hover-overlay)] px-3 py-2.5 text-ink`) and sets its
+text at `text-sm` (14px), folding into the Body/input-value bucket above. The email row itself
+is unchanged (out of this phase's scope, pre-existing 14.5px drift this phase does not need to
+account for).
+
+**`PageHero` — cited via UIC-12, not counted against the working-content cap.** The new admin
+advisor page (§ New field labels, item 4) is the one wholly new page this phase adds, and it
+renders `PageHero` (title + subtitle) above its form card — the previous draft of this table
+omitted it entirely. `PageHero.tsx` hard-codes two sizes at the primitive level:
+
+| Role | Size | Weight | Line Height | Source |
+|------|------|--------|-------------|--------|
+| `PageHero` title | 30px (`text-3xl`) | 700 (`font-bold`) | `leading-tight` | `PageHero.tsx:29-34` |
+| `PageHero` subtitle | 14.5px (`text-[14.5px]`) | 400 (`font-normal`) | `leading-relaxed` | `PageHero.tsx:35-42` |
+
+Per **UIC-12** (`.planning/codebase/UI-CONVENTIONS.md`), these two sizes are a ratified,
+project-wide exception, cited rather than re-argued here — `PageHero` has rendered unmodified
+on every authed page since Phase 16, this phase does not edit it, and it only consumes it for
+the first time inside this document's scope. (`PageHero`'s eyebrow, when used, is 11.8px/700 —
+the same value as `SectionTitle`'s eyebrow above, so it costs nothing new either way.)
+
+No other new font size is introduced. Every value above already ships on the surfaces this
 phase touches.
 
 ---
@@ -110,8 +143,9 @@ elements"). Derived mechanically per the file's own method: `app/globals.css` al
    `var(--ring)` = accent, per the shared `input.tsx` base class. This is chrome, not a
    per-surface choice; do not add a second focus treatment.
 5. `.btn-green` primary submit CTAs — "Enregistrer les modifications" (`/parametres`),
-   "Envoyer l'invitation" (admin partner form), and the new advisor page's "Enregistrer" — are
-   accent. Every `.btn-out` / `Button variant="outline"` (Annuler, dialog dismiss) is **not**.
+   "Envoyer l'invitation" (admin partner form), and the new advisor page's "Enregistrer le
+   profil" — are accent. Every `.btn-out` / `Button variant="outline"` (Annuler, dialog dismiss)
+   is **not**.
 6. The new finalization dialog's primary CTA ("Aller à Paramètres" / "Go to settings") uses
    shadcn `Button` default variant, which resolves to `bg-primary` — accent. Its dismiss action
    uses `variant="outline"` — not accent.
@@ -130,9 +164,15 @@ Nothing else on these four surfaces carries the accent. Required-field asterisks
 | Wizard step 1 → 2 | "Suivant" (existing `WizardActionBar`, unchanged) | "Next" |
 | `/parametres` save | "Enregistrer les modifications" (existing) | "Save changes" |
 | Admin partner form submit | "Envoyer l'invitation →" (existing) | "Send invitation →" |
-| **New** — advisor settings page save | "Enregistrer" | "Save" |
+| **New** — advisor settings page save | "Enregistrer le profil" | "Save advisor profile" |
 | **New** — finalize dialog primary | "Aller à Paramètres" | "Go to settings" |
 | **New** — finalize dialog dismiss | "Fermer" | "Close" |
+
+**Why not the bare "Enregistrer" / "Save" from the earlier draft.** Every other CTA this phase
+touches or sits beside names its object ("les modifications", "l'invitation"). A bare verb reads
+as inconsistent immediately next to those. "Enregistrer le profil" / "Save advisor profile"
+matches the pattern and disambiguates which "profile" is being saved on a page that otherwise
+only says "advisor" in its `PageHero` title.
 
 ### Empty state
 
@@ -180,14 +220,15 @@ share its dirty-tracking and the existing `parametres.toast.identity.saved` /
 Layout: téléphone is a new **editable** row placed directly beneath the existing Prénom/Nom
 2-column row (full-width `Field`, matching the email row's width). Fonction is a new
 **read-only** row placed **beside the existing read-only email row** (per the required-reading
-brief) — render it as a second full-width `Field` immediately after email, using the *exact*
-static-`<p>` markup class string the email row already uses
-(`m-0 rounded-xl border border-border bg-[var(--hover-overlay)] px-3 py-2.5 text-[14.5px]
-text-ink`) plus the `readonly.notice` helper paragraph beneath it, mirroring
-`parametres.identity.email.readonly.notice`'s treatment exactly. **Value is the raw
-`partnerType` string** ("Agent" / "Commercial" / "Partenaire") — **do not translate it here**;
-D-16's FR/EN label pair is scoped to the PDF only, and translating it on this surface would be
-new, undecided scope (see Deferred in `42-CONTEXT.md`).
+brief) — render it as a second full-width `Field` immediately after email, using the email row's
+**box** class (`m-0 rounded-xl border border-border bg-[var(--hover-overlay)] px-3 py-2.5
+text-ink`) with its text set at `text-sm` (14px) — **not** the email row's own `text-[14.5px]`;
+see § Typography for why. Pair it with the `readonly.notice` helper paragraph beneath it
+(`text-[12px] text-muted-foreground`), mirroring `parametres.identity.email.readonly.notice`'s
+treatment exactly. **Value is the raw `partnerType` string** ("Agent" / "Commercial" /
+"Partenaire") — **do not translate it here**; D-16's FR/EN label pair is scoped to the PDF only,
+and translating it on this surface would be new, undecided scope (see Deferred in
+`42-CONTEXT.md`).
 
 Téléphone is **optional** on this form (no asterisk) — PROF-01 lets a partner set it, it does
 not require it be set before the form itself can save; **PROF-02**'s enforcement lives
@@ -196,20 +237,42 @@ exclusively at finalize (D-17), not here.
 **3. Admin partner create/edit form (`CreatePartnerForm.tsx` + `src/lib/admin/schemas.ts`, D-13/D-19)**
 
 The form already has ONE `phone` field, placed in "INFORMATIONS SOCIÉTÉ" beside `companyName`
-and `siret` — that placement already matches where D-13 wants the **company** telephone to
-live. This phase does two things to this surface:
+and `siret` — that placement already matches where D-13 wants the **company** telephone to live
+*visually*. **It is not, today, wired to persist anywhere queryable — this is not a pure relabel.**
+Verified against the code:
 
-a. **Relabel the existing `phone` field** (Section 2, company section) to disambiguate it now
-   that a second phone field exists on the same form:
+- `src/lib/admin/schemas.ts:88-91` — the field is **required**
+  (`.min(1, 'error.field.required')`), not nullable.
+- `src/db/schema.ts:44-76` — the `users` table has **no `phone` column at all**. (The `phone`
+  columns elsewhere in the schema belong to `companies`/`contacts`, not `users`.)
+- `src/lib/admin/actions.ts:277-311, 351-358, 595-615` — `phone` is threaded into
+  `adminCreateInvitation` alongside `companyName`/`siret`, but only `buildProfilePayload()`
+  reads it, and that function's sole destination is `audit_log.payload.profile` — a write-only
+  compliance trail, never read back anywhere.
+
+So today the field captures data that goes nowhere real. This phase does **three** things to
+this surface, not two:
+
+a. **Add the backing column and a real write/read path.** A new nullable column on `users`
+   (naming/typing is Claude's Discretion per `42-CONTEXT.md`) written by the admin form's
+   submit action — in addition to, or instead of, the existing audit_log trail — and read back
+   wherever D-11's session-hydration reads `companyName` (`app/(authed)/proposals/new/parametres/page.tsx:97-107`).
+   Loosen `schemas.ts`'s `.min(1, 'error.field.required')` to optional, matching D-13's nullable
+   column. This is schema/backend work, not a visual change — flagged here because the
+   Copywriting Contract below previously assumed the persistence already existed.
+b. **Relabel the field** (Section 2, company section) to disambiguate it now that a second phone
+   field exists on the same form:
 
    | Key | Old FR | New FR | Old EN | New EN |
    |-----|--------|--------|--------|--------|
    | `partners.new.field.phone` | Téléphone | Téléphone (société) | Phone | Company phone |
 
-   No placeholder change needed. This is the company telephone (D-13) — admin-set, nullable,
-   never blocks finalization.
-
-b. **Add a new field** to Section 1 ("INFORMATIONS PERSONNELLES"), placed directly after
+   No placeholder change, and no change to the field's on-page validation shape — it keeps its
+   existing permissive regex (`/^[\d\s+()-]{6,20}$/`, see Component Inventory). This *is* the
+   company telephone (D-13) — admin-set, and once (a) ships, nullable and never blocking
+   finalization. The column ships nullable and every existing partner account has none — accurate,
+   because nothing was ever persisted in the first place.
+c. **Add a new field** to Section 1 ("INFORMATIONS PERSONNELLES"), placed directly after
    `email` and before `partnerType` — the partner's own téléphone (D-19):
 
    | Key | FR | EN |
@@ -217,12 +280,12 @@ b. **Add a new field** to Section 1 ("INFORMATIONS PERSONNELLES"), placed direct
    | `partners.new.field.telephone` | Téléphone | Phone |
    | `partners.new.field.telephone.placeholder` | 06 00 00 00 00 | 06 00 00 00 00 |
 
-   Neither new/relabeled phone field carries a required asterisk — both columns ship nullable
-   (D-13) and D-19 explicitly frames this as admins *proactively* filling gaps, not a hard gate
-   on partner creation. If this phase adds a partner **edit** surface (none exists in the
-   codebase today — only `partners/new/CreatePartnerForm.tsx` — a create form), it must carry
-   the identical section placement, labels and optionality; do not invent different copy or
-   layout for an edit variant.
+   Neither field (b or c) carries a required asterisk — both columns ship nullable (D-13/D-19)
+   and D-19 explicitly frames this as admins *proactively* filling gaps, not a hard gate on
+   partner creation. If this phase adds a partner **edit** surface (none exists in the codebase
+   today — only `partners/new/CreatePartnerForm.tsx`, a create form), it must carry the identical
+   section placement, labels and optionality; do not invent different copy or layout for an edit
+   variant.
 
 **4. New admin advisor-identity settings surface (D-08, D-07, D-09)**
 
@@ -236,8 +299,11 @@ one sibling action-footer `.card`, `PageHero` above):
 - `PageHero` title/subtitle: explains this is the single contact shown on every proposal PDF.
 - One `.card` with a single `SectionTitle` eyebrow (`accent="gd"`), containing 4 required
   fields in this order: Nom, Fonction, Téléphone, Email.
-- Sibling action-footer `.card` (Annuler / Enregistrer), same visual treatment as
+- Sibling action-footer `.card` (Annuler / Enregistrer le profil), same visual treatment as
   `CreatePartnerForm.tsx`'s action row.
+
+**Focal point:** the four required fields inside the single card. This page has exactly one
+job — everything else (`PageHero`, the action-footer) is supporting chrome around that one form.
 
 | Key | FR | EN |
 |-----|----|----|
@@ -250,7 +316,7 @@ one sibling action-footer `.card`, `PageHero` above):
 | `admin.advisor.field.telephone` | Téléphone | Phone |
 | `admin.advisor.field.email` | Email | Email |
 | `admin.advisor.action.cancel` | Annuler | Cancel |
-| `admin.advisor.action.save` | Enregistrer | Save |
+| `admin.advisor.action.save` | Enregistrer le profil | Save advisor profile |
 | `admin.advisor.action.save.spinner` | Enregistrement… | Saving… |
 | `admin.advisor.toast.saved` | Conseiller mis à jour. | Advisor updated. |
 | `admin.advisor.toast.error` | Une erreur est survenue. Réessayez. | Something went wrong. Try again. |
@@ -261,6 +327,10 @@ partial state. Reuse `PhoneInput` for Téléphone and a plain `Input type="email
 (matching `clientEmail`'s pattern, not `PhoneInput`/`SirenInput`'s Controller-bound shape, since
 neither format-transform is needed for a free-text name/role).
 
+`admin.advisor.toast.error` is a deliberate reuse of the app-wide generic-fallback pattern
+(matches `partners.new.toast.error`), not an unconsidered default — no new fallback shape is
+being introduced here.
+
 **5. Finalization profile-completeness dialog (D-17/D-18)**
 
 New shadcn `Dialog` (never `AlertDialog` — this blocks progress but is not a destructive
@@ -268,6 +338,10 @@ confirmation), rendered from `FinalizeButton.tsx` when the finalize POST returns
 dedicated bounded code — spec names it `MissingPartnerTelephone` — instead of falling into the
 existing generic-toast catch-all. This is the **one** exception `FinalizeButton` must learn; every
 other non-OK response keeps today's generic `wizard.toast.finalize.error` toast.
+
+**Focal point:** the body copy naming the missing téléphone field, and the primary "Aller à
+Paramètres" action beside it. The dismiss action is secondary chrome — it closes the dialog and
+changes nothing.
 
 | Key | FR | EN |
 |-----|----|----|
@@ -304,11 +378,12 @@ from the existing generic `ValidationFailed`), added to `SAFE_ERROR_CODES`.
 | Component | Source | Used for |
 |-----------|--------|----------|
 | `Field` / `FieldGroup` / `FieldLabel` / `FieldError` / `FieldSeparator` | `@/components/ui/field` | Every new field on all four surfaces — no new form primitive |
-| `Input` | `@/components/ui/input` | Advisor Nom/Email, admin téléphone fields (plain `type="tel"`, matching `CreatePartnerForm.tsx`'s existing phone-field precedent for permissive/international numbers) |
+| `Input` | `@/components/ui/input` | Advisor Nom/Email; **admin company téléphone** (D-13, Section 2, `CreatePartnerForm.tsx`'s existing/relabeled field) — plain `type="tel"`, keeps its existing permissive regex `/^[\d\s+()-]{6,20}$/` from `admin/schemas.ts`, now optional/nullable per § New field labels item 3a. Not Controller-bound, no auto-format. |
 | `InputGroup` / `InputGroupAddon` / `InputGroupInput` / `InputGroupButton` | `@/components/ui/input-group` | Not required by this phase's new fields (no show/hide affordance needed) — listed for completeness since `/parametres` already uses it elsewhere on the same page |
 | **New:** `SiretInput` | `src/components/proposal/SiretInput.tsx` (new file, mirrors `SirenInput.tsx`/`PhoneInput.tsx`) | Wizard step-1 SIRET field — format `XXX XXX XXX XXXXX` (3-3-3-5 grouping), `maxLength=17`, digits-only storage via a `normalizeSiren`-style helper (D-04 precedent) |
-| `PhoneInput` | `src/components/proposal/PhoneInput.tsx` | `/parametres` téléphone, admin partner-form téléphone (Section 1 new field), advisor page téléphone |
+| `PhoneInput` | `src/components/proposal/PhoneInput.tsx` | `/parametres` téléphone (D-14/D-20), **admin partner-form personal téléphone** (D-19, Section 1, the genuinely new field), advisor page téléphone (D-08). All three are Controller-bound and auto-format to a 10-digit FR number, refining on `optionalPhoneSchema`'s (`src/lib/calc/schema.ts`) stripped-digit rule per Claude's Discretion in `42-CONTEXT.md`. This is the field this row governs — **not** the admin company téléphone, which stays on the plain `Input` row above and follows the older, looser regex. The two rules disagree on purpose: one is a fresh capture this phase adds, the other is an existing field kept as-is while its persistence is fixed (§ New field labels item 3a). |
 | `SectionTitle` | `@/components/ui/SectionTitle` | Advisor page's single section eyebrow (`accent="gd"`) |
+| `PageHero` | `@/components/ui/PageHero` | Advisor page's title/subtitle — see § Typography for its two cited (UIC-12) fixed sizes |
 | `Dialog` / `DialogContent` / `DialogHeader` / `DialogTitle` / `DialogDescription` / `DialogFooter` | `@/components/ui/dialog` | D-18's finalization gate — per **UIC-06**, new modal interactions use the real shadcn `Dialog`, never a hand-rolled backdrop |
 | `Button` | `@/components/ui/button` | Dialog's two actions (`variant="outline"` dismiss, default accent primary) |
 | `.btn-green` / `.btn-out` | `app/globals.css` (existing hand-rolled classes) | Advisor page's action-footer card, matching `CreatePartnerForm.tsx`'s and `ParametresForm.tsx`'s existing footer-card convention exactly — **not** shadcn `Button`, to stay visually identical to the two sibling admin/partner forms this new page sits beside |
@@ -333,6 +408,10 @@ from the existing generic `ValidationFailed`), added to `SAFE_ERROR_CODES`.
 - **Admin advisor page save** is a singleton upsert, not a create — the "Annuler" action
   resets the form to last-saved values (mirrors `ParametresForm.tsx`'s `handleCancel`), it does
   not navigate away (there is nothing to navigate back to; this is the page's only content).
+- **Admin company téléphone persistence (D-13, § New field labels item 3a).** Until the new
+  column and write/read path ship, the relabeled field would silently continue writing only to
+  `audit_log` — the plan must not treat the copy change alone as satisfying D-13. This is a
+  backend/schema dependency this UI contract flags, not one it resolves.
 - **Accessibility (project gate, not optional).** Every inline error on new fields uses
   `<FieldError role="alert">` (already the `FieldError` primitive's default — see `field.tsx`
   line 217). Any icon-only control this phase might introduce (none currently planned) must
@@ -365,4 +444,7 @@ from primitives already in the tree) rather than pulling any new registry block.
 - [ ] Dimension 5 Spacing: PASS
 - [ ] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** pending — revised 2026-09-08 to address BLOCK (relabel-only premise for D-13
+company phone; typography size-count overrun) and four non-blocking recommendations
+(advisor CTA copy, focal-point statements, Component Inventory phone-field disambiguation,
+generic-toast note). Awaiting re-verification.

@@ -429,6 +429,36 @@ universally applicable across every selector this rule governs.
 
 ---
 
+## UIC-12 — Typography: `PageHero` contributes two fixed primitive sizes outside any surface's working-content size cap
+
+**Status:** Ratified exception, project-wide — follows UIC-02's precedent
+**Ratified:** 2026-09-08 (Phase 42 UI-SPEC revision, resolving a gsd-ui-checker BLOCK)
+**Recorded in:** `42-UI-SPEC.md` § Typography
+
+**Rule.** A phase surface's working-content type scale (body copy, labels, controls, dialog
+copy, inline errors, helper/notice text) stays capped at 4 distinct font sizes, per the generic
+GSD design-review default — this file has never ratified a size-count exception the way UIC-02
+ratified a weight-count exception. **`PageHero` is the one named departure.** Its title
+(`text-3xl font-bold`, 30px/700) and subtitle (`text-[14.5px] font-normal leading-relaxed`,
+14.5px/400) are hard-coded inside the primitive itself (`src/components/ui/PageHero.tsx`), not a
+per-call-site choice, and `PageHero` has rendered unmodified on every authed page since Phase 16.
+A surface that consumes `PageHero` cites these two sizes separately from its own 4-size
+working-content budget; it does not count them against that budget, and it does not need to
+re-argue the exception the way an earlier draft of `42-UI-SPEC.md` tried to when it folded a
+bespoke 14.5px "read-only value" size into its own table instead of citing this rule.
+
+**Rationale.** Same reasoning UIC-02 used for the fourth font weight: `PageHero`'s two sizes are
+already loaded, already in broad use, and fixed at the primitive layer. Requiring every consuming
+surface to either avoid `PageHero` or re-litigate its sizes inside a 4-size cap would mean editing
+a shipped, working primitive to satisfy a generic threshold, not fixing a defect.
+
+**How to apply.** If a surface's own new/edited content genuinely needs a fifth *working-content*
+size beyond `PageHero`'s two cited sizes, that is a real cap violation — consolidate it, the way
+UIC-02 would not excuse a fifth *weight*. Do not use this rule as cover for an unrelated bespoke
+size; it names `PageHero`'s two specific values only.
+
+---
+
 ## Plan-authoring note: grep-based acceptance criteria measure prose too
 
 An acceptance criterion of the shape `grep -c "someCall(" src/foo.ts` returns a
@@ -554,6 +584,8 @@ block wholesale:
 | `src/components/ui/icons.tsx` | UIC-07 (two-tier vocabulary) |
 | `.planning/phases/31.1-app-shell-refresh/31.1-UI-SPEC.md` | UIC-04 revision (D-01/D-02/D-03), UIC-03 dark addendum (D-13), OPEN-A/OPEN-C closure |
 | `.planning/phases/31.1-app-shell-refresh/31.1-CONTEXT.md` | D-01…D-13 decision record for the app-shell-refresh phase |
+| `.planning/phases/42-captured-data-fields-advisor-profile/42-UI-SPEC.md` | UIC-12 (origin) |
+| `src/components/ui/PageHero.tsx` | UIC-12 (fixed title/subtitle sizes) |
 
 Phase UI-SPECs remain the historical record of each phase's own contract. This file records only
 what was ratified or established as applying **beyond** the phase that first wrote it down.
