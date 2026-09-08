@@ -771,7 +771,10 @@ Plans:
   2. No proposal PDF renders a missing-glyph/tofu character or throws a font-registration error.
   3. The Inter and Inter Tight TTF files are committed into the repo as self-hosted assets (not remote-linked) — acquired from the design bundle's source handoff, since only the token CSS and SVGs were vendored into `.planning/assets/v1.9-quote-design/`.
   4. The PDF's visual design, palette and content stay exactly as they are today — this phase touches font registration only — and the byte-determinism fixture is regenerated to reflect the font swap so CI stays green.
-**Plans:** TBD
+**Plans:** 3 plans (2 waves)
+- [ ] 41-01-PLAN.md — Reconcile ROADMAP criteria 1/3 and REQUIREMENTS DOC-09 with the family-only scope (D-02, D-04)
+- [ ] 41-02-PLAN.md — Acquire SHA-256-pinned Inter statics, register them, retire Plus Jakarta Sans, invert the guard, regenerate the fixture
+- [ ] 41-03-PLAN.md — Glyph-coverage + distinct-embedded-faces proof, full gate, human visual pass (D-09, D-10, D-11)
 
 ### Phase 42: Captured Data — Fields & Advisor Profile
 
