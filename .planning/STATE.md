@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T20:18:56.645Z"
+last_updated: "2026-09-08T20:49:39.541Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 2
   total_plans: 21
-  completed_plans: 17
+  completed_plans: 18
   percent: 8
 ---
 
@@ -23,12 +23,12 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 43 — New PDF Layout
+**Current focus:** Phase 43 — new-pdf-layout
 
 ## Current Position
 
-Phase: 43 (New PDF Layout) — EXECUTING
-Plan: 5 of 8
+Phase: 43 (new-pdf-layout) — EXECUTING
+Plan: 2 of 8
 Status: Ready to execute
 Last activity: 2026-09-08
 
@@ -533,6 +533,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 43 P01 | ~5min | 2 tasks | 3 files |
 | Phase 43 P02 | 14min | 2 tasks | 3 files |
 | Phase 43 P04 | 20min | 3 tasks | 14 files |
+| Phase 43 P05 | ~25min | 3 tasks | 5 files |
 
 ## Decisions
 
@@ -747,6 +748,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 43]: D-07 verdict: react-pdf 4.5.1 honours rotate(-90 cx cy); pre-applied rx/ry swap used anyway per plan framing (correct either way)
 - [Phase 43]: Rule 1 fix: style={{opacity}} on react-pdf Svg is a silent no-op (4.5.1); LeaseticIcon now passes opacity as a direct Svg attribute
 - [Phase 43]: Plan 43-04: emDash written as the — escape (not a pasted character); advisor row mapped as an explicit four-key literal, never spread; companyTelephone threaded opaquely from the session mirroring telephone; submit.ts's pre-existing commissionPct naming is a known, out-of-scope asymmetry with finalize-wizard.ts's ADMIN-09 grep isolation.
+- [Phase ?]: pdf.project.ref.prefix deleted in 43-05 alongside pdf.tagline/pdf.ref.label/pdf.section.project — the plan's grep-then-delete instruction found no surviving consumer
+- [Phase ?]: Ledger comments naming deleted dictionary keys literally must avoid the literal dotted key string — the plan's repo-wide grep gate checks comments too, not just consumers
 
 ### Blockers
 
