@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T18:58:30.687Z"
-last_activity: 2026-09-08 -- Phase 43 planning complete
+last_updated: "2026-09-08T19:13:13.592Z"
+last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 2
   total_plans: 21
-  completed_plans: 13
+  completed_plans: 14
   percent: 8
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 42 — Captured Data — Fields & Advisor Profile
+**Current focus:** Phase 43 — New PDF Layout
 
 ## Current Position
 
-Phase: 42 (Captured Data — Fields & Advisor Profile) — COMPLETE
-Plan: 10 of 10
+Phase: 43 (New PDF Layout) — EXECUTING
+Plan: 2 of 8
 Status: Ready to execute
-Last activity: 2026-09-08 -- Phase 43 planning complete
+Last activity: 2026-09-08
 
 ## Deferred Items
 
@@ -530,6 +530,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 42 P09 | ~40min | 2 tasks | 3 files |
 | Phase 42 P10 | ~35min | 3 tasks | 7 files |
 | Phase 42 P04 | ~8min | 2 tasks | 6 files |
+| Phase 43 P01 | ~5min | 2 tasks | 3 files |
 
 ## Decisions
 
@@ -739,6 +740,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 42-10]: D-18 missing-telephone failure surfaces as a Dialog with a /parametres CTA; the legacy-draft failure surfaces as a toast + redirect to step 1 -- the two never share UI
 - [Phase 42-04]: additionalFields input:false is the structural framework-level block against client writes for companyTelephone (D-13); input:true telephone validated client-side via optionalPhoneSchema before authClient.updateUser
 - [Phase 42-04]: Migration gate covering only the production Neon branch is insufficient once additionalFields are involved — every branch in use (main, development, preview) needs the migration before code registering new columns is exercised against it; development was unmigrated and broke localhost login post-deploy, fixed via DB Migrate run 34250717059; preview remains unmigrated, flagged for Phases 43/44
+- [Phase 43]: D-03 retraction executed: DOC-03's fonction-translation clause removed as a category error (users.partnerType FR/EN pairs applied to unrelated free-text leasetic_advisor.fonction column); D-04 restructure note preserved
+- [Phase 43]: Orphaned pdf.partnerType.* keys kept and annotated (not deleted) per Deferred Ideas -- partnerType translation on web surfaces is a live later decision; disposition executed by plan 43-03
 
 ### Blockers
 

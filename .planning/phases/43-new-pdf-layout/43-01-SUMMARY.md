@@ -36,7 +36,7 @@ key-decisions:
 patterns-established:
   - "Same three-object shape (pdfColors/pdfFontSizes/pdfPageMargins) extended, not restructured, when a design system swap lands mid-phase"
 
-requirements-completed: [DOC-01, DOC-03]
+requirements-completed: []  # DOC-01/DOC-03 listed in this plan's frontmatter mark relevance, not closure — ROADMAP.md assigns their actual satisfaction (rendered VOTRE CONTACT card + full layout matching the design) to plan 43-05, which "delete[s] the three keys it retires (DOC-01/02/03)". This plan only fixes DOC-03's text and lands the tokens 43-05 will consume; neither requirement's checkbox is ticked yet.
 
 # Metrics
 duration: ~5min
@@ -92,6 +92,7 @@ None - no external service configuration required.
 - `styles.ts` now carries every token plan 43-02 through 43-06 need to build the new render tree, with the legacy tokens still present so `document.tsx` continues to compile unchanged until 43-05/43-06 rewrite it.
 - `DOC-03` and the ROADMAP note are clean of the retracted clause, so no downstream plan implements against a contradicted requirement.
 - The `__pdf-fixtures__` byte-determinism suite is red as documented and expected — this is the accepted interval through 43-06; plan 43-07 regenerates it per D-16. No action needed from this plan.
+- `DOC-01` and `DOC-03` remain unchecked in `.planning/REQUIREMENTS.md` on purpose: this plan's frontmatter `requirements: [DOC-01, DOC-03]` marks relevance (it reconciles DOC-03's text and lands the tokens both requirements will render with), not closure. ROADMAP.md explicitly assigns their satisfaction to plan 43-05 ("delete[s] the three keys it retires (DOC-01/02/03)"), once the actual page frame, header, title and two cards render per the design.
 
 ## Self-Check: PASSED
 
