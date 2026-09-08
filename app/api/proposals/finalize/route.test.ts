@@ -113,6 +113,7 @@ describe('POST /api/proposals/finalize (D-16 atomic finalize)', () => {
       language: 'fr',
       partnerType: 'Partenaire',
       telephone: null,
+      companyTelephone: null,
     });
   });
 
@@ -168,6 +169,7 @@ describe('POST /api/proposals/finalize (D-16 atomic finalize)', () => {
       language: 'en',
       partnerType: 'Partenaire',
       telephone: null,
+      companyTelephone: null,
     });
   });
 
@@ -355,6 +357,30 @@ describe('Phase 42 — new bounded codes (D-05 / D-17 / D-18)', () => {
     expect(finalizeWizardMock).toHaveBeenCalledWith(
       expect.objectContaining({ telephone: null }),
     );
+  });
+
+  it('5d (Phase 43 D-12): finalizeWizard receives companyTelephone from session.user.companyTelephone verbatim', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'u-1', companyTelephone: '05 61 00 00 00' } },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await POST(makeReq({ draftId: 'd-1' }) as any);
+    expect(finalizeWizardMock).toHaveBeenCalledWith(
+      expect.objectContaining({ companyTelephone: '05 61 00 00 00' }),
+    );
+  });
+
+  it('5e (Phase 43 D-12): finalizeWizard receives companyTelephone: null when session.user.companyTelephone is absent/null/whitespace', async () => {
+    for (const value of [undefined, null, '   ']) {
+      requireUserMock.mockResolvedValue({
+        session: { user: { id: 'u-1', companyTelephone: value } },
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await POST(makeReq({ draftId: 'd-1' }) as any);
+      expect(finalizeWizardMock).toHaveBeenCalledWith(
+        expect.objectContaining({ companyTelephone: null }),
+      );
+    }
   });
 
   it('6: the response body key set for both new codes is exactly ["error"]', async () => {
