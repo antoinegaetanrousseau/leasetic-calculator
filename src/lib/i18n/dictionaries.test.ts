@@ -5,9 +5,9 @@ describe('i18n dictionary parity', () => {
   const frKeys = Object.keys(dictionaries.fr);
   const enKeys = Object.keys(dictionaries.en);
 
-  it('has at least 981 keys per language (raised in Phase 34 for the fiche-client / timeline / à-relancer namespaces)', () => {
-    expect(frKeys.length).toBeGreaterThanOrEqual(981);
-    expect(enKeys.length).toBeGreaterThanOrEqual(981);
+  it('has at least 1011 keys per language (raised in Phase 42 for the SIRET / /parametres telephone+fonction / admin advisor / finalize-dialog / legacy-draft-toast / PDF partnerType-label namespaces)', () => {
+    expect(frKeys.length).toBeGreaterThanOrEqual(1011);
+    expect(enKeys.length).toBeGreaterThanOrEqual(1011);
   });
 
   it('every FR key exists in EN', () => {
@@ -599,5 +599,38 @@ describe('Phase 34 fiche-client i18n delta (Plan 34-01)', () => {
     const fr = dictionaries.fr as Record<string, string>;
     expect(typeof fr['relationship.toast.error']).toBe('string');
     expect(typeof fr['clients.toast.error']).toBe('string');
+  });
+});
+
+describe('Phase 42 captured-data keys', () => {
+  // Use bracket access because dot-notation keys aren't valid identifiers.
+  const fr = dictionaries.fr as Record<string, string>;
+  const en = dictionaries.en as Record<string, string>;
+
+  it('error.field.siret.mismatch has the exact UI-SPEC FR/EN strings (D-02)', () => {
+    expect(fr['error.field.siret.mismatch']).toBe(
+      'Le SIRET doit commencer par les 9 chiffres du SIREN.'
+    );
+    expect(en['error.field.siret.mismatch']).toBe(
+      "The SIRET must start with the SIREN's 9 digits."
+    );
+  });
+
+  it('partners.new.field.phone is relabeled to disambiguate the company telephone (D-13)', () => {
+    expect(fr['partners.new.field.phone']).toBe('Téléphone (société)');
+    expect(en['partners.new.field.phone']).toBe('Company phone');
+  });
+
+  it('pdf.partnerType.* carries the PDF-only FR/EN label pairs (D-16)', () => {
+    expect(en['pdf.partnerType.Commercial']).toBe('Sales Representative');
+    expect(fr['pdf.partnerType.Agent']).toBe('Agent');
+    expect(en['pdf.partnerType.Agent']).toBe('Agent');
+    expect(fr['pdf.partnerType.Partenaire']).toBe('Partenaire');
+    expect(en['pdf.partnerType.Partenaire']).toBe('Partner');
+  });
+
+  it('admin.advisor.hero.title spells the brand Leasetic with no accent (D-08)', () => {
+    expect(fr['admin.advisor.hero.title']).toBe('Conseiller Leasetic');
+    expect(en['admin.advisor.hero.title']).toBe('Leasetic advisor');
   });
 });

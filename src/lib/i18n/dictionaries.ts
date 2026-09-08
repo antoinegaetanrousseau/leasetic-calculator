@@ -89,6 +89,9 @@ export const dictionaries = {
     'form.client.email.placeholder': 'prenom.nom@société.fr',
     'form.client.siren': 'SIREN',
     'form.client.siren.placeholder': '123 456 789',
+    // Phase 42 — client SIRET (D-01..D-05, UI-SPEC §New field labels item 1)
+    'form.client.siret': 'SIRET',
+    'form.client.siret.placeholder': '123 456 789 00012',
     // form interests
     'form.interests.section': 'Intérêts exprimés',
     'form.interests.intro': 'La société est intéressée par :',
@@ -366,6 +369,8 @@ export const dictionaries = {
     'error.field.siren.invalid': 'SIREN invalide (9 chiffres requis).',
     // Phase 14 — SIRET (14 digits) validation key, consumed by createPartnerFormSchema.
     'error.field.siret.invalid': 'SIRET invalide (14 chiffres requis).',
+    // Phase 42 — SIRET/SIREN cross-field refine (D-02).
+    'error.field.siret.mismatch': 'Le SIRET doit commencer par les 9 chiffres du SIREN.',
     // Tranche labels (Plan 07-01 tLabel contract — values from v10 lines 1205-1208;
     // U+202F narrow no-break space + U+2192 rightward arrow preserved)
     'form.tranche.t1': '25 001 € → 50 000 €',
@@ -477,6 +482,29 @@ export const dictionaries = {
     'pdf.loyer.on.demand': 'Sur demande',
     'pdf.validity.caption': "Proposition valable jusqu\u2019au {0} ({1} jours), sous réserve de l\u2019accord du comité des engagements de Leasetic. Document non contractuel.",
     'pdf.footer.left': 'N° {0} · Créée le {1}',
+
+    // Phase 42 — partnerType FR/EN label pairs, PDF-only per D-16. The admin and /parametres
+    // surfaces deliberately keep rendering the raw partnerType string (D-16 explicitly declines
+    // extending the translation there) — that inconsistency is a recorded Deferred item, not drift.
+    'pdf.partnerType.Agent': 'Agent',
+    'pdf.partnerType.Commercial': 'Commercial',
+    'pdf.partnerType.Partenaire': 'Partenaire',
+
+    // Phase 42 — admin advisor-identity settings page (D-07/D-08/D-09, UI-SPEC §New field labels item 4)
+    'admin.advisor.hero.title': 'Conseiller Leasetic',
+    'admin.advisor.hero.subtitle':
+      'Cette personne apparaît comme contact secondaire sur chaque proposition PDF générée, quel que soit le partenaire.',
+    'admin.advisor.section.identity': 'IDENTITÉ DU CONSEILLER',
+    'admin.advisor.field.name': 'Nom',
+    'admin.advisor.field.fonction': 'Fonction',
+    'admin.advisor.field.fonction.placeholder': 'Ex : Chargée de clientèle',
+    'admin.advisor.field.telephone': 'Téléphone',
+    'admin.advisor.field.email': 'Email',
+    'admin.advisor.action.cancel': 'Annuler',
+    'admin.advisor.action.save': 'Enregistrer le profil',
+    'admin.advisor.action.save.spinner': 'Enregistrement…',
+    'admin.advisor.toast.saved': 'Conseiller mis à jour.',
+    'admin.advisor.toast.error': 'Une erreur est survenue. Réessayez.',
 
     // ── Phase 9 — Admin Surface (UI-SPEC §9) ───────────────────────────────────
     // 49 new keys. Categories: home (6), coefficients page (~30), accounts page (~23).
@@ -719,6 +747,15 @@ export const dictionaries = {
     'wizard.toast.finalize.success': 'Proposition générée ✓',
     'wizard.toast.finalize.error': 'Erreur lors de la génération. Réessayez.',
     'wizard.toast.validation.errors': 'Veuillez corriger les erreurs dans le formulaire.',
+    // Phase 42 — finalization profile-completeness dialog (D-17/D-18, UI-SPEC §5)
+    'wizard.finalize.dialog.missingPhone.title': 'Coordonnées manquantes',
+    'wizard.finalize.dialog.missingPhone.body':
+      'Votre numéro de téléphone doit être renseigné avant de finaliser une proposition. Ajoutez-le dans vos paramètres.',
+    'wizard.finalize.dialog.missingPhone.cta': 'Aller à Paramètres',
+    'wizard.finalize.dialog.missingPhone.dismiss': 'Fermer',
+    // Phase 42 — legacy-draft finalize gap (D-05, UI-SPEC §6)
+    'wizard.finalize.toast.legacyMissingSiret':
+      "Ce brouillon a été créé avant l'ajout du SIRET. Complétez l'étape 1 pour finaliser.",
     // Extra: save-draft error toast (supports WizardActionBar onSaveDraft
     // catch branch — Plan 13-01 Task 2).
     'wizard.toast.draft.error': "Erreur lors de l'enregistrement. Réessayez.",
@@ -735,7 +772,8 @@ export const dictionaries = {
     'partners.new.field.email': 'Email',
     'partners.new.field.companyName': 'Société',
     'partners.new.field.siret': 'SIRET (optionnel)',
-    'partners.new.field.phone': 'Téléphone',
+    // Phase 42 — relabeled to disambiguate from the new personal téléphone field below (D-13).
+    'partners.new.field.phone': 'Téléphone (société)',
     'partners.new.field.message': "Message d'invitation",
     'partners.new.field.firstName.placeholder': 'ex: Marie',
     'partners.new.field.lastName.placeholder': 'ex: Dupont',
@@ -743,6 +781,9 @@ export const dictionaries = {
     'partners.new.field.companyName.placeholder': 'ex: Acme SAS',
     'partners.new.field.siret.placeholder': '14 chiffres',
     'partners.new.field.message.placeholder': 'Bonjour Marie, …',
+    // Phase 42 — the partner's own téléphone, admin-seedable (D-19, UI-SPEC §New field labels item 3c).
+    'partners.new.field.telephone': 'Téléphone',
+    'partners.new.field.telephone.placeholder': '06 00 00 00 00',
     'partners.new.message.counter': '{0}/1000',
     'partners.new.message.tooLong':
       'Le message ne peut pas dépasser 1000 caractères',
@@ -931,6 +972,11 @@ export const dictionaries = {
     'parametres.identity.email.placeholder': 'prenom.nom@leasetic.com',
     'parametres.identity.email.readonly.notice':
       'Pour changer votre adresse e-mail, contactez un administrateur.',
+    // Phase 42 — téléphone (editable) + fonction (read-only, derived from partnerType) (D-14/D-20, UI-SPEC §New field labels item 2)
+    'parametres.identity.telephone.label': 'Téléphone',
+    'parametres.identity.telephone.placeholder': '06 00 00 00 00',
+    'parametres.identity.fonction.label': 'Fonction',
+    'parametres.identity.fonction.readonly.notice': 'Défini par votre administrateur.',
     // Password row labels (D-07 rev 2 — Ancien + Nouveau, NO confirm field).
     'parametres.password.current.label': 'Ancien mot de passe',
     'parametres.password.current.placeholder': '••••••••',
@@ -1375,6 +1421,9 @@ export const dictionaries = {
     'form.client.email.placeholder': 'first.last@company.com',
     'form.client.siren': 'Company ID',
     'form.client.siren.placeholder': '123 456 789',
+    // Phase 42 — client SIRET (D-01..D-05, UI-SPEC §New field labels item 1)
+    'form.client.siret': 'Establishment ID',
+    'form.client.siret.placeholder': '123 456 789 00012',
     // form interests
     'form.interests.section': 'Stated interests',
     'form.interests.intro': 'The company is interested in:',
@@ -1647,6 +1696,8 @@ export const dictionaries = {
     'error.field.siren.invalid': 'Invalid SIREN (9 digits required).',
     // Phase 14 — SIRET (14 digits) validation key, consumed by createPartnerFormSchema.
     'error.field.siret.invalid': 'Invalid SIRET (14 digits required).',
+    // Phase 42 — SIRET/SIREN cross-field refine (D-02).
+    'error.field.siret.mismatch': "The SIRET must start with the SIREN's 9 digits.",
     // Tranche labels (Plan 07-01 tLabel contract — values from v10 lines 1205-1208 EN-localized)
     'form.tranche.t1': '25,001 € → 50,000 €',
     'form.tranche.t2': '50,001 € → 100,000 €',
@@ -1750,6 +1801,29 @@ export const dictionaries = {
     'pdf.loyer.on.demand': 'On request',
     'pdf.validity.caption': "Proposal valid until {0} ({1} days), subject to approval by Leas\u00e9tic's credit committee. Non-contractual document.",
     'pdf.footer.left': 'No. {0} \u00b7 Created on {1}',
+
+    // Phase 42 — partnerType FR/EN label pairs, PDF-only per D-16. The admin and /parametres
+    // surfaces deliberately keep rendering the raw partnerType string (D-16 explicitly declines
+    // extending the translation there) — that inconsistency is a recorded Deferred item, not drift.
+    'pdf.partnerType.Agent': 'Agent',
+    'pdf.partnerType.Commercial': 'Sales Representative',
+    'pdf.partnerType.Partenaire': 'Partner',
+
+    // Phase 42 — admin advisor-identity settings page (D-07/D-08/D-09, UI-SPEC §New field labels item 4)
+    'admin.advisor.hero.title': 'Leasetic advisor',
+    'admin.advisor.hero.subtitle':
+      'This person appears as the secondary contact on every generated proposal PDF, regardless of partner.',
+    'admin.advisor.section.identity': 'ADVISOR IDENTITY',
+    'admin.advisor.field.name': 'Name',
+    'admin.advisor.field.fonction': 'Role',
+    'admin.advisor.field.fonction.placeholder': 'e.g. Account manager',
+    'admin.advisor.field.telephone': 'Phone',
+    'admin.advisor.field.email': 'Email',
+    'admin.advisor.action.cancel': 'Cancel',
+    'admin.advisor.action.save': 'Save advisor profile',
+    'admin.advisor.action.save.spinner': 'Saving…',
+    'admin.advisor.toast.saved': 'Advisor updated.',
+    'admin.advisor.toast.error': 'Something went wrong. Try again.',
 
     // ── Phase 9 — Admin Surface (UI-SPEC §9) ───────────────────────────────────
     // EN counterparts of the 49 FR keys above. _EnHasAllFrKeys compile-time check
@@ -1973,6 +2047,15 @@ export const dictionaries = {
     'wizard.toast.validation.errors': 'Please correct the errors in the form.',
     // Extra: save-draft error toast.
     'wizard.toast.draft.error': 'Save failed. Try again.',
+    // Phase 42 — finalization profile-completeness dialog (D-17/D-18, UI-SPEC §5)
+    'wizard.finalize.dialog.missingPhone.title': 'Missing information',
+    'wizard.finalize.dialog.missingPhone.body':
+      'Your phone number must be set before you can finalize a proposal. Add it in your settings.',
+    'wizard.finalize.dialog.missingPhone.cta': 'Go to settings',
+    'wizard.finalize.dialog.missingPhone.dismiss': 'Close',
+    // Phase 42 — legacy-draft finalize gap (D-05, UI-SPEC §6)
+    'wizard.finalize.toast.legacyMissingSiret':
+      'This draft predates the SIRET field. Complete step 1 to finalize.',
 
     // ── Phase 14 — /partners/new route (UI-SPEC §6.3, ~30 keys) ──────────────
     'partners.new.title': 'Create a partner',
@@ -1986,7 +2069,8 @@ export const dictionaries = {
     'partners.new.field.email': 'Email',
     'partners.new.field.companyName': 'Company',
     'partners.new.field.siret': 'SIRET (optional)',
-    'partners.new.field.phone': 'Phone',
+    // Phase 42 — relabeled to disambiguate from the new personal telephone field below (D-13).
+    'partners.new.field.phone': 'Company phone',
     'partners.new.field.message': 'Invitation message',
     'partners.new.field.firstName.placeholder': 'e.g. Marie',
     'partners.new.field.lastName.placeholder': 'e.g. Dupont',
@@ -1994,6 +2078,9 @@ export const dictionaries = {
     'partners.new.field.companyName.placeholder': 'e.g. Acme Inc.',
     'partners.new.field.siret.placeholder': '14 digits',
     'partners.new.field.message.placeholder': 'Hi Marie, …',
+    // Phase 42 — the partner's own telephone, admin-seedable (D-19, UI-SPEC §New field labels item 3c).
+    'partners.new.field.telephone': 'Phone',
+    'partners.new.field.telephone.placeholder': '06 00 00 00 00',
     'partners.new.message.counter': '{0}/1000',
     'partners.new.message.tooLong': 'Message cannot exceed 1000 characters',
     'partners.new.cancel': '← Cancel',
@@ -2164,6 +2251,11 @@ export const dictionaries = {
     'parametres.identity.email.placeholder': 'firstname.lastname@leasetic.com',
     'parametres.identity.email.readonly.notice':
       'To change your email address, please contact an administrator.',
+    // Phase 42 — telephone (editable) + fonction (read-only, derived from partnerType) (D-14/D-20, UI-SPEC §New field labels item 2)
+    'parametres.identity.telephone.label': 'Phone',
+    'parametres.identity.telephone.placeholder': '06 00 00 00 00',
+    'parametres.identity.fonction.label': 'Role',
+    'parametres.identity.fonction.readonly.notice': 'Set by your administrator.',
     'parametres.password.current.label': 'Previous password',
     'parametres.password.current.placeholder': '••••••••',
     'parametres.password.new.label': 'New password',
