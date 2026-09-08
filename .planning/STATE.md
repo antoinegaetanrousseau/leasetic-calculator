@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T13:45:20.866Z"
+last_updated: "2026-09-08T13:59:51.272Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 1
   total_plans: 13
-  completed_plans: 7
+  completed_plans: 8
   percent: 4
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 42 (Captured Data — Fields & Advisor Profile) — EXECUTING
-Plan: 6 of 10
+Plan: 7 of 10
 Status: Ready to execute
 Last activity: 2026-09-08
 
@@ -524,6 +524,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 42 P03 | 35min | 2 tasks | 12 files |
 | Phase 42 P05 | 22min | 3 tasks | 6 files |
 | Phase 42 P06 | 15min | 2 tasks | 10 files |
+| Phase 42 P07 | ~10min | 3 tasks | 6 files |
 
 ## Decisions
 
@@ -723,6 +724,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 42]: adminCreateInvitation extends its single existing users UPDATE with conditional-spread companyTelephone/telephone writes rather than a second .update() call, preserving the single-UPDATE-per-invitation invariant the tests assert
 - [Phase 42]: hasTenDigits extracted from optionalPhoneSchema (calc/schema.ts) so advisorFormSchema.telephone reuses the exact stripped-10-digit rule instead of a new regex
 - [Phase 42]: AuditAction gained 'admin.advisor.update' and AuditTargetType gained 'leasetic_advisor' to type-check adminUpdateAdvisor's audit write
+- [Phase 42-07]: No breadcrumb on /{adminSegment}/advisor — matches the other top-level admin routes (coefficients, companies, lc-references), none of which link back to the admin home.
+- [Phase 42-07]: AdvisorForm calls adminUpdateAdvisor directly (no action prop) — this is a singleton settings screen, not a reusable create form.
 
 ### Blockers
 
