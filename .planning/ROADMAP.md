@@ -853,7 +853,18 @@ Plans:
   5. No commission figure, rate or derived value appears anywhere in the rendered PDF, in either language, for any partner type (the existing 20-gate `tests/admin-09-grep-contracts.test.ts` suite and `src/lib/pdf/no-commission.test.ts` stay green); and re-rendering the same proposal twice produces byte-identical PDFs, with the committed fixture at `__pdf-fixtures__/expected.sha256.txt` regenerated via `scripts/update-pdf-fixture.ts` to reflect the new design.
   6. Every text node uses the design's ten-step type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), replacing the five-role scale Phase 41 deliberately froze (`pdfFontSizes` at 8 / 9 / 10 / 22 / 32pt) — relocated here from Phase 41 by the D-02 amendment.
 
-**Plans:** TBD
+**Plans:** 8 plans in 6 waves
+
+Plans:
+- [ ] 43-01-PLAN.md — Reconcile DOC-03 upstream (D-03) and transcribe the design's ten-step scale, palette and mm page margins into `styles.ts`
+- [ ] 43-02-PLAN.md — Port the lockup and icon marks to `<Svg>` primitives, evidence-first, with the rotate-transform pre-applied (D-07)
+- [ ] 43-03-PLAN.md — Add the design's full FR/EN `pdf.*` copy and dispose of the keys the redesign orphans
+- [ ] 43-04-PLAN.md — Grow `ProposalDocumentProps` and thread the advisor + partner phone through BOTH render call sites; add the `emDash` formatter (D-12/D-13)
+- [ ] 43-05-PLAN.md — Rebuild the page frame, lockup header, 2px rule, 21pt title + pills and the two cards (DOC-01/02/03)
+- [ ] 43-06-PLAN.md — Rebuild the loyer hero, financial table, conditions, bottom-pinned acceptance block and legal footer; delete the interests block and the orphaned tokens (DOC-04..08)
+- [ ] 43-07-PLAN.md — Prove DOC-10/11/12/13 + FIELD-03 against rendered bytes, reconcile the Phase 41 four-faces proof, and regenerate the fixture baseline (D-16)
+- [ ] 43-08-PLAN.md — `pdf:preview` renderer + Antoine's human visual pass against the reference PNGs (D-15)
+
 **UI hint:** yes
 
 **Planning note:** `@react-pdf/renderer`'s SVG support is partial — the header lockup and footer icon mark may need a PNG or a hand-built vector rather than the source SVGs directly; confirm during planning rather than assuming direct `<Image>`/SVG support.
