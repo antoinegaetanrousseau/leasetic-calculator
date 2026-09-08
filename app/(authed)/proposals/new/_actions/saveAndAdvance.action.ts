@@ -10,8 +10,11 @@
  *   - D-21 edit-invalidates-downstream — deriveCompletedSteps trims the
  *     `_completedSteps` array when a step-1 field changes, then
  *     markStepCompleted re-adds the leaving step idempotently.
- *   - D-22 navigate-preserves-state — `_uiAccordionOpen` is carried forward
- *     from prev unchanged (cosmetic state never changes on advance).
+ *   - D-22 navigate-preserves-state — the write is a full replace of the
+ *     validated inputs plus `_completedSteps`. No cosmetic UI state is
+ *     carried forward any more: the "+ Plus de détails" accordion that owned
+ *     `_uiAccordionOpen` was retired, so a legacy draft still holding that
+ *     key sheds it on its next advance.
  *   - D-03 silent self-heal — updateDraft returns null on cross-user /
  *     soft-deleted / non-draft; we redirect to /proposals/new/parametres.
  *
@@ -82,7 +85,7 @@ export async function saveAndAdvanceAction(
     throw new Error('ValidationFailed');
   }
 
-  // Read prev inputs for D-21 invalidation + _uiAccordionOpen carry-forward.
+  // Read prev inputs for D-21 invalidation.
   // D-03 self-heal: getDraftById returns null for cross-user / non-draft /
   // soft-deleted → never proceed; redirect to /parametres which mints a fresh draft.
   const prev = await getDraftById(draftId, session.user.id);
@@ -94,7 +97,6 @@ export async function saveAndAdvanceAction(
   const completed = deriveCompletedSteps(prevInputs, nextInputs, fromStep);
   const merged: Record<string, unknown> = {
     ...enriched,
-    _uiAccordionOpen: prevInputs._uiAccordionOpen ?? false,
     _completedSteps: markStepCompleted(completed, fromStep),
   };
 

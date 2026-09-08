@@ -264,7 +264,7 @@ export default async function ParametresStep1Page({
     partnerRef: (inputs.partnerRef as string | undefined) ?? '',
     amountHT: (inputs.amountHT as string | undefined) ?? '',
     durationMonths: inputs.durationMonths as 36 | 48 | 60 | undefined,
-    // 5 accordion fields (D-06)
+    // 5 optional fields (D-06)
     clientRole: (inputs.clientRole as string | undefined) ?? '',
     clientSiren: (inputs.clientSiren as string | undefined) ?? '',
     projectDesc: (inputs.projectDesc as string | undefined) ?? '',

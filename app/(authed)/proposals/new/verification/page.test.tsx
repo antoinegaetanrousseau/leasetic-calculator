@@ -19,7 +19,7 @@
  *   - Test 8: ● CLIENT recap rows (clientCo / clientName / email / tel) +
  *     ← Modifier link to /parametres
  *   - Test 9: ● CLIENT recap INCLUDES clientRole and clientSiren ONLY when
- *     the accordion fields are filled (D-06 + D-25 hide-when-empty)
+ *     the optional fields are filled (D-06 + D-25 hide-when-empty)
  *   - Test 10: ● PROJET recap rows (partnerRef / amountHT / durationMonths)
  *     + ← Modifier → /parametres
  *   - Test 11: ● CALCUL recap rows (coefficient / tranche / commission with
@@ -324,7 +324,7 @@ describe('verification/page.tsx (D-01 / D-03 / D-14 / D-15 / D-16)', () => {
   });
 
   // ──────────────────────────────────────────────────────────────────────────
-  // Test 9 — accordion fields appear only when filled
+  // Test 9 — optional fields appear only when filled
   // ──────────────────────────────────────────────────────────────────────────
   it('Test 9: ● CLIENT recap includes clientRole ONLY when filled; SIREN always', async () => {
     // First sub-case: NOT filled → those labels absent.
@@ -340,7 +340,7 @@ describe('verification/page.tsx (D-01 / D-03 / D-14 / D-15 / D-16)', () => {
       cleanup();
     }
 
-    // Second sub-case: accordion fields filled → labels + values present.
+    // Second sub-case: optional fields filled → labels + values present.
     getDraftByIdMock.mockResolvedValue({
       id: 'd-1',
       userId: USER_ID,

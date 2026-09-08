@@ -3,7 +3,8 @@
 /**
  * WizardStep1Wiring — client adapter that bridges the outer
  * <ProposalFormProvider> RHF context with:
- *   1. <ParametresFormCard>     — the 2-section form card + accordion mount
+ *   1. <ParametresFormCard>     — the form card (2 required sections plus
+ *                                 INFORMATIONS COMPLÉMENTAIRES)
  *   2. <WizardActionBar>        — the bottom action bar (Save / Continuer)
  *
  * Why this layer exists (Approach B from PLAN.md Task 2 action):
@@ -14,10 +15,9 @@
  * a sibling — keeping the page itself a pure server component with no
  * client boundaries of its own.
  *
- * The accordion onToggle is wired to persistAccordionOpenAction with the
- * draftId bound. The primary CTA is a plain Link (kind:'link') per PLAN.md
- * Test 11 — server-side gating on Continuer is reserved for step 2's
- * saveAndAdvanceAction (plan 13-04).
+ * The primary CTA is a `kind:'action'` button: onContinue runs RHF
+ * validation over the step-1 required fields, then calls
+ * saveAndAdvanceAction, which redirects server-side to /calcul.
  */
 
 import { useTransition } from 'react';

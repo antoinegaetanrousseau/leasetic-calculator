@@ -46,7 +46,7 @@ describe('saveAsDraftAction (D-17, D-22, D-03)', () => {
     const inputs = {
       clientCo: 'X',
       _completedSteps: [1],
-      _uiAccordionOpen: true,
+      validityDays: 30,
     };
     await expect(saveAsDraftAction('d-1', inputs)).rejects.toThrow(/NEXT_REDIRECT:\//);
     expect(updateDraftMock).toHaveBeenCalledTimes(1);
@@ -55,7 +55,8 @@ describe('saveAsDraftAction (D-17, D-22, D-03)', () => {
     expect(userIdArg).toBe('u-1');
     // Payload preserves _completedSteps EXACTLY as the client provided it (no recompute).
     expect((payloadArg as { inputs: Record<string, unknown> }).inputs._completedSteps).toEqual([1]);
-    expect((payloadArg as { inputs: Record<string, unknown> }).inputs._uiAccordionOpen).toBe(true);
+    // Every other client-supplied key rides along untouched too.
+    expect((payloadArg as { inputs: Record<string, unknown> }).inputs.validityDays).toBe(30);
   });
 
   it('Test 19: redirects to / on success', async () => {

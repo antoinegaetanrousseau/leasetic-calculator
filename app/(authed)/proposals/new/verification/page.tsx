@@ -196,7 +196,7 @@ export default async function VerificationStep3Page({ searchParams }: PageProps)
   // ──────────────────────────────────────────────────────────────────────────
   // RecapSection row builders.
   // ──────────────────────────────────────────────────────────────────────────
-  // ● CLIENT — D-25 hide-when-empty for the accordion fields (clientRole +
+  // ● CLIENT — D-25 hide-when-empty for the optional fields (clientRole +
   // clientSiren) per UI-SPEC §16 recommendation.
   const clientRows: Array<{ label: string; value: string }> = [
     { label: 'Nom du client', value: parsedData.clientCo },

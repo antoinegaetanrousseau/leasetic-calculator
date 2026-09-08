@@ -81,9 +81,12 @@ describe('saveAndAdvanceAction (D-01, D-03, D-21)', () => {
     expect(advanceCalls).toHaveLength(0);
   });
 
-  it('Test 13: happy path — updateDraft called with merged payload (inputs + _completedSteps + _uiAccordionOpen)', async () => {
+  it('Test 13: happy path — updateDraft called with merged payload (inputs + _completedSteps), shedding retired bookkeeping keys', async () => {
     getDraftByIdMock.mockResolvedValue({
       id: 'd-1',
+      // `_uiAccordionOpen` is a legacy key: the accordion that owned it was
+      // retired, so an old draft still carrying it must shed it here rather
+      // than have it copied forward forever.
       inputs: { _uiAccordionOpen: true, _completedSteps: [] },
     });
     updateDraftMock.mockResolvedValue({ id: 'd-1', inputs: { ...VALID_INPUTS } });
@@ -97,7 +100,7 @@ describe('saveAndAdvanceAction (D-01, D-03, D-21)', () => {
     expect(userIdArg).toBe('u-1');
     const merged = (payloadArg as { inputs: Record<string, unknown> }).inputs;
     expect(merged.clientCo).toBe('Acme Corp');
-    expect(merged._uiAccordionOpen).toBe(true); // preserved from prev
+    expect(merged).not.toHaveProperty('_uiAccordionOpen'); // shed, not carried
     expect(merged._completedSteps).toEqual([1]); // markStepCompleted(deriveCompletedSteps(...), 1)
   });
 

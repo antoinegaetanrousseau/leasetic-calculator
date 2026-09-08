@@ -271,8 +271,8 @@ describe('Phase 8 i18n delta', () => {
 
 // ── Phase 13 — 3-Step Proposal Wizard (Plan 13-01) ───────────────────────────
 //
-// New `wizard.*` namespace consumed by the 4 route-private wizard components
-// (WizardActionBar, PlusDeDetailsAccordion, PdfPreviewMock, RecapSection) and
+// New `wizard.*` namespace consumed by the route-private wizard components
+// (WizardActionBar, PdfPreviewMock, RecapSection) and
 // by the 3 wizard step routes (plans 13-03/04/05). The compile-time
 // `_EnHasAllFrKeys` guard in dictionaries.ts catches FR↔EN drift; this suite
 // adds runtime non-empty + exact-value assertions for the locked copy in
@@ -297,10 +297,6 @@ const phase13WizardKeys: DictKey[] = [
   // §6.3 Wizard field-label overrides (2)
   'wizard.field.client.co.label',
   'wizard.field.client.name.label',
-  // §6.4 Accordion trigger (3)
-  'wizard.accordion.trigger',
-  'wizard.accordion.aria.label.open',
-  'wizard.accordion.aria.label.close',
   // §6.5 Step-2 labels (10)
   'wizard.step2.hero.label',
   'wizard.step2.hero.sub',

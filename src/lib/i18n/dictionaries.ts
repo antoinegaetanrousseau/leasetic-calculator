@@ -666,9 +666,9 @@ export const dictionaries = {
     'login.privacy.label': 'Politique de confidentialité',
 
     // ── Phase 13 — 3-Step Proposal Wizard (Plan 13-01, locked in 13-UI-SPEC.md §6) ──
-    // ~45 new keys consumed by the 4 route-private wizard components
-    // (WizardActionBar, PlusDeDetailsAccordion, PdfPreviewMock, RecapSection)
-    // and the 3 wizard step routes (plans 13-03/04/05).
+    // ~45 new keys consumed by the route-private wizard components
+    // (WizardActionBar, PdfPreviewMock, RecapSection) and the 3 wizard step
+    // routes (plans 13-03/04/05).
     // §6.1 Page titles + subtitles
     'wizard.step1.title': 'Paramètres du projet',
     'wizard.step1.subtitle': 'Saisissez les informations du client et les détails du projet. Vous pourrez sauvegarder à tout moment et reprendre plus tard.',
@@ -693,10 +693,6 @@ export const dictionaries = {
     // wizard.field.* and form.client.co for backward compat per UI-SPEC §6.3)
     'wizard.field.client.co.label': 'Nom du client',
     'wizard.field.client.name.label': 'Personne de contact',
-    // §6.4 Accordion trigger
-    'wizard.accordion.trigger': '+ Plus de détails (facultatif)',
-    'wizard.accordion.aria.label.open': 'Afficher les détails supplémentaires',
-    'wizard.accordion.aria.label.close': 'Masquer les détails supplémentaires',
     // §6.5 Step-2 specific labels
     'wizard.step2.hero.label': 'LOYER MENSUEL',
     'wizard.step2.hero.sub': 'par mois pendant {0} mois',
@@ -2000,10 +1996,6 @@ export const dictionaries = {
     // §6.3 Wizard field-label overrides
     'wizard.field.client.co.label': 'Client name',
     'wizard.field.client.name.label': 'Contact person',
-    // §6.4 Accordion trigger
-    'wizard.accordion.trigger': '+ More details (optional)',
-    'wizard.accordion.aria.label.open': 'Show additional details',
-    'wizard.accordion.aria.label.close': 'Hide additional details',
     // §6.5 Step-2 specific labels
     'wizard.step2.hero.label': 'MONTHLY RENT',
     'wizard.step2.hero.sub': 'per month over {0} months',

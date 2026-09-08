@@ -84,11 +84,6 @@ vi.mock('@/lib/db/queries/client-relationships', () => ({
 // specifiers, so the mocks must use the SAME specifiers: `@/` maps to src/, and
 // a mock bound at `@/(authed)/...` registers a module id nothing under app/ ever
 // resolves to — the mock never fires and assertions through it pass vacuously.
-//
-// There is deliberately NO persistAccordionOpen.action mock here: the
-// PlusDeDetailsAccordion that used to call it is no longer rendered by
-// ParametresFormCard, so nothing in this page's module graph imports that
-// action. Its own coverage lives in _actions/persistAccordionOpen.action.test.ts.
 vi.mock('../_actions/saveAsDraft.action', () => ({
   saveAsDraftAction: (...args: unknown[]) => saveAsDraftMock(...args),
 }));
@@ -234,7 +229,6 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
         amountHT: '75000',
         durationMonths: 48,
         _completedSteps: [],
-        _uiAccordionOpen: false,
       },
     });
     const tree = await ParametresStep1Page({
@@ -658,7 +652,6 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
         amountHT: '75000',
         durationMonths: 48,
         _completedSteps: [],
-        _uiAccordionOpen: true, // expand accordion so all optional fields render
       },
     });
     const tree = await ParametresStep1Page({

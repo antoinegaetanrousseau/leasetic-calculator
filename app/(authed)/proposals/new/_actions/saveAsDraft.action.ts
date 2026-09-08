@@ -12,8 +12,8 @@
  *     before the redirect (see plan 13-01 WizardActionBar handleSave).
  *   - D-22 navigate-preserves-state: Save is NOT an "advance" event. This
  *     action does NOT modify `_completedSteps` — it sends the client's
- *     `nextInputs` verbatim. The client may include `_completedSteps`
- *     and `_uiAccordionOpen` in nextInputs; we persist them as-is.
+ *     `nextInputs` verbatim. Whatever bookkeeping the client includes
+ *     (`_completedSteps`) is persisted as-is.
  *   - D-03 silent self-heal: updateDraft returns null on cross-user /
  *     soft-deleted / non-draft → redirect to /proposals/new/parametres
  *     (never 404; URL-secrecy discipline).
@@ -34,7 +34,7 @@ export async function saveAsDraftAction(
   // D-01: auth FIRST.
   const { session } = await requireUser();
 
-  // D-22: preserve client-supplied _completedSteps + _uiAccordionOpen verbatim.
+  // D-22: preserve client-supplied _completedSteps verbatim.
   const updated = await updateDraft(draftId, session.user.id, {
     inputs: nextInputs,
   });

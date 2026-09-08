@@ -4,15 +4,17 @@
  * ParametresFormCard — step-1 form sub-component (Phase 13, plan 13-03).
  *
  * Renders 7 default fields in 2 bullet-headed sections inside ONE .card (per
- * D-05), with an <hr> divider at 24px between, plus a `<PlusDeDetailsAccordion>`
- * BELOW the card carrying the 5 optional fields (per D-06).
+ * D-05), with an <hr> divider at 24px between, followed by an
+ * INFORMATIONS COMPLÉMENTAIRES section carrying the optional fields.
  *
  * Decisions referenced:
  *   - D-05: 7 default fields split into INFORMATIONS CLIENT (clientCo, clientName,
  *     clientEmail, clientTel) + DÉTAILS DU PROJET (partnerRef, amountHT,
  *     durationMonths) inside ONE .card.
  *   - D-06: 4 optional fields (clientRole, projectDesc, slb,
- *     evalParc — in this order per UI-SPEC §5.2) live inside the accordion.
+ *     evalParc — in this order per UI-SPEC §5.2) are ALWAYS visible. They
+ *     used to sit behind a "+ Plus de détails" accordion; that accordion was
+ *     retired, and ParametresFormCard.test.tsx Test 7 pins its absence.
  *   - D-07: partnerCo + partnerName are session-hydrated server-side and
  *     NEVER rendered as visible inputs here.
  *   - D-08: the proposal-validity duration is server-resolved from the

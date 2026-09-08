@@ -51,8 +51,9 @@ const STEP_1_KEYS = [
  * Algorithm:
  *   1. Determine the lowest step whose owned inputs differ between
  *      prev → next (currently only step 1 owns inputs; step 2/3 don't).
- *      `_completedSteps` and `_uiAccordionOpen` are bookkeeping fields and
- *      are EXCLUDED from change detection.
+ *      Detection walks the STEP_1_KEYS allowlist, so anything outside it
+ *      (`_completedSteps`, server-resolved `validityDays`, …) is EXCLUDED
+ *      from change detection by construction.
  *   2. Start with prevInputs._completedSteps (default []).
  *   3. Filter to numbers strictly less than lowestChangedStep
  *      (i.e., clear downstream done-marks).

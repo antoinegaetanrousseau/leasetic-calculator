@@ -53,9 +53,11 @@ describe('deriveCompletedSteps (D-21)', () => {
     expect(result).toEqual([1, 2]);
   });
 
-  it('Test 5: ignores _uiAccordionOpen and _completedSteps when computing input change', () => {
-    const prev = { ...fullStep1, _completedSteps: [1, 2], _uiAccordionOpen: false };
-    const next = { ...fullStep1, _uiAccordionOpen: true }; // only bookkeeping changed
+  it('Test 5: ignores keys outside STEP_1_KEYS (_completedSteps, validityDays) when computing input change', () => {
+    // validityDays is server-resolved from global_params (D-08), not partner
+    // input — an admin changing it must not wipe a partner's progress.
+    const prev = { ...fullStep1, _completedSteps: [1, 2], validityDays: 30 };
+    const next = { ...fullStep1, validityDays: 60 }; // only non-step-1 keys changed
     const result = deriveCompletedSteps(prev, next, 2);
     // No step-1 input changed → preserve [1,2] then add fromStep=2 → still [1,2]
     expect(result).toEqual([1, 2]);

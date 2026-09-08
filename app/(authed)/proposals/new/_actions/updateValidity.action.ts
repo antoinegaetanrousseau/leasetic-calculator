@@ -71,7 +71,7 @@ export async function updateValidityAction(
 
   // Phase 12 D-22 full-replace inputs jsonb. Spread the current inputs and
   // overwrite ONLY validityDays — every other field (clientCo, amountHT,
-  // durationMonths, _completedSteps, _uiAccordionOpen, …) is preserved
+  // durationMonths, _completedSteps, …) is preserved
   // verbatim.
   const currentInputs = (current.inputs as Record<string, unknown>) ?? {};
   const nextInputs = { ...currentInputs, validityDays: daysParsed.data };

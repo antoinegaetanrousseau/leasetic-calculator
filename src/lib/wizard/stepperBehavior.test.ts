@@ -105,16 +105,16 @@ describe('Stepper behavior integration (D-20 / D-21 / D-22 / D-23)', () => {
   });
 
   /**
-   * Scenario 3 — D-21: editing an accordion field also clears downstream.
+   * Scenario 3 — D-21: editing an optional field also clears downstream.
    *
-   * The accordion fields (clientRole, clientSiren, projectDesc, slb,
-   * evalParc) are step-1-owned per STEP_1_KEYS — adding one counts as an
+   * The optional fields (clientRole, projectDesc, slb, evalParc) and
+   * clientSiren are step-1-owned per STEP_1_KEYS — adding one counts as an
    * edit to step 1.
    */
-  it('D-21: editing an accordion field (clientSiren) also clears downstream', () => {
+  it('D-21: editing clientSiren also clears downstream', () => {
     const prev = makeStep1Inputs({ _completedSteps: [1, 2] });
     const next = makeStep1Inputs({
-      clientSiren: '123456789', // accordion field — partner adds it
+      clientSiren: '123456789', // step-1-owned — partner adds it
       _completedSteps: [1, 2],
     });
 
@@ -123,27 +123,25 @@ describe('Stepper behavior integration (D-20 / D-21 / D-22 / D-23)', () => {
   });
 
   /**
-   * Scenario 4 — D-21: editing _uiAccordionOpen does NOT clear downstream.
+   * Scenario 4 — D-21: changing a non-step-1 key does NOT clear downstream.
    *
-   * Per completedSteps.ts STEP_1_KEYS exclusion, `_uiAccordionOpen` and
-   * `_completedSteps` are bookkeeping fields — toggling the accordion is
-   * not a partner-facing "edit" that should invalidate downstream
-   * progress. The persistAccordionOpenAction is fire-and-forget and does
-   * not advance.
+   * deriveCompletedSteps walks the STEP_1_KEYS allowlist, so anything outside
+   * it is not a partner-facing "edit". `validityDays` is the live example:
+   * it is server-resolved from global_params (D-08), so an admin editing it
+   * must never invalidate a partner's completed steps.
    */
-  it('D-21: toggling _uiAccordionOpen does NOT clear downstream', () => {
+  it('D-21: changing a non-step-1 key (validityDays) does NOT clear downstream', () => {
     const prev = makeStep1Inputs({
       _completedSteps: [1, 2],
-      _uiAccordionOpen: false,
+      validityDays: 30,
     });
     const next = makeStep1Inputs({
       _completedSteps: [1, 2],
-      _uiAccordionOpen: true, // <- the only change
+      validityDays: 60, // <- the only change
     });
 
-    // Even with fromStep=2 (the partner is on step 2 when the accordion
-    // is irrelevant — but the algorithm is symmetric: bookkeeping change
-    // alone must not invalidate).
+    // The algorithm is symmetric across fromStep: a non-owned key changing
+    // alone must not invalidate.
     const derived = deriveCompletedSteps(prev, next, 2);
     expect(derived).toEqual([1, 2]);
   });
