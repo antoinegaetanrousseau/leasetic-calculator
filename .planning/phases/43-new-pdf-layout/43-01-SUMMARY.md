@@ -93,6 +93,12 @@ None - no external service configuration required.
 - `DOC-03` and the ROADMAP note are clean of the retracted clause, so no downstream plan implements against a contradicted requirement.
 - The `__pdf-fixtures__` byte-determinism suite is red as documented and expected — this is the accepted interval through 43-06; plan 43-07 regenerates it per D-16. No action needed from this plan.
 
+## Self-Check: PASSED
+
+All created/modified files confirmed present: `src/lib/pdf/styles.ts`, `.planning/REQUIREMENTS.md`,
+`.planning/ROADMAP.md`, this SUMMARY.md. All task commits confirmed in `git log`: `0434f37`
+(Task 1), `c41af92` (Task 2), `1a24836` (SUMMARY.md).
+
 ---
 *Phase: 43-new-pdf-layout*
 *Completed: 2026-09-08*
