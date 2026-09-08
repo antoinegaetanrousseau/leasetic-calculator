@@ -54,6 +54,9 @@ describe('lookupCompanyBySiren — the happy path', () => {
         headcountBand: '52',
         foundedOn: '1955-01-01',
         registryState: 'A',
+        // Phase 42 Plan 03 (FIELD-01 / D-01): the fixture's siege.siret is
+        // now parsed through onto RegistryIdentity.
+        siret: '55210055400013',
       },
     });
   });

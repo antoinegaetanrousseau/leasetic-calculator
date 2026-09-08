@@ -64,6 +64,17 @@ const registrySiegeSchema = z.object({
   adresse: truncated(ADDRESS_MAX).pipe(z.string().max(ADDRESS_MAX)).nullish(),
   code_postal: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).nullish(),
   libelle_commune: truncated(COMMUNE_MAX).pipe(z.string().max(COMMUNE_MAX)).nullish(),
+  /**
+   * Phase 42 Plan 03 (FIELD-01 / D-01, R1). The siège establishment's own
+   * SIRET — the live `recherche-entreprises` OpenAPI schema declares
+   * `components.schemas.siege.properties.siret` as a plain string, and it
+   * appears in NO `required` array at either the `result` or `siege` level;
+   * `siege` itself can be entirely absent. `.nullish()`, same reason as its
+   * three siblings above: the API sends an explicit `null` for some
+   * companies, and `.optional()` would reject that and fail the whole
+   * payload for one absent field.
+   */
+  siret: truncated(CODE_MAX).pipe(z.string().max(CODE_MAX)).nullish(),
 });
 
 /**
@@ -114,6 +125,19 @@ export type RegistryIdentity = {
   headcountBand: string | null;
   foundedOn: string | null;
   registryState: string | null;
+  /**
+   * Phase 42 Plan 03 (FIELD-01 / D-01). The siège SIRET, for the wizard's
+   * client-SIRET prefill (Plan 42-07).
+   *
+   * Scoping decision (42-RESEARCH.md assumption A3): extending the shared
+   * `RegistryIdentity` here, rather than building a second wizard-scoped
+   * mapper, is deliberate. `registry-sync.ts`'s module doc restricts who may
+   * WRITE the identity columns on `companies.*` — that rule is untouched.
+   * The wizard's SIRET prefill is a second READER of the same lookup
+   * result; it writes nothing to `companies.*`. A later phase must not
+   * mistake this second consumer for a second writer.
+   */
+  siret: string | null;
 };
 
 /**
@@ -183,5 +207,6 @@ export function toRegistryIdentity(
     headcountBand: orNull(result.tranche_effectif_salarie),
     foundedOn: orNull(result.date_creation),
     registryState: orNull(result.etat_administratif),
+    siret: orNull(result.siege?.siret),
   };
 }

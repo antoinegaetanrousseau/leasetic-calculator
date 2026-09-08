@@ -36,6 +36,9 @@ describe('registrySearchResponseSchema (D-08 / D-10)', () => {
       headcountBand: '52',
       foundedOn: '1955-01-01',
       registryState: 'A',
+      // Phase 42 Plan 03 (FIELD-01 / D-01): the fixture's siege.siret is now
+      // parsed through rather than stripped as an unknown field.
+      siret: '55210055400013',
     });
   });
 
@@ -68,7 +71,12 @@ describe('registrySearchResponseSchema (D-08 / D-10)', () => {
     const fromFixture = registrySearchResponseSchema.parse(fixture);
     expect(fromFixture.results[0]).not.toHaveProperty('categorie_entreprise');
     expect(fromFixture.results[0]).not.toHaveProperty('complements');
-    expect(fromFixture.results[0].siege).not.toHaveProperty('siret');
+    // Phase 42 Plan 03 (FIELD-01 / D-01): siege.siret is now a DECLARED
+    // field, not an unknown one — the fixture's own siret ('55210055400013')
+    // is parsed through, not stripped. This assertion used to prove D-08's
+    // unknown-field-stripping for siret specifically; that is no longer the
+    // behaviour under test now that the field is deliberately read.
+    expect(fromFixture.results[0].siege).toHaveProperty('siret', '55210055400013');
   });
 
   it('test 3: an empty results array parses — not_found is the caller’s decision, not the parser’s', () => {
@@ -261,6 +269,70 @@ describe('toRegistryIdentity (D-05 defence in depth, D-06)', () => {
     const identity = toRegistryIdentity(result, '552100554');
     expect(identity).not.toBeNull();
     expect(Object.keys(identity ?? {})).not.toContain('nafLabel');
-    expect(Object.keys(identity ?? {})).toHaveLength(10);
+    // Phase 42 Plan 03 (FIELD-01 / D-01) added `siret` as the 11th field.
+    expect(Object.keys(identity ?? {})).toHaveLength(11);
+  });
+});
+
+/**
+ * Phase 42 Plan 03 — FIELD-01 / D-01 / R1. The siège SIRET, dropped by the
+ * parser until now. R1 confirms the field is `results[].siege.siret`, a
+ * plain string, in no `required` array at either level, and `siege` itself
+ * can be entirely absent.
+ */
+describe('siege.siret (FIELD-01 / D-01)', () => {
+  it('parses a siege.siret string and exposes it on RegistryIdentity', () => {
+    const result = registrySearchResponseSchema.parse({
+      results: [
+        {
+          siren: '552100554',
+          nom_raison_sociale: 'ELECTRICITE DE FRANCE',
+          siege: { siret: '55210055400013' },
+        },
+      ],
+    }).results[0];
+    const identity = toRegistryIdentity(result, '552100554');
+    expect(identity?.siret).toBe('55210055400013');
+  });
+
+  it('yields siret: null when siege.siret is explicitly null, without throwing', () => {
+    const result = registrySearchResponseSchema.parse({
+      results: [
+        {
+          siren: '552100554',
+          siege: { adresse: '22 AVENUE DE WAGRAM', siret: null },
+        },
+      ],
+    }).results[0];
+    expect(() => toRegistryIdentity(result, '552100554')).not.toThrow();
+    const identity = toRegistryIdentity(result, '552100554');
+    expect(identity?.siret).toBeNull();
+  });
+
+  it('yields siret: null when siege itself is entirely absent, without throwing', () => {
+    const result = registrySearchResponseSchema.parse({
+      results: [{ siren: '552100554', nom_raison_sociale: 'ELECTRICITE DE FRANCE' }],
+    }).results[0];
+    expect(result.siege).toBeUndefined();
+    const identity = toRegistryIdentity(result, '552100554');
+    expect(identity?.siret).toBeNull();
+  });
+
+  it('parsing the real fixture does not change any other RegistryIdentity value', () => {
+    const result = registrySearchResponseSchema.parse(fixture).results[0];
+    const identity = toRegistryIdentity(result, '552100554');
+    expect(identity).toEqual({
+      legalName: 'ELECTRICITE DE FRANCE',
+      addressLine: '22 AVENUE DE WAGRAM',
+      postalCode: '75008',
+      city: 'PARIS 8',
+      legalForm: '5599',
+      nafCode: '35.11Z',
+      nafSection: 'D',
+      headcountBand: '52',
+      foundedOn: '1955-01-01',
+      registryState: 'A',
+      siret: '55210055400013',
+    });
   });
 });
