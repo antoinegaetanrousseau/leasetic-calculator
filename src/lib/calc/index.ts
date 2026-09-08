@@ -38,5 +38,7 @@ export {
   amountHTSchema,
   durationMonthsSchema,
   validityDaysSchema,
+  optionalPhoneSchema,
+  hasTenDigits,
 } from './schema';
 export type { ProposalInput } from './schema';

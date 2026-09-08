@@ -52,11 +52,22 @@ const optionalEmailSchema = z
   .union([z.literal(''), z.string().email({ message: 'error.field.email.invalid' })])
   .optional();
 
+/**
+ * Shared digit-tolerant phone shape: strips formatting and requires exactly 10 digits.
+ * Exported (Phase 42 Plan 06) so a REQUIRED phone schema — e.g. the advisor form's
+ * `telephone` — can reuse this exact rule instead of inventing a new regex, by chaining
+ * `.min(1, 'error.field.required')` then `.refine(hasTenDigits, {...})` on a plain
+ * `z.string()`, the same way `optionalPhoneSchema` below does for the optional case.
+ */
+export function hasTenDigits(s: string): boolean {
+  return s.replace(/\D/g, '').length === 10;
+}
+
 /** Optional digit-tolerant phone (formatted "06 12 34 56 78" stored verbatim; 10 digits when stripped). */
-const optionalPhoneSchema = z
+export const optionalPhoneSchema = z
   .string()
   .optional()
-  .refine((s) => s === undefined || s === '' || s.replace(/\D/g, '').length === 10, {
+  .refine((s) => s === undefined || s === '' || hasTenDigits(s), {
     message: 'error.field.phone.invalid',
   });
 

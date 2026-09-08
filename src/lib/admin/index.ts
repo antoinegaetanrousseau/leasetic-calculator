@@ -31,3 +31,9 @@ export type {
   CreatePartnerValues,
   CreatePartnerFormValues,
 } from './schemas';
+
+// Phase 42 Plan 06 — the single Leasetic advisor identity (PROF-03, D-07/D-08/D-09).
+export { advisorFormSchema } from './advisor-schemas';
+export type { AdvisorFormValues } from './advisor-schemas';
+export { adminUpdateAdvisor } from './advisor-actions';
+export type { AdminUpdateAdvisorResult } from './advisor-actions';

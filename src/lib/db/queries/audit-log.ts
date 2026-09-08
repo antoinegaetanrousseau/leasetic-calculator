@@ -71,9 +71,14 @@ export type AuditAction =
   // (ADMIN-09, D-26).
   | 'company.display_update'
   | 'company.siren_correct'
-  | 'company.registry_sync';
+  | 'company.registry_sync'
+  // ── Phase 42 Plan 06 — the single Leasetic advisor identity (PROF-03, D-07/D-08/D-09) ──
+  // Payload carries only the changed field names and the actor — a contact-details
+  // write, so no commission, rate or derived value can appear (ADMIN-09 holds by
+  // construction: adminUpdateAdvisor never reads global_params).
+  | 'admin.advisor.update';
 
-export type AuditTargetType = 'proposal' | 'user' | 'global_params' | 'client_relationship' | 'contact' | 'company' | 'company_pair';
+export type AuditTargetType = 'proposal' | 'user' | 'global_params' | 'client_relationship' | 'contact' | 'company' | 'company_pair' | 'leasetic_advisor';
 
 export interface WriteAuditLogArgs {
   actorId: string | null;        // null when system-initiated (e.g., 'proposal.purge' via cron)
