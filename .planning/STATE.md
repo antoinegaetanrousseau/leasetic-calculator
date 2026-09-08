@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-08T12:27:01.009Z"
+last_updated: "2026-09-08T13:14:54.727Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 24
   completed_phases: 1
   total_plans: 13
-  completed_plans: 4
+  completed_plans: 5
   percent: 4
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 42 (Captured Data — Fields & Advisor Profile) — EXECUTING
-Plan: 2 of 10
+Plan: 3 of 10
 Status: Ready to execute
 Last activity: 2026-09-08
 
@@ -521,6 +521,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 41 P02 | 10min | 2 tasks | 14 files |
 | Phase 41 P03 | 25min | 3 tasks | 1 files |
 | Phase 42 P01 | 9min | 4 tasks | 5 files |
+| Phase 42 P03 | 35min | 2 tasks | 12 files |
 
 ## Decisions
 
@@ -714,6 +715,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 41]: Brand wordmark spelling (the accented pre-rebrand form was rendered where LEASETIC was correct) deferred as out-of-scope for Phase 41 per D-01; tracked separately by Antoine as a repo-wide rebrand cleanup — RESOLVED 2026-09-08 in commit 976177c, which dropped the accent across the source tree and regenerated the PROP-17 PDF fixture
 - [Phase 42]: Verify-script stale-phrase checks are substring matches — rephrased amended REQUIREMENTS/ROADMAP annotation text to preserve D-NN meaning without literally reproducing the retracted phrase the plan's own verify one-liners flag
 - [Phase 42]: pdf.partnerType.* translation is scoped to the PDF only (D-16) — admin and /parametres surfaces deliberately keep rendering the raw partnerType string, documented inline as a recorded Deferred item
+- [Phase 42]: stripNonDigits() extracted from normalizeSiren (src/lib/crm/siren.ts) so requiredSiretSchema (14 digits) reuses the same digit-stripping rule as requiredSirenSchema (9 digits) instead of duplicating it
+- [Phase 42]: SIRET/SIREN cross-field match is proposalInputSchema's first object-level .refine(), using { path: ['clientSiret'] } so zodResolver binds the mismatch error to the SIRET field rather than the form root
 
 ### Blockers
 
