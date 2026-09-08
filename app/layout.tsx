@@ -12,10 +12,10 @@ import { TooltipProvider } from '@/components/ui/tooltip';
  * font at build time and serves it from our own origin, so there is no runtime request
  * to Google and the UI-SPEC §Font Loading Contract still holds.
  *
- * NOTE: PDF generation is deliberately NOT affected — src/lib/pdf/document.tsx registers
- * its own font family from the TTFs in public/fonts/ and still uses Plus Jakarta Sans.
- * Switching the PDF typeface is a separate change: it needs Inter TTFs, re-baselines the
- * byte-determinism contract (PROP-17) and touches the glyph-coverage tests.
+ * NOTE: PDF generation is a separate surface — src/lib/pdf/document.tsx registers its
+ * own Inter TTFs from public/fonts/ (Phase 41). Same family as the UI, different binary:
+ * the UI downloads Inter via next/font/google at build time, the PDF renders from four
+ * committed static TTFs that define the PROP-17 byte-determinism baseline.
  */
 const inter = Inter({
   subsets: ['latin'],

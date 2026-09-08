@@ -8,37 +8,40 @@ import { SectionLabel } from './components/section-label';
 import { KeyValueRow } from './components/key-value-row';
 
 // ── Font.register: once, at module load ──────────────────────────────────────
-// PROP-19: Plus Jakarta Sans woff2 self-hosted under public/fonts/. The PDF
-// renderer fetches the font bytes during render — register-once-render-many.
+// PROP-19: Inter TTFs self-hosted under public/fonts/ (Phase 41 — replaces the
+// previously-registered family). The PDF renderer fetches the font bytes
+// during render — register-once-render-many.
 //
 // Path resolution: in Node runtime, `process.cwd()` is the Next project root
-// when the route handler runs. Phase 5 self-hosted 5 weights; PDF needs 4
-// (300 unused — bodies stay at 400 minimum for readability).
+// when the route handler runs. PDF needs 4 weights: 400/500/600/700.
 //
 // Determinism: file:// absolute paths guarantee the same font bytes regardless
 // of machine; PROP-17 / T-08-05-01 — font drift = CI red via Plan 08-06 gate.
+// These exact binaries are pinned by SHA-256 in 41-RESEARCH.md and guarded by
+// tests/vendored-ui-integrity.test.ts cases 3-4.
 
 const FONT_DIR = path.join(process.cwd(), 'public', 'fonts');
 
-// PROP-19 / determinism (T-08-05-04): Plus Jakarta Sans self-hosted.
+// PROP-19 / determinism (T-08-05-04): Inter self-hosted (Phase 41).
 //
-// Font format: TTF (converted from the Phase 5 woff2 set via wawoff2 decompressor).
+// Font format: TTF (static weights from the rsms/inter v4.1 release).
 // Reason: @react-pdf/renderer uses PDFKit/fontkit for font subsetting. fontkit's
 // TTFSubset correctly handles multi-weight subsetting with TTF; the woff2 brotli
 // path fails with DataView bounds errors when multiple weights share the same
-// Brotli decompression buffer (fontkit upstream issue). The TTF files are derived
-// from the same woff2 source and committed alongside them in public/fonts/.
+// Brotli decompression buffer (fontkit upstream issue) — this is why the four
+// static Inter TTFs are used here instead of a variable font or woff2 (D-03).
 // Determinism is preserved: same font binary bytes on every machine.
 //
-// Note: Plus Jakarta Sans has no separate italic cut. fontStyle: 'italic' is
-// not used in the document (validity caption is regular weight only).
+// Note: Inter's italic cuts (Inter-Italic.ttf etc.) are deliberately not
+// registered. fontStyle: 'italic' is not used in the document (validity
+// caption is regular weight only).
 Font.register({
-  family: 'PlusJakartaSans',
+  family: 'Inter',
   fonts: [
-    { src: path.join(FONT_DIR, 'PlusJakartaSans-400.ttf'), fontWeight: 400 },
-    { src: path.join(FONT_DIR, 'PlusJakartaSans-500.ttf'), fontWeight: 500 },
-    { src: path.join(FONT_DIR, 'PlusJakartaSans-600.ttf'), fontWeight: 600 },
-    { src: path.join(FONT_DIR, 'PlusJakartaSans-700.ttf'), fontWeight: 700 },
+    { src: path.join(FONT_DIR, 'Inter-400.ttf'), fontWeight: 400 },
+    { src: path.join(FONT_DIR, 'Inter-500.ttf'), fontWeight: 500 },
+    { src: path.join(FONT_DIR, 'Inter-600.ttf'), fontWeight: 600 },
+    { src: path.join(FONT_DIR, 'Inter-700.ttf'), fontWeight: 700 },
   ],
 });
 
@@ -109,7 +112,7 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
         paddingTop: pdfPageMargins.top,
         paddingBottom: pdfPageMargins.bottom,
         paddingHorizontal: pdfPageMargins.horizontal,
-        fontFamily: 'PlusJakartaSans',
+        fontFamily: 'Inter',
         fontSize: pdfFontSizes.body,
         color: pdfColors.ink,
         backgroundColor: pdfColors.surface,

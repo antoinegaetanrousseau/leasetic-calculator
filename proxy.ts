@@ -69,7 +69,7 @@ function isPublicPath(pathname: string): boolean {
  *  - _next/static  — compiled JS/CSS bundles (never need auth)
  *  - _next/image   — Next.js image optimization endpoint
  *  - favicon.ico   — browser favicon request
- *  - fonts/        — self-hosted Plus Jakarta Sans (served from /public/fonts)
+ *  - fonts/        — self-hosted Inter TTFs for the PDF (served from /public/fonts)
  *  - logo-*.svg    — the three public brand SVGs in /public (see below)
  *  - healthz       — Phase 5 unauthenticated health check endpoint
  *  - api/auth      — Better Auth's own catch-all route handler (/api/auth/[...all])

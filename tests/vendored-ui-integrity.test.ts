@@ -13,22 +13,26 @@
  * ALL PASS on that broken state: it is valid TypeScript, valid CSS and a valid
  * build. Nothing else in this repo notices. Hence a structural test.
  *
- * THE TWO SURFACES ARE DIFFERENT FONTS. Conflating them is the trap:
+ * BOTH SURFACES NOW USE THE INTER FAMILY (as of Phase 41), BUT NOT THE SAME
+ * BINARIES. Conflating "same family" with "same file" is the trap:
  *
  *   1. THE UI USES INTER. `app/layout.tsx` registers it through
  *      `next/font/google` as `--font-inter`, and `app/globals.css` resolves
  *      `--font-sans` and `--font-heading` to it. Institutional memory says
- *      "shadcn init breaks the Plus Jakarta Sans font" — that sentence is now
- *      HISTORICAL. Plus Jakarta Sans has not been the UI typeface for a while.
- *      A guard that greps `app/layout.tsx` for Plus Jakarta Sans finds nothing,
- *      reports success, and protects nothing at all.
+ *      "shadcn init breaks the self-hosted PDF font" — that sentence describes
+ *      the PDF surface below, not this one. A guard that only checks the UI
+ *      surface protects nothing about the PDF's own font registration.
  *
- *   2. THE PDF USES PLUS JAKARTA SANS. `src/lib/pdf/document.tsx` registers it
- *      with `@react-pdf/renderer` from the four TTFs committed in
- *      `public/fonts/`. Those bytes are load-bearing: the PROP-17 byte
- *      determinism contract is defined against them, so changing, dropping or
- *      re-pathing a weight silently re-baselines it. A missing TTF does not
- *      fail the build either — it fails at PDF-generation time, in production.
+ *   2. THE PDF USES INTER TOO, but from its OWN four static TTFs committed in
+ *      `public/fonts/` and registered separately in `src/lib/pdf/document.tsx`
+ *      with `@react-pdf/renderer` — a different binary from the UI's
+ *      `next/font/google`-downloaded Inter. Those bytes are load-bearing: the
+ *      PROP-17 byte determinism contract is defined against them, so changing,
+ *      dropping or re-pathing a weight silently re-baselines it. A missing TTF
+ *      does not fail the build either — it fails at PDF-generation time, in
+ *      production. So a guard that greps one surface for "Inter" still tells
+ *      you nothing about the other surface's binaries — cases 3-4 below exist
+ *      to check the PDF surface specifically.
  *
  * Case 5 guards a third, quieter failure: if `components.json` loses the `@reui`
  * registry entry, a future `shadcn add @reui/<block>` can fall back to the
@@ -123,22 +127,22 @@ describe('vendored UI integrity — the two font surfaces a shadcn install can b
     ).toBe(0);
   });
 
-  it('3. the PDF font registration is intact: document.tsx registers PlusJakartaSans at all four weights', () => {
+  it('3. the PDF font registration is intact: document.tsx registers Inter at all four weights', () => {
     const doc = readRequired(PDF_DOCUMENT);
 
     expect(
       doc,
-      `${PDF_DOCUMENT} no longer registers the PlusJakartaSans family. The PDF typeface is ` +
-        'deliberately NOT Inter: changing it re-baselines the PROP-17 byte-determinism ' +
-        'contract and touches the glyph-coverage tests.',
-    ).toContain("family: 'PlusJakartaSans'");
+      `${PDF_DOCUMENT} no longer registers the Inter family. The PDF typeface is Inter as of ` +
+        'Phase 41 (the previous family is fully retired): changing it re-baselines the ' +
+        'PROP-17 byte-determinism contract and touches the glyph-coverage tests.',
+    ).toContain("family: 'Inter'");
 
     for (const weight of PDF_FONT_WEIGHTS) {
       expect(
         doc,
-        `${PDF_DOCUMENT} no longer references PlusJakartaSans-${weight}.ttf — a dropped weight ` +
-          'renders as a substituted face and changes the output bytes.',
-      ).toContain(`PlusJakartaSans-${weight}.ttf`);
+        `${PDF_DOCUMENT} no longer references Inter-${weight}.ttf — a dropped weight renders ` +
+          'as a substituted face and changes the output bytes.',
+      ).toContain(`Inter-${weight}.ttf`);
     }
   });
 
@@ -146,7 +150,7 @@ describe('vendored UI integrity — the two font surfaces a shadcn install can b
     // Checked separately from case 3 because a missing TTF is invisible to the build:
     // @react-pdf/renderer resolves the path at render time, so the failure surfaces as a
     // broken proposal PDF in production, not as a red CI run.
-    const missing = PDF_FONT_WEIGHTS.map((w) => join(PDF_FONT_DIR, `PlusJakartaSans-${w}.ttf`)).filter(
+    const missing = PDF_FONT_WEIGHTS.map((w) => join(PDF_FONT_DIR, `Inter-${w}.ttf`)).filter(
       (p) => !existsSync(p),
     );
 
