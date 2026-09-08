@@ -83,7 +83,7 @@ proposal into it.
   name and email on the settings page; fonction is read-only. *(Restated 2026-09-08 by Phase 42 D-20 / D-14:
   "can set their fonction" is dropped — fonction is `users.partnerType`, admin-assigned
   and client-immutable by `input: false`.)*
-- [ ] **PROF-02**: A partner whose account is missing a telephone is stopped at proposal
+- [x] **PROF-02**: A partner whose account is missing a telephone is stopped at proposal
   finalization with a message naming the telephone field and linking to `/parametres`. *(Restated 2026-09-08 by Phase 42 D-21 / D-14:
   narrowed from the prior wording pairing fonction with telephone — `partner_type`
   is NOT NULL so fonction can never be the missing thing. The "fixed once, never re-prompted per
@@ -164,7 +164,7 @@ proposal into it.
 | FIELD-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | FIELD-03 | Phase 43 — New PDF Layout | Pending |
 | PROF-01 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
-| PROF-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
+| PROF-02 | Phase 42 — Captured Data — Fields & Advisor Profile | Complete |
 | PROF-03 | Phase 42 — Captured Data — Fields & Advisor Profile | Pending |
 | MIG-01 | Phase 44 — Backfill Migration | Pending |
 | MIG-02 | Phase 44 — Backfill Migration | Pending |
