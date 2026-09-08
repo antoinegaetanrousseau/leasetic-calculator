@@ -32,9 +32,11 @@
  *     (ROUTE-01 SC5)
  *   - Test 15: ADMIN-09 invariant — commission renders ONCE in ● CALCUL
  *     recap; does NOT appear in PdfPreviewMock
+ *   - Save button: the bound saveAsDraftAction fires with draft.inputs verbatim
+ *     (D-18 — saving on step 3 does NOT finalize)
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 
 vi.mock('server-only', () => ({}));
 
@@ -87,7 +89,11 @@ vi.mock('@/lib/calc', async () => {
     computeLoyer: (...args: unknown[]) => computeLoyerMock(...args),
   };
 });
-vi.mock('@/(authed)/proposals/new/_actions/saveAsDraft.action', () => ({
+// page.tsx imports this action by an app/-relative specifier, so the mock must
+// use the SAME specifier: `@/` maps to src/, and a mock bound at
+// `@/(authed)/...` registers a module id nothing under app/ ever resolves to —
+// the mock never fires and assertions through it pass vacuously.
+vi.mock('../_actions/saveAsDraft.action', () => ({
   saveAsDraftAction: (...args: unknown[]) => saveAsDraftMock(...args),
 }));
 
@@ -552,5 +558,25 @@ describe('verification/page.tsx (D-01 / D-03 / D-14 / D-15 / D-16)', () => {
     // The defensive lcRef bail fires AFTER global-params load but BEFORE
     // computeLoyer — no compute work happens for a stale legacy draft.
     expect(computeLoyerMock).not.toHaveBeenCalled();
+  });
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // D-17 / D-18 — the Save ghost button's bound server action
+  // ──────────────────────────────────────────────────────────────────────────
+  it('clicking "Enregistrer comme brouillon" invokes saveAsDraftAction with the draft id and the stored inputs verbatim', async () => {
+    const tree = await VerificationStep3Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const { getByText } = render(tree);
+
+    fireEvent.click(getByText(/Enregistrer comme brouillon/));
+
+    await waitFor(() => expect(saveAsDraftMock).toHaveBeenCalledTimes(1));
+    // Step 3 binds `draft.inputs` straight through (no RHF layer on this
+    // step), so the payload is the stored jsonb unchanged — D-22
+    // navigate-preserves-state.
+    // D-18: saving on step 3 must NOT finalize — this is the plain
+    // save-as-draft action, not the finalize route.
+    expect(saveAsDraftMock).toHaveBeenCalledWith('d-1', COMPLETE_INPUTS);
   });
 });
