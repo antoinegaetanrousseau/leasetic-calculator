@@ -147,3 +147,23 @@ None beyond the completed checkpoint. The one external action this plan's incide
 ## Self-Check: PASSED
 
 Both task commits (`e62a6b6`, `b020801`) found in git history via `git show --stat`, confirmed to touch exactly the files claimed. All 6 modified files exist on disk. GitHub Actions run `34250717059` (development-branch migration) and `34241648389` (production-branch migration, from 42-02-SUMMARY.md) are referenced as external evidence, not local git artifacts — consistent with the self-check exemption already established for Plan 42-02's Task 3.
+
+## Branch coverage — RESOLVED 2026-09-08
+
+All three Neon branches now carry migration `0011_phase42_captured_data`, so the
+`additionalFields` registration in this plan is safe against every environment the team uses:
+
+| Neon branch | Used by | Host | Actions run |
+|---|---|---|---|
+| `main` | production (`extranet.leasetic.fr`) | `ep-icy-boat-alx5o1tz` | `34241648389` |
+| `development` | localhost via `.env.local` | `ep-polished-band-alphc576` | `34250717059` |
+| `preview` | Vercel preview deploys | `ep-delicate-night-als4ogpc` | `34257094420` |
+
+The `preview` gap flagged above as a forward risk for Phases 43/44 is closed — it was migrated
+after this plan's closeout, on operator request.
+
+**Standing lesson for Phases 43 and 44:** when a migration adds a column that Better Auth
+`additionalFields` registers, migrating production alone is not sufficient. Better Auth `SELECT`s
+every registered column on every session read, so any unmigrated branch fails with
+`APIError: Failed to get session` the moment an authed route is exercised against it. Migrate
+`main`, `development` and `preview` before the registering code is exercised anywhere.
