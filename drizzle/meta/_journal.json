@@ -78,6 +78,13 @@
       "when": 1788456049104,
       "tag": "0010_phase34_fiche_client",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788870596554,
+      "tag": "0011_phase42_captured_data",
+      "breakpoints": true
     }
   ]
 }
