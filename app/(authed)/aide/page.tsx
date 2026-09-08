@@ -8,7 +8,7 @@ import { PageHero } from '@/components/ui/PageHero';
 // The (authed) layout already calls requireUser() per ARCHITECTURE.md §2.2;
 // both partner + admin roles can read this page per D-28.
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: "Centre d'aide — Leasétic Matrice" };
+export const metadata: Metadata = { title: "Centre d'aide — Leasetic Matrice" };
 
 /**
  * Aide landing — Phase 18 Plan 06 Task 2 (HELP-01, D-25).

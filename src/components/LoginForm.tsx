@@ -228,7 +228,7 @@ export function LoginForm({ lang }: LoginFormProps) {
       </div>
 
       {/* Privacy-policy link — D-10-17 / CUT-05. NEXT_PUBLIC_* inlined at build
-          time. Fallback URLs are the canonical Leasétic privacy pages — keep
+          time. Fallback URLs are the canonical Leasetic privacy pages — keep
           a working link even if env var unset (defense in depth: a missing
           env var must not produce a broken link). */}
       <div style={{ fontSize: '10.5px', color: 'var(--muted)', lineHeight: 1.5, marginTop: 4 }}>

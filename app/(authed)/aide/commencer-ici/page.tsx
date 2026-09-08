@@ -6,7 +6,7 @@ import { getCurrentLang, t } from '@/lib/i18n';
 // The (authed) layout already calls requireUser(); both partner + admin
 // roles can read this page per D-28.
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Commencer ici — Leasétic Matrice' };
+export const metadata: Metadata = { title: 'Commencer ici — Leasetic Matrice' };
 
 /**
  * Aide article "Commencer ici" — Phase 18 Plan 06 Task 4 (HELP-01, D-24/26).

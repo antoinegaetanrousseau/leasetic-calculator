@@ -64,7 +64,7 @@ import { FinalizeButton } from './FinalizeButton';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Vérifier la proposition — Leasétic Matrice',
+  title: 'Vérifier la proposition — Leasetic Matrice',
 };
 
 interface PageProps {

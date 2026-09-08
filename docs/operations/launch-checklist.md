@@ -28,7 +28,7 @@ message rather than ticking the box.
 - [ ] **3.** Admin login at `https://matrice.leasetic.fr/${ADMIN_URL_SEGMENT}`, navigate to
   Coefficients. Confirm the yellow "Vérifier les coefficients" SeedBanner is visible (D-10-13/14)
   — this confirms the admin is still on placeholder D-D1 values from the seed migration. Customize
-  coefficients, commission rate, and max threshold to Leasétic's actual values. Save. Confirm the
+  coefficients, commission rate, and max threshold to Leasetic's actual values. Save. Confirm the
   banner disappears after save.
   Verify row inserted:
   ```bash
@@ -48,7 +48,7 @@ message rather than ticking the box.
   this is resolved.
 
 - [ ] **6.** Send pilot partner comms. Antoine drafts and sends directly. Thomas reviews tone if
-  needed. Email content: invitation URL flow, password setup steps, "Leasétic Matrice has moved
+  needed. Email content: invitation URL flow, password setup steps, "Leasetic Matrice has moved
   to a hosted version" framing. v10 remains accessible (partners have the HTML file) during pilot
   — pilot partners are explicit early adopters (D-10-20).
 

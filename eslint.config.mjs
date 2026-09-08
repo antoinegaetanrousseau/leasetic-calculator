@@ -8,7 +8,7 @@ const nextConfig = require('eslint-config-next/core-web-vitals');
 const nextTypescript = require('eslint-config-next/typescript');
 
 /**
- * Flat ESLint config for Leasétic Matrice v1.1.
+ * Flat ESLint config for Leasetic Matrice v1.1.
  *
  * Two-layer protection of OVH portability (BOOT-06, ARCHITECTURE §9, PITFALLS §6.1):
  *  Layer 1: ESLint `no-restricted-imports` rule — fails lint when forbidden packages

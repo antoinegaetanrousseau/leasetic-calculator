@@ -22,7 +22,7 @@ import { formatDate } from '@/lib/i18n/format';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Administration — Leasétic Matrice',
+  title: 'Administration — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

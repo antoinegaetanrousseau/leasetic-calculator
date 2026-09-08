@@ -38,7 +38,7 @@ async function getNowMs(): Promise<number> {
 }
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Accueil — Leasétic Matrice' };
+export const metadata: Metadata = { title: 'Accueil — Leasetic Matrice' };
 
 export default async function HomePage() {
   const { session, role } = await requireUser();

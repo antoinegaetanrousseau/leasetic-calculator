@@ -18,7 +18,7 @@
  *      deliberately an equality check on UNCHANGED values. Changing any of
  *      the three is allowed only alongside a new recorded measurement,
  *      which means editing this test consciously, not incidentally.
- *   6. the accent stays Leasétic's own in both themes; Colibris's teal
+ *   6. the accent stays Leasetic's own in both themes; Colibris's teal
  *      never appears
  *
  * This is a source-assertion suite: it reads files as text with `node:fs`
@@ -122,7 +122,7 @@ describe('dark palette — invariant gate (Phase 31.1 Plan 05, ROADMAP criterion
     expect(darkBlock).toMatch(/--sidebar-accent:\s*oklch\(0\.269 0 0\);/);
   });
 
-  it("the accent is Leasétic's, in both themes", () => {
+  it("the accent is Leasetic's, in both themes", () => {
     expect(darkBlock).toMatch(/--primary:\s*var\(--brand-accent\);/);
     expect(darkBlock).toMatch(/--sidebar-primary:\s*var\(--brand-accent\);/);
 

@@ -22,7 +22,7 @@ describe('SectionTitle', () => {
     expect(header!.textContent).toContain('HISTORIQUE');
   });
 
-  it('defaults the bullet to the Leasétic accent, which every caller used to set by hand', () => {
+  it('defaults the bullet to the Leasetic accent, which every caller used to set by hand', () => {
     const { container } = render(<SectionTitle>CLIENT</SectionTitle>);
     expect(bullet(container)!.className).toContain('bg-[var(--gd)]');
   });

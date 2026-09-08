@@ -1,4 +1,4 @@
-# Leasétic Calculator — project instructions
+# Leasetic Calculator — project instructions
 
 ## Design & UI conventions
 

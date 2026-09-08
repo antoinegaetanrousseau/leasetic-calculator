@@ -63,7 +63,7 @@ export default async function NotFoundPage() {
         <ThemeToggle current={theme} />
       </div>
 
-      {/* Leasétic wordmark above the card */}
+      {/* Leasetic wordmark above the card */}
       <div
         style={{
           fontWeight: 700,

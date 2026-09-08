@@ -11,7 +11,7 @@ import { CompanyRelationsTable } from './CompanyRelationsTable';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Société — Leasétic Matrice',
+  title: 'Société — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

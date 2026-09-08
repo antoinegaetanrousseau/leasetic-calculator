@@ -6,7 +6,7 @@
  *   (a) coefficient_history rows
  *   (b) partner status changes (users.updatedAt with status='inactive' or
  *       lastLoginAt transition from NULL → not-NULL).
- *   (c) invitations table — SKIPPED in current schema. The Leasétic schema
+ *   (c) invitations table — SKIPPED in current schema. The Leasetic schema
  *       has no `invitations` table; partner invites live in `password_resets`
  *       with `kind='invite'` and have NO `createdBy` actor reference. Per
  *       plan instructions: document and defer; Recent activity becomes a

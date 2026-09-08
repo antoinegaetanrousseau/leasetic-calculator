@@ -37,7 +37,7 @@ import { CoefficientHistoryList } from './CoefficientHistoryList';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Historique des coefficients — Leasétic Matrice',
+  title: 'Historique des coefficients — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

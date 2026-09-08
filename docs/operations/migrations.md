@@ -1,6 +1,6 @@
 # Database Migrations — Operator Runbook
 
-Leasétic Matrice v1.1 uses Drizzle ORM with versioned SQL migration files committed to git. This runbook covers:
+Leasetic Matrice v1.1 uses Drizzle ORM with versioned SQL migration files committed to git. This runbook covers:
 - The full migration lifecycle (dev → review → prod)
 - One-time GitHub setup (Antoine, before first prod migration)
 - How to apply a migration to production

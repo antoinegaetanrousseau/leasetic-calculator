@@ -10,7 +10,7 @@ import { db, schema } from '@/lib/db';
  *   - `Partenaires actifs` literal label = users.role='partner' AND status='active'
  *     where status='active' is DERIVED at query time per Phase 12 DB-02 D-10:
  *     `active = role='partner' AND deleted_at IS NULL AND last_login_at IS NOT NULL`.
- *     The Leasétic schema has NO `users.status` column — invited / active /
+ *     The Leasetic schema has NO `users.status` column — invited / active /
  *     inactive are derived from existing columns. See src/db/schema.ts +
  *     src/lib/db/queries/users.ts (`listInvitedPartners`) for the established
  *     pattern.

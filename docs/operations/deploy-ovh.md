@@ -49,12 +49,12 @@ Vercel Cron fires purge          Migrations applied locally
 Before beginning provisioning in September:
 
 - **Open Q5 resolved.** Provider choice (OVH Managed PG, Scaleway Postgres, self-host) confirmed
-  with Leasétic IT. Specific CLI invocations depend on this choice — they are TBD in this runbook
+  with Leasetic IT. Specific CLI invocations depend on this choice — they are TBD in this runbook
   and will be filled in before September (see `## Provisioning` below).
 - **S3-compatible blob provider chosen.** OVH Object Storage or Scaleway Object Storage both
   expose an S3-compatible endpoint. Credentials: `accessKeyId`, `secretAccessKey`, `endpoint`,
   `bucketName`.
-- **Domain + TLS plan.** DNS for `matrice.leasetic.fr` controlled by Leasétic IT. TLS termination
+- **Domain + TLS plan.** DNS for `matrice.leasetic.fr` controlled by Leasetic IT. TLS termination
   plan (OVH CDN, nginx with Certbot, or managed endpoint) decided before cutover.
 - **Secrets generated.** Run before provisioning:
   ```bash
@@ -302,7 +302,7 @@ If OVH smoke fails (any of 7 steps red): DNS reverts to Vercel. Partners notice 
 
 ```bash
 # DNS revert — matrice.leasetic.fr CNAME or A record back to Vercel
-# TBD: exact DNS command depends on Leasétic IT DNS provider
+# TBD: exact DNS command depends on Leasetic IT DNS provider
 ```
 
 **Critical:** OVH and Vercel/Neon are SEPARATE databases during the transition window. Any partner
@@ -331,7 +331,7 @@ Don't cut over until smoke passes + 1-week OVH pilot with a single trusted partn
 - [ ] Blob bucket policies set — private ACL, EU region, presigned URL access working
 - [ ] Smoke 7/7 green — `npm run smoke:ovh` exits 0 with `OVH-portability: PROVEN`
 - [ ] Cron wired + manual fire-test — `curl -X POST -H "Authorization: Bearer $CRON_SECRET" .../api/internal/purge-soft-deleted` returns 200
-- [ ] DNS TTL reduced 24 hours before cutover — Leasétic IT action
+- [ ] DNS TTL reduced 24 hours before cutover — Leasetic IT action
 - [ ] Antoine login + admin coefficients verification on OVH — confirm SeedBanner visible (seed values), then customize
 
 Cross-reference `docs/operations/launch-checklist.md` for the full pre-launch 9-step checklist.

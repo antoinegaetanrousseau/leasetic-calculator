@@ -43,7 +43,7 @@ async function getNowMs(): Promise<number> {
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Client — Leasétic Matrice',
+  title: 'Client — Leasetic Matrice',
 };
 
 interface PageProps {

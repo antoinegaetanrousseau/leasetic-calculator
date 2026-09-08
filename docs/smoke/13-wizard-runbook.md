@@ -59,7 +59,7 @@ L'app teste les copies FR (production partner-facing). Les test 1-7 ci-dessous r
 1. **Open Chrome.** Navigate to `<Base URL>/login`. Log in as Partner A.
 2. After login, navigate to `<Base URL>/proposals/new/parametres`.
 3. **Expected — page chrome:**
-   - Page title (browser tab): `Nouvelle proposition — Leasétic Matrice` (or equivalent).
+   - Page title (browser tab): `Nouvelle proposition — Leasetic Matrice` (or equivalent).
    - Heading on page: `Paramètres du projet`.
    - Subtitle below: `Saisissez les informations du client et les détails du projet. Vous pourrez sauvegarder à tout moment et reprendre plus tard.`
    - URL: redirected to `<Base URL>/proposals/new/parametres?draft_id=<a-uuid>` (a fresh draft minted; D-02).
@@ -203,7 +203,7 @@ L'app teste les copies FR (production partner-facing). Les test 1-7 ci-dessous r
    - From `/proposals/<new-uuid>`, locate the PDF download link.
    - Click it; the PDF downloads.
    - Open the PDF in your PDF viewer. Verify:
-     - Header shows `LEASÉTIC` brand mark.
+     - Header shows `LEASETIC` brand mark.
      - Title: `Proposition de location financière` (FR) or `Financial lease proposal` (EN).
      - `Réf. LC-YYYY-NNNN` (real allocated lc_ref, not the `XXX` placeholder).
      - Recipient block shows partnerCo + clientCo.
@@ -337,7 +337,7 @@ These are quick sanity checks, not ROUTE-01 success criteria but worth verifying
 ### 7.2 — On-demand path on step 2
 
 1. On step 1, enter `Montant HT = 750000` (above 500k seuil). Pick any duration. Click `Continuer vers le calcul →`.
-2. **Expected (step 2):** hero loyer card renders `Sur demande` (not a numeric value); sublabel `Contactez Leasétic`; tranche chip hidden; Détail card shows `—` placeholders for coefficient and loyer rows; primary CTA `Continuer vers la vérification →` STAYS ENABLED (partner can still finalize; the PDF will render "Sur demande").
+2. **Expected (step 2):** hero loyer card renders `Sur demande` (not a numeric value); sublabel `Contactez Leasetic`; tranche chip hidden; Détail card shows `—` placeholders for coefficient and loyer rows; primary CTA `Continuer vers la vérification →` STAYS ENABLED (partner can still finalize; the PDF will render "Sur demande").
 
 ### 7.3 — Save-as-draft round-trip
 

@@ -34,7 +34,7 @@ import { CreatePartnerForm } from './CreatePartnerForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Créer un partenaire — Leasétic Matrice',
+  title: 'Créer un partenaire — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

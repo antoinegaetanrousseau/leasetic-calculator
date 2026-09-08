@@ -81,7 +81,7 @@ describe('/aide landing — HELP-01 (D-25)', () => {
     const heading = container.querySelector('h1');
     expect(heading?.textContent).toBe("Centre d'aide");
     // Subtitle copy from aide.landing.subtitle (FR)
-    expect(container.textContent).toContain('Tout pour démarrer et bien utiliser Leasétic');
+    expect(container.textContent).toContain('Tout pour démarrer et bien utiliser Leasetic');
   });
 
   it('Test 2: renders exactly 3 .card elements in a 3-col grid (gap:24)', async () => {

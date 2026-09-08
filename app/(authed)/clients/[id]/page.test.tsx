@@ -452,7 +452,7 @@ describe('clients/[id]/page.tsx — source-level acceptance', () => {
     expect(pageSource).not.toMatch(/maxWidth/);
     expect(pageSource).toContain("export const dynamic = 'force-dynamic'");
     expect(pageSource).toMatch(/clientRelationshipId=/);
-    expect(metadata.title).toBe('Client — Leasétic Matrice');
+    expect(metadata.title).toBe('Client — Leasetic Matrice');
   });
 
   it('Test 13: the auth gate is first, and tab validation sits AFTER the 404 branch', async () => {

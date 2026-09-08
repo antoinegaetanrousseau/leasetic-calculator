@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
  * Used for /login, /invite/<token>, /reset/<token> (SHELL-03).
  *
  * Per 06-UI-SPEC.md §"Login Page Layout" + §"Invite / Reset Page Layout":
- * centered card + top-right LocaleToggle + ThemeToggle + Leasétic logo above
+ * centered card + top-right LocaleToggle + ThemeToggle + Leasetic logo above
  * card + footer with copyright + Mentions légales link.
  *
  * The Phase 5 root layout (app/layout.tsx) provides <html>, <body>, the no-flash
@@ -54,7 +54,7 @@ export default async function PublicLayout({ children }: { children: React.React
         <ThemeToggle current={theme} />
       </div>
 
-      {/* Phase 15 — Leasétic SVG logo lockup (PUB-01, PUB-02). The CSS class
+      {/* Phase 15 — Leasetic SVG logo lockup (PUB-01, PUB-02). The CSS class
           on the JSX below is matched by a rule in globals.css that drives
           responsive sizing via clamp(140px, 50vw, 200px); the Phase 11
           brand-logo CSS picker (lines 543-545) hides whichever variant does

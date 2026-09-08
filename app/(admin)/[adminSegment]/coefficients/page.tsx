@@ -26,7 +26,7 @@ function coefficientsEqual(a: Coefficients, b: Coefficients): boolean {
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Coefficients — Leasétic Matrice',
+  title: 'Coefficients — Leasetic Matrice',
   // Robots: noindex (admin URL is hidden — defense in depth even if crawler somehow finds it).
   robots: { index: false, follow: false },
 };

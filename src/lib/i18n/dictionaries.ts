@@ -1,5 +1,5 @@
 /**
- * i18n dictionary — Leasétic Matrice v1.1.
+ * i18n dictionary — Leasetic Matrice v1.1.
  *
  * Two-namespace structure:
  *  - 5 legacy camelCase keys (welcomeHeading, etc.) preserved for backward-compat
@@ -19,7 +19,7 @@
 export const dictionaries = {
   fr: {
     // ── Legacy Phase 5 camelCase keys (preserved for backward-compat) ─────────
-    welcomeHeading: 'Bienvenue sur Leasétic Matrice',
+    welcomeHeading: 'Bienvenue sur Leasetic Matrice',
     welcomeSubtext: 'Application en cours de déploiement.',
     themeLight: 'Clair',
     themeDark: 'Sombre',
@@ -32,13 +32,13 @@ export const dictionaries = {
     //   toast.* (3), error.* (5), confirm.* (2), common.* (3) = 166 total
 
     // header
-    'header.title': 'Proposition de location — Leasétic',
-    'header.title.with.partner': 'Proposition de location — {0} — by Leasétic',
-    'header.title.default': 'Proposition de location by Leasétic',
+    'header.title': 'Proposition de location — Leasetic',
+    'header.title.with.partner': 'Proposition de location — {0} — by Leasetic',
+    'header.title.default': 'Proposition de location by Leasetic',
     'header.admin': '⚙ Admin',
     'header.generate': 'Générer la proposition →',
     // sidebar / topbar / footer
-    'sidebar.brand': 'Leasétic',
+    'sidebar.brand': 'Leasetic',
     'sidebar.collapse': 'Réduire le menu',
     'sidebar.expand': 'Déployer le menu',
     'sidebar.lang.cycle': 'Changer de langue',
@@ -59,7 +59,7 @@ export const dictionaries = {
     'topbar.action.voir_proposition': 'Voir la proposition',
     'admin.sbar.lock': 'Verrouiller',
     'admin.sbar.save': 'Enregistrer',
-    'footer.text': '© 2026 Leasétic · Matrice v10',
+    'footer.text': '© 2026 Leasetic · Matrice v10',
     // tabs
     'tab.saisie': 'Saisie',
     'tab.resultat': 'Résultat',
@@ -135,14 +135,14 @@ export const dictionaries = {
     'proposal.nores': "Générez d'abord une proposition",
     'proposal.rse.filename.label': 'Proposition + RSE —',
     'proposal.offer.title': 'Proposition de location',
-    'proposal.offer.by': 'by Leasétic',
+    'proposal.offer.by': 'by Leasetic',
     'proposal.title': 'Offre de location financière',
     'proposal.ref.date.line': '№ {0}  ·  {1}',
     'proposal.montant.label': 'Montant financé HT',
     'proposal.montant.sub': 'Hors taxes',
     'proposal.loyer.label': 'Loyer mensuel HT',
     'proposal.loyer.sub.months': '/ mois sur {0} mois',
-    'proposal.loyer.contact': 'Contactez Leasétic',
+    'proposal.loyer.contact': 'Contactez Leasetic',
     'proposal.duree.label': 'Durée',
     'proposal.duree.months': 'mois',
     'proposal.dest.label': 'Destinataire',
@@ -156,7 +156,7 @@ export const dictionaries = {
     'proposal.yn.yes': '✓ Oui',
     'proposal.yn.no': 'Non',
     'proposal.yn.nc': 'Non renseigné',
-    'proposal.why.title': 'Pourquoi choisir Leasétic ?',
+    'proposal.why.title': 'Pourquoi choisir Leasetic ?',
     'proposal.tile.1.title': 'Solution sur-mesure',
     'proposal.tile.1.body': "30 ans d'expérience en location et gestion d'actifs IT. Accompagnement adapté, en direct ou via votre intégrateur.",
     'proposal.tile.2.title': 'Résultats rapides',
@@ -167,14 +167,14 @@ export const dictionaries = {
     'proposal.tile.4.body': 'Transformez vos dépenses IT de CAPEX en OPEX. Préservez votre trésorerie pour vos priorités stratégiques.',
     'proposal.tile.5.title': 'Cycles maîtrisés',
     'proposal.tile.5.body': "Renouvellement fluidifié, fin d'obsolescence subie. Des outils performants et à jour.",
-    'proposal.conditions': "Proposition valable jusqu'au <strong>{0}</strong>, sous réserve de l'accord du comité des engagements de Leasétic. Les loyers sont exprimés HT, TVA au taux en vigueur. La présente proposition est soumise aux Conditions Générales de Location de Leasétic, disponibles sur <strong>www.leasetic.fr</strong>. Document non contractuel établi par {1} pour le compte de Leasétic.",
-    'proposal.foot.tag': 'Leasétic — Location financière IT responsable · <strong>www.leasetic.fr</strong>',
+    'proposal.conditions': "Proposition valable jusqu'au <strong>{0}</strong>, sous réserve de l'accord du comité des engagements de Leasetic. Les loyers sont exprimés HT, TVA au taux en vigueur. La présente proposition est soumise aux Conditions Générales de Location de Leasetic, disponibles sur <strong>www.leasetic.fr</strong>. Document non contractuel établi par {1} pour le compte de Leasetic.",
+    'proposal.foot.tag': 'Leasetic — Location financière IT responsable · <strong>www.leasetic.fr</strong>',
     'proposal.foot.page1': 'Page 1 / 2',
     'proposal.foot.page2': 'Page 2 / 2',
     'proposal.rse.alt': 'Notre démarche RSE',
     'proposal.rse.caption': 'Notre engagement RSE',
     // admin
-    'admin.login.title': 'Espace Administration Leasétic',
+    'admin.login.title': 'Espace Administration Leasetic',
     'admin.login.sub': 'Saisissez le mot de passe pour configurer les coefficients',
     'admin.login.placeholder': 'Mot de passe',
     'admin.login.submit': 'Accéder',
@@ -258,7 +258,7 @@ export const dictionaries = {
     'auth.error.generic': 'Une erreur est survenue. Réessayez.',
     'auth.hint.forgot.password': 'Mot de passe oublié ? Contactez votre administrateur.',
     'auth.invite.title': 'Définir votre mot de passe',
-    'auth.invite.subtitle': 'Bienvenue sur Leasétic. Définissez votre mot de passe pour activer votre compte.',
+    'auth.invite.subtitle': 'Bienvenue sur Leasetic. Définissez votre mot de passe pour activer votre compte.',
     'auth.reset.title': 'Réinitialiser le mot de passe',
     'auth.reset.subtitle': 'Choisissez un nouveau mot de passe pour votre compte.',
     'auth.token.invalid.title': 'Lien invalide ou expiré',
@@ -295,10 +295,10 @@ export const dictionaries = {
     'shell.breadcrumb.proposalDetail': 'Proposition',
     'shell.locale.toggle.aria': 'Changer la langue',
     'shell.theme.toggle.aria': 'Changer le thème',
-    'shell.footer.copyright': '© 2026 Leasétic — Application interne',
+    'shell.footer.copyright': '© 2026 Leasetic — Application interne',
     'shell.footer.privacy': 'Mentions légales',
     'error.boundary.title': "Une erreur s'est produite.",
-    'error.boundary.body': 'Si le problème persiste, contactez Leasétic.',
+    'error.boundary.body': 'Si le problème persiste, contactez Leasetic.',
     'error.boundary.retry': 'Réessayer',
     'error.404.display': '404',
     'error.404.title': 'Page introuvable',
@@ -475,7 +475,7 @@ export const dictionaries = {
     'pdf.loyer.label': 'LOYER MENSUEL HT',
     'pdf.loyer.subtext': 'sur {0} mois',
     'pdf.loyer.on.demand': 'Sur demande',
-    'pdf.validity.caption': "Proposition valable jusqu\u2019au {0} ({1} jours), sous réserve de l\u2019accord du comité des engagements de Leasétic. Document non contractuel.",
+    'pdf.validity.caption': "Proposition valable jusqu\u2019au {0} ({1} jours), sous réserve de l\u2019accord du comité des engagements de Leasetic. Document non contractuel.",
     'pdf.footer.left': 'N° {0} · Créée le {1}',
 
     // ── Phase 9 — Admin Surface (UI-SPEC §9) ───────────────────────────────────
@@ -862,7 +862,7 @@ export const dictionaries = {
 
     // Aide landing (UI-SPEC rows 70-79; D-23/D-25)
     'aide.landing.title': "Centre d'aide",
-    'aide.landing.subtitle': 'Tout pour démarrer et bien utiliser Leasétic',
+    'aide.landing.subtitle': 'Tout pour démarrer et bien utiliser Leasetic',
     'aide.landing.card.commencerIci.title': 'Commencer ici',
     'aide.landing.card.commencerIci.body': 'Premier guide pour créer une proposition en 3 étapes.',
     'aide.landing.card.commencerIci.cta': 'Lire le guide →',
@@ -1310,7 +1310,7 @@ export const dictionaries = {
   },
   en: {
     // ── Legacy Phase 5 camelCase keys ─────────────────────────────────────────
-    welcomeHeading: 'Welcome to Leasétic Matrice',
+    welcomeHeading: 'Welcome to Leasetic Matrice',
     welcomeSubtext: 'Application deployment in progress.',
     themeLight: 'Light',
     themeDark: 'Dark',
@@ -1318,13 +1318,13 @@ export const dictionaries = {
 
     // ── v10 ported dictionary EN counterparts ─────────────────────────────────
     // header
-    'header.title': 'Lease proposal — Leasétic',
-    'header.title.with.partner': 'Lease proposal — {0} — by Leasétic',
-    'header.title.default': 'Lease proposal by Leasétic',
+    'header.title': 'Lease proposal — Leasetic',
+    'header.title.with.partner': 'Lease proposal — {0} — by Leasetic',
+    'header.title.default': 'Lease proposal by Leasetic',
     'header.admin': '⚙ Admin',
     'header.generate': 'Generate proposal →',
     // sidebar / topbar / footer
-    'sidebar.brand': 'Leasétic',
+    'sidebar.brand': 'Leasetic',
     'sidebar.collapse': 'Collapse menu',
     'sidebar.expand': 'Expand menu',
     'sidebar.lang.cycle': 'Change language',
@@ -1345,7 +1345,7 @@ export const dictionaries = {
     'topbar.action.voir_proposition': 'View proposal',
     'admin.sbar.lock': 'Lock',
     'admin.sbar.save': 'Save',
-    'footer.text': '© 2026 Leasétic · Matrix v10',
+    'footer.text': '© 2026 Leasetic · Matrix v10',
     // tabs
     'tab.saisie': 'Input',
     'tab.resultat': 'Result',
@@ -1421,14 +1421,14 @@ export const dictionaries = {
     'proposal.nores': 'Generate a proposal first',
     'proposal.rse.filename.label': 'Proposal + CSR —',
     'proposal.offer.title': 'Lease proposal',
-    'proposal.offer.by': 'by Leasétic',
+    'proposal.offer.by': 'by Leasetic',
     'proposal.title': 'Financial lease offer',
     'proposal.ref.date.line': 'No. {0}  ·  {1}',
     'proposal.montant.label': 'Financed amount (ex-VAT)',
     'proposal.montant.sub': 'Excluding tax',
     'proposal.loyer.label': 'Monthly rent (ex-VAT)',
     'proposal.loyer.sub.months': '/ month over {0} months',
-    'proposal.loyer.contact': 'Contact Leasétic',
+    'proposal.loyer.contact': 'Contact Leasetic',
     'proposal.duree.label': 'Term',
     'proposal.duree.months': 'months',
     'proposal.dest.label': 'Recipient',
@@ -1442,7 +1442,7 @@ export const dictionaries = {
     'proposal.yn.yes': '✓ Yes',
     'proposal.yn.no': 'No',
     'proposal.yn.nc': 'Not specified',
-    'proposal.why.title': 'Why choose Leasétic?',
+    'proposal.why.title': 'Why choose Leasetic?',
     'proposal.tile.1.title': 'Tailored solution',
     'proposal.tile.1.body': '30 years of expertise in IT asset leasing and lifecycle management. Support adapted to you, direct or through your integrator.',
     'proposal.tile.2.title': 'Fast results',
@@ -1453,14 +1453,14 @@ export const dictionaries = {
     'proposal.tile.4.body': 'Shift your IT spend from CAPEX to OPEX. Preserve cash flow for your strategic priorities.',
     'proposal.tile.5.title': 'Controlled cycles',
     'proposal.tile.5.body': 'Smooth refresh cycles, no more forced obsolescence. Hardware that stays performant and current.',
-    'proposal.conditions': "Proposal valid until <strong>{0}</strong>, subject to approval by Leasétic's credit committee. Rents are quoted ex-VAT, VAT at the applicable rate. This proposal is subject to Leasétic's General Leasing Terms, available at <strong>www.leasetic.fr</strong>. Non-contractual document issued by {1} on behalf of Leasétic.",
-    'proposal.foot.tag': 'Leasétic — Responsible IT financial leasing · <strong>www.leasetic.fr</strong>',
+    'proposal.conditions': "Proposal valid until <strong>{0}</strong>, subject to approval by Leasetic's credit committee. Rents are quoted ex-VAT, VAT at the applicable rate. This proposal is subject to Leasetic's General Leasing Terms, available at <strong>www.leasetic.fr</strong>. Non-contractual document issued by {1} on behalf of Leasetic.",
+    'proposal.foot.tag': 'Leasetic — Responsible IT financial leasing · <strong>www.leasetic.fr</strong>',
     'proposal.foot.page1': 'Page 1 / 2',
     'proposal.foot.page2': 'Page 2 / 2',
     'proposal.rse.alt': 'Our CSR approach',
     'proposal.rse.caption': 'Our CSR commitment',
     // admin
-    'admin.login.title': 'Leasétic Administration',
+    'admin.login.title': 'Leasetic Administration',
     'admin.login.sub': 'Enter the password to configure coefficients',
     'admin.login.placeholder': 'Password',
     'admin.login.submit': 'Sign in',
@@ -1544,7 +1544,7 @@ export const dictionaries = {
     'auth.error.generic': 'An error occurred. Please try again.',
     'auth.hint.forgot.password': 'Forgot your password? Contact your admin.',
     'auth.invite.title': 'Set your password',
-    'auth.invite.subtitle': 'Welcome to Leasétic. Set your password to activate your account.',
+    'auth.invite.subtitle': 'Welcome to Leasetic. Set your password to activate your account.',
     'auth.reset.title': 'Reset your password',
     'auth.reset.subtitle': 'Choose a new password for your account.',
     'auth.token.invalid.title': 'Invalid or expired link',
@@ -1579,10 +1579,10 @@ export const dictionaries = {
     'shell.breadcrumb.proposalDetail': 'Proposal',
     'shell.locale.toggle.aria': 'Change language',
     'shell.theme.toggle.aria': 'Change theme',
-    'shell.footer.copyright': '© 2026 Leasétic — Internal application',
+    'shell.footer.copyright': '© 2026 Leasetic — Internal application',
     'shell.footer.privacy': 'Privacy notice',
     'error.boundary.title': 'Something went wrong.',
-    'error.boundary.body': 'If the problem persists, contact Leasétic.',
+    'error.boundary.body': 'If the problem persists, contact Leasetic.',
     'error.boundary.retry': 'Try again',
     'error.404.display': '404',
     'error.404.title': 'Page not found',
@@ -2102,7 +2102,7 @@ export const dictionaries = {
 
     // Aide landing
     'aide.landing.title': 'Help Center',
-    'aide.landing.subtitle': 'Everything you need to get started with Leasétic',
+    'aide.landing.subtitle': 'Everything you need to get started with Leasetic',
     'aide.landing.card.commencerIci.title': 'Start here',
     'aide.landing.card.commencerIci.body': 'First guide to create a proposal in 3 steps.',
     'aide.landing.card.commencerIci.cta': 'Read the guide →',

@@ -16,7 +16,7 @@ import { ExportButton } from './_components/ExportButton';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Mes propositions — Leasétic Matrice',
+  title: 'Mes propositions — Leasetic Matrice',
 };
 
 interface PageParams {

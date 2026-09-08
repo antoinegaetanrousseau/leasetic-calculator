@@ -80,7 +80,7 @@ The constant is defined in `src/lib/db/queries/proposals.ts`:
 const SOFT_DELETE_WINDOW = sql`now() - interval '30 days'`;
 ```
 
-A future v1.2 can expose this as an operator-configurable env var if Leasétic
+A future v1.2 can expose this as an operator-configurable env var if Leasetic
 legal requires a longer retention window.
 
 ## Failure modes

@@ -14,8 +14,8 @@ describe('BrandLogo', () => {
   });
 
   it('AC-BL-06b: renders both <img> with provided alt when alt prop given (CSS picker hides one, duplication OK)', () => {
-    const { container } = render(<BrandLogo alt="Leasétic" />);
-    const altMatches = getAllByAltText(container, 'Leasétic');
+    const { container } = render(<BrandLogo alt="Leasetic" />);
+    const altMatches = getAllByAltText(container, 'Leasetic');
     expect(altMatches).toHaveLength(2);
   });
 

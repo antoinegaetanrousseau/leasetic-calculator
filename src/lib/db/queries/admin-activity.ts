@@ -18,7 +18,7 @@ import { db, schema } from '@/lib/db';
  *       sentenceArgs[0] and a generic `Admin` actor for display).
  *
  * Source DEFERRED — Phase 18 partial (D-05 documented):
- *   (c) invitations — the Leasétic schema has NO `invitations` table. Partner
+ *   (c) invitations — the Leasetic schema has NO `invitations` table. Partner
  *       invites live in `password_resets` (kind='invite') and have NO
  *       `createdBy` actor reference. Adding invite-with-actor support requires
  *       schema work outside Phase 18's scope. Recent activity ships as a

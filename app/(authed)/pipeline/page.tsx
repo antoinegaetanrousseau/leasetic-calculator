@@ -16,7 +16,7 @@ import { PipelineMobileList } from './PipelineMobileList';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Pipeline — Leasétic Matrice',
+  title: 'Pipeline — Leasetic Matrice',
 };
 
 /**

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 /**
- * Inter — the Leasétic Group design-system typeface (Figma DS + ReUI Maia preset).
+ * Inter — the Leasetic Group design-system typeface (Figma DS + ReUI Maia preset).
  * Replaced the previous self-hosted Plus Jakarta Sans; next/font/google downloads the
  * font at build time and serves it from our own origin, so there is no runtime request
  * to Google and the UI-SPEC §Font Loading Contract still holds.
@@ -25,8 +25,8 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: 'Leasétic Matrice',
-  description: 'Matrice commerciale Leasétic — application interne',
+  title: 'Leasetic Matrice',
+  description: 'Matrice commerciale Leasetic — application interne',
 };
 
 // SECURITY: NO_FLASH_SCRIPT is a compile-time string constant defined in

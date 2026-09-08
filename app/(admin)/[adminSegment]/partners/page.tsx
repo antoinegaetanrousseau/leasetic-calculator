@@ -13,7 +13,7 @@ import { PartnersFilterPillTabs } from './_components/PartnersFilterPillTabs';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Partenaires — Leasétic Matrice',
+  title: 'Partenaires — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

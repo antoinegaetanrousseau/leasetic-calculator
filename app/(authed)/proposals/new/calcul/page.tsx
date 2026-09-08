@@ -65,7 +65,7 @@ import { saveAsDraftAction } from '../_actions/saveAsDraft.action';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Résultat du calcul — Leasétic Matrice',
+  title: 'Résultat du calcul — Leasetic Matrice',
 };
 
 interface PageProps {

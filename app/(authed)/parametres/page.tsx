@@ -22,7 +22,7 @@ import { ParametresForm } from './ParametresForm';
 
 // Cookie/session-reading page → opt out of static rendering (PITFALLS §1.6).
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Paramètres — Leasétic Matrice' };
+export const metadata: Metadata = { title: 'Paramètres — Leasetic Matrice' };
 
 /**
  * Split a Better Auth `user.name` ("Antoine Rousseau") into Prénom + Nom.

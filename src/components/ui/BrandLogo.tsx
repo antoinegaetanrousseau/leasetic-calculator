@@ -1,5 +1,5 @@
 /**
- * BrandLogo — Leasétic light/dark logo lockup (UI-SPEC §6.1, ASSET-01 + ASSET-02).
+ * BrandLogo — Leasetic light/dark logo lockup (UI-SPEC §6.1, ASSET-01 + ASSET-02).
  *
  * Renders TWO <img> tags side-by-side; the brand-logo CSS picker rules in
  * app/globals.css (added by Plan 11-01) hide whichever variant does not

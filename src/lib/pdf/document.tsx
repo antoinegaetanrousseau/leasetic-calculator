@@ -100,7 +100,7 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
   return (
     <Document
       title={`Proposition ${lcRef}`}
-      author="Leasétic"
+      author="Leasetic"
       subject="Financial lease proposal"
       keywords={`leasetic,proposal,${lcRef}`}
       creator="Leasetic Matrice v1.1"
@@ -129,7 +129,7 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
               fontSize: pdfFontSizes.title,
               fontWeight: pdfFontWeights.bold,
               color: pdfColors.navy,
-            }}>LEASÉTIC</Text>
+            }}>LEASETIC</Text>
             <Text style={{
               fontSize: pdfFontSizes.caption,
               fontWeight: pdfFontWeights.regular,

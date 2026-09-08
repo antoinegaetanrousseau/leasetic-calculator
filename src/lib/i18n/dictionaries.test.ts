@@ -21,7 +21,7 @@ describe('i18n dictionary parity', () => {
   });
 
   it('preserves the 5 legacy camelCase keys (Phase 6-06 backward-compat)', () => {
-    expect(dictionaries.fr.welcomeHeading).toBe('Bienvenue sur Leasétic Matrice');
+    expect(dictionaries.fr.welcomeHeading).toBe('Bienvenue sur Leasetic Matrice');
     expect(dictionaries.fr.welcomeSubtext).toBe('Application en cours de déploiement.');
     expect(dictionaries.fr.themeLight).toBe('Clair');
     expect(dictionaries.fr.themeDark).toBe('Sombre');

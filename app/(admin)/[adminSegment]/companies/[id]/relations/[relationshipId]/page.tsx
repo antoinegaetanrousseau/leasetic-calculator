@@ -18,7 +18,7 @@ import {
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Relation — Leasétic Matrice',
+  title: 'Relation — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

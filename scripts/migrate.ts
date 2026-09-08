@@ -1,5 +1,5 @@
 /**
- * Migration runner for Leasétic Matrice v1.1.
+ * Migration runner for Leasetic Matrice v1.1.
  *
  * Usage:
  *   npm run db:migrate              — applies all pending migrations

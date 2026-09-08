@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 export interface SectionTitleProps extends React.ComponentProps<'div'> {
   /**
-   * Accent of the leading bullet. `gd` is the Leasétic green every existing
+   * Accent of the leading bullet. `gd` is the Leasetic green every existing
    * caller asked for by hand; `teal` matches the /parametres eyebrow.
    */
   accent?: 'gd' | 'teal';

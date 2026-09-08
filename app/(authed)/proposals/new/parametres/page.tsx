@@ -73,7 +73,7 @@ import { WizardStep1Wiring } from './WizardStep1Wiring';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Nouvelle proposition — Leasétic Matrice',
+  title: 'Nouvelle proposition — Leasetic Matrice',
 };
 
 interface PageProps {

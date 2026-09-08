@@ -11,7 +11,7 @@ import { CreateClientDialog } from './CreateClientDialog';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Clients — Leasétic Matrice',
+  title: 'Clients — Leasetic Matrice',
 };
 
 interface PageProps {

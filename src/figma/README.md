@@ -1,4 +1,4 @@
-# Code Connect templates — Leasétic Design System
+# Code Connect templates — Leasetic Design System
 
 Parserless Code Connect templates (`.figma.ts`) mapping components in the
 [Leasetic Design System Figma file](https://www.figma.com/design/OUl6fQsessGM6AcnSau98g/Leasetic-Design-System?node-id=4-1407)

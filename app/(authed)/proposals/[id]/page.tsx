@@ -30,7 +30,7 @@ async function getNowMs(): Promise<number> {
 // PITFALLS §1.6 — cookie/session reads require force-dynamic.
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = { title: 'Proposition — Leasétic Matrice' };
+export const metadata: Metadata = { title: 'Proposition — Leasetic Matrice' };
 
 interface PageProps {
   params: Promise<{ id: string }>;

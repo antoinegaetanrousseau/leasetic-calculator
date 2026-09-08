@@ -2,7 +2,7 @@
  * Phase 15 — public-layout BrandLogo swap test (PUB-01, PUB-02).
  *
  * Tests the shared `(public)` layout server component after the v1.1 plain-text
- * "Leasétic" header is replaced by the Phase 11 `<BrandLogo>` SVG component.
+ * "Leasetic" header is replaced by the Phase 11 `<BrandLogo>` SVG component.
  *
  * Implementation note (first-of-kind in this codebase):
  *   PublicLayout is an async React Server Component. Vitest + jsdom cannot
@@ -24,8 +24,8 @@ vi.mock('@/lib/i18n', () => ({
   getCurrentLang: async () => 'fr',
   getCurrentTheme: async () => 'light',
   t: (key: string) => {
-    if (key === 'sidebar.brand') return 'Leasétic';
-    if (key === 'shell.footer.copyright') return '© Leasétic 2026';
+    if (key === 'sidebar.brand') return 'Leasetic';
+    if (key === 'shell.footer.copyright') return '© Leasetic 2026';
     if (key === 'shell.footer.privacy') return 'Mentions légales';
     return key;
   },
@@ -73,11 +73,11 @@ describe('app/(public)/layout — Phase 15 BrandLogo swap (PUB-01, PUB-02)', () 
     expect(darkImg).not.toBeNull();
     expect(lightImg).toHaveAttribute('src', '/logo-light.svg');
     expect(darkImg).toHaveAttribute('src', '/logo-dark.svg');
-    expect(lightImg).toHaveAttribute('alt', 'Leasétic');
-    expect(darkImg).toHaveAttribute('alt', 'Leasétic');
+    expect(lightImg).toHaveAttribute('alt', 'Leasetic');
+    expect(darkImg).toHaveAttribute('alt', 'Leasetic');
   });
 
-  it('AC-15-BL-02: does NOT render the v1.1 plain-text Leasétic header (fontSize: 22 / fontWeight: 700 styled div)', async () => {
+  it('AC-15-BL-02: does NOT render the v1.1 plain-text Leasetic header (fontSize: 22 / fontWeight: 700 styled div)', async () => {
     const { container } = await renderPublicLayout();
 
     // The v1.1 plain-text header was a <div> styled with fontWeight: 700 +

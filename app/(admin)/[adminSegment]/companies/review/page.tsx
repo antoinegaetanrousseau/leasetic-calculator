@@ -9,7 +9,7 @@ import { PairReviewList } from './PairReviewList';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Réconciliation — Leasétic Matrice',
+  title: 'Réconciliation — Leasetic Matrice',
   robots: { index: false, follow: false },
 };
 

@@ -4,7 +4,7 @@
 **Status:** Closed — privacy notice updated 2026-05-29.
 
 This document is the legal-side paper trail for the v1.3 partner-onboarding gates. It confirms
-that Leasétic's public privacy notice on `leasetic.fr` was updated to cover (a) Vercel + Neon
+that Leasetic's public privacy notice on `leasetic.fr` was updated to cover (a) Vercel + Neon
 EU hosting as data processors and (b) 10-year PDF retention as a new processing activity tied
 to French Commercial Code L123-22 / L110-4.
 

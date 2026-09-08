@@ -40,12 +40,12 @@ function readThemeCookie(): 'light' | 'dark' | 'system' {
 const STR = {
   fr: {
     title: "Une erreur s'est produite.",
-    body: 'Si le problème persiste, contactez Leasétic.',
+    body: 'Si le problème persiste, contactez Leasetic.',
     retry: 'Réessayer',
   },
   en: {
     title: 'Something went wrong.',
-    body: 'If the problem persists, contact Leasétic.',
+    body: 'If the problem persists, contact Leasetic.',
     retry: 'Try again',
   },
 } as const;
@@ -112,7 +112,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         <ThemeToggle current={theme} />
       </div>
 
-      {/* Leasétic wordmark above the card */}
+      {/* Leasetic wordmark above the card */}
       <div
         style={{
           fontWeight: 700,
@@ -121,7 +121,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           marginBottom: 16,
         }}
       >
-        {'Leasétic'}
+        {'Leasetic'}
       </div>
 
       {/* Error card */}

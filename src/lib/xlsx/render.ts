@@ -69,7 +69,7 @@ export async function generateProposalsXlsx(
   const { rows, locale } = args;
 
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = 'Leasétic Matrice';
+  workbook.creator = 'Leasetic Matrice';
   workbook.created = new Date();
 
   const worksheet = workbook.addWorksheet('Propositions');

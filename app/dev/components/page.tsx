@@ -54,8 +54,8 @@ export default function DevComponentsPage() {
       <section style={section}>
         <h2 style={sectionTitle}>BrandLogo</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <BrandLogo width={190} alt="Leasétic" />
-          <BrandLogo width={120} alt="Leasétic" />
+          <BrandLogo width={190} alt="Leasetic" />
+          <BrandLogo width={120} alt="Leasetic" />
           {/* eslint-disable-next-line @next/next/no-img-element -- intentional: mark-only static asset, no theme switch needed */}
           <img src="/logo-mark.svg" width={36} height={36} alt="" />
         </div>
