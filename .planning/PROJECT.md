@@ -163,10 +163,16 @@ https://claude.ai/design/p/004ac2c2-f4ad-4ee7-8f77-49d79542d512
   contact, then a navy-outlined loyer hero beside the financial-conditions table), the conditions
   paragraph, a bottom-pinned acceptance + signature + company-stamp block, and a legal footer with
   the company registration line and a 14%-opacity icon mark.
-- **New captured data** — `client.siret`, `advisor.role`, `advisor.phone`, `partner.phone` added to
-  the wizard and the inputs schema.
-- **Advisor block** derived from the authenticated creating user (name + email from the account;
-  role and phone newly captured).
+- **New captured data** — `client.siret` added to the wizard and the inputs schema; the partner
+  company telephone and the partner's own telephone captured on the partner account and carried
+  onto the proposal; the Leasetic advisor's name, fonction, telephone and email held as a single
+  admin-editable setting.
+- **Partner block** sourced from the authenticated creating user's account (company, commercial,
+  telephone) — the client's primary contact.
+- **Advisor block** sourced from the single Leasetic advisor setting and read live at render — the
+  client's supporting contact. *(Reconciled 2026-09-08 by Phase 42 D-06 / D-12: the advisor is a
+  Leasetic-side person supporting the partner's relationship with the end client, not the creating
+  user.)*
 - **`Total des loyers HT`** — new derived line (`monthlyRent × termMonths`) on the client-facing PDF.
 - **Bilingual retained** — FR and EN both built from their design files; `proposals.language`
   continues to drive rendering.
