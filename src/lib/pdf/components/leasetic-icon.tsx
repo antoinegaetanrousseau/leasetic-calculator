@@ -16,15 +16,18 @@ export interface LeaseticIconProps {
  * (D-07 option 1) and no `transform` attribute is emitted — the geometry is
  * correct whether or not react-pdf's partial SVG support honours the
  * transform. `src/lib/pdf/components/marks.test.tsx` records the verdict.
+ *
+ * D-07 evidence (Task 2) also found that `style={{ opacity }}` on `<Svg>` is
+ * a *silent no-op* in @react-pdf/renderer 4.5.1 — no `ExtGState`/`gs`
+ * operator appears in the rendered content stream. Passing `opacity` as a
+ * direct presentation attribute on `<Svg>` does emit the `gs` operator, so
+ * that is what this component uses instead of the plan's literal `style`
+ * form (Rule 1 auto-fix — a bug caught by the evidence test this plan
+ * mandates).
  */
 export function LeaseticIcon({ size, opacity }: LeaseticIconProps) {
   return (
-    <Svg
-      viewBox="0 0 200 200"
-      width={size}
-      height={size}
-      style={opacity !== undefined ? { opacity } : undefined}
-    >
+    <Svg viewBox="0 0 200 200" width={size} height={size} opacity={opacity}>
       <Ellipse cx={80} cy={50} rx={20} ry={50} fill={pdfColors.brandGreen} />
       <Ellipse cx={120} cy={150} rx={20} ry={50} fill={pdfColors.brandGreen} />
       {/* D-07: source is rx=20 ry=50, rotated -90 degrees about (150, 80); that origin
