@@ -68,6 +68,17 @@ export const users = pgTable('users', {
   // PTYPE-01: partner type dimension — Agent / Commercial / Partenaire.
   // DEFAULT 'Partenaire' ensures existing rows stay Partenaire on migration (PTYPE-02).
   partnerType: text('partner_type').notNull().default('Partenaire'),
+  // FIELD-02 / D-13: the partner company's telephone. Admin-write-only — set on the
+  // admin "create/edit partner" form (src/lib/admin/schemas.ts), never partner-editable.
+  // Nullable by design: every existing account has none, and this column never blocks
+  // finalization (an absent value renders as an em dash per Phase 43 DOC-11). No CHECK
+  // constraint — phone shape is validated at the Zod layer (optionalPhoneSchema).
+  companyTelephone: text('company_telephone'),
+  // PROF-01 / D-19: the partner's own telephone. Partner-writable via /parametres and
+  // admin-seedable on the admin partner form. This is the single field PROF-02's
+  // finalization gate reads (D-17). Nullable by design and unvalidated at the DB layer,
+  // same rationale as companyTelephone above.
+  telephone: text('telephone'),
 }, (table) => [
   // ROLE-01: widened from ('partner', 'admin') to add 'sales' (Phase 30 CRM registry —
   // internal Commercial staff need role-gated access, see drizzle/0007_phase30_crm_registry.sql).
@@ -174,6 +185,47 @@ export const globalParams = pgTable('global_params', {
   // "current" lookup — server reads most-recent by effective_from desc.
   index('global_params_effective_from_idx').on(sql`${table.effectiveFrom} DESC`),
 ]);
+
+/**
+ * The single Leasetic advisor identity (PROF-03 / D-07 / D-08 / D-09).
+ *
+ * Deliberately NOT modeled like `globalParams` above, despite both being
+ * admin-editable settings:
+ *   - `globalParams` is append-only history — every admin save INSERTs a new row,
+ *     and proposals.params_snapshot freezes a copy of the row current at creation
+ *     time (DATA-05/06). Contact details do not belong in that financial snapshot
+ *     (D-08): this table holds none of the calc-relevant fields and is never read
+ *     into params_snapshot or inputs.
+ *   - `leasetic_advisor` is a plain single-row settings table, seeded once by this
+ *     migration at a fixed literal id and updated in place by every subsequent
+ *     admin save (fixed-id UPDATE, never INSERT). A fixed-id UPDATE is race-safe
+ *     without a lock; an "insert if absent" branch would let two concurrent admin
+ *     saves each create a competing singleton row, which is exactly the failure
+ *     mode this shape avoids. That is also why `id` has no `.defaultRandom()` —
+ *     every read and write targets the one literal id the seed migration inserts.
+ *   - D-09: read live at proposal-render time, never snapshotted into
+ *     proposals.inputs. A client opening any proposal reaches whoever is
+ *     configured today; re-rendering an old proposal after the advisor changes
+ *     will not reproduce the originally delivered bytes (accepted consequence,
+ *     Phase 44 backfill is aware).
+ *
+ * All four content columns are nullable — the seed row exists before an admin
+ * ever fills it in, and Phase 43's DOC-11 em-dash treatment covers the unfilled
+ * window. Form-level requiredness is enforced by the Zod schema in Plan 42-06,
+ * not by the DB.
+ */
+export const leaseticAdvisor = pgTable('leasetic_advisor', {
+  id: uuid('id').primaryKey(),
+  name: text('name'),
+  fonction: text('fonction'),
+  telephone: text('telephone'),
+  email: text('email'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedBy: text('updated_by').references(() => users.id, { onDelete: 'set null' }),
+});
+
+export type LeaseticAdvisorRow = typeof leaseticAdvisor.$inferSelect;
+export type NewLeaseticAdvisorRow = typeof leaseticAdvisor.$inferInsert;
 
 /**
  * Persistent partner proposals (DATA-01..09).
