@@ -7,6 +7,8 @@ import { sanitizePdfNumber } from './sanitize-number';
 import { SectionLabel } from './components/section-label';
 import { KeyValueRow } from './components/key-value-row';
 import { LeaseticLockup } from './components/leasetic-lockup';
+import { Eyebrow } from './components/eyebrow';
+import { CardKeyValueRow } from './components/card-key-value-row';
 import { emDash } from './em-dash';
 
 // ── Font.register: once, at module load ──────────────────────────────────────
@@ -120,9 +122,18 @@ export interface ProposalDocumentProps {
 
 
 export function ProposalDocument({ data }: ProposalDocumentProps) {
-  const { lcRef, language: lang, createdAt, inputs, computed } = data;
+  const { lcRef, language: lang, createdAt, inputs, computed, partner, advisor } = data;
   const expiresAt = new Date(createdAt.getTime() + inputs.validityDays * 86_400_000);
   const projectText = inputs.projectDesc?.trim() || t('pdf.project.placeholder', lang);
+
+  // Partner-phone resolution (D-12/D-13): inputs.partnerTel is the immutable
+  // snapshot captured at proposal creation — the authoritative source. Fall
+  // back to the live partner.companyTelephone only for a pre-Phase-42
+  // proposal whose stored inputs carries no partnerTel key at all. Both are
+  // the partner COMPANY's line — the individual's own line (PROF-02's
+  // finalization gate) is deliberately never rendered anywhere in this
+  // document.
+  const partnerPhone = inputs.partnerTel?.trim() || partner.companyTelephone;
 
   return (
     <Document
@@ -231,6 +242,65 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
                 {t('pdf.pill.term', lang).replace('{0}', String(inputs.durationMonths))}
               </Text>
             </View>
+          </View>
+        </View>
+
+        {/* ── Card grid: SOCIÉTÉ CLIENTE + VOTRE CONTACT (DOC-02, DOC-03, D-04) ── */}
+        <View style={{ flexDirection: 'row', marginBottom: 10.5 }}>
+          {/* SOCIÉTÉ CLIENTE (DOC-02) */}
+          <View style={{
+            flexGrow: 1,
+            flexBasis: 0,
+            marginRight: 7.5,
+            backgroundColor: pdfColors.cardFill,
+            borderRadius: 10.5,
+            paddingVertical: 9.75,
+            paddingHorizontal: 11.25,
+          }}>
+            <Eyebrow>{t('pdf.card.client.title', lang)}</Eyebrow>
+            <Text style={{
+              fontSize: pdfFontSizes.cardHeadline,
+              fontWeight: pdfFontWeights.semibold,
+              letterSpacing: -0.11,
+              color: pdfColors.navy,
+              marginBottom: 4.5,
+            }}>{inputs.clientCo}</Text>
+            <CardKeyValueRow label={t('pdf.card.client.siren', lang)} value={emDash(inputs.clientSiren)} />
+            <CardKeyValueRow label={t('pdf.card.client.siret', lang)} value={emDash(inputs.clientSiret)} />
+            <CardKeyValueRow label={t('pdf.card.client.recipient', lang)} value={emDash(inputs.clientName)} />
+            <CardKeyValueRow label={t('pdf.card.client.role', lang)} value={emDash(inputs.clientRole)} />
+            <CardKeyValueRow label={t('pdf.card.client.phone', lang)} value={emDash(inputs.clientTel)} />
+            <CardKeyValueRow label={t('pdf.card.client.email', lang)} value={emDash(inputs.clientEmail)} />
+          </View>
+
+          {/* VOTRE CONTACT (DOC-03, restructured per D-04) */}
+          <View style={{
+            flexGrow: 1,
+            flexBasis: 0,
+            backgroundColor: pdfColors.cardFill,
+            borderRadius: 10.5,
+            paddingVertical: 9.75,
+            paddingHorizontal: 11.25,
+          }}>
+            <Eyebrow>{t('pdf.card.contact.title', lang)}</Eyebrow>
+            {/* D-04: the design headlines the Leasetic advisor's name here. Phase
+                42 D-10 deliberately inverted that — the client meets the partner
+                first and the advisor second, so this card headlines the PARTNER
+                company instead, with the advisor demoted to the rows below. Do
+                NOT "fix" this back to the design's ordering. */}
+            <Text style={{
+              fontSize: pdfFontSizes.cardHeadline,
+              fontWeight: pdfFontWeights.semibold,
+              letterSpacing: -0.11,
+              color: pdfColors.navy,
+              marginBottom: 4.5,
+            }}>{inputs.partnerCo}</Text>
+            <CardKeyValueRow label={t('pdf.card.contact.salesRep', lang)} value={emDash(inputs.partnerName)} />
+            <CardKeyValueRow label={t('pdf.card.contact.partnerPhone', lang)} value={emDash(partnerPhone)} />
+            <CardKeyValueRow label={t('pdf.card.contact.advisorName', lang)} value={emDash(advisor?.name)} />
+            <CardKeyValueRow label={t('pdf.card.contact.advisorRole', lang)} value={emDash(advisor?.fonction)} />
+            <CardKeyValueRow label={t('pdf.card.contact.advisorPhone', lang)} value={emDash(advisor?.telephone)} />
+            <CardKeyValueRow label={t('pdf.card.contact.advisorEmail', lang)} value={emDash(advisor?.email)} />
           </View>
         </View>
 
