@@ -2,10 +2,12 @@ import { Document, Page, Text, View, Font } from '@react-pdf/renderer';
 import path from 'node:path';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
 import { formatCurrency, formatDate, formatNumber } from '@/lib/i18n/format';
-import { pdfColors, pdfFontSizes, pdfFontWeights, pdfPageMargins } from './styles';
+import { pdfColors, pdfFontSizes, pdfFontWeights, pdfPageBase, pdfPageMargins } from './styles';
 import { sanitizePdfNumber } from './sanitize-number';
 import { SectionLabel } from './components/section-label';
 import { KeyValueRow } from './components/key-value-row';
+import { LeaseticLockup } from './components/leasetic-lockup';
+import { emDash } from './em-dash';
 
 // ── Font.register: once, at module load ──────────────────────────────────────
 // PROP-19: Inter TTFs self-hosted under public/fonts/ (Phase 41 — replaces the
@@ -121,9 +123,6 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
   const { lcRef, language: lang, createdAt, inputs, computed } = data;
   const expiresAt = new Date(createdAt.getTime() + inputs.validityDays * 86_400_000);
   const projectText = inputs.projectDesc?.trim() || t('pdf.project.placeholder', lang);
-  const partnerRefText = inputs.partnerRef?.trim()
-    ? `${t('pdf.project.ref.prefix', lang)} ${inputs.partnerRef.trim()}`
-    : null;
 
   return (
     <Document
@@ -141,78 +140,98 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
         paddingBottom: pdfPageMargins.bottom,
         paddingHorizontal: pdfPageMargins.horizontal,
         fontFamily: 'Inter',
-        fontSize: pdfFontSizes.body,
-        color: pdfColors.ink,
+        fontSize: pdfPageBase.fontSize,
+        lineHeight: pdfPageBase.lineHeight,
+        color: pdfColors.navy,
         backgroundColor: pdfColors.surface,
+        flexDirection: 'column',
       }}>
-        {/* ── Header band ───────────────────────────────────────────────── */}
+        {/* ── Header band (DOC-01, D-07 — the real lockup, no LEASETIC text node) ── */}
         <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          marginBottom: 16,
         }}>
-          <View>
-            <Text style={{
-              fontSize: pdfFontSizes.title,
-              fontWeight: pdfFontWeights.bold,
-              color: pdfColors.navy,
-            }}>LEASETIC</Text>
-            <Text style={{
-              fontSize: pdfFontSizes.caption,
-              fontWeight: pdfFontWeights.regular,
-              color: pdfColors.muted,
-              marginTop: 2,
-            }}>{t('pdf.tagline', lang)}</Text>
-          </View>
+          <LeaseticLockup height={19.5} />
           <View style={{ alignItems: 'flex-end' }}>
             <Text style={{
-              fontSize: pdfFontSizes.body,
+              fontSize: pdfFontSizes.eyebrow,
+              fontWeight: pdfFontWeights.regular,
+              color: pdfColors.labelTeal,
+              letterSpacing: 0.45,
+            }}>{t('pdf.header.proposition.eyebrow', lang)}</Text>
+            <Text style={{
+              fontSize: pdfFontSizes.propositionNo,
               fontWeight: pdfFontWeights.semibold,
               color: pdfColors.navy,
-            }}>{t('pdf.ref.label', lang)} {lcRef}</Text>
+              letterSpacing: -0.13,
+              marginTop: 1.5,
+            }}>{lcRef}</Text>
             <Text style={{
-              fontSize: pdfFontSizes.caption,
+              fontSize: pdfFontSizes.pill,
               fontWeight: pdfFontWeights.regular,
-              color: pdfColors.muted,
-              marginTop: 2,
-            }}>{formatDate(createdAt, lang)}</Text>
+              color: pdfColors.labelTeal,
+              marginTop: 1.5,
+            }}>{t('pdf.header.issued', lang).replace('{0}', formatDate(createdAt, lang))}</Text>
           </View>
         </View>
+
+        {/* ── The 2px navy rule (D-11) ──────────────────────────────────── */}
         <View style={{
-          height: 1,
-          backgroundColor: pdfColors.border,
-          marginVertical: 16,
+          height: 1.5,
+          backgroundColor: pdfColors.navy,
+          marginTop: 7.5,
+          marginBottom: 10.5,
         }} />
 
-        {/* ── Title row ─────────────────────────────────────────────────── */}
-        <Text style={{
-          fontSize: pdfFontSizes.title,
-          fontWeight: pdfFontWeights.bold,
-          color: pdfColors.navy,
-          marginBottom: 24,
-        }}>{t('pdf.title', lang)}</Text>
-
-        {/* ── Project block ─────────────────────────────────────────────── */}
-        <View style={{ marginBottom: 12 }}>
-          <SectionLabel>{t('pdf.section.project', lang)}</SectionLabel>
-          <Text style={{
-            fontSize: pdfFontSizes.body,
-            fontWeight: pdfFontWeights.medium,
-            color: pdfColors.ink,
-            marginBottom: 4,
-          }}>
-            {projectText}
-          </Text>
-          {partnerRefText && (
+        {/* ── Title row (DOC-01) — 21pt h1 + description, two unconditional pills ── */}
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          marginBottom: 10.5,
+        }}>
+          <View style={{ flex: 1 }}>
             <Text style={{
-              fontSize: pdfFontSizes.caption,
+              fontSize: pdfFontSizes.h1,
+              fontWeight: pdfFontWeights.semibold,
+              color: pdfColors.navy,
+              letterSpacing: -0.525,
+              lineHeight: 1.1,
+              marginBottom: 3,
+            }}>{t('pdf.title', lang)}</Text>
+            <Text style={{
+              fontSize: pdfFontSizes.projectDesc,
               fontWeight: pdfFontWeights.regular,
-              color: pdfColors.muted,
+              color: pdfColors.bodyBlue,
+            }}>{projectText}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', gap: 4.5, justifyContent: 'flex-end' }}>
+            {/* DOC-11: the partner-ref pill renders unconditionally — an absent
+                partnerRef is expressed as an em dash, not by hiding the pill. */}
+            <View style={{
+              borderWidth: 0.75,
+              borderColor: pdfColors.hairline,
+              borderRadius: 999,
+              paddingVertical: 3,
+              paddingHorizontal: 8.25,
             }}>
-              {partnerRefText}
-            </Text>
-          )}
+              <Text style={{ fontSize: pdfFontSizes.pill, color: pdfColors.bodyBlue }}>
+                {t('pdf.pill.partnerRef', lang).replace('{0}', emDash(inputs.partnerRef))}
+              </Text>
+            </View>
+            <View style={{
+              borderWidth: 0.75,
+              borderColor: pdfColors.hairline,
+              borderRadius: 999,
+              paddingVertical: 3,
+              paddingHorizontal: 8.25,
+            }}>
+              <Text style={{ fontSize: pdfFontSizes.pill, color: pdfColors.bodyBlue }}>
+                {t('pdf.pill.term', lang).replace('{0}', String(inputs.durationMonths))}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* ── Computation breakdown ─────────────────────────────────────── */}

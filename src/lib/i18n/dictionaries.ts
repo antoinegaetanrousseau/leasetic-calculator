@@ -466,24 +466,17 @@ export const dictionaries = {
     'proposal.row.toast.archive.action.viewArchived': 'Voir les archivées',
     'proposal.toast.duplicate.prefilled': "Champs pré-remplis depuis la proposition d\u2019origine. Modifiez si nécessaire.",
 
-    // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
+    // 7.8 PDF document copy (9 keys — used by @react-pdf/renderer only;
     //     5 v10 keys reused per §7.9 — pdf.computed.duration.* + pdf.interests.* + pdf.computed.amount.label
-    //     are NOT redeclared; consumers reference proposal.duree.* / proposal.interests.* / proposal.montant.label.)
-    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (D-06 — the design replaces
-    // the header region with the lockup)
-    'pdf.tagline': 'Location financière IT',
+    //     are NOT redeclared; consumers reference proposal.duree.* / proposal.interests.* / proposal.montant.label.
+    //     Phase 43 (plan 43-05) deleted the header tagline key, the bare reference-label key,
+    //     the PROJET section-label key and pdf.project.ref.prefix alongside their last consumer
+    //     — see the header/title-row rewrite.)
     'pdf.title': 'Proposition de location financière',
-    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (the bare N° / No. prefix
-    // becomes pdf.header.proposition.eyebrow)
-    'pdf.ref.label': 'N°',
-    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (D-06 — the PROJET section
-    // label is gone)
-    'pdf.section.project': 'PROJET',
     // Phase 43 orphan — deleted in plan 43-06 with its last consumer (D-05 — the SLB /
     // évaluation-de-parc block is dropped)
     'pdf.section.interests': "POINTS D\u2019INTÉRÊT IDENTIFIÉS\u202f:",
     'pdf.project.placeholder': 'Projet non précisé',
-    'pdf.project.ref.prefix': 'Réf. partenaire\u202f:',
     'pdf.computed.coefficient.label': 'Coefficient appliqué',
     'pdf.loyer.label': 'LOYER MENSUEL HT',
     'pdf.loyer.subtext': 'sur {0} mois, hors taxes',
@@ -1849,23 +1842,16 @@ export const dictionaries = {
     'proposal.row.toast.archive.action.viewArchived': 'View archived',
     'proposal.toast.duplicate.prefilled': 'Fields pre-filled from source proposal. Edit if needed.',
 
-    // 7.8 PDF document copy (13 keys — used by @react-pdf/renderer only;
-    //     5 v10 keys reused per §7.9)
-    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (D-06 — the design replaces
-    // the header region with the lockup)
-    'pdf.tagline': 'IT financial leasing',
+    // 7.8 PDF document copy (9 keys — used by @react-pdf/renderer only;
+    //     5 v10 keys reused per §7.9.
+    //     Phase 43 (plan 43-05) deleted the header tagline key, the bare reference-label key,
+    //     the PROJET section-label key and pdf.project.ref.prefix alongside their last consumer
+    //     — see the header/title-row rewrite.)
     'pdf.title': 'Equipment lease financing proposal',
-    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (the bare N° / No. prefix
-    // becomes pdf.header.proposition.eyebrow)
-    'pdf.ref.label': 'No.',
-    // Phase 43 orphan — deleted in plan 43-05 with its last consumer (D-06 — the PROJET section
-    // label is gone)
-    'pdf.section.project': 'PROJECT',
     // Phase 43 orphan — deleted in plan 43-06 with its last consumer (D-05 — the SLB /
     // évaluation-de-parc block is dropped)
     'pdf.section.interests': 'POINTS OF INTEREST IDENTIFIED:',
     'pdf.project.placeholder': 'Project not specified',
-    'pdf.project.ref.prefix': 'Partner ref.:',
     'pdf.computed.coefficient.label': 'Applied coefficient',
     'pdf.loyer.label': 'MONTHLY RENT EXCL. VAT',
     'pdf.loyer.subtext': 'over {0} months, excl. taxes',

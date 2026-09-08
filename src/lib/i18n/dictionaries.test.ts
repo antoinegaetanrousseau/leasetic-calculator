@@ -5,7 +5,7 @@ describe('i18n dictionary parity', () => {
   const frKeys = Object.keys(dictionaries.fr);
   const enKeys = Object.keys(dictionaries.en);
 
-  it('has at least 1072 keys per language (raised in Phase 43 for the Claude Design PDF-layout namespace — pdf.header.*/pdf.pill.*/pdf.card.*/pdf.table.*/pdf.conditions.title/pdf.acceptance.*/pdf.footer.legal.*. Derivation: 1078 measured immediately after 43-03 Task 1 landed the new pairs, minus 6 — the five Phase-43-orphaned keys (pdf.tagline, pdf.section.project, pdf.ref.label, pdf.section.interests, pdf.footer.left) plus pdf.project.ref.prefix, all of which plans 43-05/43-06 delete alongside their last consumer. Set to the phase-FINAL count, not the post-Task-1 count, so this floor does not go red the moment those plans remove their group.)', () => {
+  it('has at least 1072 keys per language (raised in Phase 43 for the Claude Design PDF-layout namespace — pdf.header.*/pdf.pill.*/pdf.card.*/pdf.table.*/pdf.conditions.title/pdf.acceptance.*/pdf.footer.legal.*. Derivation: 1078 measured immediately after 43-03 Task 1 landed the new pairs, minus 6 — the header tagline key, the PROJET section-label key, the bare reference-label key, pdf.section.interests, pdf.footer.left and pdf.project.ref.prefix, all of which plans 43-05/43-06 delete alongside their last consumer. Set to the phase-FINAL count, not the post-Task-1 count, so this floor does not go red the moment those plans remove their group.)', () => {
     expect(frKeys.length).toBeGreaterThanOrEqual(1072);
     expect(enKeys.length).toBeGreaterThanOrEqual(1072);
   });
@@ -185,14 +185,12 @@ const phase8Keys: DictKey[] = [
   'proposal.toast.restore.success',
   'proposal.toast.restore.error',
   'proposal.toast.duplicate.prefilled',
-  // 7.8 PDF document copy (13)
-  'pdf.tagline',
+  // 7.8 PDF document copy (9 — the header tagline key, the bare reference-label key, the
+  // PROJET section-label key and pdf.project.ref.prefix deleted in plan 43-05 alongside
+  // their last consumer)
   'pdf.title',
-  'pdf.ref.label',
-  'pdf.section.project',
   'pdf.section.interests',
   'pdf.project.placeholder',
-  'pdf.project.ref.prefix',
   'pdf.computed.coefficient.label',
   'pdf.loyer.label',
   'pdf.loyer.subtext',
