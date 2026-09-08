@@ -9,9 +9,17 @@
  * assertions (test 9 requires real aria-invalid behavior).
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { ProposalFormProvider } from '@/components/proposal/ProposalForm';
 import { ParametresFormCard } from './ParametresFormCard';
+
+const { lookupSiretActionMock } = vi.hoisted(() => ({
+  lookupSiretActionMock: vi.fn(),
+}));
+
+vi.mock('../_actions/lookupSiret.action', () => ({
+  lookupSiretAction: (...args: unknown[]) => lookupSiretActionMock(...args),
+}));
 
 afterEach(() => {
   cleanup();
@@ -191,5 +199,129 @@ describe('ParametresFormCard (D-05 / D-06 / D-07 / D-08 / D-09 / D-10)', () => {
   it('Test 16 (extra): unused `within` import not required — sanity smoke (file imports correctly)', () => {
     // No-op assertion that the test harness imported all modules.
     expect(typeof within).toBe('function');
+  });
+});
+
+/**
+ * Phase 42 Plan 08 Task 3 — clientSiret behaviours (FIELD-01 / D-01..D-04).
+ * lookupSiretAction is mocked; the field's own registry-agnostic rendering
+ * plus the prefill-on-blur wiring are both exercised here.
+ */
+describe('Phase 42 — clientSiret (FIELD-01 / D-01..D-04)', () => {
+  it('renders a required SIRET field immediately after SIREN, inside the same FieldGroup', () => {
+    const { container } = renderCard();
+    expect(screen.getByLabelText(/SIRET/)).toBeInTheDocument();
+    const sirenLabel = screen.getByText('SIREN').closest('label');
+    expect(sirenLabel?.querySelector('.text-destructive')).not.toBeNull();
+    const siretLabel = screen.getByText('SIRET').closest('label');
+    expect(siretLabel?.querySelector('.text-destructive')).not.toBeNull();
+
+    // Sibling within the same FieldGroup, in DOM order right after SIREN.
+    const group = sirenLabel!.closest('[data-slot="field-group"]');
+    expect(group).not.toBeNull();
+    expect(group!.contains(siretLabel!)).toBe(true);
+    const fields = Array.from(
+      container.querySelectorAll('[data-slot="field-group"] > [data-slot="field"]'),
+    );
+    const sirenFieldIdx = fields.findIndex((f) => f.contains(sirenLabel!));
+    const siretFieldIdx = fields.findIndex((f) => f.contains(siretLabel!));
+    expect(siretFieldIdx).toBe(sirenFieldIdx + 1);
+  });
+
+  it('blurring a resolvable SIREN calls lookupSiretAction once and prefills the grouped SIRET value', async () => {
+    lookupSiretActionMock.mockResolvedValue({ ok: true, siret: '12345678900012' });
+    renderCard();
+    const sirenInput = screen.getByLabelText(/^SIREN/) as HTMLInputElement;
+    fireEvent.change(sirenInput, { target: { value: '123456789' } });
+    fireEvent.blur(sirenInput);
+
+    const siretInput = screen.getByLabelText(/^SIRET/) as HTMLInputElement;
+    await waitFor(() => expect(siretInput.value).toBe('123 456 789 00012'));
+    expect(lookupSiretActionMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('the prefilled SIRET stays editable — typing replaces the value', async () => {
+    lookupSiretActionMock.mockResolvedValue({ ok: true, siret: '12345678900012' });
+    renderCard();
+    const sirenInput = screen.getByLabelText(/^SIREN/) as HTMLInputElement;
+    fireEvent.change(sirenInput, { target: { value: '123456789' } });
+    fireEvent.blur(sirenInput);
+
+    const siretInput = screen.getByLabelText(/^SIRET/) as HTMLInputElement;
+    await waitFor(() => expect(siretInput.value).toBe('123 456 789 00012'));
+    expect(siretInput).not.toBeDisabled();
+    fireEvent.change(siretInput, { target: { value: '99988877700099' } });
+    expect(siretInput.value).toBe('999 888 777 00099');
+  });
+
+  it('a failed lookup leaves SIRET empty and editable, and renders no notice, spinner, banner or retry', async () => {
+    lookupSiretActionMock.mockResolvedValue({ ok: false });
+    const { container } = renderCard();
+    const sirenInput = screen.getByLabelText(/^SIREN/) as HTMLInputElement;
+    fireEvent.change(sirenInput, { target: { value: '123456789' } });
+    fireEvent.blur(sirenInput);
+
+    await waitFor(() => expect(lookupSiretActionMock).toHaveBeenCalledTimes(1));
+    const siretInput = screen.getByLabelText(/^SIRET/) as HTMLInputElement;
+    expect(siretInput.value).toBe('');
+    expect(siretInput).not.toBeDisabled();
+    expect(container.querySelector('[role="status"]')).toBeNull();
+    expect(container.querySelector('[role="progressbar"]')).toBeNull();
+    // No new text node mentioning the registry anywhere in the card.
+    expect(container.textContent?.toLowerCase()).not.toMatch(/registre|registry|indisponible|unavailable/);
+  });
+
+  it('a prefill never overwrites a SIRET the partner already typed', async () => {
+    lookupSiretActionMock.mockResolvedValue({ ok: true, siret: '12345678900012' });
+    renderCard();
+    const siretInput = screen.getByLabelText(/^SIRET/) as HTMLInputElement;
+    fireEvent.change(siretInput, { target: { value: '11122233300044' } });
+
+    const sirenInput = screen.getByLabelText(/^SIREN/) as HTMLInputElement;
+    fireEvent.change(sirenInput, { target: { value: '123456789' } });
+    fireEvent.blur(sirenInput);
+
+    await waitFor(() => expect(lookupSiretActionMock).toHaveBeenCalledTimes(1));
+    expect(siretInput.value).toBe('111 222 333 00044');
+  });
+
+  it('a SIRET/SIREN mismatch renders error.field.siret.mismatch inside #client-siret-error, not at the form root', async () => {
+    renderCard();
+    // proposalInputSchema's cross-field refine only runs once every other
+    // field-level parse succeeds (schema.ts comment) — fill the other
+    // required fields so the mismatch on clientSiret is the only issue.
+    fireEvent.change(screen.getByLabelText(/Nom du client/), { target: { value: 'ACME' } });
+    fireEvent.change(screen.getByLabelText(/Montant du projet HT/), { target: { value: '10000' } });
+    fireEvent.click(screen.getByRole('radio', { name: /36 mois/ }));
+
+    const sirenInput = screen.getByLabelText(/^SIREN/) as HTMLInputElement;
+    fireEvent.change(sirenInput, { target: { value: '123456789' } });
+    fireEvent.blur(sirenInput);
+    await waitFor(() => expect(lookupSiretActionMock).toHaveBeenCalledTimes(1));
+
+    const siretInput = screen.getByLabelText(/^SIRET/) as HTMLInputElement;
+    fireEvent.change(siretInput, { target: { value: '99988877700012' } });
+    fireEvent.blur(siretInput);
+
+    await waitFor(() => {
+      const errorEl = document.getElementById('client-siret-error');
+      expect(errorEl).not.toBeNull();
+    });
+    const errorEl = document.getElementById('client-siret-error');
+    expect(errorEl!.textContent).toMatch(/SIREN/);
+    expect(errorEl).toHaveAttribute('role', 'alert');
+  });
+
+  it('an empty SIRET renders error.field.required on blur', async () => {
+    renderCard();
+    const siretInput = screen.getByLabelText(/^SIRET/) as HTMLInputElement;
+    fireEvent.blur(siretInput);
+
+    await waitFor(() => {
+      const errorEl = document.getElementById('client-siret-error');
+      expect(errorEl).not.toBeNull();
+    });
+    const errorEl = document.getElementById('client-siret-error');
+    expect(errorEl!.textContent).toBe('Ce champ est requis.');
   });
 });

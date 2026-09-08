@@ -58,10 +58,18 @@ export function WizardStep1Wiring({
   // navigation cleanly.
   const onContinue = () => {
     startContinueTransition(async () => {
-      // Only trigger the 3 visible required fields — partnerCo/partnerName/validityDays
+      // Only trigger the visible required fields — partnerCo/partnerName/validityDays
       // are session/server-hydrated hidden fields; triggering them would silently
       // block advance when the user's account has no companyName set.
-      const valid = await form.trigger(['clientCo', 'clientSiren', 'amountHT', 'durationMonths']);
+      // Phase 42 (FIELD-01 / D-04): clientSiret is SIREN's required sibling —
+      // "Suivant" must block on it the same way it blocks on clientSiren.
+      const valid = await form.trigger([
+        'clientCo',
+        'clientSiren',
+        'clientSiret',
+        'amountHT',
+        'durationMonths',
+      ]);
       if (!valid) return; // field errors visible inline; no toast needed
 
       try {

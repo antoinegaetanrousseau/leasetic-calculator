@@ -24,6 +24,15 @@
  *   - UI-SPEC §6.3: clientCo + clientName use the wizard-scoped label overrides
  *     (`wizard.field.client.co.label` / `wizard.field.client.name.label`).
  *
+ * Phase 42 Plan 08 (FIELD-01 / D-01..D-04) — clientSiret sits immediately
+ * after clientSiren as its sibling inside the same INFORMATIONS CLIENT
+ * FieldGroup. Blurring a resolvable SIREN calls lookupSiretAction and
+ * prefills clientSiret when it is still empty (D-01); the field is always
+ * editable and a registry failure renders NOTHING — no notice, spinner or
+ * retry (D-03). The cross-field mismatch error (D-02) lands on clientSiret
+ * via proposalInputSchema's object-level refine (`path: ['clientSiret']`,
+ * Plan 42-03) — no extra wiring needed for that here.
+ *
  * Consumes the outer <ProposalFormProvider>'s RHF context via useFormContext —
  * the parent (parametres/page.tsx) hoists the form one level up so the same
  * register/control surface drives every input here.
@@ -36,7 +45,9 @@
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Field, FieldError, FieldLabel, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { useTransition } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
+import type { FocusEvent } from 'react';
 import type { z } from 'zod';
 import { proposalInputSchema } from '@/lib/calc';
 import { t, type Lang, type DictKey } from '@/lib/i18n/dictionaries';
@@ -44,7 +55,9 @@ import { DurationSegmented } from '@/components/proposal/DurationSegmented';
 import { NumberInputAmount } from '@/components/proposal/NumberInputAmount';
 import { PhoneInput } from '@/components/proposal/PhoneInput';
 import { SirenInput } from '@/components/proposal/SirenInput';
+import { formatSiret, SiretInput } from '@/components/proposal/SiretInput';
 import { YesNoToggle } from '@/components/proposal/YesNoToggle';
+import { lookupSiretAction } from '../_actions/lookupSiret.action';
 
 // Match the ProposalFormProvider's input-side generic (the validity field is
 // optional because the schema applies .default(30) — see ProposalForm.tsx:22).
@@ -70,8 +83,31 @@ export function ParametresFormCard({
     register,
     control,
     setValue,
+    getValues,
     formState: { errors },
   } = form;
+
+  // Phase 42 Plan 08 (FIELD-01 / D-01 / D-03) — SIREN-blur SIRET prefill.
+  // useTransition's pending flag is deliberately unused: it exists only to
+  // avoid overlapping in-flight lookups from a single blur sequence, never
+  // to drive UI (D-03 forbids a spinner/status affordance on this field).
+  const [, startSiretLookup] = useTransition();
+
+  const handleClientSirenBlur = (e: FocusEvent<HTMLInputElement>) => {
+    const rawSiren = e.target.value;
+    startSiretLookup(async () => {
+      const result = await lookupSiretAction(rawSiren);
+      if (!result.ok) return; // D-03: silent — no notice, no retry.
+      // Never overwrite a SIRET the partner already typed — re-check the
+      // live value at resolution time, not the value captured at blur.
+      const currentSiret = getValues('clientSiret');
+      if (currentSiret) return;
+      setValue('clientSiret', formatSiret(result.siret), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    });
+  };
 
   return (
     <>
@@ -125,7 +161,12 @@ export function ParametresFormCard({
                 placeholder={t('form.client.siren.placeholder', lang)}
                 value={field.value ?? ''}
                 onChange={field.onChange}
-                onBlur={field.onBlur}
+                onBlur={(e) => {
+                  // Preserve RHF's mode='onBlur' validation first, then run
+                  // the D-01 SIRET prefill lookup.
+                  field.onBlur();
+                  handleClientSirenBlur(e);
+                }}
                 invalid={!!errors.clientSiren}
                 ariaDescribedBy={
                   errors.clientSiren ? 'client-siren-error' : undefined
@@ -136,6 +177,41 @@ export function ParametresFormCard({
           {errors.clientSiren && (
             <FieldError id="client-siren-error" role="alert">
               {t((errors.clientSiren.message as DictKey) ?? 'error.field.siren.invalid', lang)}
+            </FieldError>
+          )}
+        </Field>
+
+        {/* clientSiret — Phase 42 (FIELD-01 / D-01..D-04): SIREN's sibling,
+            registry-prefilled on SIREN blur when empty, always editable.
+            No inline registry-unavailable notice anywhere near this field
+            (D-03 — explicitly rejected). */}
+        <Field>
+          <FieldLabel htmlFor="client-siret">
+            {t('form.client.siret', lang)}
+            <span className="ml-0.5 text-destructive" aria-hidden="true">
+              *
+            </span>
+          </FieldLabel>
+          <Controller
+            name="clientSiret"
+            control={control}
+            render={({ field }) => (
+              <SiretInput
+                inputId="client-siret"
+                placeholder={t('form.client.siret.placeholder', lang)}
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                invalid={!!errors.clientSiret}
+                ariaDescribedBy={
+                  errors.clientSiret ? 'client-siret-error' : undefined
+                }
+              />
+            )}
+          />
+          {errors.clientSiret && (
+            <FieldError id="client-siret-error" role="alert">
+              {t((errors.clientSiret.message as DictKey) ?? 'error.field.siret.invalid', lang)}
             </FieldError>
           )}
         </Field>
