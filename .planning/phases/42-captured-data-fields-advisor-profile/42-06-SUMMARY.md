@@ -134,3 +134,8 @@ None — no external service configuration. `getAdvisor()`/`upsertAdvisor()` tar
 ---
 *Phase: 42-captured-data-fields-advisor-profile*
 *Completed: 2026-09-08*
+
+## Self-Check: PASSED
+
+All 5 claimed source files + this Summary found on disk; all 3 commit hashes
+(c5330b2, 5998c51, b54d58a) found in git history.
