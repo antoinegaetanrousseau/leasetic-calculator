@@ -4,7 +4,7 @@ milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: Roadmapped — 4 phases (41-44), 24/24 requirements mapped, 100% coverage
 last_updated: "2026-09-08T07:39:41.956Z"
-last_activity: 2026-09-08 — v1.9 ROADMAP.md created; awaiting `/gsd-plan-phase 41`
+last_activity: 2026-09-08 — Phase 41 context gathered (41-CONTEXT.md); awaiting `/gsd-plan-phase 41`
 progress:
   total_phases: 24
   completed_phases: 0
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** v1.9 — PDF Proposal Redesign roadmapped (4 phases, 41-44); ready for `/gsd-plan-phase 41`.
+**Current focus:** v1.9 — PDF Proposal Redesign; Phase 41 context captured, ready for `/gsd-plan-phase 41`.
 
 ## Current Position
 
-Phase: 41 — Typography Migration (not started)
+Phase: 41 — Typography Migration (context gathered)
 Plan: —
-Status: Roadmapped — 4 phases (41-44), 24/24 requirements mapped, 100% coverage
-Last activity: 2026-09-08 — v1.9 ROADMAP.md created; awaiting `/gsd-plan-phase 41`
+Status: Context captured — 12 decisions; ROADMAP criteria 1+3 and DOC-09 need amendment (D-02, D-04)
+Last activity: 2026-09-08 — Phase 41 context gathered (41-CONTEXT.md); awaiting `/gsd-plan-phase 41`
 
 ## Deferred Items
 
