@@ -70,6 +70,15 @@ export interface ProposalDocumentProps {
       clientTel?: string;
       clientEmail?: string;
       clientSiren?: string;
+      // FIELD-03: proposalInputSchema requires clientSiret, but a proposal
+      // finalized before Phase 42 carries no clientSiret key at all in its
+      // stored `inputs` jsonb. Phase 44 re-renders exactly those rows, so
+      // this stays optional on the props interface even though the schema
+      // requires it going forward.
+      clientSiret?: string;
+      // FIELD-03: same reasoning as clientSiret above — a pre-Phase-42
+      // proposal's stored `inputs` carries no partnerTel key.
+      partnerTel?: string;
       slb?: boolean;
       evalParc?: boolean;
       amountHT: string;            // digit-only
@@ -85,6 +94,25 @@ export interface ProposalDocumentProps {
       coeff?: string;              // digit-string
       isOnDemand?: boolean;
     };
+    // D-12 — sibling of inputs/computed, NEVER nested inside inputs: D-09
+    // forbids the advisor entering proposals.inputs, and mirroring that
+    // boundary in the props shape keeps a future reader from snapshotting it.
+    partner: {
+      companyTelephone: string | null;
+    };
+    // D-13: a missing advisor row is a valid state — it renders em dashes
+    // under DOC-11 and must never block a partner from finalizing. Exactly
+    // these four content columns: getAdvisor() returns the full advisor row,
+    // but its non-content columns must never reach the document — the actor
+    // id of whoever last saved the row is an information-disclosure risk,
+    // and its mutable last-saved timestamp would break the PROP-17
+    // determinism contract.
+    advisor: {
+      name: string | null;
+      fonction: string | null;
+      telephone: string | null;
+      email: string | null;
+    } | null;
   };
 }
 
