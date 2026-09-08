@@ -61,6 +61,13 @@ export interface FinalizeWizardArgs {
    *  route handler). Passed opaquely to finalize-helpers.ts which owns the
    *  branching logic and parameter naming (grep-isolation barrier D-28). */
   partnerType: 'Agent' | 'Commercial' | 'Partenaire';
+  /** Phase 42 D-17: the proposal author's partner telephone (read from the
+   *  session by the route handler, mirroring `partnerType` above), threaded
+   *  opaquely. This function has zero direct `users` reads today — it touches
+   *  only `proposals` and `global_params` — so arg-threading (not a new DB
+   *  read here) is this file's established precedent. `null` means the
+   *  account has no telephone on file. */
+  telephone: string | null;
 }
 
 export interface FinalizeWizardResult {
@@ -130,10 +137,12 @@ function buildPdfComputed(
  * Execute the D-16 finalize pipeline.
  *
  * Throws bounded errors so the route handler can map them to safeCodes:
- *   - 'DraftNotFound'    — getDraftById returned null
- *   - 'ValidationFailed' — proposalInputSchema.parse threw (ZodError)
- *   - 'NoGlobalParams'   — getLatestGlobalParams returned null
- *   - 'FinalizeFailed'   — finalizeDraft returned null (race / cross-user)
+ *   - 'DraftNotFound'          — getDraftById returned null
+ *   - 'LegacyDraftIncomplete'  — draft.inputs predates the SIRET field (D-05)
+ *   - 'ValidationFailed'       — proposalInputSchema.parse threw (ZodError)
+ *   - 'MissingPartnerTelephone'— args.telephone is null/empty (D-17)
+ *   - 'NoGlobalParams'         — getLatestGlobalParams returned null
+ *   - 'FinalizeFailed'         — finalizeDraft returned null (race / cross-user)
  */
 export async function finalizeWizard(
   args: FinalizeWizardArgs,
@@ -143,6 +152,19 @@ export async function finalizeWizard(
   if (!draft) {
     throw new Error('DraftNotFound');
   }
+
+  // Phase 42 D-05 — independent pre-check, run BEFORE proposalInputSchema.parse
+  // is ever called. Once `clientSiret` is a required schema field, a
+  // pre-Phase-42 draft produces a ZodError that the broad catch below would
+  // collapse into the generic 'ValidationFailed' — indistinguishable from any
+  // other validation failure. Inspecting `err.issues` for a `clientSiret`-path
+  // issue would work today but breaks the next time the schema shape changes;
+  // a presence check on the stored `inputs` does not depend on ZodError
+  // internals at all, so it must live here, not inside the `catch` below.
+  if (!('clientSiret' in draft.inputs)) {
+    throw new Error('LegacyDraftIncomplete');
+  }
+
   let parsed: ProposalInput;
   try {
     parsed = proposalInputSchema.parse(draft.inputs);
@@ -152,6 +174,20 @@ export async function finalizeWizard(
       throw new Error('ValidationFailed');
     }
     throw err;
+  }
+
+  // Phase 42 D-17 — the single server-side enforcement point for PROF-02.
+  // Fires only here, after schema validation succeeds and before any
+  // expensive work (getLatestGlobalParams / computeLoyer / renderProposalPdf)
+  // so a blocked finalize never spends a PDF render. This is deliberately the
+  // ONE gate — no wizard-entry check, no entry+backstop pair. The condition is
+  // a missing PARTNER telephone only (D-14: `partner_type` is NOT NULL, so
+  // fonction can never be the missing thing). The company telephone
+  // (`draft.inputs.partnerTel`) is intentionally NOT checked here — D-13
+  // states it never blocks finalization, and a partner must never be
+  // hard-blocked behind a fix only an admin can perform.
+  if (!args.telephone) {
+    throw new Error('MissingPartnerTelephone');
   }
 
   // Phase 17 D-03 — lcRef is allocated at createDraft time (no longer here).
