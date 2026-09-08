@@ -112,6 +112,7 @@ describe('POST /api/proposals/finalize (D-16 atomic finalize)', () => {
       draftId: 'd-1',
       language: 'fr',
       partnerType: 'Partenaire',
+      telephone: null,
     });
   });
 
@@ -166,6 +167,7 @@ describe('POST /api/proposals/finalize (D-16 atomic finalize)', () => {
       draftId: 'd-99',
       language: 'en',
       partnerType: 'Partenaire',
+      telephone: null,
     });
   });
 
@@ -282,5 +284,97 @@ describe('POST /api/proposals/finalize (D-16 atomic finalize)', () => {
     expect(finalizeWizardMock).toHaveBeenCalledWith(
       expect.objectContaining({ partnerType: 'Partenaire' }),
     );
+  });
+});
+
+describe('Phase 42 — new bounded codes (D-05 / D-17 / D-18)', () => {
+  it('1: SAFE_ERROR_CODES surfaces MissingPartnerTelephone with response body.error exactly that code', async () => {
+    finalizeWizardMock.mockRejectedValueOnce(new Error('MissingPartnerTelephone'));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res: any = await POST(makeReq({ draftId: 'd-1' }) as any);
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('MissingPartnerTelephone');
+  });
+
+  it('2: SAFE_ERROR_CODES surfaces LegacyDraftIncomplete with response body.error exactly that code', async () => {
+    finalizeWizardMock.mockRejectedValueOnce(new Error('LegacyDraftIncomplete'));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res: any = await POST(makeReq({ draftId: 'd-1' }) as any);
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('LegacyDraftIncomplete');
+  });
+
+  it('3: an unlisted thrown message still collapses to finalize_failed', async () => {
+    finalizeWizardMock.mockRejectedValueOnce(new Error('SomeUnrecognizedThrow'));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res: any = await POST(makeReq({ draftId: 'd-1' }) as any);
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('finalize_failed');
+  });
+
+  it('4: finalizeWizard receives telephone from session.user.telephone verbatim', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'u-1', telephone: '06 12 34 56 78' } },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await POST(makeReq({ draftId: 'd-1' }) as any);
+    expect(finalizeWizardMock).toHaveBeenCalledWith(
+      expect.objectContaining({ telephone: '06 12 34 56 78' }),
+    );
+  });
+
+  it('5a: finalizeWizard receives telephone: null when session.user.telephone is absent', async () => {
+    requireUserMock.mockResolvedValue({ session: { user: { id: 'u-1' } } });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await POST(makeReq({ draftId: 'd-1' }) as any);
+    expect(finalizeWizardMock).toHaveBeenCalledWith(
+      expect.objectContaining({ telephone: null }),
+    );
+  });
+
+  it('5b: finalizeWizard receives telephone: null when session.user.telephone is null', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'u-1', telephone: null } },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await POST(makeReq({ draftId: 'd-1' }) as any);
+    expect(finalizeWizardMock).toHaveBeenCalledWith(
+      expect.objectContaining({ telephone: null }),
+    );
+  });
+
+  it('5c: finalizeWizard receives telephone: null when session.user.telephone is an empty/whitespace string', async () => {
+    requireUserMock.mockResolvedValue({
+      session: { user: { id: 'u-1', telephone: '   ' } },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await POST(makeReq({ draftId: 'd-1' }) as any);
+    expect(finalizeWizardMock).toHaveBeenCalledWith(
+      expect.objectContaining({ telephone: null }),
+    );
+  });
+
+  it('6: the response body key set for both new codes is exactly ["error"]', async () => {
+    for (const code of ['MissingPartnerTelephone', 'LegacyDraftIncomplete']) {
+      finalizeWizardMock.mockRejectedValueOnce(new Error(code));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res: any = await POST(makeReq({ draftId: 'd-1' }) as any);
+      const body = await res.json();
+      expect(Object.keys(body)).toEqual(['error']);
+    }
+  });
+
+  it('7: route.ts contains exactly one finalizeWizard( call site', async () => {
+    const fs = await import('node:fs/promises');
+    const path = await import('node:path');
+    const source = await fs.readFile(
+      path.resolve(process.cwd(), 'app/api/proposals/finalize/route.ts'),
+      'utf8',
+    );
+    const matches = source.match(/finalizeWizard\(/g) ?? [];
+    expect(matches.length).toBe(1);
   });
 });

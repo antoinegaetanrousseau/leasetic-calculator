@@ -53,13 +53,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Bounded error codes returned to the client. Anti-enumeration discipline —
-// never echo the internal err.message. The 4 named codes are surfaced; any
+// never echo the internal err.message. The 6 named codes are surfaced; any
 // other throw maps to the generic 'finalize_failed'.
 const SAFE_ERROR_CODES = new Set([
   'DraftNotFound',
   'NoGlobalParams',
   'ValidationFailed',
   'FinalizeFailed',
+  'MissingPartnerTelephone', // Phase 42 D-17/D-18 — partner account has no telephone
+  'LegacyDraftIncomplete', // Phase 42 D-05 — draft predates the required SIRET field
 ]);
 
 export async function POST(req: NextRequest) {
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
   // redirect chain.
   let userId: string;
   let partnerType: 'Agent' | 'Commercial' | 'Partenaire';
+  let telephone: string | null;
   try {
     const { session } = await requireUser();
     userId = session.user.id;
@@ -80,6 +83,16 @@ export async function POST(req: NextRequest) {
     const rawType = (session.user as { partnerType?: unknown }).partnerType;
     partnerType =
       rawType === 'Agent' || rawType === 'Commercial' ? rawType : 'Partenaire';
+    // Phase 42 D-17 — the partner telephone is admin-seedable and
+    // partner-editable, so reading it off the session (a registered Better
+    // Auth additionalField, mirroring partnerType above) is correct.
+    // Normalising empty-or-whitespace to `null` is what makes
+    // finalizeWizard's gate a single falsy check.
+    const rawTelephone = (session.user as { telephone?: unknown }).telephone;
+    telephone =
+      typeof rawTelephone === 'string' && rawTelephone.trim().length > 0
+        ? rawTelephone
+        : null;
   } catch {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
@@ -100,7 +113,7 @@ export async function POST(req: NextRequest) {
   const language = await getCurrentLang();
 
   try {
-    const result = await finalizeWizard({ userId, draftId, language, partnerType });
+    const result = await finalizeWizard({ userId, draftId, language, partnerType, telephone });
 
     // ACTV-02 (D-15) — narrate the finalize onto the owner's timeline. Its OWN
     // try/catch, deliberately: by this point the PDF is rendered, uploaded and
