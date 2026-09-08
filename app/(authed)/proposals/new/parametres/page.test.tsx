@@ -24,7 +24,6 @@ const {
   updateDraftMock,
   getProposalByIdMock,
   getLatestGlobalParamsMock,
-  persistAccordionOpenMock,
   saveAsDraftMock,
   saveAndAdvanceMock,
   getClientRelationshipForOwnerMock,
@@ -40,7 +39,6 @@ const {
   updateDraftMock: vi.fn(),
   getProposalByIdMock: vi.fn(),
   getLatestGlobalParamsMock: vi.fn(),
-  persistAccordionOpenMock: vi.fn(),
   saveAsDraftMock: vi.fn(),
   saveAndAdvanceMock: vi.fn(),
   getClientRelationshipForOwnerMock: vi.fn(),
@@ -82,18 +80,19 @@ vi.mock('@/lib/db/queries/client-relationships', () => ({
   listContactsForRelationship: (...args: unknown[]) =>
     listContactsForRelationshipMock(...args),
 }));
-vi.mock('@/(authed)/proposals/new/_actions/persistAccordionOpen.action', () => ({
-  persistAccordionOpenAction: (...args: unknown[]) =>
-    persistAccordionOpenMock(...args),
-}));
-// WizardStep1Wiring.tsx imports this action by an app/-relative specifier, so
-// the mock must use the SAME specifier: `@/` maps to src/, and a mock bound at
-// `@/(authed)/...` registers a module id nothing under app/ ever resolves to —
-// the mock never fires and every assertion through it passes vacuously.
+// WizardStep1Wiring.tsx imports both wizard actions by app/-relative
+// specifiers, so the mocks must use the SAME specifiers: `@/` maps to src/, and
+// a mock bound at `@/(authed)/...` registers a module id nothing under app/ ever
+// resolves to — the mock never fires and assertions through it pass vacuously.
+//
+// There is deliberately NO persistAccordionOpen.action mock here: the
+// PlusDeDetailsAccordion that used to call it is no longer rendered by
+// ParametresFormCard, so nothing in this page's module graph imports that
+// action. Its own coverage lives in _actions/persistAccordionOpen.action.test.ts.
 vi.mock('../_actions/saveAsDraft.action', () => ({
   saveAsDraftAction: (...args: unknown[]) => saveAsDraftMock(...args),
 }));
-vi.mock('@/(authed)/proposals/new/_actions/saveAndAdvance.action', () => ({
+vi.mock('../_actions/saveAndAdvance.action', () => ({
   saveAndAdvanceAction: (...args: unknown[]) => saveAndAdvanceMock(...args),
 }));
 
@@ -112,7 +111,6 @@ beforeEach(() => {
   updateDraftMock.mockReset();
   getProposalByIdMock.mockReset();
   getLatestGlobalParamsMock.mockReset();
-  persistAccordionOpenMock.mockReset();
   saveAsDraftMock.mockReset();
   saveAndAdvanceMock.mockReset();
   getClientRelationshipForOwnerMock.mockReset();
@@ -569,6 +567,80 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
         validityDays: 30,
       }),
     );
+  });
+
+  it('Test 11b: clicking "Continuer vers le calcul" on a valid step-1 form invokes saveAndAdvanceAction with (draftId, values, 1)', async () => {
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      // Every field WizardStep1Wiring's onContinue runs form.trigger() over
+      // must be valid, or the gate (correctly) stops before the action.
+      // clientSiret's first 9 digits must equal clientSiren (D-02 refine).
+      inputs: {
+        clientCo: 'Cliente SARL',
+        clientSiren: '123456789',
+        clientSiret: '12345678900012',
+        amountHT: '75000',
+        durationMonths: 48,
+        _completedSteps: [],
+      },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const { getByText } = render(tree);
+
+    fireEvent.click(getByText(/Continuer vers le calcul/));
+
+    await waitFor(() => expect(saveAndAdvanceMock).toHaveBeenCalledTimes(1));
+    expect(saveAndAdvanceMock).toHaveBeenCalledWith(
+      'd-1',
+      expect.objectContaining({
+        clientCo: 'Cliente SARL',
+        clientSiren: '123456789',
+        clientSiret: '12345678900012',
+        amountHT: '75000',
+        durationMonths: 48,
+      }),
+      // The step number the action marks complete (D-20).
+      1,
+    );
+    // Advancing is not saving — the two CTAs stay distinct.
+    expect(saveAsDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('Test 11c: "Continuer vers le calcul" on an INVALID form blocks before saveAndAdvanceAction (D-04 trigger gate)', async () => {
+    getDraftByIdMock.mockResolvedValue({
+      id: 'd-1',
+      userId: USER_ID,
+      status: 'draft',
+      deletedAt: null,
+      // Same fixture as Test 11b minus a required SIREN/SIRET pair — the
+      // trigger gate must stop here rather than persist a half-filled step.
+      inputs: {
+        clientCo: 'Cliente SARL',
+        clientSiren: '',
+        clientSiret: '',
+        amountHT: '75000',
+        durationMonths: 48,
+        _completedSteps: [],
+      },
+    });
+    const tree = await ParametresStep1Page({
+      searchParams: Promise.resolve({ draft_id: 'd-1' }),
+    });
+    const { container, getByText } = render(tree);
+
+    fireEvent.click(getByText(/Continuer vers le calcul/));
+
+    // The inline field error proves the gate ran (rather than the click simply
+    // never reaching onContinue, which would make the assertion below vacuous).
+    await waitFor(() =>
+      expect(container.querySelector('[data-slot="field-error"]')).not.toBeNull(),
+    );
+    expect(saveAndAdvanceMock).not.toHaveBeenCalled();
   });
 
   // ──────────────────────────────────────────────────────────────────────────
