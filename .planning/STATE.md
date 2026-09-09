@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-09T14:17:45.279Z"
+last_updated: "2026-09-09T14:34:43.875Z"
 last_activity: 2026-09-09
 progress:
   total_phases: 24
   completed_phases: 2
   total_plans: 26
-  completed_plans: 22
+  completed_plans: 23
   percent: 8
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 43 (new-pdf-layout) — EXECUTING
-Plan: 2 of 13
+Plan: 11 of 13
 Status: Ready to execute
 Last activity: 2026-09-09
 
@@ -543,6 +543,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 43 P06 | ~65min | 3 tasks | 8 files |
 | Phase 43 P07 | ~22min | 3 tasks | 4 files |
 | Phase 43 P09 | ~20min | 2 tasks | 2 files |
+| Phase 43 P10 | ~35min | 2 tasks | 4 files |
 
 ## Decisions
 
@@ -765,6 +766,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 43]: layout.test.ts uses a font-aware PDF decoder and a q/Q/cm matrix tracker instead of no-commission.test.ts's single-merged-glyph-map reconstruction and a literal min-Tm-y check — Both literal approaches were empirically shown to produce a false negative (em-dash count of 0) or a vacuously-always-passing check (Tm is a page-height constant in every BT block); the extraction must be correct before its assertion means anything (43-07 Task 2)
 - [Phase 43]: 43-08: D-15 human visual pass — 8/9 checks pass; title-row hyphenation defect (default @react-pdf/renderer hyphenator) and VOTRE CONTACT card partner/advisor semantics confusion diagnosed for gap closure; DOC-01/02/03 stay unticked, phase not closed
 - [Phase 43]: Font.registerHyphenationCallback((word) => [word]) fixes DOC-01 Gap 1 title hyphenation; dehyphenate() removed from layout.test.ts and replaced by a falsified DOC-01 guard — 43-09; DOC-01 not marked complete — fixture regeneration deferred to 43-12 per D-16 sequencing
+- [Phase 43]: DOC-03 not marked complete by 43-10: Gap 2's Finding 3 (partnerCo fallback in parametres/page.tsx) is deferred to plan 43-11 per the plan's own threat model
+- [Phase 43]: 43-10: VOTRE CONTACT card restructured to two headlined entities (partner, then Leasetic advisor) per the D-15 human verdict in 43-08-SUMMARY.md; pdf.card.contact.salesRep/advisorName deleted, pdf.card.contact.partner added
 
 ### Blockers
 
