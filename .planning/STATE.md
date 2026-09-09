@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-09T22:24:54.789Z"
+last_updated: "2026-09-09T22:40:47.278Z"
 last_activity: 2026-09-09
 progress:
   total_phases: 24
   completed_phases: 3
   total_plans: 31
-  completed_plans: 29
+  completed_plans: 30
   percent: 13
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 44 (backfill-migration) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-09-09
 
@@ -549,6 +549,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 44 P01 | ~9min | 3 tasks | 5 files |
 | Phase 44 P02 | ~24min | 3 tasks | 5 files |
 | Phase 44 P03 | ~9min | 2 tasks | 4 files |
+| Phase 44 P04 | ~12min | 2 tasks | 4 files |
 
 ## Decisions
 
@@ -782,6 +783,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 44]: Backfill docstrings paraphrase forbidden literal tokens (proposalInputSchema, db/storage/pdf module paths) so grep-based absence gates on the source pass while the reasoning stays readable
 - [Phase 44]: A 'migrated' RowOutcome projects to outcome: 'rendered' in the backfill dry-run report — the report describes what was/would be re-rendered, not which mode produced the row — 44-03: dry-run and apply share one report shape
 - [Phase 44]: computeBackfillDrift classifies a stored-report id missing from the fresh set as 'alreadyMigrated' (not drift) when it is in the migratedIds marker set — 44-03/D-09/MIG-05: a resumed apply must never abort on its own completed rows
+- [Phase 44]: runBackfill mirrors reconcile/run.ts's gate-then-loop shape: three apply-mode refusal gates (no report, fingerprint mismatch, drift) all return before the single write-authorising loop (D-08, D-09)
+- [Phase 44]: live-deps.ts is the sole module in src/lib/backfill/ importing @/lib/db, @/lib/storage and @/lib/pdf at runtime, keeping run.ts/render-row.ts/pdf-data.ts/report.ts/drift.ts unit-testable with no runtime-guard shim
 
 ### Blockers
 

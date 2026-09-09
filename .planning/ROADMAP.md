@@ -934,7 +934,7 @@ annotated as unused under D-02, because `43-CONTEXT.md`'s Deferred Ideas lists t
   3. Every re-rendered PDF keeps its own committed `language` (no delivered document changes language at its existing reference) and reproduces the same financial figures as before, computed from that proposal's `params_snapshot` rather than current coefficients.
   4. Interrupting the backfill mid-run and re-running it does not duplicate work or corrupt any proposal — already-migrated proposals are safely skipped or re-written to the identical result.
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 Plans:
 **Wave 1**
 
@@ -947,7 +947,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 44-04-PLAN.md — The `runBackfill` orchestrator, its refusal gates, and the production dependency wiring
+- [x] 44-04-PLAN.md — The `runBackfill` orchestrator, its refusal gates, and the production dependency wiring
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -1007,7 +1007,7 @@ Plans:
 | 41. Typography Migration | v1.9 | 3/3 | Complete    | 2026-09-08 |
 | 42. Captured Data — Fields & Advisor Profile | v1.9 | 10/10 | Complete   | 2026-09-08 |
 | 43. New PDF Layout | v1.9 | 13/13 | Complete   | 2026-09-09 |
-| 44. Backfill Migration | v1.9 | 3/5 | In Progress|  |
+| 44. Backfill Migration | v1.9 | 4/5 | In Progress|  |
 
 ---
 
