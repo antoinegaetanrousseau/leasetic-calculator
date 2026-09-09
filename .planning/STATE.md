@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
-status: completed
-last_updated: "2026-09-09T21:06:03.293Z"
-last_activity: 2026-09-09
+status: executing
+last_updated: "2026-09-09T21:40:40.365Z"
+last_activity: 2026-09-09 -- Phase 44 planning complete
 progress:
   total_phases: 24
   completed_phases: 3
-  total_plans: 26
+  total_plans: 31
   completed_plans: 26
   percent: 13
 ---
@@ -29,8 +29,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 43 (new-pdf-layout) — ALL PLANS COMPLETE (awaiting verification)
 Plan: 13 of 13
-Status: All plans complete — 43-13 operator checkpoint passed (all three questions YES)
-Last activity: 2026-09-09
+Status: Ready to execute
+Last activity: 2026-09-09 -- Phase 44 planning complete
 
 ## Deferred Items
 

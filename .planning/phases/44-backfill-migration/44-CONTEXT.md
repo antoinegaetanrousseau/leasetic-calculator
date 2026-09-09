@@ -29,7 +29,7 @@ constraint it lifts — "Mutating already-saved PDFs" (`.planning/REQUIREMENTS.m
 
 ### The irreversible act
 
-- **D-01: No sidecar copy of the delivered document.** The re-render overwrites
+- **D-01:** **No sidecar copy of the delivered document.** The re-render overwrites
   `proposals/{userId}/{proposalId}.pdf` in place. This is not an added decision — the blob
   key is a pure function of `(userId, proposalId)` and `VercelBlobStorage.put()` passes
   `addRandomSuffix: false`, so a `put()` at that key IS a replacement and the store has no
@@ -38,7 +38,7 @@ constraint it lifts — "Mutating already-saved PDFs" (`.planning/REQUIREMENTS.m
   apply runs, the retired layout does not exist anywhere, so the dry-run and the approval
   gate (D-08) are the only safety net.
 
-- **D-02: Live-read fields change silently, by design.** A re-render reads the advisor
+- **D-02:** **Live-read fields change silently, by design.** A re-render reads the advisor
   live (`getAdvisor()`, 43 D-13) and takes `partner.companyTelephone` from the creating
   user's current account (PROF-03). Neither is snapshotted, so a re-rendered PDF can name
   a different advisor or phone than the document the client holds. This is correct
@@ -48,19 +48,19 @@ constraint it lifts — "Mutating already-saved PDFs" (`.planning/REQUIREMENTS.m
 
 ### Row scope
 
-- **D-03: `status IN ('active','deleted')`.** Drafts are excluded structurally — they have
+- **D-03:** **`status IN ('active','deleted')`.** Drafts are excluded structurally — they have
   no blob. Soft-deleted rows are included with **no `deleted_at` window filter**: a partner
   can restore one within the 30-day window, and an unmigrated row would resurrect a
   retired-layout document after the migration reported success.
 
-- **D-04: A missing blob is not a special case.** A row whose `pdf_blob_key` is set but
+- **D-04:** **A missing blob is not a special case.** A row whose `pdf_blob_key` is set but
   whose object is absent from storage is rendered like any other row; the render writes a
   valid PDF at the expected key and repairs the row as a side effect. No orphan category,
   no separate counter, no distinct reporting.
 
 ### Figures and idempotence
 
-- **D-05: The PDF's `computed` prop is the stored `computed` jsonb, verbatim. Nothing is
+- **D-05:** **The PDF's `computed` prop is the stored `computed` jsonb, verbatim. Nothing is
   recomputed.** `buildComputedJson` and `buildPdfComputed`
   (`src/lib/api/proposals/finalize-wizard.ts:89` and `:116`) emit identical field sets —
   `state`, `trancheKey`, `loyerHT`, `coeff`, `isOnDemand` — so the stored jsonb feeds the
@@ -77,7 +77,7 @@ constraint it lifts — "Mutating already-saved PDFs" (`.planning/REQUIREMENTS.m
   > `.planning/REQUIREMENTS.md` may warrant a restatement line in the style Phase 42/43
   > used for PROF-03 and DOC-03.
 
-- **D-06: Idempotence is an `audit_log` row per migrated proposal**, written as each row
+- **D-06:** **Idempotence is an `audit_log` row per migrated proposal**, written as each row
   completes: `action: 'proposal.pdf_backfill'`, `targetType: 'proposal'`,
   `targetId: proposal.id`. A re-run left-joins against it and skips what is already marked.
   This doubles as the operator audit trail an irreversible bulk mutation should leave.
@@ -96,7 +96,7 @@ constraint it lifts — "Mutating already-saved PDFs" (`.planning/REQUIREMENTS.m
 
 ### Where and how it runs
 
-- **D-07: Apply runs as a `workflow_dispatch` GitHub Action, never from a laptop.**
+- **D-07:** **Apply runs as a `workflow_dispatch` GitHub Action, never from a laptop.**
   Modelled on `.github/workflows/db-migrate.yml`. `import './_load-env'` arms
   `assertSafeDatabaseTarget`, which classifies Neon `main` as `refuse-production` and
   exits(1) — so a developer machine holding `.env.local` cannot run apply at all. The
@@ -111,26 +111,26 @@ constraint it lifts — "Mutating already-saved PDFs" (`.planning/REQUIREMENTS.m
   > `scripts/_db-branch-guard.ts` for this phase — a bypass built for a bulk irreversible
   > blob mutation would outlive the phase.
 
-- **D-08: One dispatch, two jobs, a GitHub Environment required-reviewer gate between
+- **D-08:** **One dispatch, two jobs, a GitHub Environment required-reviewer gate between
   them.** Job 1 (dry-run) renders every in-scope proposal, writes zero blobs and zero
   rows, and uploads the report as a workflow artifact. The approval click on the
   Environment gate **is** MIG-02's explicit confirmation. Job 2 (apply) downloads that
   exact artifact and proceeds. This makes "the run I approved" and "the run that happened"
   the same run by construction — load-bearing, because D-01 removed the rollback.
 
-- **D-09: Apply refuses on drift.** Before writing, apply re-plans the in-scope set,
+- **D-09:** **Apply refuses on drift.** Before writing, apply re-plans the in-scope set,
   diffs it against the approved report, and aborts if the set changed, with an
   `--allow-drift` escape for a deliberate override. Mirrors
   `scripts/reconcile-proposals.ts` (D-15) and its exit-code-3 guard refusal.
 
-- **D-10: Failure policy is log-and-continue, with a non-zero exit if any row failed.**
+- **D-10:** **Failure policy is log-and-continue, with a non-zero exit if any row failed.**
   Same best-effort shape as `scripts/purge-soft-deleted.ts`. One legacy row with an
   unparseable `inputs` blob must not block the rest. The non-zero exit turns the Action
   run red so a partial success cannot pass unnoticed. Because idempotence is the audit_log
   row (D-06), a failed proposal is simply unmarked, and the failures are exactly the set a
   re-run picks up — which is also how MIG-05 is satisfied for interruptions.
 
-- **D-11: The script follows the established `tsx` entry-point shape.**
+- **D-11:** **The script follows the established `tsx` entry-point shape.**
   `#!/usr/bin/env tsx`, `import './_load-env'` as the first import, npm scripts wrapped
   with `-r ./scripts/_preload-mock-server-only.cjs` (required to import from
   `src/lib/db/queries`, which carries `server-only`). Exit codes follow reconcile:

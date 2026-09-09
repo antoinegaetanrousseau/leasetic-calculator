@@ -935,12 +935,22 @@ annotated as unused under D-02, because `43-CONTEXT.md`'s Deferred Ideas lists t
   4. Interrupting the backfill mid-run and re-running it does not duplicate work or corrupt any proposal — already-migrated proposals are safely skipped or re-written to the identical result.
 
 **Plans:** 5 plans
-
 Plans:
+**Wave 1**
+
 - [ ] 44-01-PLAN.md — Contracts & data layer: the `proposal.pdf_backfill` audit action, the anti-join candidate query, and `src/lib/backfill/types.ts`
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 44-02-PLAN.md — Per-row render: stored row -> document props with verbatim `computed` and its own `language`, then mode-aware upload/persist/mark
 - [ ] 44-03-PLAN.md — Two-form dry-run report and the three-way drift gate
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 44-04-PLAN.md — The `runBackfill` orchestrator, its refusal gates, and the production dependency wiring
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 44-05-PLAN.md — CLI entry point, npm scripts, the gated two-job GitHub Action, and the operator runbook
 
 **Planning note (2026-09-09, plan set):** criterion 3's "computed from that proposal's `params_snapshot`" is satisfied transitively, not literally. The backfill prints the stored `computed` jsonb verbatim — `computeLoyer` is never called and `params_snapshot` is never read at render time — because `computed` was itself derived from that snapshot at finalization. The intent (never touch current coefficients) is met more strictly than a replay would meet it. See 44-CONTEXT.md D-05; the same restatement is recorded against MIG-04 in `.planning/REQUIREMENTS.md` by plan 44-02.
