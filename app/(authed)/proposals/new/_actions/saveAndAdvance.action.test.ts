@@ -134,6 +134,35 @@ describe('saveAndAdvanceAction (D-01, D-03, D-21)', () => {
       .rejects.toThrow(/NEXT_REDIRECT:\/proposals\/new\/parametres/);
     expect(updateDraftMock).not.toHaveBeenCalled();
   });
+
+  it('Finding 3: session user with no companyName and nextInputs.partnerCo "" does not throw ValidationFailed — persisted partnerCo is "", not the displayName/email', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: 'u-1',
+          email: 'bob@example.com',
+          displayName: 'Bob Partner',
+          name: 'Bob',
+          companyName: null,
+        },
+      },
+    });
+    const noCoInputs = { ...VALID_INPUTS, partnerCo: '' };
+    updateDraftMock.mockResolvedValue({ id: 'd-1', inputs: { ...noCoInputs } });
+
+    // The historical step-2 blocker (empty partnerCo failing safeParse) must
+    // stay closed: this must redirect onward, never throw ValidationFailed.
+    await expect(saveAndAdvanceAction('d-1', noCoInputs, 1))
+      .rejects.toThrow(/NEXT_REDIRECT:\/proposals\/new\/calcul/);
+
+    expect(updateDraftMock).toHaveBeenCalledTimes(1);
+    const [, , payloadArg] = updateDraftMock.mock.calls[0];
+    const merged = (payloadArg as { inputs: Record<string, unknown> }).inputs;
+    expect(merged.partnerCo).toBe('');
+    expect(merged.partnerCo).not.toBe('Bob Partner');
+    expect(merged.partnerCo).not.toBe('Bob');
+    expect(merged.partnerCo).not.toBe('bob@example.com');
+  });
 });
 
 describe('legacy redirect route (D-04)', () => {

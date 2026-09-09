@@ -274,6 +274,21 @@ describe('clientSiret (FIELD-01 / D-02 / D-04)', () => {
       expect(r.error.issues.map((i) => i.message)).toContain('error.field.phone.invalid');
     }
   });
+
+  // Phase 43 gap closure, Finding 3, operator option (a): partnerCo must
+  // never block finalization — an account with no companyName must still be
+  // able to complete the wizard and finalize a proposal.
+  it('a proposal input with partnerCo "" still parses — an absent company never blocks finalization', () => {
+    const r = proposalInputSchema.safeParse({ ...validBase, partnerCo: '' });
+    expect(r.success).toBe(true);
+  });
+
+  it('a proposal input with partnerCo omitted entirely still parses', () => {
+    const { partnerCo: _omit, ...withoutPartnerCo } = validBase;
+    void _omit;
+    const r = proposalInputSchema.safeParse(withoutPartnerCo);
+    expect(r.success).toBe(true);
+  });
 });
 
 describe('coefficientsSchema (D-2 typed constant validator)', () => {

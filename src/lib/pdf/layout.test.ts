@@ -478,6 +478,49 @@ describe('DOC-03: the VOTRE CONTACT card separates the partner from the Leasetic
     expect(text, 'DOC-03: deleted dictionary key "Advisor" leaked into the EN render').not.toContain('Advisor');
     expect(text, 'DOC-03: deleted dictionary key "Sales rep" leaked into the EN render').not.toContain('Sales rep');
   });
+
+  it("Finding 3: an absent partnerCo renders an em dash under Partenaire, never the partner's own name", async () => {
+    const baselineData = FR_FIXTURE.data;
+    const noCompanyData: ProposalDocumentProps['data'] = {
+      ...baselineData,
+      inputs: { ...baselineData.inputs, partnerCo: '' },
+    };
+
+    const baselineResult = await renderProposalPdf({ data: baselineData });
+    const noCompanyResult = await renderProposalPdf({ data: noCompanyData });
+
+    const baselineEmDashCount = countCodepointOccurrences(baselineResult.buffer, EM_DASH.codePointAt(0)!);
+    const noCompanyEmDashCount = countCodepointOccurrences(noCompanyResult.buffer, EM_DASH.codePointAt(0)!);
+    expect(
+      noCompanyEmDashCount,
+      'Finding 3: an absent partnerCo must add exactly one em dash (the Partenaire value), nothing else moves',
+    ).toBe(baselineEmDashCount + 1);
+
+    const text = reconstructVisibleTextFontAware(noCompanyResult.buffer);
+    expect(text, 'Finding 3: the "Partenaire" label must survive an absent partnerCo').toContain('Partenaire');
+
+    // A metacharacter-safe occurrence counter — indexOf, not a regex, so a
+    // rotated fixture value carrying a regex metacharacter can never break
+    // the count (see file header rationale for reconstructVisibleTextFontAware).
+    function countOccurrences(haystack: string, needle: string): number {
+      let count = 0;
+      let fromIndex = 0;
+      for (;;) {
+        const idx = haystack.indexOf(needle, fromIndex);
+        if (idx === -1) break;
+        count += 1;
+        fromIndex = idx + needle.length;
+      }
+      return count;
+    }
+
+    const partnerName = FR_FIXTURE.data.inputs.partnerName;
+    if (!partnerName) throw new Error('FR_FIXTURE.data.inputs.partnerName is missing — fixture rotated without updating this test');
+    expect(
+      countOccurrences(text, partnerName),
+      `Finding 3: the partner's own name "${partnerName}" must appear exactly once (the headline), never under the Partenaire label`,
+    ).toBe(1);
+  });
 });
 
 // ── DOC-11 / FIELD-03: the geometry guarantee ─────────────────────────────

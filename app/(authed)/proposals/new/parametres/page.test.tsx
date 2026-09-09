@@ -182,6 +182,47 @@ describe('parametres/page.tsx (D-01 / D-02 / D-03 / D-25 / D-26 / D-07 / D-08)',
   });
 
   // ──────────────────────────────────────────────────────────────────────────
+  // Finding 3 (43-VERIFICATION.md Gap 2, operator option (a)): a session user
+  // with NO companyName must never have partnerCo substitute their own name.
+  // ──────────────────────────────────────────────────────────────────────────
+  it('Finding 3: with session.user.companyName absent, minted partnerCo is "" — never the displayName, name, or email', async () => {
+    requireUserMock.mockResolvedValue({
+      session: {
+        user: {
+          id: USER_ID,
+          email: 'partner@example.com',
+          displayName: 'Alice Partner',
+          name: 'Alice',
+          companyName: null,
+        },
+      },
+    });
+    getProposalByIdMock.mockResolvedValue({
+      id: 'source-1',
+      userId: USER_ID,
+      deletedAt: null,
+      inputs: { clientCo: 'PrefilledCorp' },
+    });
+    await expect(
+      ParametresStep1Page({ searchParams: Promise.resolve({ duplicate: 'source-1' }) }),
+    ).rejects.toThrow(
+      /NEXT_REDIRECT:\/proposals\/new\/parametres\?draft_id=new-draft-1&duplicate=1/,
+    );
+    expect(updateDraftMock).toHaveBeenCalledTimes(1);
+    const [, , payload] = updateDraftMock.mock.calls[0] as [
+      string,
+      string,
+      { inputs: Record<string, unknown> },
+    ];
+    expect(payload.inputs.partnerCo).toBe('');
+    expect(payload.inputs.partnerCo).not.toBe('Alice Partner');
+    expect(payload.inputs.partnerCo).not.toBe('Alice');
+    expect(payload.inputs.partnerCo).not.toBe('partner@example.com');
+    // partnerName is unaffected — it legitimately still uses the name fallback.
+    expect(payload.inputs.partnerName).toBe('Alice Partner');
+  });
+
+  // ──────────────────────────────────────────────────────────────────────────
   // D-25 fallback: soft-deleted source
   // ──────────────────────────────────────────────────────────────────────────
   it('Test 3: with ?duplicate=<sourceId> + source soft-deleted → createDraft + redirect WITHOUT spreading source.inputs', async () => {
