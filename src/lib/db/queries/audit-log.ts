@@ -76,7 +76,26 @@ export type AuditAction =
   // Payload carries only the changed field names and the actor — a contact-details
   // write, so no commission, rate or derived value can appear (ADMIN-09 holds by
   // construction: adminUpdateAdvisor never reads global_params).
-  | 'admin.advisor.update';
+  | 'admin.advisor.update'
+  // ── Phase 44 — Backfill migration (MIG-01..05, D-06) ──────────────────────
+  // (1) Written once per successfully re-rendered proposal, by apply-mode only —
+  //     never written by dry-run.
+  // (2) Doubles as the MIG-05 idempotence marker: a re-run anti-joins on
+  //     `action = 'proposal.pdf_backfill' AND targetType = 'proposal' AND
+  //     targetId = proposals.id` and skips what is already marked.
+  // (3) `actorId` is null — the system-initiated-CLI convention already used by
+  //     'proposal.purge' and the three Phase 31 `.extract` actions.
+  // (4) Payload carries only the proposal's `language` and the new `pdfSizeBytes`
+  //     — never `computed`, never `paramsSnapshot`, never an amount, coefficient,
+  //     loyer or commission value (ADMIN-09).
+  //
+  // `pdf_sha256` is deliberately NOT the marker: `src/lib/pdf/render.ts:19`
+  // documents that the React Fiber scheduler reorders PDF objects per call, so
+  // identical inputs produce a different raw sha256 on every render. Only
+  // `contentHash` is stable, and it is never persisted — the schema stores
+  // `pdf_sha256` only. Any code that compares hashes to decide "already
+  // migrated?" is wrong; see D-06 in 44-CONTEXT.md.
+  | 'proposal.pdf_backfill';
 
 export type AuditTargetType = 'proposal' | 'user' | 'global_params' | 'client_relationship' | 'contact' | 'company' | 'company_pair' | 'leasetic_advisor';
 
