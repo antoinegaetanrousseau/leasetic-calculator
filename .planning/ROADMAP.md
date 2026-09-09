@@ -511,7 +511,7 @@ Plans:
   4. Two extracted clients that match only on `name_normalized` — no SIREN on one or both — are NOT silently merged; they appear in a human review queue instead.
   5. A human opens the review queue and, for each flagged pair, either merges the two into one company or marks them permanently separate; the decision is durable and is never re-flagged on a later run.
 
-**Plans:** 8/8 plans complete
+**Plans:** 13 plans (8/13 complete — plans 43-09..43-13 are gap closure for `43-VERIFICATION.md`)
 Plans:
 **Wave 1**
 
@@ -880,6 +880,26 @@ Plans:
 **Wave 6** *(blocked on Wave 5 completion)*
 
 - [x] 43-08-PLAN.md — `pdf:preview` renderer + Antoine's human visual pass against the reference PNGs (D-15)
+
+**Wave 7** *(gap closure — blocked on Wave 6 completion)*
+
+- [ ] 43-09-PLAN.md — Disable react-pdf's default hyphenator and convert `dehyphenate()` from a normaliser into a DOC-01 guard (Gap 1)
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 43-10-PLAN.md — Rebuild the VOTRE CONTACT card to Antoine's 7-row structure; delete `salesRep`/`advisorName`, add `pdf.card.contact.partner` (Gap 2)
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 43-11-PLAN.md — Finding 3, operator option (a): `partnerCo` sourced from `companyName` alone at both hydration sites, absence rendering an em dash
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
+- [ ] 43-12-PLAN.md — Add `clientSiret` to the happy-path fixtures with a positive render assertion, and regenerate the byte-determinism baseline ONCE (Gap 3, D-16)
+
+**Wave 11** *(blocked on Wave 10 completion)*
+
+- [ ] 43-13-PLAN.md — Operator confirmation on ONE real finalized proposal that a captured SIRET prints (checkpoint, human-only)
 
 **UI hint:** yes
 
