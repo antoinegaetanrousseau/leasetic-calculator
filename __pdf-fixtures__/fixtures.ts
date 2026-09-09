@@ -25,6 +25,15 @@ const SHARED_BASE: Omit<ProposalDocumentProps['data'], 'language'> = {
     clientTel: '01 23 45 67 89',
     clientEmail: 'jean.dupont@alpha.example',
     clientSiren: '123456789',
+    // Gap 3 (43-VERIFICATION.md / DOC-02): populated SIRET so the
+    // emDash(inputs.clientSiret) branch at document.tsx's SIRET row is
+    // actually exercised with a value, not just its absent/em-dash branch.
+    // '12345678900012'.slice(0, 9) === '123456789' === clientSiren above,
+    // satisfying schema.ts's requiredSiretSchema refine
+    // (data.clientSiret.slice(0, 9) === data.clientSiren). Synthetic
+    // sequential-digit value, not a real French establishment identifier —
+    // the same constant already used by src/lib/pdf/no-commission.test.ts.
+    clientSiret: '12345678900012',
     slb: true,
     evalParc: false,
     amountHT: '75000',
@@ -56,6 +65,22 @@ export interface PdfFixture {
 }
 
 /**
+ * Gap 3 (43-VERIFICATION.md / DOC-02): returns a shallow copy of SHARED_BASE's
+ * `inputs` with `clientSiret` deleted, so the agent-commission-free fixture
+ * keeps the FIELD-03 legacy-render path (a pre-Phase-42 proposal with no
+ * `clientSiret` key at all) covered by a committed fixture rather than by
+ * ad-hoc test overrides alone. `delete` is valid here because `clientSiret`
+ * is declared optional on `ProposalDocumentProps['data']['inputs']`.
+ */
+function withoutClientSiret(
+  inputs: (typeof SHARED_BASE)['inputs'],
+): (typeof SHARED_BASE)['inputs'] {
+  const copy = { ...inputs };
+  delete copy.clientSiret;
+  return copy;
+}
+
+/**
  * Commission-free fixture for Agent/Commercial partner type (PTYPE-04/06).
  * Uses the same amountHT/duration/tranche as SHARED_BASE but computes
  * loyerHT WITHOUT the commission factor:
@@ -72,8 +97,13 @@ const AGENT_COMMISSION_FREE_BASE: Omit<ProposalDocumentProps['data'], 'language'
     coeff: '2.2500',
     isOnDemand: false,
   },
+  inputs: withoutClientSiret(SHARED_BASE.inputs),
 };
 
+// Gap 3 (43-VERIFICATION.md / DOC-02) fixture split: `happy-path-fr` and
+// `happy-path-en` carry a populated SIRET (DOC-02 positive branch);
+// `agent-commission-free` deliberately omits the key (FIELD-03 legacy
+// branch). Anyone adding a fourth fixture must preserve at least one of each.
 export const pdfFixtures: ReadonlyArray<PdfFixture> = [
   {
     name: 'happy-path-fr',
