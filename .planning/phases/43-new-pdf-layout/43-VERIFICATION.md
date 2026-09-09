@@ -2,7 +2,7 @@
 phase: 43-new-pdf-layout
 verified: 2026-09-09T00:00:00Z
 status: gaps_found
-score: 5/6 roadmap success criteria verified (10/13 requirement IDs verified, 1 uncertain, 2 failed)
+score: 5/6 roadmap success criteria verified (10/13 requirement IDs verified, 3 failed — DOC-02 content confirmed by operator 2026-09-09; a third gap, the clientSiret fixture/coverage hole, was added the same day)
 overrides_applied: 0
 gaps:
   - truth: "A generated proposal PDF matches the design spec end to end (Success Criterion 1 / DOC-01)"
@@ -54,9 +54,48 @@ gaps:
       - "Implement the exact 7-row VOTRE CONTACT structure specified verbatim in 43-08-SUMMARY.md's 'Agreed target structure' block (partner headline + Partenaire/Téléphone rows, then advisor headline + Fonction/Téléphone/Email rows), including the 'delete salesRep' scope reduction Antoine gave"
       - "Apply the dictionary deletions/additions listed in 43-08-SUMMARY.md's 'Dictionary work implied' bullet (delete pdf.card.contact.salesRep and pdf.card.contact.advisorName, add pdf.card.contact.partner), landing each deletion in the same diff as its last t() call"
       - "Resolve Finding 3 (partnerCo fallback to a person's name) using one of the two candidate fixes in 43-08-SUMMARY.md before shipping the new 'Partenaire' row — pick (a) drop the nameFallback and render an em dash, or (b) give companyName an admin edit path per the companyTelephone PR precedent"
+  - truth: "A populated client SIRET renders in the SOCIÉTÉ CLIENTE card (DOC-02 / FIELD-01 render path)"
+    status: failed
+    reason: >
+      Operator report (2026-09-09): "SIRET was not populated in none of these attempts."
+      Confirmed as a fixture + coverage gap, not a write-path bug. NONE of the three fixtures in
+      __pdf-fixtures__/fixtures.ts carries a clientSiret key — all three carry only
+      clientSiren: '123456789' — so every preview PDF, and the committed byte-determinism baseline,
+      render "SIRET —" by construction. Every test that touches the field exercises only the ABSENT
+      branch: document.test.tsx:99 (clientSiret: undefined), layout.test.ts:395 (clientSiret:
+      undefined) and layout.test.ts:424 (asserts the SIRET label beside em dashes). The single test
+      carrying a real value, no-commission.test.ts:178, asserts only commission-invisibility and
+      never that SIRET appears. Net: emDash(inputs.clientSiret) at document.tsx:281 has never once
+      been rendered with a value in any test or fixture.
+      ROOT CAUSE of the blind spot: document.tsx:82 declares clientSiret?: string — optional by
+      design, because FIELD-03 requires pre-Phase-42 proposals with no clientSiret key to still
+      render. That deliberate optionality let the fixtures omit the field and still typecheck, so
+      the legacy escape hatch became the only branch under test. Same failure shape as the
+      hyphenation gap from the opposite direction: there a test normalised the bad output away,
+      here the fixtures never produce the good output. Both leave a green suite that never asked
+      the question.
+      NOT believed to be a live defect: both write paths enforce the field —
+      finalize-wizard.ts:172 throws LegacyDraftIncomplete when the key is absent, and
+      submit.ts:77 runs proposalInputSchema.safeParse, which requires clientSiret and refines that
+      its first 9 digits equal clientSiren. A wizard-finalized proposal cannot lack it. The render
+      of a populated value is nonetheless the one path no test covers, so it stays a gap until
+      proven.
+    artifacts:
+      - path: "__pdf-fixtures__/fixtures.ts"
+        issue: "No clientSiret on any of the three fixtures (only clientSiren at line 27) — every rendered fixture shows 'SIRET —'"
+      - path: "src/lib/pdf/document.tsx"
+        issue: "Line 281 emDash(inputs.clientSiret) is exercised only with undefined; line 82's FIELD-03 optionality is what permits the fixture omission"
+    missing:
+      - "Add a valid clientSiret to the happy-path fixtures — must satisfy the schema refine that its first 9 digits equal clientSiren ('123456789' -> e.g. '12345678900012'). Keep at least one fixture WITHOUT it so the FIELD-03 legacy-render path stays covered."
+      - "Add a positive assertion that a populated SIRET renders in the SOCIÉTÉ CLIENTE card, mirroring how DOC-11's em-dash case is asserted — the absent branch is well covered, the populated branch is not covered at all."
+      - "Regenerate __pdf-fixtures__/expected.sha256.txt after the fixture change (bytes will move)."
+      - "Operator confirmation on ONE real finalized proposal that a captured SIRET appears in the rendered PDF — the only path no automated test covers."
 deferred: []
 human_verification:
-  - test: "Confirm SOCIÉTÉ CLIENTE card content (DOC-02) — SIREN, SIRET, destinataire, fonction, téléphone, email labels and values — against the reference PNGs field-by-field, not just card geometry"
+  # RESOLVED 2026-09-09 by the operator: "Societe cliente card works." — DOC-02 content confirmed
+  # against the reference. The SIRET row was reported blank in the same message; that is NOT a
+  # DOC-02 content failure but the fixture/coverage gap recorded as the third gap above.
+  - test: "[RESOLVED — operator confirmed] Confirm SOCIÉTÉ CLIENTE card content (DOC-02) — SIREN, SIRET, destinataire, fonction, téléphone, email labels and values — against the reference PNGs field-by-field, not just card geometry"
     expected: "Every field label and its bound value matches Quote-FR-A.reference.png / Quote-EN-A.reference.png exactly"
     why_human: >
       43-08-SUMMARY.md's own key-decisions explicitly record that this checkpoint's lettered verdict
