@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
-status: Blocked on gap-closure plan for D-15 defects (title hyphenation; VOTRE CONTACT card semantics) — see 43-08-SUMMARY.md
-last_updated: "2026-09-09T10:00:04.060Z"
-last_activity: 2026-09-09
+status: executing
+last_updated: "2026-09-09T13:28:54.476Z"
+last_activity: 2026-09-09 -- Phase 43 planning complete
 progress:
   total_phases: 24
-  completed_phases: 3
-  total_plans: 21
+  completed_phases: 2
+  total_plans: 26
   completed_plans: 21
-  percent: 13
+  percent: 8
 ---
 
 # State — Matrice Commerciale
@@ -29,8 +29,8 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 43 (new-pdf-layout) — EXECUTING (D-15 verdict recorded, phase NOT closed — 2 defects open, gap-closure plan required before Phase 44)
 Plan: 8 of 8 (43-08 complete)
-Status: Blocked on gap-closure plan for D-15 defects (title hyphenation; VOTRE CONTACT card semantics) — see 43-08-SUMMARY.md
-Last activity: 2026-09-09
+Status: Ready to execute
+Last activity: 2026-09-09 -- Phase 43 planning complete
 
 ## Deferred Items
 

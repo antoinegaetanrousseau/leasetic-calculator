@@ -511,7 +511,7 @@ Plans:
   4. Two extracted clients that match only on `name_normalized` — no SIREN on one or both — are NOT silently merged; they appear in a human review queue instead.
   5. A human opens the review queue and, for each flagged pair, either merges the two into one company or marks them permanently separate; the decision is durable and is never re-flagged on a later run.
 
-**Plans:** 13 plans (8/13 complete — plans 43-09..43-13 are gap closure for `43-VERIFICATION.md`)
+**Plans:** 8/8 plans complete
 Plans:
 **Wave 1**
 
@@ -853,7 +853,7 @@ Plans:
   5. No commission figure, rate or derived value appears anywhere in the rendered PDF, in either language, for any partner type (the existing 20-gate `tests/admin-09-grep-contracts.test.ts` suite and `src/lib/pdf/no-commission.test.ts` stay green); and re-rendering the same proposal twice produces byte-identical PDFs, with the committed fixture at `__pdf-fixtures__/expected.sha256.txt` regenerated via `scripts/update-pdf-fixture.ts` to reflect the new design.
   6. Every text node uses the design's ten-step type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), replacing the five-role scale Phase 41 deliberately froze (`pdfFontSizes` at 8 / 9 / 10 / 22 / 32pt) — relocated here from Phase 41 by the D-02 amendment.
 
-**Plans:** 8/8 plans complete
+**Plans:** 13 plans (8/13 complete — plans 43-09..43-13 are gap closure for `43-VERIFICATION.md`)
 Plans:
 **Wave 1**
 
