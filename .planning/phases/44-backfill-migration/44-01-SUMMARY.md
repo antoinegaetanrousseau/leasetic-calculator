@@ -123,3 +123,7 @@ None - no external service configuration required.
 
 - Plans 02 (data mapping), 03 (report/drift), and 04 (orchestration) can now import `listBackfillCandidates`, `listBackfilledProposalIds`, and every type in `src/lib/backfill/types.ts` without re-deriving any shape from the codebase.
 - No blockers. No schema migration was created or applied, consistent with D-06's design (idempotence lives in `audit_log`, not a new column).
+
+## Self-Check: PASSED
+
+All 6 claimed files found on disk; all 4 commit hashes (`cb608b6`, `7cc6a25`, `82c4612`, `fa87af6`) found in git log.
