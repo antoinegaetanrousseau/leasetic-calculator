@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-09T21:40:40.365Z"
-last_activity: 2026-09-09 -- Phase 44 planning complete
+last_updated: "2026-09-09T21:58:18.246Z"
+last_activity: 2026-09-09
 progress:
   total_phases: 24
   completed_phases: 3
   total_plans: 31
-  completed_plans: 26
+  completed_plans: 27
   percent: 13
 ---
 
@@ -23,14 +23,14 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 **v1.1 evolution:** Same core value, delivered through a Vercel-hosted Next.js multi-page app instead of a standalone HTML file. Per-partner persistent PDF proposals. Admin-only global financial parameters. OVH-portable architecture.
 
-**Current focus:** Phase 43 — new-pdf-layout
+**Current focus:** Phase 44 — backfill-migration
 
 ## Current Position
 
-Phase: 43 (new-pdf-layout) — ALL PLANS COMPLETE (awaiting verification)
-Plan: 13 of 13
+Phase: 44 (backfill-migration) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-09-09 -- Phase 44 planning complete
+Last activity: 2026-09-09
 
 ## Deferred Items
 
@@ -546,6 +546,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 43 P10 | ~35min | 2 tasks | 4 files |
 | Phase 43 P11 | ~13min | 3 tasks | 8 files |
 | Phase 43 P12 | ~20min | 3 tasks | 3 files |
+| Phase 44 P01 | ~9min | 3 tasks | 5 files |
 
 ## Decisions
 
@@ -772,6 +773,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 43]: 43-10: VOTRE CONTACT card restructured to two headlined entities (partner, then Leasetic advisor) per the D-15 human verdict in 43-08-SUMMARY.md; pdf.card.contact.salesRep/advisorName deleted, pdf.card.contact.partner added
 - [Phase 43]: Finding 3 (option a): dropped partnerCo's nameFallback and made proposalInputSchema.partnerCo optional so an absent companyName renders an em dash, never a person's name, under the Partenaire label; option (b), an admin edit path for companyName, was explicitly declined by the operator.
 - [Phase 43]: DOC-02 deliberately not marked complete by 43-12 — 43-13's operator checkpoint owns the one remaining Gap 3 missing[] bullet (real-proposal SIRET confirmation)
+- [Phase 44]: Idempotence is an audit_log row per migrated proposal ('proposal.pdf_backfill'), never a pdf_sha256 comparison (D-06)
+- [Phase 44]: listBackfillCandidates row scope is status IN ('active','deleted') with NO deleted_at window filter (D-03)
+- [Phase 44]: BackfillDriftResult is declared in types.ts, not plan 03's drift.ts, to avoid a circular import
 
 ### Blockers
 
