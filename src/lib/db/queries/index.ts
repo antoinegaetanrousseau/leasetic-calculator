@@ -20,6 +20,8 @@ export {
   listPurgeCandidates,
   deriveDisplayStatus,
   deriveProposalOutcome,
+  listBackfillCandidates,
+  listBackfilledProposalIds,
 } from './proposals';
 export type {
   Cursor,
@@ -30,6 +32,7 @@ export type {
   ListResult,
   DisplayStatus,
   DisplayOutcome,
+  BackfillCandidateRow,
 } from './proposals';
 
 export {

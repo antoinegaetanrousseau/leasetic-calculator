@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, desc, eq, gt, ilike, isNotNull, isNull, lt, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, ilike, inArray, isNotNull, isNull, lt, or, sql } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import type { ProposalRow, NewProposalRow } from '@/db/schema';
 import { writeAuditLog } from './audit-log';
@@ -502,6 +502,96 @@ export async function listPurgeCandidates(): Promise<ProposalRow[]> {
       lt(schema.proposals.deletedAt, SOFT_DELETE_WINDOW),
     ))
     .orderBy(schema.proposals.deletedAt);
+}
+
+// ── Phase 44 — Backfill migration row scope + idempotence (MIG-05, D-03, D-06) ──
+
+/**
+ * Projection returned by listBackfillCandidates — everything a re-render
+ * needs without a second query (D-02): the proposal's own committed data
+ * plus the creating user's CURRENT company telephone (live-read by design,
+ * D-02 — no snapshot, no delta detection).
+ */
+export interface BackfillCandidateRow {
+  id: string;
+  userId: string;
+  lcRef: string | null;
+  language: string;
+  status: string;
+  createdAt: Date;
+  inputs: Record<string, unknown>;
+  computed: Record<string, unknown> | null;
+  pdfBlobKey: string | null;
+  partnerCompanyTelephone: string | null;
+}
+
+/**
+ * Row scope + anti-join for the Phase 44 PDF backfill (MIG-01..05).
+ *
+ * Row scope (D-03): `status IN ('active', 'deleted')`. Drafts are excluded
+ * structurally — they have no blob. Soft-deleted rows are INCLUDED with NO
+ * `deleted_at` window filter (unlike listPurgeCandidates above): a partner
+ * can restore a soft-deleted proposal inside its 30-day window, and an
+ * unmigrated row would resurrect a retired-layout document after the
+ * migration reported success.
+ *
+ * Anti-join (D-06): LEFT JOIN audit_log on the 'proposal.pdf_backfill'
+ * marker and filter WHERE audit_log.id IS NULL. Every other leftJoin in this
+ * file family (see global-params.ts) decorates rows with joined display
+ * data; this one filters rows OUT. That inversion is the whole of MIG-05:
+ * a resumed run anti-joins against its own prior progress and only sees
+ * what is still unmigrated. `pdf_sha256` is NOT and cannot be the skip
+ * signal — src/lib/pdf/render.ts:19 documents that the raw buffer hash is
+ * not stable across renders of identical inputs.
+ */
+export async function listBackfillCandidates(): Promise<BackfillCandidateRow[]> {
+  const dbi = db();
+  return dbi
+    .select({
+      id: schema.proposals.id,
+      userId: schema.proposals.userId,
+      lcRef: schema.proposals.lcRef,
+      language: schema.proposals.language,
+      status: schema.proposals.status,
+      createdAt: schema.proposals.createdAt,
+      inputs: schema.proposals.inputs,
+      computed: schema.proposals.computed,
+      pdfBlobKey: schema.proposals.pdfBlobKey,
+      partnerCompanyTelephone: schema.users.companyTelephone,
+    })
+    .from(schema.proposals)
+    .leftJoin(schema.users, eq(schema.users.id, schema.proposals.userId))
+    .leftJoin(schema.auditLog, and(
+      eq(schema.auditLog.targetType, 'proposal'),
+      eq(schema.auditLog.targetId, schema.proposals.id),
+      eq(schema.auditLog.action, 'proposal.pdf_backfill'),
+    ))
+    .where(and(
+      inArray(schema.proposals.status, ['active', 'deleted']),
+      isNull(schema.auditLog.id),
+    ))
+    .orderBy(schema.proposals.createdAt);
+}
+
+/**
+ * All proposal ids already carrying the 'proposal.pdf_backfill' marker
+ * (D-06, D-09). Plan 03's drift check uses this to tell "this row left the
+ * candidate set because we already migrated it" (expected on a resumed run,
+ * MIG-05) apart from "this row left the candidate set because it
+ * disappeared" (real drift) — without it a resumed apply would abort on its
+ * own progress.
+ */
+export async function listBackfilledProposalIds(): Promise<string[]> {
+  const dbi = db();
+  const rows = await dbi
+    .selectDistinct({ targetId: schema.auditLog.targetId })
+    .from(schema.auditLog)
+    .where(and(
+      eq(schema.auditLog.action, 'proposal.pdf_backfill'),
+      eq(schema.auditLog.targetType, 'proposal'),
+      isNotNull(schema.auditLog.targetId),
+    ));
+  return rows.map((r) => r.targetId as string);
 }
 
 // ── Phase 12 — DB-01: Draft CRUD lifecycle ──────────────────────────────────
