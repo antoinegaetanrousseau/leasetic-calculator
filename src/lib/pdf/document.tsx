@@ -49,6 +49,20 @@ Font.register({
   ],
 });
 
+// ── Hyphenation callback: disable mid-word hyphenation ────────────────────
+// DOC-01 / Gap 1 (43-VERIFICATION.md): closes the defect Antoine's D-15 human
+// visual pass caught (43-08-SUMMARY.md, Defect 1). @react-pdf/renderer's
+// default hyphenator was breaking the title mid-word — "Proposition de
+// location finan-cière" (FR) and "Equipment lease financing pro-posal" (EN)
+// — where the reference PNGs break cleanly at a space, with no hyphen.
+// Returning the word as a single unsplittable unit tells the layout engine
+// there is no legal in-word break point, so it may only wrap at spaces.
+// This is module-load global state for the renderer, exactly like
+// Font.register above — deliberately registered right beside it so the two
+// can never drift apart. It is deterministic: a pure function of `word`,
+// no I/O, no state, no recursion.
+Font.registerHyphenationCallback((word) => [word]);
+
 /**
  * Determinism contract (PROP-17 / UI-SPEC §3.3.15):
  *   - No Date.now() — creation date comes from the proposal row
