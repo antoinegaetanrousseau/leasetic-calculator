@@ -123,7 +123,7 @@ operator's own account and environment, none of them introduced by this phase:
 |-----|----------------------|
 | `Partenaire` | The account has no `users.companyName`. This is precisely 43-11 (option (a)) working: before it, this row would have printed "Delphine Specht" — a person's name under a company label. |
 | `Téléphone` (partner) | The account has no `companyTelephone`. Phase 42 shipped the column; PR #13 (`fix/partner-company-telephone-edit`) shipped the admin edit path, but this account's value was never set. |
-| advisor headline, `Fonction`, `Téléphone`, `Email` | No Leasetic advisor is configured for this partner. Known and previously diagnosed — it is the data-absence finding recorded during the 43-08 checkpoint, not a rendering fault. |
+| advisor headline, `Fonction`, `Téléphone`, `Email` | The single global `leasetic_advisor` row is blank. *(Corrected 2026-09-09: an earlier draft of this line said "for this partner" — wrong. `getAdvisor()` takes no arguments and reads one fixed-id singleton, so this is one blank row affecting every proposal, not per-partner state.)* Known and previously diagnosed — the data-absence finding recorded during the 43-08 checkpoint, not a rendering fault. |
 
 Every one of these is DOC-11's absent-field em-dash convention behaving as specified. The phase's
 requirements are about **structure**; populating this data is a separate concern.
@@ -151,11 +151,37 @@ shortcut that let the two defects this phase just closed ship in the first place
 
 ## Follow-ups (out of scope, not blocking phase completion)
 
-1. **Advisor data is unconfigured** for this partner account — the advisor block prints four empty
+1. **Advisor data is unconfigured** (RESOLVED 2026-09-09 by configuration — see item 2 below; same single blank row) — the advisor block prints four empty
    rows under an empty headline on real proposals today. This is a shipping-relevant data gap, not
    a layout gap.
 2. **Bare em-dash headline** when the advisor is absent — consider collapsing the advisor block
    entirely rather than rendering an empty headline plus four em-dash rows.
+
+   *(RESOLVED 2026-09-09, no code change — operator decision. Investigation found the premise
+   behind items 1 and 2 was misleading in two ways. First, **the advisor is a global singleton**,
+   not per-partner: `getAdvisor()` takes no arguments and reads one fixed row
+   (`ADVISOR_ROW_ID = 00000000-0000-0000-0000-000000000001`, seeded by
+   `drizzle/0011_phase42_captured_data.sql`), so filling the one admin form at
+   `/{ADMIN_URL_SEGMENT}/advisor` populates the block on **every** proposal in the system at once —
+   these are not two separate follow-ups but one blank singleton row. Second, the geometry
+   objection was weaker than assumed: both cards are `flexGrow:1 / flexBasis:0` in a flex row and
+   SOCIÉTÉ CLIENTE is invariably 8 lines (`clientCo` is a required prop, its 6 rows unconditional),
+   so the row height is pinned by the client card and collapsing the advisor block would not have
+   moved page geometry — only left whitespace inside the card.*
+
+   *The decisive constraint is `43-CONTEXT.md` **D-13**, which locks the opposite of collapsing:
+   "A null advisor, or any null column, renders em dashes under DOC-11 — the card keeps its
+   geometry and the proposal still finalizes." Collapsing would require formally amending a
+   decision locked in this same phase, to fix a state that one admin form makes unreachable.*
+   
+   *Worth recording for whoever revisits this: DOC-11's text governs a field's **label** followed
+   by an em dash. The three advisor rows have labels, so DOC-11 covers them. The headline at
+   `document.tsx:334` renders `emDash(advisor?.name)` as a bare, UNLABELLED em dash — which DOC-11
+   never asked for. If the degraded path ever needs hardening (e.g. the seed row is wiped), the
+   minimal DOC-11-compatible change is to give that headline a static "Conseiller Leasetic" /
+   "Leasetic advisor" fallback, touching only the unlabelled headline and leaving D-13 and all
+   three labelled rows intact. Deliberately NOT done now: it would move PDF bytes and force a
+   fixture re-baseline to harden a state configuration already prevents.*
 3. **`users.companyName` has no edit path.** The operator declined option (b) in 43-11
    deliberately, so `Partenaire` will render an em dash for every account whose `companyName` was
    never set. Correct by decision, but worth revisiting before these PDFs go to clients.
