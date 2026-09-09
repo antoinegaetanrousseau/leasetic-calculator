@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-09T13:28:54.476Z"
-last_activity: 2026-09-09 -- Phase 43 planning complete
+last_updated: "2026-09-09T14:17:45.279Z"
+last_activity: 2026-09-09
 progress:
   total_phases: 24
   completed_phases: 2
   total_plans: 26
-  completed_plans: 21
+  completed_plans: 22
   percent: 8
 ---
 
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 43 (new-pdf-layout) — EXECUTING (D-15 verdict recorded, phase NOT closed — 2 defects open, gap-closure plan required before Phase 44)
-Plan: 8 of 8 (43-08 complete)
+Phase: 43 (new-pdf-layout) — EXECUTING
+Plan: 2 of 13
 Status: Ready to execute
-Last activity: 2026-09-09 -- Phase 43 planning complete
+Last activity: 2026-09-09
 
 ## Deferred Items
 
@@ -542,6 +542,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 43 P05 | ~25min | 3 tasks | 5 files |
 | Phase 43 P06 | ~65min | 3 tasks | 8 files |
 | Phase 43 P07 | ~22min | 3 tasks | 4 files |
+| Phase 43 P09 | ~20min | 2 tasks | 2 files |
 
 ## Decisions
 
@@ -763,6 +764,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 43]: D-10 four-faces proof reconciled to face-membership + no-collapse + Regular/SemiBold presence, not an exact count of 4 — Claude Design layout uses only Inter weights 400/600; the four-weight REGISTRATION guard in tests/vendored-ui-integrity.test.ts stays the separate, untouched proof (43-07 Task 1)
 - [Phase 43]: layout.test.ts uses a font-aware PDF decoder and a q/Q/cm matrix tracker instead of no-commission.test.ts's single-merged-glyph-map reconstruction and a literal min-Tm-y check — Both literal approaches were empirically shown to produce a false negative (em-dash count of 0) or a vacuously-always-passing check (Tm is a page-height constant in every BT block); the extraction must be correct before its assertion means anything (43-07 Task 2)
 - [Phase 43]: 43-08: D-15 human visual pass — 8/9 checks pass; title-row hyphenation defect (default @react-pdf/renderer hyphenator) and VOTRE CONTACT card partner/advisor semantics confusion diagnosed for gap closure; DOC-01/02/03 stay unticked, phase not closed
+- [Phase 43]: Font.registerHyphenationCallback((word) => [word]) fixes DOC-01 Gap 1 title hyphenation; dehyphenate() removed from layout.test.ts and replaced by a falsified DOC-01 guard — 43-09; DOC-01 not marked complete — fixture regeneration deferred to 43-12 per D-16 sequencing
 
 ### Blockers
 
