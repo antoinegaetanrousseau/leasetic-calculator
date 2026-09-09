@@ -123,7 +123,16 @@ proposal into it.
 - [ ] **MIG-03**: Each proposal is re-rendered in its own committed `language`, so no delivered
   document changes language at its existing reference.
 - [ ] **MIG-04**: Every re-rendered PDF shows the same financial figures as before, read from that
-  proposal's `params_snapshot` rather than current coefficients.
+  proposal's `params_snapshot` rather than current coefficients. *(Restated 2026-09-09 by Phase 44
+  D-05: MIG-04 is satisfied transitively, not literally. The backfill prints the proposal's stored
+  `computed` jsonb verbatim; `computed` was itself derived from that proposal's `params_snapshot`
+  at finalization — `buildComputedJson` and `buildPdfComputed`
+  (`src/lib/api/proposals/finalize-wizard.ts:89` and `:116`) emit identical field sets — so
+  `params_snapshot` is deliberately NOT read at render time and `computeLoyer` is never called.
+  The requirement's intent, never touch current coefficients, is met more strictly than a replay
+  would meet it, because no arithmetic runs at all. The absent `params_snapshot` read is the
+  designed behaviour and must NOT be recorded as a coverage gap by verification. See
+  `.planning/phases/44-backfill-migration/44-CONTEXT.md` D-05.)*
 - [ ] **MIG-05**: The backfill can be re-run safely after an interruption without duplicating work
   or corrupting proposals already migrated.
 
