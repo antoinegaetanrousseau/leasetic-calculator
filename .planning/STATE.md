@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-09T21:58:18.246Z"
+last_updated: "2026-09-09T22:13:02.728Z"
 last_activity: 2026-09-09
 progress:
   total_phases: 24
   completed_phases: 3
   total_plans: 31
-  completed_plans: 27
+  completed_plans: 28
   percent: 13
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 44 (backfill-migration) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-09-09
 
@@ -547,6 +547,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 43 P11 | ~13min | 3 tasks | 8 files |
 | Phase 43 P12 | ~20min | 3 tasks | 3 files |
 | Phase 44 P01 | ~9min | 3 tasks | 5 files |
+| Phase 44 P02 | ~24min | 3 tasks | 5 files |
 
 ## Decisions
 
@@ -776,6 +777,8 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 44]: Idempotence is an audit_log row per migrated proposal ('proposal.pdf_backfill'), never a pdf_sha256 comparison (D-06)
 - [Phase 44]: listBackfillCandidates row scope is status IN ('active','deleted') with NO deleted_at window filter (D-03)
 - [Phase 44]: BackfillDriftResult is declared in types.ts, not plan 03's drift.ts, to avoid a circular import
+- [Phase 44]: writeMarker's dependency signature uses pdfSizeBytes (types.ts source of truth), not sizeBytes as the plan's illustrative snippet showed
+- [Phase 44]: Backfill docstrings paraphrase forbidden literal tokens (proposalInputSchema, db/storage/pdf module paths) so grep-based absence gates on the source pass while the reasoning stays readable
 
 ### Blockers
 
