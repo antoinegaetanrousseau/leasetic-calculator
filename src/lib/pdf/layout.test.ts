@@ -523,6 +523,71 @@ describe('DOC-03: the VOTRE CONTACT card separates the partner from the Leasetic
   });
 });
 
+// ── DOC-02: a populated SIRET renders (Gap 3, 43-VERIFICATION.md) ─────────
+
+describe('DOC-02: a populated client SIRET renders in the SOCIÉTÉ CLIENTE card (Gap 3, 43-VERIFICATION.md)', () => {
+  it('FR: renders the SIRET value after its own label', async () => {
+    expect(
+      FR_FIXTURE.data.inputs.clientSiret,
+      'Gap 3 requires a populated clientSiret fixture — this stops the case going vacuous if a future fixture rotation drops the key',
+    ).toBeDefined();
+    const siretValue = FR_FIXTURE.data.inputs.clientSiret!;
+
+    const result = await renderProposalPdf({ data: FR_FIXTURE.data });
+    const text = reconstructVisibleTextFontAware(result.buffer);
+
+    expect(text, 'DOC-02: the "SIRET" label is missing from the FR render').toContain('SIRET');
+    expect(text, `DOC-02: the SIRET value "${siretValue}" is missing from the FR render`).toContain(siretValue);
+    expect(
+      text.indexOf('SIRET'),
+      'DOC-02: the SIRET value must render after its own label, not merely somewhere on the page',
+    ).toBeLessThan(text.indexOf(siretValue));
+  });
+
+  it('EN: renders the SIRET value after its own label', async () => {
+    expect(
+      EN_FIXTURE.data.inputs.clientSiret,
+      'Gap 3 requires a populated clientSiret fixture — this stops the case going vacuous if a future fixture rotation drops the key',
+    ).toBeDefined();
+    const siretValue = EN_FIXTURE.data.inputs.clientSiret!;
+
+    const result = await renderProposalPdf({ data: EN_FIXTURE.data });
+    const text = reconstructVisibleTextFontAware(result.buffer);
+
+    expect(text, 'DOC-02: the "SIRET" label is missing from the EN render').toContain('SIRET');
+    expect(text, `DOC-02: the SIRET value "${siretValue}" is missing from the EN render`).toContain(siretValue);
+    expect(
+      text.indexOf('SIRET'),
+      'DOC-02: the SIRET value must render after its own label, not merely somewhere on the page',
+    ).toBeLessThan(text.indexOf(siretValue));
+  });
+
+  it('absent branch control (FIELD-03): a missing clientSiret renders SIRET followed by one more em dash than the populated render', async () => {
+    const siretValue = FR_FIXTURE.data.inputs.clientSiret!;
+    const populatedResult = await renderProposalPdf({ data: FR_FIXTURE.data });
+
+    const absentData: ProposalDocumentProps['data'] = {
+      ...FR_FIXTURE.data,
+      inputs: { ...FR_FIXTURE.data.inputs, clientSiret: undefined },
+    };
+    const absentResult = await renderProposalPdf({ data: absentData });
+
+    const populatedEmDashCount = countCodepointOccurrences(populatedResult.buffer, EM_DASH.codePointAt(0)!);
+    const absentEmDashCount = countCodepointOccurrences(absentResult.buffer, EM_DASH.codePointAt(0)!);
+    expect(
+      absentEmDashCount,
+      'DOC-02 control: an absent clientSiret must add exactly one em dash (the SIRET value), proving the populated branch genuinely replaced an em dash rather than adding a stray glyph elsewhere',
+    ).toBe(populatedEmDashCount + 1);
+
+    const absentText = reconstructVisibleTextFontAware(absentResult.buffer);
+    expect(absentText, 'DOC-02 control: the "SIRET" label must survive an absent clientSiret').toContain('SIRET');
+    expect(
+      absentText,
+      'DOC-02 control: the SIRET value must not appear when clientSiret is absent',
+    ).not.toContain(siretValue);
+  });
+});
+
 // ── DOC-11 / FIELD-03: the geometry guarantee ─────────────────────────────
 
 describe('DOC-11 / FIELD-03: absent fields render em dashes with identical card geometry', () => {
