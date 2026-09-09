@@ -338,8 +338,7 @@ describe('DOC-10: language parity — EN and FR each render their own labels and
       'CLIENT COMPANY',
       'Recipient',
       'YOUR CONTACT',
-      'Sales rep',
-      'Advisor',
+      'Partner',
       'MONTHLY RENT EXCL. VAT',
       'FINANCIAL TERMS',
       'Financed amount excl. VAT',
@@ -366,6 +365,7 @@ describe('DOC-10: language parity — EN and FR each render their own labels and
       'Total des loyers HT',
       'Fait à',
       'Cachet',
+      'Partenaire',
       'Leasétic', // stale accented spelling — never reintroduced (D-01)
     ];
     for (const phrase of forbidden) {
@@ -385,8 +385,7 @@ describe('DOC-10: language parity — EN and FR each render their own labels and
       'SOCIÉTÉ CLIENTE',
       'Destinataire',
       'VOTRE CONTACT',
-      'Commercial',
-      'Conseiller',
+      'Partenaire',
       'LOYER MENSUEL HT',
       'CONDITIONS FINANCIÈRES',
       'Montant financé HT',
@@ -417,6 +416,67 @@ describe('DOC-10: language parity — EN and FR each render their own labels and
     for (const phrase of forbidden) {
       expect(text, `FR render leaked EN/stale phrase "${phrase}"`).not.toContain(phrase);
     }
+  });
+});
+
+// ── DOC-03 guard: partner/advisor split in the VOTRE CONTACT card (Gap 2) ──
+// This is the assertion that would have caught the original defect: the old
+// card had no `Partenaire` label at all and put the advisor's name in a row
+// rather than a headline, so this ordering chain could not have held.
+
+describe('DOC-03: the VOTRE CONTACT card separates the partner from the Leasetic advisor (Gap 2, 43-VERIFICATION.md)', () => {
+  it('FR: renders partner name, then Partenaire label, then advisor name, then Email — in that order', async () => {
+    const result = await renderProposalPdf({ data: FR_FIXTURE.data });
+    const text = reconstructVisibleTextFontAware(result.buffer);
+
+    const partnerName = FR_FIXTURE.data.inputs.partnerName;
+    const advisorName = FR_FIXTURE.data.advisor?.name;
+    if (!partnerName) throw new Error('FR_FIXTURE.data.inputs.partnerName is missing — fixture rotated without updating this test');
+    if (!advisorName) throw new Error('FR_FIXTURE.data.advisor?.name is missing — fixture rotated without updating this test');
+
+    const partnerNameIndex = text.indexOf(partnerName);
+    const partenaireIndex = text.indexOf('Partenaire');
+    const advisorNameIndex = text.indexOf(advisorName);
+    const emailIndex = text.lastIndexOf('Email');
+
+    expect(partnerNameIndex, `DOC-03: partner name "${partnerName}" is missing from the FR render`).toBeGreaterThan(-1);
+    expect(partenaireIndex, 'DOC-03: the "Partenaire" label is missing from the FR render').toBeGreaterThan(-1);
+    expect(advisorNameIndex, `DOC-03: advisor name "${advisorName}" is missing from the FR render`).toBeGreaterThan(-1);
+    expect(emailIndex, 'DOC-03: the "Email" label is missing from the FR render').toBeGreaterThan(-1);
+
+    expect(partnerNameIndex, 'DOC-03: partner name must render before the "Partenaire" label').toBeLessThan(partenaireIndex);
+    expect(partenaireIndex, 'DOC-03: the "Partenaire" label must render before the advisor name').toBeLessThan(advisorNameIndex);
+    expect(advisorNameIndex, 'DOC-03: the advisor name must render before the final "Email" label').toBeLessThan(emailIndex);
+
+    expect(text, 'DOC-03: deleted dictionary key "Conseiller" leaked into the FR render').not.toContain('Conseiller');
+    expect(text, 'DOC-03: deleted dictionary key "Commercial" leaked into the FR render').not.toContain('Commercial');
+  });
+
+  it('EN: renders partner name, then Partner label, then advisor name — in that order', async () => {
+    const result = await renderProposalPdf({ data: EN_FIXTURE.data });
+    const text = reconstructVisibleTextFontAware(result.buffer);
+
+    const partnerName = EN_FIXTURE.data.inputs.partnerName;
+    const advisorName = EN_FIXTURE.data.advisor?.name;
+    if (!partnerName) throw new Error('EN_FIXTURE.data.inputs.partnerName is missing — fixture rotated without updating this test');
+    if (!advisorName) throw new Error('EN_FIXTURE.data.advisor?.name is missing — fixture rotated without updating this test');
+
+    const partnerNameIndex = text.indexOf(partnerName);
+    // Search starts at partnerNameIndex, not 0 — the header's "Partner ref." pill also
+    // contains the substring "Partner" and renders before the contact card, which would
+    // otherwise make this match the wrong occurrence.
+    const partnerLabelIndex = partnerNameIndex > -1 ? text.indexOf('Partner', partnerNameIndex) : -1;
+    const advisorNameIndex = text.indexOf(advisorName);
+
+    expect(partnerNameIndex, `DOC-03: partner name "${partnerName}" is missing from the EN render`).toBeGreaterThan(-1);
+    expect(partnerLabelIndex, 'DOC-03: the "Partner" label is missing from the EN render').toBeGreaterThan(-1);
+    expect(advisorNameIndex, `DOC-03: advisor name "${advisorName}" is missing from the EN render`).toBeGreaterThan(-1);
+
+    expect(partnerNameIndex, 'DOC-03: partner name must render before the "Partner" label').toBeLessThan(partnerLabelIndex);
+    expect(partnerLabelIndex, 'DOC-03: the "Partner" label must render before the advisor name').toBeLessThan(advisorNameIndex);
+
+    expect(text, 'DOC-03: deleted dictionary key "Advisor" leaked into the EN render').not.toContain('Advisor');
+    expect(text, 'DOC-03: deleted dictionary key "Sales rep" leaked into the EN render').not.toContain('Sales rep');
   });
 });
 
@@ -451,7 +511,10 @@ describe('DOC-11 / FIELD-03: absent fields render em dashes with identical card 
 
     // At least ten em dashes: clientSiren, clientSiret, clientName, clientRole,
     // clientTel, clientEmail (6, SOCIÉTÉ CLIENTE card) + partnerTel/companyTelephone,
-    // advisor name/role/telephone/email (5, VOTRE CONTACT card) + partnerRef pill (1) = 12.
+    // advisor name headline, advisor role/telephone/email (5, VOTRE CONTACT card) +
+    // partnerRef pill (1) = 12. Plan 43-10 moves the advisor's name from a labelled row
+    // to its own headline, but it was already emDash-wrapped either way — this fixture's
+    // partnerName/partnerCo are never nulled, so the VOTRE CONTACT count is unchanged at 5.
     const emDashCount = countCodepointOccurrences(maxAbsenceResult.buffer, EM_DASH.codePointAt(0)!);
     expect(
       emDashCount,
@@ -460,7 +523,7 @@ describe('DOC-11 / FIELD-03: absent fields render em dashes with identical card 
 
     // Labels never disappear — only values become em dashes.
     const text = reconstructVisibleTextFontAware(maxAbsenceResult.buffer);
-    const labels = ['SIREN', 'SIRET', 'Destinataire', 'Fonction', 'Téléphone', 'Email', 'Commercial', 'Conseiller'];
+    const labels = ['SIREN', 'SIRET', 'Destinataire', 'Fonction', 'Téléphone', 'Email', 'Partenaire'];
     for (const label of labels) {
       expect(text, `Label "${label}" disappeared from the max-absence render.`).toContain(label);
     }
