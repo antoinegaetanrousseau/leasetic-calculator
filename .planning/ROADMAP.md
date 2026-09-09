@@ -142,7 +142,7 @@ every existing proposal into it. Design spec: `.planning/assets/v1.9-quote-desig
 
 - [x] **Phase 41: Typography Migration** — Inter replaces Plus Jakarta Sans in the PDF font-registration path, isolated from any layout or palette change (completed 2026-09-08)
 - [x] **Phase 42: Captured Data — Fields & Advisor Profile** — client SIRET + partner phone on the wizard, advisor fonction/téléphone on the account, one-time finalize-time profile gate (completed 2026-09-08)
-- [~] **Phase 43: New PDF Layout** — the full Claude Design layout (header, client/advisor cards, loyer hero, financial-conditions table, conditions paragraph, acceptance block, legal footer), bilingual, em-dash fallbacks, ADMIN-09 + byte-determinism held — all 8 plans executed, but D-15's human visual pass (43-08, 2026-09-09) found 2 open defects (title-row hyphenation; VOTRE CONTACT card semantics); NOT closed, DOC-01/02/03 stay unticked, gap-closure plan required before Phase 44
+- [x] **Phase 43: New PDF Layout** — the full Claude Design layout (header, client/advisor cards, loyer hero, financial-conditions table, conditions paragraph, acceptance block, legal footer), bilingual, em-dash fallbacks, ADMIN-09 + byte-determinism held (completed 2026-09-09). D-15's human visual pass (43-08) found 2 open defects (title-row hyphenation; VOTRE CONTACT card semantics) plus a SIRET fixture/coverage hole; all three were closed by gap-closure plans 43-09 through 43-13 and re-verified in `43-VERIFICATION-2.md` (6/6 criteria). DOC-01/02/03 all ticked. Phase 44 is unblocked.
 - [ ] **Phase 44: Backfill Migration** — every stored proposal PDF re-rendered into the new design, dry-run first, resumable, `params_snapshot`-driven figures — the milestone's one irreversible step, run last
 
 ---

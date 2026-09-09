@@ -40,7 +40,17 @@ proposal into it.
   was a category error, applying a translation scoped to a different column on a different table,
   free text and required (`src/lib/admin/advisor-schemas.ts`). Honouring it literally would have
   meant converting the advisor's fonction to an enum and contradicting the admin form Phase 42
-  shipped. The advisor's fonction renders as typed. See `43-CONTEXT.md` D-03.)*
+  shipped. The advisor's fonction renders as typed. See `43-CONTEXT.md` D-03.)* *(Amended
+  2026-09-09 by Phase 43 plan 43-10, superseding `43-CONTEXT.md` D-04 on the operator's 43-08
+  verdict: the card is a 7-row two-entity structure, not a single list. The partner's **name** is
+  headline 1 — the partner **company** moved off the headline into an explicitly labelled
+  `Partenaire` row — followed by `Téléphone`; the Leasetic advisor regains its own headline,
+  followed by `Fonction`, `Téléphone` and `Email`. `pdf.card.contact.salesRep` and
+  `pdf.card.contact.advisorName` were deleted and `pdf.card.contact.partner` added, so "commercial"
+  no longer appears anywhere in this card. D-04's partner-first ordering intent survives; its "do
+  not fix this back" clause does not. Source: `43-08-SUMMARY.md`, `43-10-SUMMARY.md`. Since
+  2026-09-09 (43-11, operator option (a)), an account with no `users.companyName` renders an em
+  dash beside `Partenaire` rather than substituting the person's name.)*
 - [x] **DOC-04**: The PDF shows the monthly rent in a navy-outlined hero card with its term caption,
   sized and spaced per the design spec.
 - [x] **DOC-05**: The PDF shows a `CONDITIONS FINANCIÈRES` table listing financed amount, lease term,
