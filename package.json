@@ -27,6 +27,8 @@
     "db:migrate:dry-run": "tsx scripts/migrate.ts --dry-run",
     "db:backfill:coefficient-history": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-coefficient-history.ts",
     "db:backfill:partner-type": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-partner-type.ts",
+    "db:backfill:proposal-pdfs:dry-run": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-proposal-pdfs.ts --dry-run",
+    "db:backfill:proposal-pdfs": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/backfill-proposal-pdfs.ts",
     "db:reconcile:dry-run": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/reconcile-proposals.ts --dry-run",
     "db:reconcile": "tsx -r ./scripts/_preload-mock-server-only.cjs scripts/reconcile-proposals.ts",
     "grant:admin": "tsx scripts/grant-admin.ts",

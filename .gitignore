@@ -30,6 +30,9 @@ next-env.d.ts
 # Phase 31 — reconciliation dry-run reports (contain live client data, never commit)
 .reconcile/
 
+# Phase 44 — backfill dry-run reports (contain proposal ids, never commit)
+.backfill/
+
 # Phase 43-08 — rendered PDF previews for the human visual pass (D-15); never commit
 .preview/
 
