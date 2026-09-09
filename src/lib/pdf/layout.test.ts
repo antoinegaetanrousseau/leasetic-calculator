@@ -26,17 +26,23 @@
  * it. `reconstructVisibleTextFontAware` below is that decoder.
  *
  * A second, related finding while validating this decoder against a real
- * render: the EN/FR title text line-wraps INSIDE a single word under real
- * content width ("Equipment lease financing pro-posal", "Proposition de
- * location finan-cière") — a real react-pdf hyphenation break, not a
- * reconstruction bug. This is already known, and already accepted, per
- * `43-05-SUMMARY.md`'s own verification note (same two hyphenated strings,
- * verified in that plan). `dehyphenate()` below joins those wrap-hyphen
- * breaks back into a normal word before any phrase assertion, so this
- * suite's DOC-10 checks pass on the correct, already-accepted rendering
- * rather than either (a) failing spuriously on accepted behavior or
- * (b) inventing a document.tsx "fix" for something 43-05 already decided is
- * fine.
+ * render: the EN/FR title text was line-wrapping INSIDE a single word under
+ * real content width ("Equipment lease financing pro-posal", "Proposition
+ * de location finan-cière") — a real react-pdf hyphenation break. This was
+ * NOT accepted behavior, despite `43-05-SUMMARY.md`'s own verification note
+ * calling it "already accepted" — it was a real defect, caught by Antoine's
+ * D-15 human visual pass in 43-08 after two automated passes (43-05, 43-07)
+ * absorbed it instead of fixing it. Plan 43-09 Task 1 fixes the render with
+ * `Font.registerHyphenationCallback` in `document.tsx`, so the layout engine
+ * can only break at spaces. A helper named `dehyphenate`, which joined
+ * wrap-hyphen breaks back into a normal word before every phrase assertion
+ * below ran, used to sit here — it was removed in 43-09 Task 2 rather than
+ * left as dead code, because a normaliser that silently launders a
+ * rendering defect out of the string it asserts on is worse than no helper
+ * at all: it stops proving anything about the artifact it was written to
+ * hide. The pattern to name and watch for: an automated gate normalising a
+ * rendering artifact away (to keep an assertion passing) is not the same as
+ * that artifact being correct.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { inflateSync } from 'node:zlib';
@@ -127,11 +133,6 @@ function findPageContentStreams(buffer: Buffer): string[] {
   return pageStreams;
 }
 
-/** Join a react-pdf wrap-hyphenation break ("pro-" + "posal") back into one word. */
-function dehyphenate(text: string): string {
-  return text.replace(/-\s+/g, '');
-}
-
 function normalizeWhitespace(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
 }
@@ -169,13 +170,11 @@ function reconstructVisibleTextFontAware(buffer: Buffer): string {
         }
       }
       // Separate consecutive text-show runs — a line-wrap boundary or a
-      // label/value join both fall here. dehyphenate() below undoes this
-      // exact separator for the one case (wrap-hyphenation) where it isn't
-      // a real word/token boundary.
+      // label/value join both fall here.
       out.push(' ');
     }
   }
-  return normalizeWhitespace(dehyphenate(out.join('')));
+  return normalizeWhitespace(out.join(''));
 }
 
 /**
@@ -283,6 +282,46 @@ function extractPageCount(buffer: Buffer): number {
   }
   throw new Error('No /Type /Pages object with /Count found — extraction is broken.');
 }
+
+// ── DOC-01 guard: title wrap-hyphenation (Gap 1, 43-VERIFICATION.md) ─────
+
+describe('DOC-01: the title never wrap-hyphenates (Gap 1, 43-VERIFICATION.md)', () => {
+  it('FR title renders "Proposition de location financière" with no wrap-hyphen break', async () => {
+    const result = await renderProposalPdf({ data: FR_FIXTURE.data });
+    const text = reconstructVisibleTextFontAware(result.buffer);
+
+    expect(
+      text,
+      'DOC-01: FR title is missing the clean, unbroken phrase "Proposition de location financière"',
+    ).toContain('Proposition de location financière');
+    expect(
+      text,
+      'DOC-01: the hyphenator is back — FR title wrap-hyphenated "financière" into "finan- cière"',
+    ).not.toContain('finan- cière');
+    expect(
+      text,
+      'DOC-01: the hyphenator is back — a "finan-" wrap-hyphen break was found before a space',
+    ).not.toMatch(/finan-\s/);
+  });
+
+  it('EN title renders "Equipment lease financing proposal" with no wrap-hyphen break', async () => {
+    const result = await renderProposalPdf({ data: EN_FIXTURE.data });
+    const text = reconstructVisibleTextFontAware(result.buffer);
+
+    expect(
+      text,
+      'DOC-01: EN title is missing the clean, unbroken phrase "Equipment lease financing proposal"',
+    ).toContain('Equipment lease financing proposal');
+    expect(
+      text,
+      'DOC-01: the hyphenator is back — EN title wrap-hyphenated "proposal" into "pro- posal"',
+    ).not.toContain('pro- posal');
+    expect(
+      text,
+      'DOC-01: the hyphenator is back — a "pro-" wrap-hyphen break was found before a space',
+    ).not.toMatch(/pro-\s/);
+  });
+});
 
 // ── DOC-10: English / French parity, mutually exclusive ──────────────────
 
