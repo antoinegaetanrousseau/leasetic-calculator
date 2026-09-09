@@ -94,8 +94,6 @@ export default async function ParametresStep1Page({
 
   // D-07: session-derived partner attribution. Never visible inputs; carried
   // verbatim into draft.inputs at next updateDraft (via the RHF prefill).
-  // companyName is not a registered additionalField — fall back to
-  // displayName → name → email so partnerCo always satisfies schema min(1).
   const u = session.user as {
     email: string;
     displayName?: string | null;
@@ -105,7 +103,13 @@ export default async function ParametresStep1Page({
   };
   const nameFallback = u.displayName?.trim() || u.name?.trim() || u.email;
   const partnerName = nameFallback;
-  const partnerCo = u.companyName?.trim() || nameFallback;
+  // Phase 43 gap closure, Finding 3, operator option (a): partnerCo is the
+  // partner COMPANY and must never fall back to a person's name now that it
+  // renders under an explicit Partenaire label in the PDF. An absent
+  // companyName resolves to '', which emDash renders as the DOC-11 em dash;
+  // proposalInputSchema.partnerCo is optional as of this plan so '' never
+  // blocks step 1.
+  const partnerCo = u.companyName?.trim() || '';
   // Phase 42 Plan 09 (FIELD-02 / D-11): unlike companyName, companyTelephone
   // WAS registered as a Better Auth additionalField in the same phase that
   // added the column (Plan 42-04) — session.user.companyTelephone is

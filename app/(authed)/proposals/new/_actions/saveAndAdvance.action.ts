@@ -56,9 +56,14 @@ export async function saveAndAdvanceAction(
 
   // D-07: overlay session-hydrated fields before validation — these are never
   // user-editable inputs, so we source them from the authoritative session.
-  // companyName is not a registered additionalField, so we fall back to
-  // displayName → name → email (email is always non-empty for auth users)
-  // so that partnerCo always satisfies min(1).
+  // partnerName falls back to displayName → name → email (email is always
+  // non-empty for auth users) so it always satisfies min(1). Phase 43 gap
+  // closure, Finding 3, operator option (a): partnerCo is the partner
+  // COMPANY and must never fall back to a person's name now that it renders
+  // under an explicit Partenaire label in the PDF. An absent companyName
+  // resolves to '', which emDash renders as the DOC-11 em dash;
+  // proposalInputSchema.partnerCo is optional as of this plan so '' never
+  // blocks the safeParse below.
   const u = session.user as {
     email: string;
     displayName?: string | null;
@@ -74,7 +79,7 @@ export async function saveAndAdvanceAction(
   const enriched = {
     ...nextInputs,
     partnerName: (nextInputs.partnerName as string | undefined)?.trim() || nameFallback,
-    partnerCo: u.companyName?.trim() || (nextInputs.partnerCo as string | undefined)?.trim() || nameFallback,
+    partnerCo: u.companyName?.trim() || (nextInputs.partnerCo as string | undefined)?.trim() || '',
     validityDays: safeValidityDays,
   };
 
