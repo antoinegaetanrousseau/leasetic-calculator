@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
 status: executing
-last_updated: "2026-09-09T14:46:23.753Z"
+last_updated: "2026-09-09T14:59:37.494Z"
 last_activity: 2026-09-09
 progress:
   total_phases: 24
   completed_phases: 2
   total_plans: 26
-  completed_plans: 24
+  completed_plans: 25
   percent: 8
 ---
 
@@ -28,7 +28,7 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 ## Current Position
 
 Phase: 43 (new-pdf-layout) — EXECUTING
-Plan: 12 of 13
+Plan: 13 of 13
 Status: Ready to execute
 Last activity: 2026-09-09
 
@@ -545,6 +545,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 | Phase 43 P09 | ~20min | 2 tasks | 2 files |
 | Phase 43 P10 | ~35min | 2 tasks | 4 files |
 | Phase 43 P11 | ~13min | 3 tasks | 8 files |
+| Phase 43 P12 | ~20min | 3 tasks | 3 files |
 
 ## Decisions
 
@@ -770,6 +771,7 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 43]: DOC-03 not marked complete by 43-10: Gap 2's Finding 3 (partnerCo fallback in parametres/page.tsx) is deferred to plan 43-11 per the plan's own threat model
 - [Phase 43]: 43-10: VOTRE CONTACT card restructured to two headlined entities (partner, then Leasetic advisor) per the D-15 human verdict in 43-08-SUMMARY.md; pdf.card.contact.salesRep/advisorName deleted, pdf.card.contact.partner added
 - [Phase 43]: Finding 3 (option a): dropped partnerCo's nameFallback and made proposalInputSchema.partnerCo optional so an absent companyName renders an em dash, never a person's name, under the Partenaire label; option (b), an admin edit path for companyName, was explicitly declined by the operator.
+- [Phase 43]: DOC-02 deliberately not marked complete by 43-12 — 43-13's operator checkpoint owns the one remaining Gap 3 missing[] bullet (real-proposal SIRET confirmation)
 
 ### Blockers
 
