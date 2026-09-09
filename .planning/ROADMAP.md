@@ -142,7 +142,7 @@ every existing proposal into it. Design spec: `.planning/assets/v1.9-quote-desig
 
 - [x] **Phase 41: Typography Migration** — Inter replaces Plus Jakarta Sans in the PDF font-registration path, isolated from any layout or palette change (completed 2026-09-08)
 - [x] **Phase 42: Captured Data — Fields & Advisor Profile** — client SIRET + partner phone on the wizard, advisor fonction/téléphone on the account, one-time finalize-time profile gate (completed 2026-09-08)
-- [ ] **Phase 43: New PDF Layout** — the full Claude Design layout (header, client/advisor cards, loyer hero, financial-conditions table, conditions paragraph, acceptance block, legal footer), bilingual, em-dash fallbacks, ADMIN-09 + byte-determinism held
+- [~] **Phase 43: New PDF Layout** — the full Claude Design layout (header, client/advisor cards, loyer hero, financial-conditions table, conditions paragraph, acceptance block, legal footer), bilingual, em-dash fallbacks, ADMIN-09 + byte-determinism held — all 8 plans executed, but D-15's human visual pass (43-08, 2026-09-09) found 2 open defects (title-row hyphenation; VOTRE CONTACT card semantics); NOT closed, DOC-01/02/03 stay unticked, gap-closure plan required before Phase 44
 - [ ] **Phase 44: Backfill Migration** — every stored proposal PDF re-rendered into the new design, dry-run first, resumable, `params_snapshot`-driven figures — the milestone's one irreversible step, run last
 
 ---
@@ -853,7 +853,7 @@ Plans:
   5. No commission figure, rate or derived value appears anywhere in the rendered PDF, in either language, for any partner type (the existing 20-gate `tests/admin-09-grep-contracts.test.ts` suite and `src/lib/pdf/no-commission.test.ts` stay green); and re-rendering the same proposal twice produces byte-identical PDFs, with the committed fixture at `__pdf-fixtures__/expected.sha256.txt` regenerated via `scripts/update-pdf-fixture.ts` to reflect the new design.
   6. Every text node uses the design's ten-step type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), replacing the five-role scale Phase 41 deliberately froze (`pdfFontSizes` at 8 / 9 / 10 / 22 / 32pt) — relocated here from Phase 41 by the D-02 amendment.
 
-**Plans:** 7/8 plans executed
+**Plans:** 8/8 plans complete
 Plans:
 **Wave 1**
 
@@ -879,7 +879,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 43-08-PLAN.md — `pdf:preview` renderer + Antoine's human visual pass against the reference PNGs (D-15)
+- [x] 43-08-PLAN.md — `pdf:preview` renderer + Antoine's human visual pass against the reference PNGs (D-15)
 
 **UI hint:** yes
 
@@ -967,7 +967,7 @@ annotated as unused under D-02, because `43-CONTEXT.md`'s Deferred Ideas lists t
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
 | 41. Typography Migration | v1.9 | 3/3 | Complete    | 2026-09-08 |
 | 42. Captured Data — Fields & Advisor Profile | v1.9 | 10/10 | Complete   | 2026-09-08 |
-| 43. New PDF Layout | v1.9 | 7/8 | In Progress|  |
+| 43. New PDF Layout | v1.9 | 8/8 | Blocked (D-15: 2 open defects) | 2026-09-09 |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
 
 ---

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: PDF Proposal Redesign
-status: executing
-last_updated: "2026-09-08T22:43:35.806Z"
-last_activity: 2026-09-08
+status: Blocked on gap-closure plan for D-15 defects (title hyphenation; VOTRE CONTACT card semantics) — see 43-08-SUMMARY.md
+last_updated: "2026-09-09T10:00:04.060Z"
+last_activity: 2026-09-09
 progress:
   total_phases: 24
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 21
-  completed_plans: 20
-  percent: 8
+  completed_plans: 21
+  percent: 13
 ---
 
 # State — Matrice Commerciale
@@ -27,10 +27,10 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 ## Current Position
 
-Phase: 43 (new-pdf-layout) — EXECUTING
-Plan: 3 of 8
-Status: Ready to execute
-Last activity: 2026-09-08
+Phase: 43 (new-pdf-layout) — EXECUTING (D-15 verdict recorded, phase NOT closed — 2 defects open, gap-closure plan required before Phase 44)
+Plan: 8 of 8 (43-08 complete)
+Status: Blocked on gap-closure plan for D-15 defects (title hyphenation; VOTRE CONTACT card semantics) — see 43-08-SUMMARY.md
+Last activity: 2026-09-09
 
 ## Deferred Items
 
@@ -107,6 +107,12 @@ defect, reading `37-VERIFICATION.md`'s description as current state. It was fixe
 `c669d33` — both write controls gated on `isOwner` — one day after that report was written and
 never amended. See `37-VERIFICATION.md` § Post-Verification Amendment and
 `.planning/v1.8-MILESTONE-AUDIT.md` tech debt item 1.
+
+## Phase 43 Performance Metrics
+
+| Plan | Duration | Tasks | Files |
+|---|---|---|---|
+| 43-08 | ~6min (continuation session, verdict recording only) | 2 | 1 (SUMMARY created; 0 source files — Task 1's 2 files committed prior session) |
 
 ## Phase 22 Performance Metrics
 
@@ -756,7 +762,9 @@ Future-milestone candidates remain in `.planning/REQUIREMENTS.md` "Future Requir
 - [Phase 43]: 43-06: financial table row 4 (Loyer mensuel HT) renders the same on-demand branch as the hero rather than D-09's literal em-dash enumeration, since it restates the hero's own real value — flagged for the D-15 visual pass to confirm or overrule, per the plan's own instruction
 - [Phase 43]: D-10 four-faces proof reconciled to face-membership + no-collapse + Regular/SemiBold presence, not an exact count of 4 — Claude Design layout uses only Inter weights 400/600; the four-weight REGISTRATION guard in tests/vendored-ui-integrity.test.ts stays the separate, untouched proof (43-07 Task 1)
 - [Phase 43]: layout.test.ts uses a font-aware PDF decoder and a q/Q/cm matrix tracker instead of no-commission.test.ts's single-merged-glyph-map reconstruction and a literal min-Tm-y check — Both literal approaches were empirically shown to produce a false negative (em-dash count of 0) or a vacuously-always-passing check (Tm is a page-height constant in every BT block); the extraction must be correct before its assertion means anything (43-07 Task 2)
+- [Phase 43]: 43-08: D-15 human visual pass — 8/9 checks pass; title-row hyphenation defect (default @react-pdf/renderer hyphenator) and VOTRE CONTACT card partner/advisor semantics confusion diagnosed for gap closure; DOC-01/02/03 stay unticked, phase not closed
 
 ### Blockers
 
 - (resolved 2026-09-03) 33-08 task 3: integration suite ran on Neon development — 28/28 passed, cleanup verified
+- Phase 43 gap-closure plan required before Phase 44 backfill runs: (1) register Font.registerHyphenationCallback in src/lib/pdf/document.tsx to stop mid-word title breaks + regenerate expected.sha256.txt, (2) restructure VOTRE CONTACT card (delete pdf.card.contact.salesRep/advisorName, add pdf.card.contact.partner) per Antoine's 2026-09-09 verdict — see 43-08-SUMMARY.md
