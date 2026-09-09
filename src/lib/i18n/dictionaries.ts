@@ -499,15 +499,15 @@ export const dictionaries = {
     'pdf.card.client.role': 'Fonction',
     'pdf.card.client.phone': 'Téléphone',
     'pdf.card.client.email': 'Email',
-    // Contact card (DOC-03, D-04 partner-first order — row LABELS keep the design's wording,
-    // only the block ORDER inverts; card title stays VOTRE CONTACT / YOUR CONTACT)
+    // Contact card (DOC-03, amended per the 43-08-SUMMARY.md D-15 human verdict): partner-first
+    // ordering stands (D-04's intent survives), but the card now headlines TWO entities, each
+    // with its own headline — the partner (inputs.partnerName) first, then the Leasetic advisor
+    // (advisor?.name) — with the partner company demoted to an explicitly labelled `Partenaire`
+    // row so a company is never mistaken for a person. The prior sales-representative row/key
+    // was deleted at Antoine's instruction ("Let's delete and not use that field").
     'pdf.card.contact.title': 'VOTRE CONTACT',
-    'pdf.card.contact.salesRep': 'Commercial',
+    'pdf.card.contact.partner': 'Partenaire',
     'pdf.card.contact.partnerPhone': 'Téléphone',
-    // pdf.card.contact.advisorName has no design source: D-04 demotes the advisor's name from
-    // the design's 11pt headline to a key/value row, and a row needs a label. Wording matches
-    // the vocabulary Phase 42 shipped at admin.advisor.hero.title ('Conseiller Leasetic').
-    'pdf.card.contact.advisorName': 'Conseiller',
     'pdf.card.contact.advisorRole': 'Fonction',
     'pdf.card.contact.advisorPhone': 'Téléphone',
     'pdf.card.contact.advisorEmail': 'Email',
@@ -1871,15 +1871,15 @@ export const dictionaries = {
     'pdf.card.client.role': 'Role',
     'pdf.card.client.phone': 'Phone',
     'pdf.card.client.email': 'Email',
-    // Contact card (DOC-03, D-04 partner-first order — row LABELS keep the design's wording,
-    // only the block ORDER inverts; card title stays VOTRE CONTACT / YOUR CONTACT)
+    // Contact card (DOC-03, amended per the 43-08-SUMMARY.md D-15 human verdict): partner-first
+    // ordering stands (D-04's intent survives), but the card now headlines TWO entities, each
+    // with its own headline — the partner (inputs.partnerName) first, then the Leasetic advisor
+    // (advisor?.name) — with the partner company demoted to an explicitly labelled `Partner`
+    // row so a company is never mistaken for a person. The prior sales-representative row/key
+    // was deleted at Antoine's instruction ("Let's delete and not use that field").
     'pdf.card.contact.title': 'YOUR CONTACT',
-    'pdf.card.contact.salesRep': 'Sales rep',
+    'pdf.card.contact.partner': 'Partner',
     'pdf.card.contact.partnerPhone': 'Phone',
-    // pdf.card.contact.advisorName has no design source: D-04 demotes the advisor's name from
-    // the design's 11pt headline to a key/value row, and a row needs a label. Wording matches
-    // the vocabulary Phase 42 shipped at admin.advisor.hero.title ('Leasetic advisor').
-    'pdf.card.contact.advisorName': 'Advisor',
     'pdf.card.contact.advisorRole': 'Role',
     'pdf.card.contact.advisorPhone': 'Phone',
     'pdf.card.contact.advisorEmail': 'Email',

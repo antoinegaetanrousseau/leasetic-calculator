@@ -309,21 +309,29 @@ export function ProposalDocument({ data }: ProposalDocumentProps) {
             paddingHorizontal: 11.25,
           }}>
             <Eyebrow>{t('pdf.card.contact.title', lang)}</Eyebrow>
-            {/* D-04: the design headlines the Leasetic advisor's name here. Phase
-                42 D-10 deliberately inverted that — the client meets the partner
-                first and the advisor second, so this card headlines the PARTNER
-                company instead, with the advisor demoted to the rows below. Do
-                NOT "fix" this back to the design's ordering. */}
+            {/* DOC-03, amended by the D-15 human verdict recorded in 43-08-SUMMARY.md: the card
+                is two entities, each with its own headline — the partner first (D-04's ordering
+                intent survives), the Leasetic advisor second. The partner company is an
+                explicitly labelled `Partenaire` row so a company is never mistaken for a person.
+                The prior sales-representative row/key was deleted at the operator's instruction.
+                Every value goes through `emDash` per DOC-11, including both headlines. */}
             <Text style={{
               fontSize: pdfFontSizes.cardHeadline,
               fontWeight: pdfFontWeights.semibold,
               letterSpacing: -0.11,
               color: pdfColors.navy,
               marginBottom: 4.5,
-            }}>{inputs.partnerCo}</Text>
-            <CardKeyValueRow label={t('pdf.card.contact.salesRep', lang)} value={emDash(inputs.partnerName)} />
+            }}>{emDash(inputs.partnerName)}</Text>
+            <CardKeyValueRow label={t('pdf.card.contact.partner', lang)} value={emDash(inputs.partnerCo)} />
             <CardKeyValueRow label={t('pdf.card.contact.partnerPhone', lang)} value={emDash(partnerPhone)} />
-            <CardKeyValueRow label={t('pdf.card.contact.advisorName', lang)} value={emDash(advisor?.name)} />
+            <Text style={{
+              fontSize: pdfFontSizes.cardHeadline,
+              fontWeight: pdfFontWeights.semibold,
+              letterSpacing: -0.11,
+              color: pdfColors.navy,
+              marginBottom: 4.5,
+              marginTop: 4.5,
+            }}>{emDash(advisor?.name)}</Text>
             <CardKeyValueRow label={t('pdf.card.contact.advisorRole', lang)} value={emDash(advisor?.fonction)} />
             <CardKeyValueRow label={t('pdf.card.contact.advisorPhone', lang)} value={emDash(advisor?.telephone)} />
             <CardKeyValueRow label={t('pdf.card.contact.advisorEmail', lang)} value={emDash(advisor?.email)} />
