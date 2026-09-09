@@ -174,7 +174,14 @@ export const coefficientsSchema = z.object({
 export const proposalInputSchema = z
   .object({
     // Partner card
-    partnerCo: z.string().min(1, { message: 'error.field.required' }),
+    // Phase 43 gap closure, Finding 3, operator option (a): partnerCo is
+    // hydrated from users.companyName, which is admin-set and not
+    // partner-editable, so a missing value must render an em dash (DOC-11)
+    // rather than block finalization (D-13) — this mirrors partnerTel's
+    // optionality just below for the same reason. The historical incident
+    // this prevents is documented at
+    // app/(authed)/aide/commencer-ici/page.tsx:18-26.
+    partnerCo: z.string().optional(),
     partnerName: z.string().min(1, { message: 'error.field.required' }),
     // Phase 42 Plan 03 (FIELD-02 / D-11 / D-12 / D-13): the partner
     // company's own telephone, session-hydrated into the draft the same way

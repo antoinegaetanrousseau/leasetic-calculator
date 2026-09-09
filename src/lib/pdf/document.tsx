@@ -80,7 +80,7 @@ export interface ProposalDocumentProps {
     language: Lang;
     createdAt: Date;
     inputs: {
-      partnerCo: string;
+      partnerCo?: string;
       partnerName: string;
       clientCo: string;
       clientName?: string;
