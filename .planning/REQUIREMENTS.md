@@ -21,14 +21,14 @@ proposal into it.
 > Inter Tight is not committed in Phase 41 (D-04) — neither `Quote-FR-A.dc.html` nor
 > `Quote-EN-A.dc.html` references it. Authority: `.planning/phases/41-typography-migration/41-CONTEXT.md`.
 
-- [ ] **DOC-01**: A partner generating a proposal gets a single-page A4 PDF matching the design
+- [x] **DOC-01**: A partner generating a proposal gets a single-page A4 PDF matching the design
   spec's header band — `leasetic-lockup-color` logo left, `PROPOSITION N°` eyebrow + reference +
   `Établie le {date}` right, a 2px `#112C3B` rule beneath — followed by the 21pt two-line title,
   the project description, and the `Réf. partenaire` / term pills. Every text node uses the
   design's ten-step type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt) — relocated
   here from DOC-09 by the Phase 41 D-02 amendment, since the scale only has meaning alongside
   this layout.
-- [ ] **DOC-02**: The PDF shows a `SOCIÉTÉ CLIENTE` card listing the client company name, SIREN,
+- [x] **DOC-02**: The PDF shows a `SOCIÉTÉ CLIENTE` card listing the client company name, SIREN,
   SIRET, destinataire, fonction, téléphone and email in the design's two-column key/value grid.
 - [x] **DOC-03**: The PDF shows a `VOTRE CONTACT` card whose headline is the partner company,
   commercial and téléphone, with the Leasetic advisor's name, fonction, téléphone and email as the
@@ -155,8 +155,8 @@ proposal into it.
 
 | Requirement | Phase | Status |
 |---|---|---|
-| DOC-01 | Phase 43 — New PDF Layout | Pending |
-| DOC-02 | Phase 43 — New PDF Layout | Pending |
+| DOC-01 | Phase 43 — New PDF Layout | Complete |
+| DOC-02 | Phase 43 — New PDF Layout | Complete |
 | DOC-03 | Phase 43 — New PDF Layout | Complete |
 | DOC-04 | Phase 43 — New PDF Layout | Complete |
 | DOC-05 | Phase 43 — New PDF Layout | Complete |

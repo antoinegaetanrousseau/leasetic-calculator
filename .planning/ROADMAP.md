@@ -853,7 +853,7 @@ Plans:
   5. No commission figure, rate or derived value appears anywhere in the rendered PDF, in either language, for any partner type (the existing 20-gate `tests/admin-09-grep-contracts.test.ts` suite and `src/lib/pdf/no-commission.test.ts` stay green); and re-rendering the same proposal twice produces byte-identical PDFs, with the committed fixture at `__pdf-fixtures__/expected.sha256.txt` regenerated via `scripts/update-pdf-fixture.ts` to reflect the new design.
   6. Every text node uses the design's ten-step type scale (6.8 / 7.5 / 8 / 8.5 / 9 / 9.5 / 10 / 11 / 13 / 21pt), replacing the five-role scale Phase 41 deliberately froze (`pdfFontSizes` at 8 / 9 / 10 / 22 / 32pt) — relocated here from Phase 41 by the D-02 amendment.
 
-**Plans:** 12/13 plans executed
+**Plans:** 13/13 plans complete
 Plans:
 **Wave 1**
 
@@ -899,7 +899,7 @@ Plans:
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 43-13-PLAN.md — Operator confirmation on ONE real finalized proposal that a captured SIRET prints (checkpoint, human-only)
+- [x] 43-13-PLAN.md — Operator confirmation on ONE real finalized proposal that a captured SIRET prints (checkpoint, human-only)
 
 **UI hint:** yes
 
@@ -987,7 +987,7 @@ annotated as unused under D-02, because `43-CONTEXT.md`'s Deferred Ideas lists t
 | 40. Milestone Record Closure | v1.8 | 6/6 | Complete    | 2026-09-07 |
 | 41. Typography Migration | v1.9 | 3/3 | Complete    | 2026-09-08 |
 | 42. Captured Data — Fields & Advisor Profile | v1.9 | 10/10 | Complete   | 2026-09-08 |
-| 43. New PDF Layout | v1.9 | 12/13 | In Progress|  |
+| 43. New PDF Layout | v1.9 | 13/13 | Complete   | 2026-09-09 |
 | 44. Backfill Migration | v1.9 | 0/TBD | Not started | - |
 
 ---
