@@ -130,6 +130,7 @@ describe('load-env contracts (D-03 sequencing + probe-write-isolation exemption)
     const EXPECTED_LOAD_ENV_CONSUMERS = [
       'scripts/backfill-coefficient-history.ts',
       'scripts/backfill-partner-type.ts',
+      'scripts/backfill-proposal-pdfs.ts',
       'scripts/grant-admin.ts',
       'scripts/migrate.ts',
       'scripts/purge-soft-deleted.ts',
@@ -144,7 +145,7 @@ describe('load-env contracts (D-03 sequencing + probe-write-isolation exemption)
       'drizzle.config.ts',
     ].sort();
 
-    expect(EXPECTED_LOAD_ENV_CONSUMERS.length).toBe(14);
+    expect(EXPECTED_LOAD_ENV_CONSUMERS.length).toBe(15);
 
     const tsFilesInScripts = readdirSync(SCRIPTS_DIR).filter((f) => f.endsWith('.ts'));
     const actualScriptConsumers = tsFilesInScripts

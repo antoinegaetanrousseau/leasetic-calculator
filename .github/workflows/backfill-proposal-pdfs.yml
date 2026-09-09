@@ -1,0 +1,160 @@
+name: Backfill Proposal PDFs (One-Time Migration)
+
+# MANUAL TRIGGER ONLY. No on:push, no on:pull_request, no on:schedule.
+#
+# Phase 44 (MIG-01..05) — the milestone's one irreversible step. The apply
+# job overwrites `proposals/{userId}/{proposalId}.pdf` IN PLACE, with no
+# versioning and no sidecar copy of the retired layout (D-01). Once apply
+# runs, the pre-Phase-43 document does not exist anywhere — the dry-run
+# report and the two approval gates below are the only safety net.
+#
+# The local-database guard (`scripts/_db-branch-guard.ts`, armed via
+# `import './_load-env'` at the top of scripts/backfill-proposal-pdfs.ts)
+# SKIPs here on purpose: a fresh Action checkout has no `.env*` candidate
+# file on disk, which is the same sanctioned production-write path this
+# repo already uses for `db-migrate.yml`'s MIGRATE PROD run and for CI's
+# ephemeral-branch step. The guard is neither modified nor bypassed for
+# this workflow (D-07) — it simply has nothing to refuse here.
+#
+# Security note: workflow_dispatch inputs are operator-controlled (requires
+# repo write access to trigger) and flow through `env:` vars before any
+# shell evaluation — no `${{ github.event.inputs.* }}` appears directly
+# inside a `run:` block anywhere in this file.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "BACKFILL PROD PDFS" exactly to confirm.'
+        required: true
+        type: string
+      allow_drift:
+        description: >-
+          Proceed even when the apply job's freshly planned set differs from
+          the dry-run report the reviewer approved (D-09). Leave false unless
+          you have already read the printed drift and judged every change
+          expected — this is the same escape hatch reconcile's --allow-drift
+          provides, not a default path.
+        required: false
+        type: boolean
+        default: false
+
+# Never cancel a running bulk mutation, and never let two dispatches race
+# against the same irreversible write.
+concurrency:
+  group: backfill-proposal-pdfs
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: Dry run — render every in-scope proposal, write zero blobs/rows
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    # Both jobs are pinned to the `production` GitHub Environment on
+    # purpose — this reads like a mistake for a job that only READS the
+    # database, so it is explained here rather than left silent.
+    # `DATABASE_URL_MAIN` is an
+    # ENVIRONMENT secret scoped to `production` (db-migrate.yml documents
+    # this same shape), so a job without that environment cannot read it.
+    # Two alternatives were rejected: promoting the production connection
+    # string to a repository secret, or copying it into a second,
+    # unreviewed Environment — either would widen who can reach a
+    # production write credential. The accepted cost is that the operator
+    # approves twice: once to let this job READ production, and once —
+    # after reading the report — to let the apply job WRITE.
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Verify confirmation phrase
+        # Inputs flow through env: vars — never interpolated directly into
+        # the shell — matching db-migrate.yml's confirmation step.
+        env:
+          CONFIRM_INPUT: ${{ github.event.inputs.confirm }}
+        run: |
+          if [ "$CONFIRM_INPUT" != "BACKFILL PROD PDFS" ]; then
+            echo "ERROR: confirm must be exactly 'BACKFILL PROD PDFS' (got: '$CONFIRM_INPUT')"
+            exit 1
+          fi
+          echo "Confirmation OK."
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dry-run backfill
+        # No storage secret on this job — the dry run writes no blob, and
+        # keeping this job's secret surface free of blob credentials is
+        # deliberate (T-44-27), not an oversight.
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_MAIN }}
+        run: npm run db:backfill:proposal-pdfs:dry-run
+
+      # New to this repo's CI vocabulary — no other workflow uses
+      # upload-artifact or download-artifact. The hand-off, rather than a
+      # re-plan from scratch in job 2, is what makes "the run the reviewer
+      # approved" and "the run that happened" the same run by construction
+      # (D-08): job 2 downloads this EXACT report instead of re-planning.
+      - name: Upload dry-run report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backfill-dry-run-report
+          path: .backfill/
+          if-no-files-found: error
+          retention-days: 30
+
+  apply:
+    name: Apply — re-render and overwrite blobs
+    needs: dry-run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    # See the dry-run job's comment above for why both jobs use the
+    # `production` Environment. The required-reviewer approval on THIS
+    # job's deployment is MIG-02's explicit confirmation and the D-08
+    # guarantee that the approved plan is the executed plan.
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # Downloads the exact artifact job 1 uploaded — the apply script's
+      # drift check compares against THIS file, not a fresh re-plan.
+      - name: Download dry-run report
+        uses: actions/download-artifact@v4
+        with:
+          name: backfill-dry-run-report
+          path: .backfill
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply backfill
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_MAIN }}
+          STORAGE_DRIVER: ${{ secrets.STORAGE_DRIVER }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          ALLOW_DRIFT: ${{ github.event.inputs.allow_drift }}
+        run: |
+          if [ "$ALLOW_DRIFT" = "true" ]; then
+            npm run db:backfill:proposal-pdfs -- --allow-drift
+          else
+            npm run db:backfill:proposal-pdfs
+          fi
