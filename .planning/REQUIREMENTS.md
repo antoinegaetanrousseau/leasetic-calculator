@@ -30,7 +30,7 @@ proposal into it.
   this layout.
 - [ ] **DOC-02**: The PDF shows a `SOCIÉTÉ CLIENTE` card listing the client company name, SIREN,
   SIRET, destinataire, fonction, téléphone and email in the design's two-column key/value grid.
-- [ ] **DOC-03**: The PDF shows a `VOTRE CONTACT` card whose headline is the partner company,
+- [x] **DOC-03**: The PDF shows a `VOTRE CONTACT` card whose headline is the partner company,
   commercial and téléphone, with the Leasetic advisor's name, fonction, téléphone and email as the
   supporting contact beneath. *(Amended 2026-09-08 by Phase 42 D-10 / D-16 via D-24: this
   deliberately deviates from `Quote-FR-A.dc.html:67-74`, which makes `advisorName` the 11pt/600
@@ -157,7 +157,7 @@ proposal into it.
 |---|---|---|
 | DOC-01 | Phase 43 — New PDF Layout | Pending |
 | DOC-02 | Phase 43 — New PDF Layout | Pending |
-| DOC-03 | Phase 43 — New PDF Layout | Pending |
+| DOC-03 | Phase 43 — New PDF Layout | Complete |
 | DOC-04 | Phase 43 — New PDF Layout | Complete |
 | DOC-05 | Phase 43 — New PDF Layout | Complete |
 | DOC-06 | Phase 43 — New PDF Layout | Complete |
