@@ -29,8 +29,13 @@ See `.planning/PROJECT.md` (last updated 2026-05-05 — milestone v1.1 started).
 
 Phase: 44 (backfill-migration) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-09-09
+Status: BLOCKED — plan 44-05 open checkpoint (human-verify, gate=blocking)
+Blocker: Task 3 of 44-05 is the operator dispatch of the backfill GitHub Action and
+  the irreversible apply decision. No agent can complete it. Tasks 1-2 are committed
+  and pushed (83ee0fd); 44-05-SUMMARY.md is intentionally absent. On resume, spawn a
+  CONTINUATION agent, not a fresh executor.
+See: .planning/phases/44-backfill-migration/.continue-here.md
+Last activity: 2026-09-10
 
 ## Deferred Items
 
