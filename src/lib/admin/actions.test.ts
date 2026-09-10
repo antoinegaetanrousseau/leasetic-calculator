@@ -76,7 +76,11 @@ vi.mock('drizzle-orm', () => ({
   sql: (strings: TemplateStringsArray, ...values: unknown[]) => ({ _sql: { strings, values } }),
 }));
 
-import { adminCreateInvitation, adminUpdatePartnerType } from './actions';
+import {
+  adminCreateInvitation,
+  adminUpdatePartnerType,
+  adminUpdatePartnerCompanyTelephone,
+} from './actions';
 
 const ADMIN_SESSION = { user: { id: 'admin-1', email: 'admin@example.com' } } as never;
 
@@ -412,5 +416,113 @@ describe('Phase 42 — telephone persistence (D-13 / D-19)', () => {
     expect(profile).toBeDefined();
     expect(profile!.phone).toBe('01 23 45 67 89');
     expect(profile!.telephone).toBe('06 12 34 56 78');
+  });
+});
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  adminUpdatePartnerCompanyTelephone (FIELD-02 follow-up)                    */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+describe('adminUpdatePartnerCompanyTelephone — FIELD-02 admin edit path', () => {
+  it('writes the trimmed telephone into companyTelephone', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: null, role: 'partner' });
+    await adminUpdatePartnerCompanyTelephone('user-1', '  01 23 45 67 89  ');
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.companyTelephone).toBe('01 23 45 67 89');
+  });
+
+  it('NEVER writes the partner\'s own `telephone` column — that is PROF-02\'s gate field', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: null, role: 'partner' });
+    await adminUpdatePartnerCompanyTelephone('user-1', '01 23 45 67 89');
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect('telephone' in setCall).toBe(false);
+    expect(Object.keys(setCall)).toEqual(['companyTelephone']);
+  });
+
+  it('an empty string is a deliberate CLEAR → writes null', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: '01 23 45 67 89', role: 'partner' });
+    await adminUpdatePartnerCompanyTelephone('user-1', '');
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.companyTelephone).toBeNull();
+  });
+
+  it('a whitespace-only string is also a CLEAR, not a validation failure', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: '01 23 45 67 89', role: 'partner' });
+    await adminUpdatePartnerCompanyTelephone('user-1', '   ');
+    const setCall = dbSpies()._setMock.mock.calls.at(-1)![0] as Record<string, unknown>;
+    expect(setCall.companyTelephone).toBeNull();
+  });
+
+  it('no-op guard: an unchanged value skips both the write and the audit row', async () => {
+    dbSpies()._setMock.mockClear();
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: '01 23 45 67 89', role: 'partner' });
+    await adminUpdatePartnerCompanyTelephone('user-1', '01 23 45 67 89');
+    expect(dbSpies()._setMock).not.toHaveBeenCalled();
+    expect(writeAuditLogMock).not.toHaveBeenCalled();
+  });
+
+  it('audits the change with before/after under user.company_telephone_change', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: '01 11 11 11 11', role: 'partner' });
+    await adminUpdatePartnerCompanyTelephone('user-1', '02 22 22 22 22');
+    const call = writeAuditLogMock.mock.calls.at(-1)![0];
+    expect(call.action).toBe('user.company_telephone_change');
+    expect(call.actorId).toBe('admin-1');
+    expect(call.payload).toMatchObject({
+      userId: 'user-1',
+      before: '01 11 11 11 11',
+      after: '02 22 22 22 22',
+    });
+  });
+
+  it('ADMIN-09: no commission/rate token in the audit payload', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: null, role: 'partner' });
+    await adminUpdatePartnerCompanyTelephone('user-1', '01 23 45 67 89');
+    const call = writeAuditLogMock.mock.calls.at(-1)![0];
+    expect(JSON.stringify(call.payload).toLowerCase()).not.toContain('commission');
+  });
+
+  // ── Authorization ─────────────────────────────────────────────────────────
+  it('T-22-03-E: a non-admin caller is rejected BEFORE any read or write', async () => {
+    requireAdminMock.mockRejectedValue(new Error('Forbidden'));
+    dbSpies()._setMock.mockClear();
+    await expect(
+      adminUpdatePartnerCompanyTelephone('user-1', '01 23 45 67 89'),
+    ).rejects.toThrow('Forbidden');
+    expect(dbSpies()._findFirstMock).not.toHaveBeenCalled();
+    expect(dbSpies()._setMock).not.toHaveBeenCalled();
+    expect(writeAuditLogMock).not.toHaveBeenCalled();
+  });
+
+  // ── Rejections ────────────────────────────────────────────────────────────
+  it('rejects a malformed telephone without writing', async () => {
+    dbSpies()._setMock.mockClear();
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: null, role: 'partner' });
+    await expect(
+      adminUpdatePartnerCompanyTelephone('user-1', 'not-a-phone'),
+    ).rejects.toThrow('error.field.phone.invalid');
+    expect(dbSpies()._setMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects an unknown userId with a bounded error key', async () => {
+    dbSpies()._findFirstMock.mockResolvedValue(undefined);
+    await expect(
+      adminUpdatePartnerCompanyTelephone('ghost', '01 23 45 67 89'),
+    ).rejects.toThrow('admin.partners.error.phone_change');
+  });
+
+  it('refuses to write an admin row — this action is partner-side only', async () => {
+    dbSpies()._setMock.mockClear();
+    dbSpies()._findFirstMock.mockResolvedValue({ companyTelephone: null, role: 'admin' });
+    await expect(
+      adminUpdatePartnerCompanyTelephone('admin-user', '01 23 45 67 89'),
+    ).rejects.toThrow('admin.partners.error.phone_change');
+    expect(dbSpies()._setMock).not.toHaveBeenCalled();
+  });
+
+  it('never leaks a raw DB error to the caller', async () => {
+    dbSpies()._findFirstMock.mockRejectedValue(new Error('connection to 10.0.0.5 refused'));
+    await expect(
+      adminUpdatePartnerCompanyTelephone('user-1', '01 23 45 67 89'),
+    ).rejects.toThrow('admin.partners.error.phone_change');
   });
 });

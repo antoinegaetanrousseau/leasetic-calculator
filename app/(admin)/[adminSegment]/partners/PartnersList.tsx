@@ -198,6 +198,7 @@ export function PartnersList({
                   partnerEmail={row.email}
                   partnerDisplayName={row.name}
                   partnerType={row.partnerType}
+                  companyTelephone={row.companyTelephone}
                 />
               </TableCell>
             </TableRow>

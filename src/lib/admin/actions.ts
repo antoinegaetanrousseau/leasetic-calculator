@@ -38,6 +38,7 @@ import { eq } from 'drizzle-orm';
 import { getCurrentLang } from '@/lib/i18n';
 import {
   createPartnerFormSchema,
+  partnerCompanyTelephoneSchema,
   type CreatePartnerFormValues,
 } from './schemas';
 
@@ -255,6 +256,98 @@ export async function adminUpdatePartnerType(
       throw e;
     }
     throw new Error('admin.partners.error.type_change');
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  adminUpdatePartnerCompanyTelephone (FIELD-02 follow-up)                    */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Set or clear an EXISTING partner's company telephone
+ * (`users.company_telephone`).
+ *
+ * WHY THIS EXISTS: Phase 42 added the column with a write path only inside
+ * `adminCreateInvitation` (see `args.phone` below). Any partner invited before
+ * the column existed — or invited with the phone box left blank — therefore
+ * rendered an em dash for the "Téléphone" row of every PDF proposal forever,
+ * with no remedy available to the admin OR the partner (their own
+ * `/parametres` shows this column read-only; their editable field is
+ * `telephone`, a different column the PDF deliberately never renders).
+ * `src/db/schema.ts` already documented a "create/edit partner form"; this is
+ * the missing edit half.
+ *
+ * SCOPE: this touches `companyTelephone` ONLY. It must never write
+ * `telephone` — that is the partner's own line and the single field PROF-02's
+ * finalization gate reads (D-17). The two are easy to confuse because
+ * `adminCreateInvitation` maps its legacy `args.phone` to `companyTelephone`
+ * and `args.telephone` to `telephone`.
+ *
+ * `rawPhone` empty (or whitespace-only) is a deliberate CLEAR → NULL.
+ *
+ * ADMIN-09: a telephone is contact data, not a commission/rate value, so the
+ * before/after audit payload carries the specific values exactly as
+ * `adminUpdatePartnerType` records type strings.
+ */
+export async function adminUpdatePartnerCompanyTelephone(
+  userId: string,
+  rawPhone: string | null,
+): Promise<void> {
+  // T-22-03-E: admin gate FIRST — PITFALLS §7.3 privilege-escalation mitigation.
+  const { session } = await requireAdmin();
+  try {
+    // Trim before validating so " " is treated as a clear, not as invalid input.
+    const trimmed = (rawPhone ?? '').trim();
+    const parsed = partnerCompanyTelephoneSchema.safeParse(trimmed);
+    if (!parsed.success) {
+      throw new Error('error.field.phone.invalid');
+    }
+    // Empty string is the clear signal; the column is nullable by design.
+    const nextPhone: string | null = parsed.data === '' ? null : parsed.data;
+
+    // Read the before-value for the audit trail and to prove the row exists.
+    const userRow = await db().query.users.findFirst({
+      where: eq(schema.users.id, userId),
+      columns: { companyTelephone: true, role: true },
+    });
+    if (!userRow) {
+      throw new Error('admin.partners.error.phone_change');
+    }
+    // ROLE-03-adjacent guard: this action is for partner-side accounts. An
+    // admin row has no company line to render on a proposal, and allowing it
+    // here would widen the action's blast radius for no product reason.
+    if (userRow.role === 'admin') {
+      throw new Error('admin.partners.error.phone_change');
+    }
+    const previousPhone = userRow.companyTelephone ?? null;
+
+    // No-op guard, mirroring adminUpdatePartnerType's D-02 behaviour: skip
+    // both the write and the audit row when nothing actually changes.
+    if (previousPhone === nextPhone) return;
+
+    await db()
+      .update(schema.users)
+      .set({ companyTelephone: nextPhone })
+      .where(eq(schema.users.id, userId));
+
+    await writeAuditLog({
+      actorId: session.user.id,
+      action: 'user.company_telephone_change',
+      targetType: 'user',
+      targetId: null,
+      payload: { userId, before: previousPhone, after: nextPhone },
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[adminUpdatePartnerCompanyTelephone] failed:', msg);
+    // Re-throw already-structured error keys without double-wrapping.
+    if (
+      e instanceof Error &&
+      (e.message.startsWith('admin.') || e.message.startsWith('error.'))
+    ) {
+      throw e;
+    }
+    throw new Error('admin.partners.error.phone_change');
   }
 }
 

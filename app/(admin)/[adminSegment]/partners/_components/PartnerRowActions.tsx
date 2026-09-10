@@ -29,14 +29,16 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { BanIcon, CheckCircleIcon, ExternalLinkIcon, LoaderIcon, MoreVerticalIcon, RefreshIcon, SendIcon } from '@/components/ui/icons';
+import { BanIcon, CheckCircleIcon, ExternalLinkIcon, LoaderIcon, MoreVerticalIcon, PhoneIcon, RefreshIcon, SendIcon } from '@/components/ui/icons';
 import { toast } from 'sonner';
 import { t, type Lang } from '@/lib/i18n/dictionaries';
+import { PARTNER_PHONE_REGEX } from '@/lib/admin/schemas';
 import {
   adminDisableUser,
   adminReEnableUser,
   adminReissueInvitation,
   adminUpdatePartnerType,
+  adminUpdatePartnerCompanyTelephone,
 } from '@/lib/admin';
 import type { PartnerStatus } from '@/lib/db/queries/partners';
 
@@ -60,6 +62,13 @@ export interface PartnerRowActionsProps {
    * target options in the overflow menu. Optional for backward-compat.
    */
   partnerType?: 'Agent' | 'Commercial' | 'Partenaire';
+  /**
+   * FIELD-02 follow-up: the partner COMPANY's current telephone, used to
+   * prefill the edit prompt. Null/undefined renders an empty prompt, which is
+   * the common case — this control exists precisely because partners created
+   * before Phase 42 have none. NOT the partner's own `telephone`.
+   */
+  companyTelephone?: string | null;
 }
 
 const MENU_ITEM_STYLE = {
@@ -84,6 +93,7 @@ export function PartnerRowActions({
   partnerEmail,
   partnerDisplayName,
   partnerType,
+  companyTelephone,
 }: PartnerRowActionsProps) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -174,6 +184,52 @@ export function PartnerRowActions({
       refreshAfterAction();
     } catch {
       toast.error(t('admin.accounts.toast.reissue.error', lang));
+    } finally {
+      setBusy(false);
+      setOpen(false);
+    }
+  };
+
+  // FIELD-02 follow-up: company-telephone edit handler.
+  //
+  // window.prompt (not a modal) is the deliberate choice: it matches the
+  // window.confirm baseline this component already uses for the type change
+  // (UI-SPEC §443), needs no new dialog wiring, and prefills the current
+  // value so the admin can see whether they are setting or changing it.
+  // Submitting an empty string is a CLEAR — the action maps it to NULL.
+  // Cancel (null) aborts without a write.
+  //
+  // Client-side validation is a convenience only; adminUpdatePartnerCompanyTelephone
+  // re-validates server-side with the same shared schema, which is the real gate.
+  const onEditPhone = async () => {
+    const next = window.prompt(
+      t('admin.partners.phone.change.prompt', lang),
+      companyTelephone ?? '',
+    );
+    if (next === null) {
+      setOpen(false);
+      return;
+    }
+    const trimmed = next.trim();
+    if (trimmed !== '' && !PARTNER_PHONE_REGEX.test(trimmed)) {
+      toast.error(t('error.field.phone.invalid', lang));
+      setOpen(false);
+      return;
+    }
+    setBusy(true);
+    try {
+      await adminUpdatePartnerCompanyTelephone(partnerId, trimmed);
+      toast.success(
+        t(
+          trimmed === ''
+            ? 'admin.partners.phone.change.cleared'
+            : 'admin.partners.phone.change.success',
+          lang,
+        ),
+      );
+      refreshAfterAction();
+    } catch {
+      toast.error(t('admin.partners.error.phone_change', lang));
     } finally {
       setBusy(false);
       setOpen(false);
@@ -285,6 +341,18 @@ export function PartnerRowActions({
               {t('admin.partners.action.enableAccount', lang)}
             </button>
           )}
+          {/* FIELD-02 follow-up: always shown — the company phone is editable
+              regardless of account status, and a disabled account's stored
+              proposals still reference it. */}
+          <button
+            type="button"
+            role="menuitem"
+            onClick={onEditPhone}
+            style={MENU_ITEM_STYLE}
+          >
+            <PhoneIcon size={14} aria-hidden="true" style={{ color: 'var(--muted)' }} />
+            {t('admin.partners.action.editPhone', lang)}
+          </button>
           {/* PTYPE-03 / D-08: type-change options — show all types except the current one.
               D-04: plain labels (Agent/Commercial/Partenaire) per the enum. */}
           {(['Agent', 'Commercial', 'Partenaire'] as const)

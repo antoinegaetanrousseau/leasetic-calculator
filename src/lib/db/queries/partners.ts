@@ -68,6 +68,14 @@ export interface PartnerRow {
    * value — ADMIN-09 unaffected.
    */
   isInternal: boolean;
+  /**
+   * FIELD-02 follow-up — the partner COMPANY's telephone, projected so the
+   * row-actions menu can prefill the edit control with the current value.
+   * This is the column the PDF proposal renders; `users.telephone` (the
+   * partner's own line) is deliberately NOT projected here.
+   * Null when never set — which is the whole reason the edit path exists.
+   */
+  companyTelephone: string | null;
 }
 
 export interface ListPartnersArgs {
@@ -189,6 +197,9 @@ export async function listPartnersWithLastActivity(
       // ROLE-03 / T-30-03-04: project role to derive isInternal — an access
       // classification, NOT a rate/commission field (ADMIN-09 unaffected).
       role: schema.users.role,
+      // FIELD-02 follow-up: project the company telephone so the edit control
+      // can prefill. Contact data, NOT a rate/commission field.
+      companyTelephone: schema.users.companyTelephone,
       lastActivityAt:
         sql<Date | null>`MAX(${schema.proposals.createdAt})`.as('last_activity_at'),
     })
@@ -211,6 +222,11 @@ export async function listPartnersWithLastActivity(
       schema.users.createdAt,
       schema.users.partnerType,
       schema.users.role,
+      // FIELD-02 follow-up: every projected non-aggregate column must appear
+      // here — the MAX(proposals.created_at) aggregate above makes this a
+      // grouped query, and omitting the new column would fail at runtime
+      // (Postgres 42803) while tsc stayed green.
+      schema.users.companyTelephone,
     )
     .orderBy(desc(schema.users.createdAt), desc(schema.users.id))
     .limit(fetchCount);
@@ -246,6 +262,9 @@ export async function listPartnersWithLastActivity(
       // ROLE-03: internal (Commercial-turned-sales) accounts flagged for the
       // admin listing UI — derived from the same `role` predicate above.
       isInternal: r.role === 'sales',
+      // FIELD-02 follow-up: normalise '' to null so the edit control treats a
+      // blank column and an empty string identically (both = "never set").
+      companyTelephone: r.companyTelephone?.trim() ? r.companyTelephone : null,
     };
   });
 

@@ -175,6 +175,10 @@ function makePartnerRow(overrides: Partial<PartnerRow> = {}): PartnerRow {
     partnerType: 'Partenaire',
     // Phase 30 Plan 03: isInternal added to PartnerRow (ROLE-03).
     isInternal: false,
+    // Phase 42 follow-up: companyTelephone added to PartnerRow (FIELD-02) so
+    // the row-actions edit control can prefill. null = the common case this
+    // control exists for (partner created before the column existed).
+    companyTelephone: null,
     ...overrides,
   };
 }

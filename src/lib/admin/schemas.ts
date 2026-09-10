@@ -48,6 +48,28 @@ export type CoeffEditorValues = z.infer<typeof coeffEditorSchema>;
 /**
  * Create-partner modal form schema (D-09-12).
  */
+/**
+ * Shared permissive telephone shape for both partner phone columns
+ * (FIELD-02 `company_telephone` and PROF-01 `telephone`): 6-20 characters
+ * drawn from digits, spaces, `+`, `(`, `)` and `-`. Extracted in the Phase 42
+ * follow-up that added the admin edit path so the create form and the edit
+ * action cannot drift apart — previously the same literal appeared twice.
+ */
+export const PARTNER_PHONE_REGEX = /^[\d\s+()-]{6,20}$/;
+
+/**
+ * FIELD-02 follow-up — admin edit of an EXISTING partner's company telephone.
+ *
+ * An empty string is a deliberate CLEAR (the action maps it to NULL), not a
+ * validation failure: `users.company_telephone` is nullable by design and an
+ * admin must be able to remove a wrong number, not only overwrite it. Callers
+ * trim before parsing, so no `.trim()` transform is attached here.
+ */
+export const partnerCompanyTelephoneSchema = z
+  .string()
+  .regex(PARTNER_PHONE_REGEX, 'error.field.phone.invalid')
+  .or(z.literal(''));
+
 export const createPartnerSchema = z.object({
   email: z.string().email({ message: 'admin.accounts.modal.error.email.invalid' }),
   displayName: z.string().min(1, { message: 'admin.accounts.modal.error.name.required' }),
@@ -102,7 +124,7 @@ export const createPartnerFormSchema = z.object({
   // does not change, only optionality).
   phone: z
     .string()
-    .regex(/^[\d\s+()-]{6,20}$/, 'error.field.phone.invalid')
+    .regex(PARTNER_PHONE_REGEX, 'error.field.phone.invalid')
     .optional()
     .or(z.literal('')),
   // PROF-01 / D-19: the partner's OWN telephone — maps to users.telephone,
@@ -111,7 +133,7 @@ export const createPartnerFormSchema = z.object({
   // partner creation.
   telephone: z
     .string()
-    .regex(/^[\d\s+()-]{6,20}$/, 'error.field.phone.invalid')
+    .regex(PARTNER_PHONE_REGEX, 'error.field.phone.invalid')
     .optional()
     .or(z.literal('')),
   invitationMessage: z.string().max(1000, 'partners.new.message.tooLong').optional(),
